@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2297
+  sources: 2303
   by_stage:
     located: 209
     inbox: 1262
-    in_progress: 237
+    in_progress: 243
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -4054,6 +4054,16 @@ sources:
     reason: v2.1 store present; 110/628 rows battery-usable
   usable_rows: 110
   total_rows: 628
+  inbox_exclusion_reason: null
+- source_id: beyer-brown-ferrante-1980-kalo2-thermodynamics
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: bhatnagar-1993-high-concentration-minority-ion-cyclotron
   stage: inbox
@@ -8981,6 +8991,16 @@ sources:
   usable_rows: 3
   total_rows: 3
   inbox_exclusion_reason: null
+- source_id: gronvold-sveen-1974-magnetite-high-temperature-cp
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: grote-nd-transient-beam
   stage: inbox
   evidence:
@@ -11156,6 +11176,16 @@ sources:
     decided_by: in_progress
     artefacts:
     - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -22290,6 +22320,16 @@ sources:
   usable_rows: 0
   total_rows: 17
   inbox_exclusion_reason: null
+- source_id: mcgill-na-fe-o-critical-assessment
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/mcgill-na-fe-o-critical-assessment.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: mcintosh-2022-ucsd-lunar-magmatism-thesis
   stage: inbox
   evidence:
@@ -30620,6 +30660,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: shannon-1976-effective-ionic-radii
   stage: inbox
   evidence:
@@ -37159,6 +37209,16 @@ sources:
     decided_by: in_progress
     artefacts:
     - data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0

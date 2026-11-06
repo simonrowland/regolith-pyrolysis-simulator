@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 760
-  extracts: 758
+  sources: 766
+  extracts: 764
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 758
-  alias_groups_needing_resolution: 80
+  extracts_without_pdf: 764
+  alias_groups_needing_resolution: 82
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -72,6 +72,7 @@ gaps:
   - berry-2018-morb-iron-redox
   - berry-oneill-2004-chromium-xanes
   - beyer-1980-potassium-metasilicate-disilicate-ri8410
+  - beyer-brown-ferrante-1980-kalo2-thermodynamics
   - bissbort-2026-depolymerized-silicate-glass-transition-viscosity
   - bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
   - bonnell-hastie-1990-htsci-26-313
@@ -181,6 +182,7 @@ gaps:
   - green-1971-apollo12-basalt-petrology
   - greig-1927-ajs-immiscibility-silicate-melts-part1
   - gribchenkova-2017-al2o3-mgo
+  - gronvold-sveen-1974-magnetite-high-temperature-cp
   - guo-2021-mgo-activity-cmas-slag
   - habermann-daane-1964
   - hamuyuni-2016-copper-oxide-solubility-thesis-summary
@@ -198,6 +200,7 @@ gaps:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated
   - holzheid-lodders-2001-copper-solubility
   - huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
   - iapws-95-psat-liquid
   - inada-2026-forsterite-h2-h2o
   - inoue-1991-n-s-partition-cao-al2o3
@@ -407,6 +410,7 @@ gaps:
   - matzen-2017-ni-olivine-composition
   - matzen-2022-martian-basalt-redox
   - mccready-1948-sodium-silicate
+  - mcgill-na-fe-o-critical-assessment
   - mendybaev-2013-fun-cai-evaporation
   - mendybaev-2017-fun-cai-lab-evaporation
   - mendybaev-2018-cmas-evaporation
@@ -560,6 +564,7 @@ gaps:
   - sesko-2022-tum-thesis
   - seto-2010-na2o-activity-glass-emf-summary
   - sf04-magma-companion-workbook
+  - shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
   - shaw-2023-vacuum-thermal-sublimation-thesis
   - shi-2024-cr-activity-slag-polymerisation
   - shilov-1998-sno-zno-p2o5-vaporization
@@ -762,6 +767,7 @@ gaps:
   - yakovleva-2022-alkali-chondrule-evaporation
   - yam1983
   - yamaguchi-1984-na2o-activity-sodium-beta-alumina
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
   - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
   - yang-teng-seetharaman-2012-vanadium-evaporation
@@ -1098,6 +1104,12 @@ gaps:
     - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
     resolution: owner/controller
   - type: source_id_alias
+    key: beyer-1980
+    source_ids:
+    - beyer-1980-potassium-metasilicate-disilicate-ri8410
+    - beyer-brown-ferrante-1980-kalo2-thermodynamics
+    resolution: owner/controller
+  - type: source_id_alias
     key: bischof-2023
     source_ids:
     - kems-137-bischof-2023
@@ -1165,6 +1177,12 @@ gaps:
     source_ids:
     - lpi-lunar-sourcebook-chapter08
     - usgs-lunar-sourcebook-tab8-2
+    resolution: owner/controller
+  - type: source_id_alias
+    key: huang-2003
+    source_ids:
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
     resolution: owner/controller
   - type: source_id_alias
     key: ichise-1989
@@ -4521,6 +4539,64 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: beyer-brown-ferrante-1980-kalo2-thermodynamics
+  aliases: []
+  citation: Beyer, R. P.; Ferrante, M. J.; Brown, R. R. (1980). Thermodynamic properties of KAlO2. Journal
+    of Chemical Thermodynamics 12(10), 985–991. DOI 10.1016/0021-9614(80)90139-1.
+  doi: 10.1016/0021-9614(80)90139-1
+  report_number: null
+  identifier: 10.1016/0021-9614(80)90139-1
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/beyer-brown-ferrante-1980-kalo2-thermodynamics/beyer-brown-ferrante-1980-kalo2-thermodynamics.pdf
+      present: true
+      sha256: cbb1aedf5c8e4bdd5522ea11b1abdf465ecccf4ffebf6ecd3c5076a1b416c437
+      matches_simulator: null
+    sidecar:
+      path: raw/beyer-brown-ferrante-1980-kalo2-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/beyer-brown-ferrante-1980-kalo2-thermodynamics
+      exists: true
+      file_count: 12
+    tables:
+      path: tables/beyer-brown-ferrante-1980-kalo2-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: bissbort-2026-depolymerized-silicate-glass-transition-viscosity
   aliases: []
   citation: Bissbort, T., Hess, K.-U., Sturm, E., Sturm, S., Rogalla, D., Dohmen, R., Müller-Caspary,
@@ -10900,6 +10976,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: gronvold-sveen-1974-magnetite-high-temperature-cp
+  aliases: []
+  citation: Grønvold, F. and Sveen, A. (1974), “Heat capacity and thermodynamic properties of synthetic
+    magnetite (Fe3O4) from 300 to 1050 K”, Journal of Chemical Thermodynamics 6, 859–872.
+  doi: 10.1016/0021-9614(74)90230-4
+  report_number: null
+  identifier: 10.1016/0021-9614(74)90230-4
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml
+    review_status: draft
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gronvold-sveen-1974-magnetite-high-temperature-cp/gronvold-sveen-1974-magnetite-high-temperature-cp.pdf
+      present: true
+      sha256: f1cfef87d29438ddd53be0fefcd0adf6c1bfc1dfaf707c7a17aff6a9459abd64
+      matches_simulator: null
+    sidecar:
+      path: raw/gronvold-sveen-1974-magnetite-high-temperature-cp/sidecar.yaml
+      present: true
+    text:
+      path: text/gronvold-sveen-1974-magnetite-high-temperature-cp
+      exists: true
+      file_count: 23
+    tables:
+      path: tables/gronvold-sveen-1974-magnetite-high-temperature-cp
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: guo-2021-mgo-activity-cmas-slag
   aliases: []
   citation: Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2021), "Activity of MgO in
@@ -11894,6 +12028,64 @@ sources:
       last_stage: null
       date: null
     commit: 8935c18298cc693945d95bf99f3f896beb867c50
+- source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  aliases: []
+  citation: Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part
+    II. Ternary phase diagram of the Na–Fe–O system", Thermochimica Acta 405, 67–72.
+  doi: 10.1016/S0040-6031(03)00137-0
+  report_number: null
+  identifier: 10.1016/S0040-6031(03)00137-0
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
+    review_status: draft
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.pdf
+      present: true
+      sha256: 9f685ff2f67b8454eb33e14fc8c697921b2c607deb823133781b2462d464b847
+      matches_simulator: null
+    sidecar:
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram/sidecar.yaml
+      present: true
+    text:
+      path: text/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      exists: true
+      file_count: 15
+    tables:
+      path: tables/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: iapws-95-psat-liquid
   aliases: []
   citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
@@ -24029,6 +24221,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: mcgill-na-fe-o-critical-assessment
+  aliases: []
+  citation: Moosavi-Khoonsari, E. and Jung, I.-H. (2016), Critical evaluation and optimization of thermodynamic
+    properties and phase diagrams of the Na2O-FeO-Fe2O3 system, Metallurgical and Materials Transactions
+    B, 47, 576-594.
+  doi: 10.1007/s11663-015-0517-5
+  report_number: null
+  identifier: 10.1007/s11663-015-0517-5
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mcgill-na-fe-o-critical-assessment.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mcgill-na-fe-o-critical-assessment/mcgill-na-fe-o-critical-assessment.pdf
+      present: true
+      sha256: d6f81b2d723e2dbf1bf6bb5a7403392ee6d72bf43db23635f0bd6ca2f9299784
+      matches_simulator: null
+    sidecar:
+      path: raw/mcgill-na-fe-o-critical-assessment/sidecar.yaml
+      present: true
+    text:
+      path: text/mcgill-na-fe-o-critical-assessment
+      exists: true
+      file_count: 55
+    tables:
+      path: tables/mcgill-na-fe-o-critical-assessment
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mcgill-na-fe-o-critical-assessment.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mcgill-na-fe-o-critical-assessment.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: mendybaev-2013-fun-cai-evaporation
   aliases: []
   citation: 'Mendybaev, R. A. et al. (2013). Experimental evaporation of Mg- and Si-rich melts: Implications
@@ -33043,6 +33294,64 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  aliases: []
+  citation: Shaiu, B. (1976). Thermodynamic properties of compounds of Na2O with the oxides of chromium,
+    nickel and iron. M.S. thesis, Iowa State University. doi:10.2172/7145613.
+  doi: 10.2172/7145613
+  report_number: null
+  identifier: 10.2172/7145613
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml
+    review_status: draft
+    rows: 9
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.pdf
+      present: true
+      sha256: eb912bbd8eb0be509362aa320cfa034e7119ddb703fdaaee6622135808028b50
+      matches_simulator: null
+    sidecar:
+      path: raw/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      exists: true
+      file_count: 154
+    tables:
+      path: tables/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: shaw-2023-vacuum-thermal-sublimation-thesis
   aliases: []
   citation: Shaw, Matthew (2023), "Vacuum Thermal Sublimation for Metal Production from Lunar Regolith",
@@ -44914,6 +45223,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  aliases: []
+  citation: Yamaguchi, S., Kaneko, Y. and Iguchi, Y. (1987). Activity Measurements of Na2O in Na2O-Fe2O3
+    System by EMF Method Using Sodium Beta Alumina as a Solid Electrolyte. Transactions of the Japan Institute
+    of Metals, 28(12), 986–993.
+  doi: 10.2320/matertrans1960.28.986
+  report_number: null
+  identifier: 10.2320/matertrans1960.28.986
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.pdf
+      present: true
+      sha256: c016f6239437b67d054f258036525abf7c15f9c8901fcd230b07f7501f805262
+      matches_simulator: null
+    sidecar:
+      path: raw/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      exists: true
+      file_count: 39
+    tables:
+      path: tables/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: yan-2009-cr-ti-nb-v-slag-thermodynamics-review
   aliases: []
   citation: Yan, Baijun, Jiayun Zhang, and Qing Song (2009). Thermodynamic Behavior of Transition Metal
