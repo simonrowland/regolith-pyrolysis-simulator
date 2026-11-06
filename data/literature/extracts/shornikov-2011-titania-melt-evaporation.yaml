@@ -39,11 +39,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -54,6 +55,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-416.099"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -92,11 +96,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -107,6 +112,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-404.461"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -139,11 +147,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -154,6 +163,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-76.385"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -1123,32 +1135,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "CaO"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 5 as calculated\
           \ in the present study (CaSiO3-CaTiO3). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -1166,32 +1158,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "CaO"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 5 as calculated\
           \ in the present study (CaTiO3-SiO2). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -1219,34 +1191,12 @@
             "pdf_page_index": 2
             "figure": "2"
             "note": "Figure 2 caption: at the temperature 2300 K."
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "CaO"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 4 as calculated\
           \ in the present study (neutral). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -1264,34 +1214,12 @@
       "T_K": "2300"
       "point_conditions":
         "temperature_K": *id003
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "CaO"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 4 as calculated\
           \ in the present study (reducing). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -1919,11 +1847,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -1934,6 +1863,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-25.442"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -1968,11 +1900,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -1983,6 +1916,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1071.809"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2015,11 +1951,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2030,6 +1967,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1055.171"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -2064,11 +2004,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2079,6 +2020,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-2563.232"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2119,11 +2063,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2134,6 +2079,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "118.320"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -2168,11 +2116,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2183,6 +2132,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-3660.494"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2223,11 +2175,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2238,6 +2191,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "0.000"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -2305,11 +2261,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2320,6 +2277,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1665.569"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2358,11 +2318,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2373,6 +2334,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1697.195"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -2739,11 +2703,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2754,6 +2719,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "276.725"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -2788,11 +2756,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2803,6 +2772,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1043.621"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2841,11 +2813,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2856,6 +2829,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1050.971"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -2890,11 +2866,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2905,6 +2882,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "185.495"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -2939,11 +2919,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -2954,6 +2935,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1511.832"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -2992,11 +2976,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3007,6 +2992,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1503.841"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -3041,11 +3029,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3056,6 +3045,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-128.510"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -3090,11 +3082,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3105,6 +3098,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-1921.320"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -3145,11 +3141,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3160,6 +3157,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-336.523"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -3192,11 +3192,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3207,6 +3208,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-574.148"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -3245,11 +3249,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -3260,6 +3265,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-569.996"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -4517,32 +4525,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "TiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 6 as calculated\
           \ in the present study (CaSiO3-CaTiO3). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -4560,32 +4548,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "TiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 6 as calculated\
           \ in the present study (CaTiO3-SiO2). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -4603,34 +4571,12 @@
       "T_K": "2300"
       "point_conditions":
         "temperature_K": *id003
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "TiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 5 as calculated\
           \ in the present study (neutral). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -4648,34 +4594,12 @@
       "T_K": "2300"
       "point_conditions":
         "temperature_K": *id003
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "TiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 5 as calculated\
           \ in the present study (reducing). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -5307,11 +5231,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5322,6 +5247,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-2540.999"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -5362,11 +5290,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5377,6 +5306,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "161.631"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -5411,11 +5343,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5426,6 +5359,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-257.183"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -5460,11 +5396,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5475,6 +5412,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-540.626"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "cr"
@@ -5513,11 +5453,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5528,6 +5469,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-541.222"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "l"
@@ -5560,11 +5504,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -5575,6 +5520,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-313.278"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -6608,32 +6556,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "SiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 7 as calculated\
           \ in the present study (CaSiO3-CaTiO3). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -6651,32 +6579,12 @@
       "T_K": "2050"
       "point_conditions":
         "temperature_K": *id002
-      "derivation":
-        "relation": "Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
-          "locator":
-            "page": 1
-            "pdf_page_index": 0
-            "section": "Thermodynamic model"
-        "references":
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "SiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 7 as calculated\
           \ in the present study (CaTiO3-SiO2). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -6694,34 +6602,12 @@
       "T_K": "2300"
       "point_conditions":
         "temperature_K": *id003
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "SiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 6 as calculated\
           \ in the present study (neutral). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -6739,34 +6625,12 @@
       "T_K": "2300"
       "point_conditions":
         "temperature_K": *id003
-      "derivation":
-        "relation": "Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and the previously described evaporation method."
-        "raw_inputs":
-          "state": {"tag": "value", "value": "not_printed"}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "paragraph": "thermodynamic model and source inputs"
-            "note": "The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation method to Shornikov (2009); numeric inputs are not reproduced in this extract."
-        "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described by Shornikov (2009); simple-oxide evaporation model."}
-          "locator":
-            "page": 2
-            "pdf_page_index": 1
-            "section": "Evaporation calculations"
-        "references":
-        - "Shornikov (2009)"
-        - "Archakov et al. (2000)"
-        - "Xirouchakis et al. (1997)"
-        - "DeСapitani and Kirschen (1998)"
-        - "Shornikov et al. (2000)"
-        - "Shornikov and Archakov (2003)"
-        - "Glushko et al. (1978–1982)"
       "values":
         "quantity": "activity"
-        "method_class": "model_derived"
+        "method_class": "figure_only"
+        "method_class_as_printed": "model_derived"
         "formula": "SiO2"
-        "status": "typed_refusal"
+        "admission_status": "figure_only"
         "reason": "Calculated curve without data markers. The caption identifies line 6 as calculated\
           \ in the present study (reducing). No numeric points were read."
         "unavailable_reason": "model_curve_not_sampled"
@@ -7282,11 +7146,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -7297,6 +7162,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "189.307"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -7337,11 +7205,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -7352,6 +7221,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "-552.779"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
@@ -7392,11 +7264,12 @@
             "paragraph": "thermodynamic model and source inputs"
             "note": "The paper states that model parameters use experimental thermodynamic values from the cited works and reference values from Glushko et al.; the numeric input rows are not reproduced in this extract."
         "method":
-          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters; total Gibbs-energy minimization."}
+          "state": {"tag": "value", "value": "Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters."}
           "locator":
             "page": 1
             "pdf_page_index": 0
             "section": "Thermodynamic model"
+            "paragraph": "It accounts for the intermolecular interactions using the semi-phenomenological energy parameters"
         "references":
         - "Xirouchakis et al. (1997)"
         - "DeСapitani and Kirschen (1998)"
@@ -7407,6 +7280,9 @@
         "quantity": "delta_fG"
         "method_class": "model_derived"
         "T_K": "2050"
+        "standard_pressure": "not_printed"
+        "formation_basis_as_published": "from elements"
+        "standard_state": "Table 1 caption states Gibbs energy of formation from elements; column header marks ΔfG° at 2050 K."
         "value": "261.005"
         "attribution": "Authors' calculated Gibbs energies from elements; the paper states that model energy parameters use experimental thermodynamic values from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), plus reference values from Glushko et al. (1978–1982)."
       "phase": "g"
