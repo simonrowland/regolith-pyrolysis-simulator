@@ -23,6 +23,7 @@ from simulator.fe_redox import (
     kress91_ln_fO2_temperature_delta,
     kress91_referenced_log_fO2,
     kress91_split,
+    kress91_dropped_components,
     kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
 )
@@ -40,6 +41,11 @@ KRESS91_MOL_FRACTIONS = {
     'P2O5': 0.001,
     'FeOt': 0.184,
 }
+
+
+@pytest.mark.parametrize("alias", ("FeO_T", "FeOT", "FeOt", "FeO*"))
+def test_kress91_does_not_report_total_iron_alias_as_dropped(alias: str) -> None:
+    assert kress91_dropped_components({alias: 10.0}) == ((), None)
 
 
 def _no_iron_redox_diagnostic_sim() -> SimpleNamespace:

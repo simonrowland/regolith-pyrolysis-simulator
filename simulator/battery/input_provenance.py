@@ -26,6 +26,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Composition, Experiment, Locator, Notice, Observation
+from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
 SCORED_PHASE_ANALYSIS = "scored_phase_analysis"
 PRINTED_STARTING_BULK = "printed_starting_bulk"
@@ -55,7 +56,6 @@ _SATURATION_QUANTITIES = frozenset(
     {Quantity.SULFIDE_CAPACITY, Quantity.CHLORIDE_CAPACITY}
 )
 _MELT_ROLES = frozenset({PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS})
-_TOTAL_IRON_KEYS = frozenset({"FeOT", "FeO_T", "FeOt", "FeO*"})
 _PRINTED_BULK_TOKENS = frozenset({PRINTED_STARTING_BULK, NAMED_MATERIAL_MIXTURE})
 
 # d-325. 100% liquid is this mass fraction of the bulk, from the engine
@@ -304,7 +304,7 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
         return None
     if quantity in _REDOX_QUANTITIES:
         split = "FeO" in names and "Fe2O3" in names
-        total_iron = bool(names & _TOTAL_IRON_KEYS) and not split
+        total_iron = bool(names.intersection(_TOTAL_IRON_AS_FEO_KEYS)) and not split
         if total_iron:
             return None
         return refused("input_composition_is_scored_phase_analysis")
@@ -626,14 +626,14 @@ def analysed_melt_weight_map(
         if fe2o3 is not None:
             excluded.append("Fe2O3")
         carried: Decimal | None = None
-        for key in ("FeO_T", "FeOT", "FeOt", "FeO*"):
+        for key in _TOTAL_IRON_AS_FEO_KEYS:
             if key not in out:
                 continue
             carried = Decimal(str(out.pop(key)))
             excluded.append(key)
             break
         for key in list(out):
-            if key in _TOTAL_IRON_KEYS:
+            if key in _TOTAL_IRON_AS_FEO_KEYS:
                 excluded.append(key)
                 del out[key]
         if feo is not None or fe2o3 is not None:

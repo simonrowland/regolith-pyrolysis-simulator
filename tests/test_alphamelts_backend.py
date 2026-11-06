@@ -6122,6 +6122,40 @@ def test_normalize_composition_splits_feo_total_with_explicit_ratio():
     assert comp['FeO'] > comp['Fe2O3'] > 0.0
 
 
+@pytest.mark.parametrize("alias", ("FeO_T", "FeOT", "FeOt", "FeO*"))
+def test_normalize_total_iron_aliases_split_with_explicit_ratio(alias):
+    backend = AlphaMELTSBackend()
+    backend._fe3fet_ratio = 0.2
+
+    normalized = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        alias: 10.0,
+    })
+    canonical = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        "FeO_total": 10.0,
+    })
+
+    assert normalized == pytest.approx(canonical)
+    assert normalized["Fe2O3"] > 0.0
+    assert backend._last_normalization_warnings == []
+
+
+def test_total_iron_alias_consumers_share_feedstock_owner_tuple():
+    from simulator import feedstock_composition, fe_redox
+    from simulator.battery import input_provenance
+    from simulator.melt_backend import alphamelts
+
+    owner = feedstock_composition._TOTAL_IRON_AS_FEO_KEYS
+    assert input_provenance._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert fe_redox._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert alphamelts._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert all(
+        alphamelts.MELTS_OXIDE_ALIASES[alias.lower()] == "FeO_total"
+        for alias in owner
+    )
+
+
 
 def test_alphamelts_domain_gate_rejects_negative_wt_percent():
     valid, warnings = AlphaMELTSDomainGate.validate({

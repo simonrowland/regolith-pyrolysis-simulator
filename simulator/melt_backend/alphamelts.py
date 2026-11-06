@@ -160,9 +160,11 @@ MELTS_OXIDE_ALIASES = {
 }
 MELTS_OXIDE_ALIASES.update({
     'feo_total': 'FeO_total',
-    'feot': 'FeO_total',
     'feototal': 'FeO_total',
     'feo_tot': 'FeO_total',
+})
+MELTS_OXIDE_ALIASES.update({
+    key.lower(): 'FeO_total' for key in _TOTAL_IRON_AS_FEO_KEYS
 })
 FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}

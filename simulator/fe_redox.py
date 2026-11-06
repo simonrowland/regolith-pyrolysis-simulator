@@ -8,6 +8,7 @@ from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
+    _TOTAL_IRON_AS_FEO_KEYS,
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
@@ -898,10 +899,7 @@ def kress91_dropped_components(
         *KRESS91_MOL_FRACTION_OXIDES,
         'FeO',
         'Fe2O3',
-        'FeO_T',
-        'FeOT',
-        'FeOt',
-        'FeO*',
+        *_TOTAL_IRON_AS_FEO_KEYS,
     }
     values = {name: float(amount) for name, amount in comp_wt.items()}
     dropped = tuple(
