@@ -2119,6 +2119,11 @@ def test_pre_rg_missing_activity_declaration_fails_closed_for_claimed_channel() 
 
 
 def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None:
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    )
+
     declaration = ActivityInputDeclaration(
         component_id="MgO",
         standard_state=_TEST_ACTIVITY_STANDARD_STATE,
