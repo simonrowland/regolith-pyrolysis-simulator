@@ -317,7 +317,8 @@ def test_d349_fe_vapor_uses_fe020_crystal_standard_below_1650k(
         pO2_bar=1.0,
     )
     pressure = converted["vapor_pressures_Pa"]["Fe"]
-    notice = converted["vapor_activity_standard_state_notices_by_species"]["Fe"]
+    route = converted["vapor_pressure_numerator_provenance"]["Fe"]
+    notice = route["activity_standard_state_conversion"]
 
     assert pressure > 0.0
     assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
@@ -407,9 +408,13 @@ def test_d349_builtin_notices_follow_mno_and_coo_declared_standards(
         assert notice["to_standard_state_id"] == (
             MELT_OXIDE_ACTIVITY_REFERENCE_STATE
         )
-        assert provenance[species]["vapor_activity_for_crystalline_K"] == pytest.approx(
+        assert provenance[species]["vapor_activity_used_for_K"] == pytest.approx(
             provenance[species]["melt_oxide_activity"]
         )
+        assert provenance[species][
+            "vapor_activity_standard_state_id_used_for_K"
+        ] == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        assert "vapor_activity_for_crystalline_K" not in provenance[species]
 
     coo_notice = provenance["CoO_gas"]["activity_standard_state_conversion"]
     assert coo_notice["reason"] == "standard_mismatch_unconverted"
@@ -419,9 +424,13 @@ def test_d349_builtin_notices_follow_mno_and_coo_declared_standards(
     assert coo_notice["to_standard_state_id"] == (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
     )
-    assert provenance["CoO_gas"]["vapor_activity_for_crystalline_K"] == pytest.approx(
+    assert provenance["CoO_gas"]["vapor_activity_used_for_K"] == pytest.approx(
         provenance["CoO_gas"]["melt_oxide_activity"]
     )
+    assert provenance["CoO_gas"][
+        "vapor_activity_standard_state_id_used_for_K"
+    ] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert "vapor_activity_for_crystalline_K" not in provenance["CoO_gas"]
 
 
 def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
@@ -763,7 +772,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             species
         ].evaluator.evaluate(
             1773.15,
-            source_activity=float(route["vapor_activity_for_crystalline_K"]),
+            source_activity=float(route["vapor_activity_used_for_K"]),
             pO2_bar=1.0,
         ).pressure_pa
         assert answer.pressure.pa == pytest.approx(
@@ -774,15 +783,22 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         assert answer.source_reaction_activity.as_pressure_activity() == pytest.approx(
             activity, rel=1e-12, abs=0
         )
-        assert route["vapor_activity_for_crystalline_K"] > 0.0
+        used_activity = float(route["vapor_activity_used_for_K"])
+        assert used_activity > 0.0
         if species in {"Mg", "Ca"}:
-            assert route["vapor_activity_for_crystalline_K"] != pytest.approx(
+            assert used_activity != pytest.approx(
+                activity,
+                rel=1e-6,
+                abs=0,
+            )
+        elif species == "Fe":
+            assert used_activity != pytest.approx(
                 activity,
                 rel=1e-6,
                 abs=0,
             )
         else:
-            assert route["vapor_activity_for_crystalline_K"] == pytest.approx(
+            assert used_activity == pytest.approx(
                 activity,
                 rel=1e-10,
                 abs=0,
@@ -801,7 +817,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         )
         assert notice["to_standard_state_id"] == (
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-            if species in {"Mg", "Ca"}
+            if species in {"Mg", "Ca", "Fe"}
             else MELT_OXIDE_ACTIVITY_REFERENCE_STATE
         )
 
