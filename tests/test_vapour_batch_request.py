@@ -1773,6 +1773,52 @@ def test_pre_rg_demotes_species_local_activity_refusals(
     assert batch.flux_active_species_ids == frozenset()
 
 
+@pytest.mark.parametrize(
+    ("local_refusal", "expected_code"),
+    (
+        ("inapplicable", REFUSAL_INAPPLICABLE_PREDICATE),
+        ("absent_atom", REFUSAL_ABSENT_SOURCE_ATOM),
+    ),
+)
+def test_pre_rg_keeps_request_local_refusals_species_scoped(
+    local_refusal: str,
+    expected_code: str,
+) -> None:
+    required_atoms = frozenset({"K"})
+    applicability = "applicable"
+    state = VapourResolveState(temperature_K=1500.0)
+    if local_refusal == "inapplicable":
+        applicability = "stage0_only"
+        state = replace(state, process_phase="hot_train", stage="evaporation")
+    else:
+        required_atoms = frozenset({"Cl"})
+
+    rule = RequestRule(
+        species_id="K",
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"TRIGGER"}),
+        required_source_atoms=required_atoms,
+        solve_group_id="k_test",
+        applicability_predicate=applicability,
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id="K",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+    )
+    batch = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"TRIGGER": 1.0}},
+        state=state,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+
+    assert batch.channel("K").refusal_code == expected_code
+    assert batch.flux_active_species_ids == frozenset()
+
+
 def test_pre_rg_missing_activity_declaration_fails_closed_without_claims() -> None:
     catalog = compile_vapour_rail_catalog(
         _minimal_family("K"), u0_manifest=_u0_stub("K")
