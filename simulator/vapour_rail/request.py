@@ -119,16 +119,45 @@ REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing
 REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
 REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 
-# These are channel-local by construction: the request predicate/source atoms
-# exclude one species, or the activity source has no mapped phase/endmember for
-# that species. Contract and evidence refusals fail on claimed channels;
-# missing outcome-determining process state fails the whole pre-RG request.
+# These are recognized species-local outcomes: a request predicate/source atom
+# excludes one species, or a typed activity data gap prevents evaluating only
+# that species. Mixed codes with malformed-evidence details are handled below;
+# missing run-level state and other contract failures stay fail-closed.
 _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_ABSENT_SOURCE_ATOM,
     ActivityRefusalCode.MISSING_EVIDENCE.value,
     ActivityRefusalCode.UNMAPPED_PHASE.value,
     ActivityRefusalCode.UNMAPPED_ENDMEMBER.value,
+    ActivityRefusalCode.TIMEOUT.value,
+    ActivityRefusalCode.EXPIRED.value,
+    ActivityRefusalCode.STANDARD_STATE_UNRESOLVED.value,
+    ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED.value,
+    ActivityRefusalCode.REDOX_MODEL_OUT_OF_DOMAIN.value,
+    ActivityRefusalCode.UNSUPPORTED_VALENCE_RESERVOIR.value,
+    ActivityRefusalCode.SULFUR_RESERVOIR_OWNER_MISSING.value,
+    ActivityRefusalCode.HALIDE_RESERVOIR_OWNER_MISSING.value,
+    ActivityRefusalCode.UNMODELED_RESERVOIR_PRESENT.value,
+    ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY.value,
+    ActivityRefusalCode.REDOX_STATE_UNRESOLVED.value,
+})
+
+# A few stable refusal codes cover both data gaps and malformed evidence. Keep
+# those malformed cases fail-closed while allowing a missing row for one
+# species to demote only that species.
+_PRE_RG_FAIL_CLOSED_ACTIVITY_REFUSALS = frozenset({
+    (
+        ActivityRefusalCode.MISSING_EVIDENCE.value,
+        "reported activity must be finite and positive",
+    ),
+    (
+        ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY.value,
+        "Tier C mole fractions do not reconcile to the ordered inventory digest",
+    ),
+    (
+        ActivityRefusalCode.REDOX_STATE_UNRESOLVED.value,
+        "Fe redox basis/model identity does not match the admitted row",
+    ),
 })
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
@@ -2823,6 +2852,14 @@ def resolve_vapour_batch(
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
         claimed = flux_activation_context.effective_pressure_species_ids
+
+        def _is_species_local_refusal(answer: VapourAnswer) -> bool:
+            code = answer.refusal_code
+            if code not in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES:
+                return False
+            detail = str(answer.extra.get("detail") or "")
+            return (code, detail) not in _PRE_RG_FAIL_CLOSED_ACTIVITY_REFUSALS
+
         fail_closed_refusals = {
             species_id: answer.refusal_code or "unknown_refusal"
             for species_id, answer in answers.items()
@@ -2836,8 +2873,7 @@ def resolve_vapour_batch(
                     ).startswith("no live channel evaluator available")
                 )
             )
-            and answer.refusal_code
-            not in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES
+            and not _is_species_local_refusal(answer)
         }
         if fail_closed_refusals:
             refusal_summary = ", ".join(
@@ -2861,8 +2897,7 @@ def resolve_vapour_batch(
                 )
                 or (
                     answers[species_id].is_refused
-                    and answers[species_id].refusal_code
-                    in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES
+                    and _is_species_local_refusal(answers[species_id])
                 )
             )
         )
