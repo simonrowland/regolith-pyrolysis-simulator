@@ -1097,6 +1097,47 @@ def test_tier_a_rejects_wrong_engine_identity_and_out_of_domain_temperature() ->
     assert out_of_domain.refusal_code is ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED
 
 
+def test_tier_a_nonfinite_temperature_is_not_a_domain_miss() -> None:
+    resolver = MeltActivityResolver()
+    base = _query("CaO", fractions={"CaO": 0.1}, temperature_K=1600.0)
+    nonfinite = MeltActivityQuery(
+        **{**base.__dict__, "temperature_K": math.nan}
+    )
+
+    answer = resolver.resolve_engine_basis(
+        nonfinite,
+        TierAEngineInput(
+            engine_component_ids=("CaO",),
+            basis_coefficients=(1.0,),
+            target_mu0_J_per_mol=0.0,
+            mixture_mu_J_per_mol=(0.0,),
+            source_standard_state=_tier_a_source_state(resolver, "CaO"),
+        ),
+    )
+
+    assert answer.refusal_code is ActivityRefusalCode.NON_FINITE_POTENTIAL
+
+
+def test_feo_domain_nan_is_a_nonfinite_input_not_a_redox_domain_miss() -> None:
+    resolver = MeltActivityResolver()
+    base = _query(
+        "FeO",
+        fractions={"FeO": 0.25, "SiO2": 0.75},
+        temperature_K=1500.0,
+    )
+    nonfinite = MeltActivityQuery(
+        **{
+            **base.__dict__,
+            "temperature_K": math.nan,
+            "intrinsic_fO2_log10": 0.0,
+        }
+    )
+
+    answer = resolver.resolve_feo_shadow(nonfinite)
+
+    assert answer.refusal_code is ActivityRefusalCode.NON_FINITE_POTENTIAL
+
+
 def test_tier_a_matrix_domain_receipt_mismatch_is_fail_closed_identity() -> None:
     resolver = MeltActivityResolver()
     query = _query(

@@ -218,22 +218,18 @@ def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
     # liquid-referenced, as declared in the catalog.
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
     routes = {
-        "Mg": ("MgO", 0.90173974),
-        "Mg2": ("MgO", 0.90173974),
-        "MgO_gas": ("MgO", 0.90173974),
-        "Ca": ("CaO", 1.03119892),
-        "Ca2": ("CaO", 1.03119892),
-        "CaO_gas": ("CaO", 1.03119892),
+        "Mg": ("MgO", "Mg-009", "Mg-010", 0.90173974),
+        "Mg2": ("MgO", "Mg-009", "Mg-010", 0.90173974),
+        "MgO_gas": ("MgO", "Mg-009", "Mg-010", 0.90173974),
+        "Ca": ("CaO", "Ca-028", "Ca-029", 1.03119892),
+        "Ca2": ("CaO", "Ca-028", "Ca-029", 1.03119892),
+        "CaO_gas": ("CaO", "Ca-028", "Ca-029", 1.03119892),
     }
-    for species, (oxide, log10_offset) in routes.items():
+    for species, (oxide, source_id, target_id, log10_offset) in routes.items():
         notice = provenance[species]["activity_standard_state_conversion"]
         assert notice["oxide"] == oxide
-        assert notice["from_standard_state_id"] == (
-            "single_cation_Raoultian_pure_liquid_reference"
-        )
-        assert notice["to_standard_state_id"] == (
-            "single_cation_Raoultian_pure_crystalline_reference"
-        )
+        assert notice["from_standard_state_id"] == source_id
+        assert notice["to_standard_state_id"] == target_id
         assert notice["temperature_K"] == pytest.approx(1773.15)
         assert notice["log10_activity_offset"] == pytest.approx(
             log10_offset, abs=1e-7
@@ -308,27 +304,111 @@ def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
     assert notice["log10_activity_offset"] is None
 
 
+def test_d349_unknown_mgo_catalog_k_id_is_not_converted(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    _, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    catalog = copy.deepcopy(vapor_pressure_data.catalog_payload)
+    reaction = next(
+        row
+        for row in catalog["families"]["metals_mg_family"][
+            "physical_properties"
+        ]["species"]["Mg"]["source_reactions"]
+        if row["id"] == "liquid_mgo_to_mg_gas"
+    )
+    reaction["thermodynamic_standard_state"]["id"] = (
+        "synthetic_distinct_K_MgO"
+    )
+
+    result = BuiltinVaporPressureProvider(catalog).dispatch(request)
+    notice = result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"][
+        "activity_standard_state_conversion"
+    ]
+
+    assert notice["from_standard_state_id"] == "Mg-009"
+    assert notice["to_standard_state_id"] == "synthetic_distinct_K_MgO"
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["conversion_performed"] is False
+    assert notice["log10_activity_offset"] is None
+
+
 def test_d349_fe_activity_conversion_is_continuous_at_1650k():
     below = _activity_for_crystalline_vapor_k(
         "FeO",
         1.0,
         1650.0 - 1.0e-6,
-        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_id="Fe-020",
+        target_standard_state_id="Fe-020",
         source_standard_state_phase="liquid",
-        target_standard_state_phase="solid",
+        target_standard_state_phase="crystalline",
     )[0]
     above = _activity_for_crystalline_vapor_k(
         "FeO",
         1.0,
         1650.0 + 1.0e-6,
-        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        target_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_id="Fe-020",
+        target_standard_state_id="Fe-020",
         source_standard_state_phase="liquid",
         target_standard_state_phase="liquid",
     )[0]
 
     assert below == pytest.approx(above, rel=1.0e-6, abs=0.0)
+
+
+def test_d349_fe_provider_pressure_exposes_ellingham_transition_step(
+    vapor_pressure_data,
+):
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_delta_g_kj_per_mol_o2,
+    )
+
+    composition = {"FeO": 25.0, "SiO2": 75.0}
+    low_T, high_T = 1650.0 - 1.0e-6, 1650.0 + 1.0e-6
+    low = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=low_T - 273.15,
+        pO2_bar=1.0,
+    )
+    high = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=high_T - 273.15,
+        pO2_bar=1.0,
+    )
+    low_route = low["vapor_pressure_numerator_provenance"]["Fe"]
+    high_route = high["vapor_pressure_numerator_provenance"]["Fe"]
+    pressure_ratio = (
+        low["vapor_pressures_Pa"]["Fe"]
+        / high["vapor_pressures_Pa"]["Fe"]
+    )
+    dG_low = ellingham_delta_g_kj_per_mol_o2("Fe", low_T)
+    dG_high = ellingham_delta_g_kj_per_mol_o2("Fe", high_T)
+    k_basis_ratio = math.exp(
+        (dG_low * 1000.0 / low_T - dG_high * 1000.0 / high_T)
+        / (2.0 * 8.31446261815324)
+    )
+    activity_ratio = (
+        float(low_route["vapor_activity_used_for_K"])
+        / float(high_route["vapor_activity_used_for_K"])
+    )
+
+    assert low_route["activity_standard_state_conversion"][
+        "conversion_performed"
+    ] is True
+    assert high_route["activity_standard_state_conversion"][
+        "conversion_performed"
+    ] is False
+    assert pressure_ratio == pytest.approx(
+        k_basis_ratio * activity_ratio, rel=2e-6
+    )
+    assert pressure_ratio != pytest.approx(1.0, rel=1e-4)
 def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     vapor_pressure_data,
     feedstocks_data,
@@ -364,8 +444,10 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
             "MgO",
             0.5,
             3200.0,
-            source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-            target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+            source_standard_state_id="Mg-009",
+            target_standard_state_id="Mg-010",
+            source_standard_state_phase="liquid",
+            target_standard_state_phase="crystalline",
         )
     )
     assert above_notice["delta_g_fus_kJ_per_mol"] < 0.0
@@ -377,8 +459,10 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
             "MgO",
             0.5,
             4001.0,
-            source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-            target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+            source_standard_state_id="Mg-009",
+            target_standard_state_id="Mg-010",
+            source_standard_state_phase="liquid",
+            target_standard_state_phase="crystalline",
         )
     )
     # JANAF d-144 owner value at 4001 K; independently pinned from the
@@ -601,6 +685,50 @@ def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
             "vapour_batch_resolve_failed"
         )
         assert species in sim._last_vapour_batch_resolve_error["detail"]
+
+
+@pytest.mark.parametrize("species", ("Mg", "Fe"))
+@pytest.mark.parametrize(
+    "missing_field",
+    (
+        "vapor_k_standard_state_phase",
+        "vapor_k_standard_state_id",
+        "activity_standard_state_conversion",
+    ),
+)
+def test_d349_live_gateway_uses_channel_contract_when_provenance_is_missing(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    species,
+    missing_field,
+):
+    temperature_K = 1500.0
+    sim, diagnostic, equilibrium, effective_source = _live_gateway_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        temperature_C=temperature_K - 273.15,
+    )
+    mutated = _diagnostic_with_route_provenance(
+        diagnostic,
+        species,
+        remove=(missing_field,),
+    )
+
+    refused = _resolve_live_gateway_batch(
+        sim,
+        mutated,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+
+    assert refused is None
+    assert sim._last_vapour_batch_resolve_error["reason"] == (
+        "vapour_batch_resolve_failed"
+    )
+    assert species in sim._last_vapour_batch_resolve_error["detail"]
 
 
 def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(

@@ -124,6 +124,26 @@ def test_vapor_activity_mismatch_is_reported_without_claiming_identity(
     assert "declared_standard_identity" not in warning
 
 
+def test_vapor_activity_unknown_liquid_crystal_pair_is_not_converted() -> None:
+    activity, notice, _warning = _activity_for_crystalline_vapor_k(
+        "MgO",
+        0.25,
+        1773.15,
+        source_standard_state_id="synthetic_liquid_MgO",
+        target_standard_state_id="synthetic_crystalline_MgO",
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="crystalline",
+    )
+
+    assert activity == 0.25
+    assert notice is not None
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["from_standard_state_id"] == "synthetic_liquid_MgO"
+    assert notice["to_standard_state_id"] == "synthetic_crystalline_MgO"
+    assert notice["conversion_performed"] is False
+    assert notice["log10_activity_offset"] is None
+
+
 def test_table2_range_rows_remain_geometric_midpoints_without_domains() -> None:
     for parent, (low, high) in _TABLE2_RANGE.items():
         coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent]
@@ -231,7 +251,7 @@ def test_d144_fusion_owner_returns_typed_domain_verdict() -> None:
 
 @pytest.mark.parametrize(
     ("temperature_K", "delta_g_fus_kJ_per_mol"),
-    ((1400.0, 3.194), (1500.0, 1.795), (1600.0, 0.363)),
+    ((1400.0, 3.557), (1500.0, 2.158), (1600.0, 0.726)),
 )
 def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
     temperature_K: float,
@@ -248,8 +268,10 @@ def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
         "FeO",
         0.25,
         temperature_K,
-        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_id="Fe-020",
+        target_standard_state_id="Fe-020",
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="crystalline",
     )
     expected = 0.25 * math.exp(
         delta_g_fus_kJ_per_mol
@@ -257,10 +279,8 @@ def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
     )
     assert activity == pytest.approx(expected, rel=1e-12)
     assert notice["conversion_performed"] is True
-    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-    assert notice["to_standard_state_id"] == (
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-    )
+    assert notice["from_standard_state_id"] == "Fe-020"
+    assert notice["to_standard_state_id"] == "Fe-020"
     assert conversion.domain_verdict.certified_band_K == (
         Decimal("298.15"),
         Decimal("5000.0"),
@@ -268,9 +288,34 @@ def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
     assert "metastable (supercooled) liquid" in conversion.domain_verdict.reason
 
 
-def test_d144_feo_fusion_chord_is_anchored_at_ellingham_transition() -> None:
+def test_d144_feo_fusion_uses_published_transition_enthalpy_and_entropy() -> None:
     at_transition = _d144_fusion_conversion("FeO", Decimal("1650"))
-    assert at_transition.delta_g_fus_kJ_per_mol == Decimal(0)
+    transition_delta_g = Decimal("24.058") - (
+        Decimal("1650") * Decimal("14.581") / Decimal("1000")
+    )
+    assert float(at_transition.delta_g_fus_kJ_per_mol) == pytest.approx(
+        float(transition_delta_g), abs=1e-12
+    )
+
+
+@pytest.mark.parametrize(
+    ("oxide", "temperature_K", "expected"),
+    (
+        ("MgO", "1400", "38.613"),
+        ("MgO", "1500", "36.468"),
+        ("MgO", "1600", "34.324"),
+        ("MgO", "1773.15", "30.6109325"),
+        ("CaO", "1400", "44.002"),
+        ("CaO", "1500", "41.591"),
+        ("CaO", "1600", "39.180"),
+        ("CaO", "1773.15", "35.0056220"),
+    ),
+)
+def test_d144_mgo_cao_values_remain_bit_identical(
+    oxide: str, temperature_K: str, expected: str
+) -> None:
+    actual = _d144_fusion_conversion(oxide, Decimal(temperature_K))
+    assert actual.delta_g_fus_kJ_per_mol == Decimal(expected)
 
 
 @pytest.mark.parametrize("oxide", ["MgO", "CaO"])
