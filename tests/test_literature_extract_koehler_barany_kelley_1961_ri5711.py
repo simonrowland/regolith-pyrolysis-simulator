@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -184,6 +185,28 @@ def test_fidelity_values_and_observation_count_match_rendered_tables() -> None:
         entry["marker"]
         for entry in cafe_context["ri5711_cafe2o4_transition_locator_key"]["values"]["table10_marker_mapping"]
     ] == ["1", "2", "3"]
+    marker_mappings = [
+        ("Ca2Fe2O5", ca2_context["ri5711_ca2fe2o5_transition_locator_key"], "table9_marker_mapping"),
+        ("CaFe2O4", cafe_context["ri5711_cafe2o4_transition_locator_key"], "table10_marker_mapping"),
+        ("NaFeO2", marker_context, "table12_marker_mapping"),
+    ]
+    cells_path = ROOT / (
+        "data/literature/extracts/audits/"
+        "koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.cells.csv"
+    )
+    with cells_path.open(newline="", encoding="utf-8") as stream:
+        cells = list(csv.DictReader(stream))
+    for _species, context, mapping_name in marker_mappings:
+        observation_id = context["observation_id"]
+        for index, marker in enumerate(context["values"][mapping_name]):
+            cell_field = f"values.{mapping_name}[{index}].T_K"
+            matches = [
+                row for row in cells
+                if row["observation_id"] == observation_id
+                and row["cell_field"] == cell_field
+            ]
+            assert len(matches) == 1
+            assert int(matches[0]["value"]) == marker["T_K"]
     table20_g = next(
         row for row in observations["Ca2Fe2O5"]["observations"]
         if row["observation_id"] == "ri5711_table20_ca2fe2o5_element_free_energy"
@@ -214,22 +237,29 @@ def test_fidelity_values_and_observation_count_match_rendered_tables() -> None:
     )
     cafe["uncertainty"]["value"] = 130
     assert cafe["uncertainty"]["value"] != 180
-    printed_uncertainty = next(
-        sample["value"]
-        for sample in document["fidelity_samples"]
-        if sample.get("path", "").endswith(
-            "ri5711_table7_cafe2o4_oxide].values.uncertainty_as_printed"
-        )
+    # The fidelity resolver addresses evidence under values[]. Expose the
+    # migrated numeric uncertainty in a test-only values path so the existing
+    # checker verifies the source pin without adding a duplicate field to YAML.
+    uncertainty_probe = deepcopy(mutated_uncertainty)
+    probe_cafe = next(
+        row for row in uncertainty_probe["species"]["CaFe2O4"]["observations"]
+        if row["observation_id"] == "ri5711_table7_cafe2o4_oxide"
     )
-    numeric_uncertainty_errors = check_all_fidelity_samples_match(
-        mutated_uncertainty,
-        label="mutated Table 7 numeric uncertainty",
+    probe_cafe["values"]["numeric_uncertainty_probe"] = probe_cafe["uncertainty"]["value"]
+    uncertainty_probe["fidelity_samples"].append(
+        {
+            "path": "species.CaFe2O4.observations[ri5711_table7_cafe2o4_oxide].values.numeric_uncertainty_probe",
+            "value": 180,
+            "locator": {
+                "page": 16,
+                "published_page": 9,
+                "table": "7",
+                "row": "CaFe2O4(c)",
+                "column": "From oxides uncertainty",
+            },
+        }
     )
-    if cafe["uncertainty"]["value"] != int(printed_uncertainty.split()[0].lstrip("±")):
-        numeric_uncertainty_errors.append(
-            "Table 7 numeric uncertainty.value differs from its rendered fidelity pin"
-        )
-    assert numeric_uncertainty_errors
+    assert check_all_fidelity_samples_match(uncertainty_probe, label="mutated numeric uncertainty")
     mutated_printed_uncertainty = deepcopy(document)
     mutated_cafe = next(
         row for row in mutated_printed_uncertainty["species"]["CaFe2O4"]["observations"]
