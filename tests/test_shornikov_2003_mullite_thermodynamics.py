@@ -44,8 +44,16 @@ def _assert_render_pins(document: dict) -> None:
     sentence = rows[
         "shornikov_2003_mullite_thermodynamics_text_ref66_melt_gibbs_extrapolation"
     ]
+    assert sentence["values"]["quantity_as_printed"] == (
+        "Gibbs energies of formation of melts in the Al2O3–SiO2 system"
+    )
+    assert sentence["values"]["reference_state_as_printed"] == (
+        "formation from simple oxides"
+    )
+    assert sentence["values"]["schema_gap"]
+    assert "quantity" not in sentence["values"]
     assert sentence["values"]["value_as_printed"] == "–12"
-    assert sentence["values"]["value"] == "-12"
+    assert "value" not in sentence["values"]
     assert sentence["phase"] == "l"
     assert "T_K" not in sentence["values"]
     assert sentence["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"

@@ -40,7 +40,35 @@ HIT_ROWS = {'beyer-1980-potassium-metasilicate-disilicate-ri8410': {'bey80_k2si2
                                                                                                        'from '
                                                                                                        '298.15 '
                                                                                                        'K',
-                                                                                                       '52.82')},
+                                                                                                       '52.82'),
+                                                         'bey80_k2si2o5_oxide_formation_h_table10': ('delta_fH',
+                                                                                                    'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)',
+                                                                                                    'formation from simple oxides',
+                                                                                                    None),
+                                                         'bey80_k2si2o5_oxide_formation_g_table10': ('delta_fG',
+                                                                                                    'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)',
+                                                                                                    'formation from simple oxides',
+                                                                                                    None),
+                                                         'bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8': ('delta_fG',
+                                                                                                                          'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)',
+                                                                                                                          'formation from simple oxides',
+                                                                                                                          '-78.8'),
+                                                         'bey80_k2si2o5_oxide_formation_h_table12': ('delta_fH',
+                                                                                                    'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)',
+                                                                                                    'formation from simple oxides',
+                                                                                                    None),
+                                                         'bey80_k2si2o5_oxide_formation_g_table12': ('delta_fG',
+                                                                                                    'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)',
+                                                                                                    'formation from simple oxides',
+                                                                                                    None),
+                                                         'bey80_k2sio3_oxide_formation_h_table8': ('delta_fH',
+                                                                                                  'K2O(c) + SiO2(quartz) = K2SiO3(c)',
+                                                                                                  'formation from simple oxides',
+                                                                                                  None),
+                                                         'bey80_k2sio3_oxide_formation_g_table8': ('delta_fG',
+                                                                                                  'K2O(c) + SiO2(quartz) = K2SiO3(c)',
+                                                                                                  'formation from simple oxides',
+                                                                                                  None)},
  'he-2017-karrooite-ordering-heat-capacity': {'he2017_figure11_configurational_entropy': ('S',
                                                                                           'S_config '
                                                                                           '(J K−1)',
@@ -1511,7 +1539,11 @@ HIT_ROWS = {'beyer-1980-potassium-metasilicate-disilicate-ri8410': {'bey80_k2si2
                                                                                                       '12.4 '
                                                                                                       '± '
                                                                                                       '0.5'),
-                                           'shornikov_2003_mullite_thermodynamics_text_2100k_gibbs_range': ('delta_fG',
+                                                         'shornikov_2003_mullite_thermodynamics_text_ref66_melt_gibbs_extrapolation': ('delta_fG',
+                                                                                                                                       'Gibbs energies of formation of melts in the Al2O3–SiO2 system',
+                                                                                                                                       'formation from simple oxides',
+                                                                                                                                       '–12'),
+                                                         'shornikov_2003_mullite_thermodynamics_text_2100k_gibbs_range': ('delta_fG',
                                                                                                             'Gibbs '
                                                                                                             'energies '
                                                                                                             'of '
@@ -2589,6 +2621,7 @@ def test_increment_and_frame_repairs_migrate_unavailable():
         assert {gap["observation_id"] for gap in document["schema_gaps"]} == set(expected)
         for observation_id, (old_token, printed, reference, printed_value) in expected.items():
             values = rows[observation_id]["values"]
+            assert old_token not in values
             assert values["quantity_as_printed"] == printed
             assert values["reference_state_as_printed"] == reference
             assert values["schema_gap"]
@@ -2615,7 +2648,6 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
-            assert "quantity" not in values
 
 
 def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows():

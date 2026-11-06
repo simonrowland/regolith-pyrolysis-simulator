@@ -906,6 +906,8 @@ experiments:
     panel: single
     series: 22
 schema_gaps:
+  - observation_id: shornikov_2003_mullite_thermodynamics_text_ref66_melt_gibbs_extrapolation
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
   - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r02_c04
     reason: "No quantity token represents Reaction (1) 3[Al2O3]+2[SiO2]=[3Al2O3·2SiO2]; delta_fH denotes formation from the elements."
   - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r03_c04
@@ -5721,10 +5723,11 @@ species:
       standard_state: Gibbs energies of formation of melts in the Al2O3–SiO2 system, as stated in the sentence.
       experiment: shornikov_2003_text_ref66_melt_gibbs_extrapolation
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of formation of melts in the Al2O3–SiO2 system
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: quoted_attributed
         value_as_printed: '–12'
-        value: '-12'
         attribution: >-
           Reference [66], extrapolation of melt formation Gibbs energies to the temperature of fusion of mullite.
       uncertainty:

@@ -167,7 +167,15 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         "bey80_k2si2o5_t6_glass_extrapolated_s_800",
         "bey80_k2si2o5_t6_glass_extrapolated_s_850",
         "bey80_k2si2o5_t6_glass_extrapolated_s_900",
+        "bey80_k2si2o5_oxide_formation_h_table10",
+        "bey80_k2si2o5_oxide_formation_g_table10",
+        "bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8",
+        "bey80_k2si2o5_oxide_formation_h_table12",
+        "bey80_k2si2o5_oxide_formation_g_table12",
+        "bey80_k2sio3_oxide_formation_h_table8",
+        "bey80_k2sio3_oxide_formation_g_table8",
     }
+    assert sum(observation.value.kind.value == "unavailable" for observation in stored.values()) == 94
 
     def assert_noticed(table, formula, phase, quantity, temperature, kind):
         matches = [
@@ -267,20 +275,13 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
                     "6": "298-750 K",
                 }[table]
 
-    misprint = assert_noticed(
-        "10",
-        "K2Si2O5",
-        Phase.CR,
-        Quantity.DELTA_FG,
-        "867",
-        NoticeKind.PROBABLE_SOURCE_MISPRINT,
-    )
-    assert misprint.value.point == Decimal("-329.6992")
-    assert any(
-        notice.kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
-        and "printed value is retained" in notice.reason
-        for notice in misprint.notices
-    )
+    misprint_id = "bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8"
+    misprint_source = source_observations[misprint_id]["values"]
+    assert misprint_source["value_as_printed"] == "-78.8"
+    assert "delta_fG" not in misprint_source
+    assert "printed value is retained" in misprint_source["reason"]
+    misprint = stored[f"{document['source_id']}::{misprint_id}"]
+    assert misprint.value.kind.value == "unavailable"
 
     noticed = [
         notice
@@ -294,4 +295,4 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         }
         and observation.locator.table in {"3", "4", "5", "6", "10"}
     ]
-    assert len(noticed) == 30
+    assert len(noticed) == 29
