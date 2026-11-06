@@ -2028,12 +2028,17 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     finally:
         plt.close(figure)
 
-    files = render_hero_charts(data, tmp_path / "hero")
+    files = render_hero_charts(
+        data,
+        tmp_path / "hero",
+        openimcc_score_commit="66ec4a3",
+    )
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
     assert "vaporock" in svg and "n_shared=2" in svg
     assert "thermoengine" in svg and "n_shared=1" in svg
     assert "cross-engine signed dex scorecard" in svg
     assert "population sd (ddof=0)" in svg
+    assert "openimcc score commit: 66ec4a3" in svg
     assert "benchmark" not in svg
 
 
@@ -2271,8 +2276,10 @@ def test_vapour_metrics_split_source_disagreement_rows_and_shared_pairs() -> Non
     assert flagged["sd_dex"] == "0"
     assert flagged["median_abs_dex"] == "3"
     assert unflagged["rms_dex"] == "1"
-    assert all_view["temperature_ge_1700"]["source_disagreement_flagged"]["n"] == 1
-    assert all_view["temperature_lt_1700"]["unflagged"]["n"] == 1
+    assert metrics["views"]["temperature_ge_1700"][
+        "source_disagreement_flagged"
+    ]["n"] == 1
+    assert metrics["views"]["temperature_lt_1700"]["unflagged"]["n"] == 1
 
     paired = hero_plot._hero_paired_engine_rail_comparisons(
         rows,

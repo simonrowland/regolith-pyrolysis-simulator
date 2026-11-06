@@ -13,18 +13,19 @@ same-experiment duplicates without retaining the input rows in memory.
 Hero history is one append-only row per green store in
 ``docs-private/research/2026-10-19-three-hero-charts/hero-history.jsonl``;
 pass it explicitly with ``--history-path``. Each ``battery_hero_history`` row
-has ``schema_version`` and, per rail and engine, the scorer's numeric count,
-RMS and median |dex|, attempted refusal count and scorer-reason counts,
+has ``schema_version`` and, per rail and engine, n, RMS, population SD, median
+|dex|, temperature views, attempted-refusal count and scorer-reason counts,
 non-observable count, and open predict-and-flag notice counts by kind. Each row
 also carries all-rail attempted-refusal and non-observable counts per engine.
 Same-row comparisons are stored for openimcc and internal-analytical against
-every outside engine with shared rows, including both RMS values and the shared
-row count.
+every outside engine with shared rows, including both engines' metrics and the
+shared-row count.
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 from contextlib import contextmanager
 import gzip
 import hashlib
@@ -37,7 +38,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -79,9 +80,9 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
-    SCORE_ENGINE_SET,
+    FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+    _BATTERY_HERO_DECK_CHART_IDS,
     _BATTERY_HERO_DECK_SOURCE_RAILS,
-    _AllNumericPayloadAccumulator,
     _battery_hero_binned_score_records,
     _battery_hero_deck_payload,
     _battery_hero_deck_records,
@@ -91,7 +92,9 @@ from simulator.battery.score import (  # noqa: E402
     _flagged_payload_strata,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
+    _median_abs,
     _paired_engine_rail_comparisons,
+    _rms,
     _residual_engine_observable,
 )
 
@@ -109,6 +112,34 @@ HERO_AND_DECK_SOURCE_RAILS = frozenset(HERO_RAILS) | frozenset(
 )
 HERO_PRIMARY_ENGINES = ("openimcc", "internal-analytical")
 HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
+HERO_TEMPERATURE_FIELD = "candidate_observation.identity.temperature_K"
+HERO_TEMPERATURE_FLOOR_K = Decimal(1700)
+HERO_MINIMUM_REPORT_N = 5
+HERO_TEMPERATURE_VIEWS = (
+    ("all", "all"),
+    (
+        "temperature_ge_1700",
+        f"T ≥ {int(HERO_TEMPERATURE_FLOOR_K)} K",
+    ),
+    (
+        "temperature_lt_1700",
+        f"T < {int(HERO_TEMPERATURE_FLOOR_K)} K",
+    ),
+)
+
+
+@dataclass(frozen=True)
+class _HeroExposurePolicy:
+    census_observation_ids: frozenset[str]
+    exposed_source_ids: frozenset[str]
+    baseline_observation_ids: frozenset[str]
+    minimum_held_out_n: int = HERO_MINIMUM_REPORT_N
+
+    def __post_init__(self) -> None:
+        if self.minimum_held_out_n < 1:
+            raise ValueError("minimum held-out n must be positive")
+
+
 HERO_MINOR_FACETS = (
     ("minor:P", "P"),
     ("minor:S", "S"),
@@ -147,6 +178,7 @@ class EngineSummary:
     missing_identity_rows: int = 0
     source_relations: Counter[str] = field(default_factory=Counter)
     versions: set[str] = field(default_factory=set)
+    default_packs: set[str] = field(default_factory=set)
 
 @dataclass(frozen=True)
 class BinPoint:
@@ -194,6 +226,7 @@ class ScorePlotData:
     element_series: Mapping[tuple[str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
     bin_width_K: float
+    hero_openimcc_vaporock_species: tuple[Mapping[str, object], ...] = ()
     hero_deck_points: tuple[Mapping[str, object], ...] = ()
     hero_deck_metrics: Mapping[tuple[str, str], Mapping[str, object]] = field(
         default_factory=dict
@@ -442,6 +475,32 @@ def _version_text(raw: object) -> str | None:
     return None
 
 
+def _openimcc_pack_names(engine_metadata: object) -> set[str]:
+    if not isinstance(engine_metadata, Mapping):
+        return set()
+    sources = engine_metadata.get("coefficient_sources")
+    if isinstance(sources, str):
+        try:
+            sources = json.loads(sources)
+        except json.JSONDecodeError:
+            return set()
+    if not isinstance(sources, Sequence) or isinstance(sources, (str, bytes)):
+        return set()
+    pack_prefix = "openimcc-pack-version:"
+    names: set[str] = set()
+    for source in sources:
+        if not isinstance(source, str) or not source.startswith(pack_prefix):
+            continue
+        match = re.search(
+            r"\b(imcc[-_]sf\d+[-_]d\d+[-_]v\d+)\b",
+            source[len(pack_prefix):],
+            flags=re.IGNORECASE,
+        )
+        if match:
+            names.add(match.group(1).casefold().replace("_", "-"))
+    return names
+
+
 def _requested_rails(values: Sequence[str] | None) -> tuple[str, ...]:
     if not values:
         return DEFAULT_RAILS
@@ -454,6 +513,451 @@ def _requested_rails(values: Sequence[str] | None) -> tuple[str, ...]:
     if not rails:
         raise ValueError("at least one non-empty --rail value is required")
     return tuple(sorted(rails))
+
+
+def _exposure_policy_from_files(
+    *,
+    census_path: Path | None,
+    exposed_sources_path: Path | None,
+    baseline_observation_ids_path: Path | None,
+) -> _HeroExposurePolicy | None:
+    paths = (census_path, exposed_sources_path, baseline_observation_ids_path)
+    if all(path is None for path in paths):
+        return None
+    if any(path is None for path in paths):
+        raise ValueError(
+            "--exposure-census, --exposed-sources, and "
+            "--pre-cutoff-observation-ids must be supplied together"
+        )
+    assert census_path is not None
+    assert exposed_sources_path is not None
+    assert baseline_observation_ids_path is not None
+
+    with census_path.open("r", encoding="utf-8", newline="") as source:
+        census = csv.DictReader(source)
+        if "observation_id" not in (census.fieldnames or ()):
+            raise ValueError(f"{census_path}: missing observation_id column")
+        census_ids = frozenset(
+            row["observation_id"].strip()
+            for row in census
+            if row.get("observation_id") and row["observation_id"].strip()
+        )
+    with exposed_sources_path.open("r", encoding="utf-8", newline="") as source:
+        exposed_sources = csv.DictReader(source)
+        if "source_id" not in (exposed_sources.fieldnames or ()):
+            raise ValueError(f"{exposed_sources_path}: missing source_id column")
+        source_ids = frozenset(
+            row["source_id"].strip()
+            for row in exposed_sources
+            if row.get("source_id") and row["source_id"].strip()
+        )
+    baseline_ids = frozenset(
+        line.strip()
+        for line in baseline_observation_ids_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    )
+    return _HeroExposurePolicy(
+        census_observation_ids=census_ids,
+        exposed_source_ids=source_ids,
+        baseline_observation_ids=baseline_ids,
+    )
+
+
+def _hero_decimal(raw: object) -> Decimal | None:
+    try:
+        value = Decimal(str(raw))
+    except (InvalidOperation, TypeError, ValueError, ArithmeticError):
+        return None
+    return value if value.is_finite() else None
+
+
+def _hero_metric_temperature(row: Mapping[str, object]) -> Decimal | None:
+    # Temperature grouping keys on the measured residual field, not the request:
+    # candidate_observation.identity.temperature_K.
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    identity = candidate.get("identity")
+    identity = identity if isinstance(identity, Mapping) else {}
+    temperature = _state_value(identity.get("temperature_K"))
+    return _hero_decimal(temperature)
+
+
+def _hero_source_disagreement_flagged(row: Mapping[str, object]) -> bool:
+    return (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT
+        in _flagged_payload_strata(row)
+    )
+
+
+def _hero_exposure_status(
+    row: Mapping[str, object], policy: _HeroExposurePolicy
+) -> str:
+    # The scored candidate ID is engine-prefixed; `reference` is the observed
+    # row's original, unprefixed observation ID used by the exposure inputs.
+    observation_id = str(row.get("reference") or "")
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    source_id = str(candidate.get("source_id") or row.get("source_id") or "")
+    if (
+        observation_id in policy.census_observation_ids
+        or source_id in policy.exposed_source_ids
+    ):
+        return "exposed"
+    # A missing reference cannot prove that the row landed after the cutoff.
+    if not observation_id or observation_id in policy.baseline_observation_ids:
+        return "exposed"
+    return "held_out"
+
+
+def _hero_metric_stats(
+    values: Sequence[Decimal], *, minimum_n: int = 1
+) -> dict[str, object]:
+    count = len(values)
+    if count < minimum_n:
+        return {"n": count, "rms_dex": None, "sd_dex": None, "median_abs_dex": None}
+    # Scorer numeric.value is signed dex = log10(pred / obs).
+    # RMS is sqrt(sum(dex_i**2) / n); reuse the scorer's existing accumulator.
+    rms = _rms(values)
+    # SD is population standard deviation: sqrt(sum((dex_i - mean)**2) / n), ddof=0.
+    mean = sum(values, Decimal(0)) / Decimal(count)
+    variance = sum(((value - mean) ** 2 for value in values), Decimal(0)) / Decimal(count)
+    standard_deviation = variance.sqrt()
+    # Median absolute dex is median(abs(dex_i)); reuse the scorer's existing helper.
+    median_absolute = _median_abs(values)
+    return {
+        "n": count,
+        "rms_dex": None if rms is None else str(rms),
+        "sd_dex": str(standard_deviation),
+        "median_abs_dex": None if median_absolute is None else str(median_absolute),
+    }
+
+
+def _hero_metric_views(
+    items: Iterable[tuple[Mapping[str, object], Decimal]],
+    *,
+    exposure_policy: _HeroExposurePolicy | None = None,
+    minimum_metric_n: int = 1,
+    include_source_disagreement: bool = False,
+) -> dict[str, dict[str, object]]:
+    buckets: dict[str, list[tuple[Mapping[str, object], Decimal]]] = {
+        "all": [],
+        "temperature_ge_1700": [],
+        "temperature_lt_1700": [],
+    }
+    no_temperature_n = 0
+    for row, value in items:
+        buckets["all"].append((row, value))
+        temperature = _hero_metric_temperature(row)
+        if temperature is None:
+            no_temperature_n += 1
+        elif temperature >= HERO_TEMPERATURE_FLOOR_K:
+            buckets["temperature_ge_1700"].append((row, value))
+        else:
+            buckets["temperature_lt_1700"].append((row, value))
+
+    views: dict[str, dict[str, object]] = {}
+    for name, bucket in buckets.items():
+        values = [value for _row, value in bucket]
+        view = _hero_metric_stats(values, minimum_n=minimum_metric_n)
+        view["no_temperature_n"] = no_temperature_n if name == "all" else 0
+        if minimum_metric_n > 1:
+            view["minimum_n"] = minimum_metric_n
+        if include_source_disagreement:
+            flagged = [value for row, value in bucket if _hero_source_disagreement_flagged(row)]
+            unflagged = [value for row, value in bucket if not _hero_source_disagreement_flagged(row)]
+            view["source_disagreement_flagged"] = _hero_metric_stats(
+                flagged, minimum_n=minimum_metric_n
+            )
+            view["unflagged"] = _hero_metric_stats(
+                unflagged, minimum_n=minimum_metric_n
+            )
+        if exposure_policy is not None:
+            exposed_values = [
+                value
+                for row, value in bucket
+                if _hero_exposure_status(row, exposure_policy) == "exposed"
+            ]
+            held_out_values = [
+                value
+                for row, value in bucket
+                if _hero_exposure_status(row, exposure_policy) == "held_out"
+            ]
+            held_out = _hero_metric_stats(
+                held_out_values,
+                minimum_n=exposure_policy.minimum_held_out_n,
+            )
+            held_out["minimum_n"] = exposure_policy.minimum_held_out_n
+            view["exposed_n"] = len(exposed_values)
+            view["held_out"] = held_out
+        views[name] = view
+    return views
+
+
+def _hero_metric_records(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    engines: Sequence[str] | None = None,
+    rails: Sequence[str] | None = None,
+    exposure_policy: _HeroExposurePolicy | None = None,
+) -> dict[tuple[str, str], dict[str, object]]:
+    groups: dict[
+        tuple[str, str], list[tuple[Mapping[str, object], Decimal]]
+    ] = defaultdict(list)
+    for row in residuals:
+        rail = str(row.get("rail") or "")
+        numeric = row.get("numeric")
+        engine = _engine_name(row)
+        if (
+            not rail
+            or not engine
+            or not isinstance(numeric, Mapping)
+            or numeric.get("operation") != "dex"
+            or numeric.get("value") is None
+        ):
+            continue
+        value = _hero_decimal(numeric["value"])
+        if value is not None:
+            groups[(rail, engine)].append((row, value))
+
+    all_engines = set(engines or ()) | {engine for _rail, engine in groups}
+    all_rails = set(rails or ()) | {rail for rail, _engine in groups}
+    records: dict[tuple[str, str], dict[str, object]] = {}
+    for rail in sorted(all_rails):
+        for engine in sorted(all_engines):
+            views = _hero_metric_views(
+                groups.get((rail, engine), ()),
+                exposure_policy=exposure_policy,
+                include_source_disagreement=rail == Rail.VAPOUR.value,
+            )
+            all_view = views["all"]
+            records[(rail, engine)] = {
+                "rail": rail,
+                "engine": engine,
+                "n": all_view["n"],
+                "n_dex": all_view["n"],
+                "rms_dex": all_view["rms_dex"],
+                "sd_dex": all_view["sd_dex"],
+                "median_abs_dex": all_view["median_abs_dex"],
+                "views": views,
+            }
+    return records
+
+
+def _hero_pair_rows(
+    residuals: Iterable[Mapping[str, object]], *, include_species: bool = False
+) -> dict[
+    tuple[str, str, str], dict[str, list[tuple[Decimal, Mapping[str, object]]]]
+]:
+    grouped: dict[
+        tuple[str, str, str], dict[str, list[tuple[Decimal, Mapping[str, object]]]]
+    ] = defaultdict(lambda: defaultdict(list))
+    for row in residuals:
+        rail = str(row.get("rail") or "")
+        reference = str(row.get("reference") or "")
+        numeric = row.get("numeric")
+        engine = _engine_name(row)
+        if (
+            not rail
+            or not reference
+            or not engine
+            or not isinstance(numeric, Mapping)
+            or numeric.get("operation") != "dex"
+            or numeric.get("value") is None
+        ):
+            continue
+        value = _hero_decimal(numeric["value"])
+        if value is None:
+            continue
+        species = ""
+        if include_species:
+            candidate = row.get("candidate_observation")
+            candidate = candidate if isinstance(candidate, Mapping) else {}
+            identity = candidate.get("identity")
+            identity = identity if isinstance(identity, Mapping) else {}
+            raw_species = identity.get("species")
+            resolved_species = _state_value(raw_species)
+            if resolved_species is None and isinstance(raw_species, Mapping):
+                resolved_species = raw_species
+            species = (
+                str(resolved_species.get("formula") or "unknown")
+                if isinstance(resolved_species, Mapping)
+                else "unknown"
+            )
+        grouped[(rail, reference, species)][engine].append((value, row))
+    return grouped
+
+
+def _hero_comparison_metrics(
+    pairs: Sequence[tuple[Mapping[str, object], Decimal, Decimal]],
+    *,
+    exposure_policy: _HeroExposurePolicy | None,
+    minimum_n: int,
+    include_source_disagreement: bool,
+) -> dict[str, object]:
+    primary_items = [(row, primary) for row, primary, _outside in pairs]
+    outside_items = [(row, outside) for row, _primary, outside in pairs]
+    primary_views = _hero_metric_views(
+        primary_items,
+        exposure_policy=exposure_policy,
+        minimum_metric_n=minimum_n,
+        include_source_disagreement=include_source_disagreement,
+    )
+    outside_views = _hero_metric_views(
+        outside_items,
+        exposure_policy=exposure_policy,
+        minimum_metric_n=minimum_n,
+        include_source_disagreement=include_source_disagreement,
+    )
+    shared_views: dict[str, dict[str, object]] = {}
+    for name, primary_view in primary_views.items():
+        outside_view = outside_views[name]
+        view: dict[str, object] = {
+            "n_shared": outside_view["n"],
+            "no_temperature_n": outside_view["no_temperature_n"],
+            "outside_rms_dex": outside_view["rms_dex"],
+            "outside_sd_dex": outside_view["sd_dex"],
+            "outside_median_abs_dex": outside_view["median_abs_dex"],
+            "primary_rms_dex_on_shared": primary_view["rms_dex"],
+            "primary_sd_dex_on_shared": primary_view["sd_dex"],
+            "primary_median_abs_dex_on_shared": primary_view["median_abs_dex"],
+        }
+        if include_source_disagreement:
+            for flag_name in ("source_disagreement_flagged", "unflagged"):
+                primary_flag = primary_view[flag_name]
+                outside_flag = outside_view[flag_name]
+                view[flag_name] = {
+                    "n_shared": outside_flag["n"],
+                    "outside_rms_dex": outside_flag["rms_dex"],
+                    "outside_sd_dex": outside_flag["sd_dex"],
+                    "outside_median_abs_dex": outside_flag["median_abs_dex"],
+                    "primary_rms_dex_on_shared": primary_flag["rms_dex"],
+                    "primary_sd_dex_on_shared": primary_flag["sd_dex"],
+                    "primary_median_abs_dex_on_shared": primary_flag[
+                        "median_abs_dex"
+                    ],
+                }
+        if minimum_n > 1:
+            view["minimum_n"] = minimum_n
+        if exposure_policy is not None:
+            outside_held = outside_view["held_out"]
+            primary_held = primary_view["held_out"]
+            view["exposed_n"] = outside_view["exposed_n"]
+            view["held_out"] = {
+                "n": outside_held["n"],
+                "minimum_n": outside_held["minimum_n"],
+                "outside_rms_dex": outside_held["rms_dex"],
+                "outside_sd_dex": outside_held["sd_dex"],
+                "outside_median_abs_dex": outside_held["median_abs_dex"],
+                "primary_rms_dex_on_shared": primary_held["rms_dex"],
+                "primary_sd_dex_on_shared": primary_held["sd_dex"],
+                "primary_median_abs_dex_on_shared": primary_held["median_abs_dex"],
+            }
+        shared_views[name] = view
+
+    all_primary = primary_views["all"]
+    all_outside = outside_views["all"]
+    return {
+        "n_shared": all_outside["n"],
+        "outside_rms_dex": all_outside["rms_dex"],
+        "outside_sd_dex": all_outside["sd_dex"],
+        "outside_median_abs_dex": all_outside["median_abs_dex"],
+        "primary_rms_dex_on_shared": all_primary["rms_dex"],
+        "primary_sd_dex_on_shared": all_primary["sd_dex"],
+        "primary_median_abs_dex_on_shared": all_primary["median_abs_dex"],
+        "views": shared_views,
+    }
+
+
+def _hero_paired_engine_rail_comparisons(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str],
+    comparison_engines: Sequence[str],
+    rails: Sequence[str],
+    exposure_policy: _HeroExposurePolicy | None = None,
+    include_species: bool = False,
+) -> list[dict[str, object]]:
+    rows = tuple(residuals)
+    if not include_species:
+        records = _paired_engine_rail_comparisons(
+            rows,
+            primary_engines=primary_engines,
+            comparison_engines=comparison_engines,
+            rails=rails,
+        )
+        grouped = _hero_pair_rows(rows)
+        for record in records:
+            rail = str(record["rail"])
+            primary = str(record["primary_engine"])
+            for comparison in record["comparisons"]:
+                engine = str(comparison["engine"])
+                pairs: list[tuple[Mapping[str, object], Decimal, Decimal]] = []
+                for (row_rail, _reference, _species), by_engine in grouped.items():
+                    if row_rail != rail:
+                        continue
+                    primary_values = by_engine.get(primary, ())
+                    outside_values = by_engine.get(engine, ())
+                    if len(primary_values) == 1 and len(outside_values) == 1:
+                        primary_value, primary_row = primary_values[0]
+                        outside_value, _outside_row = outside_values[0]
+                        pairs.append((primary_row, primary_value, outside_value))
+                comparison.update(
+                    _hero_comparison_metrics(
+                        pairs,
+                        exposure_policy=exposure_policy,
+                        minimum_n=1,
+                        include_source_disagreement=rail == Rail.VAPOUR.value,
+                    )
+                )
+        return records
+
+    grouped = _hero_pair_rows(rows, include_species=True)
+    species_by_rail: dict[str, set[str]] = defaultdict(set)
+    for rail, _reference, species in grouped:
+        species_by_rail[rail].add(species)
+    comparison_names = sorted(set(comparison_engines) - set(primary_engines))
+    records: list[dict[str, object]] = []
+    for rail in sorted(set(rails)):
+        for species in sorted(species_by_rail.get(rail, {"unknown"})):
+            for primary in primary_engines:
+                candidates: list[tuple[int, str, dict[str, object]]] = []
+                pairs_by_engine: dict[
+                    str, list[tuple[Mapping[str, object], Decimal, Decimal]]
+                ] = defaultdict(list)
+                for (row_rail, _reference, row_species), by_engine in grouped.items():
+                    if row_rail != rail or row_species != species:
+                        continue
+                    primary_values = by_engine.get(primary, ())
+                    if len(primary_values) != 1:
+                        continue
+                    primary_value, primary_row = primary_values[0]
+                    for engine in comparison_names:
+                        outside_values = by_engine.get(engine, ())
+                        if len(outside_values) == 1:
+                            outside_value, _outside_row = outside_values[0]
+                            pairs_by_engine[engine].append(
+                                (primary_row, primary_value, outside_value)
+                            )
+                for engine, pairs in pairs_by_engine.items():
+                    comparison = _hero_comparison_metrics(
+                        pairs,
+                        exposure_policy=exposure_policy,
+                        minimum_n=HERO_MINIMUM_REPORT_N,
+                        include_source_disagreement=rail == Rail.VAPOUR.value,
+                    )
+                    comparison["engine"] = engine
+                    comparison["minimum_n"] = HERO_MINIMUM_REPORT_N
+                    candidates.append((len(pairs), engine, comparison))
+                candidates.sort(key=lambda item: (-item[0], item[1]))
+                records.append(
+                    {
+                        "rail": rail,
+                        "primary_engine": primary,
+                        "species": species,
+                        "comparisons": [item[2] for item in candidates],
+                    }
+                )
+    return records
 
 
 def _record_hero_diagnostic(
@@ -614,12 +1118,65 @@ def abundance_class_table(
     return rows
 
 
+def _hero_deck_rows(
+    score_rows: Sequence[Mapping[str, object]],
+    points: Sequence[Mapping[str, object]],
+) -> tuple[
+    dict[str, list[Mapping[str, object]]],
+    dict[str, list[Mapping[str, object]]],
+]:
+    candidates: dict[
+        tuple[str, str, Decimal], list[Mapping[str, object]]
+    ] = defaultdict(list)
+    for row in score_rows:
+        engine = _engine_name(row)
+        reference = str(row.get("reference") or "")
+        numeric = row.get("numeric")
+        value = (
+            _hero_decimal(numeric.get("value"))
+            if isinstance(numeric, Mapping)
+            else None
+        )
+        if engine and reference and value is not None:
+            candidates[(engine, reference, value)].append(row)
+
+    metric_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    comparison_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    for chart in _BATTERY_HERO_DECK_CHART_IDS:
+        used: Counter[tuple[str, str, Decimal]] = Counter()
+        chart_points = [point for point in points if point.get("chart") == chart]
+        for point in chart_points:
+            engine = str(point.get("engine") or "")
+            reference = str(point.get("reference") or "")
+            value = _hero_decimal(point.get("residual_dex"))
+            if not engine or not reference or value is None:
+                continue
+            key = (engine, reference, value)
+            matches = candidates.get(key, ())
+            index = used[key]
+            if index >= len(matches):
+                continue
+            used[key] += 1
+            chart_row = {**matches[index], "rail": chart}
+            metric_rows[chart].append(chart_row)
+            comparison_rows[chart].append(chart_row)
+
+    residue = Rail.RESIDUE_COMPOSITION.value
+    metric_rows[residue] = [
+        {**row, "rail": residue}
+        for row in score_rows
+        if str(row.get("rail") or "") == residue
+    ]
+    return metric_rows, comparison_rows
+
+
 def read_scores(
     path: Path,
     *,
     bin_width_K: float = DEFAULT_BIN_WIDTH_K,
     rails: Sequence[str] | None = None,
     scratch_dir: Path | None = None,
+    exposure_policy: _HeroExposurePolicy | None = None,
 ) -> ScorePlotData:
     """Stream the score JSONL and return binned, duplicate-collapsed data."""
 
@@ -637,10 +1194,6 @@ def read_scores(
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
     hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
-    all_numeric_payloads = _AllNumericPayloadAccumulator(
-        engines=SCORE_ENGINE_SET,
-        retain_report_facts=False,
-    )
     stamp: Mapping[str, Any] | None = None
 
     if scratch_dir is None:
@@ -684,7 +1237,6 @@ def read_scores(
                     raise ValueError(f"{path}:{line_number}: invalid JSON") from exc
                 if not isinstance(row, Mapping):
                     continue
-                all_numeric_payloads.add(row)
                 if stamp is None:
                     if row.get("kind") != "battery_store_stamp":
                         raise ValueError(f"{path}: line 1 is not a battery_store_stamp")
@@ -702,6 +1254,10 @@ def read_scores(
                     version = _version_text(recorded_engine.get("version"))
                     if version:
                         summary.versions.add(version)
+                    if engine == "openimcc":
+                        summary.default_packs.update(
+                            _openimcc_pack_names(recorded_engine)
+                        )
 
                 rail_value = row.get("rail")
                 rail = str(rail_value) if rail_value is not None else ""
@@ -757,7 +1313,15 @@ def read_scores(
                 if rail in HERO_RAILS:
                     comparison_payloads.append(row)
                 if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
-                    deck_score_rows.append(_battery_hero_deck_payload(row))
+                    deck_payload = _battery_hero_deck_payload(row)
+                    deck_candidate = deck_payload.get("candidate_observation")
+                    deck_candidate = (
+                        deck_candidate if isinstance(deck_candidate, dict) else {}
+                    )
+                    source_id = candidate_observation.get("source_id")
+                    if source_id:
+                        deck_candidate["source_id"] = source_id
+                    deck_score_rows.append(deck_payload)
 
                 identity = _row_identity(row)
                 if not identity:
@@ -864,12 +1428,6 @@ def read_scores(
         database.commit()
         if stamp is None:
             raise ValueError(f"{path}: empty score file")
-        hero_all_numeric_metrics = {
-            (str(record["rail"]), str(record["engine"])): record
-            for record in all_numeric_payloads.rms_records()
-            if record["rail"] in HERO_RAILS
-            and record["engine"] in HERO_PRIMARY_ENGINES
-        }
         binned_records = _battery_hero_binned_score_records(
             database,
             selected_rails=selected_rails,
@@ -889,6 +1447,12 @@ def read_scores(
     hero_series = _bin_points_by_key(binned_records["hero_series"])
     element_series = _bin_points_by_key(binned_records["element_series"])
     engines = tuple(sorted(summaries, key=lambda name: (name != "openimcc", name.casefold())))
+    hero_all_numeric_metrics = _hero_metric_records(
+        comparison_payloads,
+        engines=engines,
+        rails=HERO_RAILS,
+        exposure_policy=exposure_policy,
+    )
     all_temperatures = [
         summary.min_temperature_K
         for summary in summaries.values()
@@ -907,13 +1471,24 @@ def read_scores(
 
     hero_comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_comparisons(
+        for record in _hero_paired_engine_rail_comparisons(
             comparison_payloads,
             primary_engines=HERO_PRIMARY_ENGINES,
             comparison_engines=HERO_COMPARISON_ENGINES,
             rails=HERO_RAILS,
+            exposure_policy=exposure_policy,
         )
     }
+    hero_openimcc_vaporock_species = tuple(
+        _hero_paired_engine_rail_comparisons(
+            comparison_payloads,
+            primary_engines=("openimcc",),
+            comparison_engines=("vaporock",),
+            rails=(Rail.VAPOUR.value,),
+            exposure_policy=exposure_policy,
+            include_species=True,
+        )
+    )
     deck_observations = _battery_hero_deck_store_observations(deck_score_rows)
     deck_records = _battery_hero_deck_records(
         deck_score_rows,
@@ -921,6 +1496,34 @@ def read_scores(
         comparison_engines=HERO_COMPARISON_ENGINES,
         observations=deck_observations,
     )
+    deck_metric_rows, deck_comparison_rows = _hero_deck_rows(
+        deck_score_rows,
+        deck_records["points"],
+    )
+    deck_engines = tuple(sorted({engine for _chart, engine in deck_records["metrics"]}))
+    hero_deck_metrics: dict[tuple[str, str], Mapping[str, object]] = {}
+    hero_deck_comparisons: dict[tuple[str, str], Mapping[str, object]] = {}
+    for chart in _BATTERY_HERO_DECK_CHART_IDS:
+        chart_metrics = _hero_metric_records(
+            deck_metric_rows.get(chart, ()),
+            engines=deck_engines,
+            rails=(chart,),
+            exposure_policy=exposure_policy,
+        )
+        hero_deck_metrics.update(chart_metrics)
+        chart_comparisons = _hero_paired_engine_rail_comparisons(
+            deck_comparison_rows.get(chart, ()),
+            primary_engines=HERO_PRIMARY_ENGINES,
+            comparison_engines=HERO_COMPARISON_ENGINES,
+            rails=(chart,),
+            exposure_policy=exposure_policy,
+        )
+        hero_deck_comparisons.update(
+            {
+                (str(record["rail"]), str(record["primary_engine"])): record
+                for record in chart_comparisons
+            }
+        )
     hero_sweet_spot_groups: dict[
         tuple[str, str], list[Mapping[str, object]]
     ] = defaultdict(list)
@@ -946,12 +1549,13 @@ def read_scores(
             for key, cells in sorted(hero_sweet_spot_groups.items())
         },
         hero_all_numeric_metrics=hero_all_numeric_metrics,
+        hero_openimcc_vaporock_species=hero_openimcc_vaporock_species,
         element_series=element_series,
         x_limits=x_limits,
         bin_width_K=bin_width_K,
         hero_deck_points=tuple(deck_records["points"]),
-        hero_deck_metrics=deck_records["metrics"],
-        hero_deck_comparisons=deck_records["comparisons"],
+        hero_deck_metrics=hero_deck_metrics,
+        hero_deck_comparisons=hero_deck_comparisons,
         hero_deck_unavailable_axis_counts=deck_records[
             "unavailable_axis_counts"
         ],
@@ -975,10 +1579,14 @@ def _archive_json_member(path: Path, member_name: str) -> Mapping[str, Any]:
 
 def _history_fields_from_scores(
     path: Path,
+    *,
+    exposure_policy: _HeroExposurePolicy | None = None,
 ) -> tuple[
     dict[tuple[str, str], Mapping[str, object]],
     dict[tuple[str, str], Mapping[str, object]],
     list[dict[str, object]],
+    dict[tuple[str, str], Mapping[str, object]],
+    tuple[Mapping[str, object], ...],
 ]:
     rows: list[Mapping[str, object]] = []
     diagnostics: dict[tuple[str, str], dict[str, object]] = {}
@@ -1024,11 +1632,12 @@ def _history_fields_from_scores(
                 rows.append(row)
     comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_comparisons(
+        for record in _hero_paired_engine_rail_comparisons(
             rows,
             primary_engines=HERO_PRIMARY_ENGINES,
             comparison_engines=HERO_COMPARISON_ENGINES,
             rails=HERO_RAILS,
+            exposure_policy=exposure_policy,
         )
     }
     coverage = [
@@ -1043,7 +1652,18 @@ def _history_fields_from_scores(
         for rail in sorted(rails)
         for engine in sorted(engines)
     ]
-    return comparisons, _normalized_hero_diagnostics(diagnostics), coverage
+    plotted = read_scores(path, exposure_policy=exposure_policy)
+    metric_records = {
+        **plotted.hero_all_numeric_metrics,
+        **plotted.hero_deck_metrics,
+    }
+    return (
+        comparisons,
+        _normalized_hero_diagnostics(diagnostics),
+        coverage,
+        metric_records,
+        plotted.hero_openimcc_vaporock_species,
+    )
 
 
 def _refusal_coverage_from_summaries(
@@ -1086,6 +1706,9 @@ def _history_record(
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
     refusal_coverage: Sequence[Mapping[str, object]] = (),
     commit_date: str | None = None,
+    hero_metrics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
+    openimcc_score_commit: str | None = None,
+    openimcc_vaporock_species: Sequence[Mapping[str, object]] = (),
 ) -> dict[str, Any]:
     records = summary.get("records")
     if not isinstance(records, Sequence) or isinstance(records, (str, bytes)):
@@ -1109,8 +1732,15 @@ def _history_record(
             record.get("rail") in HERO_RAILS
             or (str(record.get("rail")), str(record.get("engine")))
             in diagnostic_keys
+            or (str(record.get("rail")), str(record.get("engine")))
+            in (hero_metrics or {})
         )
     }
+    for key, hero_metric in (hero_metrics or {}).items():
+        metrics_by_key[key] = {
+            **metrics_by_key.get(key, {}),
+            **dict(hero_metric),
+        }
     for rail, engine in set(metrics_by_key) | set(diagnostics):
         metric = metrics_by_key.setdefault(
             (rail, engine),
@@ -1148,6 +1778,10 @@ def _history_record(
         "store_sha": landing_sha,
         "store_revision": store.get("revision"),
         "commit_date": commit_date or _git_commit_date(landing_sha),
+        "openimcc_score_commit": openimcc_score_commit,
+        "openimcc_vaporock_shared_by_species": [
+            dict(record) for record in openimcc_vaporock_species
+        ],
         "metrics": metrics,
         "comparisons": [comparisons[key] for key in sorted(comparisons)],
         "refusal_coverage": [dict(item) for item in refusal_coverage],
@@ -1161,11 +1795,20 @@ def history_record_from_archive(
     comparisons: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     refusal_coverage: Sequence[Mapping[str, object]] | None = None,
+    exposure_policy: _HeroExposurePolicy | None = None,
+    openimcc_score_commit: str | None = None,
 ) -> dict[str, Any]:
     summary = _archive_json_member(archive_path, "data/battery/score-summary.json")
     if comparisons is None or diagnostics is None or refusal_coverage is None:
-        streamed_comparisons, streamed_diagnostics, streamed_coverage = (
-            _history_fields_from_scores(archive_path)
+        (
+            streamed_comparisons,
+            streamed_diagnostics,
+            streamed_coverage,
+            streamed_metrics,
+            streamed_species,
+        ) = _history_fields_from_scores(
+            archive_path,
+            exposure_policy=exposure_policy,
         )
         if comparisons is None:
             comparisons = streamed_comparisons
@@ -1173,12 +1816,25 @@ def history_record_from_archive(
             diagnostics = streamed_diagnostics
         if refusal_coverage is None:
             refusal_coverage = streamed_coverage
+    else:
+        streamed_metrics = {}
+        streamed_species = ()
+    if not streamed_metrics:
+        plotted = read_scores(archive_path, exposure_policy=exposure_policy)
+        streamed_metrics = {
+            **plotted.hero_all_numeric_metrics,
+            **plotted.hero_deck_metrics,
+        }
+        streamed_species = plotted.hero_openimcc_vaporock_species
     return _history_record(
         summary,
         landing_sha=landing_sha,
         comparisons=comparisons,
         diagnostics=diagnostics,
         refusal_coverage=refusal_coverage,
+        hero_metrics=streamed_metrics,
+        openimcc_score_commit=openimcc_score_commit,
+        openimcc_vaporock_species=streamed_species,
     )
 
 
@@ -1189,10 +1845,20 @@ def append_history(path: Path, record: Mapping[str, Any]) -> bool:
     if not store_sha:
         raise ValueError("history row needs store_sha")
     if path.exists():
+        identity = (
+            store_sha,
+            str(record.get("openimcc_score_commit") or ""),
+        )
         with path.open("r", encoding="utf-8") as source:
             for line in source:
-                if line.strip() and json.loads(line).get("store_sha") == store_sha:
-                    return False
+                if line.strip():
+                    previous = json.loads(line)
+                    previous_identity = (
+                        str(previous.get("store_sha") or ""),
+                        str(previous.get("openimcc_score_commit") or ""),
+                    )
+                    if previous_identity == identity:
+                        return False
         if path.stat().st_size:
             with path.open("rb") as source:
                 source.seek(-1, os.SEEK_END)
@@ -1210,10 +1876,17 @@ def append_archive_history(
     archive_path: Path,
     *,
     landing_sha: str,
+    openimcc_score_commit: str | None = None,
+    exposure_policy: _HeroExposurePolicy | None = None,
 ) -> bool:
     return append_history(
         history_path,
-        history_record_from_archive(archive_path, landing_sha=landing_sha),
+        history_record_from_archive(
+            archive_path,
+            landing_sha=landing_sha,
+            openimcc_score_commit=openimcc_score_commit,
+            exposure_policy=exposure_policy,
+        ),
     )
 
 
@@ -1666,9 +2339,15 @@ def stamp_text(
     )
     revision = str(data.stamp.get("revision") or "unknown")
     actual_simulator_commit = str(data.stamp.get("simulator_commit") or simulator_commit)
-    actual_openimcc_commit = str(data.stamp.get("openimcc_commit") or openimcc_commit)
+    actual_openimcc_commit = openimcc_commit
+    openimcc_pack = _openimcc_default_pack(data)
     parts = [
-        f"OpenIMCC {openimcc_version} · {actual_openimcc_commit}",
+        f"OpenIMCC {openimcc_version} · SCORE {actual_openimcc_commit}",
+        *(
+            (f"default pack at scored pin: {openimcc_pack}",)
+            if openimcc_pack
+            else ()
+        ),
         f"simulator {actual_simulator_commit}",
         f"store {revision}",
         f"rendered {render_date} UTC",
@@ -1679,6 +2358,13 @@ def stamp_text(
         ),
     ]
     return "  |  ".join(parts)
+
+
+def _openimcc_default_pack(data: ScorePlotData) -> str | None:
+    summary = data.summaries.get("openimcc")
+    if summary is None or not summary.default_packs:
+        return None
+    return ", ".join(sorted(summary.default_packs))
 
 
 def _revision_slug(revision: object) -> str:
@@ -1771,6 +2457,151 @@ def _compact_count(value: object) -> str:
 def _format_dex(value: object) -> str:
     number = _finite_float(value)
     return "unavailable" if number is None else f"{number:.2f}"
+
+
+def _hero_metric_view_text(label: str, view: Mapping[str, object]) -> str:
+    count = _compact_count(view.get("n"))
+    result = (
+        f"{label} RMS {_format_dex(view.get('rms_dex'))} dex (n={count}), "
+        f"SD {_format_dex(view.get('sd_dex'))} dex (n={count}), "
+        f"median |dex| {_format_dex(view.get('median_abs_dex'))} dex (n={count})"
+    )
+    if label == "all":
+        result += f", no T n={_compact_count(view.get('no_temperature_n'))}"
+    for key, flag_label in (
+        ("source_disagreement_flagged", "source-disagreement flagged"),
+        ("unflagged", "unflagged"),
+    ):
+        flag_stats = view.get(key)
+        if isinstance(flag_stats, Mapping):
+            result += "; " + _hero_metric_view_text(flag_label, flag_stats)
+    if "exposed_n" in view:
+        held_out = view.get("held_out")
+        held_out = held_out if isinstance(held_out, Mapping) else {}
+        held_count = _compact_count(held_out.get("n"))
+        result += (
+            f", exposed n={_compact_count(view.get('exposed_n'))}, "
+            f"held-out n={held_count}"
+        )
+        if int(held_out.get("n") or 0) >= int(
+            held_out.get("minimum_n") or HERO_MINIMUM_REPORT_N
+        ):
+            result += (
+                f", held-out RMS {_format_dex(held_out.get('rms_dex'))} dex "
+                f"(n={held_count}), SD {_format_dex(held_out.get('sd_dex'))} dex "
+                f"(n={held_count}), median |dex| "
+                f"{_format_dex(held_out.get('median_abs_dex'))} dex (n={held_count})"
+            )
+    return result
+
+
+def _hero_scorecard_cell_text(
+    view: Mapping[str, object], *, include_no_temperature: bool = False
+) -> str:
+    count = _compact_count(view.get("n"))
+    lines = [
+        f"RMS {_format_dex(view.get('rms_dex'))} dex (n={count}); "
+        f"SD {_format_dex(view.get('sd_dex'))} dex (n={count}); "
+        f"median |dex| {_format_dex(view.get('median_abs_dex'))} dex (n={count})"
+    ]
+    if include_no_temperature:
+        lines.append(f"no T n={_compact_count(view.get('no_temperature_n'))}")
+    for key, label in (
+        ("source_disagreement_flagged", "source-disagreement flagged"),
+        ("unflagged", "unflagged"),
+    ):
+        flag_stats = view.get(key)
+        if isinstance(flag_stats, Mapping):
+            lines.append(
+                f"{label}: " + _hero_scorecard_cell_text(flag_stats)
+            )
+    if "exposed_n" in view:
+        held_out = view.get("held_out")
+        held_out = held_out if isinstance(held_out, Mapping) else {}
+        held_count = _compact_count(held_out.get("n"))
+        lines.append(
+            f"exposed n={_compact_count(view.get('exposed_n'))}; "
+            f"held-out n={held_count}"
+        )
+        minimum_n = int(held_out.get("minimum_n") or HERO_MINIMUM_REPORT_N)
+        if int(held_out.get("n") or 0) >= minimum_n:
+            lines.append(
+                f"held-out RMS {_format_dex(held_out.get('rms_dex'))} dex "
+                f"(n={held_count}); SD {_format_dex(held_out.get('sd_dex'))} dex "
+                f"(n={held_count}); median |dex| "
+                f"{_format_dex(held_out.get('median_abs_dex'))} dex (n={held_count})"
+            )
+    return "\n".join(lines)
+
+
+def _hero_comparison_view_text(
+    engine: str,
+    primary: str,
+    label: str,
+    view: Mapping[str, object],
+) -> str:
+    count = _compact_count(view.get("n_shared"))
+    result = (
+        f"{label} {engine} RMS {_format_dex(view.get('outside_rms_dex'))} dex "
+        f"(n_shared={count}), SD {_format_dex(view.get('outside_sd_dex'))} dex "
+        f"(n_shared={count}), median |dex| "
+        f"{_format_dex(view.get('outside_median_abs_dex'))} dex (n_shared={count}) "
+        f"vs {primary} RMS {_format_dex(view.get('primary_rms_dex_on_shared'))} dex "
+        f"(n_shared={count}), SD "
+        f"{_format_dex(view.get('primary_sd_dex_on_shared'))} dex (n_shared={count}), "
+        f"median |dex| "
+        f"{_format_dex(view.get('primary_median_abs_dex_on_shared'))} dex "
+        f"(n_shared={count})"
+    )
+    if label == "all" and "no_temperature_n" in view:
+        result += f", no T n={_compact_count(view.get('no_temperature_n'))}"
+    for key, flag_label in (
+        ("source_disagreement_flagged", "source-disagreement flagged"),
+        ("unflagged", "unflagged"),
+    ):
+        flag_stats = view.get(key)
+        if isinstance(flag_stats, Mapping):
+            result += "; " + _hero_comparison_view_text(
+                engine,
+                primary,
+                flag_label,
+                flag_stats,
+            )
+    if "exposed_n" in view:
+        held_out = view.get("held_out")
+        held_out = held_out if isinstance(held_out, Mapping) else {}
+        held_count = _compact_count(held_out.get("n"))
+        result += (
+            f", exposed n={_compact_count(view.get('exposed_n'))}, "
+            f"held-out n={held_count}"
+        )
+        if int(held_out.get("n") or 0) >= int(
+            held_out.get("minimum_n") or HERO_MINIMUM_REPORT_N
+        ):
+            held_out_view = {
+                "n_shared": held_out.get("n"),
+                "outside_rms_dex": held_out.get("outside_rms_dex"),
+                "outside_sd_dex": held_out.get("outside_sd_dex"),
+                "outside_median_abs_dex": held_out.get(
+                    "outside_median_abs_dex"
+                ),
+                "primary_rms_dex_on_shared": held_out.get(
+                    "primary_rms_dex_on_shared"
+                ),
+                "primary_sd_dex_on_shared": held_out.get(
+                    "primary_sd_dex_on_shared"
+                ),
+                "primary_median_abs_dex_on_shared": held_out.get(
+                    "primary_median_abs_dex_on_shared"
+                ),
+            }
+            result += "; held-out " + _hero_comparison_view_text(
+                engine,
+                primary,
+                "all",
+                held_out_view,
+            )
+    return result
 
 
 def _temperature_tick(value: float, _position: int | None = None) -> str:
@@ -2222,7 +3053,7 @@ def _draw_hero_history(
     engine_colors: Mapping[str, Any],
 ) -> set[str]:
     metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
-        lambda: {"rms_dex": [], "median_abs_dex": []}
+        lambda: {"rms_dex": [], "sd_dex": [], "median_abs_dex": []}
     )
     comparison_points: dict[
         tuple[str, str], list[tuple[float, float, float, int]]
@@ -2242,7 +3073,7 @@ def _draw_hero_history(
                 if not isinstance(metric, Mapping) or metric.get("rail") != rail:
                     continue
                 engine = str(metric.get("engine") or "unknown")
-                for field_name in ("rms_dex", "median_abs_dex"):
+                for field_name in ("rms_dex", "sd_dex", "median_abs_dex"):
                     value = _finite_float(metric.get(field_name))
                     if value is not None:
                         metrics_by_engine[engine][field_name].append((date, value))
@@ -2294,6 +3125,7 @@ def _draw_hero_history(
         color = engine_colors.get(engine, "#555555")
         for field_name, linestyle, label in (
             ("rms_dex", "-", "RMS"),
+            ("sd_dex", "-.", "SD"),
             ("median_abs_dex", "--", "median |dex|"),
         ):
             points = sorted(metrics_by_engine[engine][field_name])
@@ -2356,7 +3188,7 @@ def _draw_hero_history(
             fontsize=7,
         )
     axis.set_title("History by green landing", loc="left", fontsize=8)
-    axis.set_ylabel("RMS / median |dex|", fontsize=7)
+    axis.set_ylabel("RMS / SD / median |dex|", fontsize=7)
     axis.set_xlabel("Green landing date", fontsize=7)
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     if history_dates:
@@ -2375,6 +3207,10 @@ def _hero_summary_payload(
     data: ScorePlotData,
 ) -> dict[str, Any]:
     charts: dict[str, Any] = {}
+    exposure_enabled = any(
+        "exposed_n" in metric.get("views", {}).get("all", {})
+        for metric in data.hero_all_numeric_metrics.values()
+    )
     for rail in HERO_RAILS:
         rows_by_engine: Counter[str] = Counter()
         for (series_rail, facet, engine, _composition), points in data.hero_series.items():
@@ -2388,9 +3224,48 @@ def _hero_summary_payload(
                 refusals[engine][reason] = count
         current_metrics = {
             engine: data.hero_all_numeric_metrics.get((rail, engine))
-            for engine in HERO_PRIMARY_ENGINES
+            for engine in sorted(data.engines)
         }
+        openimcc_vaporock = next(
+            (
+                comparison
+                for comparison in data.hero_comparisons[
+                    (rail, "openimcc")
+                ].get("comparisons", ())
+                if isinstance(comparison, Mapping)
+                and comparison.get("engine") == "vaporock"
+            ),
+            None,
+        ) if rail == Rail.VAPOUR.value else None
         charts[rail] = {
+            "temperature_split": {
+                "field": HERO_TEMPERATURE_FIELD,
+                "floor_K": str(HERO_TEMPERATURE_FLOOR_K),
+                "boundary": "1700 K is included in temperature_ge_1700",
+                "missing_temperature": "all only; counted as no_temperature_n",
+            },
+            "source_disagreement_split": (
+                {
+                    "field": "Residual.notices",
+                    "notice_kind": NoticeKind.SOURCE_DISAGREEMENT.value,
+                    "reason_prefix": "source_internally_inconsistent:",
+                    "groups": ["source_disagreement_flagged", "unflagged"],
+                }
+                if rail == Rail.VAPOUR.value
+                else None
+            ),
+            "exposure_policy": (
+                {
+                    "rule": (
+                        "exposed if row reference is in the census or source_id is "
+                        "in the exposed-source list; held_out only if reference is "
+                        "absent from both and absent from pre-cutoff store IDs"
+                    ),
+                    "minimum_held_out_n": HERO_MINIMUM_REPORT_N,
+                }
+                if exposure_enabled
+                else None
+            ),
             "plotted_observations_by_engine": dict(sorted(rows_by_engine.items())),
             "not_observable_by_engine": {
                 engine: int(
@@ -2409,13 +3284,50 @@ def _hero_summary_payload(
                     None if metric is None else metric.get("rms_dex")
                 )
                 for engine, metric in current_metrics.items()
+                if engine in HERO_PRIMARY_ENGINES
             },
+            "all_numeric_metrics_by_engine": current_metrics,
             "same_row_comparisons_by_primary_engine": {
                 engine: data.hero_comparisons[(rail, engine)]
                 for engine in HERO_PRIMARY_ENGINES
             },
+            "openimcc_vs_vaporock_shared_rows": openimcc_vaporock,
+            "openimcc_vs_vaporock_shared_by_species": (
+                [
+                    record
+                    for record in data.hero_openimcc_vaporock_species
+                    if record.get("rail") == rail
+                ]
+                if rail == Rail.VAPOUR.value
+                else []
+            ),
         }
     return charts
+
+
+def _hero_deck_summary_payload(data: ScorePlotData) -> dict[str, Any]:
+    charts = sorted({chart for chart, _engine in data.hero_deck_metrics})
+    return {
+        chart: {
+            "temperature_split": {
+                "field": HERO_TEMPERATURE_FIELD,
+                "floor_K": str(HERO_TEMPERATURE_FLOOR_K),
+                "boundary": "1700 K is included in temperature_ge_1700",
+                "missing_temperature": "all only; counted as no_temperature_n",
+            },
+            "metrics_by_engine": {
+                engine: data.hero_deck_metrics[(chart, engine)]
+                for metric_chart, engine in sorted(data.hero_deck_metrics)
+                if metric_chart == chart
+            },
+            "same_row_comparisons_by_primary_engine": {
+                engine: data.hero_deck_comparisons[(chart, engine)]
+                for comparison_chart, engine in sorted(data.hero_deck_comparisons)
+                if comparison_chart == chart
+            },
+        }
+        for chart in charts
+    }
 
 
 def render_hero_charts(
@@ -2423,6 +3335,7 @@ def render_hero_charts(
     output_dir: Path,
     *,
     history_path: Path | None = None,
+    openimcc_score_commit: str | None = None,
 ) -> dict[str, Path]:
     """Render the vaporisation, redox, and melt activity current/history charts."""
 
@@ -2545,6 +3458,14 @@ def render_hero_charts(
                     0.25 + 0.11 * math.ceil(len(minor_empty_facets) / 3),
                 )
             )
+        row_specs.append(
+            (
+                "scorecard",
+                (),
+                max(0.72, 0.18 * max(1, len(data.engines))),
+            )
+        )
+        row_specs.append(("spacer", (), 0.28))
         row_specs.append(("history", (), 1.65))
         sweet_spot_pairs = [
             tuple(sweet_spot_engines[index : index + 2])
@@ -2640,6 +3561,53 @@ def render_hero_charts(
                             fontsize=5.1,
                             linespacing=1.05,
                         )
+            elif kind == "scorecard":
+                scorecard_axis = figure.add_subplot(grid[row_index, :])
+                scorecard_axis.set_axis_off()
+                scorecard_axis.text(
+                    0.005,
+                    0.98,
+                    "Cross-engine signed dex scorecard · population SD (ddof=0); "
+                    f"held-out metrics require n≥{HERO_MINIMUM_REPORT_N}",
+                    transform=scorecard_axis.transAxes,
+                    ha="left",
+                    va="top",
+                    fontsize=5.5,
+                    fontweight="bold",
+                )
+                rows = []
+                for engine in data.engines:
+                    metric = data.hero_all_numeric_metrics.get((rail, engine), {})
+                    views = metric.get("views", {})
+                    views = views if isinstance(views, Mapping) else {}
+                    row = [engine]
+                    for view_name, _view_label in HERO_TEMPERATURE_VIEWS:
+                        view = views.get(view_name, {})
+                        view = view if isinstance(view, Mapping) else {}
+                        row.append(
+                            _hero_scorecard_cell_text(
+                                view,
+                                include_no_temperature=view_name == "all",
+                            )
+                        )
+                    rows.append(row)
+                table = scorecard_axis.table(
+                    cellText=rows,
+                    colLabels=("Engine", "All", "T ≥ 1700 K", "T < 1700 K"),
+                    cellLoc="left",
+                    colLoc="left",
+                    colWidths=(0.10, 0.30, 0.30, 0.30),
+                    bbox=(0.0, 0.0, 1.0, 0.88),
+                )
+                table.auto_set_font_size(False)
+                for (table_row, _column), cell in table.get_celld().items():
+                    cell.set_edgecolor("#cccccc")
+                    cell.set_linewidth(0.25)
+                    cell.PAD = 0.02
+                    cell.set_text_props(fontsize=3.5, va="center")
+                    if table_row == 0:
+                        cell.set_facecolor("#eeeeee")
+                        cell.set_text_props(fontsize=4.0, va="center", weight="bold")
             elif kind == "history":
                 history_axis = figure.add_subplot(grid[row_index, :])
                 history_engine_names = _draw_hero_history(
@@ -2694,33 +3662,135 @@ def render_hero_charts(
                 "comparisons", ()
             )
             metric = data.hero_all_numeric_metrics.get((rail, engine))
-            all_numeric_rms = _format_dex(None if metric is None else metric.get("rms_dex"))
-            all_numeric_rms_label = (
-                all_numeric_rms
-                if all_numeric_rms == "unavailable"
-                else f"{all_numeric_rms} dex"
+            views = {} if metric is None else metric.get("views", {})
+            views = views if isinstance(views, Mapping) else {}
+            all_view = views.get("all", {})
+            all_view = all_view if isinstance(all_view, Mapping) else {}
+            all_numeric_count = _compact_count(all_view.get("n"))
+            all_rms = _format_dex(all_view.get("rms_dex"))
+            all_rms_text = (
+                f"all-numeric RMS unavailable (n={all_numeric_count})"
+                if all_rms == "unavailable"
+                else f"all-numeric RMS {all_rms} dex (n={all_numeric_count})"
             )
-            all_numeric_count = _compact_count(
-                0 if metric is None else metric.get("n_dex", 0)
+            all_numeric_label = (
+                f"{all_rms_text}, SD {_format_dex(all_view.get('sd_dex'))} dex "
+                f"(n={all_numeric_count}), median |dex| "
+                f"{_format_dex(all_view.get('median_abs_dex'))} dex (n={all_numeric_count})"
             )
-            comparison_labels = [
-                f"{comparison.get('engine')} RMS "
-                f"{_format_dex(comparison.get('outside_rms_dex'))} dex vs "
-                f"{engine} RMS "
-                f"{_format_dex(comparison.get('primary_rms_dex_on_shared'))} dex "
-                f"(n_shared={_compact_count(comparison.get('n_shared'))})"
-                for comparison in comparisons
-                if isinstance(comparison, Mapping)
-            ]
+            if all_view:
+                all_numeric_label += (
+                    f"; no T n={_compact_count(all_view.get('no_temperature_n'))}"
+                )
+            high_view = views.get("temperature_ge_1700", {})
+            low_view = views.get("temperature_lt_1700", {})
+            if isinstance(high_view, Mapping):
+                all_numeric_label += "; " + _hero_metric_view_text(
+                    HERO_TEMPERATURE_VIEWS[1][1], high_view
+                )
+            if isinstance(low_view, Mapping):
+                all_numeric_label += "; " + _hero_metric_view_text(
+                    HERO_TEMPERATURE_VIEWS[2][1], low_view
+                )
+            comparison_labels: list[str] = []
+            for comparison in comparisons:
+                if not isinstance(comparison, Mapping):
+                    continue
+                comparison_views = comparison.get("views", {})
+                if not isinstance(comparison_views, Mapping):
+                    comparison_views = {}
+                for view_name, view_label in HERO_TEMPERATURE_VIEWS:
+                    view = comparison_views.get(view_name)
+                    if isinstance(view, Mapping):
+                        comparison_labels.append(
+                            _hero_comparison_view_text(
+                                str(comparison.get("engine") or "unknown"),
+                                engine,
+                                view_label,
+                                view,
+                            )
+                        )
             same_row_label = (
                 "; ".join(comparison_labels)
                 if comparison_labels
                 else "no same-row comparisons (n_shared=0)"
             )
-            status_lines.append(
-                f"{engine}: {same_row_label} · "
-                f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
+            status_lines.append(f"{engine}: {same_row_label} · {all_numeric_label}")
+        if rail == Rail.VAPOUR.value:
+            openimcc_record = data.hero_comparisons[(rail, "openimcc")]
+            pair = next(
+                (
+                    comparison
+                    for comparison in openimcc_record.get("comparisons", ())
+                    if isinstance(comparison, Mapping)
+                    and comparison.get("engine") == "vaporock"
+                ),
+                None,
             )
+            if pair is not None:
+                pair_views = pair.get("views", {})
+                pair_views = pair_views if isinstance(pair_views, Mapping) else {}
+                pair_text = "; ".join(
+                    _hero_comparison_view_text(
+                        "VapoRock",
+                        "OpenIMCC",
+                        label,
+                        view,
+                    )
+                    for key, label in HERO_TEMPERATURE_VIEWS
+                    if isinstance((view := pair_views.get(key)), Mapping)
+                )
+                status_lines.append(
+                    "OpenIMCC vs VapoRock on shared vapour rows: " + pair_text
+                )
+            for record in data.hero_openimcc_vaporock_species:
+                if record.get("rail") != rail:
+                    continue
+                comparisons = record.get("comparisons", ())
+                comparison = next(
+                    (
+                        row
+                        for row in comparisons
+                        if isinstance(row, Mapping)
+                        and row.get("engine") == "vaporock"
+                    ),
+                    None,
+                ) if isinstance(comparisons, Sequence) else None
+                if comparison is None:
+                    continue
+                views = comparison.get("views", {})
+                views = views if isinstance(views, Mapping) else {}
+                species_parts = []
+                for key, label in HERO_TEMPERATURE_VIEWS:
+                    view = views.get(key)
+                    if not isinstance(view, Mapping):
+                        continue
+                    n_shared = int(view.get("n_shared") or 0)
+                    if n_shared < HERO_MINIMUM_REPORT_N:
+                        no_temperature_note = (
+                            f"; no T n={_compact_count(view.get('no_temperature_n'))}"
+                            if key == "all" and "no_temperature_n" in view
+                            else ""
+                        )
+                        species_parts.append(
+                            f"{label} n_shared={_compact_count(n_shared)} "
+                            f"(<{HERO_MINIMUM_REPORT_N})"
+                            f"{no_temperature_note}"
+                        )
+                    else:
+                        species_parts.append(
+                            _hero_comparison_view_text(
+                                "VapoRock",
+                                "OpenIMCC",
+                                label,
+                                view,
+                            )
+                        )
+                status_lines.append(
+                    f"OpenIMCC vs VapoRock shared vapour rows · {record.get('species')}: "
+                    + "; ".join(species_parts)
+                    + f" (per-species metrics require n≥{HERO_MINIMUM_REPORT_N})"
+                )
         not_observable = [
             f"{engine} {_compact_count(diagnostic.get('not_observable_count'))}"
             for (diagnostic_rail, engine), diagnostic in sorted(
@@ -2740,8 +3810,9 @@ def render_hero_charts(
             "\n".join(status_lines),
             ha="center",
             va="top",
-            fontsize=6.4,
+            fontsize=5.4,
             linespacing=1.15,
+            wrap=True,
         )
         legend_engine_names = {
             engine
@@ -2784,9 +3855,13 @@ def render_hero_charts(
             )
         caption = (
             "Scatter marker face=engine colour; flagged/extrapolated=white face with engine-coloured edge. "
-            "History: solid=RMS, dashed=median |dex|, dash-dot=paired RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
-            "Sweet-spot fill=median |dex|; cell label=n; 1≤n<3 is grey and hatched; n=0 is blank."
+            "History: solid=RMS, dashed=median |dex|, dash-dot=SD/paired primary RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
+            "Sweet-spot fill=median |dex|; cell label=n; 1≤n<3 is grey and hatched; n=0 is blank. "
+            f"Temperature split uses measured residual field {HERO_TEMPERATURE_FIELD}; "
+            "1700 K is in the ≥ view and rows without T are all-only with a no T count."
         )
+        if openimcc_score_commit:
+            caption += f" OpenIMCC SCORE commit: {openimcc_score_commit}."
         if rail == Rail.MELT_ACTIVITY.value:
             caption += (
                 " ThermoEngine comparison caveat: 140/147 rows pair pure-solid "
@@ -2803,6 +3878,11 @@ def render_hero_charts(
                     "\nVapour scatter excludes uncalibrated KEMS p_partial rows "
                     f"under d-139: {counts}; scorer all-numeric and same-row RMS include them."
                 )
+            openimcc_pack = _openimcc_default_pack(data) or "not recorded in score metadata"
+            caption += (
+                f"\nDefault pack at scored pin: {openimcc_pack}; a later OpenIMCC "
+                "change will make v4 the default."
+            )
         figure.text(
             0.5,
             0.018,
@@ -2836,6 +3916,19 @@ def render_hero_charts(
 def _hero_deck_comparison_caption(
     data: ScorePlotData, chart: str
 ) -> str:
+    metric_entries: list[str] = []
+    for metric_chart, engine in sorted(data.hero_deck_metrics):
+        if metric_chart != chart:
+            continue
+        metric = data.hero_deck_metrics[(chart, engine)]
+        views = metric.get("views", {})
+        views = views if isinstance(views, Mapping) else {}
+        for key, label in HERO_TEMPERATURE_VIEWS:
+            view = views.get(key)
+            if isinstance(view, Mapping):
+                metric_entries.append(
+                    f"{engine} {_hero_metric_view_text(label, view)}"
+                )
     entries: list[str] = []
     for primary in HERO_PRIMARY_ENGINES:
         metric = data.hero_deck_metrics.get((chart, primary), {})
@@ -2851,17 +3944,48 @@ def _hero_deck_comparison_caption(
                 f"{primary}: no shared chart rows (n_shared=0; scored n={_compact_count(count)})"
             )
             continue
-        entries.extend(
-            f"{primary}: {comparison.get('engine')} RMS "
-            f"{_format_dex(comparison.get('outside_rms_dex'))} vs "
-            f"{primary} RMS "
-            f"{_format_dex(comparison.get('primary_rms_dex_on_shared'))} dex "
-            f"(n_shared={_compact_count(comparison.get('n_shared'))}; "
-            f"scored n={_compact_count(count)})"
-            for comparison in comparisons
-            if isinstance(comparison, Mapping)
-        )
-    return "Same-row comparisons on chart rows: " + "; ".join(entries)
+        for comparison in comparisons:
+            if not isinstance(comparison, Mapping):
+                continue
+            comparison_views = comparison.get("views", {})
+            comparison_views = (
+                comparison_views if isinstance(comparison_views, Mapping) else {}
+            )
+            if not comparison_views:
+                shared_count = _compact_count(comparison.get("n_shared"))
+                entries.append(
+                    f"{primary} vs {comparison.get('engine')} RMS "
+                    f"{_format_dex(comparison.get('outside_rms_dex'))} dex "
+                    f"(n_shared={shared_count}) · {primary} RMS "
+                    f"{_format_dex(comparison.get('primary_rms_dex_on_shared'))} dex "
+                    f"(n_shared={shared_count})"
+                )
+                continue
+            entries.extend(
+                f"{primary} vs {comparison.get('engine')} "
+                + _hero_comparison_view_text(
+                    str(comparison.get("engine") or "unknown"),
+                    primary,
+                    label,
+                    view,
+                )
+                + f" (scored n={_compact_count(count)})"
+                for key, label in HERO_TEMPERATURE_VIEWS
+                if isinstance((view := comparison_views.get(key)), Mapping)
+            )
+    metrics_label = (
+        "Chart metrics (each number includes its n): " + "; ".join(metric_entries)
+        if metric_entries
+        else "No scored chart metrics."
+    )
+    return (
+        "Same-row comparisons on chart rows: "
+        + "; ".join(entries)
+        + " · "
+        + f"Temperature split uses measured residual field {HERO_TEMPERATURE_FIELD}; "
+        "1700 K is included in the ≥ view, and rows without T are all-only. "
+        + metrics_label
+    )
 
 
 def _hero_deck_refusal_entries(
@@ -2881,6 +4005,7 @@ def render_hero_deck_charts(
     output_dir: Path,
     *,
     history_path: Path | None = None,
+    openimcc_score_commit: str | None = None,
 ) -> dict[str, Path]:
     """Render the scorer-owned hero deck axes and explicit missing-data panels."""
 
@@ -3084,6 +4209,13 @@ def render_hero_deck_charts(
         )
         figure.suptitle(title, fontsize=10, y=0.985)
         caption = _hero_deck_comparison_caption(data, chart)
+        openimcc_pack = _openimcc_default_pack(data) or "not recorded in score metadata"
+        caption += (
+            f" · Default pack at scored pin: {openimcc_pack}; a later "
+            "OpenIMCC change will make v4 the default."
+        )
+        if openimcc_score_commit:
+            caption += f" · OpenIMCC SCORE commit: {openimcc_score_commit}."
         if chart == "residue_composition":
             caption += " · fraction evaporated: no typed mass-loss value yet (t-1312)"
         elif chart in {"redox_sensitivity", "sio_evolution"}:
@@ -3104,7 +4236,8 @@ def render_hero_deck_charts(
             caption,
             ha="center",
             va="center",
-            fontsize=6,
+            fontsize=4.8,
+            wrap=True,
         )
 
         if chart in {"polymerisation", "redox_sensitivity"}:
@@ -3435,6 +4568,7 @@ def render_plots(
     abundance_feedstock: str = DEFAULT_ABUNDANCE_FEEDSTOCK,
     omit_empty_engines: bool | None = None,
     history_path: Path | None = None,
+    openimcc_score_commit: str | None = None,
 ) -> dict[str, Path]:
     """Write shared-scale species/element tiles and one PNG per engine/view."""
 
@@ -3558,9 +4692,21 @@ def render_plots(
             plt.close(figure)
             files[f"{view}:engine:{engine}"] = engine_png
     if history_path is not None:
-        files.update(render_hero_charts(data, output_dir, history_path=history_path))
         files.update(
-            render_hero_deck_charts(data, output_dir, history_path=history_path)
+            render_hero_charts(
+                data,
+                output_dir,
+                history_path=history_path,
+                openimcc_score_commit=openimcc_score_commit,
+            )
+        )
+        files.update(
+            render_hero_deck_charts(
+                data,
+                output_dir,
+                history_path=history_path,
+                openimcc_score_commit=openimcc_score_commit,
+            )
         )
     return files
 
@@ -3572,6 +4718,7 @@ def _summary_payload(
     *,
     omitted_engines: Sequence[str] = (),
     history: Sequence[Mapping[str, Any]] = (),
+    openimcc_score_commit: str | None = None,
 ) -> dict[str, Any]:
     engines: dict[str, Any] = {}
     for engine in data.engines:
@@ -3591,9 +4738,15 @@ def _summary_payload(
             "missing_identity_rows_skipped": summary.missing_identity_rows,
             "source_relation_counts": dict(sorted(summary.source_relations.items())),
             "versions": sorted(summary.versions),
+            "default_packs": sorted(summary.default_packs),
         }
     return {
         "store_revision": data.stamp.get("revision"),
+        "openimcc_score_commit": openimcc_score_commit,
+        "openimcc_default_pack_at_scored_pin": _openimcc_default_pack(data),
+        "openimcc_default_pack_note": (
+            "A later OpenIMCC change will make v4 the default."
+        ),
         "engines": engines,
         "rails_seen": list(data.rails_seen),
         "selected_rails": list(data.selected_rails),
@@ -3604,6 +4757,7 @@ def _summary_payload(
         "omitted_empty_engines": list(omitted_engines),
         "no_scored_rows_footer": _no_scored_rows_note(data, omitted_engines),
         "hero_charts": _hero_summary_payload(data),
+        "hero_deck_charts": _hero_deck_summary_payload(data),
         "files": {name: str(path) for name, path in files.items()},
     }
 
@@ -3655,6 +4809,21 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--simulator-commit", required=True)
     parser.add_argument("--openimcc-commit", required=True)
+    parser.add_argument(
+        "--exposure-census",
+        type=Path,
+        help="CSV of diagnostic-exposed rows by observation_id",
+    )
+    parser.add_argument(
+        "--exposed-sources",
+        type=Path,
+        help="CSV of diagnostic-exposed source IDs",
+    )
+    parser.add_argument(
+        "--pre-cutoff-observation-ids",
+        type=Path,
+        help="newline-separated observation IDs present at the exposure cutoff",
+    )
     parser.add_argument("--render-date", help="UTC date for stamps and filenames (default: today)")
     parser.add_argument(
         "--history-path",
@@ -3676,10 +4845,16 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    exposure_policy = _exposure_policy_from_files(
+        census_path=args.exposure_census,
+        exposed_sources_path=args.exposed_sources,
+        baseline_observation_ids_path=args.pre_cutoff_observation_ids,
+    )
     data = read_scores(
         args.input,
         bin_width_K=args.bin_width_k,
         rails=args.rail,
+        exposure_policy=exposure_policy,
     )
     if args.append_history:
         if not args.landing_sha:
@@ -3691,6 +4866,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             comparisons=data.hero_comparisons,
             diagnostics=data.hero_diagnostics,
             refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
+            hero_metrics={
+                **data.hero_all_numeric_metrics,
+                **data.hero_deck_metrics,
+            },
+            openimcc_score_commit=args.openimcc_commit,
+            openimcc_vaporock_species=data.hero_openimcc_vaporock_species,
         )
         append_history(args.history_path, record)
     abundance = load_element_abundance(args.abundance_feedstock)
@@ -3704,6 +4885,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         abundance_feedstock=args.abundance_feedstock,
         omit_empty_engines=args.omit_empty_engines,
         history_path=args.history_path,
+        openimcc_score_commit=args.openimcc_commit,
     )
     omitted_engines = (
         _empty_engine_names(data)
@@ -3719,6 +4901,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 abundance,
                 omitted_engines=omitted_engines,
                 history=history,
+                openimcc_score_commit=args.openimcc_commit,
             ),
             indent=2,
             sort_keys=True,
