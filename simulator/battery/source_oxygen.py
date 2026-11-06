@@ -108,6 +108,33 @@ def source_oxygen_closure_notice(quantity: Quantity, row: Observation) -> Notice
     )
 
 
+def source_oxygen_substitution_notice(quantity: Quantity, row: Observation) -> Notice:
+    """Flag a source-linked oxygen value and retain the derivation basis."""
+
+    point = oxygen_pressure_point(row)
+    inference = None if point is None else point.inference
+    if inference is None or not inference.relation.startswith(SOURCE_OXYGEN_RELATION):
+        raise ValueError("source-linked oxygen substitution has no source derivation")
+    condition = (row.provenance or {}).get("source_oxygen_condition")
+    condition_id = (
+        condition.get("observation_id")
+        if isinstance(condition, Mapping)
+        else None
+    )
+    inputs = ",".join(inference.inputs) or "untyped source inputs"
+    selected = f"; source_observation={condition_id}" if condition_id else ""
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=(
+            "model substitution: source-linked oxygen condition; "
+            f"target row has no printed fO2; basis={inference.relation}; "
+            f"inputs={inputs}{selected}"
+        ),
+        origin="source oxygen selection",
+    )
+
+
 def _point_key(row: Observation) -> tuple | None:
     identity = row.identity
     if (

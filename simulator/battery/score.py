@@ -98,6 +98,7 @@ from simulator.battery.source_oxygen import (
     printed_source_pressure,
     resolve_source_oxygen,
     source_oxygen_closure_notice,
+    source_oxygen_substitution_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.physical_constants import GAS_CONSTANT
@@ -5805,7 +5806,7 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
-def _reactive_cell_not_modelled_notice(
+def _cell_oxygen_not_modelled_notice(
     quantity: Quantity,
     materials: Sequence[Located[CellMaterial]] | None,
 ) -> Notice:
@@ -5823,13 +5824,16 @@ def _reactive_cell_not_modelled_notice(
         sort_keys=True,
         separators=(",", ":"),
     )
+    material_class, _modelled = _cell_oxygen_class(materials)
+    reason = (
+        "reactive cell: oxygen balance of the cell not modelled"
+        if material_class == "reactive"
+        else "cell oxygen balance not modelled"
+    )
     return Notice(
         kind=NoticeKind.REACTIVE_CELL_NOT_MODELLED,
         affected_quantities=(quantity,),
-        reason=(
-            "reactive cell: oxygen balance of the cell not modelled "
-            f"{payload}"
-        ),
+        reason=f"{reason} {payload}",
         origin="score:predict_with_engine",
     )
 
@@ -10001,45 +10005,17 @@ def _predict_with_engine(
     elif shared_oxygen:
         cell_materials = bench.cell_materials if bench is not None else None
         material_class, modelled = _cell_oxygen_class(cell_materials)
-        if material_class == "reactive" and modelled is None:
-            # Out-of-domain physics: predict and flag. Keep refusal only when
-            # a required input is genuinely missing (the shared decision).
+        if material_class != "inert" and modelled is None:
+            # Out-of-domain wall physics: use the melt-only closure and flag
+            # the unmodelled wall. The shared decision refuses only if the
+            # melt composition or temperature needed by that closure is absent.
             input_notices.append(
-                _reactive_cell_not_modelled_notice(quantity, cell_materials)
+                _cell_oxygen_not_modelled_notice(quantity, cell_materials)
             )
             decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
-        elif material_class != "inert" and modelled is None:
-            refusal_token = {
-                "not_inert": "cell_material_not_inert",
-                "unknown": "cell_material_unknown",
-            }[material_class]
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=(
-                    RefusalReason.IDENTITY_INCOMPLETE
-                    if material_class == "unknown"
-                    else RefusalReason.UNSUPPORTED
-                ),
-                detail={
-                    "reason": refusal_token,
-                    "cell_material": [
-                        {
-                            "field": "bench.cell_materials",
-                            "value": item.state.value.value,
-                        }
-                        for item in cell_materials or ()
-                        if item.state.is_value
-                    ],
-                },
-                notices=tuple(input_notices),
-            )
         else:
             # Inert or uniform W/Mo. The ladder returns the tier-3 effusion
             # closure, the same condition for every engine. Engines that
@@ -10063,6 +10039,9 @@ def _predict_with_engine(
             # and would replace it with the effusion closure. A printed
             # fO2 stays on oxygen_decision so both cell branches attach
             # the same tier-1 notice.
+            input_notices.append(
+                source_oxygen_substitution_notice(quantity, observation)
+            )
             po2 = Po2Request(
                 mode=PO2_COMMANDED,
                 po2_bar=float(source_pressure) / 1.0e5,
@@ -10082,7 +10061,7 @@ def _predict_with_engine(
                     for notice in input_notices
                 ):
                     input_notices.append(
-                        _reactive_cell_not_modelled_notice(
+                        _cell_oxygen_not_modelled_notice(
                             quantity, bench.cell_materials
                         )
                     )

@@ -1,12 +1,16 @@
 """One fO2 per row, shared by every engine (d-180).
 
-The ladder is the seeding order from d-160/d-163:
+The general ladder is the seeding order from d-160/d-163:
 
 1. printed fO2;
 2. printed Fe3+/ΣFe through the Kress91 inverse;
 3. the experiment's controlled atmosphere or buffer, including the
    effusion oxygen-mass-balance closure and metal/slag saturation;
 4. the melt's intrinsic fO2, flagged borrowed.
+
+Knudsen vapour rows keep printed fO2 and explicit atmosphere/buffer routes
+first, then use congruent effusion before composition-only redox estimates.
+If its melt composition or temperature is missing, the row does not resolve.
 
 Tiers 1, 2 and 4 share one numeric fO2. For tier 3 effusion the shared
 input is the closure condition, not a number.
@@ -199,9 +203,13 @@ def resolve_row_fo2(
         bar, log = printed
         return ResolvedFo2(log, 1, "identity_fO2_Pa", False, po2_bar=bar)
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
-    tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
-    if tier2 is not None:
-        return tier2
+    knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
+    # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
+    # does not replace the cell's explicit oxygen control or effusion balance.
+    if not knudsen_vapour:
+        tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
+        if tier2 is not None:
+            return tier2
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)
@@ -214,6 +222,7 @@ def resolve_row_fo2(
         experiment,
         bench,
         observation,
+        temperature_K=temperature,
         quantity=quantity,
         weights=weights,
     )
@@ -713,18 +722,6 @@ def _has_carrier_gas(experiment: Experiment | None) -> bool:
     return False
 
 
-def _closable_cell(bench: object | None) -> tuple[bool, str | None]:
-    """(True, metal or None) when the cell is inert or a uniform W/Mo reservoir."""
-
-    materials = None if bench is None else getattr(bench, "cell_materials", None)
-    material_class, modelled = _cell_oxygen_class(materials)
-    if material_class == "inert":
-        return True, None
-    if modelled is not None:
-        return True, modelled
-    return False, None
-
-
 def _formula_has_oxygen(formula: str) -> bool:
     elements = []
     token = ""
@@ -754,15 +751,18 @@ def _effusion_closure(
     bench: object | None,
     observation: Observation | None,
     *,
+    temperature_K: float | None,
     quantity: Quantity | None,
     weights: dict[str, float] | None,
 ) -> ResolvedFo2 | None:
     """Tier-3 oxygen mass balance, after atmosphere routes and before vacuum.
 
-    A Knudsen cell that is inert or a uniform W/Mo reservoir closes, including
-    a p_sat row. Any other congruent vaporisation of a pure oxide or an oxide
-    melt, with no carrier gas, closes for a partial or reference pressure.
-    p_sat outside a closable Knudsen cell stays not an oxygen input.
+    Knudsen vapor rows close when melt composition and temperature are known.
+    A uniform W/Mo reservoir adds modelled wall-oxide channels; an unmodelled
+    wall uses melt-only closure and is flagged by the scorer. Any other
+    congruent vaporisation of a pure oxide or an oxide melt, with no carrier
+    gas, closes for a partial or reference pressure. p_sat outside Knudsen
+    effusion stays not an oxygen input.
     """
 
     if not _vapour_quantity(quantity) or experiment is None or observation is None:
@@ -773,9 +773,10 @@ def _effusion_closure(
     if _has_carrier_gas(experiment):
         return None
     if _is_knudsen(experiment):
-        closes, material = _closable_cell(bench)
-        if not closes:
+        if temperature_K is None or not weights:
             return None
+        materials = None if bench is None else getattr(bench, "cell_materials", None)
+        _material_class, material = _cell_oxygen_class(materials)
         return ResolvedFo2(
             float("nan"),
             3,
