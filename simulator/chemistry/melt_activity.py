@@ -353,7 +353,9 @@ class MeltOxideActivity:
             "melt_oxide_gamma_tier": self.evidence_tier,
             "melt_oxide_activity_evidence_tier": self.evidence_tier,
             "melt_oxide_activity_model": self.activity_model,
-            "melt_oxide_activity_reference_state": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            "melt_oxide_activity_reference_state": (
+                _melt_oxide_activity_standard_state_id(self.parent_oxide)
+            ),
             "melt_oxide_gamma_citation": self.citation,
             "melt_oxide_gamma_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
@@ -654,8 +656,9 @@ class _MeltOxideActivityReferenceConversion:
 
 @dataclass(frozen=True)
 class _BuiltinVaporActivity:
-    liquid_activity: float
+    source_activity: float
     activity: float
+    source_standard_state_id: str
     notice: dict[str, Any]
     warning: str
 
@@ -707,83 +710,161 @@ def _activity_for_crystalline_vapor_k(
     parent_oxide: str,
     activity: float,
     temperature_K: float,
+    *,
+    source_standard_state_id: str | None = None,
+    target_standard_state_id: str | None = None,
 ) -> tuple[float, dict[str, Any] | None, str | None]:
-    """Put a declared liquid oxide activity on the coupled vapor K basis."""
+    """Put a declared activity on the selected vapor reaction's K basis."""
 
-    # OpenIMCC 9f25dfe's t-1637 liquid-standards registry declares MgO=Mg-009
-    # and CaO=Ca-028 in sf04-v1.0.2, sf04-ext-v4, D066 sf04-d066-v1,
-    # d066-v1-kcaalsi2o7, and d066-ext-v1; these match d-144's JANAF liquid
-    # standards. Convert from the source's declared standard to the K's
-    # crystalline standard, for both the built-in and above-1950 K OpenIMCC
-    # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
-    # by declared standard ID is a follow-up after t-1637 lands.
-    if parent_oxide not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+    temperature = float(temperature_K)
+    source_id = source_standard_state_id
+    target_id = target_standard_state_id
+    source_phase = _activity_standard_state_phase(source_id)
+    target_phase = _activity_standard_state_phase(target_id)
+    base_notice = {
+        "oxide": parent_oxide,
+        "from_standard_state_id": source_id,
+        "to_standard_state_id": target_id,
+        "temperature_K": temperature,
+        "certified_band_K": [],
+    }
+    if source_id is not None and source_id == target_id:
         notice = {
-            "oxide": parent_oxide,
-            "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-            "to_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-            "temperature_K": float(temperature_K),
+            **base_notice,
             "log10_activity_offset": 0.0,
             "delta_g_fus_kJ_per_mol": None,
             "authority": "declared_standard_identity",
             "authority_level": "identity",
-            "reason": "source and vapor K standard states match",
-            "certified_band_K": [],
+            "reason": "source_and_K_standard_states_match",
+            "conversion_performed": False,
         }
-        warning = (
-            "vapor_activity_standard_state_conversion|"
-            f"oxide={parent_oxide}|"
-            "from_standard_state_id="
-            f"{MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
-            "to_standard_state_id="
-            f"{MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
-            f"temperature_K={temperature_K:.2f}|"
-            "log10_activity_offset=+0|"
-            "authority=declared_standard_identity|authority_level=identity"
-        )
+        warning = _vapor_activity_standard_state_warning(notice)
         return float(activity), notice, warning
-    conversion = _convert_melt_oxide_activity_reference_state(
-        parent_oxide,
-        activity,
-        temperature_K,
-        source_phase="liquid",
-        target_phase="solid",
-    )
-    verdict = conversion.domain_verdict
+
+    if (
+        source_phase is not None
+        and target_phase is not None
+        and source_phase != target_phase
+        and d144_fusion_table_pair(parent_oxide) is not None
+    ):
+        conversion = _convert_melt_oxide_activity_reference_state(
+            parent_oxide,
+            activity,
+            temperature,
+            source_phase=source_phase,
+            target_phase=target_phase,
+        )
+        verdict = conversion.domain_verdict
+        notice = {
+            **base_notice,
+            "log10_activity_offset": conversion.log10_activity_offset,
+            "delta_g_fus_kJ_per_mol": conversion.delta_g_fus_kJ_per_mol,
+            "authority": verdict.authority.value,
+            "authority_level": (
+                "extrapolated"
+                if verdict.authority.value == "extrapolated"
+                else "predict_and_flag"
+            ),
+            "reason": verdict.reason or "d144_fusion_standard_state_conversion",
+            "conversion_performed": True,
+            "certified_band_K": [
+                float(bound) for bound in verdict.certified_band_K
+            ],
+        }
+        return conversion.activity, notice, _vapor_activity_standard_state_warning(
+            notice
+        )
+
     notice = {
-        "oxide": parent_oxide,
-        "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        "to_standard_state_id": (
-            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-        ),
-        "temperature_K": float(temperature_K),
-        "log10_activity_offset": conversion.log10_activity_offset,
-        "delta_g_fus_kJ_per_mol": conversion.delta_g_fus_kJ_per_mol,
-        "authority": verdict.authority.value,
-        "authority_level": (
-            "extrapolated"
-            if verdict.authority.value == "extrapolated"
-            else "predict_and_flag"
-        ),
-        "reason": verdict.reason,
-        "certified_band_K": [
-            float(bound) for bound in verdict.certified_band_K
-        ],
+        **base_notice,
+        "log10_activity_offset": None,
+        "delta_g_fus_kJ_per_mol": None,
+        "authority": "unconverted_standard_mismatch",
+        "authority_level": "predict_and_flag",
+        "reason": "standard_mismatch_unconverted",
+        "conversion_performed": False,
     }
-    warning = (
+    return float(activity), notice, _vapor_activity_standard_state_warning(notice)
+
+
+def _activity_standard_state_phase(standard_state_id: str | None) -> str | None:
+    if standard_state_id == MELT_OXIDE_ACTIVITY_REFERENCE_STATE:
+        return "liquid"
+    if standard_state_id == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE:
+        return "solid"
+    return None
+
+
+def _activity_standard_state_id_for_phase(phase: str | None) -> str | None:
+    normalized = str(phase or "").strip().lower()
+    if normalized in {"liquid", "l", "liq"}:
+        return MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    if normalized in {"solid", "crystalline", "cr", "s"}:
+        return MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    return None
+
+
+def _vapor_k_standard_state_id(
+    parent_oxide: str,
+    temperature_K: float,
+    catalog_phases: Mapping[str, str | None],
+) -> str | None:
+    """Resolve the selected vapor K standard for one parent oxide."""
+
+    if parent_oxide == "FeO":
+        from simulator.chemistry.ellingham_thermo import (
+            ellingham_segment_for_temperature,
+        )
+
+        segment = ellingham_segment_for_temperature("Fe", temperature_K)
+        basis = str(segment.phase_basis if segment is not None else "")
+        if "FeO(s)" in basis or "FeO(cr)" in basis:
+            phase = "solid"
+        elif "FeO(l)" in basis:
+            phase = "liquid"
+        else:
+            phase = None
+    elif parent_oxide in catalog_phases:
+        phase = catalog_phases[parent_oxide]
+    elif parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+        # The schema-v1 compatibility route has no catalog declaration; retain
+        # its existing MgO/CaO crystalline-K contract.
+        phase = "solid"
+    else:
+        phase = None
+    return _activity_standard_state_id_for_phase(phase)
+
+
+def _melt_oxide_activity_standard_state_id(parent_oxide: str) -> str:
+    """Return the standard of the numeric activity actually returned."""
+
+    provenance = reference_state_provenance.get(parent_oxide)
+    if (
+        isinstance(provenance, _VerifiedGammaReferenceState)
+        and provenance.phase == "solid"
+        and d144_fusion_table_pair(parent_oxide) is None
+    ):
+        return MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    return MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+
+
+def _vapor_activity_standard_state_warning(notice: Mapping[str, Any]) -> str:
+    def token(value: Any) -> str:
+        return "undeclared" if value is None else str(value)
+
+    return (
         "vapor_activity_standard_state_conversion|"
-        f"oxide={parent_oxide}|"
-        f"from_standard_state_id={MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
+        f"oxide={token(notice.get('oxide'))}|"
+        "from_standard_state_id="
+        f"{token(notice.get('from_standard_state_id'))}|"
         "to_standard_state_id="
-        f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}|"
-        f"temperature_K={temperature_K:.2f}|"
-        f"log10_activity_offset={conversion.log10_activity_offset:+.12g}|"
-        f"authority={verdict.authority.value}|"
-        f"authority_level={notice['authority_level']}"
+        f"{token(notice.get('to_standard_state_id'))}|"
+        f"temperature_K={float(notice['temperature_K']):.2f}|"
+        f"log10_activity_offset={notice.get('log10_activity_offset')}|"
+        f"authority={notice.get('authority')}|"
+        f"authority_level={notice.get('authority_level')}|"
+        f"reason={notice.get('reason')}"
     )
-    if verdict.reason:
-        warning += f"|reason={verdict.reason}"
-    return conversion.activity, notice, warning
 
 
 def _melt_oxide_gamma_for_activity(
@@ -1011,8 +1092,11 @@ def melt_oxide_activity(
 def _builtin_vapor_activities_from_weight_composition(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    pO2_bar: float | None = None,
 ) -> dict[str, _BuiltinVaporActivity]:
-    """Project AlphaMELTS weight composition onto the built-in vapor basis."""
+    """Project AlphaMELTS composition onto built-in declared vapor activities."""
 
     from simulator.accounting.formulas import resolve_species_formula
 
@@ -1033,29 +1117,68 @@ def _builtin_vapor_activities_from_weight_composition(
         ).molar_mass_kg_per_mol()
         composition_mol[parent] = weight / molar_mass
 
+    catalog_payload = getattr(
+        vapor_pressure_data, "catalog_payload", vapor_pressure_data
+    )
+    from simulator.vapour_rail.catalog import (
+        catalog_vapor_parent_standard_state_phases,
+    )
+
+    target_phases = catalog_vapor_parent_standard_state_phases(catalog_payload)
     projected: dict[str, _BuiltinVaporActivity] = {}
-    for parent in sorted(
-        set(MELT_OXIDE_ACTIVITY_COEFFICIENTS).intersection(composition_mol)
-    ):
-        liquid = melt_oxide_activity(
+    parents = set(MELT_OXIDE_ACTIVITY_COEFFICIENTS).intersection(composition_mol)
+    if "FeO" in composition_mol:
+        parents.add("FeO")
+    for parent in sorted(parents):
+        if parent == "FeO":
+            if pO2_bar is None:
+                continue
+            from simulator.fe_redox import (
+                kress91_ferrous_feo_activity,
+                kress91_furnace_activity_pressure_bar,
+            )
+
+            source_activity = kress91_ferrous_feo_activity(
+                comp_wt=composition_wt_pct,
+                fO2_log=math.log10(float(pO2_bar)),
+                T_K=float(temperature_K),
+                pressure_bar=kress91_furnace_activity_pressure_bar(),
+            )
+            source_standard_state_id = MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+        else:
+            source = melt_oxide_activity(
+                parent,
+                composition_mol,
+                temperature_K=temperature_K,
+            )
+            if source is None or source.activity <= 0.0:
+                continue
+            source_activity = float(source.activity)
+            source_standard_state_id = str(
+                source.provenance()["melt_oxide_activity_reference_state"]
+            )
+        target_standard_state_id = _vapor_k_standard_state_id(
             parent,
-            composition_mol,
-            temperature_K=temperature_K,
+            temperature_K,
+            target_phases,
         )
-        if liquid is None or liquid.activity <= 0.0:
-            continue
         activity, notice, warning = _activity_for_crystalline_vapor_k(
             parent,
-            liquid.activity,
+            source_activity,
             temperature_K,
+            source_standard_state_id=source_standard_state_id,
+            target_standard_state_id=target_standard_state_id,
         )
+        if activity <= 0.0:
+            continue
         if notice is None or warning is None:
             raise RuntimeError(
                 f"{parent}: vapor activity basis was not reported"
             )
         projected[parent] = _BuiltinVaporActivity(
-            liquid_activity=float(liquid.activity),
+            source_activity=source_activity,
             activity=activity,
+            source_standard_state_id=source_standard_state_id,
             notice=notice,
             warning=warning,
         )

@@ -6073,6 +6073,10 @@ class _MELTSBackendSupport(MeltBackend):
             _builtin_vapor_activities_from_weight_composition(
                 comp_wt,
                 float(T_C) + CELSIUS_TO_KELVIN_OFFSET,
+                vapor_pressure_data=getattr(
+                    self, '_vapor_pressure_catalog_payload', None
+                ),
+                pO2_bar=pO2_bar,
             )
         )
         pressures = self._activities_times_antoine(
@@ -6321,6 +6325,7 @@ class _MELTSBackendSupport(MeltBackend):
         pure-component wall-saturation sidecar in this adapter.
         """
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+        table = self._load_vapor_pressure_table()
         if builtin_vapor_activities is None:
             from simulator.chemistry.melt_activity import (
                 _builtin_vapor_activities_from_weight_composition,
@@ -6330,11 +6335,14 @@ class _MELTSBackendSupport(MeltBackend):
                 _builtin_vapor_activities_from_weight_composition(
                     _comp_wt,
                     T_K,
+                    vapor_pressure_data=getattr(
+                        self, '_vapor_pressure_catalog_payload', None
+                    ),
+                    pO2_bar=pO2_bar,
                 )
             )
         if not activities and not builtin_vapor_activities:
             return {}
-        table = self._load_vapor_pressure_table()
         if not table:
             return {}
         from simulator.chemistry.ellingham_graph import (
@@ -6377,31 +6385,57 @@ class _MELTSBackendSupport(MeltBackend):
             if builtin_vapor_activity is not None:
                 raw_activity = float(builtin_vapor_activity.activity)
                 notice = dict(builtin_vapor_activity.notice)
+                relation_reason = notice.get("reason")
                 notice.update(
                     {
-                        'reason': 'activity_standard_state_substitution',
                         'parent_oxide': parent_oxide,
+                        'source_standard_state_relation_reason': relation_reason,
                         'source_standard_state_substitution': (
                             'alphamelts_oxide_activity_no_declared_standard '
                             '-> builtin_declared_standard'
                         ),
                     }
                 )
+                if relation_reason != "standard_mismatch_unconverted":
+                    notice["reason"] = "activity_standard_state_substitution"
                 self._antoine_activity_standard_state_notices[
                     str(species)
                 ] = notice
                 self._antoine_activity_standard_state_activities[
                     str(species)
-                ] = float(builtin_vapor_activity.liquid_activity)
-                self._antoine_activity_standard_state_provenance[
-                    str(species)
-                ] = {
+                ] = float(builtin_vapor_activity.source_activity)
+                activity_provenance = {
                     "activity_standard_state_conversion": dict(notice),
-                    "vapor_activity_for_crystalline_K": raw_activity,
-                    "vapor_activity_for_crystalline_K_standard_state_id": (
+                    "melt_oxide_activity_reference_state": (
+                        builtin_vapor_activity.source_standard_state_id
+                    ),
+                    "vapor_activity_used_for_K": raw_activity,
+                    "vapor_activity_standard_state_id_used_for_K": (
                         notice["to_standard_state_id"]
+                        if notice["conversion_performed"]
+                        or notice["from_standard_state_id"]
+                        == notice["to_standard_state_id"]
+                        else notice["from_standard_state_id"]
                     ),
                 }
+                if (
+                    notice["to_standard_state_id"]
+                    == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                    and (
+                        notice["conversion_performed"]
+                        or notice["from_standard_state_id"]
+                        == notice["to_standard_state_id"]
+                    )
+                ):
+                    activity_provenance[
+                        "vapor_activity_for_crystalline_K"
+                    ] = raw_activity
+                    activity_provenance[
+                        "vapor_activity_for_crystalline_K_standard_state_id"
+                    ] = notice["to_standard_state_id"]
+                self._antoine_activity_standard_state_provenance[
+                    str(species)
+                ] = activity_provenance
             elif (
                 self._antoine_uses_reaction_pressure(spec)
                 and parent_oxide

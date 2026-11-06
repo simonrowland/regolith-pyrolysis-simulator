@@ -115,9 +115,12 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
 )
 from simulator.chemistry.melt_activity import (  # noqa: E402
     ALPHAMELTS_CROSS_CHECK_STATUS,
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_TIER,
     _activity_for_crystalline_vapor_k,
+    _vapor_k_standard_state_id,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
     single_cation_mole_fractions,
@@ -3027,6 +3030,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
     ) -> None:
         from simulator.vapour_rail.catalog import (
             compile_vapour_rail_catalog,
+            catalog_vapor_parent_standard_state_phases,
             vapor_pressure_legacy_view,
         )
 
@@ -3041,6 +3045,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if isinstance(catalog_payload, Mapping)
             and catalog_payload.get("schema_version") == 2
             else None
+        )
+        self._vapor_parent_standard_state_phases = (
+            catalog_vapor_parent_standard_state_phases(catalog_payload)
         )
         self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
@@ -3443,6 +3450,25 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                source_standard_state_id = oxide_activity.provenance().get(
+                    "melt_oxide_activity_reference_state"
+                )
+                target_standard_state_id = _vapor_k_standard_state_id(
+                    parent_oxide,
+                    T_K,
+                    self._vapor_parent_standard_state_phases,
+                )
+                activity_for_k_value, vapor_activity_conversion, conversion_warning = (
+                    _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        oxide_activity.activity,
+                        T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=target_standard_state_id,
+                    )
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
 
                 # provenance: liquid_oxide_standard_reaction
                 # K: Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid KO0.5.
@@ -3468,7 +3494,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=activity_for_k_value,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -3541,6 +3567,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
+                    if vapor_activity_conversion is not None:
+                        vapor_pressure_provenance[species][
+                            "melt_oxide_activity_reference_state"
+                        ] = source_standard_state_id
+                        vapor_pressure_provenance[species][
+                            "activity_standard_state_conversion"
+                        ] = vapor_activity_conversion
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_used_for_K"
+                        ] = activity_for_k_value
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_standard_state_id_used_for_K"
+                        ] = (
+                            vapor_activity_conversion["to_standard_state_id"]
+                            if vapor_activity_conversion["conversion_performed"]
+                            or vapor_activity_conversion["from_standard_state_id"]
+                            == vapor_activity_conversion["to_standard_state_id"]
+                            else vapor_activity_conversion[
+                                "from_standard_state_id"
+                            ]
+                        )
                     if gamma_auth is not None:
                         vapor_pressure_provenance[species][
                             "gamma_domain_authority"
@@ -3619,6 +3666,25 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                source_standard_state_id = oxide_activity.provenance().get(
+                    "melt_oxide_activity_reference_state"
+                )
+                target_standard_state_id = _vapor_k_standard_state_id(
+                    parent_oxide,
+                    T_K,
+                    self._vapor_parent_standard_state_phases,
+                )
+                activity_for_k_value, vapor_activity_conversion, conversion_warning = (
+                    _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        oxide_activity.activity,
+                        T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=target_standard_state_id,
+                    )
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
                 activity_exponent = float(
                     liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
                 )
@@ -3641,7 +3707,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=activity_for_k_value,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -3688,6 +3754,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
+                    if vapor_activity_conversion is not None:
+                        vapor_pressure_provenance[species][
+                            "melt_oxide_activity_reference_state"
+                        ] = source_standard_state_id
+                        vapor_pressure_provenance[species][
+                            "activity_standard_state_conversion"
+                        ] = vapor_activity_conversion
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_used_for_K"
+                        ] = activity_for_k_value
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_standard_state_id_used_for_K"
+                        ] = (
+                            vapor_activity_conversion["to_standard_state_id"]
+                            if vapor_activity_conversion["conversion_performed"]
+                            or vapor_activity_conversion["from_standard_state_id"]
+                            == vapor_activity_conversion["to_standard_state_id"]
+                            else vapor_activity_conversion[
+                                "from_standard_state_id"
+                            ]
+                        )
                 else:
                     _record_reporting_threshold_omission(
                         below_reporting_threshold_omissions,
@@ -3783,6 +3870,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                source_standard_state_id = oxide_activity.provenance().get(
+                    "melt_oxide_activity_reference_state"
+                )
+                activity_for_k_value, vapor_activity_conversion, conversion_warning = (
+                    _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        oxide_activity.activity,
+                        T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=(
+                            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                        ),
+                    )
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
                 activity_exponent = float(
                     gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
                 )
@@ -3809,7 +3912,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=activity_for_k_value,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -3873,6 +3976,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
+                    if vapor_activity_conversion is not None:
+                        vapor_pressure_provenance[species][
+                            "melt_oxide_activity_reference_state"
+                        ] = source_standard_state_id
+                        vapor_pressure_provenance[species][
+                            "activity_standard_state_conversion"
+                        ] = vapor_activity_conversion
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_used_for_K"
+                        ] = activity_for_k_value
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_standard_state_id_used_for_K"
+                        ] = (
+                            vapor_activity_conversion["to_standard_state_id"]
+                            if vapor_activity_conversion["conversion_performed"]
+                            or vapor_activity_conversion["from_standard_state_id"]
+                            == vapor_activity_conversion["to_standard_state_id"]
+                            else vapor_activity_conversion[
+                                "from_standard_state_id"
+                            ]
+                        )
                 else:
                     _record_reporting_threshold_omission(
                         below_reporting_threshold_omissions,
@@ -3885,6 +4009,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             vapor_activity_conversion = None
             activity_for_k = None
+            activity_for_k_value = None
+            source_activity_value = None
+            source_standard_state_id = None
             fe_degraded_activity_basis = None
             fe_activity_basis = None
             if parent_oxide == 'FeO':
@@ -3899,7 +4026,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     and candidate_activity is not None
                 ):
                     oxide_activity = candidate_activity
-                    a_oxide = oxide_activity.activity
+                    source_activity_value = float(oxide_activity.activity)
+                    source_standard_state_id = oxide_activity.provenance().get(
+                        "melt_oxide_activity_reference_state"
+                    )
                     fe_activity_basis = (
                         candidate_activity.activity_model
                         if candidate_activity.activity_model in {
@@ -3913,7 +4043,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 elif intrinsic_fO2_log is not None:
                     oxide_activity = None
-                    a_oxide = below_cap_fe_activity
+                    source_activity_value = float(below_cap_fe_activity)
+                    source_standard_state_id = (
+                        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                    )
                     fe_activity_basis = "kress91_ferrous"
                 else:
                     oxide_activity = None
@@ -3922,7 +4055,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # FeO wt%/100 as a stand-in activity. Typed — never silent
                     # as if it were Kress91 or a VapoRock state activity.
                     # Matrix lock: do NOT splice VapoRock IW FeO activities.
-                    a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
+                    source_activity_value = (
+                        comp_wt.get(parent_oxide, 0.0) / 100.0
+                    )
                     fe_degraded_activity_basis = "feo_weight_fraction"
                     fe_activity_basis = fe_degraded_activity_basis
                     warnings.append(
@@ -3930,7 +4065,30 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "intrinsic_fO2_log absent; using FeO wt%/100 "
                         "(documented degraded public-caller path, uncertified)"
                     )
-                activity_for_k = oxide_activity
+                target_standard_state_id = _vapor_k_standard_state_id(
+                    parent_oxide,
+                    T_K,
+                    self._vapor_parent_standard_state_phases,
+                )
+                (
+                    activity_for_k_value,
+                    vapor_activity_conversion,
+                    conversion_warning,
+                ) = _activity_for_crystalline_vapor_k(
+                    parent_oxide,
+                    source_activity_value,
+                    T_K,
+                    source_standard_state_id=source_standard_state_id,
+                    target_standard_state_id=target_standard_state_id,
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
+                activity_for_k = (
+                    replace(oxide_activity, activity=activity_for_k_value)
+                    if oxide_activity is not None
+                    else None
+                )
+                a_oxide = activity_for_k_value
             else:
                 oxide_activity = _high_t_activity_for_parent(
                     parent_oxide,
@@ -3940,11 +4098,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
+                source_activity_value = float(oxide_activity.activity)
+                source_standard_state_id = oxide_activity.provenance().get(
+                    "melt_oxide_activity_reference_state"
+                )
+                target_standard_state_id = _vapor_k_standard_state_id(
+                    parent_oxide,
+                    T_K,
+                    self._vapor_parent_standard_state_phases,
+                )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
                         parent_oxide,
                         oxide_activity.activity,
                         T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=target_standard_state_id,
                     )
                 )
                 if conversion_warning:
@@ -3963,13 +4132,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 a_oxide = activity_for_k.equivalent_parent_activity(n_ox / n_M)
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-            if (
-                oxide_activity is None
-                and a_oxide <= 1e-10
-            ) or (
-                activity_for_k is not None
-                and activity_for_k.activity <= 1e-10
-            ):
+            if activity_for_k_value is None or activity_for_k_value <= 1e-10:
                 continue
 
             ellingham_extrapolation = _ellingham_authority_limit(
@@ -3986,9 +4149,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K"
                     )
 
-            activities[species] = (
-                a_oxide if oxide_activity is None else oxide_activity.activity
-            )
+            activities[species] = float(source_activity_value)
 
             # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
@@ -4184,16 +4345,40 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species][
                         "equivalent_parent_oxide_activity"
                     ] = a_oxide
+                vapor_pressure_provenance[species][
+                    "melt_oxide_activity_reference_state"
+                ] = source_standard_state_id
                 if vapor_activity_conversion is not None:
                     vapor_pressure_provenance[species][
                         "activity_standard_state_conversion"
                     ] = vapor_activity_conversion
                     vapor_pressure_provenance[species][
-                        "vapor_activity_for_crystalline_K"
-                    ] = activity_for_k.activity
+                        "vapor_activity_used_for_K"
+                    ] = activity_for_k_value
                     vapor_pressure_provenance[species][
-                        "vapor_activity_for_crystalline_K_standard_state_id"
-                    ] = vapor_activity_conversion["to_standard_state_id"]
+                        "vapor_activity_standard_state_id_used_for_K"
+                    ] = (
+                        vapor_activity_conversion["to_standard_state_id"]
+                        if vapor_activity_conversion["conversion_performed"]
+                        or vapor_activity_conversion["from_standard_state_id"]
+                        == vapor_activity_conversion["to_standard_state_id"]
+                        else vapor_activity_conversion["from_standard_state_id"]
+                    )
+                    if (
+                        vapor_activity_conversion["to_standard_state_id"]
+                        == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                        and (
+                            vapor_activity_conversion["conversion_performed"]
+                            or vapor_activity_conversion["from_standard_state_id"]
+                            == vapor_activity_conversion["to_standard_state_id"]
+                        )
+                    ):
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_for_crystalline_K"
+                        ] = activity_for_k_value
+                        vapor_pressure_provenance[species][
+                            "vapor_activity_for_crystalline_K_standard_state_id"
+                        ] = vapor_activity_conversion["to_standard_state_id"]
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
@@ -4303,11 +4488,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
+                source_standard_state_id = oxide_activity.provenance().get(
+                    "melt_oxide_activity_reference_state"
+                )
+                target_standard_state_id = _vapor_k_standard_state_id(
+                    parent_oxide,
+                    T_K,
+                    self._vapor_parent_standard_state_phases,
+                )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
                         parent_oxide,
                         oxide_activity.activity,
                         T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=target_standard_state_id,
                     )
                 )
                 if conversion_warning:
@@ -4697,11 +4892,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "activity_standard_state_conversion"
                     ] = vapor_activity_conversion
                     vapor_pressure_provenance[name][
-                        "vapor_activity_for_crystalline_K"
+                        "vapor_activity_used_for_K"
                     ] = source_activity_for_k
                     vapor_pressure_provenance[name][
-                        "vapor_activity_for_crystalline_K_standard_state_id"
-                    ] = vapor_activity_conversion["to_standard_state_id"]
+                        "vapor_activity_standard_state_id_used_for_K"
+                    ] = (
+                        vapor_activity_conversion["to_standard_state_id"]
+                        if vapor_activity_conversion["conversion_performed"]
+                        or vapor_activity_conversion["from_standard_state_id"]
+                        == vapor_activity_conversion["to_standard_state_id"]
+                        else vapor_activity_conversion["from_standard_state_id"]
+                    )
+                    if (
+                        vapor_activity_conversion["to_standard_state_id"]
+                        == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                        and (
+                            vapor_activity_conversion["conversion_performed"]
+                            or vapor_activity_conversion["from_standard_state_id"]
+                            == vapor_activity_conversion["to_standard_state_id"]
+                        )
+                    ):
+                        vapor_pressure_provenance[name][
+                            "vapor_activity_for_crystalline_K"
+                        ] = source_activity_for_k
+                        vapor_pressure_provenance[name][
+                            "vapor_activity_for_crystalline_K_standard_state_id"
+                        ] = vapor_activity_conversion["to_standard_state_id"]
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,

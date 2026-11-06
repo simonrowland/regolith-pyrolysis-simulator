@@ -351,6 +351,8 @@ def _analytical_vapor_pressures_from_activities(
         _builtin_vapor_activities_from_weight_composition(
             comp_wt,
             T_K,
+            vapor_pressure_data=vapor_pressure_data,
+            pO2_bar=pO2,
         )
     )
 
@@ -375,17 +377,20 @@ def _analytical_vapor_pressures_from_activities(
                 return None
             return float(activities.get(parent_oxide, 0.0) or 0.0)
         notice = dict(builtin_activity.notice)
+        relation_reason = notice.get("reason")
         notice.update(
             {
                 "species": str(species),
                 "parent_oxide": parent_oxide,
-                "reason": "activity_standard_state_substitution",
+                "source_standard_state_relation_reason": relation_reason,
                 "source_standard_state_substitution": (
                     "alphamelts_oxide_activity_no_declared_standard -> "
                     "builtin_declared_standard"
                 ),
             }
         )
+        if relation_reason != "standard_mismatch_unconverted":
+            notice["reason"] = "activity_standard_state_substitution"
         activity_standard_state_notices[str(species)] = notice
         warnings.append(
             builtin_activity.warning.replace(
@@ -410,7 +415,10 @@ def _analytical_vapor_pressures_from_activities(
         activity = selected_activity(species, parent_oxide)
         if activity is None:
             continue
-        if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+        if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY or (
+            parent_oxide == "FeO"
+            and builtin_vapor_activities.get(parent_oxide) is not None
+        ):
             from simulator.chemistry.ellingham_graph import (
                 effective_equilibrium_pressure_Pa,
             )

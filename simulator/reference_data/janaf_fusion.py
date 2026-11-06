@@ -25,15 +25,21 @@ from simulator.yaml_cache import load_cached_safe_yaml
 _FUSION_TABLES = {
     "CaO": ("Ca-027", "Ca-028"),
     "Al2O3": ("Al-096", "Al-100"),
+    # Fe-020 is JANAF's crystalline FeO branch below 1650 K and shares its
+    # liquid branch above that transition; Fe-019 supplies the metastable
+    # liquid values needed to compare both standards below the transition.
+    "FeO": ("Fe-020", "Fe-019"),
     "MgO": ("Mg-008", "Mg-009"),
     "SiO2": ("O-035", "O-038"),
 }
 
-# d-144 closed single-polymorph identity: Ca-027 is lime, Mg-008 is periclase.
+# d-144 closed single-polymorph identity: Ca-027 is lime, Fe-020 is wustite,
+# and Mg-008 is periclase.
 # These are the same table IDs used by battery scoring; values are tokens here
 # so the reference-data layer does not import battery's domain enums.
 _D144_SINGLE_POLYMORPH_TABLES: dict[str, str] = {
     "Ca-027": "lime",
+    "Fe-020": "wustite",
     "Mg-008": "periclase",
 }
 
@@ -47,6 +53,8 @@ _FUSION_NODE_SET_SHA256 = {
     "Al-100": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
     "Ca-027": "0b4adb5cf7b86a053c456688e9e635947ca38276f7b703cb00062ca5f00dbb5c",
     "Ca-028": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    "Fe-019": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
+    "Fe-020": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "Mg-008": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
     "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
@@ -313,17 +321,43 @@ def _fusion_crossing_temperature(
             solid_points, liquid_points, temperature_K
         )
 
+    differences = tuple(difference(node) for node in overlap)
     crossings: list[Decimal] = []
-    for left, right in zip(overlap, overlap[1:]):
-        d_left, d_right = difference(left), difference(right)
-        if d_left == 0:
-            crossings.append(left)
-        elif d_left * d_right < 0:
-            crossings.append(
-                left - d_left * (right - left) / (d_right - d_left)
-            )
-    if overlap and difference(overlap[-1]) == 0:
-        crossings.append(overlap[-1])
+    coalesced_multiphase_branch = (
+        oxide == "FeO"
+        and solid_table_id == "Fe-020"
+        and liquid_table_id == "Fe-019"
+    )
+    if coalesced_multiphase_branch:
+        # Fe-020 is explicitly FeO(cr,l); after its liquid branch joins Fe-019,
+        # high-temperature tabulation rounding produces occasional ±0.001
+        # kJ/mol differences. Two consecutive exact shared nodes identify the
+        # one join without mistaking those later round-off blips for crossings.
+        join_index = next(
+            (
+                index
+                for index in range(len(differences) - 1)
+                if differences[index] == 0 and differences[index + 1] == 0
+            ),
+            None,
+        )
+        if join_index is not None:
+            crossings.append(overlap[join_index])
+    if not crossings:
+        for index, (left, right) in enumerate(zip(overlap, overlap[1:])):
+            d_left, d_right = differences[index], differences[index + 1]
+            if d_left == 0 and (index == 0 or differences[index - 1] != 0):
+                crossings.append(left)
+            elif d_left * d_right < 0:
+                crossings.append(
+                    left - d_left * (right - left) / (d_right - d_left)
+                )
+        if (
+            overlap
+            and differences[-1] == 0
+            and (len(differences) == 1 or differences[-2] != 0)
+        ):
+            crossings.append(overlap[-1])
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     crossing = crossings[0]
@@ -421,7 +455,18 @@ def d144_fusion_table_pair(oxide: str) -> tuple[str, str] | None:
 def _d144_fusion_conversion(
     oxide: str, temperature_K: Decimal
 ) -> D144FusionConversion:
-    """Return liquid-minus-solid Gibbs energy and its JANAF domain verdict."""
+    """Return liquid-minus-solid Gibbs energy and its JANAF domain verdict.
+
+    For FeO, Fe-020 supplies the crystalline branch and then the liquid branch;
+    Fe-019 supplies the liquid standard. The premise is
+    ``mu = G° + RT ln(a)`` for each standard; equating potentials gives
+    ``a_cr = a_l * exp((G_l° - G_cr°)/RT)``. The exponent is dimensionless
+    because both Gibbs energy and RT are per mole. At 1500 K, JANAF gives
+    ``G_l° - G_cr° = +2.158 kJ/mol``, so liquid-to-crystal activity increases
+    by ``exp(+DeltaG/RT)``. JANAF's two FeO records coalesce at 1700 K; the
+    Fe Ellingham K selects liquid FeO from 1650 K, where the coupling is
+    already identity on the liquid standard.
+    """
 
     pair = d144_fusion_table_pair(oxide)
     if pair is None:

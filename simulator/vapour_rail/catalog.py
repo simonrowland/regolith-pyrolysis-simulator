@@ -1601,6 +1601,82 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
+def catalog_vapor_parent_standard_state_phases(
+    catalog_payload: Mapping[str, Any] | None,
+) -> dict[str, str | None]:
+    """Resolve declared K phases for each selected vapor parent.
+
+    ``thermodynamic_standard_state`` is the selected reaction K basis. Older
+    rows omit that field; for those rows, the selected reaction's
+    ``activity_input.standard_state`` is the catalog's declared basis. If
+    selected routes for one parent disagree, return ``None`` for that parent
+    so consumers cannot silently call it an identity.
+    """
+
+    if not isinstance(catalog_payload, Mapping):
+        return {}
+    families = catalog_payload.get("families")
+    if not isinstance(families, Mapping):
+        return {}
+    phases_by_parent: dict[str, set[str]] = {}
+    for family in families.values():
+        if not isinstance(family, Mapping):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, Mapping):
+            continue
+        species_rows = physical.get("species")
+        if not isinstance(species_rows, Mapping):
+            continue
+        for row in species_rows.values():
+            if not isinstance(row, Mapping):
+                continue
+            parent = str(row.get("parent_oxide") or "").strip()
+            pressure_models = row.get("pressure_models")
+            reactions = row.get("source_reactions")
+            if (
+                not parent
+                or not isinstance(pressure_models, list)
+                or len(pressure_models) != 1
+                or not isinstance(pressure_models[0], Mapping)
+                or not isinstance(reactions, list)
+            ):
+                continue
+            reaction_id = pressure_models[0].get("source_reaction_id")
+            selected = [
+                reaction
+                for reaction in reactions
+                if isinstance(reaction, Mapping)
+                and reaction.get("id") == reaction_id
+            ]
+            if len(selected) != 1:
+                continue
+            reaction = selected[0]
+            thermodynamic = reaction.get("thermodynamic_standard_state")
+            activity_input = reaction.get("activity_input")
+            producer = (
+                activity_input.get("standard_state")
+                if isinstance(activity_input, Mapping)
+                else None
+            )
+            standard = (
+                thermodynamic
+                if isinstance(thermodynamic, Mapping)
+                else producer
+            )
+            phase = (
+                str(standard.get("phase") or "").strip().lower()
+                if isinstance(standard, Mapping)
+                else ""
+            )
+            if phase:
+                phases_by_parent.setdefault(parent, set()).add(phase)
+    return {
+        parent: next(iter(phases)) if len(phases) == 1 else None
+        for parent, phases in phases_by_parent.items()
+    }
+
+
 class VapourRailCatalog:
     """Compiled schema-v2 catalog plus its temporary legacy projection."""
 
