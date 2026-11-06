@@ -1014,6 +1014,18 @@ def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None
         has_alpha=True,
         has_route=True,
         has_formula=True,
+        evidence=MappingProxyType(
+            {
+                "vapor_activity_source_standard_state_id": (
+                    MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                ),
+                "vapor_activity_source_standard_state_phase": "liquid",
+                "vapor_k_standard_state_id": (
+                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                ),
+                "vapor_k_standard_state_phase": "solid",
+            }
+        ),
         source_reaction_activity=declaration,
     )
     state = VapourResolveState(
@@ -1036,9 +1048,11 @@ def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None
                     "from_standard_state_id": (
                         MELT_OXIDE_ACTIVITY_REFERENCE_STATE
                     ),
+                    "from_standard_state_phase": "liquid",
                     "to_standard_state_id": (
                         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
                     ),
+                    "to_standard_state_phase": "solid",
                     "conversion_performed": True,
                     "log10_activity_offset": math.log10(2.0),
                 },

@@ -37,6 +37,10 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
     StandardStateIdentity,
 )
+from simulator.vapour_rail.catalog_standard_states import (
+    CatalogStandardStateError,
+    catalog_vapor_parent_standard_states,
+)
 from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
@@ -1601,116 +1605,6 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
-def catalog_vapor_parent_standard_states(
-    catalog_payload: Mapping[str, Any] | None,
-) -> dict[
-    str,
-    tuple[StandardStateIdentity | None, StandardStateIdentity | None],
-]:
-    """Resolve source-activity and K identities for each selected parent.
-
-    ``thermodynamic_standard_state`` is the selected reaction K basis. Older
-    rows omit that field; for those rows, the selected reaction's
-    ``activity_input.standard_state`` is the catalog's declared K basis. The
-    first identity is the activity-input standard; the second is the K
-    standard. If selected routes disagree on either identity, that side is
-    ``None`` so consumers cannot silently call it an identity.
-    """
-
-    if not isinstance(catalog_payload, Mapping):
-        return {}
-    families = catalog_payload.get("families")
-    if not isinstance(families, Mapping):
-        return {}
-    source_states_by_parent: dict[
-        str, set[StandardStateIdentity | None]
-    ] = {}
-    k_states_by_parent: dict[str, set[StandardStateIdentity | None]] = {}
-    for family in families.values():
-        if not isinstance(family, Mapping):
-            continue
-        physical = family.get("physical_properties")
-        if not isinstance(physical, Mapping):
-            continue
-        species_rows = physical.get("species")
-        if not isinstance(species_rows, Mapping):
-            continue
-        for row in species_rows.values():
-            if not isinstance(row, Mapping):
-                continue
-            parent = str(row.get("parent_oxide") or "").strip()
-            pressure_models = row.get("pressure_models")
-            reactions = row.get("source_reactions")
-            if (
-                not parent
-                or not isinstance(pressure_models, list)
-                or len(pressure_models) != 1
-                or not isinstance(pressure_models[0], Mapping)
-                or not isinstance(reactions, list)
-            ):
-                continue
-            reaction_id = pressure_models[0].get("source_reaction_id")
-            selected = [
-                reaction
-                for reaction in reactions
-                if isinstance(reaction, Mapping)
-                and reaction.get("id") == reaction_id
-            ]
-            if len(selected) != 1:
-                continue
-            reaction = selected[0]
-            thermodynamic = reaction.get("thermodynamic_standard_state")
-            activity_input = reaction.get("activity_input")
-            producer = (
-                activity_input.get("standard_state")
-                if isinstance(activity_input, Mapping)
-                else None
-            )
-            standard = (
-                thermodynamic
-                if isinstance(thermodynamic, Mapping)
-                else producer
-            )
-            source_identity = _catalog_standard_state_identity(
-                producer,
-                label=f"{reaction_id}.activity_input.standard_state",
-            )
-            k_identity = _catalog_standard_state_identity(
-                standard,
-                label=f"{reaction_id}.thermodynamic_standard_state",
-            )
-            source_states_by_parent.setdefault(parent, set()).add(source_identity)
-            k_states_by_parent.setdefault(parent, set()).add(k_identity)
-
-    def one_identity(
-        states: set[StandardStateIdentity | None],
-    ) -> StandardStateIdentity | None:
-        return next(iter(states)) if len(states) == 1 else None
-
-    return {
-        parent: (
-            one_identity(source_states_by_parent[parent]),
-            one_identity(k_states_by_parent[parent]),
-        )
-        for parent in source_states_by_parent
-    }
-
-
-def _catalog_standard_state_identity(
-    raw: Any,
-    *,
-    label: str,
-) -> StandardStateIdentity | None:
-    if not isinstance(raw, Mapping):
-        return None
-    try:
-        return StandardStateIdentity.from_mapping(raw)
-    except (TypeError, ValueError) as exc:
-        raise CatalogCompileError(
-            f"{label} is not a valid standard-state identity"
-        ) from exc
-
-
 class VapourRailCatalog:
     """Compiled schema-v2 catalog plus its temporary legacy projection."""
 
@@ -2317,6 +2211,8 @@ def compile_vapour_rail_catalog(
                 catalog_payload=payload,
             )
         except VapourRequestConstructionError as exc:
+            raise CatalogCompileError(str(exc)) from exc
+        except CatalogStandardStateError as exc:
             raise CatalogCompileError(str(exc)) from exc
 
     result = VapourRailCatalog(

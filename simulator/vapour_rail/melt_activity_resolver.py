@@ -1696,9 +1696,25 @@ class MeltActivityResolver:
                 tier=ActivityTier.A,
                 model_row_id=row_id,
             )
+        try:
+            query_temperature_K = float(query.temperature_K)
+            query_pressure_bar = float(query.pressure_bar)
+        except (TypeError, ValueError, OverflowError):
+            query_temperature_K = math.nan
+            query_pressure_bar = math.nan
+        if not math.isfinite(query_temperature_K) or not math.isfinite(
+            query_pressure_bar
+        ):
+            return self._refusal(
+                query,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
+                "query T/P must be finite before checking the admitted row domain",
+                tier=ActivityTier.A,
+                model_row_id=row_id,
+            )
         if not (
-            minimum_T <= query.temperature_K <= maximum_T
-            and minimum_P <= query.pressure_bar <= maximum_P
+            minimum_T <= query_temperature_K <= maximum_T
+            and minimum_P <= query_pressure_bar <= maximum_P
         ):
             return self._refusal(
                 query,
@@ -2280,7 +2296,19 @@ class MeltActivityResolver:
             )
         minimum_K = 1200.0 + 273.15
         maximum_K = 1630.0 + 273.15
-        if not minimum_K <= query.temperature_K <= maximum_K:
+        try:
+            query_temperature_K = float(query.temperature_K)
+        except (TypeError, ValueError, OverflowError):
+            query_temperature_K = math.nan
+        if not math.isfinite(query_temperature_K):
+            return self._refusal(
+                query,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
+                "Kress-Carmichael temperature must be finite before checking its domain",
+                tier=ActivityTier.A,
+                model_row_id=row_id,
+            )
+        if not minimum_K <= query_temperature_K <= maximum_K:
             return self._refusal(
                 query,
                 ActivityRefusalCode.REDOX_MODEL_OUT_OF_DOMAIN,

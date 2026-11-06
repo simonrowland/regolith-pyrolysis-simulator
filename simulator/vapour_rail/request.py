@@ -37,7 +37,13 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
+from simulator.vapour_rail.catalog_standard_states import (
+    catalog_vapor_species_standard_states,
+)
 from simulator.chemistry.melt_activity import (
+    _normalize_standard_state_phase,
+    _vapor_activity_source_standard_state,
+    _vapor_k_standard_state,
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
@@ -573,6 +579,9 @@ def emit_request_rules(
     manifest = u0_manifest if u0_manifest is not None else load_u0_manifest()
     species_rows = list(manifest.get("species") or [])
     u0_by_id = {str(row["id"]): row for row in species_rows if "id" in row}
+    catalog_vapor_standards_by_species = (
+        catalog_vapor_species_standard_states(catalog_payload)
+    )
 
     # Parent / reaction metadata from the raw schema-v2 payload (not only
     # CompiledSpecies), so parent oxides and C-edge reactants stay available.
@@ -666,6 +675,56 @@ def emit_request_rules(
             required_atoms |= set(_formula_elements(parent_oxide))
         if compiled.source_reaction_id is not None:
             reaction_id = compiled.source_reaction_id
+        source_standard_state_id: str | None = None
+        source_standard_state_phase: str | None = None
+        if compiled.source_reaction_activity is not None:
+            source_standard_state = (
+                compiled.source_reaction_activity.standard_state
+            )
+            source_standard_state_id = source_standard_state.identity_id
+            source_standard_state_phase = _normalize_standard_state_phase(
+                source_standard_state.phase
+            )
+        k_standard_state_id: str | None = None
+        k_standard_state_phase: str | None = None
+        _source_identity, k_identity = catalog_vapor_standards_by_species.get(
+            species_id, (None, None)
+        )
+        if k_identity is not None:
+            if parent_oxide and parent_oxide != "FeO":
+                (
+                    k_standard_state_id,
+                    k_standard_state_phase,
+                ) = _vapor_k_standard_state(
+                    parent_oxide,
+                    None,
+                    {
+                        parent_oxide: (None, k_identity),
+                    },
+                )
+            else:
+                k_standard_state_id = k_identity.identity_id
+                k_standard_state_phase = _normalize_standard_state_phase(
+                    k_identity.phase
+                )
+        if (
+            source_standard_state_id is None
+            and parent_oxide
+            and (
+                compiled.source_reaction_activity is not None
+                or species_id == "Fe"
+            )
+        ):
+            source_standard_state_id, source_standard_state_phase = (
+                _vapor_activity_source_standard_state(
+                    parent_oxide,
+                    None,
+                    {},
+                    runtime_standard_state_phase=(
+                        source_standard_state_phase
+                    ),
+                )
+            )
         # Carrier-is-own-vapor (halides): parent is the gas formula itself.
         if not parents:
             parents.add(compiled.formula or species_id)
@@ -702,6 +761,14 @@ def emit_request_rules(
                     {
                         "family_id": compiled.family_id,
                         "request_rule": code.request_rule,
+                        "vapor_activity_source_standard_state_id": (
+                            source_standard_state_id
+                        ),
+                        "vapor_activity_source_standard_state_phase": (
+                            source_standard_state_phase
+                        ),
+                        "vapor_k_standard_state_id": k_standard_state_id,
+                        "vapor_k_standard_state_phase": k_standard_state_phase,
                     }
                 ),
                 source_reaction_activity=compiled.source_reaction_activity,
@@ -1374,15 +1441,94 @@ def refusal_closure(
             target_standard_state_phase = str(
                 reported_provenance.get("vapor_k_standard_state_phase") or ""
             ).strip().lower()
-            # A liquid source activity cannot feed a crystalline K silently.
-            # Standard IDs and their conversion notice travel with the value
-            # from the provider, so this protects every converted parent,
-            # including activity-independent evaluators such as Fe.
+            expected_source_standard_state_id = rule.evidence.get(
+                "vapor_activity_source_standard_state_id"
+            )
             if (
-                source_standard_state_phase in {"liquid", "l", "liq"}
-                and target_standard_state_phase
-                in {"solid", "crystalline", "cr", "s"}
+                expected_source_standard_state_id is None
+                and rule.source_reaction_activity is not None
+                and isinstance(
+                    rule.source_reaction_activity.standard_state,
+                    StandardStateIdentity,
+                )
             ):
+                expected_source_standard_state_id = (
+                    rule.source_reaction_activity.standard_state.identity_id
+                )
+            expected_source_standard_state_phase = (
+                _normalize_standard_state_phase(
+                    rule.evidence.get(
+                        "vapor_activity_source_standard_state_phase"
+                    )
+                )
+            )
+            if (
+                expected_source_standard_state_phase is None
+                and rule.source_reaction_activity is not None
+                and isinstance(
+                    rule.source_reaction_activity.standard_state,
+                    StandardStateIdentity,
+                )
+            ):
+                expected_source_standard_state_phase = (
+                    _normalize_standard_state_phase(
+                        rule.source_reaction_activity.standard_state.phase
+                    )
+                )
+            expected_target_standard_state_id = rule.evidence.get(
+                "vapor_k_standard_state_id"
+            )
+            expected_target_standard_state_phase = _normalize_standard_state_phase(
+                rule.evidence.get("vapor_k_standard_state_phase")
+            )
+            if (
+                expected_target_standard_state_id is None
+                and rule.parent_oxide == "FeO"
+            ):
+                # Fe's selected Ellingham K changes its FeO standard at 1650 K;
+                # resolve that expected basis from the same K segment selector.
+                (
+                    expected_target_standard_state_id,
+                    expected_target_standard_state_phase,
+                ) = _vapor_k_standard_state(
+                    "FeO",
+                    state.temperature_K,
+                    {},
+                )
+            expected_source_standard_state_phase = (
+                _normalize_standard_state_phase(
+                    expected_source_standard_state_phase
+                )
+            )
+            expected_target_standard_state_phase = (
+                _normalize_standard_state_phase(
+                    expected_target_standard_state_phase
+                )
+            )
+            if (
+                expected_source_standard_state_phase == "liquid"
+                and expected_target_standard_state_id is None
+                and _normalize_standard_state_phase(
+                    target_standard_state_phase
+                )
+                == "solid"
+            ):
+                return _make_refusal(
+                    rule,
+                    REFUSAL_MISSING_CHANNEL_CONTRACT,
+                    "crystalline vapor K is reported without a declared K "
+                    "standard-state identity",
+                )
+            # Decide whether a conversion is required from the channel's
+            # declared source and selected K standards. Provider provenance is
+            # checked below; it never decides whether this guard runs.
+            requires_vapor_standard_conversion = (
+                expected_source_standard_state_id is not None
+                and expected_target_standard_state_id is not None
+                and expected_source_standard_state_phase == "liquid"
+                and expected_target_standard_state_phase == "solid"
+            )
+            if requires_vapor_standard_conversion:
                 conversion = reported_provenance.get(
                     "activity_standard_state_conversion"
                 )
@@ -1419,20 +1565,40 @@ def refusal_closure(
                     crystalline_activity_value = math.nan
                     conversion_offset_value = math.nan
                 if (
-                    not isinstance(source_standard_state_id, str)
-                    or not source_standard_state_id
-                    or not isinstance(target_standard_state_id, str)
-                    or not target_standard_state_id
+                    source_standard_state_id
+                    != expected_source_standard_state_id
+                    or _normalize_standard_state_phase(
+                        source_standard_state_phase
+                    )
+                    != expected_source_standard_state_phase
+                    or target_standard_state_id
+                    != expected_target_standard_state_id
+                    or _normalize_standard_state_phase(
+                        target_standard_state_phase
+                    )
+                    != expected_target_standard_state_phase
                     or not isinstance(conversion, Mapping)
                     or conversion.get("from_standard_state_id")
-                    != source_standard_state_id
+                    != expected_source_standard_state_id
+                    or _normalize_standard_state_phase(
+                        conversion.get("from_standard_state_phase")
+                    )
+                    != expected_source_standard_state_phase
                     or conversion.get("to_standard_state_id")
-                    != target_standard_state_id
+                    != expected_target_standard_state_id
+                    or _normalize_standard_state_phase(
+                        conversion.get("to_standard_state_phase")
+                    )
+                    != expected_target_standard_state_phase
                     or conversion.get("conversion_performed") is not True
                     or reported_provenance.get(
                         "vapor_activity_standard_state_id_used_for_K"
                     )
-                    != target_standard_state_id
+                    != expected_target_standard_state_id
+                    or reported_provenance.get(
+                        "vapor_activity_for_crystalline_K_standard_state_id"
+                    )
+                    != expected_target_standard_state_id
                     or not is_declared_real_scalar(conversion_offset)
                     or not math.isfinite(conversion_offset_value)
                     or not raw_activity_is_valid
@@ -1445,6 +1611,12 @@ def refusal_closure(
                     or not math.isfinite(crystalline_activity_value)
                     or crystalline_activity_value <= 0.0
                     or activity_for_k_value != crystalline_activity_value
+                    or not math.isclose(
+                        activity_for_k_value / raw_activity_value,
+                        10.0**conversion_offset_value,
+                        rel_tol=1e-10,
+                        abs_tol=0.0,
+                    )
                     or (
                         conversion_offset_value != 0.0
                         and activity_for_k_value == raw_activity_value

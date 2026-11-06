@@ -3031,8 +3031,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
     ) -> None:
         from simulator.vapour_rail.catalog import (
             compile_vapour_rail_catalog,
-            catalog_vapor_parent_standard_states,
             vapor_pressure_legacy_view,
+        )
+        from simulator.vapour_rail.catalog_standard_states import (
+            catalog_vapor_species_standard_states,
         )
 
         compatibility_payload = getattr(vapor_pressure_data, "catalog_payload", None)
@@ -3047,8 +3049,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             and catalog_payload.get("schema_version") == 2
             else None
         )
-        self._vapor_parent_standard_states = (
-            catalog_vapor_parent_standard_states(catalog_payload)
+        self._vapor_species_standard_states = (
+            catalog_vapor_species_standard_states(catalog_payload)
         )
         self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
@@ -3460,7 +3462,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 (
                     target_standard_state_id,
@@ -3468,7 +3471,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_k_standard_state(
                     parent_oxide,
                     T_K,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
@@ -3698,7 +3702,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 (
                     target_standard_state_id,
@@ -3706,7 +3711,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_k_standard_state(
                     parent_oxide,
                     T_K,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
@@ -3924,7 +3930,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
@@ -4135,7 +4142,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 (
                     target_standard_state_id,
@@ -4143,7 +4151,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_k_standard_state(
                     parent_oxide,
                     T_K,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 (
                     activity_for_k_value,
@@ -4185,7 +4194,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 (
                     target_standard_state_id,
@@ -4193,7 +4203,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_k_standard_state(
                     parent_oxide,
                     T_K,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=species,
                 )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(
@@ -4601,7 +4612,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_activity_source_standard_state(
                     parent_oxide,
                     source_standard_state_id,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=name,
                 )
                 (
                     target_standard_state_id,
@@ -4609,7 +4621,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ) = _vapor_k_standard_state(
                     parent_oxide,
                     T_K,
-                    self._vapor_parent_standard_states,
+                    self._vapor_species_standard_states,
+                    route_id=name,
                 )
                 activity_for_k_value, vapor_activity_conversion, conversion_warning = (
                     _activity_for_crystalline_vapor_k(

@@ -33,6 +33,14 @@ _FUSION_TABLES = {
     "SiO2": ("O-035", "O-038"),
 }
 
+# Exact standards that this owner has a source-grounded vapor conversion for.
+# Phases use the canonical ``liquid``/``solid`` tokens used by the converter.
+_D144_VAPOR_STANDARD_PAIRS = {
+    "MgO": (("Mg-009", "liquid"), ("Mg-010", "solid")),
+    "CaO": (("Ca-028", "liquid"), ("Ca-029", "solid")),
+    "FeO": (("Fe-020", "liquid"), ("Fe-020", "solid")),
+}
+
 # d-144 closed single-polymorph identity: Ca-027 is lime, Fe-020 is wustite,
 # and Mg-008 is periclase.
 # These are the same table IDs used by battery scoring; values are tokens here
@@ -452,54 +460,168 @@ def d144_fusion_table_pair(oxide: str) -> tuple[str, str] | None:
     return pair
 
 
+def d144_vapor_standard_state_pair(
+    oxide: str,
+) -> tuple[tuple[str, str], tuple[str, str]] | None:
+    """Return the registered vapor source/K standards for one oxide."""
+
+    return _D144_VAPOR_STANDARD_PAIRS.get(str(oxide))
+
+
+def d144_vapor_conversion_oxide(
+    source_standard_state_id: str | None,
+    source_phase: str | None,
+    target_standard_state_id: str | None,
+    target_phase: str | None,
+) -> str | None:
+    """Resolve only explicitly registered liquid-to-crystal standard pairs."""
+
+    pair = (
+        (source_standard_state_id, source_phase),
+        (target_standard_state_id, target_phase),
+    )
+    return next(
+        (
+            oxide
+            for oxide, registered in _D144_VAPOR_STANDARD_PAIRS.items()
+            if pair == registered
+        ),
+        None,
+    )
+
+
+@lru_cache(maxsize=1)
+def _feo_transition_fusion_data() -> tuple[Decimal, Decimal]:
+    """Read FeO's transition T and ΔG from JANAF's own transition rows."""
+
+    _rows, _digest = _checked_fusion_table_rows("Fe-020")
+    document = load_table_document(TABLES_DIR / "Fe-020.yaml")
+    table = document.get("table")
+    ambiguities = table.get("parse_ambiguities") if isinstance(table, Mapping) else None
+    if not isinstance(ambiguities, list):
+        raise ValueError("Fe-020: JANAF transition rows are missing")
+    transition_rows: dict[str, tuple[Decimal, Decimal, Decimal]] = {}
+    for row in ambiguities:
+        if not isinstance(row, Mapping):
+            continue
+        raw_line = row.get("raw_line")
+        if not isinstance(raw_line, str):
+            continue
+        fields = raw_line.split("\t")
+        label = fields[-1].strip()
+        if label not in {"CRYSTAL <--> LIQUID", "TRANSITION"}:
+            continue
+        try:
+            values = tuple(Decimal(value.strip()) for value in fields[:-1])
+        except Exception as exc:  # noqa: BLE001 - malformed source row
+            raise ValueError("Fe-020: invalid JANAF transition row") from exc
+        if len(values) != 5:
+            raise ValueError("Fe-020: incomplete JANAF transition row")
+        transition_rows[label] = (values[0], values[2], values[4])
+    crystal = transition_rows.get("CRYSTAL <--> LIQUID")
+    liquid = transition_rows.get("TRANSITION")
+    if crystal is None or liquid is None or crystal[0] != liquid[0]:
+        raise ValueError("Fe-020: JANAF crystal/liquid transition rows disagree")
+    transition_temperature, crystal_entropy, crystal_enthalpy = crystal
+    _liquid_temperature, liquid_entropy, liquid_enthalpy = liquid
+    delta_h_kJ_per_mol = liquid_enthalpy - crystal_enthalpy
+    delta_s_J_per_mol_K = liquid_entropy - crystal_entropy
+    delta_g_kJ_per_mol = delta_h_kJ_per_mol - (
+        transition_temperature * delta_s_J_per_mol_K / Decimal("1000")
+    )
+    return transition_temperature, delta_g_kJ_per_mol
+
+
+@lru_cache(maxsize=1)
+def _feo_fusion_phase_points() -> tuple[
+    tuple[tuple[Decimal, Decimal], ...],
+    tuple[tuple[Decimal, Decimal], ...],
+    Decimal,
+]:
+    """Return distinct FeO crystal/liquid branches joined at JANAF's transition."""
+
+    mixed_points, _mixed_digest = _fusion_table_points("Fe-020")
+    liquid_points, _liquid_digest = _fusion_table_points("Fe-019")
+    transition_temperature, transition_delta_g = _feo_transition_fusion_data()
+    crystal_points = tuple(
+        point for point in mixed_points if point[0] < transition_temperature
+    )
+    if len(crystal_points) < 2:
+        raise ValueError("Fe-020: JANAF crystal branch has fewer than two Gibbs nodes")
+
+    # Fe-020's values above 1650 K are liquid. Never use those rows to extend
+    # the crystalline branch. Its transition Gibbs value is obtained from the
+    # Fe-019 liquid value at the same T and the published transition-row ΔG.
+    liquid_at_transition = _interpolate_table_points(
+        liquid_points, transition_temperature
+    )
+    crystal_at_transition = liquid_at_transition - transition_delta_g
+    crystal_points = (*crystal_points, (transition_temperature, crystal_at_transition))
+    return tuple(crystal_points), liquid_points, transition_temperature
+
+
 def _d144_fusion_conversion(
     oxide: str, temperature_K: Decimal
 ) -> D144FusionConversion:
     """Return liquid-minus-solid Gibbs energy and its JANAF domain verdict.
 
-    For FeO, Fe-020 supplies the crystalline branch and then its liquid
-    branch; Fe-019 supplies the liquid standard. Fe Ellingham switches its K
-    basis at the Fe-020 FeO melting point, 1650 K. The JANAF Fe-019/Fe-020
-    difference at that boundary is 0.363 kJ/mol from separate tabulation, but
-    the two standards describe coexisting phases there, so their chemical
-    potentials must agree. Anchor the table difference by subtracting its
-    value at 1650 K. For either oxide, ``mu = G° + RT ln(a)``; equating the
-    liquid and crystal potentials gives
-    ``a_cr = a_l * exp((G_l° - G_cr°)/RT)``. The FeO anchor makes
-    ``DeltaG_fus(1650 K)=0`` and the activity multiplier one at the K switch,
-    so the pressure is continuous. DeltaG and RT are both energy per mole,
-    making the exponent dimensionless. The remaining FeO chord at 1500 K is
-    ``+1.795 kJ/mol`` after anchoring, so liquid-to-crystal activity increases
-    by ``exp(+DeltaG/RT)``.
+    Fe-020 contains crystalline FeO nodes below its 1650 K transition and
+    liquid FeO nodes above it. Interpolating its 1600 and 1700 K values would
+    cross a phase boundary and mix two standards. The crystal branch therefore
+    uses Fe-020 nodes below the transition and its endpoint from JANAF's
+    transition row; the liquid branch uses Fe-019 nodes. Fe-020's transition
+    rows give ΔH_tr = 103.139 - 79.081 = 24.058 kJ/mol and
+    ΔS_tr = 171.990 - 157.409 = 14.581 J/mol/K, so
+    ΔG_tr = ΔH_tr - Tm*ΔS_tr = -0.00065 kJ/mol at published precision.
+    This transition difference joins the branches directly; no constant
+    offset is subtracted from any temperature.
+
+    For either oxide, both standards use ``mu = G° + RT ln(a)``. Equating
+    liquid and crystalline chemical potentials gives
+    ``a_cr = a_l * exp((G_l° - G_cr°)/RT)``. Thus the liquid-to-crystal sign
+    is positive; ΔG_fus -> 0 gives equal activities, and above Tm a negative
+    ΔG_fus makes the converted activity smaller. Unit check: ΔG_fus and RT
+    are both energy per mole, so the exponent is dimensionless.
     """
 
     pair = d144_fusion_table_pair(oxide)
     if pair is None:
         raise ValueError(f"no d-144 JANAF fusion pair for {oxide}")
     temperature = Decimal(str(temperature_K))
-    solid_points, _solid_digest = _fusion_table_points(pair[0])
-    liquid_points, _liquid_digest = _fusion_table_points(pair[1])
-    _complete_fusion_overlap_nodes(
-        oxide,
-        pair[0],
-        pair[1],
-        solid_points,
-        liquid_points,
-        temperature,
-    )
-    melting_temperature = _fusion_crossing_temperature(oxide, pair[0], pair[1])
+    if oxide == "FeO":
+        solid_points, liquid_points, melting_temperature = _feo_fusion_phase_points()
+        for table_id, points in (
+            (pair[0], solid_points),
+            (pair[1], liquid_points),
+        ):
+            missing_nodes = _fusion_missing_gibbs_temperatures(table_id)
+            missing_node = _missing_node_for_interpolation(
+                points, missing_nodes, temperature
+            )
+            # Fe-019's 1650 K transition row is source data for the branch join;
+            # the missing formation-Gibbs cell at that node is expected.
+            if missing_node is not None and not (
+                table_id == "Fe-019" and missing_node == melting_temperature
+            ):
+                raise ValueError(
+                    f"{table_id}: needed JANAF formation Gibbs row missing at "
+                    f"{missing_node} K for interpolation at {temperature} K"
+                )
+    else:
+        solid_points, _solid_digest = _fusion_table_points(pair[0])
+        liquid_points, _liquid_digest = _fusion_table_points(pair[1])
+        _complete_fusion_overlap_nodes(
+            oxide,
+            pair[0],
+            pair[1],
+            solid_points,
+            liquid_points,
+            temperature,
+        )
+        melting_temperature = _fusion_crossing_temperature(oxide, pair[0], pair[1])
     delta_g = _fusion_gibbs_difference_from_points(
         solid_points, liquid_points, temperature, extrapolate=True
     )
-    if oxide == "FeO":
-        feo_k_transition_K = Decimal("1650")
-        raw_transition_difference = _fusion_gibbs_difference_from_points(
-            solid_points,
-            liquid_points,
-            feo_k_transition_K,
-            extrapolate=True,
-        )
-        delta_g -= raw_transition_difference
     certified_band = (
         max(solid_points[0][0], liquid_points[0][0]),
         min(solid_points[-1][0], liquid_points[-1][0]),

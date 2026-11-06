@@ -18,6 +18,8 @@ from typing import Any
 from simulator.reference_data.janaf_fusion import (
     FusionDomainVerdict,
     _d144_fusion_conversion,
+    d144_vapor_conversion_oxide,
+    d144_vapor_standard_state_pair,
     d144_fusion_table_pair,
 )
 
@@ -754,15 +756,13 @@ def _activity_for_crystalline_vapor_k(
         warning = _vapor_activity_standard_state_warning(notice)
         return float(activity), notice, warning
 
-    if (
-        source_phase is not None
-        and target_phase is not None
-        and source_phase != target_phase
-        and source_id is not None
-        and target_id is not None
-        and source_id != target_id
-        and d144_fusion_table_pair(parent_oxide) is not None
-    ):
+    registered_oxide = d144_vapor_conversion_oxide(
+        source_id,
+        source_phase,
+        target_id,
+        target_phase,
+    )
+    if registered_oxide == parent_oxide:
         conversion = _convert_melt_oxide_activity_reference_state(
             parent_oxide,
             activity,
@@ -835,32 +835,57 @@ def _vapor_activity_source_standard_state(
     catalog_standard_states: Mapping[
         str, tuple[Any | None, Any | None]
     ],
+    *,
+    route_id: str | None = None,
+    runtime_standard_state_phase: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """Carry an explicit catalog source ID when one is declared."""
+    """Resolve the liquid handshake's JANAF ID without changing its token."""
 
-    pair = catalog_standard_states.get(parent_oxide)
+    if parent_oxide == "FeO":
+        return "Fe-020", "liquid"
+    pair = catalog_standard_states.get(route_id or "") or catalog_standard_states.get(
+        parent_oxide
+    )
     source = pair[0] if pair is not None else None
-    if source is not None and source.identity_id is not None:
-        return (
-            source.identity_id,
-            _normalize_standard_state_phase(source.phase),
-        )
+    source_phase = (
+        _normalize_standard_state_phase(source.phase)
+        if source is not None
+        else _normalize_standard_state_phase(runtime_standard_state_phase)
+    )
+    source_id = source.identity_id if source is not None else None
+    if source_id is None:
+        # activity_input.standard_state.phase is a runtime handshake token.
+        # Keep its generic fingerprint, and get the separately reported JANAF
+        # source ID from the same d-144 registry that owns its K conversion.
+        registered_pair = d144_vapor_standard_state_pair(parent_oxide)
+        if (
+            registered_pair is not None
+            and source_phase == registered_pair[0][1]
+        ):
+            source_id = registered_pair[0][0]
+    if source_id is not None:
+        return source_id, source_phase
     return (
         runtime_standard_state_id,
-        _activity_standard_state_phase(runtime_standard_state_id),
+        source_phase
+        or _activity_standard_state_phase(runtime_standard_state_id),
     )
 
 
 def _vapor_k_standard_state(
     parent_oxide: str,
-    temperature_K: float,
+    temperature_K: float | None,
     catalog_standard_states: Mapping[
         str, tuple[Any | None, Any | None]
     ],
+    *,
+    route_id: str | None = None,
 ) -> tuple[str | None, str | None]:
     """Resolve the selected vapor K identity and phase for one parent."""
 
     if parent_oxide == "FeO":
+        if temperature_K is None:
+            return "Fe-020", None
         from simulator.chemistry.ellingham_thermo import (
             ellingham_segment_for_temperature,
         )
@@ -873,14 +898,26 @@ def _vapor_k_standard_state(
             phase = "liquid"
         else:
             phase = None
-    elif parent_oxide in catalog_standard_states:
-        pair = catalog_standard_states[parent_oxide]
+        return "Fe-020", phase
+    elif route_id in catalog_standard_states or parent_oxide in catalog_standard_states:
+        pair = catalog_standard_states.get(route_id or "") or catalog_standard_states[
+            parent_oxide
+        ]
         target = pair[1]
         if target is None:
             return None, None
         phase = _normalize_standard_state_phase(target.phase)
+        registered_pair = d144_vapor_standard_state_pair(parent_oxide)
+        registered_target_id = (
+            registered_pair[1][0]
+            if registered_pair is not None
+            and phase == registered_pair[1][1]
+            else None
+        )
         return (
-            target.identity_id or _activity_standard_state_id_for_phase(phase),
+            target.identity_id
+            or registered_target_id
+            or _activity_standard_state_id_for_phase(phase),
             phase,
         )
     elif parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
