@@ -450,8 +450,8 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 # Stage-3 purity admission bypasses rejected parcels; downstream Stage-4
 # collector values below are pinned from the production CLI and Studio fixture.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 1.62573915508e-06,
-    "mars_basalt": 1.61520571175e-06,
+    "lunar_mare_low_ti": 8.76551515134e-07,
+    "mars_basalt": 8.90876677849e-07,
 }
 
 # Production CLI pins after Stage-3 purity admission bypasses parcels rejected
@@ -459,7 +459,7 @@ BASELINE_STAGE4_SIO2_KG = {
 # capture under its distinct feedstock composition.
 BASELINE_STAGE3_SIO2_KG = {
     "lunar_mare_low_ti": 0.0,
-    "mars_basalt": 4.89606602577e-09,
+    "mars_basalt": 4.89580870473e-09,
 }
 
 
@@ -648,16 +648,17 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
     # the de32c69ca runner regen). Lunar full runs diverge between the laptop
     # and studio-3, so this value is not a laptop re-run.
-    # constack merge: repin on gate box
+    # constack merge: repin on gate box. Condenser fix branch (312fcce4f):
+    # studio-3 actuals after the e-NTU stage capture and the d-344 cartridge.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333585288513e-7,
+        "lunar_mare_low_ti": 1.6649989611898087e-6,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
         # The piecewise segment solve changes the cancellation residual by
         # 1.134167275e-14 percentage points from the single-exponential pin;
         # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        "mars_basalt": 4.4306091172096064e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15

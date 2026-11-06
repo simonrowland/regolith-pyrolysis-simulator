@@ -220,7 +220,11 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
     # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
     # is the production value (train rpp nightly and the laptop run agree).
-    assert na2o_left == pytest.approx(0.07626529983087423, abs=1e-6)
+    # Condenser branch (d-344 14.74 m2 cartridge + e-NTU stage capture): more
+    # Na is held in the train, so the zero-dose shuttle returns less Na2O to
+    # the melt; 0.0763 -> 4.1e-5 kg. Studio-3 actual; the laptop agrees.
+    # FeO reduction (>80 %) and the 5e-12 % closure still hold.
+    assert na2o_left == pytest.approx(4.115499686711082e-05, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
