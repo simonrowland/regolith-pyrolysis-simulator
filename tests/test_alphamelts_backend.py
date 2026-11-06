@@ -8970,7 +8970,7 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     pressures = backend._activities_times_antoine(
         1600.0,
         {'Na': 2.0, 'K': 1.0, 'unknown': 10.0},
-        {'SiO2': 100.0},
+        {},
         pO2_bar=1e-9,
     )
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
@@ -9044,17 +9044,52 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     # Composite CrO2 is evaluated by the canonical vapour-rail catalog; this
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     # Mg/Ca use the built-in provider's declared liquid parent-oxide activities,
-    # converted to the crystalline K basis before this fallback evaluates them.
+    # converted to the crystalline K basis. Other melt-present parents with a
+    # supported built-in activity use that provider's declared standard too.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
-    assert set(backend._antoine_activity_standard_state_notices) == {'Mg', 'Ca'}
+    from simulator.chemistry.ellingham_graph import (
+        effective_equilibrium_pressure_Pa,
+    )
+    from simulator.chemistry.melt_activity import (
+        _builtin_vapor_activities_from_weight_composition,
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    table = backend._load_vapor_pressure_table()
+    builtin_activities = _builtin_vapor_activities_from_weight_composition(
+        comp_wt, 1600.0 + CELSIUS_TO_KELVIN_OFFSET
+    )
+    expected_substitutions = {
+        species
+        for species in required
+        if table[species].get('parent_oxide') in builtin_activities
+        and backend._antoine_uses_reaction_pressure(table[species])
+    }
+    assert set(backend._antoine_activity_standard_state_notices) == (
+        expected_substitutions
+    )
     assert all(
         notice['reason'] == 'activity_standard_state_substitution'
         for notice in backend._antoine_activity_standard_state_notices.values()
     )
-    assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
-    assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
-    assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
+    for species in required:
+        spec = table[species]
+        parent_oxide = str(spec.get('parent_oxide', '') or '')
+        builtin_activity = builtin_activities.get(parent_oxide)
+        activity = (
+            builtin_activity.activity
+            if builtin_activity is not None
+            else backend._activity_for_vapor_species(species, activities)
+        )
+        expected = effective_equilibrium_pressure_Pa(
+            species,
+            1600.0 + CELSIUS_TO_KELVIN_OFFSET,
+            1e-9,
+            a_oxide=float(activity),
+            vapor_pressure_data=backend._vapor_pressure_catalog_payload,
+        )
+        assert pressures[species] == pytest.approx(expected)
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5
     )
@@ -9113,7 +9148,7 @@ def test_endmember_projection_never_sums_multiple_activity_carriers():
     ) is None
 
 
-def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
+def test_thermoengine_missing_proxy_activity_uses_flagged_builtin_projection():
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._vaporock_available = False
@@ -9139,29 +9174,23 @@ def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
     )
 
     assert result.status == 'ok'
-    assert result.vapor_pressures_Pa == {}
-    assert result.diagnostics['vapor_pressure_backend_status'] == 'refused'
-    refusal = result.diagnostics['vapor_pressure_refusal']
-    assert refusal == {
-        'status': 'refused',
-        'reason': 'missing_melt_activity',
-        'missing_precursor_species': ['Na'],
-        'context': 'ThermoEngine VapoRock fallback unavailable',
-    }
-    assert isinstance(
-        backend._activities_times_antoine_or_fail(
-            1600.0,
-            {'SiO2': 0.4},
-            {'SiO2': 70.0, 'Na2O': 30.0},
-            # 2026-08-05 MC-4 wave 1B: Si now carries a standard-reaction
-            # model with a pO2 exponent, making pO2_bar a required input of
-            # this helper (the raise on absence is the fail-loud caller-bug
-            # guard; production callers thread it per the b-139 fix).
-            pO2_bar=1.0e-9,
-            context='test missing activity',
-        ),
-        VaporPressureActivityRefusal,
+    assert {'Na', 'Si', 'SiO'} <= set(result.vapor_pressures_Pa)
+    notices = result.diagnostics[
+        'vapor_activity_standard_state_notices_by_species'
+    ]
+    assert {'Na', 'Si', 'SiO'} <= set(notices)
+    assert all(
+        notices[species]['reason'] == 'activity_standard_state_substitution'
+        for species in ('Na', 'Si', 'SiO')
     )
+    projection = backend._activities_times_antoine_or_fail(
+        1600.0,
+        {'SiO2': 0.4},
+        {'SiO2': 70.0, 'Na2O': 30.0},
+        pO2_bar=1.0e-9,
+        context='test missing proxy activity',
+    )
+    assert {'Na', 'Si', 'SiO'} <= set(projection)
 
 
 def test_activities_times_antoine_returns_empty_without_species_activity():
@@ -9170,7 +9199,7 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
     assert backend._activities_times_antoine(
         1600.0,
         {},
-        {'Na2O': 100.0},
+        {},
     ) == {}
 
 
@@ -9322,7 +9351,7 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
     backend._vaporock_helper = EmptyVapoRock()
 
     with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
-        pressures, refusal = backend._vapor_pressures_via_vaporock_or_antoine(
+        pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=1600.0,
             solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
             liquid_fraction=1.0,
@@ -9331,9 +9360,16 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
             activities={},
         )
 
-    assert pressures == {}
-    assert isinstance(refusal, VaporPressureActivityRefusal)
-    assert refusal.missing_precursor_species == ('Na', 'Si', 'SiO')
+    assert {'Na', 'Si', 'SiO'} <= set(pressures)
+    assert isinstance(source, dict)
+    assert {'Na', 'Si', 'SiO'} <= set(
+        backend._antoine_activity_standard_state_notices
+    )
+    assert all(
+        backend._antoine_activity_standard_state_notices[species]['reason']
+        == 'activity_standard_state_substitution'
+        for species in ('Na', 'Si', 'SiO')
+    )
 
 
 def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
