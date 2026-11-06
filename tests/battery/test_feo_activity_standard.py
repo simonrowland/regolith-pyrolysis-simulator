@@ -47,8 +47,11 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24"
     ),
 }
+# Studio-3 with openimcc 9f25dfe: t-1637's liquid-standard notices
+# (fafbee7c4 + d-346) change serialized notice content; status and the
+# residual numeric value are unchanged.
 _DISTIN_GREEN_RESIDUAL_SHA256 = (
-    "3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0"
+    "ddc00721f32458d2c72f915a5d781a7c51993c2f3a389e267f40c75e0b631d50"
 )
 
 

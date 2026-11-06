@@ -177,10 +177,9 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 
 @pytest.mark.parametrize("staged", [False, True], ids=["lunar_24h", "c2a_staged"])
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
-    # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
-    # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
-    # full runs diverge between the laptop and studio-3, so these digests are
-    # not a laptop re-run.
+    # Studio-3 with openimcc 9f25dfe: t-1637's liquid-standard notices
+    # (fafbee7c4 + d-346) change serialized notices; capture totals are
+    # numeric-unchanged.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(
