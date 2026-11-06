@@ -209,6 +209,7 @@ def test_raw_weight_fraction_comparison_stays_out_of_crystalline_k(
         raw_fraction = row["wt_fraction_activity"]
         assert raw_fraction > 0.0
         assert row["P_eq_wt_fraction_Pa"] is None
+        assert row["wt_fraction_activity_factor"] is None
         assert row["P_eq_delta_vs_wt_fraction_Pa"] is None
         assert row["P_eq_ratio_vs_wt_fraction"] is None
         assert "raw_weight_fraction_comparison=not_evaluated_against_crystalline_K" in (
