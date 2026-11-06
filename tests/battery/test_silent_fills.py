@@ -663,14 +663,14 @@ def test_unmodelled_reactive_knudsen_cell_predicts_with_notice(
     assert prediction.refusal_detail.get("reason") != "reactive_cell_oxygen_reservoir"
     assert any(
         notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
-        and "cell oxygen balance not modelled" in notice.reason
+        and "reactive cell: oxygen balance of the cell not modelled" in notice.reason
         for notice in prediction.notices
     )
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
 
 
-def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> None:
-    opened = _no_engine(monkeypatch)
+def test_platinum_alloy_prose_stays_untyped_and_uses_flagged_melt_balance(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
     bench = replace(
         _cell_material_bench(None),
@@ -685,8 +685,13 @@ def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> 
         isolated=False,
     )
 
-    assert opened == []
-    assert prediction.refusal_detail["reason"] == "cell_material_unknown"
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["cell_material"] is None
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "cell oxygen balance not modelled" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(monkeypatch) -> None:

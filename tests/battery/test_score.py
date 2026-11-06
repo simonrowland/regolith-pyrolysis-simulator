@@ -17254,12 +17254,7 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
 
 
 def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
-    """An unlinked experiment does not inherit its work's only typed bench.
-
-    Restoring the sole-bench adoption in _bench_for_score makes this red:
-    the W bench would be attached and the refusal would not be
-    cell_material_unknown.
-    """
+    """An unlinked bench stays unknown while the melt-only closure is flagged."""
     from simulator.battery.enums import BenchIdentityBasis, CellMaterial
     from simulator.battery.records import Bench, BenchIdentity
 
@@ -17306,8 +17301,17 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
         Engine.OPENIMCC,
         context=context,
     )
-    assert residual.refusal is not None
-    assert residual.refusal.detail.get("reason") == "cell_material_unknown"
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and '"cell_material":[]' in notice.reason
+        for notice in residual.notices
+    )
+    assert any(
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        for notice in residual.notices
+    )
 
 
 def _cell_material_score_case(material, inference):
