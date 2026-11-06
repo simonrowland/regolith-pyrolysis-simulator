@@ -657,6 +657,7 @@ def run(
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
+            budget=config.budget,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -1832,6 +1833,7 @@ def _load_study_journal(
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
+            budget=config.budget,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -2938,6 +2940,7 @@ def resolve_strategy(
     seed: int,
     schema: RecipeSchema,
     parallel: int = 1,
+    budget: int = 24,
     warm_start_seeds: Sequence[WarmStartSeed] = (),
 ) -> Strategy:
     if not isinstance(strategy, str):
@@ -2960,6 +2963,7 @@ def resolve_strategy(
             schema,
             seed=seed,
             objective_profile=profile,
+            budget=budget,
             parallel=parallel,
             warm_start_seeds=warm_start_seeds,
         )
