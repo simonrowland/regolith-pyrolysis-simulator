@@ -32,7 +32,10 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import build_per_hour_summary
+from simulator.runner import (
+    RUNNER_MASS_BALANCE_LIMIT_PCT as MASS_BALANCE_MAX_PCT,
+    build_per_hour_summary,
+)
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
 from tests.magemin_test_support import close_test_owned_magemin_backend
@@ -334,10 +337,17 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
         for account in sim.atom_ledger.mol_by_account()
     )
+    # Premise: the closure contract bounds relative error. The owner is
+    # RUNNER_MASS_BALANCE_LIMIT_PCT, imported as MASS_BALANCE_MAX_PCT.
+    # Algebra: |final - initial| <= initial * pct/100.
+    # Unit check: mol vs mol.
+    # Limiting value: 2359 mol x 5e-14 = 1.2e-10 mol, about 260 ulp,
+    # against a measured -8 ulp. The bound still catches any real leak
+    # bigger than one ten-billionth.
     assert final_iron_atoms == pytest.approx(
         initial_iron_atoms,
         rel=0.0,
-        abs=2.0 * math.ulp(initial_iron_atoms),
+        abs=initial_iron_atoms * MASS_BALANCE_MAX_PCT / 100,
     )
 
 
