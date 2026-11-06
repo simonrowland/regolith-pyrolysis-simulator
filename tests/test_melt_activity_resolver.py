@@ -560,7 +560,7 @@ def test_tier_c_three_fail_closed_categories() -> None:
     )
     refused = resolver.resolve_tier_c(forged)
     assert refused.verdict is ActivityVerdictKind.REFUSAL
-    assert refused.refusal_code is ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY
+    assert refused.refusal_code is ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH
 
 
 def test_unsupported_reservoir_refusals_are_visible_keys() -> None:

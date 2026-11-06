@@ -1024,6 +1024,14 @@ def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None
         source_reaction_activity_standard_states={"Mg": liquid_standard},
         source_reaction_activity_provenance={
             "Mg": {
+                "melt_oxide_activity_reference_state": (
+                    MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                ),
+                "melt_oxide_activity_reference_state_phase": "liquid",
+                "vapor_k_standard_state_id": (
+                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                ),
+                "vapor_k_standard_state_phase": "solid",
                 "activity_standard_state_conversion": {
                     "from_standard_state_id": (
                         MELT_OXIDE_ACTIVITY_REFERENCE_STATE
@@ -1031,7 +1039,13 @@ def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None
                     "to_standard_state_id": (
                         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
                     ),
+                    "conversion_performed": True,
+                    "log10_activity_offset": math.log10(2.0),
                 },
+                "vapor_activity_used_for_K": 0.5,
+                "vapor_activity_standard_state_id_used_for_K": (
+                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                ),
                 "vapor_activity_for_crystalline_K": 0.5,
                 "vapor_activity_for_crystalline_K_standard_state_id": (
                     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
@@ -2145,6 +2159,18 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
         source_reaction_activity_evidence_refs={"Mg": "test:d349"},
         source_reaction_activity_standard_states={
             "Mg": _TEST_ACTIVITY_STANDARD_STATE
+        },
+        source_reaction_activity_provenance={
+            "Mg": {
+                "melt_oxide_activity_reference_state": (
+                    MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                ),
+                "melt_oxide_activity_reference_state_phase": "liquid",
+                "vapor_k_standard_state_id": (
+                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                ),
+                "vapor_k_standard_state_phase": "solid",
+            }
         },
     )
 

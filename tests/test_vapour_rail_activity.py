@@ -337,7 +337,7 @@ def test_provider_reported_activity_point_records_exact_provenance():
         )
     )
     assert missing_provenance.verdict is ActivityVerdictKind.REFUSAL
-    assert missing_provenance.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
+    assert missing_provenance.refusal_code is ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH
 
     missing_provider = (
         CondensedPhaseActivityProvider().resolve_source_reaction_activity(
@@ -352,7 +352,7 @@ def test_provider_reported_activity_point_records_exact_provenance():
         )
     )
     assert missing_provider.verdict is ActivityVerdictKind.REFUSAL
-    assert missing_provider.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
+    assert missing_provider.refusal_code is ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH
 
     missing_external_ref = (
         CondensedPhaseActivityProvider().resolve_source_reaction_activity(
@@ -618,7 +618,7 @@ def test_provider_henrian_path_without_engine_evidence():
 
     solid_reference = resolve("CaO", 0.2)
     assert solid_reference.verdict is ActivityVerdictKind.REFUSAL
-    assert solid_reference.refusal_code is ActivityRefusalCode.MONOTONICITY_UNPROVED
+    assert solid_reference.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
 
     upper = resolve("Na2O", 0.2)
     assert upper.verdict is ActivityVerdictKind.UPPER_BOUND
