@@ -793,9 +793,9 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
                 abs=0,
             )
         elif species == "Fe":
-            assert used_activity != pytest.approx(
+            assert used_activity == pytest.approx(
                 activity,
-                rel=1e-6,
+                rel=1e-10,
                 abs=0,
             )
         else:
@@ -809,6 +809,11 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         ][species]
         assert notice["reason"] == "activity_standard_state_substitution"
         assert math.isfinite(float(notice["log10_activity_offset"]))
+        if species == "Fe":
+            assert notice["conversion_performed"] is False
+            assert notice["source_standard_state_relation_reason"] == (
+                "source_and_K_standard_states_match"
+            )
         assert notice["source_standard_state_substitution"] == (
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
