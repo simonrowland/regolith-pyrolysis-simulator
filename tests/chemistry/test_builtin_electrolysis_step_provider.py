@@ -1435,6 +1435,20 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
     assert diagnostic["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
     assert diagnostic["mre_decomposition_voltage_authoritative_by_oxide"]["FeO"] is False
     refusal = diagnostic["mre_raw_margin_refused_targets"]["FeO"]
+    assert tuple(
+        refusal[key].hex()
+        for key in (
+            "fallback_requirement_V",
+            "fallback_margin_V",
+            "raw_requirement_V",
+            "raw_margin_V",
+        )
+    ) == (
+        "0x1.0db594231c1e0p-1",
+        "0x1.1c39ce03926c0p-2",
+        "0x1.0383fc7a5579ap+0",
+        "-0x1.acd5f73f167d0p-3",
+    )
     assert refusal["fallback_margin_V"] > 0.0
     assert refusal["raw_margin_V"] <= 0.0
     assert refusal["raw_requirement_V"] > held_voltage_V
