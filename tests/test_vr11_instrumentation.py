@@ -2044,6 +2044,8 @@ def test_b3_production_route_folds_stage_outcomes() -> None:
         gas_temperature_C=1500.0,
         campaign_name="C2A",
     )
+    # This fixture has no K cartridge; zero is pass-through, missing refuses.
+    model.stage_area_m2_by_stage["k_stage4b"] = 0.0
     # Force zero residence on every stage so efficiency mints pass-through.
     model.residence_time_s = {
         int(stage.stage_number): 0.0 for stage in model.train.stages
