@@ -1,0 +1,40 @@
+source_id: mcgill-na-fe-o-critical-assessment
+source:
+  citation: 'Moosavi-Khoonsari, E. and Jung, I.-H. (2016), Critical evaluation and optimization of thermodynamic properties and phase diagrams of the Na2O-FeO-Fe2O3 system, Metallurgical and Materials Transactions B, 47, 576-594.'
+  doi: 10.1007/s11663-015-0517-5
+extraction:
+  method: Hand transcription from MinerU and pdftotext, with flagged table cells resolved against page renders.
+  date: '2026-11-05'
+  worker: codex-resume-77747-1793930354
+review_status: draft
+tables:
+  - page: 5
+    table_index: 2
+    type: heat_capacity_and_heat_content_series
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    phase: cr
+    rows: [23]
+    values:
+      - {column: 2, species: NaFeO2, phase: cr}
+  - page: 5
+    table_index: 2
+    type: heat_capacity_and_heat_content_series
+    quantity: S
+    evidence_class: quoted_attributed
+    unit: J/mol/K
+    phase: cr
+    rows: [22]
+    values:
+      - {column: 3, species: NaFeO2, phase: cr}
+  - page: 7
+    table_index: 4
+    type: transition_point
+    quantity: transition_temperature
+    evidence_class: quoted_attributed
+    unit: K
+    phase: cr
+    rows: [7]
+    values:
+      - {column: 1, species: NaFeO2, phase: cr}

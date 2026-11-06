@@ -1,0 +1,398 @@
+schema_version: literature_extract.v1
+source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+source:
+  citation: >-
+    Shaiu, B. (1976). Thermodynamic properties of compounds of Na2O with the
+    oxides of chromium, nickel and iron. M.S. thesis, Iowa State University.
+    doi:10.2172/7145613.
+  year: 1976
+  corpus_asset: raw/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.pdf
+extraction:
+  method: >-
+    Fe-bearing rows transcribed from the MinerU table blocks and markdown and
+    compared with the pdftotext layout. All numeric cells in Tables 7, 8, 9,
+    10, 11 and A4 used here were checked against page renders because the source
+    is scanned and the table QA flagged disagreement. Figure-only data were
+    excluded.
+  date: '2026-11-06'
+  worker: w1106a-shaiu76
+  provenance_path: text/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.Na2FeO2.observations[shaiu_1976_table8_na2feo2].values.equation_as_printed
+    value: '-183060 + 51.34T'
+    locator:
+      page: 47
+      table: '8'
+      row: Na2FeO2
+  - path: species.NaFeO2.observations[shaiu_1976_table8_nafeo2].values.equation_as_printed
+    value: '-173410 + 43.66T'
+    locator:
+      page: 47
+      table: '8'
+      row: NaFeO2
+  - path: species.Na4FeO3.observations[shaiu_1976_table8_na4feo3].values.equation_as_printed
+    value: '-289180 + 82.69T'
+    locator:
+      page: 47
+      table: '8'
+      row: Na4FeO3
+  - path: species.NaFeO2.observations[shaiu_1976_table_a4_cell_vi].values.points[19].value
+    value: 1.2743
+    locator:
+      page: 76
+      table: A4
+      table_caption_page: 74
+      table_continued: true
+      row: Cell VI, row 20
+species:
+  Na2FeO2:
+    observations:
+      - observation_id: shaiu_1976_table8_na2feo2
+        type: gibbs_table
+        locator:
+          page: 47
+          table: '8'
+          row: Na2FeO2
+        phase: cr
+        units: cal/mol as printed
+        standard_state: >-
+          Standard free energy of formation for Na2FeO2, from the table's
+          general reaction xNa(l) + yM(s) + (z/2)O2(g) -> Na_xM_yO_z(s).
+          Values are left on the printed formula basis.
+        T_range_K: [843, 911]
+        derived_from: [shaiu_1976_table7_cell_v_emf_fit]
+        derivation:
+          relation: Reduction of the Cell V emf fit with the printed cell reaction and reference thermodynamic functions.
+          inputs: [shaiu_1976_table7_cell_v_emf_fit]
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          reaction: '2 Na(l) + Fe(s) + O2(g) -> Na2FeO2(s)'
+          formula_as_printed: Na2FeO2
+          equation_as_printed: '-183060 + 51.34T'
+          uncertainty_as_printed: '±3000 cal/mol'
+          uncertainty:
+            value: 3000
+            units: cal/mol
+            reported_status: printed
+            note: Confidence level not stated.
+          reduction: >-
+            Formation-energy equation calculated from the Cell V emf fit and
+            literature thermodynamic functions.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The equation and temperature interval are preserved, but this
+            coefficient-only function is not evaluated as numeric points by
+            the migrator.
+      - observation_id: shaiu_1976_table7_cell_v_emf_fit
+        type: gibbs_table
+        locator:
+          page: 46
+          table: '7'
+          row: Cell V
+        phase: cr
+        units: V as printed
+        T_range_K: [843, 911]
+        derived_from: [shaiu_1976_table_a4_cell_v]
+        derivation:
+          relation: Least-squares fit to the printed Table A4 Cell V emf measurements.
+          inputs: [shaiu_1976_table_a4_cell_v]
+        values:
+          quantity: measured_cell_emf_fit
+          method_class: measured_reduced
+          reaction: 'Ca + 2 NaF + 2 FeO -> Na2FeO2 + CaF2 + Fe'
+          fit_as_printed: 'E(V) = (A + BT) ± C'
+          A_as_printed: 1.5993
+          A_standard_deviation_as_printed: 0.0736
+          B_times_1e5_as_printed: -20.42
+          B_standard_deviation_times_1e5_as_printed: 8.38
+          C_times_1e3_as_printed: 4.0
+          T_range_as_printed: 843–911 K
+          method_class_reason: Authors' least-squares fit to their measured Cell V emf readings.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            No observation quantity token represents a cell emf fit; preserved
+            as a typed refusal rather than mislabeled as Gibbs energy.
+      - observation_id: shaiu_1976_table_a4_cell_v
+        type: gibbs_table
+        locator:
+          page: 76
+          table: A4
+          table_caption_page: 74
+          table_continued: true
+          row: Cell V
+        phase: cr
+        units: V; temperature in K as printed
+        values:
+          method_class: measured_direct
+          quantity: measured_cell_emf
+          method: galvanic cell emf measurement
+          cell_as_printed: Na2FeO2, NaF, FeO, Fe/CaF2/Ca
+          points:
+            - {T_K: 843, value: 1.4248, locator: {page: 76, row: Cell V}}
+            - {T_K: 858, value: 1.4220, locator: {page: 76, row: Cell V}}
+            - {T_K: 870, value: 1.4246, locator: {page: 76, row: Cell V}}
+            - {T_K: 889, value: 1.4249, locator: {page: 76, row: Cell V}}
+            - {T_K: 902, value: 1.4149, locator: {page: 76, row: Cell V}}
+            - {T_K: 911, value: 1.4080, locator: {page: 76, row: Cell V}}
+          printed_row_count: 6
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source directly reports cell emf, for which this extract schema
+            has no exact quantity token; the measured points are retained and
+            not aliased to Gibbs energy.
+          audit_note: All 6 temperature/emf pairs confirmed against the page 76 render.
+  NaFeO2:
+    observations:
+      - observation_id: shaiu_1976_table8_nafeo2
+        type: gibbs_table
+        locator:
+          page: 47
+          table: '8'
+          row: NaFeO2
+        phase: cr
+        units: cal/mol as printed
+        standard_state: >-
+          Standard free energy of formation for NaFeO2, from the table's
+          general reaction xNa(l) + yM(s) + (z/2)O2(g) -> Na_xM_yO_z(s).
+          Values are left on the printed formula basis; no polymorph is
+          specified by the source.
+        T_range_K: [795, 1048]
+        derived_from: [shaiu_1976_table7_cell_vi_emf_fit]
+        derivation:
+          relation: Reduction of the Cell VI emf fit with the printed cell reaction and reference thermodynamic functions.
+          inputs: [shaiu_1976_table7_cell_vi_emf_fit]
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          reaction: 'Na(l) + Fe(s) + O2(g) -> NaFeO2(s)'
+          formula_as_printed: NaFeO2
+          polymorph_as_printed: not stated
+          equation_as_printed: '-173410 + 43.66T'
+          uncertainty_as_printed: '±1200 cal/mol'
+          uncertainty:
+            value: 1200
+            units: cal/mol
+            reported_status: printed
+            note: Confidence level not stated.
+          reduction: >-
+            Formation-energy equation calculated from the Cell VI emf fit and
+            literature thermodynamic functions, as stated in Table 8.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The equation and temperature interval are preserved, but this
+            coefficient-only function is not evaluated as numeric points by
+            the migrator.
+      - observation_id: shaiu_1976_table7_cell_vi_emf_fit
+        type: gibbs_table
+        locator:
+          page: 46
+          table: '7'
+          row: Cell VI
+        phase: cr
+        units: V as printed
+        T_range_K: [795, 1048]
+        derived_from: [shaiu_1976_table_a4_cell_vi]
+        derivation:
+          relation: Least-squares fit to the printed Table A4 Cell VI emf measurements.
+          inputs: [shaiu_1976_table_a4_cell_vi]
+        values:
+          quantity: measured_cell_emf_fit
+          method_class: measured_reduced
+          reaction: 'Na2FeO2 + FeO + Cu2O -> 2NaFeO2 + 2Cu'
+          fit_as_printed: 'E(V) = (A + BT) ± C'
+          A_as_printed: 1.3559
+          A_standard_deviation_as_printed: 0.0184
+          B_times_1e5_as_printed: -7.55
+          B_standard_deviation_times_1e5_as_printed: 1.95
+          C_times_1e3_as_printed: 6.4
+          T_range_as_printed: 795–1048 K
+          method_class_reason: Authors' least-squares fit to their measured Cell VI emf readings.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            No observation quantity token represents a cell emf fit; preserved
+            as a typed refusal rather than mislabeled as Gibbs energy.
+      - observation_id: shaiu_1976_table_a4_cell_vi
+        type: gibbs_table
+        locator:
+          page: 76
+          table: A4
+          table_caption_page: 74
+          table_continued: true
+          row: Cell VI
+        phase: cr
+        units: V; temperature in K as printed
+        values:
+          method_class: measured_direct
+          quantity: measured_cell_emf
+          method: galvanic cell emf measurement
+          cell_as_printed: FeO, NaFeO2, Na2FeO2/ZrO2·15 mole % CaO/Cu2O, Cu
+          points:
+            - {T_K: 795, value: 1.3040, locator: {page: 76, row: Cell VI}}
+            - {T_K: 820, value: 1.2903, locator: {page: 76, row: Cell VI}}
+            - {T_K: 835, value: 1.2905, locator: {page: 76, row: Cell VI}}
+            - {T_K: 850, value: 1.2880, locator: {page: 76, row: Cell VI}}
+            - {T_K: 867, value: 1.2932, locator: {page: 76, row: Cell VI}}
+            - {T_K: 879, value: 1.2913, locator: {page: 76, row: Cell VI}}
+            - {T_K: 896, value: 1.2900, locator: {page: 76, row: Cell VI}}
+            - {T_K: 904, value: 1.2880, locator: {page: 76, row: Cell VI}}
+            - {T_K: 920, value: 1.2800, locator: {page: 76, row: Cell VI}}
+            - {T_K: 937, value: 1.2894, locator: {page: 76, row: Cell VI}}
+            - {T_K: 948, value: 1.2743, locator: {page: 76, row: Cell VI}}
+            - {T_K: 970, value: 1.2754, locator: {page: 76, row: Cell VI}}
+            - {T_K: 974, value: 1.2780, locator: {page: 76, row: Cell VI}}
+            - {T_K: 989, value: 1.2970, locator: {page: 76, row: Cell VI}}
+            - {T_K: 993, value: 1.2773, locator: {page: 76, row: Cell VI}}
+            - {T_K: 1015, value: 1.2930, locator: {page: 76, row: Cell VI}}
+            - {T_K: 1029, value: 1.2767, locator: {page: 76, row: Cell VI}}
+            - {T_K: 1034, value: 1.2777, locator: {page: 76, row: Cell VI}}
+            - {T_K: 1040, value: 1.2742, locator: {page: 76, row: Cell VI}}
+            - {T_K: 1048, value: 1.2743, locator: {page: 76, row: Cell VI}}
+          printed_row_count: 20
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source directly reports cell emf, for which this extract schema
+            has no exact quantity token; the measured points are retained and
+            not aliased to Gibbs energy.
+          audit_note: All 20 temperature/emf pairs confirmed against the page 76 render; MinerU and pdftotext differed on rows 11–12.
+  Na4FeO3:
+    observations:
+      - observation_id: shaiu_1976_table8_na4feo3
+        type: gibbs_table
+        locator:
+          page: 47
+          table: '8'
+          row: Na4FeO3
+        phase: cr
+        units: cal/mol as printed
+        derived_from: [shaiu_1976_eq62_gross_wilson_enthalpy]
+        derivation:
+          locator:
+            page: 47
+            equation: '61-63'
+          relation: Formation relation estimated by combining Gross and Wilson solution calorimetry with reference oxide data.
+          inputs: [shaiu_1976_eq62_gross_wilson_enthalpy]
+        standard_state: >-
+          Standard free energy of formation for Na4FeO3 from the Table 8
+          general reaction xNa(l) + yM(s) + (z/2)O2(g) -> Na_xM_yO_z(s),
+          per formula as printed.
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          reaction: '4 Na(l) + Fe(s) + 1.5 O2(g) -> Na4FeO3(s)'
+          formula_as_printed: Na4FeO3
+          equation_as_printed: '-289180 + 82.69T'
+          table_8_footnote: Estimated value, see text.
+          reduction: >-
+            Text identifies the estimated Na4FeO3 relation as based on Gross and
+            Wilson solution calorimetry data; no numerical point value was
+            independently calculated during extraction.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The equation is preserved as printed, but its coefficient-only form
+            is not evaluated as numeric points by the migrator.
+      - observation_id: shaiu_1976_eq62_gross_wilson_enthalpy
+        type: gibbs_table
+        locator:
+          page: 47
+          equation: '62'
+        phase: cr
+        units: kcal/mol as printed
+        values:
+          quantity: reaction_enthalpy_at_298K
+          method_class: quoted_attributed
+          attribution: Gross and Wilson [10], as reported by Shaiu
+          reaction: '2Na2O + FeO -> Na4FeO3'
+          formula_as_printed: Na4FeO3
+          T_K: 298
+          value_as_printed: '-25.07 kcal'
+          uncertainty_as_printed: '±0.55 kcal'
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            This is a reaction enthalpy, not a standard enthalpy of formation.
+            No exact reaction-enthalpy quantity token exists; DELTA_FH is a
+            near-miss because the source's quantity is for the printed
+            reaction. The printed value and uncertainty are retained without
+            binding that result to formation enthalpy.
+      - observation_id: shaiu_1976_table9_na4feo3_critical_oxygen
+        type: concentration_series
+        locator:
+          page: 50
+          table: '9'
+          column: (Na2O)2·FeO
+        phase: cr
+        units: ppm oxygen in sodium as printed
+        derived_from: [shaiu_1976_table8_na4feo3]
+        derivation:
+          locator:
+            page: 50
+            table: '9'
+          relation: Calculated critical oxygen concentration from Table 8 Gibbs-energy values using the stated pure-metal equilibrium assumption.
+          inputs: [shaiu_1976_table8_na4feo3]
+        values:
+          quantity: critical_oxygen_concentration_for_formation
+          method_class: measured_reduced
+          values_as_printed:
+            - {T_K: 773, concentration_ppm: '1.81×10^3'}
+            - {T_K: 873, concentration_ppm: '3.53×10^3'}
+            - {T_K: 973, concentration_ppm: '5.71×10^3'}
+            - {T_K: 1073, concentration_ppm: '8.56×10^3'}
+          calculation: >-
+            Calculated from Table 8 Gibbs-energy values; the authors assume
+            liquid sodium is in equilibrium with pure metal and metal activity
+            unity (Table 9 footnote a).
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source reports a critical dissolved-oxygen concentration in
+            liquid sodium. The migrator has no exact quantity token for this
+            property; it is not relabeled as generic concentration.
+    context:
+      - observation_id: shaiu_1976_na4feo3_calorimetry_method
+        type: method_context
+        locator:
+          page: 47
+          equation: '61-63'
+        units: kcal/mol and cal/mol-K as printed
+        values:
+          method_class: quoted_attributed
+          method: solution calorimetry
+          calorimetry_attribution: Gross and Wilson [10]
+          reaction: '2 Na2O + FeO -> Na4FeO3'
+          delta_H_298_as_printed: '-25.07 ± 0.55 kcal'
+          delta_S_as_printed: '0.0 ± 1.0 cal/mol-K'
+          confidence_level: not stated
+          gibbs_relation_as_printed: 'ΔGf°[Na4FeO3] = 2ΔGf°[Na2O] + ΔGf°[FeO] - 25070 = -289180 + 82.69T'
+      - observation_id: shaiu_1976_table10_na4feo3_comparison
+        type: comparison_context
+        locator:
+          page: 55
+          table: '10'
+          row: (Na2O)2·FeO, 973 K
+        units: Values in columns headed -kcal/mol and cal/mol-K as printed
+        values:
+          method_class: measured_reduced
+          this_work: {delta_Hf_column_value: '289.2', delta_Sf: '82.69', delta_Gf_column_value: '208.7', method: estimated, method_class: measured_reduced}
+          wu_6: {delta_Hf_column_value: '276.4', delta_Sf: '80.6', delta_Gf_column_value: '198.0', method: estimated, method_class: quoted_attributed, attribution: '[6]'}
+          source_note: The printed ΔHf and ΔGf column headings carry a leading minus sign; values are preserved as printed without re-signing.
+      - observation_id: shaiu_1976_table11_fe_oxide_reactions
+        type: comparison_context
+        locator:
+          page: 57
+          table: '11'
+        units: ΔG° in kcal/mol as printed
+        values:
+          rows:
+            - {reaction: 'Na2O + FeO -> Na2FeO2', T_K: 298, delta_G_as_printed: '-18.86', method: galvanic cell, attribution: This work, method_class: measured_reduced}
+            - {reaction: 'Na2O + FeO -> Na2FeO2', T_K: 298, delta_G_as_printed: '-18.0', method: estimated, attribution: '[35]', method_class: quoted_attributed}
+            - {reaction: '2Na2O + Fe -> Na2FeO2 + 2Na(l)', T_K: 298, delta_G_as_printed: '+13.4', method: galvanic cell, attribution: This work, method_class: measured_reduced}
+            - {reaction: '2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-83.4', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-88.8', method: estimated, attribution: '[10]', method_class: quoted_attributed}
+            - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-25.1', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-25.07', method: calorimetry, attribution: '[10]', method_class: quoted_attributed}
+            - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-24.8', method: Knudsen effusion, attribution: '[65]', method_class: quoted_attributed}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 298, delta_G_as_printed: '+7.2', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-3.2', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-2.2', method: calorimetry, attribution: '[10]', method_class: quoted_attributed}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-2.5', method: calorimetry, attribution: '[18]', method_class: quoted_attributed}
+            - {reaction: 'Na2O + Fe -> FeO + 2Na(l)', T_K: 298, delta_G_as_printed: '+32.2', method: estimated, attribution: This work, method_class: measured_reduced}
