@@ -1,0 +1,20 @@
+# Table indices refer to the two MinerU blocks. Printed locators retain Table I and Table II.
+# Table I block p005-t01 contains six data rows; the rendered page shows the seventh draft row is not a printed body row.
+# Table II block p005-t02 contains four temperature rows. Its 1000 K row has two S298 values; later dashes are not values.
+# The article is born digital. All 6 Table I rows and 4 Table II rows were assigned against the PDF page 5 render.
+source_id: forsberg-2002-ca-fe-o-incongruent-melting
+tables:
+  - page: 5
+    table_index: 1
+    printed_table: I
+    type: thermochemical_fit_context
+    quantity: gibbs_energy_function
+    evidence_class: mixed attribution and measured_reduced
+    render_verified: all six printed rows, all coefficient columns, temperature interval, and reference columns
+  - page: 5
+    table_index: 2
+    printed_table: II
+    type: thermochemical_data_context
+    quantity: calorimetric_increments
+    evidence_class: quoted_attributed and measured_reduced
+    render_verified: all four printed temperature rows and each populated numeric cell; em dashes retained as not_reported

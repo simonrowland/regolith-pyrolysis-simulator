@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 760
-  extracts: 758
+  sources: 765
+  extracts: 763
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 78
+  extracts_with_private_locators: 79
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 758
+  extracts_without_pdf: 763
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -75,6 +75,7 @@ gaps:
   - bissbort-2026-depolymerized-silicate-glass-transition-viscosity
   - bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
   - bonnell-hastie-1990-htsci-26-313
+  - bonnickson-1954-calcium-magnesium-ferrite-heat-contents
   - borisov-2004-karrooite-liquidus-redox
   - borisov-2004-tio2-pd-ni-fe-solubilities
   - borisov-2008-k-na-miscible-liquids
@@ -108,6 +109,7 @@ gaps:
   - chen-2022-mgo-sio2-tio2-phase-equilibria
   - cheng-2021-fe-ca-si-o-phase-equilibria
   - cho-suito-1994-cas-slag-activities
+  - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   - colson-colson-1995-chromium-dimer-lpsc
   - colson-floden-1998-lpsc-co-nickel-activity
   - colson-floden-haugen-2005-nio-feo-o2-activities
@@ -159,6 +161,7 @@ gaps:
   - filiberto-lpsc2011-2064-volatiles
   - florin-2025-cu-silicate-evaporation
   - folstad-2024-metals-cao-dissolution-cas
+  - forsberg-2002-ca-fe-o-incongruent-melting
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
@@ -332,10 +335,12 @@ gaps:
   - kim-2004-na2o-float-glass-emf
   - kim-2014-carbon-fe-v-mo-ni
   - kim-2018-sulfur-fe-v-mo-ni
+  - king-1954-cafe2o4-ca2fe2o5-low-t-cp
   - kirschen-1998-silicate-miscibility-thesis
   - kirschen-1999-si-ti-al-miscibility
   - kirschen-decapitani-1999-liquid-miscibility
   - klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  - koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
   - kohsaka-1979-na2o-sio2-emf
   - konar-2018-alkali-cmas-thesis
   - kor-1967-thesis-sulphur-oxides-slags
@@ -827,6 +832,7 @@ gaps:
   - kems-046-van-limpt-2007
   - kems-190-wu-1993
   - kems-ms2000-044
+  - king-1954-cafe2o4-ca2fe2o5-low-t-cp
   - lamoreaux-hildenbrand-1984
   - lee-bruckner-1986-borate-redox-series
   - liu-2024-cao-al2o3-vox-phase
@@ -4697,6 +4703,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  aliases: []
+  citation: Bonnickson, K. R. (1954). High temperature heat contents of calcium and magnesium ferrites.
+    Journal of the American Chemical Society, 76, 1480–1482.
+  doi: 10.1021/ja01635a006
+  report_number: null
+  identifier: 10.1021/ja01635a006
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/bonnickson-1954-calcium-magnesium-ferrite-heat-contents/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.pdf
+      present: true
+      sha256: a6bcd77666effddd8a12370fa5be844d784f9ac3424950ad8144454ef35d2c3e
+      matches_simulator: null
+    sidecar:
+      path: raw/bonnickson-1954-calcium-magnesium-ferrite-heat-contents/sidecar.yaml
+      present: true
+    text:
+      path: text/bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      exists: true
+      file_count: 19
+    tables:
+      path: tables/bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: borisov-2004-karrooite-liquidus-redox
   aliases: []
   citation: Borisov A., Brenker F., Palme H. (2004). Liquidus karrooite stability and composition at reducing
@@ -6628,6 +6692,65 @@ sources:
       last_stage: extracted
       date: '2026-10-04'
     commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  aliases: []
+  citation: Christensen, A. U., Conway, J. B., and Kelley, K. K. (1960). High-temperature heat contents
+    and entropies of aluminates and ferrites of lithium and sodium. U.S. Bureau of Mines Report of Investigations
+    5565.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.pdf
+      present: true
+      sha256: 41edf14ec0263664dc29b6604eb1e12057a71e1b297b09fe908f68252755d32c
+      matches_simulator: null
+    sidecar:
+      path: raw/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/sidecar.yaml
+      present: true
+    text:
+      path: text/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      exists: true
+      file_count: 49
+    tables:
+      path: tables/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: colson-colson-1995-chromium-dimer-lpsc
   aliases: []
   citation: 'Colson RO, Colson MC (1995). Chromium, a dimer in silicate melts?: Implications for redox
@@ -9610,6 +9733,65 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  aliases: []
+  citation: Forsberg, S., Wikström, P. and Rosén, E. (2002). Determination of Gibbs Energies of Formation
+    of CaFe2O4 and Ca2Fe2O5 from Solid-State EMF Measurements Using CaF2 as Solid Electrolyte. Metallurgical
+    and Materials Transactions B, 33B, 385–392.
+  doi: 10.1007/s11663-002-0050-1
+  report_number: null
+  identifier: 10.1007/s11663-002-0050-1
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/forsberg-2002-ca-fe-o-incongruent-melting.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/forsberg-2002-ca-fe-o-incongruent-melting/forsberg-2002-ca-fe-o-incongruent-melting.pdf
+      present: true
+      sha256: 7e1e6a18740a51114b0860f5cae840ea80015a74c32241a47860d1d465a886b3
+      matches_simulator: null
+    sidecar:
+      path: raw/forsberg-2002-ca-fe-o-incongruent-melting/sidecar.yaml
+      present: true
+    text:
+      path: text/forsberg-2002-ca-fe-o-incongruent-melting
+      exists: true
+      file_count: 58
+    tables:
+      path: tables/forsberg-2002-ca-fe-o-incongruent-melting
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/forsberg-2002-ca-fe-o-incongruent-melting.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/forsberg-2002-ca-fe-o-incongruent-melting.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: fray-schmitt-2009-ch4-1
   aliases:
   - fray-schmitt-2009-co-1
@@ -19640,6 +19822,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: king-1954-cafe2o4-ca2fe2o5-low-t-cp
+  aliases: []
+  citation: King, E. G. (1954), “Heat Capacities at Low Temperatures and Entropies at 298.16° K. of Calcium
+    and Magnesium Ferrites,” J. Am. Chem. Soc., 76(22), 5849–5850. doi:10.1021/ja01651a092
+  doi: 10.1021/ja01651a092
+  report_number: null
+  identifier: 10.1021/ja01651a092
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/king-1954-cafe2o4-ca2fe2o5-low-t-cp.yaml
+    review_status: draft
+    rows: 4
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/king-1954-cafe2o4-ca2fe2o5-low-t-cp.pdf
+      present: true
+      sha256: 69dad88b7794c690ef1818b8384babdac09e04a5daed368af704adb1a471cb9b
+      matches_simulator: null
+    sidecar:
+      path: raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/sidecar.yaml
+      present: true
+    text:
+      path: text/king-1954-cafe2o4-ca2fe2o5-low-t-cp
+      exists: true
+      file_count: 20
+    tables:
+      path: tables/king-1954-cafe2o4-ca2fe2o5-low-t-cp
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/king-1954-cafe2o4-ca2fe2o5-low-t-cp.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/king-1954-cafe2o4-ca2fe2o5-low-t-cp.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: kirschen-1998-silicate-miscibility-thesis
   aliases: []
   citation: Kirschen, M. T. (1998), “Immiscible Silicate Melts in the System CaO-MgO-SiO2-TiO2-Al2O3”,
@@ -19873,6 +20114,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  aliases: []
+  citation: Koehler, M. F., Barany, R., and Kelley, K. K. (1961). Heats and free energies of formation
+    of ferrites and aluminates of calcium, magnesium, sodium, and lithium. U.S. Bureau of Mines Report
+    of Investigations 5711.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.yaml
+    review_status: draft
+    rows: 38
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.pdf
+      present: true
+      sha256: 6c3519828b11ff90533918c3de0c51ea9112f9d0cffd076e8b26575b8daf7e6a
+      matches_simulator: null
+    sidecar:
+      path: raw/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/sidecar.yaml
+      present: true
+    text:
+      path: text/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      exists: true
+      file_count: 72
+    tables:
+      path: tables/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: kohsaka-1979-na2o-sio2-emf
   aliases: []
   citation: Kohsaka, Shoji; Sato, Seichi; Yokokawa, Toshio (1979), “E.m.f. measurements of molten oxide

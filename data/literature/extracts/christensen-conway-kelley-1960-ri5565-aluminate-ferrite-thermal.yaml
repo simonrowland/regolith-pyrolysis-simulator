@@ -1,0 +1,1711 @@
+schema_version: literature_extract.v1
+source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+source:
+  citation: Christensen, A. U., Conway, J. B., and Kelley, K. K. (1960). High-temperature heat contents and entropies
+    of aluminates and ferrites of lithium and sodium. U.S. Bureau of Mines Report of Investigations 5565.
+  year: 1960
+extraction:
+  method: Transcribed from MinerU tables and pdftotext layout, then checked cell-by-cell against 600 dpi renders
+    of PDF pages 12–13 (printed pages 5–6). Table row/column assignments were checked against the same renders.
+  date: '2026-11-05'
+  worker: w1105fe-ri5565
+  provenance_path: data/literature/extracts/audits/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.audit.md
+  source_note: The source reports high-temperature heat contents and entropies for NaFeO2. It contains no CaFe2O4
+    or Ca2Fe2O5 entry, no NaFeO2 heat of formation, and no NaFeO2 Gibbs energy. No pressure is stated. No lithium,
+    magnesium, aluminate, or lithium-titanate values were extracted.
+review_status: draft
+scope_assessment:
+  included:
+  - NaFeO2 Tables 7–8 and associated text/equations
+  not_present:
+  - CaFe2O4
+  - Ca2Fe2O5
+  - NaFeO2 formation enthalpy
+  - NaFeO2 Gibbs energy
+species:
+  NaFeO2:
+    observations:
+    - observation_id: cck60_nafeo2_table7_measured_cr_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        published_page: 5
+        pdf_page_index: 11
+        table: '7'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 399.7
+      - 1492.8
+      phase: cr
+      phase_label_as_printed: measured values
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        evidence_class: measured_direct
+        points:
+        - T_K: '399.7'
+          value: '2170'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '399.7'
+            column: H_T-H_298.15
+        - T_K: '500.6'
+          value: '4560'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '500.6'
+            column: H_T-H_298.15
+        - T_K: '598.5'
+          value: '7010'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '598.5'
+            column: H_T-H_298.15
+        - T_K: '699.3'
+          value: '9660'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '699.3'
+            column: H_T-H_298.15
+        - T_K: '788.9'
+          value: '12120'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '788.9'
+            column: H_T-H_298.15
+        - T_K: '799.2'
+          value: '12380'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '799.2'
+            column: H_T-H_298.15
+        - T_K: '799.3'
+          value: '12380'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '799.3'
+            column: H_T-H_298.15
+        - T_K: '809.2'
+          value: '12700'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '809.2'
+            column: H_T-H_298.15
+        - T_K: '848.3'
+          value: '13860'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '848.3'
+            column: H_T-H_298.15
+        - T_K: '851.3'
+          value: '13950'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '851.3'
+            column: H_T-H_298.15
+        - T_K: '869.3'
+          value: '14530'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '869.3'
+            column: H_T-H_298.15
+        - T_K: '877.3'
+          value: '14780'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '877.3'
+            column: H_T-H_298.15
+        - T_K: '892.9'
+          value: '15200'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '892.9'
+            column: H_T-H_298.15
+        - T_K: '898.7'
+          value: '15340'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '898.7'
+            column: H_T-H_298.15
+        - T_K: '1002.4'
+          value: '18220'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1002.4'
+            column: H_T-H_298.15
+        - T_K: '1100.4'
+          value: '20940'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1100.4'
+            column: H_T-H_298.15
+        - T_K: '1198.4'
+          value: '23700'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1198.4'
+            column: H_T-H_298.15
+        - T_K: '1265.1'
+          value: '25660'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1265.1'
+            column: H_T-H_298.15
+        - T_K: '1268.8'
+          value: '26110'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1268.8'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote 1: shows pretransition effect.'
+        - T_K: '1274.4'
+          value: '26420'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1274.4'
+            column: H_T-H_298.15
+        - T_K: '1299.2'
+          value: '27170'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1299.2'
+            column: H_T-H_298.15
+        - T_K: '1348.6'
+          value: '28520'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1348.6'
+            column: H_T-H_298.15
+        - T_K: '1395.6'
+          value: '29930'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1395.6'
+            column: H_T-H_298.15
+        - T_K: '1398.1'
+          value: '30000'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1398.1'
+            column: H_T-H_298.15
+        - T_K: '1449.2'
+          value: '31390'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1449.2'
+            column: H_T-H_298.15
+        - T_K: '1492.8'
+          value: '32800'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1492.8'
+            column: H_T-H_298.15
+      per: mol_species
+    - observation_id: cck60_nafeo2_table7_melting_range_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        published_page: 5
+        pdf_page_index: 11
+        table: '7'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 1549.1
+      - 1619.2
+      phase: in melting range
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        evidence_class: measured_direct
+        points:
+        - T_K: '1549.1'
+          value: '35400'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1549.1'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1574.6'
+          value: '37420'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1574.6'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1595.9'
+          value: '40400'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1595.9'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1596.2'
+          value: '40020'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1596.2'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1596.9'
+          value: '39280'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1596.9'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1617.2'
+          value: '47870'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1617.2'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+        - T_K: '1619.2'
+          value: '47910'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1619.2'
+            column: H_T-H_298.15
+            note: 'Table 7 footnote: in melting range.'
+      per: mol_species
+    - observation_id: cck60_nafeo2_table7_measured_liquid_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        published_page: 5
+        pdf_page_index: 11
+        table: '7'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 1628.5
+      - 1801.7
+      phase: l
+      phase_label_as_printed: measured values
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        evidence_class: measured_direct
+        points:
+        - T_K: '1628.5'
+          value: '48500'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1628.5'
+            column: H_T-H_298.15
+        - T_K: '1644.1'
+          value: '49040'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1644.1'
+            column: H_T-H_298.15
+        - T_K: '1701.6'
+          value: '51140'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1701.6'
+            column: H_T-H_298.15
+        - T_K: '1753.7'
+          value: '53170'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1753.7'
+            column: H_T-H_298.15
+        - T_K: '1801.7'
+          value: '54880'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            table: '7'
+            row: '1801.7'
+            column: H_T-H_298.15
+      per: mol_species
+    - observation_id: cck60_nafeo2_table8_α_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 400.0
+      - 870.0
+      phase: cr
+      condensed_form:
+        polymorph: alpha
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '400'
+          value: '2180'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '400'
+            column: H_T-H_298.15
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '500'
+          value: '4540'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '500'
+            column: H_T-H_298.15
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '600'
+          value: '7050'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '600'
+            column: H_T-H_298.15
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '700'
+          value: '9680'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '700'
+            column: H_T-H_298.15
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '800'
+          value: '12430'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '800'
+            column: H_T-H_298.15
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '870'
+          value: '14580'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 870(α)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from:
+      - cck60_nafeo2_table7_measured_cr_heat_content
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_α_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: S_T°
+      T_range_K:
+      - 400.0
+      - 870.0
+      phase: cr
+      condensed_form:
+        polymorph: alpha
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol/K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '400'
+          value: '27.37'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '400'
+            column: S_T°
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '500'
+          value: '32.63'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '500'
+            column: S_T°
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '600'
+          value: '37.20'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '600'
+            column: S_T°
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '700'
+          value: '41.25'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '700'
+            column: S_T°
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '800'
+          value: '44.92'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '800'
+            column: S_T°
+            note: The table labels the 870 K transition as α; preceding rows are the same low-temperature crystalline
+              form.
+        - T_K: '870'
+          value: '47.50'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 870(α)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from:
+      - cck60_nafeo2_table7_measured_cr_heat_content
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_β_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 870.0
+      - 1270.0
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '870'
+          value: '14580'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 870(β)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+        - T_K: '900'
+          value: '15390'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '900'
+            column: H_T-H_298.15
+        - T_K: '1000'
+          value: '18130'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1000'
+            column: H_T-H_298.15
+        - T_K: '1100'
+          value: '20920'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1100'
+            column: H_T-H_298.15
+        - T_K: '1200'
+          value: '23760'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1200'
+            column: H_T-H_298.15
+        - T_K: '1270'
+          value: '25780'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1270(β)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from: &id001
+      - cck60_nafeo2_table7_measured_cr_heat_content
+      - cck60_nafeo2_table7_melting_range_heat_content
+      - cck60_nafeo2_table7_measured_liquid_heat_content
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_β_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: S_T°
+      T_range_K:
+      - 870.0
+      - 1270.0
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol/K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '870'
+          value: '47.50'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 870(β)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+        - T_K: '900'
+          value: '48.41'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '900'
+            column: S_T°
+        - T_K: '1000'
+          value: '51.30'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1000'
+            column: S_T°
+        - T_K: '1100'
+          value: '53.96'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1100'
+            column: S_T°
+        - T_K: '1200'
+          value: '56.43'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1200'
+            column: S_T°
+        - T_K: '1270'
+          value: '58.07'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1270(β)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_γ_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 1270.0
+      - 1620.0
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '1270'
+          value: '26300'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1270(γ)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+        - T_K: '1300'
+          value: '27160'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1300'
+            column: H_T-H_298.15
+        - T_K: '1400'
+          value: '30040'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1400'
+            column: H_T-H_298.15
+        - T_K: '1500'
+          value: '32920'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1500'
+            column: H_T-H_298.15
+        - T_K: '1600'
+          value: '35800'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1600'
+            column: H_T-H_298.15
+        - T_K: '1620'
+          value: '36380'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1620(γ)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_γ_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: S_T°
+      T_range_K:
+      - 1270.0
+      - 1620.0
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol/K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '1270'
+          value: '58.48'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1270(γ)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+        - T_K: '1300'
+          value: '59.15'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1300'
+            column: S_T°
+        - T_K: '1400'
+          value: '61.28'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1400'
+            column: S_T°
+        - T_K: '1500'
+          value: '63.27'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1500'
+            column: S_T°
+        - T_K: '1600'
+          value: '65.13'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1600'
+            column: S_T°
+        - T_K: '1620'
+          value: '65.49'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1620(γ)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_l_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: H_T-H_298.15
+      T_range_K:
+      - 1620.0
+      - 2000.0
+      phase: l
+      phase_label_as_printed: l
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '1620'
+          value: '48140'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1620(l)
+            column: H_T-H_298.15
+            note: Table 8 marks this row as a transition point.
+        - T_K: '1700'
+          value: '51120'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1700'
+            column: H_T-H_298.15
+        - T_K: '1800'
+          value: '54850'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1800'
+            column: H_T-H_298.15
+        - T_K: '1900'
+          value: '58580'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1900'
+            column: H_T-H_298.15
+            note: Table 8 extrapolation (parenthesized values).
+        - T_K: '2000'
+          value: '62310'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '2000'
+            column: H_T-H_298.15
+            note: Table 8 extrapolation (parenthesized values).
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_table8_l_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: all rows
+        column: S_T°
+      T_range_K:
+      - 1620.0
+      - 2000.0
+      phase: l
+      phase_label_as_printed: l
+      standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
+      units: cal/mol/K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        points:
+        - T_K: '1620'
+          value: '72.75'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: 1620(l)
+            column: S_T°
+            note: Table 8 marks this row as a transition point.
+        - T_K: '1700'
+          value: '74.54'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1700'
+            column: S_T°
+        - T_K: '1800'
+          value: '76.67'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1800'
+            column: S_T°
+        - T_K: '1900'
+          value: '78.69'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '1900'
+            column: S_T°
+            note: Table 8 extrapolation (parenthesized values).
+        - T_K: '2000'
+          value: '80.60'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: '2000'
+            column: S_T°
+            note: Table 8 extrapolation (parenthesized values).
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
+          entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
+        inputs:
+        - cck60_nafeo2_table7_measured_cr_heat_content
+        - cck60_nafeo2_table7_melting_range_heat_content
+        - cck60_nafeo2_table7_measured_liquid_heat_content
+        - cck60_nafeo2_king_standard_entropy_29815
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_heat_of_fusion_1620
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: γ→l fusion
+        column: property
+      phase: cr
+      phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
+      units: cal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1620'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: γ→l fusion
+            column: T
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        property_kind: heat of fusion
+        value: '11760'
+        T_K: '1620'
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Fusion enthalpy and entropy are reported with the authors’ smooth Table 8 heat-content analysis.
+        inputs: *id001
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_entropy_of_fusion_1620
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: γ→l fusion
+        column: property
+      phase: cr
+      phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
+      units: cal/mol/K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1620'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: γ→l fusion
+            column: T
+      values:
+        quantity: entropy_of_fusion
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        property_kind: entropy of fusion
+        value: '7.26'
+        T_K: '1620'
+      per: mol_species
+      derived_from: *id001
+      derivation:
+        relation: Fusion enthalpy and entropy are reported with the authors’ smooth Table 8 heat-content analysis.
+        inputs: *id001
+        page: 13
+        table: '8'
+    - observation_id: cck60_nafeo2_king_standard_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        published_page: 5
+        pdf_page_index: 11
+        row: discussion after Figure 2, footnote 17
+        column: S°298.15
+      phase: cr
+      units: cal/mol/K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            row: discussion after Figure 2, footnote 17
+            column: S°298.15
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: King, reference 17 (p. 3, as cited here)
+        points:
+        - T_K: '298.15'
+          value: '21.1'
+          locator:
+            page: 12
+            published_page: 5
+            pdf_page_index: 11
+            row: discussion after Figure 2, footnote 17
+            column: S°298.15
+            note: King’s result (S°298.15 = 21.1±0.2 cal./deg. mole) was adopted.
+      uncertainty:
+        reported_status: printed
+        value: '0.2'
+        units: cal/mol/K
+        confidence_level: not_stated
+      per: mol_species
+    - observation_id: cck60_nafeo2_transition_enthalpy_870
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: α→β
+        column: ΔH transition
+      phase: cr
+      phase_label_as_printed: α→β
+      per: mol_species
+      units: cal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '870'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: α→β
+            column: T
+      derived_from: *id001
+      derivation:
+        relation: Transition enthalpy reported with the authors’ smoothed Table 8 heat-content analysis of Table
+          7 measurements.
+        inputs: *id001
+        page: 13
+        table: '8'
+      values:
+        quantity: solid_solid_transition_enthalpy_as_printed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value: '0'
+        T_m_K: '870'
+        property_kind: solid-solid transition enthalpy
+        schema_gap: No exact transition-enthalpy Quantity token in simulator/battery/enums.py::Quantity, QUANTITY_ALIASES,
+          or TYPE_QUANTITY in simulator/battery/migrate.py; retain the printed solid-solid transition enthalpy as
+          a typed refusal rather than bind heat_of_fusion or H_minus_H298.
+    - observation_id: cck60_nafeo2_transition_enthalpy_1270
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: β→γ
+        column: ΔH transition
+      phase: cr
+      phase_label_as_printed: β→γ
+      per: mol_species
+      units: cal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1270'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: β→γ
+            column: T
+      derived_from: *id001
+      derivation:
+        relation: Transition enthalpy reported with the authors’ smoothed Table 8 heat-content analysis of Table
+          7 measurements.
+        inputs: *id001
+        page: 13
+        table: '8'
+      values:
+        quantity: solid_solid_transition_enthalpy_as_printed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value: '520'
+        T_m_K: '1270'
+        property_kind: solid-solid transition enthalpy
+        schema_gap: No exact transition-enthalpy Quantity token in simulator/battery/enums.py::Quantity, QUANTITY_ALIASES,
+          or TYPE_QUANTITY in simulator/battery/migrate.py; retain the printed solid-solid transition enthalpy as
+          a typed refusal rather than bind heat_of_fusion or H_minus_H298.
+    - observation_id: cck60_nafeo2_transition_870
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: α→β transition
+        column: T
+      phase: cr
+      phase_label_as_printed: α→β transition
+      per: mol_species
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '870'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: α→β transition
+            column: T
+      derived_from: &id002
+      - cck60_nafeo2_table7_measured_cr_heat_content
+      - cck60_nafeo2_table7_melting_range_heat_content
+      - cck60_nafeo2_table7_measured_liquid_heat_content
+      derivation:
+        relation: Authors identify the transition or melting point in their smooth analysis of the Table 7 measurements.
+        inputs: *id002
+        page: 13
+        table: '8'
+      values:
+        quantity: transition_temperature
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        T_m_K: '870'
+        property_kind: transition_point
+    - observation_id: cck60_nafeo2_transition_1270
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: β→γ transition
+        column: T
+      phase: cr
+      phase_label_as_printed: β→γ transition
+      per: mol_species
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1270'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: β→γ transition
+            column: T
+      derived_from: *id002
+      derivation:
+        relation: Authors identify the transition or melting point in their smooth analysis of the Table 7 measurements.
+        inputs: *id002
+        page: 13
+        table: '8'
+      values:
+        quantity: transition_temperature
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        T_m_K: '1270'
+        property_kind: transition_point
+    - observation_id: cck60_nafeo2_fusion_temperature_1620
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: γ→l fusion
+        column: T
+      phase: cr
+      phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
+      per: mol_species
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1620'
+          locator:
+            page: 13
+            published_page: 6
+            pdf_page_index: 12
+            table: '8'
+            row: γ→l fusion
+            column: T
+      derived_from: *id002
+      derivation:
+        relation: Authors identify the transition or melting point in their smooth analysis of the Table 7 measurements.
+        inputs: *id002
+        page: 13
+        table: '8'
+      values:
+        quantity: transition_temperature
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        T_m_K: '1620'
+        property_kind: melting_point
+    context:
+    - observation_id: cck60_nafeo2_margrave_grimley_comparison
+      type: literature_comparison_context
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        section: Margrave and Grimley comparison
+      units: percent
+      values:
+        method_class: quoted_attributed
+        attribution: Margrave and Grimley (1958), as cited in this paper
+        statement_as_printed: Their sodium-ferrite heat-content results over 298–1,378 K are higher than the authors’
+          results by 0.4 to 3.5 percent (average, 2.1 percent); the authors repeated their measurements and concluded
+          the discrepancy was not in their measurements.
+        higher_by_percent_range:
+        - '0.4'
+        - '3.5'
+        average_higher_by_percent: '2.1'
+    - observation_id: cck60_nafeo2_heat_capacity_narrative
+      type: heat_capacity_narrative_context
+      locator:
+        page: 12
+        published_page: 5
+        pdf_page_index: 11
+        section: sodium ferrite discussion
+      units: cal/mol/K
+      values:
+        method_class: measured_reduced
+        statements_as_printed:
+        - 20.20 at 298.15 K (King measurement); exceeding 30.7 near 870 K; drops to 27.0; increases to 29.1 at 1,270
+          K; 28.8 from 1,270 to 1,620 K; liquid is 37.3 over 1,620–1,802 K.
+        attribution_for_29815: King (reference 16 as cited here)
+    - observation_id: cck60_nafeo2_α_printed_thermochemical_equations
+      type: heat_capacity_equation_context
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: equation block
+        column: H(T)-H(298.15 K) and Cp(T)
+      T_range_K:
+      - 298.15
+      - 870.0
+      phase: cr
+      condensed_form:
+        polymorph: alpha
+      standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        enthalpy_equation_as_printed: H_T − H_298.15 = 17.92T + 7.05 × 10⁻³T² + 1.72 × 10⁵T⁻¹ − 6,546; T.P. = 870
+          K; ΔH₈₇₀ = 0.
+        heat_capacity_equation_as_printed: Cₚ = 17.92 + 14.10 × 10⁻³T − 1.72 × 10⁵T⁻²
+        note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
+          equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+        quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+        schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar
+          cp token exists but does not represent a formula.
+      units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+    - observation_id: cck60_nafeo2_β_printed_thermochemical_equations
+      type: heat_capacity_equation_context
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: equation block
+        column: H(T)-H(298.15 K) and Cp(T)
+      T_range_K:
+      - 870.0
+      - 1270.0
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        enthalpy_equation_as_printed: H_T − H_298.15 = 22.55T + 2.55 × 10⁻³T² − 6,969; T.P. = 1,270 K; ΔH₁₂₇₀ =
+          520.
+        heat_capacity_equation_as_printed: Cₚ = 22.55 + 5.10 × 10⁻³T
+        note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
+          equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+        quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+        schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar
+          cp token exists but does not represent a formula.
+      units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+    - observation_id: cck60_nafeo2_γ_printed_thermochemical_equations
+      type: heat_capacity_equation_context
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: equation block
+        column: H(T)-H(298.15 K) and Cp(T)
+      T_range_K:
+      - 1270.0
+      - 1620.0
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        enthalpy_equation_as_printed: H_T − H_298.15 = 28.80T − 10,276; M.P. = 1,620 K; ΔH₁₆₂₀ = 11,760.
+        heat_capacity_equation_as_printed: Cₚ = 28.80
+        note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
+          equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+        quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+        schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar
+          cp token exists but does not represent a formula.
+      units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+    - observation_id: cck60_nafeo2_l_printed_thermochemical_equations
+      type: heat_capacity_equation_context
+      locator:
+        page: 13
+        published_page: 6
+        pdf_page_index: 12
+        table: '8'
+        row: equation block
+        column: H(T)-H(298.15 K) and Cp(T)
+      T_range_K:
+      - 1620.0
+      - 1802.0
+      phase: l
+      phase_label_as_printed: l
+      standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        enthalpy_equation_as_printed: H_T − H_298.15 = 37.30T − 12,286.
+        heat_capacity_equation_as_printed: Cₚ = 37.30
+        note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
+          equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+        quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+        schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar
+          cp token exists but does not represent a formula.
+      units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+fidelity_samples:
+- path: species.NaFeO2.observations[cck60_nafeo2_table7_measured_cr_heat_content].values.points[0].value
+  value: '2170'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    table: '7'
+    row: '399.7'
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table7_measured_cr_heat_content].values.points[25].value
+  value: '32800'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    table: '7'
+    row: '1492.8'
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table7_melting_range_heat_content].values.points[0].value
+  value: '35400'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    table: '7'
+    row: '1549.1'
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table7_measured_liquid_heat_content].values.points[0].value
+  value: '48500'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    table: '7'
+    row: '1628.5'
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table8_α_heat_content].values.points[0].value
+  value: '2180'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: '400'
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table8_β_entropy].values.points[0].value
+  value: '47.50'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: 870(β)
+    column: S_T°
+- path: species.NaFeO2.observations[cck60_nafeo2_table8_γ_heat_content].values.points[0].value
+  value: '26300'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: 1270(γ)
+    column: H_T-H_298.15
+- path: species.NaFeO2.observations[cck60_nafeo2_table8_l_entropy].values.points[0].value
+  value: '72.75'
+  note: 600 dpi page render; direct transcription independent of MinerU CSV.
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: 1620(l)
+    column: S_T°
