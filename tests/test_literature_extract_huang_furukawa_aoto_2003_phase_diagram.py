@@ -87,6 +87,9 @@ def test_table_1_render_pins_and_numeric_cell_count() -> None:
     )["values"]
     assert reactions["method_class"] == "measured_direct"
     assert len(reactions["reactions_as_printed"]) == 4
+    assert reactions["oxygen_potential"] == (
+        "The paper says the partial oxygen pressures for reactions (7)–(10) were too low to measure."
+    )
     na8_h = next(
         row
         for row in document["species"]["Na8Fe2O7"]["observations"]
@@ -122,6 +125,9 @@ def test_table_1_render_pins_and_numeric_cell_count() -> None:
     stability = context_rows["huang2003p2_Na8Fe2O7_temperature_stability_prose"]
     assert stability["values"]["appears_over_temperature_as_printed"] == "about 637 K"
     assert stability["values"]["tends_to_replace_Na5FeO4_above_temperature_as_printed"] == "about 944 K"
+    overlap = context_rows["huang2003p2_data_summary_overlap"]["values"]["overlap"]
+    assert "Reaction (10)" in overlap and "590–717 K" in overlap
+    assert "720 K limit to about 1000 K" in overlap
     assert len(TABLE_VALUES) + sum(
         len(heat_capacity) + len(gibbs)
         for heat_capacity, gibbs in TABLE_COEFFICIENTS.values()

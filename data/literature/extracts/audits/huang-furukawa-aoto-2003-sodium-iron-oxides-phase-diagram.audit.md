@@ -56,6 +56,8 @@ value. The exact candidate tokens checked were
   Table 1 Gibbs value remains quoted_attributed to Part I. The Part II
   formation enthalpy is model_derived using equation (3) and the stored Gibbs
   and entropy rows; its entropy is marked author_estimate.
+  Reaction (10) over 590–717 K is the Part I experiment; Part II extends the
+  Gibbs fit beyond Part I's 720 K limit to about 1000 K.
   Equations (7)–(10) are Part II results: the text says the authors
   confirmed them by vapor-pressure measurements and XRD in their laboratory,
   so they are marked measured_direct. Their reaction stoichiometry and ranges

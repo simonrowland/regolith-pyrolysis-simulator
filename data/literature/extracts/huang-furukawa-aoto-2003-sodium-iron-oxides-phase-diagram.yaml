@@ -730,7 +730,7 @@ species:
         values:
           method_class: measured_direct
           measurement_statement: The paper says these equilibrium reactions were confirmed by the authors' vapor-pressure measurements and XRD analysis in the present laboratory.
-          oxygen_potential: The paper says the partial oxygen pressures for these conditions were too low to measure; no numeric oxygen potential is printed.
+          oxygen_potential: The paper says the partial oxygen pressures for reactions (7)–(10) were too low to measure.
           reactions_as_printed:
             - NaFeO2(s) → 1/3 Fe3O4(s) + Na(g) + 1/3 O2(g), 1288–1380 K
             - Na3FeO3(s) → NaFeO2(s) + 2Na(g) + 1/2 O2(g), 823–1023 K
@@ -764,5 +764,5 @@ species:
         locator: {page: 3, published_page: 69, pdf_page_index: 2, section: 2.2.3}
         values:
           overlap_source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
-          overlap: Part I contains the original Na3FeO3 vapor-pressure measurements and derived Gibbs function, reported here as equation (4) and again among Table 1 thermodynamic values. Part I remains the owner of its measured rows; the Part II copies above are attributed to Part I.
+          overlap: Part I contains the original Na3FeO3 vapor-pressure measurements and derived Gibbs function, reported here as equation (4) and again among Table 1 thermodynamic values. Reaction (10), Na4FeO3(s) → Na3FeO3(s) + Na(g) over 590–717 K, is the Part I experiment; Part II extends the fit from Part I's 720 K limit to about 1000 K. Part I remains the owner of its measured rows; the Part II copies above are attributed to Part I.
           consumer: openimcc/physics NaFeO2 band
