@@ -1,0 +1,118 @@
+schema_version: literature_extract.v1
+source_id: mcgill-na-fe-o-critical-assessment
+source:
+  citation: >-
+    Moosavi-Khoonsari, E. and Jung, I.-H. (2016), Critical evaluation and optimization of thermodynamic properties and phase diagrams of the Na2O-FeO-Fe2O3 system, Metallurgical and Materials Transactions B, 47, 576-594.
+  doi: 10.1007/s11663-015-0517-5
+  year: 2016
+  corpus_asset: raw/mcgill-na-fe-o-critical-assessment/mcgill-na-fe-o-critical-assessment.pdf
+extraction:
+  method: >-
+    This first extraction slice transcribes NaFeO2 thermochemistry from Table II and its explanatory text using the MinerU content list and markdown plus the born-digital pdftotext layout. The entire Table II page render was checked for row/column assignment and the NaFeO2 numeric cells.
+  date: '2026-11-05'
+  worker: codex-resume-77747-1793930354
+  provenance_path: text/mcgill-na-fe-o-critical-assessment/pdftotext-layout.txt
+  source_note: >-
+    This is the journal article as its own source, separate from the authors' 2015 thesis. The paper models alpha, beta, and gamma NaFeO2; the later reported delta polymorph is discussed but excluded from the optimization for lack of transition thermochemistry. Figure-only heat-content and heat-capacity points are not extracted.
+review_status: draft
+fidelity_samples:
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_quoted_delta_fH].values.value
+    value: '-698.02'
+    locator: {page: 5, published_page: 580, table: 'II', row: NaFeO2, column: 'ΔH°298 K'}
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_fusion_temperature_exp].values.T_m_K
+    value: '1620'
+    locator: {page: 7, published_page: 581, table: 'IV', row: 'L = NaFeO2(c)'}
+species:
+  NaFeO2:
+    observations:
+      - observation_id: mcgill16_nafeo2_quoted_delta_fH
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: NaFeO2, column: 'ΔH°298 K'}
+        phase: cr
+        units: kJ/mol
+        per: mol_species
+        standard_pressure_Pa: '100000'
+        uncertainty: {kind: printed, value: '1.30', verbatim: '± 1.30 kJ/mol', confidence_level: not_stated}
+        standard_state: Standard enthalpy of formation at 298 K, as labeled in Table II.
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          value: '-698.02'
+          T_K: '298'
+          attribution: Koehler et al. [28], solution calorimetry (SC)
+          standard_pressure_Pa: '100000'
+          phase_as_printed: alpha-NaFeO2
+          per_as_printed: per mole of compound
+          method_class_reason: Quoted calorimetric experimental value, not the present authors' measurement.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 5, table: 'II', row: NaFeO2}
+      - observation_id: mcgill16_nafeo2_quoted_entropy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: NaFeO2, column: 'S°298 K'}
+        phase: cr
+        units: J/mol/K
+        per: mol_species
+        uncertainty: {kind: printed, value: '0.84', verbatim: '± 0.84 J/mol-K', confidence_level: not_stated}
+        values:
+          quantity: S
+          method_class: quoted_attributed
+          value: '88.34'
+          T_K: '298'
+          per: mol_species
+          standard_pressure_Pa: '100000'
+          attribution: King [32], adiabatic calorimetry (AC)
+          phase_as_printed: alpha-NaFeO2
+          method_class_reason: Quoted low-temperature calorimetry value attributed to King.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 5, table: 'II', row: NaFeO2}
+      - observation_id: mcgill16_nafeo2_fusion_temperature_exp
+        type: transition_point
+        locator: {page: 7, published_page: 581, pdf_page_index: 6, table: 'IV', row: 'L = NaFeO2(c)', column: 'T exp'}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          T_m_K: '1620'
+          property_kind: melting_point
+          phase_as_printed: NaFeO2(c)
+          attribution: Christensen et al. [27] and Koehler et al. [28], Table IV references [27, 28]
+          method_class_reason: Experimental fusion temperature listed for comparison with the calculated invariant temperature.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '1620'}}
+            locator: {page: 7, table: 'IV', row: 'L = NaFeO2(c)'}
+    context:
+      - observation_id: mcgill16_nafeo2_cp_assessment
+        type: thermodynamic_model_context
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: alpha-NaFeO2}
+        units: J/mol-K
+        values:
+          statement_as_printed: 'Cp = 110.95 + 0.0076933T - 2552200T^-2; the same heat capacity was assumed for all three polymorphs.'
+          method_class: model_derived
+          temperature_reference: 298 K
+          polymorph_transition_enthalpies_as_printed:
+            - {transition: 'alpha -> beta', value: '41.84', unit: J/mol, temperature_K: '870'}
+            - {transition: 'beta -> gamma', value: '2177', unit: J/mol, temperature_K: '1270'}
+          optimized_thermochemistry_as_printed:
+            formation_enthalpy_298_kJ_mol: '-697.350'
+            standard_entropy_298_J_mol_K: '88.341'
+            fusion_temperature_K: '1620'
+          optimization_method: >-
+            The standard entropy was fixed according to King [32]; heat capacity was fit using King [32] low-temperature measurements and Margrave and Grimley [31] and Christensen et al. [27] heat content; formation enthalpy was selected from Koehler et al. [28] calorimetry and emf Gibbs-energy data.
+          method_locator: {page: 5, section: NaFeO2 thermodynamic properties}
+          schema_gap: >-
+            These assessed transition enthalpies have no exact quantity token in simulator/battery/enums.py::Quantity. They remain located context rather than being mislabeled as formation or fusion enthalpies.
+      - observation_id: mcgill16_nafeo2_liquid_gibbs_parameter
+        type: thermodynamic_model_context
+        locator: {page: 6, published_page: 580, pdf_page_index: 5, table: 'III', row: GNaFeO2}
+        units: J/mol
+        values:
+          parameter_as_printed: 'GNaFeO2 = 1/2 GNa2O + 1/2 GFe2O3 - 99371.2552 + 16.91756468T'
+          method_class: model_derived
+          model_phase: liquid solution
+          note: The row is the NaFeO2 associate Gibbs-energy term in the liquid model; it is not a solid polymorph property.

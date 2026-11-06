@@ -1,0 +1,24 @@
+source_id: mcgill-na-fe-o-critical-assessment
+status: partial-nafeo2-thermochemistry-slice
+source_rows:
+  table_ii:
+    printed_locator: {page: 5, table: 'II'}
+    body_rows_printed: 33
+    selected_species: NaFeO2
+    columns:
+      delta_H_298_K_kJ_per_mol: [quoted experimental, current optimized]
+      S_298_K_J_per_mol_K: [quoted experimental, current optimized]
+      Cp_J_per_mol_K: [current optimized equation, common to alpha beta gamma]
+      phase_transformation_enthalpy: [current optimized, retained as located context; no exact quantity token]
+  table_iii:
+    printed_locator: {page: 6, table: 'III'}
+    selected_row: GNaFeO2
+    output: liquid associate Gibbs energy parameter as located model context
+  table_iv:
+    printed_locator: {page: 7, table: 'IV'}
+    selected_row: 'L = NaFeO2(c)'
+    selected_column: experimental temperature
+    output: quoted fusion temperature
+  excluded:
+    - Figure 3 numerical curve reads; figure-only values are outside scope.
+    - Other compounds and the remaining invariant rows; included in continuing extraction.
