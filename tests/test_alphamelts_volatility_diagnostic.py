@@ -137,6 +137,11 @@ def test_raw_weight_fraction_comparison_stays_out_of_crystalline_k(
     composition = _domain_composition()
     activity_inputs: dict[str, list[float]] = {}
     original_evaluate = CompiledPressureEvaluator.evaluate
+    import simulator.chemistry.ellingham_graph as ellingham_graph_module
+
+    original_effective_pressure = (
+        ellingham_graph_module.effective_equilibrium_pressure_Pa
+    )
 
     def record_crystalline_k_input(
         evaluator,
@@ -160,8 +165,33 @@ def test_raw_weight_fraction_comparison_stays_out_of_crystalline_k(
             reaction_inputs=reaction_inputs,
         )
 
+    def record_ellingham_input(
+        species,
+        temperature_K,
+        pO2_bar,
+        *,
+        vapor_pressure_data=None,
+        a_oxide=1.0,
+        vacuum_floor_bar=1e-9,
+    ):
+        if species in {"Mg", "Ca"}:
+            activity_inputs.setdefault(species, []).append(float(a_oxide))
+        return original_effective_pressure(
+            species,
+            temperature_K,
+            pO2_bar,
+            vapor_pressure_data=vapor_pressure_data,
+            a_oxide=a_oxide,
+            vacuum_floor_bar=vacuum_floor_bar,
+        )
+
     monkeypatch.setattr(
         CompiledPressureEvaluator, "evaluate", record_crystalline_k_input
+    )
+    monkeypatch.setattr(
+        ellingham_graph_module,
+        "effective_equilibrium_pressure_Pa",
+        record_ellingham_input,
     )
     diagnostic = alphamelts_activity_volatility_diagnostic(
         composition_wt_pct=composition,
@@ -187,6 +217,15 @@ def test_raw_weight_fraction_comparison_stays_out_of_crystalline_k(
         assert activity_inputs[species]
         assert all(
             not math.isclose(value, raw_fraction, rel_tol=0.0, abs_tol=1e-14)
+            for value in activity_inputs[species]
+        )
+        assert any(
+            math.isclose(
+                value,
+                row["melt_oxide_activity"],
+                rel_tol=1e-12,
+                abs_tol=0.0,
+            )
             for value in activity_inputs[species]
         )
 
