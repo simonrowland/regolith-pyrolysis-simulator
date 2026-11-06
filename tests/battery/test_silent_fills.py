@@ -624,7 +624,7 @@ def test_unmodelled_knudsen_cell_uses_flagged_melt_effusion_balance(
 
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["cell_material"] is None
-    assert prediction.value is not None
+    assert prediction.refusal_detail.get("refusal_reason") == "census_stop"
     assert any(
         notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
         and "cell oxygen balance not modelled" in notice.reason
