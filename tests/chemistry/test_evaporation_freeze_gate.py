@@ -2107,6 +2107,66 @@ def test_stable_refusal_held_curve_is_flagged_but_not_memoized(
     assert shared_cache[key]['curve']['source'] == 'gate_liquid_fraction'
 
 
+def _held_redox_gate_curve_for_notice_projection_test():
+    return {
+        'source': 'test_held_gate_curve',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1500.0,
+        'path': ((1000.0, 0.0), (1500.0, 1.0)),
+        'gate_provider_refusal': {
+            'status': 'out_of_domain',
+            'qualification': 'held_last_good_curve',
+        },
+    }
+
+
+def test_held_gate_notice_reaches_redox_liquid_fraction_snapshot(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
+    )
+    held_curve = _held_redox_gate_curve_for_notice_projection_test()
+
+    sim._melt_redox_liquid_fraction_factor(
+        1300.0 + 273.15,
+        gate_authority=held_curve,
+    )
+    snapshot = sim._make_snapshot()
+
+    assert snapshot.liquid_fraction_gate['liquid_fraction'][
+        'gate_provider_refusal'
+    ]['qualification'] == 'held_last_good_curve'
+
+
+def test_held_gate_notice_reaches_fe_redox_respeciation_authority(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test explicit oxygen for held-curve respeciation notice',
+        material_origin='feedstock',
+    )
+    held_curve = _held_redox_gate_curve_for_notice_projection_test()
+
+    diagnostic = sim._apply_fe_redox_respeciation(
+        gate_authority=held_curve,
+    )
+
+    assert diagnostic['gate_authority']['gate_provider_refusal'][
+        'qualification'
+    ] == 'held_last_good_curve'
+
+
 def _lunar_composition_projected_diagnostic(sim):
     """Ig-order drop notice for the lunar cleaned melt, without a binary."""
     from simulator.melt_backend.magemin import (
