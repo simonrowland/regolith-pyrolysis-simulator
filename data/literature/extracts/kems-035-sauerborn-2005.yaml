@@ -3606,6 +3606,8 @@ species:
         cells, not independent measurements.
     - observation_id: sauerborn_2005_melts_liquidus_model_deep2
       experiment: jsc1-melts-model
+      derived_from:
+      - sauerborn_2005_jsc1_composition_figure_only_blocked_deep2
       type: rate_series
       locator:
         page: 17
@@ -3617,12 +3619,14 @@ species:
       derivation:
         relation: >-
           Sauerborn reports a MELTS simulation of JSC-1 Lunar Soil Simulant at normal pressure, using the JSC-1 composition cited as [MKCa 94] and MELTS cited as [melt 03].
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 17, pdf_page_index: 16, section: 2.1.2 Mondstaub-Simulat JSC-1}
+        inputs: [sauerborn_2005_jsc1_composition_figure_only_blocked_deep2]
         method:
           state: {tag: value, value: MELTS simulation for JSC-1 Lunar Soil Simulant under normal pressure}
-          locator: {page: 17, pdf_page_index: 16, section: 2.1.2 Mondstaub-Simulat JSC-1}
+          locator:
+            page: 17
+            pdf_page_index: 16
+            section: 2.1.2 Mondstaub-Simulat JSC-1
+            note: 'Prose: “Eine Untersuchung mit dem Simulationsprogramm MELTS ergab für JSC-1 Lunar Soil Simulant unter Normaldruck einen Schmelzpunkt von 1264 °C [melt 03].”'
         references:
         - '[melt 03] http://melts.uchicago.edu; Version ; 09/2003'
         - '[MKCa 94] D. S. McKay, J. L. Carter, W. W. Boles, C. C. Allen, J. H. Allton; JSC-1: A New Lunar Soil Simulant; 1994'

@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kems-035-sauerborn-2005.yaml"
 OBSERVATION_ID = "sauerborn_2005_melts_liquidus_model_deep2"
 UNKNOWN_METHOD_OBSERVATION_ID = "sauerborn_2005_melts_full_melt_model_1261_deep2"
+INPUT_OBSERVATION_ID = "sauerborn_2005_jsc1_composition_figure_only_blocked_deep2"
 
 
 def _assert_model_row(document: dict) -> None:
@@ -21,8 +22,11 @@ def _assert_model_row(document: dict) -> None:
     assert row["values"]["method_class"] == "model_derived"
     assert row["values"]["evidence_class"] == "model_derived"
     assert "attribution" not in row["values"]
+    assert row["derived_from"] == [INPUT_OBSERVATION_ID]
     derivation = row["derivation"]
-    assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+    assert "raw_inputs" not in derivation
+    assert derivation["inputs"] == [INPUT_OBSERVATION_ID]
+    assert "Eine Untersuchung mit dem Simulationsprogramm MELTS" in derivation["method"]["locator"]["note"]
     assert derivation["method"]["state"]["value"].startswith("MELTS simulation")
     assert derivation["method"]["locator"]["section"] == (
         "2.1.2 Mondstaub-Simulat JSC-1"
