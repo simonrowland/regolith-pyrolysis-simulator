@@ -479,17 +479,9 @@ species:
       standard_state: percent composition vs T (C)
       regime: HSC_gibbs_minimization_model
       units: percent composition as published
-      derivation:
-        relation: >-
-          The authors modeled MLS-1A vaporization chemistry by minimizing Gibbs free energy with the HSC analysis package; the reported equilibrium-composition curve is at 10^-1 Torr.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 49, pdf_page_index: 5, section: MODELING}
-        method:
-          state: {tag: value, value: Gibbs free-energy minimization with the HSC analysis package}
-          locator: {page: 49, pdf_page_index: 5, section: MODELING}
-        references:
-        - 'none_printed: The Modeling section does not identify a thermodynamic database or reference-data source for the calculation.'
+      source_quotes:
+      - locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        quote: "minimization of the Gibbs free energy with the HSC analysis package"
       uncertainty:
         note: figure-only; not digitised
       values:
@@ -514,17 +506,9 @@ species:
       standard_state: percent composition vs T (C)
       regime: HSC_gibbs_minimization_model
       units: percent composition as published
-      derivation:
-        relation: >-
-          The authors modeled MLS-1A vaporization chemistry by minimizing Gibbs free energy with the HSC analysis package; the reported equilibrium-composition curve is at 10^-7 Torr.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 49, pdf_page_index: 5, section: MODELING}
-        method:
-          state: {tag: value, value: Gibbs free-energy minimization with the HSC analysis package}
-          locator: {page: 49, pdf_page_index: 5, section: MODELING}
-        references:
-        - 'none_printed: The Modeling section does not identify a thermodynamic database or reference-data source for the calculation.'
+      source_quotes:
+      - locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        quote: "minimization of the Gibbs free energy with the HSC analysis package"
       uncertainty:
         note: figure-only; not digitised
       values:

@@ -21,13 +21,17 @@ def _assert_model_rows(document: dict) -> None:
     ):
         row = rows[observation_id]
         assert row["values"]["method_class"] == "model_derived"
-        derivation = row["derivation"]
-        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-        assert derivation["method"]["state"]["value"] == (
-            "Gibbs free-energy minimization with the HSC analysis package"
+        assert row["values"]["admission_status"] == "figure_only"
+        assert "derivation" not in row
+        quote = row["source_quotes"][0]
+        assert quote["locator"] == {
+            "page": 49,
+            "pdf_page_index": 5,
+            "section": "MODELING",
+        }
+        assert quote["quote"] == (
+            "minimization of the Gibbs free energy with the HSC analysis package"
         )
-        assert derivation["method"]["locator"]["section"] == "MODELING"
-        assert derivation["references"][0].startswith("none_printed:")
 
 
 def test_hsc_equilibrium_outputs_are_model_derived_and_mutation_sensitive():
