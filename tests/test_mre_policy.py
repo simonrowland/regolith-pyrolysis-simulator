@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.core import PyrolysisSimulator
+from simulator.electrolysis import MRE_RAW_MARGIN_REFUSAL
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.mre_ladder import canonical_mre_decomposition_voltage
 from simulator.optimize.evaluate import evaluate
@@ -154,26 +155,20 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_internal_analytical_outco
         CANONICAL_SIO2_MRE_CAP_V
     )
 
-    # 2026-08-05 MC-1 trace wiring d1b4f5d: these Stage-0 products exist for
-    # both policies and are orthogonal to the C5 Si-target cache-key contract.
+    # 2026-08-05 MC-1 trace wiring d1b4f5d: MRE-off Stage-0 products remain
+    # independent of the C5 Si-target cache-key contract.
     assert _product_ledger(off) == pytest.approx({
         "Cl": 0.015407403867280558,
         "Co": 0.035950609023654635,
         "Ni": 0.20543205156374078,
         "S": 0.7190121804730926,
     })
-    assert _product_ledger(si_target) != _product_ledger(off)
-    assert _product_ledger(si_target)["Si"] > 0.0
-    assert "Na" not in _product_ledger(si_target)
-    assert "K" not in _product_ledger(si_target)
+    assert MRE_RAW_MARGIN_REFUSAL in si_target.notes
+    assert not si_target.run_reference.trace.snapshots
+    assert "product_ledger_kg" not in si_target.run_reference.product_summary
 
     off_trace = off.run_reference.trace
-    si_trace = si_target.run_reference.trace
     assert max(snapshot.mre_current_A for snapshot in off_trace.snapshots) == pytest.approx(0.0)
-    assert max(snapshot.mre_current_A for snapshot in si_trace.snapshots) > 0.0
-    assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= (
-        CANONICAL_SIO2_MRE_CAP_V
-    )
 
 
 def test_tc8_si_and_ti_targets_split_c5_behavior_not_only_cache_key() -> None:
@@ -240,9 +235,8 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
     assert captured[0]["pO2_bar"] == pytest.approx(0.05)
 
 
-@pytest.mark.parametrize("c5_enabled", (False, True))
-def test_tc8_internal_analytical_path_mass_balance_closes_for_mre_policy(c5_enabled: bool) -> None:
-    result = _evaluate_policy(c5_enabled=c5_enabled)
+def test_tc8_internal_analytical_path_mass_balance_closes_when_mre_is_disabled() -> None:
+    result = _evaluate_policy(c5_enabled=False)
     snapshots = result.run_reference.trace.snapshots
 
     assert snapshots
