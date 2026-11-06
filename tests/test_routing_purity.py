@@ -502,6 +502,7 @@ def test_na_at_the_k_trap_is_a_contaminant_and_mass_closes():
     # This host records stage sources only; the stubbed move has no
     # origin state, so the mark is a no-op here.
     host.atom_ledger = SimpleNamespace(
+        registry={},
         mark_amalgamated_pool=lambda *_args, **_kwargs: None,
     )
     host._LEDGER_KG_TOL = 1e-12
