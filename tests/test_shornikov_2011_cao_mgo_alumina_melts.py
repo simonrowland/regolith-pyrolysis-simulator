@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -263,6 +263,8 @@ def test_fresh_reads_lie_inside_the_printed_uncertainty_band() -> None:
             assert f"({second[0]}, {second[1]})" in row["locator"]["note"]
             assert ordinate in row["locator"]["note"]
             assert str(row["uncertainty"][key]) == width
+            if migrated[observation_id].value.kind is ValueKind.UNAVAILABLE:
+                continue
             _assert_printed_band_contains_both_reads(
                 migrated[observation_id],
                 panel,
@@ -301,8 +303,8 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     observations = list(result.observations.values())
 
     assert len(observations) == 60
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 52
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 8
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 47
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 13
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
@@ -311,11 +313,21 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
         for row in observations
         if row.observation_id.endswith("::shornikov_2011_text_minimum_delta_fG1960_melt")
     )
-    assert minimum.admission.status.value == "admitted"
-    assert minimum.value.kind is ValueKind.POINT
+    assert minimum.admission.status.value == "pending"
+    assert minimum.value.kind is ValueKind.UNAVAILABLE
     assert minimum.identity.temperature_K is not None
     assert minimum.point_conditions["composition"].state.is_unknown
     assert minimum.point_conditions["composition"].locator is not None
+    for suffix in ("01", "02", "03", "04"):
+        marker = next(
+            row
+            for row in observations
+            if row.observation_id.endswith(
+                f"::shornikov_2011_fig1_d_allibert_marker_{suffix}"
+            )
+        )
+        assert marker.value.kind is ValueKind.UNAVAILABLE
+        assert marker.admission.status is AdmissionStatus.REJECTED
     for row in observations:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value

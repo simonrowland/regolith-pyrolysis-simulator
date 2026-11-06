@@ -217,6 +217,17 @@ figures:
     '2': Sublattice model [Hallstedt, 1992]
     '3': Calculated in the present study
   digitized_data_markers: Series 1 open squares only; all other plotted series remain typed unavailable.
+schema_gaps:
+  - observation_id: shornikov_2011_text_minimum_delta_fG1960_melt
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_01
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_02
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_03
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_04
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 species:
   Al2O3:
     observations:
@@ -3231,7 +3242,10 @@ species:
       experiment: shornikov_2011_text_conclusion_minimum_melt
       standard_state: Gibbs energy of melt formation from oxides, as stated in the source text.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3 system melt at the temperature 1960 K"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: quoted_attributed
         value_as_printed: '−31.5'
         value: '-31.5'
@@ -3295,10 +3309,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3 system melt at the temperature 1960 K"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
         value: -23.0
         composition_Al2O3_mole_pct_as_plotted: 24.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
@@ -3376,10 +3393,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3 system melt at the temperature 1960 K"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
         value: '-24.25'
         composition_Al2O3_mole_pct_as_plotted: 28.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
@@ -3459,10 +3479,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3 system melt at the temperature 1960 K"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
         value: -27.0
         composition_Al2O3_mole_pct_as_plotted: 32.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
@@ -3540,10 +3563,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3 system melt at the temperature 1960 K"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
         value: -30.0
         composition_Al2O3_mole_pct_as_plotted: 36.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.

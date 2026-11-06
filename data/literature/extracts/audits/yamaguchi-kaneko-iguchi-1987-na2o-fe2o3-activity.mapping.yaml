@@ -1,0 +1,78 @@
+source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+source_tables:
+  - printed_table: '1'
+    published_page: 988
+    pdf_page: 3
+    columns:
+      Cell No.: cell identity, retained in phase_assemblage_table context
+      Sample Composition: printed bulk formula, retained verbatim in context
+      Sample Phases: printed phases, retained verbatim in context
+      Reference Composition: printed bulk formula, retained verbatim in context
+      Reference Phases: printed phases, retained verbatim in context
+    printed_rows: 5
+  - printed_table: '2'
+    published_page: 989
+    pdf_page: 4
+    columns:
+      Cell: cell identifier
+      Temp. range/K: retained as printed text, no missing range endpoint inferred
+      A: intercept in mV
+      dA: printed coefficient uncertainty in mV
+      B: slope in mV/K
+      dB: printed coefficient uncertainty in mV/K
+    printed_rows: 8
+    storage: species.Na2O.context[yki1987_table2_emf_fits]
+    reason: >-
+      EMF fit coefficients have no exact quantity token in the migrator and are
+      retained as measured-reduced located context, with input points declared
+      not_printed and the fit-only schema gap identified.
+  - printed_table: '3'
+    published_page: 991
+    pdf_page: 6
+    columns:
+      Phases: printed phase assemblage
+      Temp. range/K: exact printed bound or interval, retained in point_conditions.temperature_K
+      A: log10 activity intercept
+      dA: printed coefficient uncertainty
+      B: coefficient of 10^4 K/T
+      dB: printed coefficient uncertainty
+    printed_rows: 4
+    quantity: activity
+    printed_form: log10
+    method_class: measured_reduced
+    figure_raw_inputs: Figure 2 for Fe2O3 + Na3Fe5O9; Figure 3 for Na3Fe5O9 + Na2Fe2O4
+  - printed_table: '4'
+    published_page: 991
+    pdf_page: 6
+    columns:
+      Equation label: copied literally including Eq. (A) on first row
+      Temp. range/K: exact printed bound or interval, retained in point_conditions.temperature_K
+      A: coefficient of 10^-3 T/K
+      dA: printed coefficient uncertainty
+      B: intercept in kJ/mol on the printed reaction basis
+      dB: printed coefficient uncertainty
+    printed_rows: 4
+    quantity: reaction_standard_gibbs_energy_for_reaction_B_or_D
+    method_class: measured_reduced
+    derived_from: Table 3 activity fit observation identifiers; see each row's derivation.inputs
+    quantity_unknown_rows:
+      - yki1987_gibbs_abstract_na3fe5o9
+      - yki1987_gibbs_table4_na3fe5o9
+      - yki1987_gibbs_table4_na2fe2o4_lt1047
+      - yki1987_gibbs_abstract_na2fe2o4_lt1047
+      - yki1987_gibbs_abstract_na2fe2o4_1047_1278
+      - yki1987_gibbs_table4_na2fe2o4_mid
+      - yki1987_gibbs_abstract_na2fe2o4_gt1278
+      - yki1987_gibbs_table4_na2fe2o4_nf_lt1405
+    quantity_unknown_reason: >-
+      All eight Gibbs fits describe reaction (B) or (D), not formation from
+      elements. No exact reaction-extent Gibbs-energy quantity token exists;
+      printed coefficients and bases remain unchanged and typed-refused.
+  - printed_section: Abstract
+    published_page: 986
+    pdf_page: 1
+    storage: duplicate author fit statements retained separately from Table 4
+    note: Conflicting printed values remain separate rows and are not reconciled.
+excluded:
+  - Figures 2–5 numerical points: figure-only values deferred, not digitized.
+  - Table 4 reaction line C for Na2Fe2O4: reaction preserved in the equation context; no separate Gibbs fit coefficients are printed for it.
