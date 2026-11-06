@@ -3,11 +3,14 @@ from __future__ import annotations
 import gzip
 import io
 import json
+import math
 import re
+import statistics
 import subprocess
 import sys
 import tarfile
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -1957,6 +1960,8 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
                     "reason": "extrapolated beyond certified band",
                 }
             ]
+        if engine == "internal-analytical" and experiment == "second-shared":
+            del row["candidate_observation"]["identity"]["temperature_K"]
         rows.append(row)
     residuals.write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
@@ -1980,7 +1985,11 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     ]
     assert comparisons[0]["outside_sd_dex"] == "0"
     assert comparisons[0]["outside_median_abs_dex"] == "4.0"
-    assert comparisons[0]["views"]["temperature_lt_1700"]["n_shared"] == 2
+    assert comparisons[0]["views"]["all"]["no_temperature_n"] == 1
+    assert comparisons[0]["views"]["temperature_lt_1700"]["n_shared"] == 1
+    assert data.hero_all_numeric_metrics[("redox", "internal-analytical")][
+        "views"
+    ]["all"]["no_temperature_n"] == 1
     assert data.hero_comparisons[("redox", "openimcc")]["comparisons"][0][
         "engine"
     ] == "thermoengine"
@@ -2056,6 +2065,168 @@ def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> No
     assert "held-out RMS 1.10 dex (n=5)" in text
     assert "SD 0.30 dex (n=5)" in text
     assert "median |dex| 0.80 dex (n=5)" in text
+
+
+def _hero_metric_row(
+    engine: str,
+    reference: str,
+    value: str,
+    *,
+    temperature_K: str | None = None,
+    source_id: str | None = None,
+    species: str = "SiO",
+    rail: str = "vapour",
+) -> dict[str, object]:
+    identity: dict[str, object] = {"species": {"formula": species}}
+    if temperature_K is not None:
+        identity["temperature_K"] = {"tag": "value", "value": temperature_K}
+    candidate: dict[str, object] = {
+        "observation_id": f"engine:{engine}:{reference}",
+        "identity": identity,
+    }
+    if source_id is not None:
+        candidate["source_id"] = source_id
+    return {
+        "rail": rail,
+        "reference": reference,
+        "candidate_request": {"engine": engine},
+        "candidate_observation": candidate,
+        "numeric": {"operation": "dex", "value": value},
+    }
+
+
+def test_hero_metrics_use_population_sd_and_measured_temperature_views() -> None:
+    values = [Decimal("-1"), Decimal("1"), Decimal("3"), Decimal("4")]
+    rows = [
+        _hero_metric_row("openimcc", "below", "-1", temperature_K="1699"),
+        _hero_metric_row("openimcc", "boundary", "1", temperature_K="1700"),
+        _hero_metric_row("openimcc", "above", "3", temperature_K="1701"),
+        _hero_metric_row("openimcc", "no-temperature", "4"),
+    ]
+
+    metric = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    views = metric["views"]
+    all_view = views["all"]
+    high_view = views["temperature_ge_1700"]
+    low_view = views["temperature_lt_1700"]
+
+    assert all_view["n"] == metric["n"] == 4
+    assert all_view["no_temperature_n"] == 1
+    assert high_view["n"] == 2
+    assert low_view["n"] == 1
+    assert high_view["no_temperature_n"] == low_view["no_temperature_n"] == 0
+    assert float(metric["rms_dex"]) == pytest.approx(math.sqrt(6.75))
+    assert Decimal(metric["sd_dex"]) == statistics.pstdev(values)
+    assert float(metric["median_abs_dex"]) == 2.0
+    assert Decimal(high_view["sd_dex"]) == statistics.pstdev(
+        [Decimal("1"), Decimal("3")]
+    )
+    assert float(high_view["median_abs_dex"]) == 2.0
+    assert low_view["sd_dex"] == "0"
+
+
+def test_hero_exposure_rule_uses_reference_and_both_exposure_sources() -> None:
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset({"census-only", "both"}),
+        exposed_source_ids=frozenset({"exposed-source", "both-source"}),
+        baseline_observation_ids=frozenset({"pre-cutoff"}),
+    )
+    cases = (
+        (_hero_metric_row("openimcc", "neither", "1", source_id="new-source"), "held_out"),
+        (_hero_metric_row("openimcc", "census-only", "1", source_id="new-source"), "exposed"),
+        (_hero_metric_row("openimcc", "source-only", "1", source_id="exposed-source"), "exposed"),
+        (_hero_metric_row("openimcc", "both", "1", source_id="both-source"), "exposed"),
+        (_hero_metric_row("openimcc", "pre-cutoff", "1"), "exposed"),
+        (_hero_metric_row("openimcc", "new-without-source", "1"), "held_out"),
+    )
+
+    assert [hero_plot._hero_exposure_status(row, policy) for row, _ in cases] == [
+        expected for _row, expected in cases
+    ]
+
+
+def test_hero_exposure_metrics_show_counts_below_minimum_n_only() -> None:
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset(),
+        exposed_source_ids=frozenset(),
+        baseline_observation_ids=frozenset(),
+        minimum_held_out_n=5,
+    )
+    rows = [
+        *[
+            _hero_metric_row("openimcc", f"held-{i}", str(i), temperature_K="1800")
+            for i in range(1, 6)
+        ],
+        *[
+            _hero_metric_row("vaporock", f"small-{i}", str(i), temperature_K="1600")
+            for i in range(1, 5)
+        ],
+    ]
+    metrics = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc", "vaporock"),
+        rails=("vapour",),
+        exposure_policy=policy,
+    )
+
+    held_out = metrics[("vapour", "openimcc")]["views"]["temperature_ge_1700"]["held_out"]
+    assert held_out["n"] == 5
+    assert held_out["rms_dex"] is not None
+    assert held_out["sd_dex"] is not None
+    assert held_out["median_abs_dex"] is not None
+    small = metrics[("vapour", "vaporock")]["views"]["temperature_lt_1700"]["held_out"]
+    assert small["n"] == 4
+    assert small["rms_dex"] is None
+    assert small["sd_dex"] is None
+    assert small["median_abs_dex"] is None
+
+
+def test_openimcc_vaporock_pair_metrics_split_by_species_and_temperature() -> None:
+    rows: list[dict[str, object]] = []
+    for index in range(5):
+        temperature = "1700" if index == 0 else "1600"
+        for engine, value in (("openimcc", str(index)), ("vaporock", str(index + 1))):
+            rows.append(
+                _hero_metric_row(
+                    engine,
+                    f"sio-{index}",
+                    value,
+                    temperature_K=temperature,
+                    species="SiO",
+                )
+            )
+    for index in range(2):
+        for engine, value in (("openimcc", "0"), ("vaporock", "2")):
+            rows.append(
+                _hero_metric_row(
+                    engine,
+                    f"na-{index}",
+                    value,
+                    temperature_K="1800",
+                    species="Na",
+                )
+            )
+
+    records = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+        include_species=True,
+    )
+    by_species = {record["species"]: record for record in records}
+    sio = by_species["SiO"]["comparisons"][0]
+    na = by_species["Na"]["comparisons"][0]
+
+    assert sio["n_shared"] == 5
+    assert sio["views"]["all"]["outside_median_abs_dex"] == "3"
+    assert sio["views"]["temperature_ge_1700"]["n_shared"] == 1
+    assert na["n_shared"] == 2
+    assert na["views"]["all"]["outside_rms_dex"] is None
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
@@ -2326,9 +2497,15 @@ def test_cutoff_observation_id_script_reads_the_store_at_requested_commit(
     tmp_path: Path,
 ) -> None:
     repo = tmp_path / "cutoff-store"
-    store = repo / "data" / "literature" / "observations-v2"
+    literature = repo / "data" / "literature"
+    store = literature / "observations-v2"
+    extracts = literature / "extracts-v2"
     nested = store / "nested"
-    nested.mkdir(parents=True)
+    extract_family = extracts / "abdul-2023-cao-sio2-calphad"
+    deep = extracts / "compilations-janaf" / "deeper"
+    ignored = extracts / "_ignored"
+    for directory in (nested, extract_family, deep, ignored):
+        directory.mkdir(parents=True)
     (store / "first.yaml").write_text(
         "source_id: source-a\nobservations:\n  - observation_id: obs-b\n  - observation_id: obs-a\n",
         encoding="utf-8",
@@ -2336,6 +2513,20 @@ def test_cutoff_observation_id_script_reads_the_store_at_requested_commit(
     (nested / "second.yaml").write_text(
         "source_id: source-b\nobservations:\n  - observation_id: obs-c\n",
         encoding="utf-8",
+    )
+    (extract_family / "row.yaml").write_text(
+        "source_id: abdul-source\nobservations:\n  - observation_id: abdul-pre-cutoff\n",
+        encoding="utf-8",
+    )
+    (extracts / "extract-root.yaml").write_text(
+        "source_id: extract-root\nobservations:\n  - observation_id: extract-root-id\n",
+        encoding="utf-8",
+    )
+    (deep / "too-deep.yaml").write_text(
+        "observations:\n  - observation_id: too-deep-id\n", encoding="utf-8"
+    )
+    (ignored / "ignored.yaml").write_text(
+        "observations:\n  - observation_id: ignored-id\n", encoding="utf-8"
     )
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
     subprocess.run(
@@ -2375,11 +2566,25 @@ def test_cutoff_observation_id_script_reads_the_store_at_requested_commit(
         text=True,
     )
 
-    assert output.read_text(encoding="utf-8").splitlines() == [
+    baseline_ids = frozenset(output.read_text(encoding="utf-8").splitlines())
+    assert baseline_ids == {
+        "abdul-pre-cutoff",
+        "extract-root-id",
         "obs-a",
         "obs-b",
         "obs-c",
-    ]
+    }
+    assert "too-deep-id" not in baseline_ids
+    assert "ignored-id" not in baseline_ids
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset(),
+        exposed_source_ids=frozenset(),
+        baseline_observation_ids=baseline_ids,
+    )
+    extract_row = _hero_metric_row(
+        "openimcc", "abdul-pre-cutoff", "0.25", source_id="abdul-source"
+    )
+    assert hero_plot._hero_exposure_status(extract_row, policy) == "exposed"
 
 
 def test_history_keeps_deck_rail_all_numeric_count() -> None:
@@ -2910,6 +3115,17 @@ def test_stamp_derives_default_pack_from_scored_openimcc_version(
         residual=0.25,
         version="IMCC-SF04-D066-v9",
     )
+    row["candidate_observation"]["engine"] = {
+        "name": "openimcc",
+        "channel": "battery",
+        "run_id": "openimcc:run",
+        "coefficient_sources": [
+            "openimcc-pack-version:imcc-sf04-d066-v5",
+            "openimcc-pack-digest:sha256:green-archive-pack-digest",
+        ],
+        "lineage_complete": True,
+        "version": "66ec4a3",
+    }
     with residuals.open("a", encoding="utf-8") as target:
         target.write(json.dumps(row) + "\n")
     data = read_scores(residuals)
@@ -2921,7 +3137,7 @@ def test_stamp_derives_default_pack_from_scored_openimcc_version(
         render_date="2026-11-06",
     )
 
-    assert "default pack at scored pin: imcc-sf04-d066-v9" in stamp
+    assert "default pack at scored pin: imcc-sf04-d066-v5" in stamp
     assert "SCORE 66ec4a3" in stamp
 
 

@@ -12,7 +12,6 @@ import json
 import math
 import os
 import shutil
-import statistics
 import subprocess
 import sys
 import warnings
@@ -95,8 +94,6 @@ from simulator.battery.score import (
     _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
-    _BatteryHeroExposurePolicy,
-    _battery_hero_metric_records,
     _paired_engine_rail_comparisons,
     _residual_engine_observable,
     compile_residual,
@@ -7511,198 +7508,48 @@ def test_paired_engine_rail_comparisons_include_all_shared_rows() -> None:
         (record["rail"], record["primary_engine"]): record for record in records
     }
 
-    assert [
-        (row["engine"], row["n_shared"], row["outside_rms_dex"], row["primary_rms_dex_on_shared"])
-        for row in by_key[(Rail.VAPOUR.value, "openimcc")]["comparisons"]
-    ] == [("thermoengine", 1, "2", "1"), ("vaporock", 1, "4", "1")]
-    assert [
-        (row["engine"], row["n_shared"], row["outside_rms_dex"], row["primary_rms_dex_on_shared"])
-        for row in by_key[(Rail.VAPOUR.value, "internal-analytical")]["comparisons"]
-    ] == [("vaporock", 2, "4", "3"), ("thermoengine", 1, "2", "3")]
-    vaporock = next(
-        row
-        for row in by_key[(Rail.VAPOUR.value, "openimcc")]["comparisons"]
-        if row["engine"] == "vaporock"
-    )
-    assert vaporock["views"]["all"]["n_shared"] == 1
-    assert vaporock["views"]["all"]["outside_sd_dex"] == "0"
-    assert vaporock["views"]["all"]["outside_median_abs_dex"] == "4"
-    assert vaporock["views"]["all"]["primary_sd_dex_on_shared"] == "0"
-    assert vaporock["views"]["temperature_ge_1700"]["n_shared"] == 0
+    assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "openimcc",
+        "comparisons": [
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "1",
+            },
+            {
+                "engine": "vaporock",
+                "n_shared": 1,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "1",
+            },
+        ],
+    }
+    assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "internal-analytical",
+        "comparisons": [
+            {
+                "engine": "vaporock",
+                "n_shared": 2,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "3",
+            },
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "3",
+            },
+        ],
+    }
     for primary in ("openimcc", "internal-analytical"):
         assert by_key[(Rail.REDOX.value, primary)] == {
             "rail": Rail.REDOX.value,
             "primary_engine": primary,
             "comparisons": [],
         }
-
-
-def _hero_metric_row(
-    engine: str,
-    reference: str,
-    value: str,
-    *,
-    temperature_K: str | None = None,
-    observation_id: str | None = None,
-    source_id: str | None = None,
-    species: str = "SiO",
-) -> dict[str, object]:
-    candidate: dict[str, object] = {
-        "identity": {"species": {"formula": species}},
-    }
-    if temperature_K is not None:
-        candidate["identity"]["temperature_K"] = {
-            "tag": "value",
-            "value": temperature_K,
-        }
-    if observation_id is not None:
-        candidate["observation_id"] = observation_id
-    if source_id is not None:
-        candidate["source_id"] = source_id
-    return {
-        "rail": Rail.VAPOUR.value,
-        "reference": reference,
-        "candidate_request": {"engine": engine},
-        "candidate_observation": candidate,
-        "numeric": {"operation": "dex", "value": value},
-    }
-
-
-def test_battery_hero_metric_records_use_population_sd_and_temperature_views() -> None:
-    values = [Decimal("-1"), Decimal("1"), Decimal("3"), Decimal("4")]
-    rows = [
-        _hero_metric_row("openimcc", "below", "-1", temperature_K="1699"),
-        _hero_metric_row("openimcc", "boundary", "1", temperature_K="1700"),
-        _hero_metric_row("openimcc", "above", "3", temperature_K="1701"),
-        _hero_metric_row("openimcc", "no-temperature", "4"),
-    ]
-
-    record = _battery_hero_metric_records(
-        rows,
-        engines=("openimcc",),
-        rails=(Rail.VAPOUR.value,),
-    )[0]
-
-    all_view = record["views"]["all"]
-    high_view = record["views"]["temperature_ge_1700"]
-    low_view = record["views"]["temperature_lt_1700"]
-    assert all_view["n"] == record["n"] == 4
-    assert all_view["no_temperature_n"] == 1
-    assert high_view["n"] == 2
-    assert low_view["n"] == 1
-    assert high_view["no_temperature_n"] == 0
-    assert record["sd_dex"] == str(statistics.pstdev(values))
-    assert record["median_abs_dex"] == str(statistics.median(map(abs, values)))
-    high_values = [Decimal("1"), Decimal("3")]
-    assert high_view["sd_dex"] == str(statistics.pstdev(high_values))
-    assert high_view["median_abs_dex"] == "2"
-    assert low_view["sd_dex"] == "0"
-
-
-def test_battery_hero_exposure_categories_minimum_n_and_missing_source_id() -> None:
-    policy = _BatteryHeroExposurePolicy(
-        census_observation_ids=frozenset({"census"}),
-        exposed_source_ids=frozenset({"exposed-source"}),
-        baseline_observation_ids=frozenset({"baseline"}),
-        minimum_held_out_n=5,
-    )
-    rows = [
-        _hero_metric_row("openimcc", "census", "1", observation_id="census"),
-        _hero_metric_row(
-            "openimcc",
-            "exposed-source",
-            "2",
-            observation_id="new-source-row",
-            source_id="exposed-source",
-        ),
-        _hero_metric_row("openimcc", "baseline", "3", observation_id="baseline"),
-        *[
-            _hero_metric_row(
-                "openimcc",
-                f"held-{index}",
-                str(index),
-                observation_id=f"held-{index}",
-                source_id="fresh-source" if index < 4 else None,
-            )
-            for index in range(1, 6)
-        ],
-        *[
-            _hero_metric_row(
-                "vaporock",
-                f"small-{index}",
-                str(index),
-                observation_id=f"small-{index}",
-                source_id="fresh-source",
-            )
-            for index in range(1, 5)
-        ],
-    ]
-    records = {
-        row["engine"]: row
-        for row in _battery_hero_metric_records(
-            rows,
-            engines=("openimcc", "vaporock"),
-            rails=(Rail.VAPOUR.value,),
-            exposure_policy=policy,
-        )
-    }
-
-    openimcc_all = records["openimcc"]["views"]["all"]
-    openimcc_held_out = openimcc_all["held_out"]
-    assert openimcc_all["exposed_n"] == 3
-    assert openimcc_held_out["n"] == 5
-    assert openimcc_held_out["sd_dex"] is not None
-    vaporock_held_out = records["vaporock"]["views"]["all"]["held_out"]
-    assert vaporock_held_out["n"] == 4
-    assert vaporock_held_out["rms_dex"] is None
-    assert vaporock_held_out["sd_dex"] is None
-    assert vaporock_held_out["median_abs_dex"] is None
-
-
-def test_openimcc_vaporock_shared_comparison_is_split_by_species() -> None:
-    rows: list[dict[str, object]] = []
-    for index in range(5):
-        species = "SiO"
-        temperature = "1700" if index == 0 else "1600"
-        for engine, value in (("openimcc", str(index)), ("vaporock", str(index + 1))):
-            rows.append(
-                _hero_metric_row(
-                    engine,
-                    f"sio-{index}",
-                    value,
-                    temperature_K=temperature,
-                    observation_id=f"sio-{index}",
-                    species=species,
-                )
-            )
-    for index in range(2):
-        for engine, value in (("openimcc", "0"), ("vaporock", "2")):
-            rows.append(
-                _hero_metric_row(
-                    engine,
-                    f"na-{index}",
-                    value,
-                    temperature_K="1800",
-                    observation_id=f"na-{index}",
-                    species="Na",
-                )
-            )
-
-    records = _paired_engine_rail_comparisons(
-        rows,
-        primary_engines=("openimcc",),
-        comparison_engines=("vaporock",),
-        rails=(Rail.VAPOUR.value,),
-        include_species=True,
-    )
-    by_species = {record["species"]: record for record in records}
-    sio_comparison = by_species["SiO"]["comparisons"][0]
-    na_comparison = by_species["Na"]["comparisons"][0]
-    assert sio_comparison["n_shared"] == 5
-    assert sio_comparison["views"]["all"]["outside_median_abs_dex"] == "3"
-    assert sio_comparison["views"]["temperature_ge_1700"]["n_shared"] == 1
-    assert na_comparison["n_shared"] == 2
-    assert na_comparison["views"]["all"]["outside_rms_dex"] is None
 
 
 def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
