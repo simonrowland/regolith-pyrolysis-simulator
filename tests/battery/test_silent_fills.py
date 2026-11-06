@@ -599,32 +599,37 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
 
 
 @pytest.mark.parametrize(
-    ("engine", "materials", "reason"),
+    "materials",
     (
-        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
-        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
-        (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
+        None,
+        (CellMaterial.AL2O3,),
+        (CellMaterial.PT, CellMaterial.AL2O3),
+        (CellMaterial.OTHER,),
     ),
 )
-def test_noninert_knudsen_cell_refuses_oxygen_balance(
-    engine: Engine,
-    materials: tuple[CellMaterial, ...],
-    reason: str,
+def test_unmodelled_knudsen_cell_uses_flagged_melt_effusion_balance(
+    materials: tuple[CellMaterial, ...] | None,
     monkeypatch,
 ) -> None:
-    opened = _no_engine(monkeypatch)
+    seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        engine,
+        Engine.OPENIMCC,
         observation,
         experiment=experiment,
         bench=_cell_material_bench(materials),
         isolated=False,
     )
 
-    assert opened == []
-    assert prediction.refusal_detail["reason"] == reason
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["cell_material"] is None
+    assert prediction.value is not None
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "cell oxygen balance not modelled" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -657,13 +662,11 @@ def test_unmodelled_reactive_knudsen_cell_predicts_with_notice(
 
     assert prediction.refusal_detail.get("reason") != "reactive_cell_oxygen_reservoir"
     assert any(
-        "reactive cell: oxygen balance of the cell not modelled" in notice.reason
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "cell oxygen balance not modelled" in notice.reason
         for notice in prediction.notices
     )
-    # Without printed fo2, p_partial still needs an oxygen input or omission.
-    assert prediction.refusal_detail.get("reason") in {None, "missing_fO2"} or (
-        seen.get("mode") in {PO2_NOT_AN_INPUT, PO2_COMMANDED}
-    )
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
 
 
 def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> None:
