@@ -28,7 +28,13 @@ from simulator.condensation import (
 )
 from simulator.condensation_routing import K_TRAP_STAGE_KEY
 from simulator.config import load_config_bundle
-from simulator.core import CondensationTrain, EvaporationFlux, MeltState
+from simulator.core import (
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+    PyrolysisSimulator,
+)
+from simulator.state import MOLAR_MASS
 
 _TRAIN = "process.condensation_train"
 
@@ -209,6 +215,38 @@ def test_swing_closes_mass_and_keeps_solids_off_the_alkali_train():
     liquid = train.get("Na", 0.0) + train.get("K", 0.0)
     solid = sum(residue.values())
     assert liquid + solid == pytest.approx(sum(captured.values()))
+
+
+def test_swing_partially_withdraws_mixed_origin_sio_from_the_train():
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        _TRAIN,
+        {"SiO": 1.0},
+        source="feedstock SiO",
+        material_origin="feedstock",
+    )
+    ledger.load_external_mol(
+        _TRAIN,
+        {"SiO": 1.0},
+        source="recovered SiO",
+        material_origin="reagent",
+    )
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim.atom_ledger = ledger
+    sim.train = CondensationTrain.create_default()
+    sim.vapor_pressures = load_config_bundle().vapor_pressures
+    sim._retarget_stage_collection_source = lambda *_args, **_kwargs: None
+    stage_idx = next(
+        index for index, stage in enumerate(sim.train.stages)
+        if stage.stage_key == K_TRAP_STAGE_KEY
+    )
+    swing_kg = 0.5 * MOLAR_MASS["SiO"] / 1000.0
+
+    sim._swing_alkali_freeze_out_cartridge(stage_idx, {"SiO": swing_kg})
+    assert ledger.kg_by_account(_TRAIN)["SiO"] == pytest.approx(
+        1.5 * MOLAR_MASS["SiO"] / 1000.0
+    )
 
 
 def test_missing_melt_out_holds_the_mass_on_the_train():
