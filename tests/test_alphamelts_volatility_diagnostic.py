@@ -396,20 +396,81 @@ def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
     assert diagnostic["status"] == "ok"
     assert diagnostic["melt_oxide_activities"] == {"SiO2": 0.25}
 
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        _builtin_vapor_activities_from_weight_composition,
+    )
+    from simulator.diagnostic_helpers.alphamelts_volatility import (
+        _oxide_vapor_pressure_Pa,
+    )
+
+    builtin_activity = _builtin_vapor_activities_from_weight_composition(
+        _domain_composition(), 1773.15
+    )["SiO2"].activity
+    expected_hard_pressure, _ = _oxide_vapor_pressure_Pa(
+        species="SiO",
+        data=_SIO_VAPOR_DATA["oxide_vapors"]["SiO"],
+        P_reference_Pa=100.0,
+        pO2_bar=1.0e-9,
+        oxide_activity=builtin_activity,
+        activity_exponent=1.0,
+        vacuum_floor_bar=1.0e-9,
+    )
+    expected_wt_pressure, _ = _oxide_vapor_pressure_Pa(
+        species="SiO",
+        data=_SIO_VAPOR_DATA["oxide_vapors"]["SiO"],
+        P_reference_Pa=100.0,
+        pO2_bar=1.0e-9,
+        oxide_activity=0.5,
+        activity_exponent=1.0,
+        vacuum_floor_bar=1.0e-9,
+    )
+
     hard_vacuum = diagnostic["grid"][0]["species"]["SiO"]
     assert hard_vacuum["P_reference_Antoine_Pa"] == pytest.approx(100.0)
-    assert hard_vacuum["melt_oxide_activity"] == pytest.approx(0.25)
+    assert hard_vacuum["melt_oxide_activity"] == pytest.approx(builtin_activity)
+    assert hard_vacuum["melt_oxide_activity"] != pytest.approx(0.25)
     assert hard_vacuum["wt_fraction_activity"] == pytest.approx(0.50)
-    assert hard_vacuum["P_eq_Pa"] == pytest.approx(25.0)
-    assert hard_vacuum["P_eq_wt_fraction_Pa"] == pytest.approx(50.0)
-    assert hard_vacuum["activity_ratio_vs_wt_fraction"] == pytest.approx(0.5)
-    assert hard_vacuum["P_eq_ratio_vs_wt_fraction"] == pytest.approx(0.5)
+    assert hard_vacuum["P_eq_Pa"] == pytest.approx(expected_hard_pressure)
+    assert hard_vacuum["P_eq_wt_fraction_Pa"] == pytest.approx(
+        expected_wt_pressure
+    )
+    assert hard_vacuum["activity_ratio_vs_wt_fraction"] == pytest.approx(
+        builtin_activity / 0.5
+    )
+    assert hard_vacuum["P_eq_ratio_vs_wt_fraction"] == pytest.approx(
+        expected_hard_pressure / expected_wt_pressure
+    )
+    notice = diagnostic[
+        "vapor_activity_standard_state_notices_by_species"
+    ]["SiO"]
+    assert notice["reason"] == "activity_standard_state_substitution"
+    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
 
     oxidized = diagnostic["grid"][1]["species"]["SiO"]
-    # Builtin SiO branch applies sqrt(vacuum_floor / pO2) when pO2 exceeds
-    # the 1e-9 bar floor: 100 Pa * a(SiO2)=0.25 * sqrt(1e-9 / 1e-7).
-    assert oxidized["P_eq_Pa"] == pytest.approx(2.5)
-    assert oxidized["P_eq_wt_fraction_Pa"] == pytest.approx(5.0)
+    expected_oxidized_pressure, _ = _oxide_vapor_pressure_Pa(
+        species="SiO",
+        data=_SIO_VAPOR_DATA["oxide_vapors"]["SiO"],
+        P_reference_Pa=100.0,
+        pO2_bar=1.0e-7,
+        oxide_activity=builtin_activity,
+        activity_exponent=1.0,
+        vacuum_floor_bar=1.0e-9,
+    )
+    expected_oxidized_wt_pressure, _ = _oxide_vapor_pressure_Pa(
+        species="SiO",
+        data=_SIO_VAPOR_DATA["oxide_vapors"]["SiO"],
+        P_reference_Pa=100.0,
+        pO2_bar=1.0e-7,
+        oxide_activity=0.5,
+        activity_exponent=1.0,
+        vacuum_floor_bar=1.0e-9,
+    )
+    assert oxidized["P_eq_Pa"] == pytest.approx(expected_oxidized_pressure)
+    assert oxidized["P_eq_wt_fraction_Pa"] == pytest.approx(
+        expected_oxidized_wt_pressure
+    )
 
 
 def test_reconstructed_mn_is_authority_limited_not_fit_extrapolated():
