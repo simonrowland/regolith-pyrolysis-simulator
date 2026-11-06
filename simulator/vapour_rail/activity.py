@@ -930,7 +930,7 @@ def henrian_unknown_gamma_upper_bound(
             provider="henrian_bound_policy",
             authority=False,
             report_label=BOUND_NOT_POINT,
-            refusal_code=ActivityRefusalCode.MONOTONICITY_UNPROVED,
+            refusal_code=ActivityRefusalCode.MISSING_EVIDENCE,
             detail=str(exc),
         )
 
@@ -1084,7 +1084,7 @@ class CondensedPhaseActivityProvider:
             if declaration.activity_model != "provider_reported_thermodynamic_activity":
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH,
                     "reported activity cannot answer activity_model "
                     f"{declaration.activity_model!r}",
                     standard_state=declaration.standard_state,
@@ -1114,7 +1114,7 @@ class CondensedPhaseActivityProvider:
             if not provider_id or reported_activity_standard_state is None:
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH,
                     "reported activity requires provider and standard-state identity",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
@@ -1142,7 +1142,7 @@ class CondensedPhaseActivityProvider:
             if not math.isfinite(value) or value <= 0.0:
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.NON_FINITE_POTENTIAL,
                     "reported activity must be finite and positive",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
@@ -1233,7 +1233,7 @@ class CondensedPhaseActivityProvider:
             ):
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.NON_FINITE_POTENTIAL,
                     "measured_gamma and mole_fraction must be numeric",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
@@ -1242,7 +1242,7 @@ class CondensedPhaseActivityProvider:
             if mole_fraction < 0.0 or not math.isfinite(mole_fraction):
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.NON_FINITE_POTENTIAL,
                     "mole_fraction must be finite and non-negative",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
@@ -1251,7 +1251,7 @@ class CondensedPhaseActivityProvider:
             if measured_gamma < 0.0 or not math.isfinite(measured_gamma):
                 return _refusal(
                     declaration.component_id,
-                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    ActivityRefusalCode.NON_FINITE_POTENTIAL,
                     "measured_gamma must be finite and non-negative",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,

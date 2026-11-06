@@ -457,15 +457,20 @@ def _d144_fusion_conversion(
 ) -> D144FusionConversion:
     """Return liquid-minus-solid Gibbs energy and its JANAF domain verdict.
 
-    For FeO, Fe-020 supplies the crystalline branch and then the liquid branch;
-    Fe-019 supplies the liquid standard. The premise is
-    ``mu = G° + RT ln(a)`` for each standard; equating potentials gives
-    ``a_cr = a_l * exp((G_l° - G_cr°)/RT)``. The exponent is dimensionless
-    because both Gibbs energy and RT are per mole. At 1500 K, JANAF gives
-    ``G_l° - G_cr° = +2.158 kJ/mol``, so liquid-to-crystal activity increases
-    by ``exp(+DeltaG/RT)``. JANAF's two FeO records coalesce at 1700 K; the
-    Fe Ellingham K selects liquid FeO from 1650 K, where the coupling is
-    already identity on the liquid standard.
+    For FeO, Fe-020 supplies the crystalline branch and then its liquid
+    branch; Fe-019 supplies the liquid standard. Fe Ellingham switches its K
+    basis at the Fe-020 FeO melting point, 1650 K. The JANAF Fe-019/Fe-020
+    difference at that boundary is 0.363 kJ/mol from separate tabulation, but
+    the two standards describe coexisting phases there, so their chemical
+    potentials must agree. Anchor the table difference by subtracting its
+    value at 1650 K. For either oxide, ``mu = G° + RT ln(a)``; equating the
+    liquid and crystal potentials gives
+    ``a_cr = a_l * exp((G_l° - G_cr°)/RT)``. The FeO anchor makes
+    ``DeltaG_fus(1650 K)=0`` and the activity multiplier one at the K switch,
+    so the pressure is continuous. DeltaG and RT are both energy per mole,
+    making the exponent dimensionless. The remaining FeO chord at 1500 K is
+    ``+1.795 kJ/mol`` after anchoring, so liquid-to-crystal activity increases
+    by ``exp(+DeltaG/RT)``.
     """
 
     pair = d144_fusion_table_pair(oxide)
@@ -486,6 +491,15 @@ def _d144_fusion_conversion(
     delta_g = _fusion_gibbs_difference_from_points(
         solid_points, liquid_points, temperature, extrapolate=True
     )
+    if oxide == "FeO":
+        feo_k_transition_K = Decimal("1650")
+        raw_transition_difference = _fusion_gibbs_difference_from_points(
+            solid_points,
+            liquid_points,
+            feo_k_transition_K,
+            extrapolate=True,
+        )
+        delta_g -= raw_transition_difference
     certified_band = (
         max(solid_points[0][0], liquid_points[0][0]),
         min(solid_points[-1][0], liquid_points[-1][0]),

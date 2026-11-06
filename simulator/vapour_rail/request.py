@@ -38,10 +38,6 @@ from simulator.backend_names import (
 )
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
-    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
-    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
-    crystalline_vapor_activity_standard_state_matches,
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
@@ -119,10 +115,9 @@ REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing
 REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
 REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 
-# These are recognized species-local outcomes: a request predicate/source atom
-# excludes one species, or a typed activity data gap prevents evaluating only
-# that species. Mixed codes with malformed-evidence details are handled below;
-# missing run-level state and other contract failures stay fail-closed.
+# These codes represent one-species applicability or evidence gaps. Emitters
+# must use separate codes for malformed values and identity/contract failures;
+# request closure therefore classifies by code alone.
 _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_ABSENT_SOURCE_ATOM,
@@ -140,24 +135,6 @@ _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     ActivityRefusalCode.UNMODELED_RESERVOIR_PRESENT.value,
     ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY.value,
     ActivityRefusalCode.REDOX_STATE_UNRESOLVED.value,
-})
-
-# A few stable refusal codes cover both data gaps and malformed evidence. Keep
-# those malformed cases fail-closed while allowing a missing row for one
-# species to demote only that species.
-_PRE_RG_FAIL_CLOSED_ACTIVITY_REFUSALS = frozenset({
-    (
-        ActivityRefusalCode.MISSING_EVIDENCE.value,
-        "reported activity must be finite and positive",
-    ),
-    (
-        ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY.value,
-        "Tier C mole fractions do not reconcile to the ordered inventory digest",
-    ),
-    (
-        ActivityRefusalCode.REDOX_STATE_UNRESOLVED.value,
-        "Fe redox basis/model identity does not match the admitted row",
-    ),
 })
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
@@ -1296,8 +1273,10 @@ def refusal_closure(
             source_reaction_activity=source_reaction_activity,
         )
 
-    def _outcome_state_refusal_detail(rule: RequestRule) -> str | None:
-        """Missing state that would determine the pressure answer → typed refuse.
+    def _outcome_state_refusal(
+        rule: RequestRule,
+    ) -> tuple[str, str] | None:
+        """Return the refusal code and detail for an unavailable answer.
 
         DESIGN-REV5 §1.2 / HI-8: never emit ``PressureValue(0.0)`` +
         ``FluxEligible`` as a stand-in for "could not evaluate". A deferred
@@ -1306,9 +1285,9 @@ def refusal_closure(
         """
 
         if state_identity_error is not None:
-            return state_identity_error
+            return REFUSAL_MISSING_OUTCOME_STATE, state_identity_error
         if state is None or state.temperature_K is None:
-            return (
+            return REFUSAL_MISSING_OUTCOME_STATE, (
                 "outcome-determining temperature_K absent from resolve state "
                 f"(species={rule.species_id})"
             )
@@ -1317,7 +1296,7 @@ def refusal_closure(
             # Contract flags may claim an evaluator exists while the live
             # catalog_species map was not supplied (or evaluator is pending).
             if rule.has_pressure_evaluator:
-                return (
+                return REFUSAL_NO_ADMITTED_SOURCE, (
                     "no live channel evaluator available for point evaluation "
                     f"(species={rule.species_id})"
                 )
@@ -1339,6 +1318,7 @@ def refusal_closure(
         # must resolve or refuse. Instrument the pure-component default so
         # the unit activity is typed, not silent.
         source_activity = 1.0
+        numeric_activity: float | None = None
         crystalline_vapor_activity_value: float | None = None
         _unit_activity_note: dict[str, Any] | None = None
         if (
@@ -1366,6 +1346,117 @@ def refusal_closure(
             evaluator_activity_exponent = float(
                 getattr(compiled.evaluator, "activity_exponent", 0.0) or 0.0
             )
+            reported_activity = state.source_reaction_activities.get(
+                rule.species_id
+            )
+            reported_standard_state = (
+                state.source_reaction_activity_standard_states.get(
+                    rule.species_id
+                )
+            )
+            reported_provenance = state.source_reaction_activity_provenance.get(
+                rule.species_id, {}
+            )
+            if not isinstance(reported_provenance, Mapping):
+                reported_provenance = {}
+            source_standard_state_id = reported_provenance.get(
+                "melt_oxide_activity_reference_state"
+            )
+            target_standard_state_id = reported_provenance.get(
+                "vapor_k_standard_state_id"
+            )
+            source_standard_state_phase = str(
+                reported_provenance.get(
+                    "melt_oxide_activity_reference_state_phase"
+                )
+                or ""
+            ).strip().lower()
+            target_standard_state_phase = str(
+                reported_provenance.get("vapor_k_standard_state_phase") or ""
+            ).strip().lower()
+            # A liquid source activity cannot feed a crystalline K silently.
+            # Standard IDs and their conversion notice travel with the value
+            # from the provider, so this protects every converted parent,
+            # including activity-independent evaluators such as Fe.
+            if (
+                source_standard_state_phase in {"liquid", "l", "liq"}
+                and target_standard_state_phase
+                in {"solid", "crystalline", "cr", "s"}
+            ):
+                conversion = reported_provenance.get(
+                    "activity_standard_state_conversion"
+                )
+                activity_for_k = reported_provenance.get(
+                    "vapor_activity_used_for_K"
+                )
+                crystalline_activity_for_k = reported_provenance.get(
+                    "vapor_activity_for_crystalline_K"
+                )
+                conversion_offset = (
+                    conversion.get("log10_activity_offset")
+                    if isinstance(conversion, Mapping)
+                    else None
+                )
+                raw_activity_is_valid = is_declared_real_scalar(
+                    reported_activity
+                )
+                activity_for_k_is_valid = is_declared_real_scalar(
+                    activity_for_k
+                )
+                crystalline_activity_is_valid = is_declared_real_scalar(
+                    crystalline_activity_for_k
+                )
+                try:
+                    raw_activity_value = float(reported_activity)
+                    activity_for_k_value = float(activity_for_k)
+                    crystalline_activity_value = float(
+                        crystalline_activity_for_k
+                    )
+                    conversion_offset_value = float(conversion_offset)
+                except (TypeError, ValueError):
+                    raw_activity_value = math.nan
+                    activity_for_k_value = math.nan
+                    crystalline_activity_value = math.nan
+                    conversion_offset_value = math.nan
+                if (
+                    not isinstance(source_standard_state_id, str)
+                    or not source_standard_state_id
+                    or not isinstance(target_standard_state_id, str)
+                    or not target_standard_state_id
+                    or not isinstance(conversion, Mapping)
+                    or conversion.get("from_standard_state_id")
+                    != source_standard_state_id
+                    or conversion.get("to_standard_state_id")
+                    != target_standard_state_id
+                    or conversion.get("conversion_performed") is not True
+                    or reported_provenance.get(
+                        "vapor_activity_standard_state_id_used_for_K"
+                    )
+                    != target_standard_state_id
+                    or not is_declared_real_scalar(conversion_offset)
+                    or not math.isfinite(conversion_offset_value)
+                    or not raw_activity_is_valid
+                    or not math.isfinite(raw_activity_value)
+                    or raw_activity_value <= 0.0
+                    or not activity_for_k_is_valid
+                    or not math.isfinite(activity_for_k_value)
+                    or activity_for_k_value <= 0.0
+                    or not crystalline_activity_is_valid
+                    or not math.isfinite(crystalline_activity_value)
+                    or crystalline_activity_value <= 0.0
+                    or activity_for_k_value != crystalline_activity_value
+                    or (
+                        conversion_offset_value != 0.0
+                        and activity_for_k_value == raw_activity_value
+                    )
+                ):
+                    return _make_refusal(
+                        rule,
+                        REFUSAL_MISSING_CHANNEL_CONTRACT,
+                        "crystalline vapor K requires converted activity with "
+                        "matching source and K standard-state provenance",
+                    )
+                crystalline_vapor_activity_value = activity_for_k_value
             if evaluator_activity_exponent != 0.0:
                 declaration = rule.source_reaction_activity
                 if declaration is None:
@@ -1389,16 +1480,8 @@ def refusal_closure(
                         declaration.component_id
                     )
                 )
-                reported_activity = state.source_reaction_activities.get(
-                    rule.species_id
-                )
                 evidence_ref = state.source_reaction_activity_evidence_refs.get(
                     rule.species_id
-                )
-                reported_standard_state = (
-                    state.source_reaction_activity_standard_states.get(
-                        rule.species_id
-                    )
                 )
                 if reported_activity is not None:
                     provider_id = state.source_reaction_activity_provider
@@ -1416,9 +1499,6 @@ def refusal_closure(
                             REFUSAL_MISSING_CHANNEL_CONTRACT,
                             "reported activity lacks its standard-state identity",
                         )
-                reported_provenance = state.source_reaction_activity_provenance.get(
-                    rule.species_id, {}
-                )
                 reported_mole_fraction = reported_provenance.get(
                     "melt_oxide_X_single_cation"
                 )
@@ -1473,61 +1553,10 @@ def refusal_closure(
                         source_reaction_activity=source_reaction_activity,
                     )
                 source_activity = numeric_activity
-                if declaration.component_id in (
-                    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
-                ):
-                    conversion = reported_provenance.get(
-                        "activity_standard_state_conversion"
-                    )
-                    vapor_activity = reported_provenance.get(
-                        "vapor_activity_for_crystalline_K"
-                    )
-                    vapor_activity_standard_state_id = reported_provenance.get(
-                        "vapor_activity_for_crystalline_K_standard_state_id"
-                    )
-                    if (
-                        reported_standard_state is None
-                        or reported_standard_state.phase != "liquid"
-                        or not isinstance(conversion, Mapping)
-                        or conversion.get("from_standard_state_id")
-                        != MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-                        or not crystalline_vapor_activity_standard_state_matches(
-                            declaration.component_id,
-                            conversion.get("to_standard_state_id"),
-                        )
-                        or not crystalline_vapor_activity_standard_state_matches(
-                            declaration.component_id,
-                            vapor_activity_standard_state_id,
-                        )
-                        or not is_declared_real_scalar(vapor_activity)
-                    ):
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_CHANNEL_CONTRACT,
-                            "crystalline vapor K requires its d-349 converted "
-                            "activity and matching standard-state ID",
-                            source_reaction_activity=source_reaction_activity,
-                        )
-                    try:
-                        vapor_activity_value = float(vapor_activity)
-                    except (TypeError, ValueError):
-                        vapor_activity_value = math.nan
-                    if not math.isfinite(vapor_activity_value) or (
-                        vapor_activity_value <= 0.0
-                    ):
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_CHANNEL_CONTRACT,
-                            "crystalline vapor K activity must be finite and "
-                            "positive",
-                            source_reaction_activity=source_reaction_activity,
-                        )
-                    # The converted operand and K standard-state ID travel
-                    # together in this species' provenance. Keep the liquid
-                    # activity above for handshake validation; only this value
-                    # enters the crystalline K.
-                    source_activity = vapor_activity_value
-                    crystalline_vapor_activity_value = vapor_activity_value
+                if crystalline_vapor_activity_value is not None:
+                    # Preserve the liquid value in the activity handshake;
+                    # evaluate the crystalline K with its declared operand.
+                    source_activity = crystalline_vapor_activity_value
             else:
                 # Pure-component / activity-independent evaluator: a=1 is
                 # the correct dimensionless unit activity, but it was
@@ -1660,16 +1689,12 @@ def refusal_closure(
                         shadow_activity = source_reaction_activity_shadow
                         if (
                             declaration is not None
-                            and declaration.component_id
-                            in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
                             and crystalline_vapor_activity_value is not None
                         ):
                             expected_shadow_standard_state = replace(
                                 declaration.standard_state,
                                 phase="crystalline",
-                                identity_id=(
-                                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-                                ),
+                                identity_id=str(target_standard_state_id),
                             )
                             shadow_source_standard_state = (
                                 shadow_activity.source_standard_state
@@ -1680,6 +1705,9 @@ def refusal_closure(
                                 shadow_value is not None
                                 and math.isfinite(float(shadow_value))
                                 and float(shadow_value) > 0.0
+                                and numeric_activity is not None
+                                and math.isfinite(float(numeric_activity))
+                                and float(numeric_activity) > 0.0
                             ):
                                 converted_shadow_value = (
                                     float(shadow_value)
@@ -1809,10 +1837,11 @@ def refusal_closure(
                 return _make_refusal(
                     rule, REFUSAL_MISSING_CHANNEL_CONTRACT, contract_detail
                 )
-            state_detail = _outcome_state_refusal_detail(rule)
-            if state_detail is not None:
+            state_refusal = _outcome_state_refusal(rule)
+            if state_refusal is not None:
+                state_code, state_detail = state_refusal
                 return _make_refusal(
-                    rule, REFUSAL_MISSING_OUTCOME_STATE, state_detail
+                    rule, state_code, state_detail
                 )
             # Reachable only if evaluator was present but returned no pressure
             # without raising — still refuse rather than fabricate a zero.
@@ -1987,10 +2016,11 @@ def refusal_closure(
 
             # 5) Missing outcome-determining state (temperature / live
             #    evaluator). Typed refusal — never a flux-active zero.
-            state_detail = _outcome_state_refusal_detail(rule)
-            if state_detail is not None:
+            state_refusal = _outcome_state_refusal(rule)
+            if state_refusal is not None:
+                state_code, state_detail = state_refusal
                 answers[species_id] = _make_refusal(
-                    rule, REFUSAL_MISSING_OUTCOME_STATE, state_detail
+                    rule, state_code, state_detail
                 )
                 refused.add(species_id)
                 changed = True
@@ -2854,11 +2884,7 @@ def resolve_vapour_batch(
         claimed = flux_activation_context.effective_pressure_species_ids
 
         def _is_species_local_refusal(answer: VapourAnswer) -> bool:
-            code = answer.refusal_code
-            if code not in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES:
-                return False
-            detail = str(answer.extra.get("detail") or "")
-            return (code, detail) not in _PRE_RG_FAIL_CLOSED_ACTIVITY_REFUSALS
+            return answer.refusal_code in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES
 
         fail_closed_refusals = {
             species_id: answer.refusal_code or "unknown_refusal"
@@ -2866,12 +2892,7 @@ def resolve_vapour_batch(
             if answer.is_refused
             and (
                 species_id in claimed
-                or (
-                    answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
-                    and not str(
-                        answer.extra.get("detail") or ""
-                    ).startswith("no live channel evaluator available")
-                )
+                or answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
             )
             and not _is_species_local_refusal(answer)
         }

@@ -1691,7 +1691,7 @@ class MeltActivityResolver:
         except (KeyError, TypeError, ValueError):
             return self._refusal(
                 query,
-                ActivityRefusalCode.MISSING_EVIDENCE,
+                ActivityRefusalCode.VALIDATION_BAND_UNAVAILABLE,
                 "Tier A row has no valid T/P domain",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
@@ -1710,7 +1710,7 @@ class MeltActivityResolver:
         if query.matrix_domain_ref != domain.get("matrix_domain_ref"):
             return self._refusal(
                 query,
-                ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED,
+                ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH,
                 "query matrix-domain receipt does not match the admitted row",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
@@ -1954,7 +1954,7 @@ class MeltActivityResolver:
         ):
             return self._refusal(
                 query,
-                ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 "Tier C requires a finite normalized complete mole-fraction basis",
                 tier=ActivityTier.C,
                 model_row_id=row_id,
@@ -2000,7 +2000,7 @@ class MeltActivityResolver:
         ):
             return self._refusal(
                 query,
-                ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY,
+                ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH,
                 "Tier C mole fractions do not reconcile to the ordered inventory digest",
                 tier=ActivityTier.C,
                 model_row_id=row_id,
@@ -2028,7 +2028,7 @@ class MeltActivityResolver:
         if not math.isfinite(mole_fraction) or mole_fraction < 0.0:
             return self._refusal(
                 query,
-                ActivityRefusalCode.MISSING_EVIDENCE,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 "component mole fraction must be finite and non-negative",
                 tier=ActivityTier.C,
                 model_row_id=None,
@@ -2165,7 +2165,7 @@ class MeltActivityResolver:
         if not math.isfinite(value) or value <= 0.0:
             return self._refusal(
                 query,
-                ActivityRefusalCode.MISSING_EVIDENCE,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 "legacy shadow adapter requires a finite positive activity",
                 tier=None,
                 model_row_id=row_id,
@@ -2257,7 +2257,7 @@ class MeltActivityResolver:
         ):
             return self._refusal(
                 query,
-                ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+                ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH,
                 "Fe redox basis/model identity does not match the admitted row",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
@@ -2309,11 +2309,14 @@ class MeltActivityResolver:
                 tier=ActivityTier.A,
                 model_row_id=row_id,
             )
-        pressure_control = float(query.redox_model_pressure_bar)
+        try:
+            pressure_control = float(query.redox_model_pressure_bar)
+        except (TypeError, ValueError):
+            pressure_control = math.nan
         if not math.isfinite(pressure_control) or pressure_control <= 0.0:
             return self._refusal(
                 query,
-                ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 "Kress-Carmichael pressure control must be finite and positive",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
@@ -2334,7 +2337,7 @@ class MeltActivityResolver:
         except (TypeError, ValueError) as exc:
             return self._refusal(
                 query,
-                ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 f"Kress-Carmichael input refused: {exc}",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
@@ -2342,7 +2345,7 @@ class MeltActivityResolver:
         if not math.isfinite(typed_value) or typed_value <= 0.0:
             return self._refusal(
                 query,
-                ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+                ActivityRefusalCode.NON_FINITE_POTENTIAL,
                 "Kress-Carmichael produced no positive FeO activity",
                 tier=ActivityTier.A,
                 model_row_id=row_id,

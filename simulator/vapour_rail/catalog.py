@@ -1601,16 +1601,20 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
-def catalog_vapor_parent_standard_state_phases(
+def catalog_vapor_parent_standard_states(
     catalog_payload: Mapping[str, Any] | None,
-) -> dict[str, str | None]:
-    """Resolve declared K phases for each selected vapor parent.
+) -> dict[
+    str,
+    tuple[StandardStateIdentity | None, StandardStateIdentity | None],
+]:
+    """Resolve source-activity and K identities for each selected parent.
 
     ``thermodynamic_standard_state`` is the selected reaction K basis. Older
     rows omit that field; for those rows, the selected reaction's
-    ``activity_input.standard_state`` is the catalog's declared basis. If
-    selected routes for one parent disagree, return ``None`` for that parent
-    so consumers cannot silently call it an identity.
+    ``activity_input.standard_state`` is the catalog's declared K basis. The
+    first identity is the activity-input standard; the second is the K
+    standard. If selected routes disagree on either identity, that side is
+    ``None`` so consumers cannot silently call it an identity.
     """
 
     if not isinstance(catalog_payload, Mapping):
@@ -1618,7 +1622,10 @@ def catalog_vapor_parent_standard_state_phases(
     families = catalog_payload.get("families")
     if not isinstance(families, Mapping):
         return {}
-    phases_by_parent: dict[str, set[str]] = {}
+    source_states_by_parent: dict[
+        str, set[StandardStateIdentity | None]
+    ] = {}
+    k_states_by_parent: dict[str, set[StandardStateIdentity | None]] = {}
     for family in families.values():
         if not isinstance(family, Mapping):
             continue
@@ -1664,17 +1671,44 @@ def catalog_vapor_parent_standard_state_phases(
                 if isinstance(thermodynamic, Mapping)
                 else producer
             )
-            phase = (
-                str(standard.get("phase") or "").strip().lower()
-                if isinstance(standard, Mapping)
-                else ""
+            source_identity = _catalog_standard_state_identity(
+                producer,
+                label=f"{reaction_id}.activity_input.standard_state",
             )
-            if phase:
-                phases_by_parent.setdefault(parent, set()).add(phase)
+            k_identity = _catalog_standard_state_identity(
+                standard,
+                label=f"{reaction_id}.thermodynamic_standard_state",
+            )
+            source_states_by_parent.setdefault(parent, set()).add(source_identity)
+            k_states_by_parent.setdefault(parent, set()).add(k_identity)
+
+    def one_identity(
+        states: set[StandardStateIdentity | None],
+    ) -> StandardStateIdentity | None:
+        return next(iter(states)) if len(states) == 1 else None
+
     return {
-        parent: next(iter(phases)) if len(phases) == 1 else None
-        for parent, phases in phases_by_parent.items()
+        parent: (
+            one_identity(source_states_by_parent[parent]),
+            one_identity(k_states_by_parent[parent]),
+        )
+        for parent in source_states_by_parent
     }
+
+
+def _catalog_standard_state_identity(
+    raw: Any,
+    *,
+    label: str,
+) -> StandardStateIdentity | None:
+    if not isinstance(raw, Mapping):
+        return None
+    try:
+        return StandardStateIdentity.from_mapping(raw)
+    except (TypeError, ValueError) as exc:
+        raise CatalogCompileError(
+            f"{label} is not a valid standard-state identity"
+        ) from exc
 
 
 class VapourRailCatalog:
@@ -2895,6 +2929,19 @@ def _compile_source_reaction_activity(
             reference_temperature,
             f"{species_id}.{reaction_id}.activity_input.reference_temperature_K",
         )
+    identity_id = standard_raw.get("id")
+    component_standard_id = standard_raw.get("component_id")
+    for field_name, value in (
+        ("id", identity_id),
+        ("component_id", component_standard_id),
+    ):
+        if value is not None and (
+            not isinstance(value, str) or not value.strip()
+        ):
+            raise CatalogCompileError(
+                f"{species_id}.{reaction_id}.activity_input.standard_state."
+                f"{field_name} must be a non-empty string"
+            )
     standard_state = StandardStateIdentity(
         convention=_required_string(
             standard_raw.get("convention"),
@@ -2912,6 +2959,12 @@ def _compile_source_reaction_activity(
         component_basis=_required_string(
             standard_raw.get("component_basis"),
             f"{species_id}.{reaction_id}.activity_input.standard_state.component_basis",
+        ),
+        identity_id=identity_id.strip() if isinstance(identity_id, str) else None,
+        component_id=(
+            component_standard_id.strip()
+            if isinstance(component_standard_id, str)
+            else None
         ),
     )
     return reaction_id, ActivityInputDeclaration(

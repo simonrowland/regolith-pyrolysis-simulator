@@ -713,22 +713,35 @@ def _activity_for_crystalline_vapor_k(
     *,
     source_standard_state_id: str | None = None,
     target_standard_state_id: str | None = None,
+    source_standard_state_phase: str | None = None,
+    target_standard_state_phase: str | None = None,
 ) -> tuple[float, dict[str, Any] | None, str | None]:
     """Put a declared activity on the selected vapor reaction's K basis."""
 
     temperature = float(temperature_K)
     source_id = source_standard_state_id
     target_id = target_standard_state_id
-    source_phase = _activity_standard_state_phase(source_id)
-    target_phase = _activity_standard_state_phase(target_id)
+    source_phase = _normalize_standard_state_phase(
+        source_standard_state_phase
+    ) or _activity_standard_state_phase(source_id)
+    target_phase = _normalize_standard_state_phase(
+        target_standard_state_phase
+    ) or _activity_standard_state_phase(target_id)
     base_notice = {
         "oxide": parent_oxide,
         "from_standard_state_id": source_id,
+        "from_standard_state_phase": source_phase,
         "to_standard_state_id": target_id,
+        "to_standard_state_phase": target_phase,
         "temperature_K": temperature,
         "certified_band_K": [],
     }
-    if source_id is not None and source_id == target_id:
+    if (
+        source_id is not None
+        and source_id == target_id
+        and source_phase is not None
+        and source_phase == target_phase
+    ):
         notice = {
             **base_notice,
             "log10_activity_offset": 0.0,
@@ -745,6 +758,9 @@ def _activity_for_crystalline_vapor_k(
         source_phase is not None
         and target_phase is not None
         and source_phase != target_phase
+        and source_id is not None
+        and target_id is not None
+        and source_id != target_id
         and d144_fusion_table_pair(parent_oxide) is not None
     ):
         conversion = _convert_melt_oxide_activity_reference_state(
@@ -795,6 +811,15 @@ def _activity_standard_state_phase(standard_state_id: str | None) -> str | None:
     return None
 
 
+def _normalize_standard_state_phase(phase: str | None) -> str | None:
+    normalized = str(phase or "").strip().lower()
+    if normalized in {"liquid", "l", "liq"}:
+        return "liquid"
+    if normalized in {"solid", "crystalline", "cr", "s"}:
+        return "solid"
+    return None
+
+
 def _activity_standard_state_id_for_phase(phase: str | None) -> str | None:
     normalized = str(phase or "").strip().lower()
     if normalized in {"liquid", "l", "liq"}:
@@ -804,12 +829,36 @@ def _activity_standard_state_id_for_phase(phase: str | None) -> str | None:
     return None
 
 
-def _vapor_k_standard_state_id(
+def _vapor_activity_source_standard_state(
+    parent_oxide: str,
+    runtime_standard_state_id: str | None,
+    catalog_standard_states: Mapping[
+        str, tuple[Any | None, Any | None]
+    ],
+) -> tuple[str | None, str | None]:
+    """Carry an explicit catalog source ID when one is declared."""
+
+    pair = catalog_standard_states.get(parent_oxide)
+    source = pair[0] if pair is not None else None
+    if source is not None and source.identity_id is not None:
+        return (
+            source.identity_id,
+            _normalize_standard_state_phase(source.phase),
+        )
+    return (
+        runtime_standard_state_id,
+        _activity_standard_state_phase(runtime_standard_state_id),
+    )
+
+
+def _vapor_k_standard_state(
     parent_oxide: str,
     temperature_K: float,
-    catalog_phases: Mapping[str, str | None],
-) -> str | None:
-    """Resolve the selected vapor K standard for one parent oxide."""
+    catalog_standard_states: Mapping[
+        str, tuple[Any | None, Any | None]
+    ],
+) -> tuple[str | None, str | None]:
+    """Resolve the selected vapor K identity and phase for one parent."""
 
     if parent_oxide == "FeO":
         from simulator.chemistry.ellingham_thermo import (
@@ -824,15 +873,23 @@ def _vapor_k_standard_state_id(
             phase = "liquid"
         else:
             phase = None
-    elif parent_oxide in catalog_phases:
-        phase = catalog_phases[parent_oxide]
+    elif parent_oxide in catalog_standard_states:
+        pair = catalog_standard_states[parent_oxide]
+        target = pair[1]
+        if target is None:
+            return None, None
+        phase = _normalize_standard_state_phase(target.phase)
+        return (
+            target.identity_id or _activity_standard_state_id_for_phase(phase),
+            phase,
+        )
     elif parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
         # The schema-v1 compatibility route has no catalog declaration; retain
         # its existing MgO/CaO crystalline-K contract.
         phase = "solid"
     else:
         phase = None
-    return _activity_standard_state_id_for_phase(phase)
+    return _activity_standard_state_id_for_phase(phase), phase
 
 
 def _melt_oxide_activity_standard_state_id(parent_oxide: str) -> str:
@@ -1121,10 +1178,12 @@ def _builtin_vapor_activities_from_weight_composition(
         vapor_pressure_data, "catalog_payload", vapor_pressure_data
     )
     from simulator.vapour_rail.catalog import (
-        catalog_vapor_parent_standard_state_phases,
+        catalog_vapor_parent_standard_states,
     )
 
-    target_phases = catalog_vapor_parent_standard_state_phases(catalog_payload)
+    catalog_standard_states = catalog_vapor_parent_standard_states(
+        catalog_payload
+    )
     projected: dict[str, _BuiltinVaporActivity] = {}
     parents = set(MELT_OXIDE_ACTIVITY_COEFFICIENTS).intersection(composition_mol)
     if "FeO" in composition_mol:
@@ -1157,10 +1216,21 @@ def _builtin_vapor_activities_from_weight_composition(
             source_standard_state_id = str(
                 source.provenance()["melt_oxide_activity_reference_state"]
             )
-        target_standard_state_id = _vapor_k_standard_state_id(
+        (
+            source_standard_state_id,
+            source_standard_state_phase,
+        ) = _vapor_activity_source_standard_state(
+            parent,
+            source_standard_state_id,
+            catalog_standard_states,
+        )
+        (
+            target_standard_state_id,
+            target_standard_state_phase,
+        ) = _vapor_k_standard_state(
             parent,
             temperature_K,
-            target_phases,
+            catalog_standard_states,
         )
         activity, notice, warning = _activity_for_crystalline_vapor_k(
             parent,
@@ -1168,6 +1238,8 @@ def _builtin_vapor_activities_from_weight_composition(
             temperature_K,
             source_standard_state_id=source_standard_state_id,
             target_standard_state_id=target_standard_state_id,
+            source_standard_state_phase=source_standard_state_phase,
+            target_standard_state_phase=target_standard_state_phase,
         )
         if activity <= 0.0:
             continue

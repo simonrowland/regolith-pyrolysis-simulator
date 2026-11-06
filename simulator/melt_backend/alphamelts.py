@@ -6409,6 +6409,15 @@ class _MELTSBackendSupport(MeltBackend):
                     "melt_oxide_activity_reference_state": (
                         builtin_vapor_activity.source_standard_state_id
                     ),
+                    "melt_oxide_activity_reference_state_phase": (
+                        notice.get("from_standard_state_phase")
+                    ),
+                    "vapor_k_standard_state_id": (
+                        notice.get("to_standard_state_id")
+                    ),
+                    "vapor_k_standard_state_phase": (
+                        notice.get("to_standard_state_phase")
+                    ),
                     "vapor_activity_used_for_K": raw_activity,
                     "vapor_activity_standard_state_id_used_for_K": (
                         notice["to_standard_state_id"]
@@ -6419,8 +6428,8 @@ class _MELTSBackendSupport(MeltBackend):
                     ),
                 }
                 if (
-                    notice["to_standard_state_id"]
-                    == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                    str(notice.get("to_standard_state_phase") or "").lower()
+                    in {"solid", "crystalline", "cr", "s"}
                     and (
                         notice["conversion_performed"]
                         or notice["from_standard_state_id"]
