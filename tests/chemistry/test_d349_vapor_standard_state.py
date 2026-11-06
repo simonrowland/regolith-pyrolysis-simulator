@@ -823,7 +823,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         )
         assert notice["to_standard_state_id"] == (
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-            if species in {"Mg", "Ca", "Fe"}
+            if species in {"Mg", "Ca"}
             else MELT_OXIDE_ACTIVITY_REFERENCE_STATE
         )
 
