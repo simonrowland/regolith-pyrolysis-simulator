@@ -4050,7 +4050,7 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
     # Missing physical state refuses K, so pre-RG activation fails closed.
     with pytest.raises(
         VapourRequestConstructionError,
-        match="pre-RG effective-pressure channels are not flux-eligible",
+        match="pre-RG request has a fail-closed channel contract or outcome-state refusal",
     ):
         catalog.resolve_batch(
             ledger,
