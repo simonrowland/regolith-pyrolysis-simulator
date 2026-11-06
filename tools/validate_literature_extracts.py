@@ -1310,6 +1310,26 @@ def _check_observation(
                 f"(misplaced top-level key refused)"
             )
 
+    if "standard_pressure" in obs:
+        if obs["standard_pressure"] != "not_printed":
+            errors.append(
+                f"{path}.standard_pressure: must be 'not_printed' when present"
+            )
+        elif (
+            str(obs.get("phase") or "").strip().casefold() in {"g", "gas"}
+            and isinstance(obs.get("values"), Mapping)
+            and obs["values"].get("quantity") == "delta_fG"
+        ):
+            temperature = obs["values"].get("T_K")
+            try:
+                temperature_value = float(temperature)
+                if not math.isfinite(temperature_value) or temperature_value <= 0:
+                    raise ValueError
+            except (OverflowError, TypeError, ValueError):
+                errors.append(
+                    f"{path}.standard_pressure: gas delta_fG rows require a positive row values.T_K"
+                )
+
     if "values" not in obs or obs["values"] is None:
         errors.append(
             f"{path}: values is required (empty/null-only payloads refused; "

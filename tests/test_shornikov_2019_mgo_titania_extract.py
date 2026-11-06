@@ -9,8 +9,19 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, ValueKind
+from simulator.battery.enums import (
+    AdmissionStatus,
+    NoticeKind,
+    UncertaintyKind,
+    ValueKind,
+)
+from simulator.battery.identity import (
+    PA_PER_ATM_DEC,
+    PA_PER_BAR_DEC,
+    standard_pressure_delta_g_kJ_per_mol,
+)
 from simulator.battery.migrate import Migrator
+from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -203,3 +214,117 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     assert estimate.value.point == Decimal("-856")
     assert estimate.value.approximate
     assert estimate.identity.temperature_K.value == Decimal("298")
+
+
+def _migrate_extract_document(document: dict, path: Path):
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    migrator = Migrator(root=ROOT, index=None, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    return migrator.result
+
+
+def _source_observation(document: dict, observation_id: str) -> dict:
+    return next(
+        row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+        if row["observation_id"] == observation_id
+    )
+
+
+def _migrated_observation(result, observation_id: str):
+    return next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(observation_id)
+    )
+
+
+@pytest.mark.parametrize("temperature_K", ("2173", "2973"))
+def test_unprinted_standard_pressure_derives_gas_band_at_row_temperature(
+    tmp_path: Path, temperature_K: str
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    row = _source_observation(document, observation_id)
+    row["standard_pressure"] = "not_printed"
+    row["values"]["T_K"] = temperature_K
+
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    observation = _migrated_observation(result, observation_id)
+
+    expected = abs(
+        standard_pressure_delta_g_kJ_per_mol(
+            Decimal("1"),
+            Decimal(temperature_K),
+            PA_PER_BAR_DEC,
+            PA_PER_ATM_DEC,
+        )
+    )
+    assert observation.uncertainty.kind is UncertaintyKind.DERIVED
+    assert observation.uncertainty.value == expected
+    assert observation.uncertainty.basis == "kJ/mol"
+    if temperature_K == "2973":
+        assert abs(expected - Decimal("0.33")) < Decimal("0.005")
+    notice = next(
+        notice for notice in observation.notices
+        if notice.kind is NoticeKind.INPUT_OMITTED
+    )
+    assert notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"
+
+
+def test_unprinted_standard_pressure_condensed_row_gets_notice_only(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r03_c02"
+    row = _source_observation(document, observation_id)
+    row["standard_pressure"] = "not_printed"
+
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    observation = _migrated_observation(result, observation_id)
+
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"
+        for notice in observation.notices
+    )
+
+
+def test_absent_standard_pressure_keeps_existing_gas_uncertainty_behavior(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    row = _source_observation(document, observation_id)
+    row.pop("standard_pressure", None)
+
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    observation = _migrated_observation(result, observation_id)
+
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert not any(
+        notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"
+        for notice in observation.notices
+    )
+
+
+def test_standard_pressure_declaration_is_closed_and_requires_gas_temperature() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    row = _source_observation(document, observation_id)
+    row["standard_pressure"] = "one_bar"
+    assert any(
+        ".standard_pressure: must be 'not_printed'" in error
+        for error in validate_extract_document(document, expected_source_id=SOURCE_ID)
+    )
+
+    row["standard_pressure"] = "not_printed"
+    row["values"].pop("T_K")
+    assert any(
+        ".standard_pressure: gas delta_fG rows require a positive row values.T_K"
+        in error
+        for error in validate_extract_document(document, expected_source_id=SOURCE_ID)
+    )

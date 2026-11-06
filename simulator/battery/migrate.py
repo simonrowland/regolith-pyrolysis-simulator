@@ -152,6 +152,7 @@ from simulator.battery.identity import (
     Identity,
     IdentityRefusal,
     PA_PER_ATM_DEC,
+    PA_PER_BAR_DEC,
     StandardState,
     SweepIdentity,
     THERMOCHEMICAL_CALORIE_J,
@@ -166,6 +167,7 @@ from simulator.battery.identity import (
     identity_equal,
     profile_for,
     quantity_token,
+    standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
@@ -1083,6 +1085,8 @@ def _hold_reason_notice(
     lowered = reason.lower()
     if include_misprint and lowered.startswith("probable source misprint"):
         kind = NoticeKind.PROBABLE_SOURCE_MISPRINT
+    elif lowered == "standard pressure unprinted (1 bar vs 1 atm)":
+        kind = NoticeKind.INPUT_OMITTED
     elif lowered.startswith("out_of_certified_band:"):
         kind = NoticeKind.OUT_OF_CERTIFIED_BAND
     elif _is_source_internally_inconsistent(
@@ -23848,6 +23852,50 @@ class Migrator:
         observation_notices: list[Notice] = []
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
+        if obs.get("standard_pressure") == "not_printed":
+            standard_pressure_notice = _hold_reason_notice(
+                "standard pressure unprinted (1 bar vs 1 atm)",
+                quantity=q_token,
+                origin=obs_id,
+            )
+            if standard_pressure_notice is not None:
+                observation_notices.append(standard_pressure_notice)
+            if (
+                q_token is Quantity.DELTA_FG
+                and phase.is_value
+                and phase.value is Phase.G
+            ):
+                row_temperature_K = _as_dec_or_none(values.get("T_K"))
+                if row_temperature_K is None or row_temperature_K <= 0:
+                    raise ValueError(
+                        f"{obs_id}: gas delta_fG with unprinted standard pressure "
+                        "requires a positive row values.T_K"
+                    )
+                # Premise: the printed gas standard state may mean 1 bar or 1 atm.
+                # Algebra: |ΔG| = |RT ln(p_atm/p_bar)| per mole of gas.
+                # Units: J/(mol K) × K / 1000 = kJ/mol.
+                # Check: at 2973 K the width is about 0.33 kJ/mol.
+                pressure_width = abs(
+                    standard_pressure_delta_g_kJ_per_mol(
+                        Decimal("1"),
+                        row_temperature_K,
+                        PA_PER_BAR_DEC,
+                        PA_PER_ATM_DEC,
+                    )
+                )
+                uncertainty = Uncertainty(
+                    kind=UncertaintyKind.DERIVED,
+                    value=pressure_width,
+                    basis="kJ/mol",
+                    derivation=Derivation(
+                        relation=(
+                            "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+                        ),
+                        inputs=(),
+                        parameters=(),
+                        output_unit="kJ/mol",
+                    ),
+                )
         identity, point_conditions, observation_notices = (
             _initial_charge_only_missing_composition(
                 identity,

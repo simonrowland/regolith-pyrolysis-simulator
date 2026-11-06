@@ -491,6 +491,16 @@ optional and records only a source-stated direction. For Cr glass valence
 fractions, an oxidising direction is reported as a notice and does not gate
 scoring.
 
+### Standard pressure declaration
+
+An observation may set `standard_pressure: not_printed` when the source does
+not print its standard pressure. This is a closed one-value enum; omit the key
+when the source does not declare this fact. During migration, gas-phase
+`delta_fG` rows with this declaration receive a notice for the 1 bar versus
+1 atm ambiguity and a derived absolute uncertainty width of `RT ln(1.01325)`
+at the row's printed temperature. The width is derived during migration and is
+never written into the extract.
+
 ### Uncertainty (first-class)
 
 Each observation **retains stated uncertainty verbatim** under `uncertainty`
