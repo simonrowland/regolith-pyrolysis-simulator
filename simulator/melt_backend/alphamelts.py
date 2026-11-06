@@ -3107,10 +3107,14 @@ class _MELTSBackendSupport(MeltBackend):
                     eq.warnings.append(FO2_GAS_ONLY_NOTICE)
                 vapor_fO2_log = float(gas_only_fo2_log)
 
+            self._antoine_activity_standard_state_notices = {}
+            self._antoine_activity_standard_state_activities = {}
+            self._antoine_activity_standard_state_provenance = {}
             # Vapor pressures via the real VapoRock helper if available,
             # fed the SOLVED equilibrium liquid composition (not the
             # pre-equilibrium input); explicit Antoine fallback otherwise.
             vaporock_envelope_diagnostics: dict[str, Any] = {}
+            antoine_fallback_used = False
             if self._vaporock_available:
                 eq.vapor_pressures_Pa, source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
@@ -3125,6 +3129,8 @@ class _MELTSBackendSupport(MeltBackend):
                 vaporock_envelope_diagnostics = (
                     _h2_melt_envelope_diagnostics(temperature_C)
                 )
+                if self._vapor_pressure_degraded_to_antoine(source):
+                    antoine_fallback_used = True
             else:
                 # Activity x Antoine fallback when VapoRock is unavailable.
                 # Activities here are whatever _parse_petthermotools_result
@@ -3138,7 +3144,7 @@ class _MELTSBackendSupport(MeltBackend):
                 projection = self._activities_times_antoine_or_fail(
                     temperature_C,
                     eq.activity_coefficients,
-                    comp_wt,
+                    eq.liquid_composition_wt_pct,
                     context='PetThermoTools VapoRock fallback unavailable',
                     **antoine_kwargs,
                 )
@@ -3146,15 +3152,21 @@ class _MELTSBackendSupport(MeltBackend):
                     projection,
                     base_source='alphamelts_python_api',
                 )
+                antoine_fallback_used = True
             eq.vapor_pressures_source = self._vapor_pressure_source_map(
                 eq.vapor_pressures_Pa,
                 source,
             )
+            diagnostic_payload = {
+                **eq.diagnostics,
+                **vaporock_envelope_diagnostics,
+            }
+            if antoine_fallback_used:
+                diagnostic_payload['source_reaction_composition_wt_pct'] = dict(
+                    eq.liquid_composition_wt_pct or {}
+                )
             eq.diagnostics = self._vapor_pressure_diagnostics(
-                {
-                    **eq.diagnostics,
-                    **vaporock_envelope_diagnostics,
-                },
+                diagnostic_payload,
                 eq.vapor_pressures_Pa,
                 source,
             )
@@ -6232,6 +6244,7 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species): dict(notice)
                 for species, notice in standard_state_notices.items()
             }
+        payload.update(self._antoine_activity_gateway_diagnostics())
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -6263,6 +6276,33 @@ class _MELTSBackendSupport(MeltBackend):
                 'vaporock_unavailable_not_attempted'
             )
         return payload
+
+    def _antoine_activity_gateway_diagnostics(self) -> dict[str, Any]:
+        """Return only the declared built-in activities substituted by AlphaMELTS."""
+
+        activities = dict(
+            getattr(self, "_antoine_activity_standard_state_activities", {}) or {}
+        )
+        provenance = dict(
+            getattr(self, "_antoine_activity_standard_state_provenance", {}) or {}
+        )
+        if not activities or not provenance:
+            return {}
+        # AlphaMELTS proxy values remain untyped. The catalog sees only these
+        # routes' built-in liquid activities and their owner-produced K-basis
+        # conversion, matching BuiltinVaporPressureProvider's handshake.
+        return {
+            "activities": activities,
+            "activities_provider": "BuiltinVaporPressureProvider",
+            "activities_standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "liquid",
+                "reference_pressure_bar": 1.0,
+                "reference_temperature_K": None,
+                "component_basis": "raoultian_pure_endmember",
+            },
+            "vapor_pressure_numerator_provenance": provenance,
+        }
 
     def _activities_times_antoine(
         self,
@@ -6318,6 +6358,8 @@ class _MELTSBackendSupport(MeltBackend):
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
         self._antoine_activity_standard_state_notices = {}
+        self._antoine_activity_standard_state_activities = {}
+        self._antoine_activity_standard_state_provenance = {}
         for species, spec in table.items():
             if species not in ELLINGHAM_THERMO and not spec.get('antoine'):
                 # Retain this bridge's original oxide-gas request surface.
@@ -6348,6 +6390,18 @@ class _MELTSBackendSupport(MeltBackend):
                 self._antoine_activity_standard_state_notices[
                     str(species)
                 ] = notice
+                self._antoine_activity_standard_state_activities[
+                    str(species)
+                ] = float(builtin_vapor_activity.liquid_activity)
+                self._antoine_activity_standard_state_provenance[
+                    str(species)
+                ] = {
+                    "activity_standard_state_conversion": dict(notice),
+                    "vapor_activity_for_crystalline_K": raw_activity,
+                    "vapor_activity_for_crystalline_K_standard_state_id": (
+                        notice["to_standard_state_id"]
+                    ),
+                }
             elif (
                 self._antoine_uses_reaction_pressure(spec)
                 and parent_oxide

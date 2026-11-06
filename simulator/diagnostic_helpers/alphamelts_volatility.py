@@ -184,7 +184,9 @@ def alphamelts_activity_volatility_diagnostic(
             temperature_C=float(temperature_C),
             pO2_bar=pO2_bar,
             melt_oxide_activities=activities,
-            composition_wt_pct=comp_wt,
+            composition_wt_pct=(
+                primary["liquid_composition_wt_pct"] or comp_wt
+            ),
             vacuum_floor_bar=float(vacuum_floor_bar),
         )
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
@@ -1053,6 +1055,11 @@ def _source_extrapolation_limits(*samples: Mapping[str, Any]) -> dict[str, Any]:
 def _coerce_activity_sample(value: Any) -> dict[str, Any]:
     if isinstance(value, Mapping):
         diagnostics = dict(value.get("diagnostics", {}) or {})
+        raw_liquid_composition = (
+            value.get("liquid_composition_wt_pct")
+            or diagnostics.get("liquid_composition_wt_pct")
+            or {}
+        )
         raw_activities = (
             value.get("diagnostic_oxide_activities")
             or diagnostics.get("diagnostic_oxide_activities")
@@ -1068,10 +1075,20 @@ def _coerce_activity_sample(value: Any) -> dict[str, Any]:
                 or diagnostics.get("backend_status_reason")
             ),
             "activity_coefficients": _canonical_activity_mapping(raw_activities),
+            "liquid_composition_wt_pct": (
+                _finite_positive_mapping(raw_liquid_composition)
+                if isinstance(raw_liquid_composition, Mapping)
+                else {}
+            ),
             "warnings": tuple(str(w) for w in value.get("warnings", ()) or ()),
             "diagnostics": diagnostics,
         }
     diagnostics = dict(getattr(value, "diagnostics", {}) or {})
+    raw_liquid_composition = (
+        getattr(value, "liquid_composition_wt_pct", None)
+        or diagnostics.get("liquid_composition_wt_pct")
+        or {}
+    )
     raw_activities = (
         diagnostics.get("diagnostic_oxide_activities")
         or getattr(value, "diagnostic_oxide_activities", None)
@@ -1085,6 +1102,11 @@ def _coerce_activity_sample(value: Any) -> dict[str, Any]:
             or diagnostics.get("backend_status_reason")
         ),
         "activity_coefficients": _canonical_activity_mapping(raw_activities),
+        "liquid_composition_wt_pct": (
+            _finite_positive_mapping(raw_liquid_composition)
+            if isinstance(raw_liquid_composition, Mapping)
+            else {}
+        ),
         "warnings": tuple(str(w) for w in getattr(value, "warnings", ()) or ()),
         "diagnostics": diagnostics,
     }

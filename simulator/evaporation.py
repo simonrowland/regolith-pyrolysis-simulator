@@ -1110,14 +1110,15 @@ class EvaporationMixin:
                 state == 'zero_by_physics' for state in channel_states.values()
             ):
                 return flux
-            # When every channel is a typed non-debit outcome (genuine bound,
-            # zero, dormant) and none is refused / eligible / missing-seam,
-            # empty flux is authorized, not an empty-provider false zero.
+            # Species refusals stay local to those channels. If nothing in the
+            # batch can debit, they are flagged and contribute zero flux; the
+            # run-level resolution refusal above still fails closed.
             _typed_non_debit = frozenset(
                 {
                     'zero_by_physics',
                     'upper_bound',
                     'dormant_by_epoch',
+                    'refused',
                 }
             )
             if (
@@ -1130,9 +1131,9 @@ class EvaporationMixin:
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
-                        'every requested vapour channel is a typed non-debit '
-                        'outcome (upper_bound / zero / dormant); '
-                        'empty flux is authorized'
+                        'every requested vapour channel is non-debiting '
+                        '(upper_bound / zero / dormant / refused); '
+                        'species refusals are flagged and do not abort the run'
                     ),
                     'batch_channel_states': channel_states,
                     'evaporation_flux_kg_hr': {},

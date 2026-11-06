@@ -2022,7 +2022,6 @@ def _empty_vapor_pressure_source_report() -> dict[str, object]:
         "vapor_pressure_backend_status_reason": "",
         "vapor_pressure_fallback_source": "",
         "authoritative_for_requested_vapor_pressure": None,
-        "vapor_activity_standard_state_notices_by_species": {},
     }
 
 
@@ -2072,13 +2071,13 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
             "authoritative_for_requested_vapor_pressure",
             None,
         ),
-        "vapor_activity_standard_state_notices_by_species": dict(
-            diagnostics.get(
-                "vapor_activity_standard_state_notices_by_species", {}
-            )
-            or {}
-        ),
     }
+    notices = dict(
+        diagnostics.get("vapor_activity_standard_state_notices_by_species", {})
+        or {}
+    )
+    if notices:
+        report["vapor_activity_standard_state_notices_by_species"] = notices
     return report
 
 

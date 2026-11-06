@@ -654,6 +654,7 @@ class _MeltOxideActivityReferenceConversion:
 
 @dataclass(frozen=True)
 class _BuiltinCrystallineVaporActivity:
+    liquid_activity: float
     activity: float
     notice: dict[str, Any]
     warning: str
@@ -691,6 +692,8 @@ def _convert_melt_oxide_activity_reference_state(
     # Thus liquid -> solid uses the positive sign and solid -> liquid the
     # negative sign. DeltaG_fus -> 0 gives a_s = a_l; above Tm, JANAF has
     # DeltaG_fus < 0, so liquid -> solid decreases the activity as expected.
+    # Unit check: DeltaG_fus and RT are both energy per mole, so the exponent
+    # is dimensionless; activity remains dimensionless.
     multiplier = math.exp(exponent)
     return _MeltOxideActivityReferenceConversion(
         activity=float(activity) * multiplier,
@@ -1026,6 +1029,7 @@ def _builtin_crystalline_vapor_activities_from_weight_composition(
                 f"{parent}: crystalline vapor activity conversion was not reported"
             )
         projected[parent] = _BuiltinCrystallineVaporActivity(
+            liquid_activity=float(liquid.activity),
             activity=activity,
             notice=notice,
             warning=warning,
