@@ -1136,6 +1136,7 @@ def run(
         ),
         config=config,
         strategy=active_strategy,
+        staged_strategies=staged_strategies,
         strategy_name=_strategy_label(active_strategy),
         sampler_name=_resolved_strategy_sampler(active_strategy),
         study_status=result_status,
@@ -4990,6 +4991,7 @@ def _write_artifacts(
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
     process_cpu_seconds: float | None = None,
+    staged_strategies: Sequence[Strategy] = (),
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -5004,6 +5006,7 @@ def _write_artifacts(
     resolved_strategy_input = strategy if strategy is not None else (
         config.strategy if config is not None else resolved_strategy
     )
+    winner_provenance = _winner_provenance(winner, strategy, staged_strategies)
     strategy_config = _strategy_config_payload(
         resolved_strategy_input,
         config=config,
@@ -5063,6 +5066,7 @@ def _write_artifacts(
         failure_counts=failure_counts,
         config=config,
         strategy_name=resolved_strategy,
+        winner_provenance=winner_provenance,
         prefix_evals_run=prefix_evals_run,
         process_cpu_seconds=process_cpu_seconds,
     )
@@ -5128,6 +5132,7 @@ def _write_artifacts(
                     search_space_identity=search_space_identity,
                     strategy_config=strategy_config,
                     prefix_evals_run=prefix_evals_run,
+                    winner_provenance=winner_provenance,
                     # journal replay reconstructs strategy state from the ask/tell
                     # journal alone; a warm_start_from study needs bundled seed
                     # state replay cannot rebuild, so it is not journal-replayable
@@ -5212,6 +5217,7 @@ def _study_summary_payload(
     strategy_name: str,
     prefix_evals_run: int = 0,
     process_cpu_seconds: float | None = None,
+    winner_provenance: str | None = None,
 ) -> Mapping[str, Any]:
     feasible_count = sum(1 for record in leaderboard if record.feasible)
     infeasible_count = sum(int(value) for value in failure_counts.values())
@@ -5255,6 +5261,7 @@ def _study_summary_payload(
             if winner is not None
             else None
         ),
+        "winner_provenance": winner_provenance,
         "dual_winner_non_seeded": (
             _summary_record_ref(best_non_seeded, _record_rank(best_non_seeded, leaderboard))
             if best_non_seeded is not None
@@ -5310,6 +5317,7 @@ def _study_manifest_payload(
     strategy_config: Mapping[str, Any],
     replayable: bool,
     prefix_evals_run: int = 0,
+    winner_provenance: str | None = None,
 ) -> Mapping[str, Any]:
     reoptimized_from, goals_source = _lineage_fields(config)
     return {
@@ -5344,6 +5352,7 @@ def _study_manifest_payload(
         "result_scope": None,
         "sampler_name": sampler_name,
         "sampler_description": PRESSURE_PAIR_SAMPLER_DESCRIPTION,
+        "winner_provenance": winner_provenance,
         "scipy_version": _package_version("scipy"),
         "optuna_version": _package_version("optuna"),
         "cache_tier_policy": _jsonable_value(
@@ -5462,6 +5471,33 @@ def _record_rank(record: StudyRecord | None, leaderboard: Sequence[StudyRecord])
         if candidate.candidate_id == record.candidate_id:
             return rank
     return None
+
+
+def _winner_provenance(
+    winner: StudyRecord | None,
+    strategy: Strategy | str | None,
+    staged_strategies: Sequence[Strategy],
+) -> str | None:
+    if winner is None:
+        return None
+    strategies = (() if strategy is None or isinstance(strategy, str) else (strategy,))
+    staged_record_seen = False
+    for candidate_strategy in (*strategies, *staged_strategies):
+        archive = getattr(candidate_strategy, "_archive", None)
+        if archive is None:
+            continue
+        if any(
+            getattr(getattr(member, "candidate", None), "id", None)
+            == winner.candidate_id
+            for member in archive
+        ):
+            return "in_archive"
+        if any(
+            getattr(candidate, "id", None) == winner.candidate_id
+            for candidate, _ in getattr(candidate_strategy, "results", ())
+        ):
+            staged_record_seen = True
+    return "pruned_record" if staged_record_seen else "in_archive"
 
 
 def _summary_products_source(
