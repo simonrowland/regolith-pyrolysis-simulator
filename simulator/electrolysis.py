@@ -133,41 +133,49 @@ MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
 })
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
-# C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
-# oxides keep their existing policy until their margins are independently
-# validated; their raw requirements are still surfaced in diagnostics below.
-MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
+MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 
 
-def _mre_raw_margin_refusal(
+def _mre_raw_margin_assessment(
     *,
     oxide: str,
+    voltage_V: float,
     fallback_requirement_V: float,
     fallback_margin_V: float,
-    raw_requirement_V: float | None,
-    raw_margin_V: float | None,
     reference: MREDecompositionVoltageReference | None,
-) -> dict[str, object] | None:
+) -> tuple[float | None, float | None, dict[str, object] | None]:
+    if reference is None or reference.raw_graph_voltage_V is None:
+        return None, None, None
+
+    # Premise: fallback and raw E0 share the same Nernst activity, pO2, and
+    # product-phase terms. Thus E_raw = E_fallback + (E0_raw - E0_fallback),
+    # with every term in V. The raw margin is V_applied - E_raw; it is zero at
+    # the support boundary, which is refused below (<= 0 V).
+    raw_requirement_V = (
+        fallback_requirement_V
+        + reference.raw_graph_voltage_V
+        - reference.voltage
+    )
+    raw_margin_V = voltage_V - raw_requirement_V
+    refusal = None
     if (
-        fallback_margin_V <= 0.0
-        or oxide not in MRE_RAW_MARGIN_GUARDED_OXIDES
-        or reference is None
-        or reference.authoritative
-        or raw_margin_V is None
-        or raw_margin_V > 0.0
+        fallback_margin_V > 0.0
+        and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
+        and not reference.authoritative
+        and raw_margin_V <= 0.0
     ):
-        return None
-    return {
-        'fallback_requirement_V': fallback_requirement_V,
-        'fallback_margin_V': fallback_margin_V,
-        'raw_requirement_V': raw_requirement_V,
-        'raw_margin_V': raw_margin_V,
-        'voltage_status': reference.status,
-    }
+        refusal = {
+            'fallback_requirement_V': fallback_requirement_V,
+            'fallback_margin_V': fallback_margin_V,
+            'raw_requirement_V': raw_requirement_V,
+            'raw_margin_V': raw_margin_V,
+            'voltage_status': reference.status,
+        }
+    return raw_requirement_V, raw_margin_V, refusal
 
 
 def mre_control_domain_assessment(
@@ -984,36 +992,21 @@ class ElectrolysisModel:
                 )
 
             fallback_margin_V = voltage_V - E_nernst
-            raw_requirement_V = None
-            raw_margin_V = None
-            if (
-                reference is not None
-                and reference.raw_graph_voltage_V is not None
-            ):
-                # Premise: fallback and raw E0 share the same Nernst
-                # activity, pO2, and product-phase terms. Thus E_raw =
-                # E_fallback + (E0_raw - E0_fallback), with every term in V.
-                # The raw margin is V_applied - E_raw; it is zero at the
-                # support boundary, which is refused below (<= 0 V).
-                raw_requirement_V = (
-                    E_nernst
-                    + reference.raw_graph_voltage_V
-                    - reference.voltage
+            raw_requirement_V, raw_margin_V, raw_margin_refusal = (
+                _mre_raw_margin_assessment(
+                    oxide=oxide,
+                    voltage_V=voltage_V,
+                    fallback_requirement_V=E_nernst,
+                    fallback_margin_V=fallback_margin_V,
+                    reference=reference,
                 )
-                raw_margin_V = voltage_V - raw_requirement_V
+            )
+            if raw_margin_V is not None:
                 result['mre_raw_graph_requirement_V_by_oxide'][oxide] = (
                     raw_requirement_V
                 )
                 result['mre_raw_voltage_margin_V_by_oxide'][oxide] = raw_margin_V
 
-            raw_margin_refusal = _mre_raw_margin_refusal(
-                oxide=oxide,
-                fallback_requirement_V=E_nernst,
-                fallback_margin_V=fallback_margin_V,
-                raw_requirement_V=raw_requirement_V,
-                raw_margin_V=raw_margin_V,
-                reference=reference,
-            )
             if raw_margin_refusal is not None:
                 result['mre_raw_margin_refused_targets'][oxide] = raw_margin_refusal
                 continue

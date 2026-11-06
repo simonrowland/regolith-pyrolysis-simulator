@@ -286,6 +286,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
             _faraday_reduced_extent,
+            _mre_raw_margin_assessment,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
@@ -296,7 +297,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
-            MRE_RAW_MARGIN_GUARDED_OXIDES,
             MRE_CERTIFICATION_DENYLIST_REASON,
             MRE_CERTIFICATION_EVIDENCE_CLASS,
             MRE_CURRENT_PARTITION_CERTIFICATION,
@@ -623,40 +623,27 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             diagnostic["mre_effective_voltage_margin_V_by_oxide"][oxide] = (
                 fallback_margin_V
             )
-            raw_margin_V = None
-            if (
-                voltage_reference is not None
-                and voltage_reference.raw_graph_voltage_V is not None
-            ):
-                # The Nernst activity/pO2 shift is identical for the selected
-                # fallback and raw graph E0.  Replacing E0 therefore shifts the
-                # full requirement by exactly (E0_raw - E0_fallback).
-                raw_requirement_V = (
-                    E_nernst
-                    + voltage_reference.raw_graph_voltage_V
-                    - voltage_reference.voltage
-                )
-                raw_margin_V = voltage_V - raw_requirement_V
+            (
+                raw_requirement_V,
+                raw_margin_V,
+                raw_margin_refusal,
+            ) = _mre_raw_margin_assessment(
+                oxide=oxide,
+                voltage_V=voltage_V,
+                fallback_requirement_V=E_nernst,
+                fallback_margin_V=fallback_margin_V,
+                reference=voltage_reference,
+            )
+            if raw_margin_V is not None:
                 diagnostic["mre_raw_graph_requirement_V_by_oxide"][oxide] = (
                     raw_requirement_V
                 )
                 diagnostic["mre_raw_voltage_margin_V_by_oxide"][oxide] = raw_margin_V
 
-            if (
-                fallback_margin_V > 0.0
-                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
-                and voltage_reference is not None
-                and not voltage_reference.authoritative
-                and raw_margin_V is not None
-                and raw_margin_V <= 0.0
-            ):
-                diagnostic["mre_raw_margin_refused_targets"][oxide] = {
-                    "fallback_requirement_V": E_nernst,
-                    "fallback_margin_V": fallback_margin_V,
-                    "raw_requirement_V": raw_requirement_V,
-                    "raw_margin_V": raw_margin_V,
-                    "voltage_status": voltage_reference.status,
-                }
+            if raw_margin_refusal is not None:
+                diagnostic["mre_raw_margin_refused_targets"][oxide] = (
+                    raw_margin_refusal
+                )
                 continue
 
             if fallback_margin_V > 0.0:
