@@ -156,7 +156,7 @@ def test_product_class_with_only_refused_parts_is_unavailable(two_hour_run):
     assert unavailable["class_total_kg"] is None
 
 
-def test_product_class_keeps_estimated_flux_and_ignores_empty_refusal():
+def test_product_class_keeps_estimated_flux_and_marks_empty_refusal_partial():
     estimated_sio = {
         "species_id": "SiO",
         "source_account": "process.cleaned_melt",
@@ -213,9 +213,9 @@ def test_product_class_keeps_estimated_flux_and_ignores_empty_refusal():
         snapshots=(snapshot,),
     )
 
-    assert available["status"] == "available"
+    assert available["status"] == "partial"
     assert available["class_total_kg"] == 4.0
-    assert available["excluded"] == []
+    assert [item["species"] for item in available["excluded"]] == ["Si"]
     assert available["estimated_contributions"] == [
         {
             "species": "SiO",
