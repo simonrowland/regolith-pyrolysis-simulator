@@ -1773,6 +1773,32 @@ def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
     assert report["authoritative_for_requested_vapor_pressure"] is False
 
 
+def test_vapor_pressure_source_report_surfaces_activity_standard_state_notices():
+    notices = {
+        "Mg": {
+            "reason": "activity_standard_state_substitution",
+            "source_standard_state_substitution": (
+                "alphamelts_oxide_activity_no_declared_standard -> "
+                "builtin_declared_standard"
+            ),
+            "from_standard_state_id": "single_cation_Raoultian_pure_liquid_reference",
+            "to_standard_state_id": "single_cation_Raoultian_pure_crystalline_reference",
+            "temperature_K": 1873.15,
+            "log10_activity_offset": 0.90173974,
+        },
+    }
+    sim = SimpleNamespace(
+        _last_vapor_pressures_source={"Mg": "alphamelts_fallback"},
+        _last_backend_diagnostics={
+            "vapor_activity_standard_state_notices_by_species": notices,
+        },
+    )
+
+    report = _vapor_pressure_source_report(sim)
+
+    assert report["vapor_activity_standard_state_notices_by_species"] == notices
+
+
 def test_vapor_pressure_source_report_surfaces_not_attempted():
     # SC-03 (t-121): a production CONSUMER — the runner vapor-provenance report — must READ +
     # surface the 'not_attempted' facet status, not merely have the backend emit it. Without a

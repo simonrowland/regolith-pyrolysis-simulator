@@ -2,25 +2,26 @@
 
 from __future__ import annotations
 
+import math
 from types import SimpleNamespace
 
 import pytest
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
-from simulator.chemistry import ellingham_graph
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.vapour_rail.batch import PressureValue
 from simulator.vapour_rail.instrumentation import EffectivePressureSource
-from simulator.vapour_rail import catalog as catalog_module
 from tests.chemistry.conftest import _build_sim
 
 _D349_VAPOR_ROUTES = ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas")
@@ -66,6 +67,38 @@ def _lunar_mare_probe(
         control_inputs={"pO2_bar": 1.0, "intrinsic_fO2_log": 0.0},
     )
     return BuiltinVaporPressureProvider(vapor_pressure_data), request
+
+
+def _builtin_pressure_projection(
+    vapor_pressure_data,
+    composition_wt_pct,
+    *,
+    temperature_C,
+    pO2_bar,
+):
+    composition_mol = {
+        str(species): float(wt_pct)
+        / resolve_species_formula(str(species)).molar_mass_kg_per_mol()
+        for species, wt_pct in composition_wt_pct.items()
+        if float(wt_pct) > 0.0
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": composition_mol},
+            species_formula_registry={},
+        ),
+        temperature_C=float(temperature_C),
+        pressure_bar=1.0,
+        fO2_log=math.log10(float(pO2_bar)),
+        control_inputs={
+            "pO2_bar": float(pO2_bar),
+            "intrinsic_fO2_log": math.log10(float(pO2_bar)),
+        },
+    )
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    assert result.status == "ok"
+    return dict(result.diagnostic)
 
 
 def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
@@ -370,79 +403,110 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
         ), species
 
 
-def test_d349_alphamelts_fallback_skips_undeclared_mgo_cao_standards(
-    monkeypatch,
+@pytest.mark.parametrize(
+    ("composition_wt_pct", "activities", "expected_peer"),
+    [
+        (
+            {"MgO": 50.0, "CaO": 40.0, "Na2O": 10.0},
+            {"MgO": 0.4, "CaO": 0.3, "Na2O": 0.2},
+            "Na",
+        ),
+        (
+            {"MgO": 50.0, "CaO": 50.0},
+            {},
+            None,
+        ),
+    ],
+    ids=("mixed-with-peer", "all-mg-ca"),
+)
+def test_d350_alphamelts_fallback_substitutes_builtin_mgo_cao_activity(
+    vapor_pressure_data,
+    composition_wt_pct,
+    activities,
+    expected_peer,
 ):
     backend = AlphaMELTSBackend()
-
-    def unexpected_catalog_k(*args, **kwargs):
-        raise AssertionError("untyped AlphaMELTS activity reached crystalline K")
-
-    monkeypatch.setattr(
-        ellingham_graph,
-        "effective_equilibrium_pressure_Pa",
-        unexpected_catalog_k,
+    expected_diagnostic = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition_wt_pct,
+        temperature_C=1500.0,
+        pO2_bar=1.0,
     )
     projection = backend._activities_times_antoine_or_fail(
         1500.0,
-        {"MgO": 0.4, "CaO": 0.3},
-        {"MgO": 10.0, "CaO": 10.0},
+        activities,
+        composition_wt_pct,
         pO2_bar=1.0,
-        context="d-349 standard-state guard test",
+        context="d-350 built-in activity substitution test",
     )
 
-    assert projection.reason == "activity_standard_state_undeclared"
+    assert isinstance(projection, dict)
+    for species in ("Mg", "Ca"):
+        assert projection[species] == pytest.approx(
+            expected_diagnostic["vapor_pressures_Pa"][species],
+            rel=1e-10,
+            abs=0,
+        )
+    if expected_peer is not None:
+        assert projection[expected_peer] > 0.0
+
+    notices = backend._antoine_activity_standard_state_notices
+    assert set(notices) >= {"Mg", "Ca"}
     for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
-        notice = backend._antoine_activity_standard_state_notices[species]
-        assert notice["reason"] == "activity_standard_state_undeclared"
+        notice = notices[species]
         assert notice["parent_oxide"] == parent_oxide
-        assert notice["source_standard_state_id"] is None
-        assert notice["required_standard_state_id"] == (
+        assert notice["reason"] == "activity_standard_state_substitution"
+        assert notice["source_standard_state_substitution"] == (
+            "alphamelts_oxide_activity_no_declared_standard -> "
+            "builtin_declared_standard"
+        )
+        assert notice["from_standard_state_id"] == (
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+        )
+        assert notice["to_standard_state_id"] == (
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
         )
-    diagnostics = backend._vapor_pressure_diagnostics(
-        {}, {}, projection
-    )
+        assert math.isfinite(float(notice["log10_activity_offset"]))
+
+    diagnostics = backend._vapor_pressure_diagnostics({}, projection, "alphamelts")
     assert set(
         diagnostics["vapor_activity_standard_state_notices_by_species"]
     ) == {"Mg", "Ca"}
-    assert diagnostics["vapor_pressure_backend_status_reason"] == (
-        "activity_standard_state_undeclared"
-    )
 
 
-def test_d349_alphamelts_volatility_diagnostic_skips_untyped_k_activity(
+def test_d350_alphamelts_volatility_diagnostic_uses_builtin_mgo_cao_activity(
     vapor_pressure_data,
-    monkeypatch,
 ):
-    class CatalogThatMustNotEvaluate:
-        def evaluator_for(self, species):
-            if species in {"Mg", "Ca"}:
-                raise AssertionError(
-                    f"{species} reached crystalline K with undeclared activity"
-                )
-            return object()
-
-    monkeypatch.setattr(
-        catalog_module,
-        "compiled_catalog_for",
-        lambda _payload: CatalogThatMustNotEvaluate(),
+    composition_wt_pct = {"MgO": 50.0, "CaO": 50.0}
+    expected_diagnostic = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition_wt_pct,
+        temperature_C=1600.0,
+        pO2_bar=1.0e-9,
     )
     result = _analytical_vapor_pressures_from_activities(
         vapor_pressure_data=vapor_pressure_data,
         temperature_C=1600.0,
         pO2_bar=1.0e-9,
         melt_oxide_activities={"MgO": 0.4, "CaO": 0.3},
-        composition_wt_pct={"MgO": 10.0, "CaO": 10.0},
+        composition_wt_pct=composition_wt_pct,
     )
 
-    assert "Mg" not in result["species"]
-    assert "Ca" not in result["species"]
+    for species in ("Mg", "Ca"):
+        assert result["species"][species]["P_eq_Pa"] == pytest.approx(
+            expected_diagnostic["vapor_pressures_Pa"][species],
+            rel=1e-10,
+            abs=0,
+        )
     for species in ("Mg", "Ca"):
         assert any(
             f"species={species} " in notice
-            and "reason=activity_standard_state_undeclared" in notice
-            and "required_standard_state_id="
-            "single_cation_Raoultian_pure_crystalline_reference" in notice
+            and "reason=activity_standard_state_substitution" in notice
+            and "source_standard_state_substitution="
+            "alphamelts_oxide_activity_no_declared_standard->"
+            "builtin_declared_standard" in notice
+            and MELT_OXIDE_ACTIVITY_REFERENCE_STATE in notice
+            and MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE in notice
+            and "log10_activity_offset=" in notice
             for notice in result["warnings"]
         )

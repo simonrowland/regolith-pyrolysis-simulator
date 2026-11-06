@@ -9008,15 +9008,19 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
 
     required = {
         'Na', 'K', 'Fe', 'Al', 'Si', 'Ti',
-        'Cr', 'Mn', 'SiO',
+        'Cr', 'Mn', 'SiO', 'Mg', 'Ca',
     }
     # Composite CrO2 is evaluated by the canonical vapour-rail catalog; this
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
-    # MgO and CaO are not MELTS liquid endmembers, so their component proxies
-    # have no declared parent-oxide standard state for crystalline K.
+    # Mg/Ca use the built-in provider's declared liquid parent-oxide activities,
+    # converted to the crystalline K basis before this fallback evaluates them.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
-    assert not {'Mg', 'Ca'} & set(pressures)
+    assert set(backend._antoine_activity_standard_state_notices) == {'Mg', 'Ca'}
+    assert all(
+        notice['reason'] == 'activity_standard_state_substitution'
+        for notice in backend._antoine_activity_standard_state_notices.values()
+    )
     assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
     assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
     for species in ('Mg', 'Ca'):
@@ -10722,12 +10726,14 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     assert source["SiO"] == (
         "antoine_fallback_from_vaporock:standard_reaction_term"
     )
-    # AlphaMELTS has no declared pure-MgO activity standard, so this fallback
-    # must not send its component proxy into the crystalline Ellingham K.
-    assert "Mg" not in pressures
-    assert "Mg" not in source
+    # Mg uses the built-in liquid activity and d-144 conversion rather than
+    # AlphaMELTS's undeclared component proxy.
+    assert pressures["Mg"] > 0.0
+    assert source["Mg"] == (
+        "antoine_fallback_from_vaporock:standard_reaction_term"
+    )
     assert backend._antoine_activity_standard_state_notices["Mg"]["reason"] == (
-        "activity_standard_state_undeclared"
+        "activity_standard_state_substitution"
     )
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
     # would zero the evaporation flux.

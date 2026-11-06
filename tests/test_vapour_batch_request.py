@@ -30,6 +30,7 @@ from simulator.backend_names import (
     VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
 )
 from simulator.vapour_rail.activity import (
+    ActivityInputDeclaration,
     ActivityRefusalCode,
     ActivityTier,
     ActivityVerdictKind,
@@ -953,6 +954,148 @@ def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
     ).answers["Fe"]
 
     assert answer.source_reaction_activity_shadow is typed_fe
+    assert answer.source_reaction_activity_shadow_evaluation["status"] == (
+        "shadow_only_no_behavior_authority"
+    )
+
+
+def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None:
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    )
+
+    liquid_standard = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase="liquid",
+        reference_pressure_bar=1.0,
+        identity_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        component_id="MgO",
+    )
+    crystalline_standard = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase="crystalline",
+        reference_pressure_bar=1.0,
+        identity_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        component_id="MgO",
+    )
+    shadow = SourceReactionActivity(
+        component_id="MgO",
+        value=0.25,
+        ln_value=math.log(0.25),
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="test_d349_liquid_shadow",
+        standard_state=liquid_standard,
+        target_standard_state=liquid_standard,
+        phase_assemblage_ref="test:liquid_melt",
+        chemical_potential_ref="test:mu",
+        state_fingerprint="shadow-state:mg",
+        solve_group_id="mg_test",
+        provider="test",
+    )
+    declaration = ActivityInputDeclaration(
+        component_id="MgO",
+        standard_state=liquid_standard,
+        activity_model="provider_reported_thermodynamic_activity",
+        require_assemblage_match=False,
+    )
+    rule = RequestRule(
+        species_id="Mg",
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"MgO"}),
+        required_source_atoms=frozenset({"Mg", "O"}),
+        solve_group_id="mg_test",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id="Mg",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+        source_reaction_activity=declaration,
+    )
+    state = VapourResolveState(
+        temperature_K=1773.15,
+        source_reaction_activities={"Mg": 0.25},
+        source_reaction_activity_provider="builtin-vapor-pressure",
+        source_reaction_activity_evidence_refs={"Mg": "test:d349"},
+        source_reaction_activity_standard_states={"Mg": liquid_standard},
+        source_reaction_activity_provenance={
+            "Mg": {
+                "activity_standard_state_conversion": {
+                    "from_standard_state_id": (
+                        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                    ),
+                    "to_standard_state_id": (
+                        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                    ),
+                },
+                "vapor_activity_for_crystalline_K": 0.5,
+                "vapor_activity_for_crystalline_K_standard_state_id": (
+                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                ),
+            }
+        },
+        source_reaction_activity_results={"MgO": shadow},
+        melt_activity_shadow_state_fingerprint="shadow-state:mg",
+    )
+
+    class CrystallineGuardEvaluator:
+        activity_exponent = 1.0
+        pO2_exponent = 0.0
+        valid_temperature_K = (298.15, 4000.0)
+        pO2_reference_bar = 1.0
+
+        def evaluate(self, temperature_K, *, source_activity=1.0, pO2_bar=None):
+            return SimpleNamespace(pressure_pa=float(source_activity))
+
+        def evaluate_typed_shadow(
+            self,
+            temperature_K,
+            *,
+            activity,
+            pO2_bar,
+            expected_component_id,
+            expected_standard_state,
+            expected_state_fingerprint,
+        ):
+            # Fail at the evaluator boundary if any crystalline-K shadow path
+            # hands through the original liquid activity or identity.
+            assert activity.component_id == "MgO"
+            assert activity.standard_state == crystalline_standard
+            assert activity.target_standard_state == crystalline_standard
+            assert activity.value == pytest.approx(0.5)
+            assert activity.ln_value == pytest.approx(math.log(0.5))
+            assert expected_standard_state == crystalline_standard
+            assert expected_state_fingerprint == "shadow-state:mg"
+            return {
+                "status": "shadow_only_no_behavior_authority",
+                "ln_pressure_Pa": activity.ln_value,
+                "activity_term_ln": activity.ln_value,
+                "flux_disposition": "instrumented_not_selected",
+            }
+
+    evaluator = CrystallineGuardEvaluator()
+    answer = refusal_closure(
+        requested=frozenset({"Mg"}),
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"MgO": 1.0}},
+        state=state,
+        catalog_species={
+            "Mg": SimpleNamespace(
+                species_id="Mg",
+                evaluator=evaluator,
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            )
+        },
+    ).answers["Mg"]
+
+    assert answer.source_reaction_activity_shadow is not None
+    assert answer.source_reaction_activity_shadow.standard_state == crystalline_standard
     assert answer.source_reaction_activity_shadow_evaluation["status"] == (
         "shadow_only_no_behavior_authority"
     )
