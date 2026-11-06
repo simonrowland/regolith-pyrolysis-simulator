@@ -279,6 +279,9 @@ def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
                 for entry in row["source_reactions"]
                 if entry["id"] == reaction_id
             )
+            reaction["activity_input"]["standard_state"]["id"] = (
+                "synthetic_distinct_liquid_activity_source"
+            )
             standard = reaction.setdefault(
                 "thermodynamic_standard_state",
                 copy.deepcopy(reaction["activity_input"]["standard_state"]),
@@ -294,7 +297,7 @@ def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
         "activity_standard_state_conversion"
     ]
     assert notice["from_standard_state_id"] == (
-        "single_cation_Raoultian_pure_liquid_reference"
+        "synthetic_distinct_liquid_activity_source"
     )
     assert notice["to_standard_state_id"] == (
         "synthetic_distinct_liquid_K_standard"
