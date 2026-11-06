@@ -2590,6 +2590,101 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     assert vector[oxygen_index] > 0.0
 
 
+def test_liquidus_trace_fe2o3_keeps_feo_total_buffer_oxygen():
+    """A ledger redox split must not drop the imposed-fO2 buffer reservoir.
+
+    Lunar iron arrives as FeO_T. Once respeciation writes a trace of Fe2O3,
+    the closed-bulk projection correctly refuses the total-iron oxygen peel.
+    The liquidus search is not that closed bulk: it imposes fO2 through the
+    qfm buffer, which participates only when that peel has provisioned O.
+    Collapsing O to the trace ferric excess makes every later sample fail
+    the native fO2 readback, and the freeze gate then republishes the last
+    honoured curve.
+    """
+    from simulator.feedstock_composition import total_fe
+    from simulator.melt_backend.base import CLEANED_MELT_ACCOUNT, EquilibriumResult
+
+    feo = 16.981033
+    fe2o3 = 0.00347
+    captured: list[dict] = []
+
+    def fake_equilibrate(temperature_C, composition_kg=None, fO2_log=-9.0,
+                         pressure_bar=1.0e-6, **kwargs):
+        captured.append({
+            'composition_kg': composition_kg,
+            'composition_mol': kwargs.get('composition_mol'),
+            'composition_mol_by_account': kwargs.get('composition_mol_by_account'),
+            'projected_oxide_wt_pct': kwargs.get('projected_oxide_wt_pct'),
+        })
+        return EquilibriumResult(
+            temperature_C=float(temperature_C),
+            pressure_bar=float(pressure_bar),
+            fO2_log=float(fO2_log),
+            status='ok',
+            liquid_fraction=0.0 if float(temperature_C) < 1100.0 else 1.0,
+            phase_masses_kg={'liquid': 1.0},
+        )
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {}
+    backend._subprocess_pool = None
+    backend.equilibrate = fake_equilibrate
+
+    backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 45.0, 'FeO': feo, 'Fe2O3': fe2o3},
+        composition_mol={'SiO2': 1.0, 'FeO': 0.20, 'Fe2O3': 0.001},
+        composition_mol_by_account={
+            CLEANED_MELT_ACCOUNT: {'SiO2': 1.0, 'FeO': 0.20, 'Fe2O3': 0.001},
+            'process.overhead_gas': {'O2': 0.01, 'Fe2O3': 0.5},
+        },
+        fO2_log=-9.0,
+        pressure_bar=1.0e-4,
+        min_T_C=1000.0,
+        max_T_C=1200.0,
+        scan_step_C=200.0,
+        tolerance_C=50.0,
+    )
+
+    assert captured, 'liquidus search never called equilibrate'
+    submitted = captured[0]
+    assert submitted['projected_oxide_wt_pct'] is None
+    folded_kg = submitted['composition_kg']
+    assert 'Fe2O3' not in folded_kg
+    feo_total = total_fe({'FeO': feo, 'Fe2O3': fe2o3})
+    assert folded_kg['FeO'] == pytest.approx(feo_total)
+    assert folded_kg['SiO2'] == pytest.approx(45.0)
+    folded_mol = submitted['composition_mol']
+    assert 'Fe2O3' not in folded_mol
+    assert folded_mol['FeO'] == pytest.approx(0.202)
+    melt = submitted['composition_mol_by_account'][CLEANED_MELT_ACCOUNT]
+    assert 'Fe2O3' not in melt
+    assert melt['FeO'] == pytest.approx(0.202)
+    # Other accounts are not the imposed-fO2 bulk. Leave their Fe2O3 alone.
+    assert submitted['composition_mol_by_account']['process.overhead_gas']['Fe2O3'] == pytest.approx(0.5)
+
+    projection = backend._build_db_bulk_projection(folded_kg)
+    expected_o = feo_total * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
+    assert projection.composition_wt_pct['O'] == pytest.approx(expected_o)
+    assert projection.composition_wt_pct['FeOt'] == pytest.approx(feo_total - expected_o)
+
+    captured.clear()
+    backend.find_liquidus_solidus(
+        projected_retry=True,
+        projected_oxide_wt_pct={'SiO2': 50.0, 'FeO': 10.0, 'Fe2O3': 1.0, 'O': 0.1},
+        fO2_log=-9.0,
+        pressure_bar=1.0e-4,
+        min_T_C=1000.0,
+        max_T_C=1200.0,
+        scan_step_C=200.0,
+        tolerance_C=50.0,
+    )
+    assert captured[0]['projected_oxide_wt_pct']['Fe2O3'] == pytest.approx(1.0)
+    assert captured[0]['projected_oxide_wt_pct']['O'] == pytest.approx(0.1)
+
+
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     # A successful call must populate phases_present, phase_masses_kg and
     # liquid_fraction from the library's phase block -- and still leave
