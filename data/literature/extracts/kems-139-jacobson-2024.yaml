@@ -179,13 +179,14 @@ species:
       T_range_K:
       - 2500.0
       - 2500.0
-      phase: lunar_basalt_12022_factsage_slag
+      phase: gas
+      standard_state: Partial pressure of gas species in bar; Table 1 reports FactSage equilibrium at 2500 K.
       regime: thermochemical_equilibrium_model
-      units: bar as printed
+      units: bar
       values:
-        quantity: predicted_partial_pressure
+        quantity: partial_pressure
         method_class: model_derived
-        semantics: bound_not_point_ordering
+        basis_as_printed: Lunar basalt sample 12022; chemical analysis in Table 1 (Snyder et al. [117]).
         factsage_note: factsage_model_output_not_measurement
         model_as_printed: SLAG database in FactSage at 2500 K
         cited_primary: '[115] Bale CW et al., FactSage thermochemical software and databases, CAL 26 (2002)
@@ -201,147 +202,147 @@ species:
           species_id: PO2
           T_K: 2500.0
           p_bar: 0.004569408
-          p_bar_as_printed: '0.004569408'
+          value_as_printed: '0.004569408'
           observed_de_maria: not_printed
           quote: PO2(g) 0.004569408
         - species_as_printed: SiO(g)
           species_id: SiO
           T_K: 2500.0
           p_bar: 0.004541139
-          p_bar_as_printed: '0.004541139'
+          value_as_printed: '0.004541139'
           observed_de_maria: checkmark
           quote: SiO(g) 0.004541139 checkmark
         - species_as_printed: Fe(g)
           species_id: Fe
           T_K: 2500.0
           p_bar: 0.003317841
-          p_bar_as_printed: '0.003317841'
+          value_as_printed: '0.003317841'
           observed_de_maria: checkmark
           quote: Fe(g) 0.003317841 checkmark
         - species_as_printed: Na(g)
           species_id: Na
           T_K: 2500.0
           p_bar: 0.002800994
-          p_bar_as_printed: '0.002800994'
+          value_as_printed: '0.002800994'
           observed_de_maria: checkmark
           quote: Na(g) 0.002800994 checkmark
         - species_as_printed: PO(g)
           species_id: PO
           T_K: 2500.0
           p_bar: 0.001925179
-          p_bar_as_printed: '0.001925179'
+          value_as_printed: '0.001925179'
           observed_de_maria: not_printed
           quote: PO(g) 0.001925179
         - species_as_printed: K(g)
           species_id: K
           T_K: 2500.0
           p_bar: 0.000794608
-          p_bar_as_printed: '0.000794608'
+          value_as_printed: '0.000794608'
           observed_de_maria: checkmark
           quote: K(g) 0.000794608 checkmark
         - species_as_printed: FeO(g)
           species_id: FeO_gas
           T_K: 2500.0
           p_bar: 0.00031189
-          p_bar_as_printed: '0.00031189'
+          value_as_printed: '0.00031189'
           observed_de_maria: not_printed
           quote: FeO(g) 0.00031189
         - species_as_printed: O(g)
           species_id: O
           T_K: 2500.0
           p_bar: 0.000156368
-          p_bar_as_printed: '0.000156368'
+          value_as_printed: '0.000156368'
           observed_de_maria: checkmark
           quote: O(g) 0.000156368 checkmark
         - species_as_printed: O2(g)
           species_id: O2
           T_K: 2500.0
           p_bar: 0.000116427
-          p_bar_as_printed: '0.000116427'
+          value_as_printed: '0.000116427'
           observed_de_maria: checkmark
           quote: O2(g) 0.000116427 checkmark
         - species_as_printed: Mg(g)
           species_id: Mg
           T_K: 2500.0
           p_bar: 0.000107833
-          p_bar_as_printed: '0.000107833'
+          value_as_printed: '0.000107833'
           observed_de_maria: checkmark
           quote: Mg(g) 0.000107833 checkmark
         - species_as_printed: SiO2(g)
           species_id: SiO2_gas
           T_K: 2500.0
           p_bar: 6.14219e-05
-          p_bar_as_printed: '6.14219E-05'
+          value_as_printed: '6.14219E-05'
           observed_de_maria: checkmark
           quote: SiO2(g) 6.14219E-05 checkmark
         - species_as_printed: TiO2(g)
           species_id: TiO2_gas
           T_K: 2500.0
           p_bar: 7.34285e-06
-          p_bar_as_printed: '7.34285E-06'
+          value_as_printed: '7.34285E-06'
           observed_de_maria: checkmark
           quote: TiO2(g) 7.34285E-06 checkmark
         - species_as_printed: P(g)
           species_id: P
           T_K: 2500.0
           p_bar: 3.85922e-06
-          p_bar_as_printed: '3.85922E-06'
+          value_as_printed: '3.85922E-06'
           observed_de_maria: not_printed
           quote: P(g) 3.85922E-06
         - species_as_printed: KO(g)
           species_id: KO
           T_K: 2500.0
           p_bar: 1.08059e-06
-          p_bar_as_printed: '1.08059E-06'
+          value_as_printed: '1.08059E-06'
           observed_de_maria: not_printed
           quote: KO(g) 1.08059E-06
         - species_as_printed: TiO(g)
           species_id: TiO
           T_K: 2500.0
           p_bar: 2.00284e-07
-          p_bar_as_printed: '2.00284E-07'
+          value_as_printed: '2.00284E-07'
           observed_de_maria: checkmark
           quote: TiO(g) 2.00284E-07 checkmark
         - species_as_printed: Ca(g)
           species_id: Ca
           T_K: 2500.0
           p_bar: 1.0955e-07
-          p_bar_as_printed: '1.0955E-07'
+          value_as_printed: '1.0955E-07'
           observed_de_maria: checkmark
           quote: Ca(g) 1.0955E-07 checkmark
         - species_as_printed: CaO(g)
           species_id: CaO_gas
           T_K: 2500.0
           p_bar: 1.8925e-08
-          p_bar_as_printed: '1.8925E-08'
+          value_as_printed: '1.8925E-08'
           observed_de_maria: not_printed
           quote: CaO(g) 1.8925E-08
         - species_as_printed: Al(g)
           species_id: Al
           T_K: 2500.0
           p_bar: 3.66595e-09
-          p_bar_as_printed: '3.66595E-09'
+          value_as_printed: '3.66595E-09'
           observed_de_maria: checkmark
           quote: Al(g) 3.66595E-09 checkmark
         - species_as_printed: Si(g)
           species_id: Si
           T_K: 2500.0
           p_bar: 3.17871e-09
-          p_bar_as_printed: '3.17871E-09'
+          value_as_printed: '3.17871E-09'
           observed_de_maria: not_printed
           quote: Si(g) 3.17871E-09
         - species_as_printed: K2(g)
           species_id: K2
           T_K: 2500.0
           p_bar: 8.01489e-10
-          p_bar_as_printed: '8.01489E-10'
+          value_as_printed: '8.01489E-10'
           observed_de_maria: not_printed
           quote: K2(g) 8.01489E-10
         - species_as_printed: Ti(g)
           species_id: Ti
           T_K: 2500.0
           p_bar: 1.85167e-11
-          p_bar_as_printed: '1.85167E-11'
+          value_as_printed: '1.85167E-11'
           observed_de_maria: not_printed
           quote: Ti(g) 1.85167E-11
         table_csv: tables/kems-139-jacobson-2024/t1.csv
@@ -358,6 +359,8 @@ species:
             published_page: 18
             section: >-
               2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated vapor pressures for the condensed phase in the Knudsen cell
+            note: >-
+              For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species using the SLAG database in FactSage [115] at 2500 K.
         references:
         - Bale et al. [115]
         - Snyder et al. [117]
@@ -369,7 +372,7 @@ species:
             page: 19
             published_page: 18
             table: '1'
-            note: Table 1 gives the basalt composition but does not print the FactSage input files or intermediate calculation inputs.
+            note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate calculation inputs.
       uncertainty:
         note: none stated; FactSage model output
     - observation_id: jacobson_2024_t1_demaria_observed_species
