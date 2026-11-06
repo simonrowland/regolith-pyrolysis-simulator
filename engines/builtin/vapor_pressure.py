@@ -1795,6 +1795,13 @@ def _activity_for_crystalline_vapor_k(
 ) -> tuple[float, dict[str, Any] | None, str | None]:
     """Return the activity on the crystalline K basis for MgO/CaO vapor rows."""
 
+    # OpenIMCC 9f25dfe's t-1637 liquid-standards registry declares MgO=Mg-009
+    # and CaO=Ca-028 in sf04-v1.0.2, sf04-ext-v4, D066 sf04-d066-v1,
+    # d066-v1-kcaalsi2o7, and d066-ext-v1; these match d-144's JANAF liquid
+    # standards. Convert from the source's declared standard to the K's
+    # crystalline standard, for both the built-in and above-1950 K OpenIMCC
+    # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
+    # by declared standard ID is a follow-up after t-1637 lands.
     if parent_oxide not in {"MgO", "CaO"}:
         return float(activity), None, None
     conversion = _convert_melt_oxide_activity_reference_state(
