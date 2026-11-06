@@ -76,8 +76,8 @@ def test_moeller_2007_printed_table_rows_and_locator_pins() -> None:
     assert deposition_fit["values"]["quantity_as_printed"] == (
         "Variablen mit Werten der Fitparametern für die Modellierung von SiO."
     )
-    assert [row["mode_as_printed"] for row in deposition_fit["values"]["rows"]] == [
-        "Streckschwingung", "Biegeschwingung", "Schaukelschwingung"
+    assert [row["mode_label_de"] for row in deposition_fit["values"]["rows"]] == [
+        "Streck-", "Biege-", "Schaukelschwingung"
     ]
     assert deposition_fit["values"]["mode_assignment_locator"]["page"] == 72
     assert "paragraph" in deposition_fit["values"]["mode_assignment_locator"]["note"].lower()
@@ -94,10 +94,20 @@ def test_moeller_2007_printed_table_rows_and_locator_pins() -> None:
     assert pressure_bounds["locator"]["page"] == 70
     printed = pressure_bounds["values"]["printed_results"]
     assert "über 1 mbar" in printed["measured_vapor_pressures"]
-    assert "etwa einer Größenordnung" in printed["difference_between_two_series"]
+    assert printed["difference_between_two_series_as_printed"] == (
+        "Die Messungen weisen einen Unterschied von etwa einer Größenordnung auf."
+    )
     assert "±50 °C" in printed["temperature_oscillations"]
-    assert "(2.20)" in printed["equation_2_20"]
-    assert "nicht reproduziert" in printed["reproducibility"]
+    assert printed["equation_2_20_as_printed"] == (
+        "Die gemessenen Dampfdrücke lagen fast alle über 1 mbar, so dass die "
+        "Gleichung (2.20) nicht mehr verwendet werden kann."
+    )
+    assert "almost all measured vapor pressures" in printed["equation_2_20_gloss_en"].lower()
+    assert printed["reproducibility_as_printed"] == (
+        "Man kann erkennen, dass die gemessenen Dampfdrücke nicht reproduziert "
+        "werden konnten."
+    )
+    assert "could not be reproduced" in printed["reproducibility_gloss_en"]
     assert "p_sat" in pressure_bounds["values"]["disposition"]
 
     ta_thickness = _context(document, "SiO", "moeller2007_ta_deposition_thickness")
@@ -112,4 +122,9 @@ def test_moeller_2007_printed_table_rows_and_locator_pins() -> None:
         "previously_calculated_film_thickness": "78 nm",
     }
     assert ta_thickness["values"]["explanation_locator"]["page"] == 80
-    assert "2 mm aperture" in ta_thickness["values"]["author_explanation"]
+    explanation = ta_thickness["values"]["author_explanation"]
+    assert "2 mm" in explanation["aperture"]
+    assert "72.1°" in explanation["sample_rotation"]
+    assert "exceeded 10 mm" in explanation["incident_beam_diameter"]
+    assert "diameter of 11 mm" in explanation["deposited_film_diameter"]
+    assert "4 mm from the sample center" in explanation["film_center_offset"]

@@ -119,9 +119,9 @@ species:
           method_class: measured_reduced
           schema_gap: IR band wavenumber and fitted film thickness in this table are retained as typed-refused context because table_record is outside the closed observation type set; no exact wavenumber quantity token exists.
           rows:
-            - {resonance_frequency_cm_1: '996', oscillator_strength_cm_1: '833', damping_cm_1: '0,02', gaussian_width_cm_1: '73', mode_as_printed: Streckschwingung, mode_gloss_en: stretching vibration}
-            - {resonance_frequency_cm_1: '697', oscillator_strength_cm_1: '303', damping_cm_1: '0,07', gaussian_width_cm_1: '68', mode_as_printed: Biegeschwingung, mode_gloss_en: bending vibration}
-            - {resonance_frequency_cm_1: '442', oscillator_strength_cm_1: '336', damping_cm_1: '0,02', gaussian_width_cm_1: '65', mode_as_printed: Schaukelschwingung, mode_gloss_en: rocking vibration}
+            - {resonance_frequency_cm_1: '996', oscillator_strength_cm_1: '833', damping_cm_1: '0,02', gaussian_width_cm_1: '73', mode_label_de: 'Streck-', mode_gloss_en: stretching vibration}
+            - {resonance_frequency_cm_1: '697', oscillator_strength_cm_1: '303', damping_cm_1: '0,07', gaussian_width_cm_1: '68', mode_label_de: 'Biege-', mode_gloss_en: bending vibration}
+            - {resonance_frequency_cm_1: '442', oscillator_strength_cm_1: '336', damping_cm_1: '0,02', gaussian_width_cm_1: '65', mode_label_de: Schaukelschwingung, mode_gloss_en: rocking vibration}
           dielectric_background: {real_part: '4,02', imaginary_part: '0'}
           fitted_film_thickness_nm: '166'
           film_thickness_from_deposition_rates_nm: '104,8'
@@ -216,10 +216,13 @@ species:
           method_class: measured_direct
           printed_results:
             measured_vapor_pressures: 'Die gemessenen Dampfdrücke lagen fast alle über 1 mbar.'
-            difference_between_two_series: 'Die Messungen weisen einen Unterschied von etwa einer Größenordnung auf.'
+            difference_between_two_series_as_printed: 'Die Messungen weisen einen Unterschied von etwa einer Größenordnung auf.'
+            difference_between_two_series_gloss_en: The measurements differ by about one order of magnitude.
             temperature_oscillations: 'gelegentlich zu stärkeren Temperaturoszillationen (∆T = ±50 °C)'
-            equation_2_20: 'Die Gleichung (2.20) konnte wegen der meist über 1 mbar liegenden gemessenen Dampfdrücke nicht mehr verwendet werden.'
-            reproducibility: 'Die gemessenen Dampfdrücke konnten nicht reproduziert werden.'
+            equation_2_20_as_printed: 'Die gemessenen Dampfdrücke lagen fast alle über 1 mbar, so dass die Gleichung (2.20) nicht mehr verwendet werden kann.'
+            equation_2_20_gloss_en: Almost all measured vapor pressures were above 1 mbar, so equation (2.20) can no longer be used.
+            reproducibility_as_printed: 'Man kann erkennen, dass die gemessenen Dampfdrücke nicht reproduziert werden konnten.'
+            reproducibility_gloss_en: One can see that the measured vapor pressures could not be reproduced.
           disposition: Prose bounds and methodological caveats only; the Figure 4.3 pressure series is not transcribed or mapped to p_sat.
       - observation_id: moeller2007_text_condensation_conditions
         type: table_context
@@ -283,6 +286,13 @@ species:
           printed_value_locators:
             fitted_film_thickness: {page: 81, pdf_page_index: 80, published_page: 76, table: '4.4'}
             previously_calculated_film_thickness: {page: 78, pdf_page_index: 77, published_page: 73, section: '4.3.3'}
-          author_explanation: 'The 2 mm aperture was too large for the off-centre approximately 11 mm deposit under a beam exceeding 10 mm at the sample; reflection also came from bare substrate. Anisotropy or inhomogeneity may also explain the discrepancy.'
+          author_explanation:
+            aperture: 'The selected aperture was 2 mm.'
+            sample_rotation: 'The sample was rotated by 72.1°.'
+            incident_beam_diameter: 'At that rotation, the incident beam diameter in the plane of incidence at the sample exceeded 10 mm.'
+            deposited_film_diameter: 'The deposited circular film had an approximate diameter of 11 mm.'
+            film_center_offset: 'The film center was about 4 mm from the sample center.'
+            bare_substrate_reflection: The beam also reflected from bare substrate.
+            possible_anisotropy_or_inhomogeneity: The discrepancy may also indicate anisotropy or inhomogeneity in the deposited film.
           explanation_locator: {page: 80, pdf_page_index: 79, published_page: 75, section: '4.3.3'}
           disposition: The fitted and previously calculated Ta thicknesses are both retained as printed; reflectance spectra are not digitized.
