@@ -687,7 +687,7 @@ def test_closable_knudsen_row_is_one_effusion_closure() -> None:
     assert resolved.cell_material is None
 
 
-def test_unmodelled_knudsen_row_does_not_borrow_intrinsic_fo2() -> None:
+def test_unmodelled_knudsen_row_uses_melt_closure_not_intrinsic_fo2() -> None:
     from simulator.battery.enums import CellMaterial, Quantity
     from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
 
@@ -700,7 +700,10 @@ def test_unmodelled_knudsen_row_does_not_borrow_intrinsic_fo2() -> None:
         temperature_K=float(observation.identity.temperature_K.value),
         quantity=Quantity.P_PARTIAL,
     )
-    assert resolved is None
+    assert resolved is not None
+    assert resolved.closure
+    assert resolved.route == "effusion_oxygen_balance"
+    assert resolved.cell_material is None
 
 
 def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> None:
