@@ -287,8 +287,32 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
         str(issue) for issue in result.validation.hard_issues[:30]
     )
     assert result.registry_issues == []
+    oxide_basis_ids = {
+        "ri5711_table7_ca2fe2o5_oxide",
+        "ri5711_table9_ca2fe2o5_oxide_enthalpy",
+        "ri5711_table9_ca2fe2o5_oxide_enthalpy_liquid",
+        "ri5711_table9_ca2fe2o5_oxide_free_energy",
+        "ri5711_table9_ca2fe2o5_oxide_free_energy_liquid",
+        "ri5711_table7_cafe2o4_oxide",
+        "ri5711_table10_cafe2o4_oxide_enthalpy",
+        "ri5711_table10_cafe2o4_oxide_enthalpy_liquid",
+        "ri5711_table10_cafe2o4_oxide_free_energy",
+        "ri5711_table10_cafe2o4_oxide_free_energy_liquid",
+        "ri5711_table7_nafeo2_oxide",
+        "ri5711_table12_nafeo2_oxide_enthalpy",
+        "ri5711_table12_nafeo2_oxide_enthalpy_liquid",
+        "ri5711_table12_nafeo2_oxide_free_energy",
+        "ri5711_table12_nafeo2_oxide_free_energy_liquid",
+    }
+    oxide_point_count = sum(
+        len(source["values"].get("points", [])) or 1
+        for rows in expected.values()
+        for source in rows
+        if source["observation_id"] in oxide_basis_ids
+    )
+    assert oxide_point_count == 147
     assert len(result.observations) == 334
-    assert len(result.queue) == 48
+    assert len(result.queue) == 210
     assert not any("temperature_K" in entry.axes for entry in result.queue)
     printed_value_count = sum(
         len(source["values"].get("points", [])) or 1
@@ -306,8 +330,8 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
                 row for key, row in result.observations.items()
                 if key == prefix or key.startswith(prefix + "::")
             ]
-            expected_count = len(source["values"].get("points", [])) or 1
-            assert len(matches) == expected_count
+            printed_count = len(source["values"].get("points", [])) or 1
+            assert len(matches) == printed_count
             for migrated in matches:
                 assert migrated.identity.species.formula == species
                 expected_phase = Phase.L if source["phase"] == "l" else Phase.CR
@@ -321,6 +345,7 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
                     assert set(migrated.point_conditions) == {"temperature_K"}
                 if migrated.identity.quantity.is_unknown:
                     unknown_quantity_ids.add(source["observation_id"])
+                    assert migrated.value.kind is ValueKind.UNAVAILABLE
                 else:
                     assert migrated.identity.quantity.is_value
 
@@ -347,16 +372,23 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
         "ri5711_nafeo2_calorimetric_inputs",
         "ri5711_nafeo2_calorimetric_reaction30",
         "ri5711_nafeo2_calorimetric_reaction30_298_15",
+    } | oxide_basis_ids
+    table12_h_source = next(
+        row for row in expected["NaFeO2"]
+        if row["observation_id"] == "ri5711_table12_nafeo2_oxide_enthalpy"
+    )
+    assert table12_h_source["values"]["points"][0] == {
+        "T_K": 298.15,
+        "delta_fH": -18.45,
     }
     table12_h = next(
         row for key, row in result.observations.items()
         if key.startswith(
-            f"{SOURCE_ID}::ri5711_table12_nafeo2_oxide_enthalpy::T=298.15:h="
+            f"{SOURCE_ID}::ri5711_table12_nafeo2_oxide_enthalpy::T=298.15:"
         )
     )
-    assert table12_h.identity.quantity.value is Quantity.DELTA_FH
-    assert table12_h.value.kind is ValueKind.POINT
-    assert table12_h.value.point == Decimal("-77.19480")
+    assert table12_h.identity.quantity.is_unknown
+    assert table12_h.value.kind is ValueKind.UNAVAILABLE
     assert table12_h.identity.temperature_K.value == Decimal("298.15")
     table23_g = next(
         row for key, row in result.observations.items()
