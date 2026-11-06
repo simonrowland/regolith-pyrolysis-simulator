@@ -346,6 +346,41 @@ def test_d349_unknown_mgo_catalog_k_id_is_not_converted(
     assert notice["log10_activity_offset"] is None
 
 
+def test_d349_malformed_mgo_catalog_standard_is_not_converted(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    _, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    catalog = copy.deepcopy(vapor_pressure_data.catalog_payload)
+    reaction = next(
+        row
+        for row in catalog["families"]["metals_mg_family"][
+            "physical_properties"
+        ]["species"]["Mg"]["source_reactions"]
+        if row["id"] == "liquid_mgo_to_mg_gas"
+    )
+    standard = reaction["activity_input"]["standard_state"]
+    standard.pop("id", None)
+    standard["convention"] = "henrian_liquid"
+    standard["component_basis"] = "wt_percent"
+
+    result = BuiltinVaporPressureProvider(catalog).dispatch(request)
+    route = result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
+    notice = route["activity_standard_state_conversion"]
+
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["conversion_performed"] is False
+    assert notice["log10_activity_offset"] is None
+    assert route["vapor_activity_used_for_K"] == result.diagnostic[
+        "activities"
+    ]["Mg"]
+
+
 def test_d349_unknown_runtime_mgo_id_is_not_relabelled(
     vapor_pressure_data,
     feedstocks_data,
