@@ -120,6 +120,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_TIER,
     _activity_for_crystalline_vapor_k,
+    _melt_oxide_activity_standard_state_id,
     _vapor_activity_source_standard_state,
     _vapor_k_standard_state,
     melt_oxide_activity,
@@ -4116,7 +4117,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     oxide_activity = None
                     source_activity_value = float(below_cap_fe_activity)
                     source_standard_state_id = (
-                        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                        _melt_oxide_activity_standard_state_id(parent_oxide)
                     )
                     fe_activity_basis = "kress91_ferrous"
                 else:

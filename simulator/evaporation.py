@@ -3667,11 +3667,51 @@ class EvaporationMixin:
                         )
                     evidence += f';activity_basis={activity_basis}'
                 activity_evidence_refs[str(species_id)] = evidence
-            activity_standard_states = {
-                str(species_id): activity_standard_state
-                for species_id in reported_activities
-                if activity_provider_id and activity_standard_state is not None
-            }
+            activity_standard_states = {}
+            compiled_species_by_id = getattr(
+                getattr(self, "vapour_rail_catalog", None), "species", {}
+            )
+            for species_id in reported_activities:
+                if not activity_provider_id or activity_standard_state is None:
+                    continue
+                compiled_species = compiled_species_by_id.get(
+                    str(species_id)
+                )
+                activity_declaration = getattr(
+                    compiled_species, "source_reaction_activity", None
+                )
+                declared_standard_state = getattr(
+                    activity_declaration, "standard_state", None
+                )
+                declared_standard_state_id = getattr(
+                    declared_standard_state, "identity_id", None
+                )
+                runtime_standard_state_id = (
+                    activity_provenance.get(str(species_id), {}).get(
+                        "melt_oxide_activity_reference_state"
+                    )
+                    if declared_standard_state_id is not None
+                    else None
+                )
+                activity_standard_states[str(species_id)] = (
+                    StandardStateIdentity(
+                        convention=activity_standard_state.convention,
+                        phase=activity_standard_state.phase,
+                        reference_pressure_bar=(
+                            activity_standard_state.reference_pressure_bar
+                        ),
+                        reference_temperature_K=(
+                            activity_standard_state.reference_temperature_K
+                        ),
+                        component_basis=activity_standard_state.component_basis,
+                        identity_id=(
+                            runtime_standard_state_id
+                            if isinstance(runtime_standard_state_id, str)
+                            else None
+                        ),
+                        component_id=activity_standard_state.component_id,
+                    )
+                )
             campaign = getattr(self.melt, 'campaign', None)
             campaign_name = str(getattr(campaign, 'name', '') or '')
             # Keep the global request phase on the legacy hot-train contract.

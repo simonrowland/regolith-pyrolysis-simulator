@@ -837,38 +837,53 @@ def _vapor_activity_source_standard_state(
     ],
     *,
     route_id: str | None = None,
-    runtime_standard_state_phase: str | None = None,
+    declared_source_standard_state_phase: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """Resolve the liquid handshake's JANAF ID without changing its token."""
+    """Preserve runtime ID; use only explicit catalog IDs for vapor routes."""
 
-    if parent_oxide == "FeO":
-        return "Fe-020", "liquid"
     pair = catalog_standard_states.get(route_id or "") or catalog_standard_states.get(
         parent_oxide
     )
     source = pair[0] if pair is not None else None
-    source_phase = (
+    catalog_source_phase = (
         _normalize_standard_state_phase(source.phase)
         if source is not None
-        else _normalize_standard_state_phase(runtime_standard_state_phase)
+        else None
     )
-    source_id = source.identity_id if source is not None else None
-    if source_id is None:
-        # activity_input.standard_state.phase is a runtime handshake token.
-        # Keep its generic fingerprint, and get the separately reported JANAF
-        # source ID from the same d-144 registry that owns its K conversion.
-        registered_pair = d144_vapor_standard_state_pair(parent_oxide)
-        if (
-            registered_pair is not None
-            and source_phase == registered_pair[0][1]
+    declared_source_phase = catalog_source_phase or (
+        _normalize_standard_state_phase(declared_source_standard_state_phase)
+    )
+    registered_pair = d144_vapor_standard_state_pair(parent_oxide)
+    if runtime_standard_state_id is not None:
+        source_phase = None
+        if registered_pair is not None and not (
+            source is not None and source.identity_id is None
         ):
-            source_id = registered_pair[0][0]
+            source_phase = next(
+                (
+                    phase
+                    for identity_id, phase in registered_pair
+                    if identity_id == runtime_standard_state_id
+                ),
+                None,
+            )
+        return (
+            runtime_standard_state_id,
+            source_phase
+            or _activity_standard_state_phase(runtime_standard_state_id),
+        )
+
+    source_id = source.identity_id if source is not None else None
     if source_id is not None:
+        source_phase = catalog_source_phase
         return source_id, source_phase
+
+    # A phase-only catalog handshake cannot establish a d-144 identity. The
+    # converting MgO/CaO routes carry explicit JANAF IDs in their catalog
+    # declarations; an absent ID remains unconverted.
     return (
-        runtime_standard_state_id,
-        source_phase
-        or _activity_standard_state_phase(runtime_standard_state_id),
+        None,
+        declared_source_phase,
     )
 
 
@@ -932,6 +947,9 @@ def _vapor_k_standard_state(
 def _melt_oxide_activity_standard_state_id(parent_oxide: str) -> str:
     """Return the standard of the numeric activity actually returned."""
 
+    registered_vapor_standards = d144_vapor_standard_state_pair(parent_oxide)
+    if registered_vapor_standards is not None:
+        return registered_vapor_standards[0][0]
     provenance = reference_state_provenance.get(parent_oxide)
     if (
         isinstance(provenance, _VerifiedGammaReferenceState)
@@ -1240,7 +1258,9 @@ def _builtin_vapor_activities_from_weight_composition(
                 T_K=float(temperature_K),
                 pressure_bar=kress91_furnace_activity_pressure_bar(),
             )
-            source_standard_state_id = MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+            source_standard_state_id = _melt_oxide_activity_standard_state_id(
+                parent
+            )
         else:
             source = melt_oxide_activity(
                 parent,

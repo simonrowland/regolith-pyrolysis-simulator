@@ -41,6 +41,7 @@ from simulator.vapour_rail.catalog_standard_states import (
     catalog_vapor_species_standard_states,
 )
 from simulator.chemistry.melt_activity import (
+    _melt_oxide_activity_standard_state_id,
     _normalize_standard_state_phase,
     _vapor_activity_source_standard_state,
     _vapor_k_standard_state,
@@ -715,12 +716,17 @@ def emit_request_rules(
                 or species_id == "Fe"
             )
         ):
+            runtime_source_standard_state_id = (
+                _melt_oxide_activity_standard_state_id(parent_oxide)
+                if species_id == "Fe"
+                else None
+            )
             source_standard_state_id, source_standard_state_phase = (
                 _vapor_activity_source_standard_state(
                     parent_oxide,
-                    None,
+                    runtime_source_standard_state_id,
                     {},
-                    runtime_standard_state_phase=(
+                    declared_source_standard_state_phase=(
                         source_standard_state_phase
                     ),
                 )
