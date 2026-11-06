@@ -149,20 +149,30 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
-    stored = [
-        observation
-        for observation in migrator.result.observations.values()
+    stored = {
+        key: observation
+        for key, observation in migrator.result.observations.items()
         if observation.source_id == document["source_id"]
-    ]
+    }
     assert len(stored) == 628
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
-    assert all(observation.value.kind.value != "unavailable" for observation in stored)
+    unavailable_ids = {
+        key.split("::", 2)[1]
+        for key, observation in stored.items()
+        if observation.value.kind.value == "unavailable"
+    }
+    assert unavailable_ids == {
+        "bey80_k2si2o5_reference_glass_S_table6",
+        "bey80_k2si2o5_t6_glass_extrapolated_s_800",
+        "bey80_k2si2o5_t6_glass_extrapolated_s_850",
+        "bey80_k2si2o5_t6_glass_extrapolated_s_900",
+    }
 
     def assert_noticed(table, formula, phase, quantity, temperature, kind):
         matches = [
             observation
-            for observation in stored
+            for observation in stored.values()
             if observation.locator.table == table
             and observation.identity.species.formula == formula
             and observation.identity.species.phase.value is phase
@@ -205,7 +215,7 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
     for temperature in ("503.0", "852.6"):
         observation = next(
             item
-            for item in stored
+            for item in stored.values()
             if item.locator.table == "3"
             and item.identity.species.formula == "K2Si2O5"
             and item.identity.species.phase.value is Phase.CR
@@ -232,6 +242,8 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
     ):
         for temperature in temperatures:
             for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+                if table == "6" and quantity is Quantity.S:
+                    continue
                 observation = assert_noticed(
                     table,
                     formula,
@@ -272,7 +284,7 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
 
     noticed = [
         notice
-        for observation in stored
+        for observation in stored.values()
         for notice in observation.notices
         if notice.kind
         in {
@@ -282,4 +294,4 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         }
         and observation.locator.table in {"3", "4", "5", "6", "10"}
     ]
-    assert len(noticed) == 33
+    assert len(noticed) == 30

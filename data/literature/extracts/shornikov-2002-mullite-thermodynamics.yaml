@@ -17,6 +17,9 @@ fidelity_samples:
   field: delta_H_fus_kJ_mol-1
   value: 74.84
   locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '8'}
+schema_gaps:
+  - observation_id: shornikov_2002_fig2_oxide_formation_gibbs
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 species:
   Al2O3:
     observations:
@@ -331,7 +334,10 @@ species:
       locator: {page: 2, published_page: S47, pdf_page_index: 1, figure: '2'}
       units: 'ΔfG_T(M), kJ/mol; T, K'
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Fig. 2. Gibbs energy of mullite formation from oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
         method_class: figure_only
         admission_status: figure_only
         species: mullite

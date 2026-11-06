@@ -34,6 +34,15 @@ notes:
     The separately stated K2Si2O5 liquid equation relative to glass at
     298.15 K is H-H298 = 65.800e-3 T - 29.564 over 1318-1600 K (<0.1%).
   locator: {pdf_page_index: 20, page: 21, published_page: 17}
+schema_gaps:
+  - observation_id: bey80_k2si2o5_reference_glass_S_table6
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_800
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_850
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_900
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
 species:
   K2Si2O5:
     observations:
@@ -174,6 +183,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -184,6 +194,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -195,6 +206,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -206,6 +218,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -218,6 +231,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -228,6 +242,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -240,6 +255,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -252,6 +268,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -429,7 +446,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, series: *bey80_t6}
+      values: {method_class: model_derived, series: *bey80_t6, quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "0"}
     - observation_id: bey80_k2si2o5_reference_glass_H_table6
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -453,7 +470,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_800}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_800, quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "46.34"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_800
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -477,7 +494,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_850}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_850, quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "49.65"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_850
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -501,7 +518,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_900}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_900, quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "52.82"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_900
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}

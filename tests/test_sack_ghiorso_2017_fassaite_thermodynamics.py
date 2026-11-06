@@ -131,8 +131,20 @@ def test_all_figures_are_deferred_with_identity_and_series_inventory() -> None:
 
     by_id = _contexts_by_id(document)
     fig3 = by_id["sack_ghiorso_2017_fig3_configurational_entropy"][1]
-    assert fig3["values"]["quantity"] == "S"
+    assert "quantity" not in fig3["values"]
+    assert fig3["values"]["quantity_as_printed"] == (
+        "Configurational entropy of diopside – CATS solid solutions"
+    )
+    assert fig3["values"]["reference_state_as_printed"] == "configurational entropy"
+    assert fig3["values"]["schema_gap"]
     assert sum(series["marker_count"] for series in fig3["values"]["series"]) == 8
+    fig9 = by_id["sack_ghiorso_2017_fig9_configurational_entropy"][1]
+    assert "quantity" not in fig9["values"]
+    assert fig9["values"]["quantity_as_printed"] == (
+        "Configurational entropy of diopside – grossmanite solid solutions"
+    )
+    assert fig9["values"]["reference_state_as_printed"] == "configurational entropy"
+    assert fig9["values"]["schema_gap"]
     fig13 = by_id["sack_ghiorso_2017_fig13_solar_gas_oxygen_fugacity"][1]
     assert fig13["values"]["printed_quantity"] == "log10 fO2"
     assert fig13["values"]["pressure_as_published"] == "Ptot = 10^-3 atm"
