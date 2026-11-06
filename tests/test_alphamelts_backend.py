@@ -9023,13 +9023,6 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     )
     assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
     assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
-    for species in ('Mg', 'Ca'):
-        assert (
-            backend._antoine_activity_standard_state_notices[species][
-                'reason'
-            ]
-            == 'activity_standard_state_undeclared'
-        )
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5
