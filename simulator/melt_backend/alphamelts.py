@@ -6066,11 +6066,11 @@ class _MELTSBackendSupport(MeltBackend):
             )
 
         from simulator.chemistry.melt_activity import (
-            _builtin_crystalline_vapor_activities_from_weight_composition,
+            _builtin_vapor_activities_from_weight_composition,
         )
 
         builtin_vapor_activities = (
-            _builtin_crystalline_vapor_activities_from_weight_composition(
+            _builtin_vapor_activities_from_weight_composition(
                 comp_wt,
                 float(T_C) + CELSIUS_TO_KELVIN_OFFSET,
             )
@@ -6289,8 +6289,8 @@ class _MELTSBackendSupport(MeltBackend):
         if not activities or not provenance:
             return {}
         # AlphaMELTS proxy values remain untyped. The catalog sees only these
-        # routes' built-in liquid activities and their owner-produced K-basis
-        # conversion, matching BuiltinVaporPressureProvider's handshake.
+        # routes' built-in declared-standard activities and their owner-produced
+        # K-basis conversion (or identity), matching the built-in handshake.
         return {
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
@@ -6323,11 +6323,11 @@ class _MELTSBackendSupport(MeltBackend):
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         if builtin_vapor_activities is None:
             from simulator.chemistry.melt_activity import (
-                _builtin_crystalline_vapor_activities_from_weight_composition,
+                _builtin_vapor_activities_from_weight_composition,
             )
 
             builtin_vapor_activities = (
-                _builtin_crystalline_vapor_activities_from_weight_composition(
+                _builtin_vapor_activities_from_weight_composition(
                     _comp_wt,
                     T_K,
                 )

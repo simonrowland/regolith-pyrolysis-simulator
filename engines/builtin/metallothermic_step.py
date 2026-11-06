@@ -495,6 +495,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 control_audit=control_audit,
             )
 
+        # C3 K's reductant ΔG uses JANAF K-012, K2O(cr). K2O inventory
+        # enters only the 10 wt% solubility cap here; no a(K2O) term is coupled
+        # to this equilibrium, so there is no activity basis to convert.
         margin = self._reduction_margin_kj_per_mol_o2(
             "K",
             "FeO",
@@ -1879,6 +1882,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_mol: Mapping[str, float],
     ) -> tuple[tuple[str, ...], dict[str, Any]]:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        # C3 Na pairs JANAF Na-013/Na-014's Na2O(l) standard with
+        # melt_oxide_activity's liquid single-cation Raoultian standard.
+        # Green a6d75d8b4 and this tip use that same basis, so no conversion
+        # belongs at this shuttle coupling.
         na_standard_delta_g = _na_activity_reference_standard_delta_g_kj_per_mol_o2(
             temperature_K
         )

@@ -126,6 +126,7 @@ REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_ABSENT_SOURCE_ATOM,
+    ActivityRefusalCode.MISSING_EVIDENCE.value,
     ActivityRefusalCode.UNMAPPED_PHASE.value,
     ActivityRefusalCode.UNMAPPED_ENDMEMBER.value,
 })
@@ -1346,6 +1347,14 @@ def refusal_closure(
                         "source_reactions[].activity_input declaration; silent "
                         "pure-component substitution is forbidden",
                     )
+                if not isinstance(
+                    declaration.standard_state, StandardStateIdentity
+                ):
+                    return _make_refusal(
+                        rule,
+                        REFUSAL_MISSING_CHANNEL_CONTRACT,
+                        "activity_input declaration lacks a standard-state identity",
+                    )
                 source_reaction_activity_shadow = (
                     state.source_reaction_activity_results.get(
                         declaration.component_id
@@ -1362,6 +1371,22 @@ def refusal_closure(
                         rule.species_id
                     )
                 )
+                if reported_activity is not None:
+                    provider_id = state.source_reaction_activity_provider
+                    if not isinstance(provider_id, str) or not provider_id.strip():
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "reported activity lacks its provider identity",
+                        )
+                    if not isinstance(
+                        reported_standard_state, StandardStateIdentity
+                    ):
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "reported activity lacks its standard-state identity",
+                        )
                 reported_provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
                 )
@@ -2626,6 +2651,76 @@ def _state_fingerprint(state: VapourResolveState | None) -> str:
     )
 
 
+def _validate_run_state_inputs(
+    state: VapourResolveState | None,
+    rules: Sequence[RequestRule],
+    catalog_species: Mapping[str, Any] | None,
+    requested: frozenset[str],
+) -> None:
+    """Validate process inputs before channel selection can hide a gap."""
+
+    live_species = catalog_species or {}
+    relevant = requested or frozenset(rule.species_id for rule in rules)
+    relevant_rules = tuple(
+        rule for rule in rules if rule.species_id in relevant
+    )
+    evaluators = tuple(
+        getattr(live_species.get(species_id), "evaluator", None)
+        for species_id in relevant
+    )
+    needs_temperature = any(
+        rule.has_pressure_evaluator for rule in relevant_rules
+    ) or any(evaluator is not None for evaluator in evaluators)
+    needs_intrinsic_fo2 = any(
+        getattr(evaluator, "oxygen_fugacity_channel", None) == "intrinsic_melt"
+        for evaluator in evaluators
+        if evaluator is not None
+    )
+
+    def require_positive(value: Any, label: str, *, required: bool) -> None:
+        if value is None:
+            if required:
+                raise VapourRequestConstructionError(
+                    f"run-level {label} is required before vapor resolution"
+                )
+            return
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise VapourRequestConstructionError(
+                f"run-level {label} must be finite and positive"
+            )
+        try:
+            numeric = _fingerprint_float(value)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise VapourRequestConstructionError(
+                f"run-level {label} must be finite and positive"
+            ) from exc
+        if not math.isfinite(numeric) or numeric <= 0.0:
+            raise VapourRequestConstructionError(
+                f"run-level {label} must be finite and positive"
+            )
+
+    if state is None:
+        if needs_temperature:
+            require_positive(None, "temperature_K", required=True)
+        return
+
+    require_positive(
+        state.temperature_K,
+        "temperature_K",
+        required=needs_temperature,
+    )
+    require_positive(
+        state.total_pressure_Pa,
+        "total_pressure_Pa",
+        required=False,
+    )
+    require_positive(
+        state.source_reaction_fO2_bar,
+        "intrinsic_melt oxygen fugacity",
+        required=needs_intrinsic_fo2,
+    )
+
+
 def resolve_vapour_batch(
     *,
     rules: Sequence[RequestRule],
@@ -2648,6 +2743,7 @@ def resolve_vapour_batch(
         caller_species_filter=caller_species_filter,
     )
     assert_request_coverage(rules, ledger_snapshot, requested)
+    _validate_run_state_inputs(state, rules, catalog_species, requested)
 
     # t-568 Phase 1 is diagnostic-only and explicitly gated. The ordinary
     # request path stays lazy; opted-in callers compute once per component and

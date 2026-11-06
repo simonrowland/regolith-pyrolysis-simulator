@@ -653,7 +653,7 @@ class _MeltOxideActivityReferenceConversion:
 
 
 @dataclass(frozen=True)
-class _BuiltinCrystallineVaporActivity:
+class _BuiltinVaporActivity:
     liquid_activity: float
     activity: float
     notice: dict[str, Any]
@@ -708,7 +708,7 @@ def _activity_for_crystalline_vapor_k(
     activity: float,
     temperature_K: float,
 ) -> tuple[float, dict[str, Any] | None, str | None]:
-    """Convert a declared liquid oxide activity to its crystalline K basis."""
+    """Put a declared liquid oxide activity on the coupled vapor K basis."""
 
     # OpenIMCC 9f25dfe's t-1637 liquid-standards registry declares MgO=Mg-009
     # and CaO=Ca-028 in sf04-v1.0.2, sf04-ext-v4, D066 sf04-d066-v1,
@@ -718,7 +718,30 @@ def _activity_for_crystalline_vapor_k(
     # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
     # by declared standard ID is a follow-up after t-1637 lands.
     if parent_oxide not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
-        return float(activity), None, None
+        notice = {
+            "oxide": parent_oxide,
+            "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            "to_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            "temperature_K": float(temperature_K),
+            "log10_activity_offset": 0.0,
+            "delta_g_fus_kJ_per_mol": None,
+            "authority": "declared_standard_identity",
+            "authority_level": "identity",
+            "reason": "source and vapor K standard states match",
+            "certified_band_K": [],
+        }
+        warning = (
+            "vapor_activity_standard_state_conversion|"
+            f"oxide={parent_oxide}|"
+            "from_standard_state_id="
+            f"{MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
+            "to_standard_state_id="
+            f"{MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
+            f"temperature_K={temperature_K:.2f}|"
+            "log10_activity_offset=+0|"
+            "authority=declared_standard_identity|authority_level=identity"
+        )
+        return float(activity), notice, warning
     conversion = _convert_melt_oxide_activity_reference_state(
         parent_oxide,
         activity,
@@ -985,10 +1008,10 @@ def melt_oxide_activity(
     )
 
 
-def _builtin_crystalline_vapor_activities_from_weight_composition(
+def _builtin_vapor_activities_from_weight_composition(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
-) -> dict[str, _BuiltinCrystallineVaporActivity]:
+) -> dict[str, _BuiltinVaporActivity]:
     """Project AlphaMELTS weight composition onto the built-in vapor basis."""
 
     from simulator.accounting.formulas import resolve_species_formula
@@ -1010,8 +1033,10 @@ def _builtin_crystalline_vapor_activities_from_weight_composition(
         ).molar_mass_kg_per_mol()
         composition_mol[parent] = weight / molar_mass
 
-    projected: dict[str, _BuiltinCrystallineVaporActivity] = {}
-    for parent in sorted(MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY):
+    projected: dict[str, _BuiltinVaporActivity] = {}
+    for parent in sorted(
+        set(MELT_OXIDE_ACTIVITY_COEFFICIENTS).intersection(composition_mol)
+    ):
         liquid = melt_oxide_activity(
             parent,
             composition_mol,
@@ -1026,9 +1051,9 @@ def _builtin_crystalline_vapor_activities_from_weight_composition(
         )
         if notice is None or warning is None:
             raise RuntimeError(
-                f"{parent}: crystalline vapor activity conversion was not reported"
+                f"{parent}: vapor activity basis was not reported"
             )
-        projected[parent] = _BuiltinCrystallineVaporActivity(
+        projected[parent] = _BuiltinVaporActivity(
             liquid_activity=float(liquid.activity),
             activity=activity,
             notice=notice,

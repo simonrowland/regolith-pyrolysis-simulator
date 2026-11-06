@@ -345,10 +345,10 @@ def _analytical_vapor_pressures_from_activities(
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
         MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
-        _builtin_crystalline_vapor_activities_from_weight_composition,
+        _builtin_vapor_activities_from_weight_composition,
     )
     builtin_vapor_activities = (
-        _builtin_crystalline_vapor_activities_from_weight_composition(
+        _builtin_vapor_activities_from_weight_composition(
             comp_wt,
             T_K,
         )
@@ -410,7 +410,7 @@ def _analytical_vapor_pressures_from_activities(
         activity = selected_activity(species, parent_oxide)
         if activity is None:
             continue
-        if parent_oxide in builtin_vapor_activities:
+        if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
             from simulator.chemistry.ellingham_graph import (
                 effective_equilibrium_pressure_Pa,
             )
@@ -660,7 +660,7 @@ def _analytical_vapor_pressures_from_activities(
         activity = selected_activity(str(species), parent_oxide)
         if activity is None:
             continue
-        if parent_oxide in builtin_vapor_activities:
+        if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
             if catalog is None:
                 raise RuntimeError(
                     f"{species} requires its crystalline-K catalog reaction"

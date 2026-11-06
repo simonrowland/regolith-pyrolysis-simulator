@@ -65,6 +65,7 @@ class ActivityRefusalCode(str, Enum):
     STANDARD_STATE_MISMATCH = "standard_state_mismatch"
     UNMAPPED_PHASE = "unmapped_phase"
     UNMAPPED_ENDMEMBER = "unmapped_endmember"
+    COMPONENT_IDENTITY_MISMATCH = "component_identity_mismatch"
     TIMEOUT = "timeout"
     CRASH = "crash"
     EXPIRED = "expired"
@@ -1433,7 +1434,7 @@ class CondensedPhaseActivityProvider:
         if thermoengine.component_id != declaration.component_id:
             return _refusal(
                 declaration.component_id,
-                ActivityRefusalCode.UNMAPPED_ENDMEMBER,
+                ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH,
                 "ThermoEngine component_id does not match declaration",
                 standard_state=declaration.standard_state,
                 solve_group_id=solve_group_id,
