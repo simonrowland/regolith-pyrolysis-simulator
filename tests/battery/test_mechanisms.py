@@ -1268,7 +1268,7 @@ def _reduced_without_raw_parent(
 
 def _model_derived_without_raw_parent(
     *,
-    declaration: Located,
+    declaration: Located | None = None,
     method: Located | None = None,
     references: tuple[str, ...] = (),
     derived_from: tuple[str, ...] | None = None,
@@ -1353,12 +1353,12 @@ def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.method")
-        and "equation and physical page locator" in issue.detail
+        and "paragraph/section or equation locator" in issue.detail
         for issue in issues
     )
 
 
-def test_model_derived_unprinted_inputs_requires_equation_not_section() -> None:
+def test_model_derived_unprinted_inputs_accepts_located_prose_method() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
@@ -1372,9 +1372,36 @@ def test_model_derived_unprinted_inputs_requires_equation_not_section() -> None:
     issues = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
+    assert issues == ()
+
+
+def test_model_derived_prose_method_without_equation_passes() -> None:
+    observation = _model_derived_without_raw_parent(
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="2.2"),
+        ),
+        references=("Shornikov et al. (2008)",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert issues == ()
+
+
+def test_model_derived_prose_method_without_named_references_fails() -> None:
+    observation = _model_derived_without_raw_parent(
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="2.2"),
+        ),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
     assert any(
-        issue.path.endswith(".derivation.method")
-        and "equation and physical page locator" in issue.detail
+        issue.path.endswith(".derivation.references")
+        and "requires named references" in issue.detail
         for issue in issues
     )
 
@@ -1394,7 +1421,7 @@ def test_model_derived_unprinted_inputs_requires_named_references() -> None:
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.references")
-        and "requires named compiled references" in issue.detail
+        and "requires named references" in issue.detail
         for issue in issues
     )
 
@@ -1440,7 +1467,7 @@ def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
             observation.derivation,
             method=Located(
                 State.of("Gibbs energy minimisation with the authors' model"),
-                locator=F.loc(page=164, section=2.2),
+                locator=F.loc(page=164, section="2.2"),
             ),
             references=("Shornikov et al. (2008)",),
             raw_inputs=None,
@@ -1485,7 +1512,7 @@ def test_model_derived_notice_does_not_replace_method_or_named_references() -> N
     )
     assert any(
         issue.path.endswith(".derivation.references")
-        and "requires named compiled references" in issue.detail
+        and "requires named references" in issue.detail
         for issue in issues
     )
 

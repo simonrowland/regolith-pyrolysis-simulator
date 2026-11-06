@@ -10,6 +10,7 @@ import yaml
 
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_file
+from simulator.battery.records import AdmissionStatus, EvidenceClass, ValueKind
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,13 +19,6 @@ MODEL_ROWS = (
     "robinot_2026_o2_hsc_expected_1p37_model",
     "robinot_2026_fig1_hsc_figure_only",
 )
-TRANSIENT_EQUATION_GATE = {
-    "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
-    "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-    "derived observation requires derived_from",
-}
-
-
 def _observations(document: dict) -> dict[str, dict]:
     return {
         row["observation_id"]: row
@@ -49,19 +43,23 @@ def _assert_model_rows(document: dict) -> None:
         ]
 
 
-def test_hsc_rows_are_model_derived_and_migrate_with_only_equation_gate() -> None:
+def test_hsc_rows_are_model_derived_and_migrate_with_prose_method() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_model_rows(document)
     assert validate_extract_file(EXTRACT) == []
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
-    hard_issues = migrator.result.validation.hard_issues
-    assert all(
-        issue.detail in TRANSIENT_EQUATION_GATE
-        and any(observation_id in issue.path for observation_id in MODEL_ROWS)
-        for issue in hard_issues
+    assert migrator.result.validation.hard_issues == ()
+    model = next(
+        row for key, row in migrator.result.observations.items()
+        if key.endswith(MODEL_ROWS[0])
     )
+    assert model.admission.status is AdmissionStatus.ADMITTED
+    assert model.value.kind is ValueKind.UNAVAILABLE
+    assert model.derivation is not None and model.derivation.has_located_method
+    assert model.derivation.has_named_references
+    assert model.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
 def test_model_class_mutation_back_to_quote_fails() -> None:

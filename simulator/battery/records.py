@@ -605,6 +605,11 @@ class Derivation:
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
         ) or (isinstance(page, str) and bool(page.strip()))
+        # d-351 admits a located prose method; an equation is not required.
+        has_section_or_equation = locator is not None and any(
+            isinstance(value, str) and bool(value.strip())
+            for value in (locator.section, locator.paragraph, locator.equation)
+        )
         return (
             self.method is not None
             and self.method.state.is_value
@@ -612,8 +617,7 @@ class Derivation:
             and bool(self.method.state.value.strip())
             and locator is not None
             and has_physical_page
-            and isinstance(locator.equation, str)
-            and bool(locator.equation.strip())
+            and has_section_or_equation
         )
 
     @property

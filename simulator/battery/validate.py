@@ -1336,6 +1336,27 @@ def _validate_observation(
         declares_unprinted_raw_inputs = (
             derivation is not None and derivation.declares_unprinted_raw_inputs
         )
+        if (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and _value_has_numeric_value(observation.value)
+            and not declares_unprinted_raw_inputs
+        ):
+            if not method_located:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires a nonempty method with a physical page and paragraph/section or equation locator",
+                    )
+                )
+            if not model_references_declared:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.references",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires named references",
+                    )
+                )
         if raw_inputs is not None:
             if (
                 not declares_unprinted_raw_inputs
@@ -1393,7 +1414,7 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.method",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+                        "model_derived raw_inputs method requires a nonempty value and a physical page with paragraph/section or equation locator",
                     )
                 )
             if derivation is not None and not derivation.has_named_references:
@@ -1401,7 +1422,7 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.references",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires named compiled references",
+                        "model_derived raw_inputs method requires named references",
                     )
                 )
         has_resolved_lineage = any(
@@ -1420,7 +1441,14 @@ def _validate_observation(
                 )
             )
         )
-        if not figure_only_without_value:
+        claims_parent_lineage = (
+            ev.value is EvidenceClass.MEASURED_REDUCED
+            or bool(observation.derived_from)
+            or bool(derivation is not None and derivation.inputs)
+        )
+        if not figure_only_without_value and claims_parent_lineage:
+            # d-351 keeps lineage checks when a record names parents; prose
+            # method plus references alone does not claim parent derivation.
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
             # measured_reduced, and for model_derived only with a located
