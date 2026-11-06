@@ -10,7 +10,8 @@ tables:
     mapping: >-
       Columns 1-8 contain four paired T/Cp blocks. Series labels change within
       the printed table; table row assignments were verified against the page
-      render. All 100 T/Cp pairs are stored as measured_direct, per mole Fe3O4.
+      render. All 100 T/Cp pairs are stored as measured_direct with per:
+      mol_species, per mole Fe3O4.
     cell_audit: >-
       The companion cells CSV preserves the MinerU table grid. All numeric
       digits agree with pdftotext-layout; page 4 render confirms paired-column
@@ -21,9 +22,11 @@ tables:
     mapping: >-
       The two four-column blocks each contain T, Cp, enthalpy increment, and
       entropy increment. The right-hand H° heading is ΔH° under the caption
-      definition. All 38 temperature entries are stored for each applicable
-      quantity; values are measured_reduced from Table 1 and documented
-      low-temperature data.
+      definition. All 38 temperatures are stored for each column. Cp and
+      ΔH° are measured_reduced from Table 1 and documented low-temperature
+      data, per mol_species; ΔH° has reference_temperature_K 298.15. The
+      printed ΔS° = S°(T)−S°(298.15 K) values are retained with their exact
+      symbol but schema-gapped because Quantity.S is absolute standard entropy.
     cell_audit: >-
       Three flagged temperature cells were resolved against the page 6 render:
       row 10 column 5 is 840 (omitted by pdftotext-layout), row 11 column 5 is
@@ -41,8 +44,11 @@ tables:
       The five columns are T, −log10(pH2O/pH2), −ΔrG°, Δ{G°(T)−H°(0)}, and
       −ΔfH°(Fe3O4,T→0); each data column is stored separately. The negative
       reaction Gibbs energy and gas ratio are quoted from Rau; the Gibbs
-      function is measured_reduced; the last column is model_derived. The
-      Gibbs functions have typed schema gaps per the controller ruling. The second 790.5 K row was read from the render:
+      function is measured_reduced from Table 2 and standard-state functions
+      for Fe(s), H2O(g), and H2(g), assuming S°(0)=0 for each species; the
+      last column is model_derived from Rau's equilibrium data and those
+      functions. All four non-token columns retain typed schema gaps per the
+      controller ruling. The second 790.5 K row was read from the render:
       pdftotext-layout/OCR has 190.5 there.
     cell_audit: >-
       The companion cells CSV preserves the MinerU table grid. All numeric
@@ -51,9 +57,10 @@ tables:
     render_verified:
       - {row: 14, column: 1, text: '790.5', reason: 'pdftotext-layout reads 190.5; the page 13 render clearly reads 790.5.'}
 context_audit:
-  page_2: >-
-    Sample preparation and composition/impurity statements are transcribed as
-    located context. No calorimetry pressure is printed, so pressure is absent.
+  page_3: >-
+    Sample characterization, composition, impurities, and ampoule mass are
+    printed on published page 861. No calorimetry pressure is printed, so
+    pressure is absent.
   page_4: >-
     The measured heat-capacity maximum is 337 J K−1 mol−1 at 848.04 K over
     1.052 K. Curie-temperature fits and transition entropy estimates are
@@ -68,9 +75,13 @@ context_audit:
     left out of the requested extract. MinerU QA flags row 2 column 5 as 673
     while pdftotext-layout reads 613; the page 7 render confirms 673. Its
     component values are not stored.
+  page_12: >-
+    The authors' least-squares fit to the Table 4 enthalpy values gives a
+    zero-point entropy of 4.13 J K−1 mol−1; they state verbatim that the best
+    value is about 4 J K−1 mol−1.
   page_13: >-
-    The zero-point entropy discussion says the best value is about 4 J K−1
-    mol−1 and notes the evidence cannot settle the question unequivocally.
+    The following page reports Rau's results as insufficiently accurate to
+    settle the question; this is not attributed to the authors' fit statement.
   figures: >-
     Figure 1 quotes graphical earlier-investigator heat capacities only; these
     are figure-read candidates and are not extracted as numeric observations.

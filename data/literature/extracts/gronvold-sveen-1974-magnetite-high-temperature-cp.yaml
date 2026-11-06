@@ -46,6 +46,14 @@ schema_gaps:
   - simulator/battery/migrate.py::QUANTITY_ALIASES
   - simulator/battery/migrate.py::TYPE_QUANTITY
   - simulator/battery/enums.py::Quantity.DELTA_FH
+- printed_quantity: ΔS° = S°(T)−S°(298.15 K)
+  reason: This is an entropy increment, while Quantity.S denotes absolute standard entropy; no exact entropy-increment
+    quantity token exists.
+  code_citations:
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  - simulator/battery/enums.py::Quantity.S
 fidelity_samples:
 - path: species.Fe3O4.observations[gronvold_sveen_1974_table1_i].values.points[0].value
   value: '159.11'
@@ -104,6 +112,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -252,6 +261,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -628,6 +638,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1061,6 +1072,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1228,6 +1240,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1433,6 +1446,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1581,6 +1595,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1843,6 +1858,7 @@ species:
         pdf_page_index: 3
         table: '1'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -2124,6 +2140,7 @@ species:
         pdf_page_index: 5
         table: '2'
       units: J/mol K
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_reduced
@@ -2874,6 +2891,8 @@ species:
         pdf_page_index: 5
         table: '2'
       units: J/mol
+      per: mol_species
+      reference_temperature_K: 298.15
       values:
         quantity: H_minus_H298
         method_class: measured_reduced
@@ -3122,8 +3141,11 @@ species:
         pdf_page_index: 5
         table: '2'
       units: J/mol K
+      per: mol_species
       values:
-        quantity: S
+        quantity: standard_entropy_increment
+        printed_symbol: ΔS° = S°(T)−S°(298.15 K)
+        schema_gap: Table 2 prints an entropy increment from 298.15 K, not absolute standard entropy; no exact quantity token represents this definition.
         method_class: measured_reduced
         evidence_class: measured_reduced
         points:
@@ -3820,11 +3842,6 @@ species:
           point_conditions: *id211
           locator: *id194
         attribution: Rau (reference 21), as cited
-        derivation:
-          relation: Authors compute Gibbs function from their thermodynamic data.
-          inputs: &id212
-          - gronvold_sveen_1974_table4_log10_pH2O_over_pH2
-        derived_from: *id212
     - observation_id: gronvold_sveen_1974_table4_gibbs_function_G_T_minus_H_0
       type: gibbs_table
       phase: cr
@@ -3944,7 +3961,7 @@ species:
           point_conditions: *id211
           locator: *id194
         derivation:
-          relation: Authors compute Gibbs function from their thermodynamic data.
+          relation: Authors compute the Gibbs function from the Table 2 enthalpy and entropy functions and standard-state functions for Fe(s), H2O(g), and H2(g), assuming S°(0)=0 for each reaction species.
           inputs: &id213
           - gronvold_sveen_1974_table2_H_minus_H298
           - gronvold_sveen_1974_table2_S
@@ -4079,8 +4096,8 @@ species:
     - observation_id: gronvold_sveen_1974_sample_characterization_context
       type: sample_characterization_context
       locator:
-        page: 2
-        published_page: 860
+        page: 3
+        published_page: 861
         section: Sample
       units: compositional values as printed
       values:
@@ -4126,11 +4143,15 @@ species:
     - observation_id: gronvold_sveen_1974_zero_point_entropy_context
       type: zero_point_entropy_statement
       locator:
-        page: 13
-        published_page: 871
+        page: 12
+        published_page: 870
         section: Zero-point entropy of Fe3O4
       units: J K−1 mol−1
       values:
-        method_class: quoted_attributed
-        statement: “the best value of the zero-point entropy is about 4 J K−1 mol−1.” The authors state the data
-          are not accurate enough to settle the question unequivocally.
+        method_class: model_derived
+        evidence_class: model_derived
+        statement: The authors' least-squares fit gives S°(Fe3O4, T→0)=4.13 J K−1 mol−1; they say “the best value of the zero-point entropy is about 4 J K−1 mol−1.”
+        derivation:
+          relation: Authors' least-squares fit of the Table 4 negative formation enthalpy values against A + BT to estimate the zero-point entropy.
+          inputs:
+          - gronvold_sveen_1974_table4_negative_formation_enthalpy
