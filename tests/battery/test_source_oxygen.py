@@ -127,6 +127,8 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     )
     assert condition["observation_id"] in substitution.reason
     assert "target row has no printed fO2" in substitution.reason
+    assert "basis=source_oxygen_condition;" in substitution.reason
+    assert "inputs=" in substitution.reason
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
 
 
