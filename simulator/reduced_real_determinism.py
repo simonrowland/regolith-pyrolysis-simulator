@@ -3771,6 +3771,13 @@ def _is_cacheable_equilibrium_result(result: EquilibriumResult) -> bool:
 
 
 def _is_cacheable_gate_curve(curve: Mapping[str, Any]) -> bool:
+    refusal = curve.get("gate_provider_refusal")
+    if (
+        isinstance(refusal, Mapping)
+        and str(refusal.get("qualification") or "")
+        == "held_last_good_curve"
+    ):
+        return False
     status = _normalized_status(
         curve.get("status") or curve.get("backend_status")
     )

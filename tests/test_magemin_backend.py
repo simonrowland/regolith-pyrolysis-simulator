@@ -2684,6 +2684,34 @@ def test_liquidus_trace_fe2o3_keeps_feo_total_buffer_oxygen():
     assert captured[0]['projected_oxide_wt_pct']['Fe2O3'] == pytest.approx(1.0)
     assert captured[0]['projected_oxide_wt_pct']['O'] == pytest.approx(0.1)
 
+    captured.clear()
+    retry_kg = {'SiO2': 50.0, 'FeO': 10.0, 'Fe2O3': 1.0}
+    retry_mol = {'SiO2': 1.0, 'FeO': 0.20, 'Fe2O3': 0.001}
+    retry_accounts = {
+        CLEANED_MELT_ACCOUNT: dict(retry_mol),
+        'process.overhead_gas': {'O2': 0.01, 'Fe2O3': 0.5},
+    }
+    # Verify the retry guard on the bulk that equilibrate receives, separately
+    # from the projected-oxide override above. Without the guard, Fe2O3 is
+    # folded into FeO before this solve input is submitted.
+    backend.find_liquidus_solidus(
+        composition_kg=retry_kg,
+        composition_mol=retry_mol,
+        composition_mol_by_account=retry_accounts,
+        projected_retry=True,
+        fO2_log=-9.0,
+        pressure_bar=1.0e-4,
+        min_T_C=1000.0,
+        max_T_C=1200.0,
+        scan_step_C=200.0,
+        tolerance_C=50.0,
+    )
+    retry_bulk = captured[0]
+    assert retry_bulk['projected_oxide_wt_pct'] is None
+    assert retry_bulk['composition_kg'] == retry_kg
+    assert retry_bulk['composition_mol'] == retry_mol
+    assert retry_bulk['composition_mol_by_account'] == retry_accounts
+
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     # A successful call must populate phases_present, phase_masses_kg and

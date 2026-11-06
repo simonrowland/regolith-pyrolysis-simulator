@@ -1999,6 +1999,114 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
         assert notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
 
 
+def test_stable_refusal_held_curve_is_flagged_but_not_memoized(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
+    )
+    sim.melt.temperature_C = 1150.0
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    from simulator.evaporation import _FREEZE_GATE_COMPOSITION_SPECIES
+
+    baseline_mol = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
+    base_oxide_total = sum(
+        float(baseline_mol.get(species, 0.0))
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES - {'NiO', 'CoO'}
+    )
+    projection = MAGEMinBackend()._build_db_bulk_projection(
+        {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0},
+    )
+    stable_diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'input_composition_projection': _magemin_bulk_projection_details(
+            projection
+        ),
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+    provider_calls = []
+
+    def injected_provider_result(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        provider_calls.append(intent)
+        if len(provider_calls) in {2, 3}:
+            return IntentResult(
+                intent=intent,
+                status='out_of_domain',
+                transition=None,
+                diagnostic=stable_diagnostic,
+            )
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0 if len(provider_calls) == 1 else 1050.0,
+                'liquidus_T_C': 1300.0 if len(provider_calls) == 1 else 1450.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
+    first = sim._freeze_gate_curve()
+    first_key = sim._freeze_gate_liquid_fraction_cache['key']
+    sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'NiO': base_oxide_total * 0.002, 'CoO': base_oxide_total * 0.002},
+        source='stable refusal held-curve cache regression',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'NiO': base_oxide_total * 0.004},
+        source='stable refusal held-curve cache-key perturbation',
+        material_origin='feedstock',
+    )
+    sim.melt.hour += 1
+    key = _freeze_gate_key_for_current_state(sim)
+    assert key != first_key
+
+    held = sim._freeze_gate_curve()
+    assert held['source'] == first['source']
+    assert held['path'] == first['path']
+    assert held['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    assert held['gate_provider_refusal']['authority'] == 'extrapolated (held)'
+    assert key not in shared_cache
+    assert sim._freeze_gate_liquid_fraction_cache['key'] == first_key
+
+    # The predicted fraction and its exported notice both come from the held
+    # bracket; the stable refusal does not zero flux or abort the run.
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(0.5)
+    assert sim._last_freeze_gate_diagnostic['source'] == first['source']
+    assert sim._last_freeze_gate_diagnostic['gate_provider_refusal'][
+        'qualification'
+    ] == 'held_last_good_curve'
+    snapshot = sim._make_snapshot()
+    assert snapshot.liquid_fraction_gate['evaporation'][
+        'gate_provider_refusal'
+    ]['qualification'] == 'held_last_good_curve'
+
+    calls_before_next_hour = len(provider_calls)
+    sim.melt.hour += 1
+    assert _freeze_gate_key_for_current_state(sim) == key
+    rebuilt = sim._freeze_gate_curve()
+    assert len(provider_calls) == calls_before_next_hour + 1
+    assert rebuilt['source'] == 'gate_liquid_fraction'
+    assert rebuilt['solidus_T_C'] == 1050.0
+    assert rebuilt['liquidus_T_C'] == 1450.0
+    assert shared_cache[key]['curve']['source'] == 'gate_liquid_fraction'
+
+
 def _lunar_composition_projected_diagnostic(sim):
     """Ig-order drop notice for the lunar cleaned melt, without a binary."""
     from simulator.melt_backend.magemin import (
