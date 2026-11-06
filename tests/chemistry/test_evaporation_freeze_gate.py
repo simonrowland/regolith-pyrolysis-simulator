@@ -648,9 +648,15 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     # Stage 4 now resolves Na and K through separate collectors. In the lunar
     # staged run, that path records the C3_NA gate curve once; the prior
     # single-stage capture contained a second identical C3_NA curve record.
-    # The production output therefore moves from two copies to one, while all
-    # six remaining curve tuples retain their pinned endpoints and paths.
+    # The production output therefore moves from two copies to one. The lunar
+    # endpoints below were re-measured on studio-3 (see the lunar comment).
     expected = {
+        # Studio-3 actual after the imposed-fO2 liquidus search folds ledger
+        # Fe2O3 back onto FeO (the fixed-fO2 solve has an open oxygen budget).
+        # The earlier 1042/1375 brackets came from an oxygen-starved bulk
+        # (native fO2 about -15.5) accepted before MAGEMin fO2 readback, and
+        # after readback the gate held the C0 curve all day. Each record is a
+        # committed rebuild; hours that do not move the cache key add none.
         'lunar_mare_low_ti_C0_24h': [
             (
                 'C0',
@@ -676,23 +682,30 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1042.1875,
-                1375.0,
-                ((1042.1875, 0.0), (1375.0, 1.0)),
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
+            ),
+            (
+                'C3_NA',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
