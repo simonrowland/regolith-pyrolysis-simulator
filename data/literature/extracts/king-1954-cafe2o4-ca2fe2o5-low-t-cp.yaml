@@ -24,6 +24,7 @@ fidelity_samples:
     value: '36.72'
     printed_value: (36.72)
     extrapolated: true
+    approximate: true
   locator:
     published_page: 5849
     table: I
@@ -33,6 +34,7 @@ fidelity_samples:
     value: '46.10'
     printed_value: (46.10)
     extrapolated: true
+    approximate: true
   locator:
     published_page: 5849
     table: I
@@ -46,6 +48,20 @@ fidelity_samples:
   locator:
     published_page: 5850
     table: II
+- path: species.CaFe2O4.observations[king1954_cafe2o4_table1_cp].values.points[38]
+  value:
+    T_K: '296.08'
+    value: '36.65'
+  locator:
+    published_page: 5849
+    table: I
+- path: species.Ca2Fe2O5.observations[king1954_ca2fe2o5_table1_cp].values.points[26]
+  value:
+    T_K: '296.09'
+    value: '45.92'
+  locator:
+    published_page: 5849
+    table: I
 scope_assessment:
   document_type: Primary calorimetric study of calcium ferrites.
   note: 'Only CaFe2O4 and Ca2Fe2O5 included; magnesium ferrite and figure-only values excluded. Consumer
@@ -159,6 +175,7 @@ species:
           value: '36.72'
           printed_value: (36.72)
           extrapolated: true
+          approximate: true
         - T_K: '155.88'
           value: '24.30'
         - T_K: '194.45'
@@ -168,6 +185,7 @@ species:
       uncertainty:
         reported_status: not_reported_for_individual_points
       units_note: Printed as cal./deg. mole; temperature is in K.
+      per: mol_species
     - observation_id: king1954_cafe2o4_table2_s29816
       type: gibbs_table
       locator:
@@ -211,6 +229,7 @@ species:
         value: 0.2
         confidence_level: not_stated
       units_note: Printed as cal./deg. mole; temperature is in K.
+      per: mol_species
   Ca2Fe2O5:
     observations:
     - observation_id: king1954_ca2fe2o5_table1_cp
@@ -293,11 +312,13 @@ species:
           value: '46.10'
           printed_value: (46.10)
           extrapolated: true
+          approximate: true
         table_row_count: 30
         note: Table I values as printed; parenthesized final Cp is extrapolated.
       uncertainty:
         reported_status: not_reported_for_individual_points
       units_note: Printed as cal./deg. mole; temperature is in K.
+      per: mol_species
     - observation_id: king1954_ca2fe2o5_table2_s29816
       type: gibbs_table
       locator:
@@ -315,7 +336,7 @@ species:
       values:
         quantity: S
         method_class: measured_reduced
-        S0_51_extrapolated_cal_per_deg_mol: 2.5
+        S0_51_extrapolated_cal_per_deg_mol: '2.50'
         S0_29816_minus_S0_51_measured_cal_per_deg_mol: 42.61
         extrapolation_model_as_printed: D(175/T) + 3E(284/T) + 3E(610/T) + 2E(547/T) (1.4%, 51–225 K)
         reduction: Simpson-rule integration of Cp against log T plots; Debye/Einstein extrapolation below
@@ -341,3 +362,4 @@ species:
         value: 0.3
         confidence_level: not_stated
       units_note: Printed as cal./deg. mole; temperature is in K.
+      per: mol_species
