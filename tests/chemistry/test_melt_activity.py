@@ -283,7 +283,7 @@ def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
     assert notice["to_standard_state_id"] == "Fe-020"
     assert conversion.domain_verdict.certified_band_K == (
         Decimal("298.15"),
-        Decimal("5000.0"),
+        Decimal("1650"),
     )
     assert "metastable (supercooled) liquid" in conversion.domain_verdict.reason
 
