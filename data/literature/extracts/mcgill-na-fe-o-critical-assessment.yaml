@@ -28,6 +28,12 @@ fidelity_samples:
   - path: species.NaFeO2.observations[mcgill16_nafeo2_fusion_temperature_exp].values.T_m_K
     value: '1620'
     locator: {page: 7, published_page: 582, table: 'IV', row: 'L = NaFeO2(c)'}
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_assessed_delta_fH].values.value
+    value: '-697.350'
+    locator: {page: 5, published_page: 580, table: 'II', row: 'α-NaFeO2 this work', column: 'ΔH°298 K'}
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_assessed_entropy].values.value
+    value: '88.341'
+    locator: {page: 5, published_page: 580, table: 'II', row: 'α-NaFeO2 this work', column: 'S°298 K'}
 species:
   NaFeO2:
     observations:
@@ -55,6 +61,47 @@ species:
           temperature_K:
             state: {tag: value, value: {kind: point, point: '298'}}
             locator: {page: 5, table: 'II', row: NaFeO2}
+        condensed_form:
+          polymorph: alpha
+      - observation_id: mcgill16_nafeo2_assessed_delta_fH
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: 'α-NaFeO2 this work', column: 'ΔH°298 K'}
+        phase: cr
+        condensed_form:
+          polymorph: alpha
+        units: kJ/mol
+        per: mol_species
+        standard_pressure_Pa: '101325'
+        standard_state: Optimized standard enthalpy of formation at 298 K, as reported in Table II.
+        values:
+          quantity: delta_fH
+          method_class: model_derived
+          value: '-697.350'
+          T_K: '298'
+          standard_pressure_Pa: '101325'
+          standard_pressure_as_printed: 1 atm (reference state)
+          phase_as_printed: α-NaFeO2
+          per_as_printed: per mole of compound
+          method_class_reason: Authors' optimized thermodynamic assessment value, distinct from the quoted Koehler calorimetry result.
+        derivation:
+          relation: The authors fixed NaFeO2 thermodynamic properties from experimental data before optimizing other solid Gibbs energies and liquid-model parameters.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 8, published_page: 583, pdf_page_index: 7, section: NaFeO2 thermodynamic properties, note: The numerical experimental and emf inputs used in the assessment are not tabulated as a complete input set.}
+          method:
+            state: {tag: value, value: "The standard enthalpy was determined from Koehler et al. [28] calorimetry and Gibbs-energy data measured using emf."}
+            locator:
+              page: 8
+              published_page: 583
+              pdf_page_index: 7
+              section: NaFeO2 thermodynamic properties
+              equation: NaFeO2 standard-enthalpy assessment described in prose
+              note: The authors say the emf results are inconsistent and explain the enthalpy assessment against Koehler calorimetry.
+          references: ["Koehler et al. [28]", "Yamaguchi et al. [2]", "emf studies [2, 4, 33, 34]"]
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 5, table: 'II', row: 'α-NaFeO2 this work'}
       - observation_id: mcgill16_nafeo2_quoted_entropy
         type: heat_capacity_and_heat_content_series
         locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: NaFeO2, column: 'S°298 K'}
@@ -77,6 +124,47 @@ species:
           temperature_K:
             state: {tag: value, value: {kind: point, point: '298'}}
             locator: {page: 5, table: 'II', row: NaFeO2}
+        condensed_form:
+          polymorph: alpha
+      - observation_id: mcgill16_nafeo2_assessed_entropy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: 'α-NaFeO2 this work', column: 'S°298 K'}
+        phase: cr
+        condensed_form:
+          polymorph: alpha
+        units: J/mol/K
+        per: mol_species
+        standard_pressure_Pa: '101325'
+        standard_state: Optimized standard entropy at 298 K, as reported in Table II.
+        values:
+          quantity: S
+          method_class: model_derived
+          value: '88.341'
+          T_K: '298'
+          per: mol_species
+          standard_pressure_Pa: '101325'
+          standard_pressure_as_printed: 1 atm (standard entropy state)
+          phase_as_printed: α-NaFeO2
+          method_class_reason: Authors fixed the standard entropy in their thermodynamic assessment according to King [32], distinct from the quoted value.
+        derivation:
+          relation: The authors fixed the standard entropy of α-NaFeO2 at 298 K according to King [32] as part of the NaFeO2 thermodynamic assessment.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 8, published_page: 583, pdf_page_index: 7, section: NaFeO2 thermodynamic properties, note: The assessment's numerical inputs are not tabulated as a complete input set.}
+          method:
+            state: {tag: value, value: "The standard entropy of formation was fixed according to King [32]."}
+            locator:
+              page: 8
+              published_page: 583
+              pdf_page_index: 7
+              section: NaFeO2 thermodynamic properties
+              equation: NaFeO2 standard-entropy assessment described in prose
+              note: The authors identify King [32] as the basis for the fixed value.
+          references: ["King [32]"]
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 5, table: 'II', row: 'α-NaFeO2 this work'}
       - observation_id: mcgill16_nafeo2_alpha_beta_transition_enthalpy
         type: phase_transition
         locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: 'Phase transformations', column: 'ΔH_tr α → β'}
@@ -152,6 +240,8 @@ species:
           phase_as_printed: NaFeO2(c)
           attribution: Christensen et al. [27] and Koehler et al. [28], Table IV references [27, 28]
           method_class_reason: Experimental fusion temperature listed for comparison with the calculated invariant temperature.
+        condensed_form:
+          polymorph: gamma
         point_conditions:
           temperature_K:
             state: {tag: value, value: {kind: point, point: '1620'}}
@@ -191,7 +281,7 @@ species:
         locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II'}
         units: as printed by each table column
         values:
-          printed_body_row_count: 33
+          printed_body_row_count: 32
           unmarked_rows_evidence_class: quoted_attributed
           reference_state_as_printed: Standard thermodynamic properties at 298 K; the text defines the elemental reference state at 1 atm and formation enthalpies as ΔH°f.
           rows:
@@ -227,7 +317,6 @@ species:
             - {species: Na4FeO3, delta_fH_kJ_mol: '-1205.56', technique: SC, attribution: '[62]', note: '** converted from constituent-oxide basis to elements in this study'}
             - {species: Na4FeO3, delta_fH_kJ_mol: '-1249.78', technique: SC, attribution: '[33]', note: '** converted from constituent-oxide basis to elements in this study'}
             - {species: Na4FeO3, delta_fH_kJ_mol: '-1205.000', S_J_mol_K: '212.625', Cp: '2 Cp(Na2O) + Cp(FeO)', method_class: model_derived, attribution: 'This work'}
-            - {species: NaFeO2, phase_transformations: 'alpha -> beta: 41.84 J/mol at 870 K; beta -> gamma: 2177 J/mol at 1270 K', method_class: model_derived, attribution: 'This work, based on [27]'}
           footnotes_as_printed:
             - 'KEMS = Knudsen effusion mass spectrometry; MS = mass spectrometry; SC = solution calorimetry; DC = drop calorimetry; AC = adiabatic calorimetry; Est = estimation.'
             - "'**' values are enthalpies originally given from Na2O and FeO constituent oxides and converted to an elemental-species base in this study."
@@ -279,7 +368,7 @@ species:
             - {T_exp: '1620 K (1347 °C)', T_calc: '1620 K (1347 °C)', reaction: 'L = NaFeO2(c)', Na2O_exp_mol_pct: '50.0', Na2O_calc_mol_pct: '50.0', reference: '[27, 28]'}
             - {T_exp: 'not printed', T_calc: '1492 K (1219 °C)', reaction: 'L = NaFeO2(c) + Na8Fe2O7', Na2O_calc_mol_pct: '63.5'}
             - {T_exp: '~1023 K (750 °C)', T_calc: '1052 K (779 °C)', reaction: 'NaFeO2(b) + Na8Fe2O7 = Na3FeO3', Na2O_exp_mol_pct: '75.0', Na2O_calc_mol_pct: '75.0', reference: '[46]'}
-            - {T_exp: 'not printed', T_calc: '644 K (371 °C)', reaction: 'Na8Fe2O7 = Na3FeO3 + Na2O(a)', Na2O_calc_mol_pct: '80.0'}
+            - {T_exp: 'not printed', T_calc: '644 K (371 °C)', reaction: 'Na8Fe2O7 = Na3FeO3 + Na2O(a)', Na2O_exp_mol_pct: '80.0', Na2O_calc_mol_pct: '80.0'}
             - {T_exp: 'not printed', T_calc: '1530 K (1257 °C)', reaction: 'L = Na8Fe2O7', Na2O_calc_mol_pct: '80.0'}
             - {T_exp: 'not printed', T_calc: '1306 K (1033 °C)', reaction: 'L = Na8Fe2O7 + Na2O(c)', Na2O_calc_mol_pct: '95.6'}
       - observation_id: mcgill16_table_v_na2o_feo_invariants

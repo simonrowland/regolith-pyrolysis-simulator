@@ -23,10 +23,12 @@ def _rows() -> dict[str, dict]:
 def test_nafeo2_table_ii_render_values_and_comparison_are_pinned() -> None:
     assert validate_extract_file(EXTRACT, check_fidelity_match=True) == []
     rows = _rows()
-    assert len(rows) == 5
+    assert len(rows) == 7
     pins = {
         "mcgill16_nafeo2_quoted_delta_fH": "-698.02",
         "mcgill16_nafeo2_quoted_entropy": "88.34",
+        "mcgill16_nafeo2_assessed_delta_fH": "-697.350",
+        "mcgill16_nafeo2_assessed_entropy": "88.341",
         "mcgill16_nafeo2_fusion_temperature_exp": "1620",
     }
     for observation_id, expected in pins.items():
@@ -52,8 +54,8 @@ def test_nafeo2_table_ii_render_values_and_comparison_are_pinned() -> None:
     by_id = {row["observation_id"]: row for row in source_contexts}
     table_ii = by_id["mcgill16_table_ii_complete_thermochemistry_inventory"]
     assert table_ii["locator"]["page"] == 5 and table_ii["locator"]["table"] == "II"
-    assert table_ii["values"]["printed_body_row_count"] == 33
-    assert len(table_ii["values"]["rows"]) == 33
+    assert table_ii["values"]["printed_body_row_count"] == 32
+    assert len(table_ii["values"]["rows"]) == 32
     table_ii_rows = table_ii["values"]["rows"]
     assert table_ii_rows[0] == {
         "species": "Na2O",
@@ -68,9 +70,14 @@ def test_nafeo2_table_ii_render_values_and_comparison_are_pinned() -> None:
         if row.get("species") == "Na4FeO3" and row.get("delta_fH_kJ_mol") == "-1205.000"
     )
     assert na4feo3_current["S_J_mol_K"] == "212.625"
-    assert table_ii_rows[-1]["phase_transformations"] == (
-        "alpha -> beta: 41.84 J/mol at 870 K; beta -> gamma: 2177 J/mol at 1270 K"
-    )
+    assert table_ii_rows[-1] == {
+        "species": "Na4FeO3",
+        "delta_fH_kJ_mol": "-1205.000",
+        "S_J_mol_K": "212.625",
+        "Cp": "2 Cp(Na2O) + Cp(FeO)",
+        "method_class": "model_derived",
+        "attribution": "This work",
+    }
 
     table_iii = by_id["mcgill16_table_iii_optimized_parameters"]
     assert table_iii["locator"]["page"] == 6 and table_iii["locator"]["table"] == "III"
@@ -88,8 +95,16 @@ def test_nafeo2_table_ii_render_values_and_comparison_are_pinned() -> None:
     assert len(table_v["values"]["rows"]) == table_v["values"]["printed_body_row_count"] == 9
     assert len(table_vi["values"]["rows"]) == table_vi["values"]["printed_body_row_count"] == 11
     assert table_iv["values"]["rows"][0]["T_exp"] == "1408 K (1135 °C) ± 24"
+    assert table_iv["values"]["rows"][6]["Na2O_exp_mol_pct"] == "80.0"
+    assert table_iv["values"]["rows"][6]["Na2O_calc_mol_pct"] == "80.0"
     assert table_v["values"]["rows"][0]["Na2O_exp_mol_pct"] == "25.00"
     assert table_vi["values"]["rows"][0]["FeO_mol_pct"] == "9.7"
+    table_vi_1070 = next(row for row in table_vi["values"]["rows"] if row["T"] == "1070 K (797 °C)")
+    assert (table_vi_1070["Na2O_mol_pct"], table_vi_1070["Fe2O3_mol_pct"], table_vi_1070["FeO_mol_pct"]) == ("51.8", "29.0", "45.3")
+    assert sum(
+        Decimal(table_vi_1070[key])
+        for key in ("Na2O_mol_pct", "Fe2O3_mol_pct", "FeO_mol_pct")
+    ) == Decimal("126.1")
     assert all(row["locator"]["page"] in {5, 6, 7, 12, 14} for row in by_id.values())
 
 
@@ -97,7 +112,7 @@ def test_isolated_migration_keeps_numeric_rows_and_transition_schema_gap() -> No
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     observations = migrator.result.observations
-    assert len(observations) == 5
+    assert len(observations) == 7
     assert not migrator.result.validation.hard_issues
     assert observations[
         "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_delta_fH"
@@ -105,6 +120,12 @@ def test_isolated_migration_keeps_numeric_rows_and_transition_schema_gap() -> No
     assert observations[
         "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_entropy"
     ].value.point == Decimal("88.34")
+    assert observations[
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH"
+    ].value.point == Decimal("-697.350")
+    assert observations[
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy"
+    ].value.point == Decimal("88.341")
     assert observations[
         "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_fusion_temperature_exp"
     ].value.point == Decimal("1620")
@@ -120,6 +141,21 @@ def test_isolated_migration_keeps_numeric_rows_and_transition_schema_gap() -> No
     assert "total_pressure_Pa" not in fusion.point_conditions
     assert "fO2_log" not in fusion.point_conditions
     assert all(row.identity.species.phase.is_value for row in observations.values())
+    for observation_id in (
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_delta_fH",
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_entropy",
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH",
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy",
+    ):
+        assert observations[observation_id].identity.species.polymorph.value.value == "alpha"
+    assert observations[
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_fusion_temperature_exp"
+    ].identity.species.polymorph.value.value == "gamma"
+    for observation_id in (
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH",
+        "mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy",
+    ):
+        assert observations[observation_id].evidence.class_.value.value == "model_derived"
     assert {
         row_id for row_id, row in observations.items()
         if row.value.kind is ValueKind.UNAVAILABLE
