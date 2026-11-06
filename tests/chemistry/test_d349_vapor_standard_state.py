@@ -1075,7 +1075,10 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         assert notice["reason"] == "activity_standard_state_substitution"
         assert math.isfinite(float(notice["log10_activity_offset"]))
         if species == "Fe":
-            assert notice["conversion_performed"] is True
+            assert notice["conversion_performed"] is False
+            assert notice["source_standard_state_relation_reason"] == (
+                "source_and_K_standard_states_match"
+            )
         assert notice["source_standard_state_substitution"] == (
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
