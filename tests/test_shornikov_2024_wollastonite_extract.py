@@ -29,7 +29,7 @@ PRINTED_ROWS = {
         "−11.29",
     ),
     "shornikov_2024_liquid_formation_entropy": (
-        "entropy of wollastonite formation from simple oxides",
+        "entropy of wollastonite melt formation from simple oxides",
         "17.53",
     ),
 }
