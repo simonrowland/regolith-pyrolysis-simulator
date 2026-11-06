@@ -9,6 +9,7 @@ from simulator.chemistry.kernel import (
     IntentResult,
     LedgerTransitionProposal,
 )
+from simulator.accounting.completeness import product_class_availability
 from simulator.accounting.ledger import LedgerTransition
 from simulator.accounting.lots import MaterialLot
 from simulator.cost_energy import (
@@ -29,6 +30,10 @@ from simulator.cost_ledger import (
 from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.optimize.objective import (
+    ObjectiveComputationError,
+    _metric_value,
+)
 
 
 MASS_BALANCE_HARD_GATE_PCT = 5.0e-12
@@ -36,6 +41,57 @@ MASS_BALANCE_HARD_GATE_PCT = 5.0e-12
 
 def _cost(summary: dict, key: str) -> CostVector:
     return CostVector(**summary["product_costs"][key]["accumulated_cost"])
+
+
+def test_zero_flux_refusal_is_unavailable_to_accounting_ledger_and_optimizer():
+    refusal = {
+        "species_id": "Si",
+        "parent_oxide": "SiO2",
+        "pressure": {"kind": "refusal", "code": "missing_input"},
+        "flux": {"kind": "refusal", "code": "missing_input"},
+        "is_refused": True,
+        "authority_level": "refused",
+        "reason": "Si carrier activity was refused",
+    }
+    snapshot = SimpleNamespace(
+        evap_flux=SimpleNamespace(
+            species_kg_hr={"Si": 0.0},
+            carrier_authority_by_species={"Si": refusal},
+        )
+    )
+    sim = SimpleNamespace(
+        _last_evaporation_flux_diagnostic={},
+        species_formula_registry={},
+        record=SimpleNamespace(snapshots=(snapshot,)),
+    )
+
+    availability = product_class_availability(
+        sim,
+        "SiO",
+        {},
+        has_computed_part=False,
+        snapshots=(snapshot,),
+    )
+    assert availability["status"] == "unavailable"
+    assert availability["class_total_kg"] is None
+    assert [item["species"] for item in availability["excluded"]] == ["Si"]
+
+    ledger_report = build_cost_rollup_diagnostic(
+        sim=sim,
+        cost_ledger=CostLedger(),
+        per_hour=(),
+        products_kg={},
+        snapshots=(snapshot,),
+    )
+    assert ledger_report["run_input_cost"]["allocation_status"] == (
+        "incomplete_unavailable_products"
+    )
+
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="Si carrier activity was refused",
+    ):
+        _metric_value("Si_kg", sim, {"Si": 0.0}, {})
 
 
 @pytest.mark.parametrize("diagnostic", [
