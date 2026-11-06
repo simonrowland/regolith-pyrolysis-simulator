@@ -1,0 +1,130 @@
+source_id: dikov-2009-luna16-condensate-iron
+table_draft_index: tables/dikov-2009-luna16-condensate-iron/index.yaml
+input_order:
+  - MinerU HTML table blocks and markdown from corpus text/dikov-2009-luna16-condensate-iron/mineru/p002-p006
+  - corpus text/dikov-2009-luna16-condensate-iron/pdftotext-layout.txt
+  - rendered PDF pages only for the checks listed below
+tables:
+  - table: '1'
+    page: 2
+    published_page: 430
+    printed_rows: 9
+    printed_columns: 14
+    source_columns: [Depth, Si, Ti, Al, Fe, Mg, Ca, Na, O, C, S, Zn, Bi, Total]
+    disposition: >-
+      All table cells retained in dikov_2009_table1_l1639_elemental_at_percent. Mineral composition analysis
+      as at.% (not oxide wt.%); rows are source-depth rows and absent dash cells remain null.
+    machine_reads: (a) MinerU and pdftotext digits/signs agree for all numeric cells; QA numeric agreement 1.000.
+    layout_render: >-
+      Rendered PDF page 2 and verified header, column order, row assignment, Surface plus 50–1800 Å rows.
+      QA comma_dot_decimal flag on 100.01 resolved: render prints 100.01 (ordinary decimal total).
+    full_cell_audit: >-
+      9 rows × 14 printed columns checked by column and row against the render. Numeric transcription uses
+      both machine reads; the 100.01 total also has explicit render confirmation. No OCR redo needed.
+  - table: '2'
+    page: 3
+    published_page: 431
+    printed_rows: 9
+    printed_columns: 16
+    source_columns: [Depth, Si4+, Si2+, Si0, Si0/SumSi, Ti4+, Ti3+, Ti2+, Ti2+/SumTi, Al3+, Al0, Al0/SumAl, Fe3+, Fe2+, Fe0, Fe0/SumFe]
+    disposition: >-
+      Full printed table retained in the typed-refused elemental-valence composition row. The Fe0/SumFe
+      column is separately stored as the supported Fe valence_ratio quantity; this does not derive other
+      valence fractions from the printed concentrations.
+      The authors' own XPS values are measured_direct: no printed calibration, fit, or ratio equation describes
+      a separate reduction step for the Fe0/SumFe column.
+    machine_reads: (a) MinerU and pdftotext digits/signs agree for all numeric cells; QA numeric agreement 1.000.
+    layout_render: >-
+      Rendered PDF page 3; verified both header tiers, all 16 columns, row assignments, and empty cells.
+      Empty printed cells are not zero values.
+    full_cell_audit: >-
+      9 rows × 16 printed columns checked against the page render. All numeric transcriptions agree in both
+      machine reads. No flagged numeric traps and no OCR redo needed.
+  - table: '3'
+    page: 6
+    published_page: 434
+    printed_rows: 12
+    printed_columns: 13
+    source_columns: [Depth, Si0, Si2+, Si4+, Al0, Al3+, Mg, Ca, Fe0, Fe2+, Fe3+, Na, O]
+    disposition: >-
+      All printed at.% composition cells retained in dikov_2009_table3_augite_condensate_composition.
+      Blank cells stay null. The values are measured condensate composition, but the schema has no exact
+      elemental-at-percent quantity; see the schema-gap note in the extract.
+    machine_reads: (a) MinerU and pdftotext digits/signs agree for all numeric cells; QA numeric agreement 1.000.
+    layout_render: >-
+      Rendered PDF page 6; verified both header tiers, all 13 columns, the 12 row depths, and all blank cells.
+    full_cell_audit: >-
+      12 rows × 13 printed columns checked against the page render. Every numeric cell agreed between the
+      two machine reads. No OCR redo needed.
+render_checks:
+  - page: 2
+    table: '1'
+    row: '200 Å'
+    cell: total_at_pct
+    machine_text: MinerU and pdftotext both read 100.01; QA flagged the decimal formatting.
+    render: 100.01
+    disposition: keep 100.01 as printed.
+  - page: 2
+    table: '1'
+    cell: table_layout
+    render: verified all row-to-column assignments and the printed dash cells.
+  - page: 3
+    table: '2'
+    cell: table_layout
+    render: verified all row-to-column assignments, multi-tier headers, and empty cells.
+  - page: 6
+    table: '3'
+    cell: table_layout
+    render: verified all row-to-column assignments, multi-tier headers, and empty cells.
+  - page: 1
+    cell: abstract_temperature_range
+    render: abstract prints approximately 3000–4000 K and pulse duration approximately 10^-3 s.
+  - page: 5
+    cell: experimental_temperature_range_and_conditions
+    render: Experimental section prints characteristic sample temperature 4000–5000 K, approximately 10^-3 s pulse, He atmosphere at 1 atm.
+  - page: 7
+    cell: cited_vaporization_comparisons
+    render: >-
+      Render confirms Brewer and Rosenblatt's FeO/Fe equilibrium-vapor partial-pressure ratio is approximately 0.2 at
+      1700 °C; the symbol is approximate, not plus/minus. It also confirms the Yakovlev/Markova comparison at 1700–1750 °C
+      states Fe2+ is approximately two orders of magnitude below Fe0. Both attributions are retained as context without
+      converting either comparison to a new scalar value.
+row_reconciliation:
+  table_1: printed 9 data rows; extract has 9.
+  table_2: printed 9 data rows; extract has 9.
+  table_3: printed 12 data rows; extract has 12.
+  species_assignment: >-
+    Fe columns in Table 2 were checked against their Fe3+, Fe2+, Fe0 and Fe0/SumFe headings; Table 3 Fe
+    columns were checked against Fe0, Fe2+, Fe3+. No column assignment was inferred from order alone.
+schema_review:
+  - >-
+    Exact scalar Quantity.VALENCE_RATIO and ValenceValueForm.FRACTION are available
+    (simulator/battery/enums.py::Quantity.VALENCE_RATIO, ValenceValueForm.FRACTION), and the Table 2
+    Fe0/SumFe values use that printed fraction basis.
+  - >-
+    No exact elemental-at-percent concentration token exists in simulator/battery/migrate.py::QUANTITY_ALIASES
+    or simulator/battery/enums.py::Quantity. Quantity.CONDENSATE_COMPOSITION is a component mole-fraction
+    vector, and Quantity.RESIDUE_COMPONENT_COMPOSITION is a different residue observable. The three full
+    elemental tables remain typed-refused under descriptive non-token quantity labels; do not bind a near-miss.
+  - >-
+    Observation types used are closed-set members: gibbs_table and concentration_series in
+    tools/validate_literature_extracts.py::OBSERVATION_TYPES. The measured specimen is a condensed solid;
+    condensed_solid maps to Phase.CR via simulator/battery/migrate.py::PHASE_MAP. Phase is not unknown.
+condition_review:
+  - >-
+    Luna sample XPS rows have no printed sample T or fO2. The analyzer vacuum is recorded verbatim as an
+    apparatus fact (1–2 × 10^-9 torr), not promoted to a sample total-pressure scalar. No assumed lunar
+    pressure, room temperature, or fO2 is stored.
+  - >-
+    The augite experiment explicitly prints He at 1 atm and approximately 10^-3 s pulse. The abstract says
+    approximately 3000–4000 K, while the Experimental section says characteristic sample temperature
+    4000–5000 K. Both are retained with their own locators; no single scalar temperature is inferred.
+  - >-
+    Table 3 row depth is not a temperature coordinate. The experiment's printed temperature range,
+    atmosphere and pulse duration are attached as located point conditions to each table row.
+figure_only_candidates:
+  - Figures 1 and 6: plotted composition correlations and reduced-species totals.
+  - Figure 2: Zn and Na depth profiles.
+  - Figures 3–5: XPS spectral profiles.
+  - Figures 7–9: Fe correlations, Fe valence depth profile, and Fe0/Fe2+ and Fe3+/Fe2+ ratios.
+  reason: No plotted numeric values transcribed; figure-only values are out of scope.
