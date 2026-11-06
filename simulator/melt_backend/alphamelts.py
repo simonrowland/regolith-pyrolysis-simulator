@@ -6074,6 +6074,12 @@ class _MELTSBackendSupport(MeltBackend):
             )
         if pressures:
             return pressures
+        if getattr(self, "_antoine_activity_standard_state_notices", None):
+            return VaporPressureActivityRefusal(
+                missing_precursor_species=(),
+                context=str(context),
+                reason="activity_standard_state_undeclared",
+            )
 
         if not self._melt_has_antoine_vapor_precursor(comp_wt, table):
             return {}
@@ -6210,6 +6216,14 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species): dict(notice)
                 for species, notice in notices.items()
             }
+        standard_state_notices = (
+            getattr(self, "_antoine_activity_standard_state_notices", None) or {}
+        )
+        if standard_state_notices:
+            payload["vapor_activity_standard_state_notices_by_species"] = {
+                str(species): dict(notice)
+                for species, notice in standard_state_notices.items()
+            }
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -6272,10 +6286,15 @@ class _MELTSBackendSupport(MeltBackend):
         from simulator.vapour_rail.channels import (
             validate_physical_pO2_bar, _pO2_evaluation_notice,
         )
+        from simulator.chemistry.melt_activity import (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+            crystalline_vapor_activity_standard_state_matches,
+        )
 
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
+        self._antoine_activity_standard_state_notices = {}
         for species, spec in table.items():
             if species not in ELLINGHAM_THERMO and not spec.get('antoine'):
                 # Retain this bridge's original oxide-gas request surface.
@@ -6287,6 +6306,28 @@ class _MELTSBackendSupport(MeltBackend):
             pO2_exponent = float(reaction.get('pO2_exponent', 0.0) or 0.0)
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
+            parent_oxide = str(spec.get('parent_oxide', '') or '')
+            if self._antoine_uses_reaction_pressure(spec) and not (
+                crystalline_vapor_activity_standard_state_matches(
+                    parent_oxide,
+                    None,
+                )
+            ):
+                # AlphaMELTS supplies liquid endmember activities and component
+                # proxies. Its bridge does not declare a pure MgO/CaO activity
+                # standard, so d-144 cannot convert these operands to the
+                # crystalline K basis. Refuse this route instead of evaluating
+                # the catalog with an untyped activity.
+                self._antoine_activity_standard_state_notices[str(species)] = {
+                    'reason': 'activity_standard_state_undeclared',
+                    'parent_oxide': parent_oxide,
+                    'source_standard_state_id': None,
+                    'source_standard_state_status': 'undeclared',
+                    'required_standard_state_id': (
+                        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                    ),
+                }
+                continue
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
                 raise RuntimeError(
                     'AlphaMELTS Antoine fallback cannot evaluate '

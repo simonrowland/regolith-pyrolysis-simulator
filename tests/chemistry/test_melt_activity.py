@@ -11,7 +11,9 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     P2O5_ACTIVITY_COEFFICIENT,
+    crystalline_vapor_activity_standard_state_matches,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
     na_reductant_activity_shift_kj_per_mol_o2,
@@ -45,6 +47,17 @@ def test_limitation_does_not_claim_cited_point_or_universal_domain_status() -> N
     assert "geometric midpoint" in text
     assert "valid_range_K is unset" in text
     assert "status-bearing" in text
+
+
+def test_crystalline_vapor_activity_guard_requires_the_crystalline_id() -> None:
+    assert crystalline_vapor_activity_standard_state_matches(
+        "MgO", MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
+    assert not crystalline_vapor_activity_standard_state_matches(
+        "CaO", MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    )
+    assert not crystalline_vapor_activity_standard_state_matches("MgO", None)
+    assert crystalline_vapor_activity_standard_state_matches("SiO2", None)
 
 
 def test_table2_range_rows_remain_geometric_midpoints_without_domains() -> None:

@@ -8,10 +8,19 @@ import pytest
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+from simulator.chemistry import ellingham_graph
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+)
+from simulator.diagnostic_helpers.alphamelts_volatility import (
+    _analytical_vapor_pressures_from_activities,
+)
+from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.vapour_rail.batch import PressureValue
 from simulator.vapour_rail.instrumentation import EffectivePressureSource
+from simulator.vapour_rail import catalog as catalog_module
 from tests.chemistry.conftest import _build_sim
 
 _D349_VAPOR_ROUTES = ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas")
@@ -359,3 +368,81 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
             rel=1e-9,
             abs=0,
         ), species
+
+
+def test_d349_alphamelts_fallback_skips_undeclared_mgo_cao_standards(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+
+    def unexpected_catalog_k(*args, **kwargs):
+        raise AssertionError("untyped AlphaMELTS activity reached crystalline K")
+
+    monkeypatch.setattr(
+        ellingham_graph,
+        "effective_equilibrium_pressure_Pa",
+        unexpected_catalog_k,
+    )
+    projection = backend._activities_times_antoine_or_fail(
+        1500.0,
+        {"MgO": 0.4, "CaO": 0.3},
+        {"MgO": 10.0, "CaO": 10.0},
+        pO2_bar=1.0,
+        context="d-349 standard-state guard test",
+    )
+
+    assert projection.reason == "activity_standard_state_undeclared"
+    for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
+        notice = backend._antoine_activity_standard_state_notices[species]
+        assert notice["reason"] == "activity_standard_state_undeclared"
+        assert notice["parent_oxide"] == parent_oxide
+        assert notice["source_standard_state_id"] is None
+        assert notice["required_standard_state_id"] == (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        )
+    diagnostics = backend._vapor_pressure_diagnostics(
+        {}, {}, projection
+    )
+    assert set(
+        diagnostics["vapor_activity_standard_state_notices_by_species"]
+    ) == {"Mg", "Ca"}
+    assert diagnostics["vapor_pressure_backend_status_reason"] == (
+        "activity_standard_state_undeclared"
+    )
+
+
+def test_d349_alphamelts_volatility_diagnostic_skips_untyped_k_activity(
+    vapor_pressure_data,
+    monkeypatch,
+):
+    class CatalogThatMustNotEvaluate:
+        def evaluator_for(self, species):
+            if species in {"Mg", "Ca"}:
+                raise AssertionError(
+                    f"{species} reached crystalline K with undeclared activity"
+                )
+            return object()
+
+    monkeypatch.setattr(
+        catalog_module,
+        "compiled_catalog_for",
+        lambda _payload: CatalogThatMustNotEvaluate(),
+    )
+    result = _analytical_vapor_pressures_from_activities(
+        vapor_pressure_data=vapor_pressure_data,
+        temperature_C=1600.0,
+        pO2_bar=1.0e-9,
+        melt_oxide_activities={"MgO": 0.4, "CaO": 0.3},
+        composition_wt_pct={"MgO": 10.0, "CaO": 10.0},
+    )
+
+    assert "Mg" not in result["species"]
+    assert "Ca" not in result["species"]
+    for species in ("Mg", "Ca"):
+        assert any(
+            f"species={species} " in notice
+            and "reason=activity_standard_state_undeclared" in notice
+            and "required_standard_state_id="
+            "single_cation_Raoultian_pure_crystalline_reference" in notice
+            for notice in result["warnings"]
+        )

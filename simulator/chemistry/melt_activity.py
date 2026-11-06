@@ -60,6 +60,20 @@ MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY = frozenset({"MgO", "CaO"})
 HIGH_T_MELT_ACTIVITY_MODES = frozenset({"openimcc", "constant_gamma"})
 
 
+def crystalline_vapor_activity_standard_state_matches(
+    parent_oxide: str,
+    standard_state_id: str | None,
+) -> bool:
+    """Check whether an activity is on the crystalline K basis when required."""
+
+    if (
+        str(parent_oxide).strip()
+        not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
+    ):
+        return True
+    return standard_state_id == MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+
+
 def normalize_high_t_melt_activity(value: Any) -> str:
     """Validate the session/recipe high-temperature activity authority."""
 

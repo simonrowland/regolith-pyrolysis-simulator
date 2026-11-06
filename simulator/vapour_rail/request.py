@@ -39,8 +39,8 @@ from simulator.backend_names import (
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
+    crystalline_vapor_activity_standard_state_matches,
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
@@ -1423,10 +1423,14 @@ def refusal_closure(
                         or not isinstance(conversion, Mapping)
                         or conversion.get("from_standard_state_id")
                         != MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-                        or conversion.get("to_standard_state_id")
-                        != MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-                        or vapor_activity_standard_state_id
-                        != MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                        or not crystalline_vapor_activity_standard_state_matches(
+                            declaration.component_id,
+                            conversion.get("to_standard_state_id"),
+                        )
+                        or not crystalline_vapor_activity_standard_state_matches(
+                            declaration.component_id,
+                            vapor_activity_standard_state_id,
+                        )
                         or not is_declared_real_scalar(vapor_activity)
                     ):
                         return _make_refusal(

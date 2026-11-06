@@ -317,6 +317,10 @@ def _analytical_vapor_pressures_from_activities(
     antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
     from simulator.vapour_rail.catalog import compiled_catalog_for
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        crystalline_vapor_activity_standard_state_matches,
+    )
 
     catalog_payload = getattr(vapor_pressure_data, "catalog_payload", vapor_pressure_data)
     catalog = (
@@ -330,6 +334,19 @@ def _analytical_vapor_pressures_from_activities(
             continue
         parent_oxide = str(sp_data.get("parent_oxide", "") or "")
         if not parent_oxide:
+            continue
+        if not crystalline_vapor_activity_standard_state_matches(
+            parent_oxide,
+            None,
+        ):
+            warnings.append(
+                "catalog_k_activity_skipped: "
+                f"species={species} parent_oxide={parent_oxide} "
+                "reason=activity_standard_state_undeclared "
+                "source_standard_state_id=undeclared "
+                "required_standard_state_id="
+                f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}"
+            )
             continue
         if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
             if catalog is None:
