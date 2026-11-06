@@ -1942,7 +1942,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
     ) -> float:
-        from simulator.reduced_real_determinism import GATE_CURVE_NOTICE_KEYS
+        from simulator.reduced_real_determinism import copy_gate_curve_notices
 
         if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
             curve = self._resolved_melt_redox_gate_authority()
@@ -1974,10 +1974,9 @@ class EvaporationMixin:
             'liquidus_T_C': curve['liquidus_T_C'],
             'liquid_fraction': factor,
         }
-        for notice_key in GATE_CURVE_NOTICE_KEYS:
-            notice = curve.get(notice_key)
-            if isinstance(notice, Mapping):
-                self._last_freeze_gate_diagnostic[notice_key] = dict(notice)
+        self._last_freeze_gate_diagnostic.update(
+            copy_gate_curve_notices(curve)
+        )
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 

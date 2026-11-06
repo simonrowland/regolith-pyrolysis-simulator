@@ -5275,7 +5275,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_origin_matches,
         )
         from simulator.reduced_real_determinism import (
-            GATE_CURVE_NOTICE_KEYS,
+            copy_gate_curve_notices,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -5524,10 +5524,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
         }
-        for notice_key in GATE_CURVE_NOTICE_KEYS:
-            notice = normalized_curve.get(notice_key)
-            if isinstance(notice, Mapping):
-                gate_diagnostic[notice_key] = dict(notice)
+        gate_diagnostic.update(copy_gate_curve_notices(normalized_curve))
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_record

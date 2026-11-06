@@ -111,6 +111,18 @@ GATE_CURVE_NOTICE_KEYS = (
     'composition_projected_notice', 'gate_provider_refusal',
     'gate_provider_step_down', 'alphamelts_reference_pressure',
 )
+
+
+def copy_gate_curve_notices(
+    curve: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    return {
+        notice_key: dict(notice)
+        for notice_key in GATE_CURVE_NOTICE_KEYS
+        if isinstance((notice := curve.get(notice_key)), Mapping)
+    }
+
+
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
