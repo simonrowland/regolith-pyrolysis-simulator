@@ -2991,6 +2991,35 @@ def test_request_fingerprint_refuses_nonfinite(
     assert "non-finite" in answer.extra["detail"]
 
 
+def test_missing_live_evaluator_selects_source_refusal_code_when_unclaimed() -> None:
+    answer = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species={},
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("K")
+
+    assert answer.refusal_code == REFUSAL_NO_ADMITTED_SOURCE
+    assert "no live channel evaluator available" in answer.extra["detail"]
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+
+
+def test_missing_live_evaluator_still_fails_closed_when_claimed() -> None:
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="K=no_admitted_source_in_domain",
+    ):
+        resolve_vapour_batch(
+            rules=(_selector_rule("K"),),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=VapourResolveState(temperature_K=1600.0),
+            catalog_species={},
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
+
+
 @pytest.mark.parametrize("field_name", (
     "temperature_K", "fO2_bar", "total_pressure_Pa",
     "source_reaction_fO2_bar", "source_reaction_fO2_log10",
