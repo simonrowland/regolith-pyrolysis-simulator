@@ -1,0 +1,1384 @@
+schema_version: literature_extract.v1
+source_id: barin-1995
+source:
+  citation: Barin, I. (1995). Thermochemical Data of Pure Substances (3rd ed.). VCH.
+  year: 1995
+extraction:
+  method: Transcribed from the MinerU table block and pdftotext layout, then checked against a 400 dpi
+    render of PDF page 823 for the complete row and column layout and every retained numeric cell. The
+    page's 1995 print page is 708.
+  date: '2026-11-04'
+  worker: w1104nf-barin
+  provenance_path: data/literature/extracts/audits/barin-1995-nafeo2-audit.md
+review_status: draft
+classification:
+  primary: compilation_assessed
+species:
+  NaFeO2:
+    observations:
+    - observation_id: barin95_nafeo2_solb_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: Cp
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '298.15'
+      - '1620.00'
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      standard_state: FeNaO2 SOL-B as printed; no pressure is stated.
+      units: J/mol/K
+      units_note: Printed as J/(K mol).
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: References row SOL-B assigns Cp to e; the reference key defines e as estimated data
+          by I. Barin, 1985–1988.
+        points:
+        - T_K: '298.15'
+          value: '84.517'
+          table_row_number: 3
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 298.15
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '300.00'
+          value: '84.542'
+          table_row_number: 4
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 300.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '400.00'
+          value: '85.872'
+          table_row_number: 5
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 400.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '500.00'
+          value: '87.203'
+          table_row_number: 6
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 500.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '600.00'
+          value: '88.533'
+          table_row_number: 7
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 600.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '700.00'
+          value: '89.864'
+          table_row_number: 8
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 700.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '800.00'
+          value: '91.194'
+          table_row_number: 9
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 800.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '900.00'
+          value: '92.525'
+          table_row_number: 10
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 900.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1000.00'
+          value: '93.855'
+          table_row_number: 11
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1000.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1100.00'
+          value: '95.186'
+          table_row_number: 12
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1100.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1200.00'
+          value: '96.517'
+          table_row_number: 13
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1200.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1300.00'
+          value: '97.847'
+          table_row_number: 14
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1300.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1400.00'
+          value: '99.178'
+          table_row_number: 15
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1400.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1500.00'
+          value: '100.508'
+          table_row_number: 16
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1500.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1600.00'
+          value: '101.839'
+          table_row_number: 17
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1600.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1620.00'
+          value: '102.105'
+          table_row_number: 18
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1620.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_solb_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: S
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '298.15'
+      - '1620.00'
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      standard_state: FeNaO2 SOL-B as printed.
+      units: J/mol/K
+      units_note: Printed as J/(K mol).
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row SOL-B: H / S sources Nbl,Tkl; remarks cite Tkl and print TPT=870.,1270.'
+        points:
+        - T_K: '298.15'
+          value: '88.299'
+          table_row_number: 3
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 298.15
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '300.00'
+          value: '88.822'
+          table_row_number: 4
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 300.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '400.00'
+          value: '113.325'
+          table_row_number: 5
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 400.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '500.00'
+          value: '132.630'
+          table_row_number: 6
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 500.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '600.00'
+          value: '148.647'
+          table_row_number: 7
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 600.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '700.00'
+          value: '162.394'
+          table_row_number: 8
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 700.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '800.00'
+          value: '174.481'
+          table_row_number: 9
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 800.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '900.00'
+          value: '185.299'
+          table_row_number: 10
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 900.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1000.00'
+          value: '195.116'
+          table_row_number: 11
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1000.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1100.00'
+          value: '204.124'
+          table_row_number: 12
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1100.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1200.00'
+          value: '212.463'
+          table_row_number: 13
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1200.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1300.00'
+          value: '220.241'
+          table_row_number: 14
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1300.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1400.00'
+          value: '227.541'
+          table_row_number: 15
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1400.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1500.00'
+          value: '234.429'
+          table_row_number: 16
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1500.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1600.00'
+          value: '240.958'
+          table_row_number: 17
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1600.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1620.00'
+          value: '242.225'
+          table_row_number: 18
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1620.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_solb_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: delta Hf
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '298.15'
+      - '1620.00'
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      standard_state: FeNaO2 SOL-B as printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row SOL-B: H / S sources Nbl,Tkl.'
+        points:
+        - T_K: '298.15'
+          value: '-698.787'
+          table_row_number: 3
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 298.15
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '300.00'
+          value: '-698.783'
+          table_row_number: 4
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 300.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '400.00'
+          value: '-701.481'
+          table_row_number: 5
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 400.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '500.00'
+          value: '-701.840'
+          table_row_number: 6
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 500.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '600.00'
+          value: '-702.317'
+          table_row_number: 7
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 600.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '700.00'
+          value: '-702.933'
+          table_row_number: 8
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 700.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '800.00'
+          value: '-703.742'
+          table_row_number: 9
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 800.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '900.00'
+          value: '-704.881'
+          table_row_number: 10
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 900.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1000.00'
+          value: '-706.687'
+          table_row_number: 11
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1000.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1100.00'
+          value: '-709.202'
+          table_row_number: 12
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1100.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1200.00'
+          value: '-808.006'
+          table_row_number: 13
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1200.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1300.00'
+          value: '-807.392'
+          table_row_number: 14
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1300.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1400.00'
+          value: '-806.760'
+          table_row_number: 15
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1400.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1500.00'
+          value: '-806.107'
+          table_row_number: 16
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1500.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1600.00'
+          value: '-805.430'
+          table_row_number: 17
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1600.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1620.00'
+          value: '-805.291'
+          table_row_number: 18
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1620.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+      note: The 1200 K cell is printed as -808.006 kJ/mol. The render confirms the leading digit 8; this
+        is retained despite the adjacent 1100 K and 1300 K values being -709.202 and -807.392 kJ/mol.
+    - observation_id: barin95_nafeo2_solb_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: H-H298
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '298.15'
+      - '1620.00'
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      standard_state: H-H298 is referenced to the printed 298.15 K SOL-B row.
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row SOL-B: H / S sources Nbl,Tkl.'
+        points:
+        - T_K: '298.15'
+          value: '0.000'
+          table_row_number: 3
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 298.15
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '300.00'
+          value: '0.156'
+          table_row_number: 4
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 300.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '400.00'
+          value: '8.677'
+          table_row_number: 5
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 400.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '500.00'
+          value: '17.331'
+          table_row_number: 6
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 500.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '600.00'
+          value: '26.118'
+          table_row_number: 7
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 600.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '700.00'
+          value: '35.038'
+          table_row_number: 8
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 700.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '800.00'
+          value: '44.090'
+          table_row_number: 9
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 800.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '900.00'
+          value: '53.276'
+          table_row_number: 10
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 900.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1000.00'
+          value: '62.595'
+          table_row_number: 11
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1000.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1100.00'
+          value: '72.048'
+          table_row_number: 12
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1100.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1200.00'
+          value: '81.633'
+          table_row_number: 13
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1200.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1300.00'
+          value: '91.351'
+          table_row_number: 14
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1300.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1400.00'
+          value: '101.202'
+          table_row_number: 15
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1400.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1500.00'
+          value: '111.186'
+          table_row_number: 16
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1500.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1600.00'
+          value: '121.304'
+          table_row_number: 17
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1600.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1620.00'
+          value: '123.343'
+          table_row_number: 18
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B 1620.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_liq_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: Cp
+        row: LIQ
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '1620.00'
+      - '2000.00'
+      phase: l
+      phase_label_as_printed: LIQ
+      standard_state: FeNaO2 LIQ as printed; no pressure is stated.
+      units: J/mol/K
+      units_note: Printed as J/(K mol).
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: References row LIQ assigns Cp to e; the reference key defines e as estimated data
+          by I. Barin, 1985–1988.
+        points:
+        - T_K: '1620.00'
+          value: '125.520'
+          table_row_number: 20
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1620.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1700.00'
+          value: '125.520'
+          table_row_number: 21
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1700.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1800.00'
+          value: '125.520'
+          table_row_number: 22
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1800.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1900.00'
+          value: '125.520'
+          table_row_number: 23
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1900.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '2000.00'
+          value: '125.520'
+          table_row_number: 24
+          table_column_number: 3
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 2000.00
+            column: Cp
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_liq_entropy
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: S
+        row: LIQ
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '1620.00'
+      - '2000.00'
+      phase: l
+      phase_label_as_printed: LIQ
+      standard_state: FeNaO2 LIQ as printed.
+      units: J/mol/K
+      units_note: Printed as J/(K mol).
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row LIQ: H / S source Tkl.'
+        points:
+        - T_K: '1620.00'
+          value: '272.701'
+          table_row_number: 20
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1620.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1700.00'
+          value: '278.751'
+          table_row_number: 21
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1700.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1800.00'
+          value: '285.926'
+          table_row_number: 22
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1800.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1900.00'
+          value: '292.712'
+          table_row_number: 23
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1900.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '2000.00'
+          value: '299.150'
+          table_row_number: 24
+          table_column_number: 4
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 2000.00
+            column: S
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_liq_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: delta Hf
+        row: LIQ
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '1620.00'
+      - '2000.00'
+      phase: l
+      phase_label_as_printed: LIQ
+      standard_state: FeNaO2 LIQ as printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row LIQ: H / S source Tkl.'
+        points:
+        - T_K: '1620.00'
+          value: '-755.920'
+          table_row_number: 20
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1620.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1700.00'
+          value: '-754.477'
+          table_row_number: 21
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1700.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1800.00'
+          value: '-751.917'
+          table_row_number: 22
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1800.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1900.00'
+          value: '-763.561'
+          table_row_number: 23
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1900.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '2000.00'
+          value: '-761.454'
+          table_row_number: 24
+          table_column_number: 9
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 2000.00
+            column: delta Hf
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_liq_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        column: H-H298
+        row: LIQ
+        note: Printed heading FeNaO2; no numbered table caption.
+      T_range_K:
+      - '1620.00'
+      - '2000.00'
+      phase: l
+      phase_label_as_printed: LIQ
+      standard_state: H-H298 is referenced to the printed 298.15 K SOL-B row.
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'References row LIQ: H / S source Tkl.'
+        points:
+        - T_K: '1620.00'
+          value: '172.714'
+          table_row_number: 20
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1620.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1700.00'
+          value: '182.756'
+          table_row_number: 21
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1700.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1800.00'
+          value: '195.308'
+          table_row_number: 22
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1800.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '1900.00'
+          value: '207.860'
+          table_row_number: 23
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 1900.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+        - T_K: '2000.00'
+          value: '220.412'
+          table_row_number: 24
+          table_column_number: 7
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: LIQ 2000.00
+            column: H-H298
+            note: Printed heading FeNaO2; no numbered table caption.
+    - observation_id: barin95_nafeo2_solb_transition_870
+      type: transition_point
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        row: SOL-B
+        column: Remarks
+        note: TPT=870. is printed in the References row.
+        section: References
+        table_row_number: 2
+        table_column_number: 5
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '870.'
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B
+            column: Remarks
+            section: References
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        property_kind: transition_point
+        attribution: Tkl
+        T_m_K: '870.'
+        note: TPT identifies transition points at these temperatures; neither the transition name nor
+          its enthalpy is printed.
+    - observation_id: barin95_nafeo2_solb_transition_1270
+      type: transition_point
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        row: SOL-B
+        column: Remarks
+        note: TPT=1270. is printed in the References row.
+        section: References
+        table_row_number: 2
+        table_column_number: 5
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1270.'
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: SOL-B
+            column: Remarks
+            section: References
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        property_kind: transition_point
+        attribution: Tkl
+        T_m_K: '1270.'
+        note: TPT identifies transition points at these temperatures; neither the transition name nor
+          its enthalpy is printed.
+    - observation_id: barin95_nafeo2_fusion_transition_1620
+      type: transition_point
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        row: 1620.00 SOL-B to LIQ transition
+        column: T
+        table_row_number: 18
+        table_column_number: 2
+        note: Printed heading FeNaO2; no numbered table caption.
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B to LIQ
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1620.00'
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: 1620.00 SOL-B to LIQ transition
+            column: T
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        property_kind: melting_point
+        phase_from: SOL-B
+        phase_to: LIQ
+        attribution: Tkl
+        T_m_K: '1620.00'
+    - observation_id: barin95_nafeo2_heat_of_fusion_1620
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        row: 1620.00 SOL-B to LIQ transition
+        column: H
+        table_row_number: 19
+        table_column_number: 6
+        note: Printed heading FeNaO2; no numbered table caption.
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B to LIQ
+      standard_state: Heat-content increment at fusion of FeNaO2 from SOL-B to LIQ as printed.
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1620.00'
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: 1620.00 SOL-B to LIQ transition
+            column: H
+      values:
+        quantity: heat_of_fusion
+        method_class: compilation_assessed
+        T_K: '1620.00'
+        attribution: Tkl
+        note: Printed H increment between SOL-B and LIQ.
+        value: '49.371'
+    - observation_id: barin95_nafeo2_entropy_of_fusion_1620
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 823
+        published_page: 708
+        pdf_page_index: 822
+        row: 1620.00 SOL-B to LIQ transition
+        column: S
+        table_row_number: 19
+        table_column_number: 4
+        note: Printed heading FeNaO2; no numbered table caption.
+      phase: cr
+      condensed_form:
+        polymorph: SOL-B
+      phase_label_as_printed: SOL-B to LIQ
+      standard_state: Entropy increment at fusion of FeNaO2 from SOL-B to LIQ as printed.
+      units: J/mol/K
+      units_note: Printed as J/(K mol).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1620.00'
+          locator:
+            page: 823
+            published_page: 708
+            pdf_page_index: 822
+            row: 1620.00 SOL-B to LIQ transition
+            column: S
+      values:
+        quantity: entropy_of_fusion
+        method_class: compilation_assessed
+        T_K: '1620.00'
+        attribution: Tkl
+        value: '30.476'
+fidelity_samples:
+- path: species.NaFeO2.observations[barin95_nafeo2_solb_cp].values.points[0].value
+  value: '84.517'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- path: species.NaFeO2.observations[barin95_nafeo2_solb_entropy].values.points[0].value
+  value: '88.299'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- path: species.NaFeO2.observations[barin95_nafeo2_solb_delta_fH].values.points[10].value
+  value: '-808.006'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- path: species.NaFeO2.observations[barin95_nafeo2_solb_heat_content].values.points[15].value
+  value: '123.343'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- species: NaFeO2
+  observation_id: barin95_nafeo2_heat_of_fusion_1620
+  field: value
+  value: '49.371'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- species: NaFeO2
+  observation_id: barin95_nafeo2_entropy_of_fusion_1620
+  field: value
+  value: '30.476'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    note: Printed heading FeNaO2; no numbered table caption.
+- species: NaFeO2
+  observation_id: barin95_nafeo2_solb_transition_870
+  field: T_m_K
+  value: '870.'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    section: References
+- species: NaFeO2
+  observation_id: barin95_nafeo2_solb_transition_1270
+  field: T_m_K
+  value: '1270.'
+  locator:
+    page: 823
+    published_page: 708
+    pdf_page_index: 822
+    section: References

@@ -342202,6 +342202,607 @@ entries:
     locator:
       note: LH87 In–O gas (In2O); JANAF if present
       record: LH87#In2O_g
+- work_id: 31b78bbe4ccec980034bd158662e01c85f85035ef996d0564b5b21f95c9d789a
+  source: data/literature/extracts/barin-1995.yaml
+  why: source T_range_K [1620.00, 2000.00]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: barin-1995::barin95_nafeo2_liq_cp::T=1620.00:row=liq-1620.00:h=b8fc04ba056f
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=Cp; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_delta_fH::T=1620.00:row=liq-1620.00:h=fadbbb70a336
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=delta Hf; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_entropy::T=1620.00:row=liq-1620.00:h=78d37e4bf452
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=S; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_heat_content::T=1620.00:row=liq-1620.00:h=4fbe915e3a6c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=H-H298; row=LIQ
+- work_id: 31b78bbe4ccec980034bd158662e01c85f85035ef996d0564b5b21f95c9d789a
+  source: data/literature/extracts/barin-1995.yaml
+  why: source T_range_K [298.15, 1620.00]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1000.00:row=sol-b-1000.00:h=20c48dbc5f92
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1000.00:row=sol-b-1000.00:h=644169f45c3d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1000.00:row=sol-b-1000.00:h=6f09f2ca0955
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1000.00:row=sol-b-1000.00:h=9ab018619032
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=H-H298
+- work_id: 31b78bbe4ccec980034bd158662e01c85f85035ef996d0564b5b21f95c9d789a
+  source: data/literature/extracts/barin-1995.yaml
+  why: source does not state a numeric total_pressure_Pa
+  axes:
+  - total_pressure_Pa
+  observations:
+  - observation_id: barin-1995::barin95_nafeo2_fusion_transition_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=T; table_row_number=18;
+        table_column_number=2
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_1270
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=1270. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_870
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=870. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
+- work_id: 31b78bbe4ccec980034bd158662e01c85f85035ef996d0564b5b21f95c9d789a
+  source: data/literature/extracts/barin-1995.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: barin-1995::barin95_nafeo2_entropy_of_fusion_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=S; table_row_number=19;
+        table_column_number=4
+  - observation_id: barin-1995::barin95_nafeo2_fusion_transition_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=T; table_row_number=18;
+        table_column_number=2
+  - observation_id: barin-1995::barin95_nafeo2_heat_of_fusion_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=H; table_row_number=19;
+        table_column_number=6
+  - observation_id: barin-1995::barin95_nafeo2_liq_cp::T=1620.00:row=liq-1620.00:h=b8fc04ba056f
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=Cp; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_delta_fH::T=1620.00:row=liq-1620.00:h=fadbbb70a336
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=delta Hf; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_entropy::T=1620.00:row=liq-1620.00:h=78d37e4bf452
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=S; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_liq_heat_content::T=1620.00:row=liq-1620.00:h=4fbe915e3a6c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=H-H298; row=LIQ
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1000.00:row=sol-b-1000.00:h=20c48dbc5f92
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1000.00:row=sol-b-1000.00:h=644169f45c3d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1000.00:row=sol-b-1000.00:h=6f09f2ca0955
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1000.00:row=sol-b-1000.00:h=9ab018619032
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_1270
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=1270. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_870
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=870. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
+- work_id: 31b78bbe4ccec980034bd158662e01c85f85035ef996d0564b5b21f95c9d789a
+  source: data/literature/extracts/barin-1995.yaml
+  why: unrecognised polymorph 'SOL-B' is not a closed Polymorph token
+  axes:
+  - species.polymorph
+  observations:
+  - observation_id: barin-1995::barin95_nafeo2_entropy_of_fusion_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=S; table_row_number=19;
+        table_column_number=4
+  - observation_id: barin-1995::barin95_nafeo2_fusion_transition_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=T; table_row_number=18;
+        table_column_number=2
+  - observation_id: barin-1995::barin95_nafeo2_heat_of_fusion_1620
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=1620.00 SOL-B to LIQ transition; column=H; table_row_number=19;
+        table_column_number=6
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1000.00:row=sol-b-1000.00:h=20c48dbc5f92
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1000.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1100.00:row=sol-b-1100.00:h=df1f1bdabc22
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1100.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1200.00:row=sol-b-1200.00:h=a94484f2e237
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1200.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1300.00:row=sol-b-1300.00:h=d3fceffd3fae
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1300.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1400.00:row=sol-b-1400.00:h=09df4e84e2a0
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1400.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1500.00:row=sol-b-1500.00:h=bec306bdfa68
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1500.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1600.00:row=sol-b-1600.00:h=24b7a20e46f8
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1600.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=1620.00:row=sol-b-1620.00:h=85faa9935998
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1620.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=298.15:row=sol-b-298.15:h=4ccb668dc4f6
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 298.15; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=300.00:row=sol-b-300.00:h=ae6c1a019bd0
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 300.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=400.00:row=sol-b-400.00:h=482f91bad625
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 400.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=500.00:row=sol-b-500.00:h=c2e87e5ac88b
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 500.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=600.00:row=sol-b-600.00:h=a3752b01ddf7
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 600.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=700.00:row=sol-b-700.00:h=d9447ed11112
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 700.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=800.00:row=sol-b-800.00:h=87481c71f44d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 800.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_cp::T=900.00:row=sol-b-900.00:h=7a9cf4f6afc7
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 900.00; column=Cp
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1000.00:row=sol-b-1000.00:h=644169f45c3d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1000.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1100.00:row=sol-b-1100.00:h=85cc1d63391d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1100.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1200.00:row=sol-b-1200.00:h=2b1dceba2bd3
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1200.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1300.00:row=sol-b-1300.00:h=43ae96ffefd8
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1300.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1400.00:row=sol-b-1400.00:h=b59974ddd3d8
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1400.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1500.00:row=sol-b-1500.00:h=2cc26daf8126
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1500.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1600.00:row=sol-b-1600.00:h=4ab43e6b4452
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1600.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=1620.00:row=sol-b-1620.00:h=b889ec0e59a2
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1620.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=298.15:row=sol-b-298.15:h=ee64c34eea64
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 298.15; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=300.00:row=sol-b-300.00:h=33cc291199e4
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 300.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=400.00:row=sol-b-400.00:h=814246653dea
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 400.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=500.00:row=sol-b-500.00:h=2a9ff12fd178
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 500.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=600.00:row=sol-b-600.00:h=288cc3f6a364
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 600.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=700.00:row=sol-b-700.00:h=8ef668abe445
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 700.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=800.00:row=sol-b-800.00:h=b05f46175ca2
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 800.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_delta_fH::T=900.00:row=sol-b-900.00:h=295c22377ef1
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 900.00; column=delta Hf
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1000.00:row=sol-b-1000.00:h=6f09f2ca0955
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1000.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1100.00:row=sol-b-1100.00:h=fb5765f9756e
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1100.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1200.00:row=sol-b-1200.00:h=429c1a925d19
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1200.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1300.00:row=sol-b-1300.00:h=94cfcdc8e6b6
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1300.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1400.00:row=sol-b-1400.00:h=65395a137d82
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1400.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1500.00:row=sol-b-1500.00:h=475938fa1a98
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1500.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1600.00:row=sol-b-1600.00:h=6c2044e24026
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1600.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=1620.00:row=sol-b-1620.00:h=b81804ade21c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1620.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=298.15:row=sol-b-298.15:h=8be2b13170ad
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 298.15; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=300.00:row=sol-b-300.00:h=8e3f8223fd68
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 300.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=400.00:row=sol-b-400.00:h=37a34c7d1e7c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 400.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=500.00:row=sol-b-500.00:h=dcf4db230935
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 500.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=600.00:row=sol-b-600.00:h=0666909e73ca
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 600.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=700.00:row=sol-b-700.00:h=e41f6a62794d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 700.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=800.00:row=sol-b-800.00:h=e048e2b0a880
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 800.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_entropy::T=900.00:row=sol-b-900.00:h=298311343f62
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 900.00; column=S
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1000.00:row=sol-b-1000.00:h=9ab018619032
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1000.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1100.00:row=sol-b-1100.00:h=a9a44121d85c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1100.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1200.00:row=sol-b-1200.00:h=df275551e48e
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1200.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1300.00:row=sol-b-1300.00:h=eeff3b05765d
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1300.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1400.00:row=sol-b-1400.00:h=bdbccfbae2dd
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1400.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1500.00:row=sol-b-1500.00:h=1f8567be1f19
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1500.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1600.00:row=sol-b-1600.00:h=be6a9e4d14e9
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1600.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=1620.00:row=sol-b-1620.00:h=dcf2cfdd713b
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 1620.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=298.15:row=sol-b-298.15:h=4ae8ae61201f
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 298.15; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=300.00:row=sol-b-300.00:h=235ddd435452
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 300.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=400.00:row=sol-b-400.00:h=76c21570ee0b
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 400.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=500.00:row=sol-b-500.00:h=52f837150712
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 500.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=600.00:row=sol-b-600.00:h=227b57329300
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 600.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=700.00:row=sol-b-700.00:h=3dbba4b6a78a
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 700.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=800.00:row=sol-b-800.00:h=b04b2ff8ce4c
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 800.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_heat_content::T=900.00:row=sol-b-900.00:h=29d1aadbb10e
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      note: Printed heading FeNaO2; no numbered table caption.; row=SOL-B 900.00; column=H-H298
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_1270
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=1270. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
+  - observation_id: barin-1995::barin95_nafeo2_solb_transition_870
+    locator:
+      page: 823
+      published_page: 708
+      pdf_page_index: 822
+      section: References
+      note: TPT=870. is printed in the References row.; row=SOL-B; column=Remarks; table_row_number=2; table_column_number=5
 - work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
   source: data/literature/extracts/shornikov-2016-cao-mgo-silicate.yaml
   why: The caption does not state the activity standard state (pure oxide or a stated reference).
@@ -500328,6 +500929,19 @@ entries:
       table: '2'
       note: MAC row 2; metal Si and slag elements Ca/Si/Al/Mg are mass percent; metal Mg/Al/Ca/O/N and slag N are ppm, as
         headed.
+- work_id: 92bd058aadbf98e02639f9c7c3736b9409bcf9197a6892fef9257a7cdf95a8af
+  source: data/literature/extracts/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: stuve-pankratz-richardson-1971-ri7535-sodium-ferrite::stuve_1971_table8_nafeo2_delta_fG_1000K
+    locator:
+      page: 18
+      published_page: 11
+      pdf_page_index: 17
+      table: '8'
+      note: Render confirms the NaFeO₂(c) row and ΔGf° cell.; row=NaFeO₂(c); column_header=ΔGf°, kcal
 - work_id: 92c60ed22f36845020e5ae2bf08275523497715516d302540a4c13ec78b9a0c3
   source: data/literature/extracts/dong-2009-cr-v-slag-activities.yaml
   why: extract yielded no observations
@@ -586620,6 +587234,226 @@ entries:
     locator:
       note: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
       record: PENDING#MgCl2_measured_VP
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, formula,
+    formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed, equation_as_printed,
+    T_range_as_printed, table_header_marker_as_printed, equation_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+    method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_834_1004
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 834–1004 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, formula,
+    formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed, equation_as_printed,
+    T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_dai
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Dai et al. [10]
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_shaiu
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Shaiu et al. [11]
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1047_1278
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1047–1278 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1278_1405
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1278–1405 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_930_1047
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 930–1047 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_635_785
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 635–785 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, formula, formula_as_published, formula_basis_note,
+    property_as_printed, reference_state_as_printed, polymorph_as_printed, equation_as_printed, T_range_as_printed, uncertainty_as_printed,
+    uncertainty_kind_as_printed, confidence_level, status, schema_gap, method_class_reason, derivation'
+  axes:
+  - value
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_eq10_current
+    locator:
+      page: 4
+      published_page: 178
+      equation: '10'
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [1047, 1278]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1047_1278
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1047–1278 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [1278, 1405]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1278_1405
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1278–1405 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [635, 785]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_635_785
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 635–785 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [773, 1030]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_dai
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Dai et al. [10]
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [795, 1048]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_shaiu
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Shaiu et al. [11]
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [834, 1004]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_834_1004
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 834–1004 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [930, 1047]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_930_1047
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 930–1047 K
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source T_range_K [930, 998]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_eq10_current
+    locator:
+      page: 4
+      published_page: 178
+      equation: '10'
+- work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_eq10_current
+    locator:
+      page: 4
+      published_page: 178
+      equation: '10'
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_dai
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Dai et al. [10]
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_shaiu
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Shaiu et al. [11]
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1047_1278
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1047–1278 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1278_1405
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 1278–1405 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_930_1047
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Yamaguchi et al. [8], 930–1047 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_635_785
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 635–785 K
+  - observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_834_1004
+    locator:
+      page: 2
+      published_page: 176
+      table: I
+      note: row=Zhang et al. [1], 834–1004 K
 - work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
   source: data/literature/extracts/shornikov-2000-titania-melts.yaml
   why: 'source reference state not printed: Fig. 2 caption, published page 1471: panels (d, f) are previous data [31] at 1933
