@@ -1,4 +1,4 @@
-"""The fog flag does not move mass. Digests are the pre-flag census ledgers.
+"""The fog flag does not move mass. Digests pin post-condenser fog-census ledger bytes.
 
 Mars basalt will not start without its declared Stage 0 carbon reductant.
 That mass comes from the feedstock owner, not from a nucleation constant.
@@ -188,11 +188,11 @@ def _assert_ledger(name: str, run: PyrolysisRun) -> None:
     assert model.vapour_fog_history
 
 
-def test_lunar_c2a_ledger_matches_pre_flag_census() -> None:
+def test_lunar_c2a_pins_post_condenser_fog_census_ledger_digest() -> None:
     _assert_ledger("lunar_c2a_18h", _c2a_run("lunar_mare_low_ti"))
 
 
-def test_mars_c2a_ledger_matches_pre_flag_census() -> None:
+def test_mars_c2a_pins_post_condenser_fog_census_ledger_digest() -> None:
     carbon_kg = _declared_mars_carbon_kg(1000.0)
     assert carbon_kg == pytest.approx(30.0)
     _assert_ledger(
@@ -207,11 +207,11 @@ def test_mars_c2a_without_declared_carbon_is_refused() -> None:
         run._start_session()
 
 
-def test_ci_c2a_ledger_matches_pre_flag_census() -> None:
+def test_ci_c2a_pins_post_condenser_fog_census_ledger_digest() -> None:
     _assert_ledger("ci_c2a_18h", _c2a_run("ci_carbonaceous_chondrite"))
 
 
-def test_lunar_c0_ledger_matches_pre_flag_census() -> None:
+def test_lunar_c0_pins_post_condenser_fog_census_ledger_digest() -> None:
     _assert_ledger(
         "lunar_c0_24h",
         PyrolysisRun(
