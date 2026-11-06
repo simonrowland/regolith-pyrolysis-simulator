@@ -80,7 +80,6 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
-    FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
     _BATTERY_HERO_DECK_CHART_IDS,
     _BATTERY_HERO_DECK_SOURCE_RAILS,
     _battery_hero_binned_score_records,
@@ -115,6 +114,10 @@ HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
 HERO_TEMPERATURE_FIELD = "candidate_observation.identity.temperature_K"
 HERO_TEMPERATURE_FLOOR_K = Decimal(1700)
 HERO_MINIMUM_REPORT_N = 5
+HERO_SCORECARD_FONT_SIZE = 3.5
+HERO_SCORECARD_LINE_HEIGHT_IN = 0.085
+HERO_SCORECARD_TABLE_HEIGHT_FRACTION = 0.88
+HERO_SCORECARD_TITLE_HEIGHT_IN = 0.16
 HERO_TEMPERATURE_VIEWS = (
     ("all", "all"),
     (
@@ -583,9 +586,13 @@ def _hero_metric_temperature(row: Mapping[str, object]) -> Decimal | None:
 
 
 def _hero_source_disagreement_flagged(row: Mapping[str, object]) -> bool:
-    return (
-        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT
-        in _flagged_payload_strata(row)
+    notices = row.get("notices")
+    if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
+        return False
+    return any(
+        isinstance(notice, Mapping)
+        and notice.get("kind") == NoticeKind.SOURCE_DISAGREEMENT.value
+        for notice in notices
     )
 
 
@@ -2534,6 +2541,132 @@ def _hero_scorecard_cell_text(
     return "\n".join(lines)
 
 
+def _hero_scorecard_rows(data: ScorePlotData, rail: str) -> list[list[str]]:
+    rows: list[list[str]] = []
+    for engine in data.engines:
+        metric = data.hero_all_numeric_metrics.get((rail, engine), {})
+        views = metric.get("views", {})
+        views = views if isinstance(views, Mapping) else {}
+        row = [engine]
+        for view_name, _view_label in HERO_TEMPERATURE_VIEWS:
+            view = views.get(view_name, {})
+            view = view if isinstance(view, Mapping) else {}
+            row.append(
+                _hero_scorecard_cell_text(
+                    view,
+                    include_no_temperature=view_name == "all",
+                )
+            )
+        rows.append(row)
+    return rows
+
+
+def _hero_scorecard_row_weights(
+    rows: Sequence[Sequence[str]],
+) -> tuple[float, ...]:
+    # Each unit reserves one rendered scorecard text line at the configured font size.
+    return (1.0,) + tuple(
+        float(max(1, max(text.count("\n") + 1 for text in row)))
+        for row in rows
+    )
+
+
+def _hero_scorecard_section_height(rows: Sequence[Sequence[str]]) -> float:
+    line_count = sum(_hero_scorecard_row_weights(rows))
+    table_height = (
+        line_count
+        * HERO_SCORECARD_LINE_HEIGHT_IN
+        / HERO_SCORECARD_TABLE_HEIGHT_FRACTION
+    )
+    return HERO_SCORECARD_TITLE_HEIGHT_IN + table_height
+
+
+def _draw_hero_scorecard_table(axis: Axes, rows: Sequence[Sequence[str]]) -> None:
+    table = axis.table(
+        cellText=rows,
+        colLabels=("Engine", "All", "T ≥ 1700 K", "T < 1700 K"),
+        cellLoc="left",
+        colLoc="left",
+        colWidths=(0.10, 0.30, 0.30, 0.30),
+        bbox=(0.0, 0.0, 1.0, HERO_SCORECARD_TABLE_HEIGHT_FRACTION),
+    )
+    table.auto_set_font_size(False)
+    row_weights = _hero_scorecard_row_weights(rows)
+    for (table_row, _column), cell in table.get_celld().items():
+        cell.set_height(row_weights[table_row])
+        cell.set_edgecolor("#cccccc")
+        cell.set_linewidth(0.25)
+        cell.PAD = 0.02
+        cell.set_text_props(fontsize=HERO_SCORECARD_FONT_SIZE, va="center")
+        if table_row == 0:
+            cell.set_facecolor("#eeeeee")
+            cell.set_text_props(fontsize=4.0, va="center", weight="bold")
+
+
+def _reserve_hero_status_space(
+    figure: Any,
+    grid: Any,
+    title_artist: Any,
+    status_artist: Any,
+    legend: Any | None,
+    scatter_axes: Sequence[Axes],
+) -> None:
+    if not scatter_axes:
+        return
+
+    gap_inches = 0.10
+    dpi = figure.get_dpi()
+    height_inches = figure.get_size_inches()[1]
+    grid_top_inches = grid.top * height_inches
+    grid_bottom_inches = grid.bottom * height_inches
+    for _attempt in range(4):
+        figure.canvas.draw()
+        renderer = figure.canvas.get_renderer()
+        figure_bbox = figure.bbox
+        height_pixels = figure_bbox.height
+        if title_artist is not None:
+            title_bbox = title_artist.get_window_extent(renderer)
+            status_artist.set_y(
+                (title_bbox.y0 - gap_inches * dpi) / height_pixels
+            )
+            figure.canvas.draw()
+            renderer = figure.canvas.get_renderer()
+        status_bbox = status_artist.get_window_extent(renderer)
+        if legend is not None:
+            legend.set_bbox_to_anchor(
+                (
+                    0.5,
+                    (status_bbox.y0 - gap_inches * dpi) / height_pixels,
+                ),
+                transform=figure.transFigure,
+            )
+            figure.canvas.draw()
+            renderer = figure.canvas.get_renderer()
+
+        scatter_top = max(
+            bbox.y1
+            for axis in scatter_axes
+            if (bbox := axis.get_tightbbox(renderer)) is not None
+        )
+        content_bottom = (
+            legend.get_window_extent(renderer).y0
+            if legend is not None
+            else status_bbox.y0
+        )
+        gap_pixels = content_bottom - scatter_top
+        if gap_pixels >= gap_inches * dpi:
+            return
+
+        height_inches = figure.get_size_inches()[1]
+        extra_inches = (gap_inches - gap_pixels / dpi) / 0.994 + 0.02
+        height_inches += extra_inches
+        figure.set_size_inches(figure.get_size_inches()[0], height_inches, forward=True)
+        grid.update(
+            top=grid_top_inches / height_inches,
+            bottom=grid_bottom_inches / height_inches,
+        )
+
+
 def _hero_comparison_view_text(
     engine: str,
     primary: str,
@@ -3408,6 +3541,7 @@ def render_hero_charts(
             engine: data.hero_sweet_spot_cells[(rail, engine)]
             for engine in sweet_spot_engines
         }
+        scorecard_rows = _hero_scorecard_rows(data, rail)
         sweet_spot_values = [
             value
             for cells in sweet_spot_cells.values()
@@ -3462,7 +3596,7 @@ def render_hero_charts(
             (
                 "scorecard",
                 (),
-                max(0.72, 0.18 * max(1, len(data.engines))),
+                _hero_scorecard_section_height(scorecard_rows),
             )
         )
         row_specs.append(("spacer", (), 0.28))
@@ -3491,6 +3625,7 @@ def render_hero_charts(
             wspace=0.2,
         )
         sweet_spot_axes: list[Axes] = []
+        scatter_axes: list[Axes] = []
         history_engine_names: set[str] = set()
         row_index = 0
         for kind, payload, _height in row_specs:
@@ -3512,6 +3647,7 @@ def render_hero_charts(
                         engine_colors=engine_colors,
                     )
                     axis.set_title(facet, loc="left", fontsize=7.5)
+                    scatter_axes.append(axis)
             elif kind == "refusals":
                 pair = payload
                 assert isinstance(pair, tuple)
@@ -3575,39 +3711,7 @@ def render_hero_charts(
                     fontsize=5.5,
                     fontweight="bold",
                 )
-                rows = []
-                for engine in data.engines:
-                    metric = data.hero_all_numeric_metrics.get((rail, engine), {})
-                    views = metric.get("views", {})
-                    views = views if isinstance(views, Mapping) else {}
-                    row = [engine]
-                    for view_name, _view_label in HERO_TEMPERATURE_VIEWS:
-                        view = views.get(view_name, {})
-                        view = view if isinstance(view, Mapping) else {}
-                        row.append(
-                            _hero_scorecard_cell_text(
-                                view,
-                                include_no_temperature=view_name == "all",
-                            )
-                        )
-                    rows.append(row)
-                table = scorecard_axis.table(
-                    cellText=rows,
-                    colLabels=("Engine", "All", "T ≥ 1700 K", "T < 1700 K"),
-                    cellLoc="left",
-                    colLoc="left",
-                    colWidths=(0.10, 0.30, 0.30, 0.30),
-                    bbox=(0.0, 0.0, 1.0, 0.88),
-                )
-                table.auto_set_font_size(False)
-                for (table_row, _column), cell in table.get_celld().items():
-                    cell.set_edgecolor("#cccccc")
-                    cell.set_linewidth(0.25)
-                    cell.PAD = 0.02
-                    cell.set_text_props(fontsize=3.5, va="center")
-                    if table_row == 0:
-                        cell.set_facecolor("#eeeeee")
-                        cell.set_text_props(fontsize=4.0, va="center", weight="bold")
+                _draw_hero_scorecard_table(scorecard_axis, scorecard_rows)
             elif kind == "history":
                 history_axis = figure.add_subplot(grid[row_index, :])
                 history_engine_names = _draw_hero_history(
@@ -3803,8 +3907,10 @@ def render_hero_charts(
             status_lines.append(
                 "not an observable of this engine: " + ", ".join(not_observable)
             )
-        figure.suptitle(_HERO_TITLES[rail], fontsize=10, y=0.994)
-        figure.text(
+        title_artist = figure.suptitle(
+            _HERO_TITLES[rail], fontsize=10, y=0.994
+        )
+        status_artist = figure.text(
             0.5,
             0.966,
             "\n".join(status_lines),
@@ -3842,8 +3948,9 @@ def render_hero_charts(
             engine_colors,
             flagged=flagged_points,
         )
+        legend = None
         if legend_handles:
-            figure.legend(
+            legend = figure.legend(
                 handles=legend_handles,
                 loc="upper center",
                 bbox_to_anchor=(0.5, 0.916),
@@ -3853,6 +3960,14 @@ def render_hero_charts(
                 handlelength=1.4,
                 columnspacing=1.0,
             )
+        _reserve_hero_status_space(
+            figure,
+            grid,
+            title_artist,
+            status_artist,
+            legend,
+            scatter_axes,
+        )
         caption = (
             "Scatter marker face=engine colour; flagged/extrapolated=white face with engine-coloured edge. "
             "History: solid=RMS, dashed=median |dex|, dash-dot=SD/paired primary RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
