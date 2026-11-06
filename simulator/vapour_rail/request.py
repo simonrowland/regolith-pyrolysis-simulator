@@ -2727,7 +2727,10 @@ def resolve_vapour_batch(
                 or (
                     answers[species_id].is_refused
                     and answers[species_id].refusal_code
-                    != REFUSAL_MISSING_OUTCOME_STATE
+                    not in {
+                        REFUSAL_MISSING_OUTCOME_STATE,
+                        REFUSAL_MISSING_CHANNEL_CONTRACT,
+                    }
                 )
             )
         )
