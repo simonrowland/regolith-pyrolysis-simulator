@@ -605,14 +605,6 @@ class Derivation:
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
         ) or (isinstance(page, str) and bool(page.strip()))
-        has_section_or_equation = locator is not None and any(
-            (isinstance(location, str) and bool(location.strip()))
-            or (
-                isinstance(location, (int, float))
-                and not isinstance(location, bool)
-            )
-            for location in (locator.section, locator.equation)
-        )
         return (
             self.method is not None
             and self.method.state.is_value
@@ -620,7 +612,8 @@ class Derivation:
             and bool(self.method.state.value.strip())
             and locator is not None
             and has_physical_page
-            and has_section_or_equation
+            and isinstance(locator.equation, str)
+            and bool(locator.equation.strip())
         )
 
     @property

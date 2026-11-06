@@ -248,43 +248,40 @@ derivation:
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
 inputs. When printed parent observations resolve, name them in `inputs` and
-`derived_from`; `raw_inputs` is not needed. For `model_derived`, describe the
-printed model or calculation in a `method` field and locate it by physical page
-and section. Record a printed equation in the locator when available, but a
-located prose description is sufficient. `references` names the input
-references as printed. If the source names none, use `none_printed` and add a
-notice explaining that absence. If no method can be located, keep the
-`model_derived` class and add a `method_unknown` notice; do not infer a method
-or relabel the value as quoted. For example:
+`derived_from`; `raw_inputs` is not needed. For `model_derived`, the derivation
+must also carry its method as a located `method` field whose value describes
+the printed calculation. Its locator identifies the printed equation and
+physical page, and `references` is a typed list naming at least one compiled
+reference used. For example:
 
 ```yaml
 derivation:
-  relation: "author calculation using the printed equilibrium model"
+  relation: "author calculation using the printed equilibrium equation"
   output_unit: Pa
   method:
-    state: {tag: value, value: "Gibbs energy minimisation with the authors' model"}
+    state: {tag: value, value: "Eqs. (7)–(9) calculate K_ref from unprinted ion-current ratios"}
     locator:
       page: 19
-      section: '3.2'
+      equation: "7–9"
   references:
-    - "Shornikov et al. (2008)"
+    - "Gurvich K°(T)"
+    - "Mann cross-sections"
   raw_inputs:
     state: {tag: value, value: not_printed}
     locator:
       page: 19
-      section: '3.2'
+      equation: "7–9"
       note: "The row-wise ion currents are not printed."
 ```
 
 `raw_inputs` is a typed status with its own source locator. `not_printed` is
-valid for `measured_reduced` and `model_derived` when the source does not print
-the inputs and no printed parent observations resolve. For `model_derived`, a
-`not_printed` declaration needs a method named as printed and located by page
-and section, or a `method_unknown` notice if no method can be located. Record
-input references as printed, or use `none_printed` with a notice when the
-source names none. An equation is optional. `raw_inputs` cannot appear with
-derivation `inputs` or observation `derived_from`; resolved parents supply
-lineage without it. `printed_unresolved` does not supply lineage.
+valid for `measured_reduced`, and for `model_derived` only when a nonempty
+method with an equation and physical-page locator and at least one named
+compiled reference is supplied. It cannot appear with derivation `inputs` or
+observation `derived_from`. A model-derived method locator does not replace
+the observation's required method locator. A located `not_printed` declaration
+that meets those conditions supplies lineage, so `derived_from` is not
+required. `printed_unresolved` does not supply lineage.
 
 `printed_unresolved` means every derivation input was printed prose and none
 of it resolves to a record id or asset. `inputs` is then empty. The verbatim

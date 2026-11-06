@@ -16,7 +16,7 @@ review_status: draft
 fidelity_samples:
 - species: Al2O3
   observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02
-  field: value
+  field: value_as_printed
   value: '-1046.788'
   locator:
     page: 1
@@ -25,7 +25,7 @@ fidelity_samples:
     row: 3
 - species: CaO
   observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
-  field: value
+  field: value_as_printed
   value: '-425.847'
   locator:
     page: 1
@@ -34,7 +34,7 @@ fidelity_samples:
     row: 4
 - species: O3
   observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
-  field: value
+  field: value_as_printed
   value: '271.522'
   locator:
     page: 1
@@ -232,26 +232,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: &shornikov_2011_table1_lineage
-          relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.
-          method:
-            state: {tag: value, value: ideal associated solutions theory with Gibbs energy minimization}
-            locator: {page: 1, pdf_page_index: 0, table: '1', section: Method discussion following Table 1}
-          raw_inputs:
-            state: {tag: value, value: not_printed}
-            locator:
-              page: 1
-              pdf_page_index: 0
-              table: '1'
-          references:
-          - Glushko et al. (1978–1982)
-          - Allibert et al. (1979)
-          - Shornikov et al. (1997)
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1046.788'
+        value_as_printed: '-1046.788'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -280,12 +270,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1029.796'
+        value_as_printed: '-1029.796'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -314,12 +308,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-407.794'
+        value_as_printed: '-407.794'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -981,12 +979,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '89.605'
+        value_as_printed: '89.605'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1017,12 +1019,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-425.847'
+        value_as_printed: '-425.847'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -1051,12 +1057,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-413.472'
+        value_as_printed: '-413.472'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -1085,12 +1095,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-72.634'
+        value_as_printed: '-72.634'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1653,12 +1667,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-72.492'
+        value_as_printed: '-72.492'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1689,12 +1707,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1533.967'
+        value_as_printed: '-1533.967'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -1723,12 +1745,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1536.789'
+        value_as_printed: '-1536.789'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -1759,12 +1785,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-99.299'
+        value_as_printed: '-99.299'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1795,12 +1825,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-2596.897'
+        value_as_printed: '-2596.897'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -1831,12 +1865,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '196.232'
+        value_as_printed: '196.232'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1867,12 +1905,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-6795.323'
+        value_as_printed: '-6795.323'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -1903,12 +1945,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-280.491'
+        value_as_printed: '-280.491'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1939,12 +1985,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-2400.664'
+        value_as_printed: '-2400.664'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -1975,12 +2025,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-387.192'
+        value_as_printed: '-387.192'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -2011,12 +2065,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-5489.050'
+        value_as_printed: '-5489.050'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -2047,12 +2105,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-12932.929'
+        value_as_printed: '-12932.929'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -2081,12 +2143,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-13005.601'
+        value_as_printed: '-13005.601'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -2117,12 +2183,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-17.589'
+        value_as_printed: '-17.589'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -2153,12 +2223,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-3885.890'
+        value_as_printed: '-3885.890'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -2187,12 +2261,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-3885.257'
+        value_as_printed: '-3885.257'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -2238,12 +2316,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1471.685'
+        value_as_printed: '-1471.685'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -2272,12 +2354,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-1434.364'
+        value_as_printed: '-1434.364'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -2308,12 +2394,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-53.734'
+        value_as_printed: '-53.734'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -2344,12 +2434,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-381.143'
+        value_as_printed: '-381.143'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -2378,12 +2472,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-359.587'
+        value_as_printed: '-359.587'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: l
       per: mol_species
       point_conditions:
@@ -2412,12 +2510,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '-106.108'
+        value_as_printed: '-106.108'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -3169,12 +3271,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '124.333'
+        value_as_printed: '124.333'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -3205,12 +3311,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '0.000'
+        value_as_printed: '0.000'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -3241,12 +3351,16 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        derivation: *shornikov_2011_table1_lineage
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1960'
-        value: '271.522'
+        value_as_printed: '271.522'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.'
       phase: g
       per: mol_species
       point_conditions:
@@ -3278,39 +3392,16 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as stated in the source text.
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         value_as_printed: '−31.5'
-        value: '-31.5'
-        derivation:
-          relation: >-
-            The minimum melt Gibbs energy of formation is calculated in the
-            present study using ideal associated solutions theory and Gibbs
-            energy minimization.
-          method:
-            state: {tag: value, value: ideal associated solutions theory with Gibbs energy minimization}
-            locator:
-              page: 2
-              pdf_page_index: 1
-              section: Results
-              figure: '1'
-              note: Panel d, the Gibbs-energy result.
-          raw_inputs:
-            state: {tag: value, value: not_printed}
-            locator:
-              page: 2
-              pdf_page_index: 1
-              section: Results
-              figure: '1'
-              note: >-
-                Fig. 1d, panel d; series 3 is calculated in the present study;
-                numerical input rows are not printed.
-          references:
-          - Glushko et al. (1978–1982)
-          - Allibert et al. (1979)
-          - Shornikov et al. (1997)
         T_K: '1960'
         composition_Al2O3_mole_pct_as_printed: '45'
         attribution: Present-study minimum from the Gibbs-energy calculation in Fig. 1d.
+        method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
+        method_description: 'The minimum melt Gibbs energy of formation is calculated in the present study using ideal associated solutions theory and Gibbs energy minimization.'
       point_conditions:
         temperature_K:
           state:

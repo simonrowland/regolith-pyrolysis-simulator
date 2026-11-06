@@ -114,30 +114,31 @@ def _render_pins(document: dict) -> None:
         document,
         "Al2O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
-    )["values"]["value"] == "-1046.788"
+    )["values"]["value_as_printed"] == "-1046.788"
     assert _observation(
         document,
         "CaO",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02",
-    )["values"]["value"] == "-425.847"
+    )["values"]["value_as_printed"] == "-425.847"
     assert _observation(
         document,
         "O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06",
-    )["values"]["value"] == "271.522"
+    )["values"]["value_as_printed"] == "271.522"
     model_result = _observation(
         document,
         "Al2O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
     )
-    assert model_result["values"]["method_class"] == "model_derived"
-    assert model_result["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-    assert model_result["values"]["derivation"]["method"]["locator"]["page"] == 1
-    assert model_result["values"]["derivation"]["references"] == [
-        "Glushko et al. (1978–1982)",
-        "Allibert et al. (1979)",
-        "Shornikov et al. (1997)",
-    ]
+    assert model_result["values"]["method_class"] == "typed_refusal"
+    assert model_result["values"]["method_class_as_printed"] == "model_derived"
+    assert model_result["values"]["admission_status"] == "typed_refusal"
+    assert "equation" in model_result["values"]["reason"]
+    assert model_result["values"]["method_as_printed"] == (
+        "ideal associated solutions theory with Gibbs energy minimization"
+    )
+    assert "Table 1 Gibbs energies" in model_result["values"]["method_description"]
+    assert "derivation" not in model_result
 
     marker_pins = (
         ("CaO", "a", "0.497", "(1401.5, 3435.5)", "(1401.76, 3436.61)", "0.303870", "0.000961"),
@@ -167,21 +168,15 @@ def _render_pins(document: dict) -> None:
         "shornikov_2011_text_minimum_delta_fG1960_melt",
     )
     assert minimum["values"]["value_as_printed"] == "−31.5"
-    assert minimum["values"]["value"] == "-31.5"
-    assert minimum["values"]["method_class"] == "model_derived"
-    assert minimum["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-    assert minimum["values"]["derivation"]["method"]["locator"] == {
-        "page": 2,
-        "pdf_page_index": 1,
-        "section": "Results",
-        "figure": "1",
-        "note": "Panel d, the Gibbs-energy result.",
-    }
-    assert minimum["values"]["derivation"]["references"] == [
-        "Glushko et al. (1978–1982)",
-        "Allibert et al. (1979)",
-        "Shornikov et al. (1997)",
-    ]
+    assert minimum["values"]["method_class"] == "typed_refusal"
+    assert minimum["values"]["method_class_as_printed"] == "model_derived"
+    assert minimum["values"]["admission_status"] == "typed_refusal"
+    assert "equation" in minimum["values"]["reason"]
+    assert minimum["values"]["method_as_printed"] == (
+        "ideal associated solutions theory with Gibbs energy minimization"
+    )
+    assert "minimum melt Gibbs energy" in minimum["values"]["method_description"]
+    assert "derivation" not in minimum
     assert minimum["values"]["composition_Al2O3_mole_pct_as_printed"] == "45"
     assert minimum["values"]["T_K"] == "1960"
     assert minimum["phase"] == "l"
@@ -327,8 +322,8 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     observations = list(result.observations.values())
 
     assert len(observations) == 60
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 52
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 8
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 19
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 41
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
@@ -337,8 +332,8 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
         for row in observations
         if row.observation_id.endswith("::shornikov_2011_text_minimum_delta_fG1960_melt")
     )
-    assert minimum.admission.status.value == "admitted"
-    assert minimum.value.kind is ValueKind.POINT
+    assert minimum.admission.status.value == "rejected"
+    assert minimum.value.kind is ValueKind.UNAVAILABLE
     assert minimum.identity.temperature_K is not None
     assert minimum.point_conditions["composition"].state.is_unknown
     assert minimum.point_conditions["composition"].locator is not None

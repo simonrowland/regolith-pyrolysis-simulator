@@ -65,7 +65,7 @@ def _table_pins(document: dict) -> None:
         document,
         "MgO",
         "shornikov_2020_mgo_feo_melts_p002_t03_r03_c02",
-    )["values"]["value"] == "-355.557"
+    )["values"]["value_as_printed"] == "-355.557"
     assert _observation(
         document,
         "MgO",
@@ -76,13 +76,13 @@ def _table_pins(document: dict) -> None:
         "FeO",
         "shornikov_2020_mgo_feo_melts_p002_t03_r06_c04",
     )
-    assert feo_liquid["values"]["value"] == "-134.332"
+    assert feo_liquid["values"]["value_as_printed"] == "-134.332"
     assert feo_liquid["phase"] == "l"
     assert _observation(
         document,
         "O4",
         "shornikov_2020_mgo_feo_melts_p002_t03_r13_c06",
-    )["values"]["value"] == "240.548"
+    )["values"]["value_as_printed"] == "240.548"
     for row in table2:
         assert row["values"]["T_K"] == "2500"
         assert row["point_conditions"]["temperature_K"]["state"]["value"]["point"] == "2500"
@@ -217,13 +217,14 @@ def test_table2_standard_gibbs_energies_are_model_derived():
         "MgO",
         "shornikov_2020_mgo_feo_melts_p002_t03_r03_c02",
     )
-    assert row["values"]["method_class"] == "model_derived"
-    derivation = row["derivation"]
-    assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-    assert "semi-empirical model" in derivation["method"]["state"]["value"].lower()
-    assert derivation["method"]["locator"]["page"] == 3
-    assert derivation["method"]["locator"]["section"] == "Theoretical calculations"
-    assert derivation["references"] == ["Shornikov (2019)"]
+    assert row["values"]["method_class"] == "typed_refusal"
+    assert row["values"]["method_class_as_printed"] == "model_derived"
+    assert row["values"]["admission_status"] == "typed_refusal"
+    assert "equation" in row["values"]["reason"]
+    assert row["values"]["value_as_printed"] == "-355.557"
+    assert "semi-empirical model" in row["values"]["method_as_printed"].lower()
+    assert "Shornikov (2019)" in row["values"]["attribution"]
+    assert "derivation" not in row
 
 
 def test_figure_reads_match_literal_render_pins() -> None:
@@ -236,7 +237,7 @@ def test_render_pins_fail_when_a_table_value_is_mutated() -> None:
         document,
         "O4",
         "shornikov_2020_mgo_feo_melts_p002_t03_r13_c06",
-    )["values"]["value"] = "240.549"
+    )["values"]["value_as_printed"] = "240.549"
     with pytest.raises(AssertionError):
         _table_pins(document)
 
@@ -347,10 +348,10 @@ def test_isolated_migration_preserves_conditions_for_all_observations() -> None:
     result = migrator.result
     observations = list(result.observations.values())
     assert len(observations) == 146
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 17
-    assert sum(row.admission.status.value == "rejected" for row in observations) == 129
-    assert sum(row.value.kind is ValueKind.POINT for row in observations) == 127
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 19
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 0
+    assert sum(row.admission.status.value == "rejected" for row in observations) == 146
+    assert sum(row.value.kind is ValueKind.POINT for row in observations) == 110
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 36
     assert result.validation is not None
     source_rows = {row["observation_id"]: row for row in _observations(document)}
     for row in observations:

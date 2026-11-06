@@ -2976,30 +2976,6 @@ species:
       - 1600.0
       - 2100.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04
-      derivation:
-        relation: "Table 1 reports the authors’ calculations from the cited thermochemical literature using method IX, defined as calculations from literature data."
-        method:
-          state: {tag: value, value: "Calculations from literature data (method IX)"}
-          locator:
-            page: 2
-            published_page: 1045
-            pdf_page_index: 1
-            table: "1"
-            section: "Table 1 method legend"
-            note: Method IX is defined as calculations from literature data.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 1045
-            pdf_page_index: 1
-            table: "1"
-            section: "Table 1 method legend"
-            note: Thermochemical input values are not printed in this table.
-        references:
-        - "Babushkin et al. 1986 [15]"
-        - "Berezhnoi 1970 [17]"
-        - "Kiseleva et al. 1983 [23]"
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3019,13 +2995,15 @@ species:
       experiment: shornikov_2003_table1_this_work_row30
       values:
         quantity: delta_fH
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1790'
         value_as_printed: 11.05 ± 0.08
         method_as_printed: IX
         method_description: calculations from literature data
         attribution: Table 1, This work; method IX (calculations from literature data).
-        value: '11.05'
         temperature_span_as_printed: 1400–2180
       uncertainty:
         value: '0.08'
@@ -3051,30 +3029,6 @@ species:
       - 1400.0
       - 2180.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c05
-      derivation:
-        relation: "Table 1 reports the authors’ calculations from the cited thermochemical literature using method IX, defined as calculations from literature data."
-        method:
-          state: {tag: value, value: "Calculations from literature data (method IX)"}
-          locator:
-            page: 2
-            published_page: 1045
-            pdf_page_index: 1
-            table: "1"
-            section: "Table 1 method legend"
-            note: Method IX is defined as calculations from literature data.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 1045
-            pdf_page_index: 1
-            table: "1"
-            section: "Table 1 method legend"
-            note: Thermochemical input values are not printed in this table.
-        references:
-        - "Babushkin et al. 1986 [15]"
-        - "Berezhnoi 1970 [17]"
-        - "Kiseleva et al. 1983 [23]"
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3094,19 +3048,19 @@ species:
       experiment: shornikov_2003_table1_this_work_row30
       values:
         quantity: delta_fS
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         T_K: '1790'
         value_as_printed: 10.05 ± 0.04*
         method_as_printed: IX
         method_description: calculations from literature data
         attribution: Table 1, This work; method IX (calculations from literature data).
-        value: '10.05'
         temperature_span_as_printed: 1400–2180
         footnote_as_printed: '*'
         footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
         admission_status: typed_refusal
         status: typed_refusal
-        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
       uncertainty:
         value: '0.04'
         unit: J/(mol K)

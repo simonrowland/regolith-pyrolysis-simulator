@@ -30,21 +30,17 @@ species:
         row: 1
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-355.557'
+        value_as_printed: '-355.557'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -73,21 +69,17 @@ species:
         row: 1
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-340.913'
+        value_as_printed: '-340.913'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: l
       per: mol_species
       point_conditions:
@@ -116,21 +108,17 @@ species:
         row: 3
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-141.776'
+        value_as_printed: '-141.776'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -305,21 +293,17 @@ species:
         row: 1
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-100.474'
+        value_as_printed: '-100.474'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -350,21 +334,17 @@ species:
         row: 2
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-481.919'
+        value_as_printed: '-481.919'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -410,21 +390,17 @@ species:
         row: 2
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-4.268'
+        value_as_printed: '-4.268'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -455,21 +431,17 @@ species:
         row: 3
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-602.032'
+        value_as_printed: '-602.032'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -515,21 +487,17 @@ species:
         row: 4
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-118.362'
+        value_as_printed: '-118.362'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -558,21 +526,17 @@ species:
         row: 4
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '-134.332'
+        value_as_printed: '-134.332'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: l
       per: mol_species
       point_conditions:
@@ -601,21 +565,17 @@ species:
         row: 6
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '31.496'
+        value_as_printed: '31.496'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6518,21 +6478,17 @@ species:
         row: 4
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '70.719'
+        value_as_printed: '70.719'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6563,21 +6519,17 @@ species:
         row: 5
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '322.148'
+        value_as_printed: '322.148'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6608,21 +6560,17 @@ species:
         row: 7
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '40.263'
+        value_as_printed: '40.263'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6653,21 +6601,17 @@ species:
         row: 8
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '88.160'
+        value_as_printed: '88.160'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6698,21 +6642,17 @@ species:
         row: 9
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '0.000'
+        value_as_printed: '0.000'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6743,21 +6683,17 @@ species:
         row: 10
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '300.418'
+        value_as_printed: '300.418'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -6788,21 +6724,17 @@ species:
         row: 11
       units: kJ/mol
       mineru_flags: []
-      derivation:
-        relation: Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations", note: "The paper states that the Table 2 model parameters were calculated from experimental and theoretical data but does not identify the specific input source rows for these values."}
-        method:
-          state: {tag: value, value: "Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions."}
-          locator: {page: 3, published_page: 76, pdf_page_index: 2, section: "Theoretical calculations"}
-        references: ["Shornikov (2019)"]
       values:
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '2500'
-        value: '240.548'
+        value_as_printed: '240.548'
         attribution: "Authors' standard Gibbs energies calculated in the present study using the semi-empirical model cited to Shornikov (2019); the article says the model parameters are calculated from experimental and theoretical data but does not identify the specific input source rows for Table 2."
+        method_as_printed: 'Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.'
+        method_description: 'Author-calculated standard Gibbs energies for condensed phases and vapor species over MgO–FeO melts at 2500 K.'
       phase: g
       per: mol_species
       point_conditions:
@@ -9995,7 +9927,7 @@ notes:
 fidelity_samples:
 - species: MgO
   observation_id: shornikov_2020_mgo_feo_melts_p002_t03_r03_c02
-  field: value
+  field: value_as_printed
   value: '-355.557'
   locator:
     page: 2
@@ -10005,7 +9937,7 @@ fidelity_samples:
     row: 1
 - species: FeO
   observation_id: shornikov_2020_mgo_feo_melts_p002_t03_r06_c04
-  field: value
+  field: value_as_printed
   value: '-134.332'
   locator:
     page: 3
@@ -10015,7 +9947,7 @@ fidelity_samples:
     row: 4
 - species: O4
   observation_id: shornikov_2020_mgo_feo_melts_p002_t03_r13_c06
-  field: value
+  field: value_as_printed
   value: '240.548'
   locator:
     page: 3

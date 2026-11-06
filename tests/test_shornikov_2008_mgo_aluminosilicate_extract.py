@@ -18,17 +18,18 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-me
 
 
 def _assert_sc456_model_class(row: dict) -> None:
-    assert row["values"]["method_class"] == "model_derived"
-    assert row["derivation"]["method"]["locator"]["section"] == (
-        "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+    assert row["values"]["method_class"] == "typed_refusal"
+    assert row["values"]["method_class_as_printed"] == "model_derived"
+    assert row["values"]["admission_status"] == "typed_refusal"
+    assert "equation" in row["values"]["reason"]
+    assert row["values"]["method_as_printed"].startswith("Calculation within")
+    assert "Gibbs formation energies calculated" in row["values"]["method_description"]
+    assert row["values"]["attribution"] == (
+        "Cited model input references: Shornikov and Archakov [1]; "
+        "Zaitsev et al. [3]; Shornikov and Archakov [4]; "
+        "Robie and Hemingway [5]"
     )
-    assert row["derivation"]["references"] == [
-        "Shornikov and Archakov [1]",
-        "Zaitsev et al. [3]",
-        "Shornikov and Archakov [4]",
-        "Robie and Hemingway [5]",
-    ]
-    assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert "derivation" not in row
 
 
 def test_render_pins_and_isolated_migration_preserve_every_temperature():
@@ -56,7 +57,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         and row["locator"].get("curve") is not None
     ]
     assert len(table_rows) == 42
-    assert all(row["values"]["method_class"] == "model_derived" for row in table_rows)
+    assert all(row["values"]["method_class"] == "typed_refusal" for row in table_rows)
     _assert_sc456_model_class(table_rows[0])
     flipped = deepcopy(table_rows[0])
     flipped["values"]["method_class"] = "quoted_attributed"
@@ -91,7 +92,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             for candidate, row in observations
             if candidate == formula and row["observation_id"] == observation_id
         )
-        assert row["values"]["value"] == value
+        assert row["values"]["value_as_printed"] == value
         assert row["phase"] == phase
         assert row["locator"]["page"] == 2
         assert row["locator"]["published_page"] == 148
@@ -221,10 +222,10 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == document["source_id"]]
     assert len(migrated) == 70
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 66
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 4
-    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 66
-    assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 4
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 24
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 46
+    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 24
+    assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 46
     assert not result.registry_issues
     assert result.validation is not None
     assert not result.validation.hard_issues

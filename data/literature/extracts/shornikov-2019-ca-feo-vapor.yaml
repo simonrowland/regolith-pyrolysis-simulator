@@ -86,26 +86,6 @@ species:
   CaO:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c02
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -117,10 +97,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-435.296'
+        value_as_printed: '-435.296'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -138,26 +124,6 @@ species:
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c04
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -169,10 +135,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-422.317'
+        value_as_printed: '-422.317'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: l
       per: mol_species
       point_conditions:
@@ -184,26 +156,6 @@ species:
               point: '1873'
           locator: *id001
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -215,10 +167,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-68.953'
+        value_as_printed: '-68.953'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -412,26 +370,6 @@ species:
   Ca:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -443,10 +381,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-9.985'
+        value_as_printed: '-9.985'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -473,26 +417,6 @@ species:
         reason_no_number: 'This is a process range, not one transition temperature; no numeric observation is scored.'
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r04_c02
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -504,10 +428,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-599.816'
+        value_as_printed: '-599.816'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -551,26 +481,6 @@ species:
   Ca2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r04_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -582,10 +492,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '90.363'
+        value_as_printed: '90.363'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -599,26 +515,6 @@ species:
   FeO:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c02
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -630,10 +526,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-153.762'
+        value_as_printed: '-153.762'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
       per: mol_species
       point_conditions:
@@ -645,26 +547,6 @@ species:
               point: '1873'
           locator: *id003
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c04
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -676,10 +558,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '-157.951'
+        value_as_printed: '-157.951'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: l
       per: mol_species
       point_conditions:
@@ -691,26 +579,6 @@ species:
               point: '1873'
           locator: *id003
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r08_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -722,10 +590,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '76.891'
+        value_as_printed: '76.891'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1530,26 +1404,6 @@ species:
   Fe:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r06_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1561,10 +1415,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '145.501'
+        value_as_printed: '145.501'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1584,26 +1444,6 @@ species:
   Fe2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r07_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1615,10 +1455,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '399.724'
+        value_as_printed: '399.724'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1638,26 +1484,6 @@ species:
   FeO2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r09_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1669,10 +1495,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '34.624'
+        value_as_printed: '34.624'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1692,26 +1524,6 @@ species:
   O:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r10_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1723,10 +1535,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '130.138'
+        value_as_printed: '130.138'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1746,26 +1564,6 @@ species:
   O2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r11_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1777,10 +1575,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '0.000'
+        value_as_printed: '0.000'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1800,26 +1604,6 @@ species:
   O3:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r12_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1831,10 +1615,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '266.369'
+        value_as_printed: '266.369'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:
@@ -1854,26 +1644,6 @@ species:
   O4:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r13_c06
-      derivation:
-        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
-        method:
-          state: {tag: value, value: "Theory of ideal associated solutions; semi-empirical model"}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 2
-            published_page: 83
-            pdf_page_index: 1
-            section: "thermodynamic model paragraph (no subsection heading printed)"
-            note: Per-row thermodynamic input data are not printed.
-        references:
-        - "Glushko et al. (1978–1982)"
-        - "Bale et al. (2016)"
       type: gibbs_table
       locator:
         page: 3
@@ -1885,10 +1655,16 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
+        attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
         T_K: '1873'
-        value: '181.230'
+        value_as_printed: '181.230'
+        method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
+        method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
       per: mol_species
       point_conditions:

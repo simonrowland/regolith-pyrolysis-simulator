@@ -140,14 +140,13 @@ def _assert_sc456_evidence_classes(document: dict) -> None:
         "shornikov_2003_mullite_thermodynamics_p002_t01_r31_c05",
     ):
         row = rows[observation_id]
-        assert row["values"]["method_class"] == "model_derived"
-        assert "calculations from the cited thermochemical literature" in row["derivation"]["relation"]
-        assert "Calculations from literature data" in row["derivation"]["method"]["state"]["value"]
-        assert row["derivation"]["references"] == [
-            "Babushkin et al. 1986 [15]",
-            "Berezhnoi 1970 [17]",
-            "Kiseleva et al. 1983 [23]",
-        ]
+        assert row["values"]["method_class"] == "typed_refusal"
+        assert row["values"]["method_class_as_printed"] == "model_derived"
+        assert row["values"]["admission_status"] == "typed_refusal"
+        assert row["values"]["method_as_printed"] == "IX"
+        assert "calculations from literature data" in row["values"]["method_description"]
+        assert "equation" in row["values"]["reason"]
+        assert "derivation" not in row
 
 
 def test_sc456_evidence_class_pins_reject_quoted_reversion() -> None:
