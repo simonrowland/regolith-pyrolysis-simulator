@@ -4,6 +4,8 @@ import gzip
 import io
 import json
 import re
+import subprocess
+import sys
 import tarfile
 from dataclasses import replace
 from pathlib import Path
@@ -2188,6 +2190,165 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     ]
 
 
+def test_history_record_keeps_sd_views_and_openimcc_score_commit() -> None:
+    residuals = [
+        {
+            "rail": "redox",
+            "engine": "openimcc",
+            "n": 2,
+            "rms_dex": "1",
+            "sd_dex": "1",
+            "median_abs_dex": "1",
+            "views": {
+                "all": {
+                    "n": 2,
+                    "rms_dex": "1",
+                    "sd_dex": "1",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+                "temperature_ge_1700": {
+                    "n": 1,
+                    "rms_dex": "1",
+                    "sd_dex": "0",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+                "temperature_lt_1700": {
+                    "n": 1,
+                    "rms_dex": "1",
+                    "sd_dex": "0",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+            },
+        }
+    ]
+    record = _history_record(
+        {
+            "store": {"revision": "redox-test"},
+            "records": [
+                {
+                    "tier": "all_numeric",
+                    "rail": "redox",
+                    "engine": "openimcc",
+                    "n": 2,
+                    "rms_dex": "1",
+                    "median_abs_dex": "1",
+                }
+            ],
+        },
+        landing_sha="green-test",
+        commit_date="2026-10-18T10:27:53-04:00",
+        comparisons={},
+        diagnostics={},
+        hero_metrics={("redox", "openimcc"): residuals[0]},
+        openimcc_score_commit="66ec4a3",
+    )
+
+    metric = record["metrics"][0]
+    assert record["openimcc_score_commit"] == "66ec4a3"
+    assert metric["sd_dex"] == "1"
+    assert metric["views"]["temperature_ge_1700"]["n"] == 1
+
+
+def test_legacy_history_without_sd_or_views_still_draws_convergence(tmp_path: Path) -> None:
+    history = tmp_path / "legacy-history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "legacy",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "openimcc",
+                        "n": 5,
+                        "rms_dex": "0.5",
+                        "median_abs_dex": "0.4",
+                    }
+                ],
+                "comparisons": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_history(
+            axis,
+            "vapour",
+            hero_plot.read_history(history),
+            engine_colors={"openimcc": "#0072b2"},
+        )
+        assert axis.lines
+    finally:
+        plt.close(figure)
+
+
+def test_cutoff_observation_id_script_reads_the_store_at_requested_commit(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "cutoff-store"
+    store = repo / "data" / "literature" / "observations-v2"
+    nested = store / "nested"
+    nested.mkdir(parents=True)
+    (store / "first.yaml").write_text(
+        "source_id: source-a\nobservations:\n  - observation_id: obs-b\n  - observation_id: obs-a\n",
+        encoding="utf-8",
+    )
+    (nested / "second.yaml").write_text(
+        "source_id: source-b\nobservations:\n  - observation_id: obs-c\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "hero@example.test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.name", "Hero Test"],
+        check=True,
+    )
+    subprocess.run(["git", "-C", str(repo), "add", "data"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-qm", "baseline observations"],
+        check=True,
+    )
+    commit = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    output = tmp_path / "baseline-observation-ids.txt"
+
+    subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts" / "battery_hero_observation_ids.py"),
+            "--repo",
+            str(repo),
+            "--commit",
+            commit,
+            "--output",
+            str(output),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert output.read_text(encoding="utf-8").splitlines() == [
+        "obs-a",
+        "obs-b",
+        "obs-c",
+    ]
+
+
 def test_history_keeps_deck_rail_all_numeric_count() -> None:
     """A deck-rail diagnostic copies the scorer's all-numeric summary.
 
@@ -2620,7 +2781,7 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
         openimcc_commit="openimcc-test",
         render_date="2026-10-15",
     )
-    assert "OpenIMCC 1.2.3 · openimcc-test" in stamp
+    assert "OpenIMCC 1.2.3 · SCORE openimcc-test" in stamp
     assert "simulator sim-test" in stamp
     assert "store test-store" in stamp
     assert "rendered 2026-10-15 UTC" in stamp
@@ -2661,6 +2822,8 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     )
     assert "patch 0123456789ab" in dirty_equal_stamp
     assert "openimcc patch abcdef012345" in dirty_equal_stamp
+
+
     clean = replace(
         data,
         stamp={
@@ -2699,3 +2862,48 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     assert "test-store-2026-10-15-species" in files["species:tile_png"].name
     assert "test-store-2026-10-15-element" in files["element:tile_png"].name
     assert "no scored rows: magemin (not an observable of this engine ×1)" in files["species:tile_svg"].read_text(encoding="utf-8")
+
+
+def test_stamp_derives_default_pack_from_scored_openimcc_version(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "pack-residuals.jsonl"
+    _score_file(residuals)
+    row = _record(
+        engine="openimcc",
+        experiment="pack-row",
+        formula="SiO",
+        temperature_K=1700,
+        residual=0.25,
+        version="IMCC-SF04-D066-v9",
+    )
+    with residuals.open("a", encoding="utf-8") as target:
+        target.write(json.dumps(row) + "\n")
+    data = read_scores(residuals)
+
+    stamp = stamp_text(
+        data,
+        simulator_commit="sim-test",
+        openimcc_commit="66ec4a3",
+        render_date="2026-11-06",
+    )
+
+    assert "default pack at scored pin: imcc-sf04-d066-v9" in stamp
+    assert "SCORE 66ec4a3" in stamp
+
+
+def test_hero_summary_exposes_split_metrics_for_every_residual_engine(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+
+    chart = hero_plot._hero_summary_payload(data)["vapour"]
+
+    metrics = chart["all_numeric_metrics_by_engine"]
+    assert set(metrics) == set(data.engines)
+    assert metrics["openimcc"]["views"]["all"]["n"] == metrics["openimcc"]["n"]
+    assert "sd_dex" in metrics["openimcc"]
+    assert "temperature_ge_1700" in metrics["openimcc"]["views"]
+    assert metrics["magemin"]["n"] == 0
