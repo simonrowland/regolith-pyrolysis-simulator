@@ -224,7 +224,10 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # Na is held in the train, so the zero-dose shuttle returns less Na2O to
     # the melt; 0.0763 -> 4.1e-5 kg. Studio-3 actual; the laptop agrees.
     # FeO reduction (>80 %) and the 5e-12 % closure still hold.
-    assert na2o_left == pytest.approx(4.115499686711082e-05, abs=1e-6)
+    # Freeze-gate liquidus fix (285420627): the gate follows composition, so
+    # the zero-dose C5 Na2O moves 4.1155e-5 -> 4.5216e-5 kg. Studio-3 full
+    # gate actual at 101aebdaf.
+    assert na2o_left == pytest.approx(4.5215994651378906e-05, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
