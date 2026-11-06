@@ -8,7 +8,7 @@ source:
   corpus_asset: raw/mcgill-na-fe-o-critical-assessment/mcgill-na-fe-o-critical-assessment.pdf
 extraction:
   method: >-
-    This first extraction slice transcribes NaFeO2 thermochemistry from Table II and its explanatory text using the MinerU content list and markdown plus the born-digital pdftotext layout. The entire Table II page render was checked for row/column assignment and the NaFeO2 numeric cells.
+    Transcribed Tables II-VI from the MinerU content list and markdown plus the born-digital pdftotext layout. Render checks resolve flagged numeric cells and verify table row/column assignments. Figure-only values are excluded.
   date: '2026-11-05'
   worker: codex-resume-77747-1793930354
   provenance_path: text/mcgill-na-fe-o-critical-assessment/pdftotext-layout.txt
@@ -19,9 +19,15 @@ fidelity_samples:
   - path: species.NaFeO2.observations[mcgill16_nafeo2_quoted_delta_fH].values.value
     value: '-698.02'
     locator: {page: 5, published_page: 580, table: 'II', row: NaFeO2, column: 'ΔH°298 K'}
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_alpha_beta_transition_enthalpy].values.value
+    value: '41.84'
+    locator: {page: 5, published_page: 580, table: 'II', row: 'Phase transformations', column: 'ΔH_tr α → β'}
+  - path: species.NaFeO2.observations[mcgill16_nafeo2_beta_gamma_transition_enthalpy].values.value
+    value: '2177'
+    locator: {page: 5, published_page: 580, table: 'II', row: 'Phase transformations', column: 'ΔH_tr β → γ'}
   - path: species.NaFeO2.observations[mcgill16_nafeo2_fusion_temperature_exp].values.T_m_K
     value: '1620'
-    locator: {page: 7, published_page: 581, table: 'IV', row: 'L = NaFeO2(c)'}
+    locator: {page: 7, published_page: 582, table: 'IV', row: 'L = NaFeO2(c)'}
 species:
   NaFeO2:
     observations:
@@ -31,7 +37,7 @@ species:
         phase: cr
         units: kJ/mol
         per: mol_species
-        standard_pressure_Pa: '100000'
+        standard_pressure_Pa: '101325'
         uncertainty: {kind: printed, value: '1.30', verbatim: '± 1.30 kJ/mol', confidence_level: not_stated}
         standard_state: Standard enthalpy of formation at 298 K, as labeled in Table II.
         values:
@@ -40,7 +46,8 @@ species:
           value: '-698.02'
           T_K: '298'
           attribution: Koehler et al. [28], solution calorimetry (SC)
-          standard_pressure_Pa: '100000'
+          standard_pressure_Pa: '101325'
+          standard_pressure_as_printed: 1 atm (reference state)
           phase_as_printed: alpha-NaFeO2
           per_as_printed: per mole of compound
           method_class_reason: Quoted calorimetric experimental value, not the present authors' measurement.
@@ -61,7 +68,8 @@ species:
           value: '88.34'
           T_K: '298'
           per: mol_species
-          standard_pressure_Pa: '100000'
+          standard_pressure_Pa: '101325'
+          standard_pressure_as_printed: 1 atm (standard entropy state)
           attribution: King [32], adiabatic calorimetry (AC)
           phase_as_printed: alpha-NaFeO2
           method_class_reason: Quoted low-temperature calorimetry value attributed to King.
@@ -69,9 +77,71 @@ species:
           temperature_K:
             state: {tag: value, value: {kind: point, point: '298'}}
             locator: {page: 5, table: 'II', row: NaFeO2}
+      - observation_id: mcgill16_nafeo2_alpha_beta_transition_enthalpy
+        type: phase_transition
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: 'Phase transformations', column: 'ΔH_tr α → β'}
+        phase: cr
+        units: J/mol
+        values:
+          quantity: polymorph_transition_enthalpy_as_printed
+          value: '41.84'
+          transition_as_printed: alpha -> beta
+          transition_temperature_K: '870'
+          method_class: model_derived
+          derivation:
+            relation: Authors' thermodynamic assessment based on Christensen et al. [27] transition data.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 8, published_page: 583, pdf_page_index: 7, section: NaFeO2 thermodynamic properties, note: Numerical experimental transition inputs are not separately printed.}
+            method:
+              state: {tag: value, value: "Authors' thermodynamic assessment from Christensen et al. [27] transition data."}
+              locator:
+                page: 8
+                published_page: 583
+                pdf_page_index: 7
+                section: NaFeO2 thermodynamic properties
+                equation: Table II phase-transformation summary
+                note: "The authors state the transition enthalpies were determined based on Christensen et al. [27]."
+            references: ["Christensen et al. [27]"]
+          schema_gap: No exact solid-solid transition-enthalpy quantity token exists in simulator/battery/enums.py::Quantity. Quantity.ENTHALPY_OF_FUSION is not the same printed quantity.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '870'}}
+            locator: {page: 5, table: 'II', row: 'Phase transformations'}
+      - observation_id: mcgill16_nafeo2_beta_gamma_transition_enthalpy
+        type: phase_transition
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II', row: 'Phase transformations', column: 'ΔH_tr β → γ'}
+        phase: cr
+        units: J/mol
+        values:
+          quantity: polymorph_transition_enthalpy_as_printed
+          value: '2177'
+          transition_as_printed: beta -> gamma
+          transition_temperature_K: '1270'
+          method_class: model_derived
+          derivation:
+            relation: Authors' thermodynamic assessment based on Christensen et al. [27] transition data.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 8, published_page: 583, pdf_page_index: 7, section: NaFeO2 thermodynamic properties, note: Numerical experimental transition inputs are not separately printed.}
+            method:
+              state: {tag: value, value: "Authors' thermodynamic assessment from Christensen et al. [27] transition data."}
+              locator:
+                page: 8
+                published_page: 583
+                pdf_page_index: 7
+                section: NaFeO2 thermodynamic properties
+                equation: Table II phase-transformation summary
+                note: "The authors state the transition enthalpies were determined based on Christensen et al. [27]."
+            references: ["Christensen et al. [27]"]
+          schema_gap: No exact solid-solid transition-enthalpy quantity token exists in simulator/battery/enums.py::Quantity. Quantity.ENTHALPY_OF_FUSION is not the same printed quantity.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '1270'}}
+            locator: {page: 5, table: 'II', row: 'Phase transformations'}
       - observation_id: mcgill16_nafeo2_fusion_temperature_exp
         type: transition_point
-        locator: {page: 7, published_page: 581, pdf_page_index: 6, table: 'IV', row: 'L = NaFeO2(c)', column: 'T exp'}
+        locator: {page: 7, published_page: 582, pdf_page_index: 6, table: 'IV', row: 'L = NaFeO2(c)', column: 'T exp'}
         phase: cr
         units: K
         values:
@@ -109,10 +179,147 @@ species:
             These assessed transition enthalpies have no exact quantity token in simulator/battery/enums.py::Quantity. They remain located context rather than being mislabeled as formation or fusion enthalpies.
       - observation_id: mcgill16_nafeo2_liquid_gibbs_parameter
         type: thermodynamic_model_context
-        locator: {page: 6, published_page: 580, pdf_page_index: 5, table: 'III', row: GNaFeO2}
+        locator: {page: 6, published_page: 581, pdf_page_index: 5, table: 'III', row: GNaFeO2}
         units: J/mol
         values:
           parameter_as_printed: 'GNaFeO2 = 1/2 GNa2O + 1/2 GFe2O3 - 99371.2552 + 16.91756468T'
           method_class: model_derived
           model_phase: liquid solution
           note: The row is the NaFeO2 associate Gibbs-energy term in the liquid model; it is not a solid polymorph property.
+      - observation_id: mcgill16_table_ii_complete_thermochemistry_inventory
+        type: thermochemistry_table_context
+        locator: {page: 5, published_page: 580, pdf_page_index: 4, table: 'II'}
+        units: as printed by each table column
+        values:
+          printed_body_row_count: 33
+          unmarked_rows_evidence_class: quoted_attributed
+          reference_state_as_printed: Standard thermodynamic properties at 298 K; the text defines the elemental reference state at 1 atm and formation enthalpies as ΔH°f.
+          rows:
+            - {species: Na2O, phase: alpha, delta_fH_kJ_mol: '-417.982', S_J_mol_K: '75.061', Cp: '66.216 + 0.0438651T - 813370.0184T^-2 - 1.40875003856E-5T^2 (298-1405 K)', attribution: '[17]'}
+            - {species: Na2O, phase: beta, delta_fH_kJ_mol: '-416.225', S_J_mol_K: '76.779', Cp: '104.6 (1405-1500 K)', attribution: '[17]'}
+            - {species: Na2O, phase: gamma, delta_fH_kJ_mol: '-404.300', S_J_mol_K: '86.372', attribution: '[17]'}
+            - {species: Fe2O3, delta_fH_kJ_mol: '-825.787', S_J_mol_K: '87.728', Cp: '137.00893 - 2907640T^-2', attribution: '[17]'}
+            - {species: FeO, delta_fH_kJ_mol: '-265.832', S_J_mol_K: '59.496', Cp: '-18.0244740968 + 0.0306080599496T - 2533299.99432T^-2 + 1500.90000264T^-0.5 (298-1644 K); 68.1992 (1644-2000 K)', attribution: '[17]'}
+            - {species: Na3Fe5O9, delta_fH_kJ_mol: '-2890', S_J_mol_K: '346', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na3Fe5O9, delta_fH_kJ_mol: '-2899.491', S_J_mol_K: '375.360', Cp: '1.5 Cp(Na2O) + 2.5 Cp(Fe2O3)', method_class: model_derived, attribution: 'This work'}
+            - {species: Na4Fe6O11, delta_fH_kJ_mol: '-3665', S_J_mol_K: '442', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na4Fe6O11, delta_fH_kJ_mol: '-3569.54', uncertainty_kJ_mol: '3.95', technique: KEMS, attribution: '[49]'}
+            - {species: Na4Fe6O11, delta_fH_kJ_mol: '-3559.339', S_J_mol_K: '490.549', Cp: '2 Cp(Na2O) + 3 Cp(Fe2O3)', method_class: model_derived, attribution: 'This work'}
+            - {species: Na8Fe2O7, delta_fH_kJ_mol: '-2745.54', uncertainty_kJ_mol: '4.18', technique: SC, attribution: '[40]'}
+            - {species: Na8Fe2O7, S_J_mol_K: '437.96', technique: AC, attribution: '[40]'}
+            - {species: Na8Fe2O7, delta_fH_kJ_mol: '-2710.378', S_J_mol_K: '437.964', Cp: '392.78204057729 + 0.0808869T - 3552627.12022383T^-2 + 1.497672E-5T^2', method_class: model_derived, attribution: 'This work'}
+            - {species: Na3FeO3, delta_fH_kJ_mol: '-1155', S_J_mol_K: '172', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na3FeO3, delta_fH_kJ_mol: '-1162.6', technique: MS, attribution: '[43]'}
+            - {species: Na3FeO3, Cp: '181.7 + 0.03339T - 2967000T^-2', technique: sum of oxides, attribution: '[43]'}
+            - {species: Na3FeO3, delta_fH_kJ_mol: '-1175.871', S_J_mol_K: '133.434', Cp: '1.5 Cp(Na2O) + 0.5 Cp(Fe2O3)', method_class: model_derived, attribution: 'This work'}
+            - {species: Na5FeO4, delta_fH_kJ_mol: '-1596', S_J_mol_K: '246.3', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na5FeO4, delta_fH_kJ_mol: '-1450.246', S_J_mol_K: '240.620', Cp: '2.5 Cp(Na2O) + 0.5 Cp(Fe2O3)', method_class: model_derived, attribution: 'This work'}
+            - {species: NaFeO2, S_J_mol_K: '88.34', uncertainty_J_mol_K: '0.84', technique: AC, attribution: 'King [32]'}
+            - {species: NaFeO2, delta_fH_kJ_mol: '-698.02', uncertainty_kJ_mol: '1.30', technique: SC, attribution: 'Koehler et al. [28]'}
+            - {species: NaFeO2, phase: alpha, delta_fH_kJ_mol: '-697.350', S_J_mol_K: '88.341', Cp: '110.95 + 0.0076933T - 2552200T^-2', method_class: model_derived, attribution: 'This work'}
+            - {species: NaFeO2, phase_transformations: 'alpha -> beta: 41.84 J/mol at 870 K; beta -> gamma: 2177 J/mol at 1270 K', method_class: model_derived, attribution: 'This work, based on [27]'}
+            - {species: Na2FeO2, delta_fH_kJ_mol: '-802.92', uncertainty_kJ_mol: '3.73', technique: SC, attribution: '[33]', note: '** converted from constituent-oxide basis to elements in this study'}
+            - {species: Na2FeO2, delta_fH_kJ_mol: '-780', S_J_mol_K: '136', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na2FeO2, delta_fH_kJ_mol: '-755.435', S_J_mol_K: '134', Cp: 'Cp(Na2O) + Cp(FeO)', method_class: model_derived, attribution: 'This work'}
+            - {species: NaFe2O3, delta_fH_kJ_mol: '-968.000', S_J_mol_K: '149.994', Cp: '0.5 Cp(Na2O) + 0.5 Cp(Fe2O3) + Cp(FeO)', method_class: model_derived, attribution: 'This work'}
+            - {species: Na4FeO3, delta_fH_kJ_mol: '-1206.70', uncertainty_kJ_mol: '2.3', technique: SC, attribution: '[57]', note: '** converted from constituent-oxide basis to elements in this study'}
+            - {species: Na4FeO3, S_J_mol_K: '203', method_class: quoted_attributed, attribution: 'Estimation by Lindemer et al. [20]'}
+            - {species: Na4FeO3, delta_fH_kJ_mol: '-1205.56', technique: SC, attribution: '[62]', note: '** converted from constituent-oxide basis to elements in this study'}
+            - {species: Na4FeO3, delta_fH_kJ_mol: '-1249.78', technique: SC, attribution: '[33]', note: '** converted from constituent-oxide basis to elements in this study'}
+            - {species: Na4FeO3, delta_fH_kJ_mol: '-1205.000', S_J_mol_K: '212.625', Cp: '2 Cp(Na2O) + Cp(FeO)', method_class: model_derived, attribution: 'This work'}
+            - {species: NaFeO2, phase_transformations: 'alpha -> beta: 41.84 J/mol at 870 K; beta -> gamma: 2177 J/mol at 1270 K', method_class: model_derived, attribution: 'This work, based on [27]'}
+          footnotes_as_printed:
+            - 'KEMS = Knudsen effusion mass spectrometry; MS = mass spectrometry; SC = solution calorimetry; DC = drop calorimetry; AC = adiabatic calorimetry; Est = estimation.'
+            - "'**' values are enthalpies originally given from Na2O and FeO constituent oxides and converted to an elemental-species base in this study."
+      - observation_id: mcgill16_table_iii_optimized_parameters
+        type: thermodynamic_model_context
+        locator: {page: 6, published_page: 581, pdf_page_index: 5, table: 'III'}
+        units: J/mol and J/mol-K as printed
+        values:
+          printed_body_row_count: 25
+          method_class: model_derived
+          model_method: FactSage thermodynamic optimization; these are the printed parameter equations and temperature ranges.
+          parameters_as_printed:
+            - 'Liquid solution (NaO0.5-FeO-FeO1.5-NaFeO2): ZNaNa^Na=0.68872188; ZFe(II)Fe(II)^Fe(II)=1.37744375; ZFe(III)Fe(III)^Fe(III)=2.06616563; ZNaFeNaFe^NaFe=2.75488750.'
+            - 'GNaO0.5 = 1/2 GNa2O.'
+            - 'GNa2O: 298-1405 K, H298=-356602.750952, S298=120.320451152, Cp=66.216000736+0.043865102024T-813370.10208T^-2-1.4087498712E-5T^2; 1405-9999 K, H298=-372790.914728, S298=91.72246388, Cp=104.6.'
+            - 'GFeO: 298-1644 K, H298=-234136.87012, S298=78.465514272, Cp=-18.0244749336+0.0306080612048T-2533299.99432T^-2+1500.89966792T^-0.5; 1644-9999 K, H298=-247254.835616, S298=58.4820022560, Cp=68.199212552.'
+            - 'GFeO1.5 = 1/2 GFe2O3.'
+            - 'GFe2O3: H298=-805257.07504, S298=873.77363144, Cp=-8760452.505600E6T^-2-146.8578519E-6T^2.'
+            - 'GNaFeO2 = 1/2GNa2O + 1/2GFe2O3 - 99371.2552 + 16.91756468T.'
+            - 'Δg_Na-Fe(II)=(-158992+33.472T)-96232X_NaNa^1-87864X_Fe(II)Fe(II)^1-125520X_NaNa^2+(211764.792-74.596536T)X_Fe(II)Fe(II)^2.'
+            - 'Δg_Na-Fe(III)=(-271960+47.005428T)-12552X_Fe(III)Fe(III)^1.'
+            - '*Δg_Fe(II)-Fe(III)=-18823.816X_Fe(III)Fe(III)^1-9878.424X_Fe(II)Fe(II)^2.'
+            - 'q^011_Na,Fe(II),Fe(III)=83680; q^001_Fe(II),NaFe,Na=-62760.'
+            - 'Wüstite solution (FeO-FeO1.5-NaO0.5): GFeO H298=-265238.11112, S298=59.495798, Cp=-18.0244749336+0.0306080612048T-2533299.99432T^-2+1500.89966792T^-0.5.'
+            - 'GFeO1.5 = 1/2GFe2O3.'
+            - 'GFe2O3: H298=-769123.08872, S298=97.33910732, Cp=146.8584-5576782.0536T^-2+525627886.72T^-3.'
+            - 'GNa2O: 298-1405 K, H298=-397062.001664, S298=75.060997656, Cp=66.216000736+0.043865102T-813370.0184T^-2-1.4087498712E-5T^2; 1405-1500 K, H298=-413250, S298=46.46302, Cp=104.6.'
+            - 'Δg_FeO-NaO0.5=-69036+(-35762.74+29.0193872T)X_FeO^2.'
+            - 'Δg_FeO1.5-NaO0.5=-62760-96232X_NaO0.5^1.'
+            - '*Δg_FeO-FeO1.5=-(8275.952+11.572944T)-49145.264X_FeO1.5^1.'
+          inherited_parameter_notes:
+            - 'FeO-FeO1.5 binary parameters marked * are from [11].'
+            - 'Spinel solid-solution parameters are from [11].'
+      - observation_id: mcgill16_table_iv_na2o_fe2o3_invariants
+        type: phase_equilibrium_context
+        locator: {page: 7, published_page: 582, pdf_page_index: 6, table: 'IV'}
+        units: K, °C, and mol pct Na2O as printed
+        values:
+          printed_body_row_count: 9
+          experimental_columns_method_class: quoted_attributed
+          calculated_columns_method_class: model_derived
+          model_method: Calculated invariant reactions from the authors' FactSage thermodynamic optimization.
+          condition_as_printed: In air, per the Table IV caption; the caption does not print a gas ratio or numeric fO2.
+          uncertainty_note: Printed ± widths are retained as printed; confidence level is not stated.
+          rows:
+            - {T_exp: '1408 K (1135 °C) ± 24', T_calc: '1400 K (1127 °C)', reaction: 'L = Fe2O3 + NaFeO2(c)', Na2O_exp_mol_pct: '36', Na2O_calc_mol_pct: '36.0', reference: '[21]'}
+            - {T_exp: '1373 K (1100 °C)', T_calc: '1369 K (1096 °C)', reaction: 'Fe2O3 + NaFeO2(c) = Na3Fe5O9', Na2O_exp_mol_pct: '38.5', Na2O_calc_mol_pct: '37.5', reference: '[22]'}
+            - {T_exp: '1033 K (760 °C)', T_calc: '1038 K (765 °C)', reaction: 'Na3Fe5O9 = Fe2O3 + NaFeO2(b)', Na2O_exp_mol_pct: '38.5', Na2O_calc_mol_pct: '37.5', reference: '[22]'}
+            - {T_exp: '1620 K (1347 °C)', T_calc: '1620 K (1347 °C)', reaction: 'L = NaFeO2(c)', Na2O_exp_mol_pct: '50.0', Na2O_calc_mol_pct: '50.0', reference: '[27, 28]'}
+            - {T_exp: 'not printed', T_calc: '1492 K (1219 °C)', reaction: 'L = NaFeO2(c) + Na8Fe2O7', Na2O_calc_mol_pct: '63.5'}
+            - {T_exp: '~1023 K (750 °C)', T_calc: '1052 K (779 °C)', reaction: 'NaFeO2(b) + Na8Fe2O7 = Na3FeO3', Na2O_exp_mol_pct: '75.0', Na2O_calc_mol_pct: '75.0', reference: '[46]'}
+            - {T_exp: 'not printed', T_calc: '644 K (371 °C)', reaction: 'Na8Fe2O7 = Na3FeO3 + Na2O(a)', Na2O_calc_mol_pct: '80.0'}
+            - {T_exp: 'not printed', T_calc: '1530 K (1257 °C)', reaction: 'L = Na8Fe2O7', Na2O_calc_mol_pct: '80.0'}
+            - {T_exp: 'not printed', T_calc: '1306 K (1033 °C)', reaction: 'L = Na8Fe2O7 + Na2O(c)', Na2O_calc_mol_pct: '95.6'}
+      - observation_id: mcgill16_table_v_na2o_feo_invariants
+        type: phase_equilibrium_context
+        locator: {page: 12, published_page: 587, pdf_page_index: 11, table: 'V'}
+        units: K, °C, and mol pct Na2O as printed
+        values:
+          printed_body_row_count: 9
+          experimental_columns_method_class: quoted_attributed
+          calculated_columns_method_class: model_derived
+          model_method: Calculated invariant reactions from the authors' FactSage thermodynamic optimization at metallic saturation.
+          condition_as_printed: Metallic saturation
+          uncertainty_note: Printed ± widths are retained as printed; confidence level is not stated.
+          rows:
+            - {T_exp: '1253 K (980 °C) ± 20', T_calc: '1230 K (957 °C)', reaction: 'L + wüstite = NaFeO2(b)', Na2O_exp_mol_pct: '25.00', Na2O_calc_mol_pct: '25.00'}
+            - {T_exp: 'not printed', T_calc: '1210 K (937 °C)', reaction: 'wüstite + NaFeO2(b) = NaFe2O3', Na2O_calc_mol_pct: '16.67'}
+            - {T_exp: 'not printed', T_calc: '761 K (488 °C)', reaction: 'wüstite = spinel + NaFe2O3', Na2O_calc_mol_pct: '4.34'}
+            - {T_exp: 'not printed', T_calc: '474 K (201 °C)', reaction: 'NaFe2O3 = spinel + NaFeO2(a)', Na2O_calc_mol_pct: '16.67'}
+            - {T_exp: '1031 K (758 °C) ± 20', T_calc: '1051 K (778 °C)', reaction: 'L = Na2FeO2 + NaFeO2(b)', Na2O_exp_mol_pct: '42.5', Na2O_calc_mol_pct: '44.31'}
+            - {T_exp: '1086 K (813 °C)', T_calc: '1086 K (813 °C)', reaction: 'L = Na2FeO2', Na2O_exp_mol_pct: '50.0', Na2O_calc_mol_pct: '50.0'}
+            - {T_exp: 'not printed', T_calc: '763 K (490 °C)', reaction: 'Na2FeO2 = Na3FeO3 + Fe', Na2O_calc_mol_pct: '50.0'}
+            - {T_exp: '904 K (631 °C) ± 8', T_calc: '915 K (642 °C)', reaction: 'L + Na2FeO2 = Na4FeO3', Na2O_exp_mol_pct: '66.7', Na2O_calc_mol_pct: '66.67'}
+            - {T_exp: '869 K (596 °C) ± 15', T_calc: '898 K (625 °C)', reaction: 'L = Na4FeO3 + Na2O(a)', Na2O_exp_mol_pct: '75.4', Na2O_calc_mol_pct: '74.22'}
+      - observation_id: mcgill16_table_vi_ternary_invariants
+        type: phase_equilibrium_context
+        locator: {page: 14, published_page: 589, pdf_page_index: 13, table: 'VI'}
+        units: K, °C, and mol pct components as printed
+        values:
+          printed_body_row_count: 11
+          method_class: model_derived
+          model_method: Calculated ternary invariant reactions from the authors' FactSage thermodynamic optimization.
+          rows:
+            - {T: '1374 K (1101 °C)', phases_with_liquid: 'spinel + Fe2O3 + NaFeO2(c)', Na2O_mol_pct: '32.9', Fe2O3_mol_pct: '57.3', FeO_mol_pct: '9.7'}
+            - {T: '1309 K (1036 °C)', phases_with_liquid: 'spinel + wüstite + NaFeO2(c)', Na2O_mol_pct: '26.6', Fe2O3_mol_pct: '33.2', FeO_mol_pct: '40.2'}
+            - {T: '1270 K (997 °C)', phases_with_liquid: 'Na8Fe2O7 + NaFeO2(c) + NaFeO2(b)', Na2O_mol_pct: '61.9', Fe2O3_mol_pct: '5.5', FeO_mol_pct: '33.0'}
+            - {T: '1270 K (997 °C)', phases_with_liquid: 'NaFe2O3 + NaFeO2(c) + NaFeO2(b)', Na2O_mol_pct: '32.3', Fe2O3_mol_pct: '16.4', FeO_mol_pct: '51.3'}
+            - {T: '1252 K (979 °C)', phases_with_liquid: 'wüstite + NaFeO2(b) + NaFe2O3', Na2O_mol_pct: '32.0', Fe2O3_mol_pct: '14.0', FeO_mol_pct: '54.0'}
+            - {T: '1243 K (970 °C)', phases_with_liquid: 'Na8Fe2O7 + Na2O(b) + Na2O(c)', Na2O_mol_pct: '89.3', Fe2O3_mol_pct: '0.1', FeO_mol_pct: '10.5'}
+            - {T: '1230 K (957 °C)', phases_with_liquid: 'wüstite + NaFeO2(b) + Fe(fcc)', Na2O_mol_pct: '33.8', Fe2O3_mol_pct: '12.8', FeO_mol_pct: '53.4'}
+            - {T: '1185 K (912 °C)', phases_with_liquid: 'NaFeO2(b) + Fe(bcc) + Fe(fcc)', Na2O_mol_pct: '40.6', Fe2O3_mol_pct: '6.8', FeO_mol_pct: '52.5'}
+            - {T: '1070 K (797 °C)', phases_with_liquid: 'Na8Fe2O7 + Na2FeO2 + NaFeO2(b)', Na2O_mol_pct: '51.8', Fe2O3_mol_pct: '29.0', FeO_mol_pct: '45.3'}
+            - {T: '1051 K (778 °C)', phases_with_liquid: 'Na2FeO2 + NaFeO2(b) + Fe(bcc)', Na2O_mol_pct: '46.7', Fe2O3_mol_pct: '2.7', FeO_mol_pct: '50.6'}
+            - {T: '914 K (641 °C)', phases_with_liquid: 'Na8Fe2O7 + Na2FeO2 + Na4FeO3', Na2O_mol_pct: '69.7', Fe2O3_mol_pct: '0.0', FeO_mol_pct: '30.2'}
