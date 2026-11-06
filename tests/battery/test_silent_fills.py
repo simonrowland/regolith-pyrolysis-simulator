@@ -413,6 +413,83 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     )
 
 
+@pytest.mark.parametrize("missing_input", ("composition", "temperature"))
+def test_knudsen_effusion_balance_requires_composition_and_temperature(
+    missing_input: str,
+) -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    observation, experiment = _kems_partial(cell_material=None)
+    identity = observation.identity
+    assert identity.composition is not None and identity.composition.is_value
+    composition = identity.composition.value
+    temperature = (
+        float(identity.temperature_K.value)
+        if identity.temperature_K is not None and identity.temperature_K.is_value
+        else None
+    )
+    if missing_input == "composition":
+        observation = replace(
+            observation,
+            identity=replace(
+                identity,
+                composition=State.unknown("no melt composition"),
+            ),
+        )
+        composition = None
+    else:
+        temperature = None
+
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.PT,)),
+        observation,
+        composition=composition,
+        temperature_K=temperature,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert resolved is None
+
+
+def test_knudsen_effusion_balance_uses_hertz_knudsen_flux_weighting() -> None:
+    from openimcc import oxygen_balance_from_pressure_model, oxygen_balance_species_metadata
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_cell_oxygen_balance,
+    )
+
+    species = oxygen_balance_species_metadata({"SiO": "SiO2", "O2": None})
+    root_logp = -5.0
+    target_p_sio_bar = 1e-3
+    # SiO2(l) -> SiO(g) + 1/2 O2(g). Its gas O balance is
+    # 2 J_O2 = J_SiO; J_i ∝ p_i/sqrt(M_i T), so pO2/pSiO is
+    # 0.5*sqrt(M_O2/M_SiO), not the pressure-balance value 0.5.
+    expected_ratio = 0.5 * (
+        species["O2"].molar_mass / species["SiO"].molar_mass
+    ) ** 0.5
+
+    def pressure_model(pO2_bar: float) -> dict[str, float]:
+        delta_logp = math.log10(pO2_bar) - root_logp
+        return {
+            "SiO": target_p_sio_bar * 10.0 ** (-0.5 * delta_logp),
+            "O2": target_p_sio_bar * expected_ratio * 10.0**delta_logp,
+        }
+
+    pO2_bar, pressures, _balance, _cell_fraction, _cell_info = (
+        _solve_cell_oxygen_balance(
+            pressure_model,
+            species,
+            temperature_K=2000.0,
+            cell_material=None,
+            oxygen_balance_from_pressure_model=oxygen_balance_from_pressure_model,
+        )
+    )
+
+    assert pO2_bar == pytest.approx(10.0**root_logp, rel=1e-10)
+    assert pressures["O2"] / pressures["SiO"] == pytest.approx(expected_ratio)
+    assert pressures["O2"] / pressures["SiO"] != pytest.approx(0.5)
+
+
 @pytest.mark.parametrize(
     ("materials", "cell_material"),
     (

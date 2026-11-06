@@ -11,6 +11,7 @@ from simulator.battery.enums import (
     CellMaterial,
     Engine,
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
 )
@@ -118,6 +119,14 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     assert condition["derived_from"]
     assert condition["derivation"]["inputs"] == condition["derived_from"]
     assert "cell-metal activity as assumed by the source" in condition["derivation"]["relation"]
+    substitution = next(
+        notice for notice in residual.notices
+        if notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.origin == "source oxygen selection"
+        and notice.reason.startswith("model substitution: source-linked oxygen condition;")
+    )
+    assert condition["observation_id"] in substitution.reason
+    assert "target row has no printed fO2" in substitution.reason
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
 
 
