@@ -56,10 +56,10 @@ def test_render_pinned_rows_and_migrated_fe_valence_values():
     assert len(augite_table["values"]["printed_rows"]) == 12
     assert augite_table["values"]["printed_rows"][11][1:4] == ["3.5", None, "17.2"]
     assert augite_table["values"]["printed_rows"][11][10] == "1.7"
-    # Rendered PDF page 7, discussion: cited comparison retains approximate ratio and attribution.
+    # Rendered PDF page 7, discussion: retain the printed ± glyph and attribution.
     assert comparisons["values"]["method_class"] == "quoted_attributed"
     assert comparisons["values"]["comparisons"][0]["attribution"] == "Brewer and Rosenblatt (1969)"
-    assert "approximately 0.2" in comparisons["values"]["comparisons"][0]["statement_as_printed"]
+    assert "P(FeO)/P(Fe) ± 0.2" in comparisons["values"]["comparisons"][0]["statement_as_printed"]
     assert "approximately two orders of magnitude" in comparisons["values"]["comparisons"][1]["statement_as_printed"]
 
     result = _migrate()
@@ -73,8 +73,25 @@ def test_render_pinned_rows_and_migrated_fe_valence_values():
     assert ratio.identity.valence_basis.value.numerator_oxidation_states == (0,)
     assert ratio.identity.species.phase.value is Phase.CR
     assert ratio.value.point == Decimal("0.21")
-    assert ratio.point_conditions["depth_A"].locator.table == "2"
-    assert ratio.point_conditions["depth_A"].locator.page == 3
+    depth_rows = {
+        str(row.point_conditions["depth_A"].state.value): row for row in ratio_rows
+    }
+    assert depth_rows["Surface"].value.point == Decimal("0.21")
+    assert depth_rows["700"].value.point == Decimal("0.21")
+    assert depth_rows["100"].value.point == Decimal("0.46")
+    assert depth_rows["Surface"].point_conditions["depth_A"].locator.table == "2"
+    assert depth_rows["700"].point_conditions["depth_A"].locator.table == "2"
+    assert depth_rows["100"].point_conditions["depth_A"].locator.table == "2"
+    assert depth_rows["100"].point_conditions["depth_A"].locator.page == 3
+    assert depth_rows["100"].identity.composition.is_value
+    assert depth_rows["100"].identity.composition.value.as_map()["Fe"] == Decimal("6.7")
+    assert all(row.identity.composition.is_value for row in ratio_rows)
+    assert all(row.point_conditions["temperature_K"].state.is_unknown for row in ratio_rows)
+    assert all(row.point_conditions["fO2_Pa"].state.is_unknown for row in ratio_rows)
+    assert all("total_pressure_Pa" not in row.point_conditions for row in ratio_rows)
+    assert depth_rows["100"].identity.temperature_K.is_unknown
+    assert depth_rows["100"].identity.fO2_Pa.is_unknown
+    assert depth_rows["100"].identity.total_pressure_Pa.is_unknown
 
     # The printed upper-zone percentages are canonical percent units; migration converts to fractions.
     upper_layer_rows = {
@@ -94,6 +111,68 @@ def test_render_pinned_rows_and_migrated_fe_valence_values():
         == oxidation_state
         for token, oxidation_state in (("fe0", (0,)), ("fe2", (2,)), ("fe3", (3,)))
     )
+
+    augite_fraction_rows = {
+        observation_id: next(
+            row for row in rows if observation_id in row.observation_id
+        )
+        for observation_id in (
+            "dikov_2009_augite_condensate_fe0_fraction",
+            "dikov_2009_augite_condensate_fe2_fraction",
+            "dikov_2009_augite_condensate_fe3_fraction",
+            "dikov_2009_initial_augite_fe0_fraction",
+            "dikov_2009_initial_augite_fe2_fraction",
+            "dikov_2009_initial_augite_fe3_fraction",
+        )
+    }
+    # Rendered PDF page 5, Experimental prose: percent of total iron content.
+    printed_augite_fractions = {
+        "dikov_2009_augite_condensate_fe0_fraction": "7.8",
+        "dikov_2009_augite_condensate_fe2_fraction": "46.6",
+        "dikov_2009_augite_condensate_fe3_fraction": "45.6",
+        "dikov_2009_initial_augite_fe0_fraction": "0.0",
+        "dikov_2009_initial_augite_fe2_fraction": "84.0",
+        "dikov_2009_initial_augite_fe3_fraction": "16.0",
+    }
+    raw_augite_fractions = {
+        row["observation_id"]: row["values"]["points"][0]["value"]
+        for row in document["species"]["Fe"]["observations"]
+        if row["observation_id"] in printed_augite_fractions
+    }
+    assert raw_augite_fractions == printed_augite_fractions
+    migrated_augite_fractions = {
+        observation_id: row.value.point
+        for observation_id, row in augite_fraction_rows.items()
+    }
+    assert migrated_augite_fractions == {
+        "dikov_2009_augite_condensate_fe0_fraction": Decimal("0.078"),
+        "dikov_2009_augite_condensate_fe2_fraction": Decimal("0.466"),
+        "dikov_2009_augite_condensate_fe3_fraction": Decimal("0.456"),
+        "dikov_2009_initial_augite_fe0_fraction": Decimal("0"),
+        "dikov_2009_initial_augite_fe2_fraction": Decimal("0.840"),
+        "dikov_2009_initial_augite_fe3_fraction": Decimal("0.160"),
+    }
+    assert all(
+        row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.identity.species.phase.value is Phase.CR
+        for row in augite_fraction_rows.values()
+    )
+    condensate_fe0 = augite_fraction_rows["dikov_2009_augite_condensate_fe0_fraction"]
+    assert condensate_fe0.identity.total_pressure_Pa.is_value
+    assert condensate_fe0.identity.total_pressure_Pa.value == Decimal("101325")
+    assert condensate_fe0.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+    assert condensate_fe0.identity.composition.is_unknown
+    assert condensate_fe0.identity.temperature_K.is_unknown
+    assert condensate_fe0.identity.fO2_Pa.is_unknown
+    initial_fe0 = augite_fraction_rows["dikov_2009_initial_augite_fe0_fraction"]
+    assert initial_fe0.identity.composition.is_value
+    assert initial_fe0.identity.composition.value.as_map()["Fe2+"] == Decimal("2.1")
+    assert initial_fe0.identity.composition.value.as_map()["Fe3+"] == Decimal("0.4")
+    assert initial_fe0.identity.temperature_K.is_unknown
+    assert initial_fe0.identity.fO2_Pa.is_unknown
+    assert initial_fe0.identity.total_pressure_Pa.is_unknown
+    assert len(rows) == 21
+    assert sum(row.value.kind.value == "unavailable" for row in rows) == 3
 
     # The only quantity-unknown observations are the three documented exact schema gaps.
     unknown_quantities = {

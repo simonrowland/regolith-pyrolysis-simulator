@@ -9,8 +9,9 @@ extraction:
     Machine transcription used the corpus pdftotext-layout and MinerU markdown/content-list tables first.
     The three table layouts were then checked against rendered PDF pages 2, 3, and 6; all numeric cells
     agreed between the two machine reads. Table 1's 100.01 total was render-checked after the table QA
-    comma-decimal flag. The printed upper-layer Fe proportions and the two differing temperature ranges
-    were checked against rendered PDF pages 1 and 4. Figures 1–9 were not digitized; the figure-only
+    comma-decimal flag. The printed upper-layer Fe proportions, augite valence fractions, Brewer comparison,
+    and the two differing temperature ranges were checked against rendered PDF pages 1, 4, 5, and 7.
+    Figures 1–9 were not digitized; the figure-only
     values are deferred. Elemental at.% tables are retained as typed refusals: Quantity.CONDENSATE_COMPOSITION
     is a component mole-fraction vector and Quantity.RESIDUE_COMPONENT_COMPOSITION is not elemental
     concentration; QUANTITY_ALIASES has no exact elemental-at-percent quantity. See the audit mapping.
@@ -54,6 +55,22 @@ experiments:
     printed_composition:
       state: {tag: value, value: augite sample; initial XPS composition reported in at.% in prose}
       locator: {page: 5, pdf_page_index: 4, published_page: 433}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          amount_basis: mol_inventory
+          components:
+          - [Si, '18.0']
+          - [Al, '4.3']
+          - [Fe2+, '2.1']
+          - [Fe3+, '0.4']
+          - [Mg, '7.1']
+          - [Ca, '6.1']
+          - [Na, '2.0']
+          - [O, '59.8']
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
     other_facts:
       value:
       - {name: laser set-up, value: method described by Gerasimov et al. (1999), locator: {page: 5, pdf_page_index: 4, published_page: 433}}
@@ -92,23 +109,268 @@ species:
         method_class: measured_direct
         method: XPS valence-state analysis; authors report Fe0/ΣFe directly in Table 2, with no calibration or fit relation stated
         points:
-        - {label: Surface, depth_A: Surface, value: '0.21', table_row_number: 3, table_column_number: 16}
-        - {label: '50 Å', depth_A: '50', value: '0.27', table_row_number: 4, table_column_number: 16}
-        - {label: '100 Å', depth_A: '100', value: '0.46', table_row_number: 5, table_column_number: 16}
-        - {label: '200 Å', depth_A: '200', value: '0.32', table_row_number: 6, table_column_number: 16}
-        - {label: '400 Å', depth_A: '400', value: '0.43', table_row_number: 7, table_column_number: 16}
-        - {label: '700 Å', depth_A: '700', value: '0.21', table_row_number: 8, table_column_number: 16}
-        - {label: '1000 Å', depth_A: '1000', value: '0.25', table_row_number: 9, table_column_number: 16}
-        - {label: '1400 Å', depth_A: '1400', value: '0.24', table_row_number: 10, table_column_number: 16}
-        - {label: '1800 Å', depth_A: '1800', value: '0.26', table_row_number: 11, table_column_number: 16}
+        - label: Surface
+          depth_A: Surface
+          value: '0.21'
+          table_row_number: 3
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: Surface}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '20.7']
+                  - [Ti, '2.6']
+                  - [Al, '6.1']
+                  - [Fe, '4.2']
+                  - [Mg, '4.1']
+                  - [Ca, '2.5']
+                  - [O, '36.4']
+                  - [C, '21.9']
+                  - [S, '1.4']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '50 Å'
+          depth_A: '50'
+          value: '0.27'
+          table_row_number: 4
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '50'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '22.2']
+                  - [Ti, '2.2']
+                  - [Al, '10.6']
+                  - [Fe, '6.4']
+                  - [Mg, '3.6']
+                  - [Ca, '4.1']
+                  - [Na, '5.7']
+                  - [O, '34.7']
+                  - [C, '7.2']
+                  - [S, '1.1']
+                  - [Zn, '2.1']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '100 Å'
+          depth_A: '100'
+          value: '0.46'
+          table_row_number: 5
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '100'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '20.0']
+                  - [Ti, '2.0']
+                  - [Al, '9.6']
+                  - [Fe, '6.7']
+                  - [Mg, '6.8']
+                  - [Ca, '3.9']
+                  - [Na, '5.3']
+                  - [O, '38.0']
+                  - [C, '3.5']
+                  - [S, '1.4']
+                  - [Zn, '2.8']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '200 Å'
+          depth_A: '200'
+          value: '0.32'
+          table_row_number: 6
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '200'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '13.4']
+                  - [Ti, '0.6']
+                  - [Al, '7.7']
+                  - [Fe, '2.2']
+                  - [Mg, '3.9']
+                  - [Ca, '3.9']
+                  - [Na, '2.9']
+                  - [O, '56.2']
+                  - [C, '6.1']
+                  - [S, '0.7']
+                  - [Zn, '2.4']
+                  - [Bi, '0.01']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '400 Å'
+          depth_A: '400'
+          value: '0.43'
+          table_row_number: 7
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '400'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '11.6']
+                  - [Ti, '1.1']
+                  - [Al, '6.5']
+                  - [Fe, '2.8']
+                  - [Mg, '2.9']
+                  - [Ca, '4.8']
+                  - [Na, '3.3']
+                  - [O, '60.7']
+                  - [C, '2.9']
+                  - [S, '0.7']
+                  - [Zn, '2.3']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '700 Å'
+          depth_A: '700'
+          value: '0.21'
+          table_row_number: 8
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '700'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '13.5']
+                  - [Ti, '0.7']
+                  - [Al, '6.7']
+                  - [Fe, '3.4']
+                  - [Mg, '3.7']
+                  - [Ca, '3.4']
+                  - [Na, '3.0']
+                  - [O, '59.0']
+                  - [C, '3.6']
+                  - [S, '1.1']
+                  - [Zn, '2.0']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '1000 Å'
+          depth_A: '1000'
+          value: '0.25'
+          table_row_number: 9
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '1000'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '11.8']
+                  - [Ti, '1.1']
+                  - [Al, '7.6']
+                  - [Fe, '2.4']
+                  - [Mg, '4.7']
+                  - [Ca, '3.6']
+                  - [Na, '3.0']
+                  - [O, '58.6']
+                  - [C, '6.4']
+                  - [S, '0.5']
+                  - [Zn, '0.4']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '1400 Å'
+          depth_A: '1400'
+          value: '0.24'
+          table_row_number: 10
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '1400'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '13.1']
+                  - [Ti, '1.8']
+                  - [Al, '6.9']
+                  - [Fe, '2.5']
+                  - [Mg, '3.3']
+                  - [Ca, '3.3']
+                  - [Na, '1.1']
+                  - [O, '63.7']
+                  - [C, '3.0']
+                  - [S, '1.2']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
+        - label: '1800 Å'
+          depth_A: '1800'
+          value: '0.26'
+          table_row_number: 11
+          table_column_number: 16
+          point_conditions:
+            depth_A:
+              state: {tag: value, value: '1800'}
+              locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_atomic_percent
+                  amount_basis: mol_inventory
+                  components:
+                  - [Si, '11.2']
+                  - [Ti, '2.3']
+                  - [Al, '6.3']
+                  - [Fe, '2.3']
+                  - [Mg, '3.5']
+                  - [Ca, '9.4']
+                  - [O, '56.7']
+                  - [C, '7.4']
+                  - [S, '0.9']
+              locator: {page: 2, pdf_page_index: 1, published_page: 430, table: '1'}
       uncertainty:
         note: >-
           Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for
           elemental contents below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
       point_conditions:
-        depth_A:
-          state: {tag: value, value: table row depth in Å}
-          locator: {page: 3, pdf_page_index: 2, published_page: 431, table: '2'}
+        temperature_K:
+          state: {tag: unknown, reason: The paper reports no sample temperature for the lunar XPS profile.}
+          locator: {page: 2, pdf_page_index: 1, published_page: 430, section: 'Analytical Methods'}
+        fO2_Pa:
+          state: {tag: unknown, reason: The paper reports no oxygen fugacity for the lunar XPS profile.}
+          locator: {page: 2, pdf_page_index: 1, published_page: 430, section: 'Analytical Methods'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Spectrometer vacuum is an apparatus fact; sample total pressure is not reported.}
+          locator: {page: 2, pdf_page_index: 1, published_page: 430, section: 'Analytical Methods'}
     - observation_id: dikov_2009_upper_layer_fe0_fraction
       experiment: dikov_2009_l1639_xps_depth_profile
       type: concentration_series
@@ -126,6 +388,18 @@ species:
       point_conditions:
         sample_zone:
           state: {tag: value, value: upper layers with maximum condensate products}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        temperature_K:
+          state: {tag: unknown, reason: No sample temperature is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Spectrometer vacuum is an apparatus fact; sample total pressure is not reported.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        composition:
+          state: {tag: unknown, reason: No single bulk composition is reported for the upper-zone proportions.}
           locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
       uncertainty: {note: No uncertainty printed for the reported 33:45:22 proportions.}
     - observation_id: dikov_2009_upper_layer_fe2_fraction
@@ -145,6 +419,18 @@ species:
         sample_zone:
           state: {tag: value, value: upper layers with maximum condensate products}
           locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        temperature_K:
+          state: {tag: unknown, reason: No sample temperature is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Spectrometer vacuum is an apparatus fact; sample total pressure is not reported.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        composition:
+          state: {tag: unknown, reason: No single bulk composition is reported for the upper-zone proportions.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
       uncertainty: {note: No uncertainty printed for the reported 33:45:22 proportions.}
     - observation_id: dikov_2009_upper_layer_fe3_fraction
       experiment: dikov_2009_l1639_xps_depth_profile
@@ -163,7 +449,268 @@ species:
         sample_zone:
           state: {tag: value, value: upper layers with maximum condensate products}
           locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        temperature_K:
+          state: {tag: unknown, reason: No sample temperature is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity is reported for this lunar XPS ratio.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Spectrometer vacuum is an apparatus fact; sample total pressure is not reported.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
+        composition:
+          state: {tag: unknown, reason: No single bulk composition is reported for the upper-zone proportions.}
+          locator: {page: 4, pdf_page_index: 3, published_page: 432, section: 'Analytical Results'}
       uncertainty: {note: No uncertainty printed for the reported 33:45:22 proportions.}
+    - observation_id: dikov_2009_augite_condensate_fe0_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [0], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; average condensate fractions reported as percent of total iron content
+        P_total_atm: '1'
+        points: [{label: quench-condensed augite vapor, value: '7.8'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: quench-condensed augite vapor on Ni foil}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_range_as_published:
+          state: {tag: value, value: '4000–5000 K characteristic sample temperature'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        atmosphere:
+          state: {tag: value, value: He at 1 atm}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: value, value: '101325'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL, note: Source prints He at 1 atm; identity uses Pa.}
+        temperature_K:
+          state: {tag: unknown, reason: 'Only a 4000–5000 K characteristic range is printed, not a single temperature.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state: {tag: unknown, reason: The fraction is reported as an average; no aggregate condensate composition is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        duration_s:
+          state: {tag: value, value: '~10^-3 s laser pulse'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
+    - observation_id: dikov_2009_augite_condensate_fe2_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; average condensate fractions reported as percent of total iron content
+        P_total_atm: '1'
+        points: [{label: quench-condensed augite vapor, value: '46.6'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: quench-condensed augite vapor on Ni foil}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_range_as_published:
+          state: {tag: value, value: '4000–5000 K characteristic sample temperature'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        atmosphere:
+          state: {tag: value, value: He at 1 atm}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: value, value: '101325'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL, note: Source prints He at 1 atm; identity uses Pa.}
+        temperature_K:
+          state: {tag: unknown, reason: 'Only a 4000–5000 K characteristic range is printed, not a single temperature.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state: {tag: unknown, reason: The fraction is reported as an average; no aggregate condensate composition is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        duration_s:
+          state: {tag: value, value: '~10^-3 s laser pulse'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
+    - observation_id: dikov_2009_augite_condensate_fe3_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; average condensate fractions reported as percent of total iron content
+        P_total_atm: '1'
+        points: [{label: quench-condensed augite vapor, value: '45.6'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: quench-condensed augite vapor on Ni foil}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_range_as_published:
+          state: {tag: value, value: '4000–5000 K characteristic sample temperature'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        atmosphere:
+          state: {tag: value, value: He at 1 atm}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: value, value: '101325'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL, note: Source prints He at 1 atm; identity uses Pa.}
+        temperature_K:
+          state: {tag: unknown, reason: 'Only a 4000–5000 K characteristic range is printed, not a single temperature.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state: {tag: unknown, reason: The fraction is reported as an average; no aggregate condensate composition is printed.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        duration_s:
+          state: {tag: value, value: '~10^-3 s laser pulse'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
+    - observation_id: dikov_2009_initial_augite_fe0_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [0], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; initial augite fractions reported as percent of total iron content
+        points: [{label: initial augite sample, value: '0.0'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: initial augite sample}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_atomic_percent
+              amount_basis: mol_inventory
+              components:
+              - [Si, '18.0']
+              - [Al, '4.3']
+              - [Fe2+, '2.1']
+              - [Fe3+, '0.4']
+              - [Mg, '7.1']
+              - [Ca, '6.1']
+              - [Na, '2.0']
+              - [O, '59.8']
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_K:
+          state: {tag: unknown, reason: No measurement temperature for initial augite XPS fractions is reported.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Sample total pressure is not reported for initial augite XPS measurement.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
+    - observation_id: dikov_2009_initial_augite_fe2_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; initial augite fractions reported as percent of total iron content
+        points: [{label: initial augite sample, value: '84.0'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: initial augite sample}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_atomic_percent
+              amount_basis: mol_inventory
+              components:
+              - [Si, '18.0']
+              - [Al, '4.3']
+              - [Fe2+, '2.1']
+              - [Fe3+, '0.4']
+              - [Mg, '7.1']
+              - [Ca, '6.1']
+              - [Na, '2.0']
+              - [O, '59.8']
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_K:
+          state: {tag: unknown, reason: No measurement temperature for initial augite XPS fractions is reported.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Sample total pressure is not reported for initial augite XPS measurement.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
+    - observation_id: dikov_2009_initial_augite_fe3_fraction
+      experiment: dikov_2009_augite_laser_vaporization_condensation
+      type: concentration_series
+      locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      phase: cr
+      units: '%'
+      values:
+        quantity: valence_ratio
+        formula: Fe
+        valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+        method_class: measured_direct
+        method: XPS valence-state analysis; initial augite fractions reported as percent of total iron content
+        points: [{label: initial augite sample, value: '16.0'}]
+      point_conditions:
+        sample_zone:
+          state: {tag: value, value: initial augite sample}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_atomic_percent
+              amount_basis: mol_inventory
+              components:
+              - [Si, '18.0']
+              - [Al, '4.3']
+              - [Fe2+, '2.1']
+              - [Fe3+, '0.4']
+              - [Mg, '7.1']
+              - [Ca, '6.1']
+              - [Na, '2.0']
+              - [O, '59.8']
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        temperature_K:
+          state: {tag: unknown, reason: No measurement temperature for initial augite XPS fractions is reported.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        fO2_Pa:
+          state: {tag: unknown, reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Sample total pressure is not reported for initial augite XPS measurement.}
+          locator: {page: 5, pdf_page_index: 4, published_page: 433, section: EXPERIMENTAL}
+      uncertainty: {note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page 436).'}
   L1639:
     observations:
     - observation_id: dikov_2009_table1_l1639_elemental_at_percent
@@ -240,7 +787,7 @@ species:
         method_class: quoted_attributed
         comparisons:
         - attribution: Brewer and Rosenblatt (1969)
-          statement_as_printed: FeO/Fe equilibrium vapor partial-pressure ratio approximately 0.2 at 1700 °C for FeO1.11(l).
+          statement_as_printed: P(FeO)/P(Fe) ± 0.2 in equilibrium vapor at T = 1700°C for FeO1.11(l).
         - attribution: Yakovlev et al. (1984); Markova et al. (1986)
           statement_as_printed: at 1700–1750 °C, Fe2+ content was approximately two orders of magnitude lower than Fe0 when FeO partial pressures were maximal.
         note: >-

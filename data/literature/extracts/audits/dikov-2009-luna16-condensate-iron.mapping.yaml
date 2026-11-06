@@ -85,10 +85,15 @@ render_checks:
   - page: 7
     cell: cited_vaporization_comparisons
     render: >-
-      Render confirms Brewer and Rosenblatt's FeO/Fe equilibrium-vapor partial-pressure ratio is approximately 0.2 at
-      1700 °C; the symbol is approximate, not plus/minus. It also confirms the Yakovlev/Markova comparison at 1700–1750 °C
+      Render confirms the Brewer and Rosenblatt (1969) clause P(FeO)/P(Fe) ± 0.2 in equilibrium vapor at T = 1700°C
+      for FeO1.11(l), matching the text layer. It also confirms the Yakovlev/Markova comparison at 1700–1750 °C
       states Fe2+ is approximately two orders of magnitude below Fe0. Both attributions are retained as context without
       converting either comparison to a new scalar value.
+  - page: 5
+    cell: augite_valence_fraction_prose
+    render: >-
+      Render confirms the printed percent-of-total-iron triples: condensate 7.8 Fe0, 46.6 Fe2+, 45.6 Fe3+;
+      initial augite 0.0 Fe0, 84.0 Fe2+, 16.0 Fe3+. These are prose measurements, not values derived from Table 3.
 row_reconciliation:
   table_1: printed 9 data rows; extract has 9.
   table_2: printed 9 data rows; extract has 9.
@@ -110,6 +115,12 @@ schema_review:
     Observation types used are closed-set members: gibbs_table and concentration_series in
     tools/validate_literature_extracts.py::OBSERVATION_TYPES. The measured specimen is a condensed solid;
     condensed_solid maps to Phase.CR via simulator/battery/migrate.py::PHASE_MAP. Phase is not unknown.
+  - >-
+    Table 1's printed atomic percentages are attached to each same-depth Table 2 Fe0/ΣFe point as the
+    composition identity, with basis printed_atomic_percent and simulator/battery/enums.py::AmountBasis.MOL_INVENTORY. The point
+    composition keeps the published elemental component values without converting or filling blank cells;
+    the complete Table 1 observation remains typed-refused because its elemental-at-percent measurement
+    has no exact quantity token.
 condition_review:
   - >-
     Luna sample XPS rows have no printed sample T or fO2. The analyzer vacuum is recorded verbatim as an
@@ -122,6 +133,37 @@ condition_review:
   - >-
     Table 3 row depth is not a temperature coordinate. The experiment's printed temperature range,
     atmosphere and pulse duration are attached as located point conditions to each table row.
+  - >-
+    The three augite condensate valence rows bind the printed He at 1 atm to identity.total_pressure_Pa
+    through the existing P_total_atm path (101325 Pa), while preserving the verbatim atmosphere condition.
+    Their temperature identity stays unknown because only a 4000–5000 K characteristic range is printed;
+    fO2 stays unknown because no oxygen fugacity or gas ratio is reported. The averaged condensate composition
+    is unknown because the paper prints only depth-profile compositions, not an aggregate matching the average.
+identity_axis_check:
+  - row: Table 2 Fe0/ΣFe at 100 Å
+    composition: mapped from the matching Table 1 row; Fe = 6.7 at.% as printed
+    total_pressure_Pa: unknown; the 1–2 × 10^-9 torr statement is spectrometer vacuum, not sample pressure
+    fO2_Pa: unknown; not printed for the lunar sample
+    temperature_K: unknown; not printed for the lunar sample
+  - row: augite condensate average Fe0 fraction
+    composition: unknown; no aggregate composition is printed for the averaged valence fractions
+    total_pressure_Pa: 101325; He at 1 atm is printed for the vaporization/condensation experiment
+    fO2_Pa: unknown; no oxygen fugacity or gas ratio is printed
+    temperature_K: unknown; only the characteristic range 4000–5000 K is printed
+  - row: initial augite Fe0 fraction
+    composition: mapped from the printed initial augite atomic-percent analysis
+    total_pressure_Pa: unknown; sample pressure for this initial-sample XPS measurement is not printed
+    fO2_Pa: unknown; not printed
+    temperature_K: unknown; no initial-sample XPS temperature is printed
+migration:
+  observations: 21
+  hard_issues: 0
+  typed_unavailable: 3
+  admitted_observations: 18
+  interpretation: >-
+    The 18 admitted observations are nine printed Table 2 Fe0/ΣFe points, three printed L1639 upper-zone valence
+    fractions, and six printed augite/condensate valence fractions. The three unavailable observations are the
+    complete at.% composition tables, retained as typed refusals for the schema gaps described above.
 figure_only_candidates:
   - Figures 1 and 6: plotted composition correlations and reduced-species totals.
   - Figure 2: Zn and Na depth profiles.
