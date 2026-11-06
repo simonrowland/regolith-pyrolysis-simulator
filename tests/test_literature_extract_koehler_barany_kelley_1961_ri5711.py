@@ -87,6 +87,72 @@ def test_fidelity_values_and_observation_count_match_rendered_tables() -> None:
     assert len(na_rows["ri5711_table23_nafeo2_element_free_energy"]["values"]["points"]) + len(
         na_rows["ri5711_table23_nafeo2_element_free_energy_liquid"]["values"]["points"]
     ) == 32
+    ca2_rows = {
+        row["observation_id"]: row
+        for row in observations["Ca2Fe2O5"]["observations"]
+    }
+    table9_h_points = [
+        point
+        for observation_id in (
+            "ri5711_table9_ca2fe2o5_oxide_enthalpy",
+            "ri5711_table9_ca2fe2o5_oxide_enthalpy_liquid",
+        )
+        for point in ca2_rows[observation_id]["values"]["points"]
+    ]
+    table9_g_points = [
+        point
+        for observation_id in (
+            "ri5711_table9_ca2fe2o5_oxide_free_energy",
+            "ri5711_table9_ca2fe2o5_oxide_free_energy_liquid",
+        )
+        for point in ca2_rows[observation_id]["values"]["points"]
+    ]
+    assert len(table9_h_points) == len(table9_g_points) == 22
+    assert [point for point in table9_h_points if point["T_K"] == 1050] == [
+        {"T_K": 1050, "delta_fH": -12.35, "row_marker_as_printed": "2"},
+        {"T_K": 1050, "delta_fH": -12.35},
+    ]
+    assert [point for point in table9_g_points if point["T_K"] == 1050] == [
+        {"T_K": 1050, "delta_fG": -15.5, "row_marker_as_printed": "2"},
+        {"T_K": 1050, "delta_fG": -15.5},
+    ]
+    cafe_rows = {
+        row["observation_id"]: row
+        for row in observations["CaFe2O4"]["observations"]
+    }
+    ca2_context = {
+        row["observation_id"]: row
+        for row in observations["Ca2Fe2O5"]["context"]
+    }
+    cafe_context = {
+        row["observation_id"]: row
+        for row in observations["CaFe2O4"]["context"]
+    }
+    table10_h_points = [
+        point
+        for observation_id in (
+            "ri5711_table10_cafe2o4_oxide_enthalpy",
+            "ri5711_table10_cafe2o4_oxide_enthalpy_liquid",
+        )
+        for point in cafe_rows[observation_id]["values"]["points"]
+    ]
+    table10_g_points = [
+        point
+        for observation_id in (
+            "ri5711_table10_cafe2o4_oxide_free_energy",
+            "ri5711_table10_cafe2o4_oxide_free_energy_liquid",
+        )
+        for point in cafe_rows[observation_id]["values"]["points"]
+    ]
+    assert len(table10_h_points) == len(table10_g_points) == 22
+    assert [point for point in table10_h_points if point["T_K"] == 1050] == [
+        {"T_K": 1050, "delta_fH": -18.15, "row_marker_as_printed": "2"},
+        {"T_K": 1050, "delta_fH": -18.15},
+    ]
+    assert [point for point in table10_g_points if point["T_K"] == 1050] == [
+        {"T_K": 1050, "delta_fG": -17.9, "row_marker_as_printed": "2"},
+        {"T_K": 1050, "delta_fG": -17.9},
+    ]
     table12_h_points = (
         na_rows["ri5711_table12_nafeo2_oxide_enthalpy"]["values"]["points"]
         + na_rows["ri5711_table12_nafeo2_oxide_enthalpy_liquid"]["values"]["points"]
@@ -103,8 +169,21 @@ def test_fidelity_values_and_observation_count_match_rendered_tables() -> None:
         if row["observation_id"] == "ri5711_nafeo2_transition_locator_key"
     )
     assert [entry["marker"] for entry in marker_context["values"]["table12_marker_mapping"]] == [
-        "1", "2", "3", "5", "6"
+        "1", "2", "3", "4", "5", "6"
     ]
+    assert marker_context["values"]["table12_marker_mapping"][3] == {
+        "marker": "4",
+        "label_as_printed": "Melting point of Na2O",
+        "T_K": 1190,
+    }
+    assert [
+        entry["marker"]
+        for entry in ca2_context["ri5711_ca2fe2o5_transition_locator_key"]["values"]["table9_marker_mapping"]
+    ] == ["1", "2", "3"]
+    assert [
+        entry["marker"]
+        for entry in cafe_context["ri5711_cafe2o4_transition_locator_key"]["values"]["table10_marker_mapping"]
+    ] == ["1", "2", "3"]
     table20_g = next(
         row for row in observations["Ca2Fe2O5"]["observations"]
         if row["observation_id"] == "ri5711_table20_ca2fe2o5_element_free_energy"
@@ -135,6 +214,22 @@ def test_fidelity_values_and_observation_count_match_rendered_tables() -> None:
     )
     cafe["uncertainty"]["value"] = 130
     assert cafe["uncertainty"]["value"] != 180
+    printed_uncertainty = next(
+        sample["value"]
+        for sample in document["fidelity_samples"]
+        if sample.get("path", "").endswith(
+            "ri5711_table7_cafe2o4_oxide].values.uncertainty_as_printed"
+        )
+    )
+    numeric_uncertainty_errors = check_all_fidelity_samples_match(
+        mutated_uncertainty,
+        label="mutated Table 7 numeric uncertainty",
+    )
+    if cafe["uncertainty"]["value"] != int(printed_uncertainty.split()[0].lstrip("±")):
+        numeric_uncertainty_errors.append(
+            "Table 7 numeric uncertainty.value differs from its rendered fidelity pin"
+        )
+    assert numeric_uncertainty_errors
     mutated_printed_uncertainty = deepcopy(document)
     mutated_cafe = next(
         row for row in mutated_printed_uncertainty["species"]["CaFe2O4"]["observations"]
@@ -162,7 +257,7 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
         str(issue) for issue in result.validation.hard_issues[:30]
     )
     assert result.registry_issues == []
-    assert len(result.observations) == 330
+    assert len(result.observations) == 334
     assert len(result.queue) == 48
     assert not any("temperature_K" in entry.axes for entry in result.queue)
     printed_value_count = sum(
@@ -170,8 +265,8 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
         for rows in expected.values()
         for source in rows
     )
-    assert printed_value_count == 330
-    assert len(result.observations) == 330
+    assert printed_value_count == 334
+    assert len(result.observations) == 334
 
     unknown_quantity_ids = set()
     for species, rows in expected.items():

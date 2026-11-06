@@ -158,6 +158,7 @@ species:
             - {T_K: 950, delta_fH: -11.95, row_marker_as_printed: '1'}
             - {T_K: 950, delta_fH: -12.1}
             - {T_K: 1000, delta_fH: -12.25}
+            - {T_K: 1050, delta_fH: -12.35, row_marker_as_printed: '2'}
             - {T_K: 1050, delta_fH: -12.35}
             - {T_K: 1100, delta_fH: -12.35}
             - {T_K: 1200, delta_fH: -12.45}
@@ -216,6 +217,7 @@ species:
             - {T_K: 950, delta_fG: -15.15, row_marker_as_printed: '1'}
             - {T_K: 950, delta_fG: -15.15}
             - {T_K: 1000, delta_fG: -15.35}
+            - {T_K: 1050, delta_fG: -15.5, row_marker_as_printed: '2'}
             - {T_K: 1050, delta_fG: -15.5}
             - {T_K: 1100, delta_fG: -15.7}
             - {T_K: 1200, delta_fG: -15.95}
@@ -383,7 +385,10 @@ species:
         units: K
         values:
           quantity: transition and fusion temperature markers
-          table9_marker_mapping: [{marker: '3', label_as_printed: Melting point of Ca2Fe2O5, T_K: 1750}]
+          table9_marker_mapping:
+            - {marker: '1', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
+            - {marker: '2', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '3', label_as_printed: Melting point of Ca2Fe2O5, T_K: 1750}
           table20_marker_mapping: [{marker: '6', label_as_printed: Melting point of Ca2Fe2O5, T_K: 1750}]
           enthalpy_note: >-
             No separate heat of fusion or transition enthalpy is printed. The
@@ -514,6 +519,7 @@ species:
             - {T_K: 950, delta_fH: -17.5, row_marker_as_printed: '1'}
             - {T_K: 950, delta_fH: -17.7}
             - {T_K: 1000, delta_fH: -17.9}
+            - {T_K: 1050, delta_fH: -18.15, row_marker_as_printed: '2'}
             - {T_K: 1050, delta_fH: -18.15}
             - {T_K: 1100, delta_fH: -18.25}
             - {T_K: 1200, delta_fH: -18.45}
@@ -572,6 +578,7 @@ species:
             - {T_K: 950, delta_fG: -17.8, row_marker_as_printed: '1'}
             - {T_K: 950, delta_fG: -17.8}
             - {T_K: 1000, delta_fG: -17.85}
+            - {T_K: 1050, delta_fG: -17.9, row_marker_as_printed: '2'}
             - {T_K: 1050, delta_fG: -17.9}
             - {T_K: 1100, delta_fG: -17.85}
             - {T_K: 1200, delta_fG: -17.8}
@@ -739,7 +746,10 @@ species:
         units: K
         values:
           quantity: transition and fusion temperature markers
-          table10_marker_mapping: [{marker: '3', label_as_printed: Melting point of CaFe2O4, T_K: 1510}]
+          table10_marker_mapping:
+            - {marker: '1', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
+            - {marker: '2', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '3', label_as_printed: Melting point of CaFe2O4, T_K: 1510}
           table21_marker_mapping: [{marker: '5', label_as_printed: Melting point of CaFe2O4, T_K: 1510}]
           enthalpy_note: >-
             No separate heat of fusion or transition enthalpy is printed. The
@@ -1188,6 +1198,7 @@ species:
             - {marker: '1', label_as_printed: Transition point of NaFeO2(α→β), T_K: 870}
             - {marker: '2', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
             - {marker: '3', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '4', label_as_printed: Melting point of Na2O, T_K: 1190}
             - {marker: '5', label_as_printed: Transition point of NaFeO2(β→γ), T_K: 1270}
             - {marker: '6', label_as_printed: Melting point of NaFeO2, T_K: 1620}
           table23_marker_mapping:
