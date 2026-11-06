@@ -689,10 +689,10 @@ species:
         units: kJ/mol
         uncertainty: "± 0.52 kJ/mol as printed"
         values:
-          quantity_as_printed: enthalpy and entropy of wollastonite formation from simple oxides
+          quantity_as_printed: enthalpy of wollastonite formation from simple oxides
           reference_state_as_printed: formation from simple oxides
           schema_gap: No quantity token represents formation enthalpy from simple oxides; delta_fH denotes formation from the elements.
-          value_as_printed: −38.92
+          value_as_printed: '−38.92'
           method_class: model_derived
           method: Least-squares fit to the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)
           derivation:
@@ -723,10 +723,9 @@ species:
           quantity_as_printed: entropy of wollastonite formation from simple oxides
           reference_state_as_printed: formation from simple oxides
           schema_gap: No quantity token represents formation entropy from simple oxides; S denotes absolute entropy.
-          value_as_printed: 2.33
+          value_as_printed: '2.33'
           method_class: model_derived
           method: Least-squares fit to the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)
-          entropy: 2.33
           derivation:
             relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the crystalline interval, Eq. (10)
             inputs:
@@ -752,10 +751,10 @@ species:
         units: kJ/mol
         uncertainty: "± 0.24 kJ/mol as printed"
         values:
-          quantity_as_printed: enthalpy and entropy of wollastonite formation from simple oxides
+          quantity_as_printed: enthalpy of wollastonite melt formation from simple oxides
           reference_state_as_printed: formation from simple oxides
           schema_gap: No quantity token represents formation enthalpy from simple oxides; delta_fH denotes formation from the elements.
-          value_as_printed: −11.29
+          value_as_printed: '−11.29'
           method_class: model_derived
           method: Least-squares fit to the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)
           derivation:
@@ -783,13 +782,12 @@ species:
         units: J/mol/K
         uncertainty: "± 0.12 J/(mol × K) as printed"
         values:
-          quantity_as_printed: entropy of wollastonite melt formation from simple oxides
+          quantity_as_printed: entropy of wollastonite formation from simple oxides
           reference_state_as_printed: formation from simple oxides
           schema_gap: No quantity token represents formation entropy from simple oxides; S denotes absolute entropy.
-          value_as_printed: 17.53
+          value_as_printed: '17.53'
           method_class: model_derived
           method: Least-squares fit to the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)
-          entropy: 17.53
           derivation:
             relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the liquid interval, Eq. (10)
             inputs:

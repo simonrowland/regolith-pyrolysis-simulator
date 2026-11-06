@@ -155,16 +155,21 @@ def test_partial_gibbs_rows_name_oxide_field_quantities_not_measurement_reaction
         for species in document["species"].values()
         for row in species.get("context", [])
     }
-    for row_id, quantity in (
-        ("arutyunyan_2005_partial_gibbs_mgo_from_oxide_field", "ΔfG''(MgO)"),
-        ("arutyunyan_2005_partial_gibbs_sio2_from_oxide_field", "ΔfG''(SiO2)"),
+    gas_exchange_reaction = "SiO2(solid, liquid) + Mg(gas) = MgO(solid, liquid) + SiO(gas)"
+    for row_id, component in (
+        ("arutyunyan_2005_partial_gibbs_mgo_from_oxide_field", "MgO"),
+        ("arutyunyan_2005_partial_gibbs_sio2_from_oxide_field", "SiO2"),
     ):
         values = rows[row_id]["values"]
-        assert values["quantity_as_printed"] == quantity
+        assert values["quantity_as_printed"] == f"ΔfG''({component})"
         assert "MgSiO3 + Mg2SiO4" in values["phase_field_as_printed"]
         assert values["reference_components_as_printed"] == "crystalline MgO and β-cristobalite"
         assert values["measurement_lineage_as_printed"].endswith("(3)")
-        assert not values["reaction_as_printed"].endswith("(3)")
+        assert values["reaction_as_printed"] == (
+            f"ΔfG''({component}) in the MgSiO3 + Mg2SiO4 two-phase field, "
+            "referenced to crystalline MgO and β-cristobalite"
+        )
+        assert gas_exchange_reaction not in values["reaction_as_printed"]
         assert rows[row_id]["values"]["admission_status"] == "context_only"
 
 
