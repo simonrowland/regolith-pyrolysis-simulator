@@ -89,13 +89,20 @@ def test_table_1_render_pins_and_numeric_cell_count() -> None:
         if row["values"]["quantity"] == "delta_fH"
     )
     assert na8_h["standard_state_as_printed"].startswith("Standard formation enthalpy")
-    prose_conflict = next(
+    na8_g = next(
         row
-        for row in document["species"]["Na8Fe2O7"]["context"]
-        if row["observation_id"] == "huang2003p3_Na8Fe2O7_enthalpy_statement_conflict"
+        for row in document["species"]["Na8Fe2O7"]["observations"]
+        if row["values"]["quantity"] == "delta_fG"
     )
-    assert prose_conflict["values"]["value_as_printed"] == "-2524.3 kJ mol−1"
-    assert prose_conflict["locator"]["page"] == 3
+    assert na8_g["values"]["method_class"] == "model_derived"
+    assert na8_g["values"]["printed_discrepancy"].startswith(
+        "In section 2.2.5 the prose says ΔfH°(Na8Fe2O7) was calculated"
+    )
+    assert na8_g["derivation"]["method"]["locator"]["page"] == 3
+    assert na8_g["derived_from"] == [
+        "huang2003p2_Na8Fe2O7_table1_delta_fH",
+        "huang2003p2_Na8Fe2O7_table1_entropy",
+    ]
     assert len(TABLE_VALUES) + sum(
         len(heat_capacity) + len(gibbs)
         for heat_capacity, gibbs in TABLE_COEFFICIENTS.values()

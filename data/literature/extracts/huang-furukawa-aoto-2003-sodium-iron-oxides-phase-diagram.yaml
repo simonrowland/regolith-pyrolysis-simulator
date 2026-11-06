@@ -561,6 +561,11 @@ species:
           value: '-2524.3'
           temperature_K: '298'
           derivation: Calculated by the authors from the selected formation enthalpy and entropy using equation (2).
+          printed_discrepancy: >-
+            In section 2.2.5 the prose says ΔfH°(Na8Fe2O7) was calculated by Eq. (2),
+            giving ΔfH°(298) = −2524.3 kJ mol−1. Table 1 assigns −2524.3 to
+            ΔfG°(298) and −2746.0 to ΔfH°(298), with the latter attributed to
+            Stuve et al. [14]. The page 3 render confirms the prose glyph is H.
       - observation_id: huang2003p2_Na8Fe2O7_table1_delta_fH
         type: gibbs_table
         locator: {page: 2, published_page: 68, pdf_page_index: 1, table: '1', row: 2, column: 6, note: 'Table 1, standard formation enthalpy at 298.'}
@@ -629,17 +634,6 @@ species:
           schema_gap_symbols:
             - simulator/battery/enums.py::Quantity.CP
             - simulator/battery/enums.py::Quantity.DELTA_FG
-      - observation_id: huang2003p3_Na8Fe2O7_enthalpy_statement_conflict
-        type: thermodynamic_statement_context
-        units: as_printed
-        locator: {page: 3, published_page: 69, pdf_page_index: 2, section: 2.2.5}
-        values:
-          method_class: model_derived
-          quantity_as_printed: ΔfH°(Na8Fe2O7)
-          value_as_printed: '-2524.3 kJ mol−1'
-          method_as_printed: The authors say the value was calculated by equation (2) from Stuve et al.'s ΔfH°(Na8Fe2O7) = −2746.0 kJ mol−1 and Lindemer et al.'s S°(298) = 438.1 J mol−1 K−1.
-          conflicting_table_1_assignment: Table 1 assigns −2524.3 to ΔfG°(298) and −2746.0 to ΔfH°(298), with the latter attributed to Stuve et al. [14].
-          render_check: PDF page 3 at 600 dpi confirms the prose glyph is ΔfH°; it matches the MinerU and pdftotext reads.
   Na(g):
     observations: []
     context:
