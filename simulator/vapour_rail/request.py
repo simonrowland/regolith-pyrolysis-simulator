@@ -48,6 +48,7 @@ from simulator.chemistry.melt_activity import (
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
+    ActivityRefusalCode,
     ActivityVerdictKind,
     CondensedPhaseActivityProvider,
     SourceReactionActivity,
@@ -117,6 +118,17 @@ REFUSAL_CHEMICAL_POTENTIAL_CHANNEL = "refused_missing_channel_input"
 REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing"
 REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
 REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
+
+# These are channel-local by construction: the request predicate/source atoms
+# exclude one species, or the activity source has no mapped phase/endmember for
+# that species. Contract and evidence refusals fail on claimed channels;
+# missing outcome-determining process state fails the whole pre-RG request.
+_PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
+    REFUSAL_INAPPLICABLE_PREDICATE,
+    REFUSAL_ABSENT_SOURCE_ATOM,
+    ActivityRefusalCode.UNMAPPED_PHASE.value,
+    ActivityRefusalCode.UNMAPPED_ENDMEMBER.value,
+})
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
 DEFAULT_SOLVE_GROUP_PREFIX = "u0_v:"
@@ -2708,13 +2720,40 @@ def resolve_vapour_batch(
     # Answerability is not activation authority. Pre-RG keeps the species set
     # supplied by the typed effective-pressure seam, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
-    # Typed non-debiting answers and channel-local refusals demote only that
-    # species' seam claim. Missing outcome-determining state remains a hard
-    # refusal so absent run-level inputs such as intrinsic pO2 fail closed.
+    # Typed non-debiting answers and species-local refusals demote only that
+    # species' seam claim. Contract refusals fail on claimed channels, while
+    # missing outcome-determining process state fails even with no claims.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
         claimed = flux_activation_context.effective_pressure_species_ids
+        fail_closed_refusals = {
+            species_id: answer.refusal_code or "unknown_refusal"
+            for species_id, answer in answers.items()
+            if answer.is_refused
+            and (
+                species_id in claimed
+                or (
+                    answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+                    and not str(
+                        answer.extra.get("detail") or ""
+                    ).startswith("no live channel evaluator available")
+                )
+            )
+            and answer.refusal_code
+            not in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES
+        }
+        if fail_closed_refusals:
+            refusal_summary = ", ".join(
+                f"{species_id}={refusal_code}"
+                for species_id, refusal_code in sorted(
+                    fail_closed_refusals.items()
+                )
+            )
+            raise VapourRequestConstructionError(
+                "pre-RG request has a fail-closed channel contract or "
+                f"outcome-state refusal: {refusal_summary}"
+            )
         demoted_non_debiting = frozenset(
             species_id
             for species_id in claimed
@@ -2727,10 +2766,7 @@ def resolve_vapour_batch(
                 or (
                     answers[species_id].is_refused
                     and answers[species_id].refusal_code
-                    not in {
-                        REFUSAL_MISSING_OUTCOME_STATE,
-                        REFUSAL_MISSING_CHANNEL_CONTRACT,
-                    }
+                    in _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES
                 )
             )
         )

@@ -462,11 +462,8 @@ def _evaporation_quantity_authority_contributions(
                         ),
                     )
                     continue
-                if (
-                    status in {
-                        VAPOUR_CARRIER_AUTHORITY_REFUSED,
-                        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
-                    }
+                if status == VAPOUR_CARRIER_AUTHORITY_REFUSED or (
+                    status == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO
                     and (
                         has_positive_flux(flux, species)
                         or has_positive_capture(snapshot, species)
@@ -493,7 +490,7 @@ def _evaporation_quantity_authority_contributions(
                             record.get("reason") or record.get("detail")
                             or pressure.get("detail") or carrier_flux.get("detail")
                             or extra.get("reason")
-                            or "carrier authority refused positive species output"
+                            or "carrier authority was refused"
                         ),
                     )
 

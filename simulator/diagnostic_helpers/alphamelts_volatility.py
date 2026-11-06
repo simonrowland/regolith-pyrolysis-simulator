@@ -59,6 +59,10 @@ from simulator.physical_constants import GAS_CONSTANT
 
 ActivitySource = Callable[..., Any]
 
+_RAW_WEIGHT_FRACTION_CRYSTALLINE_K_LABEL = (
+    "raw_weight_fraction_comparison=not_evaluated_against_crystalline_K"
+)
+
 PRIMARY_ACTIVITY_PRESSURE_BAR = 1.0
 COMPARISON_ACTIVITY_PRESSURE_BAR = 10.0
 
@@ -430,13 +434,10 @@ def _analytical_vapor_pressures_from_activities(
                 0.0,
                 float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0,
             )
-            wt_pressure = effective_equilibrium_pressure_Pa(
-                species,
-                T_K,
-                pO2,
-                a_oxide=wt_activity,
-                vapor_pressure_data=route_data,
-            )
+            # A raw weight fraction has no declared activity standard state.
+            # Keep it as a labeled composition diagnostic; evaluating it
+            # under crystalline K would assign a standard it does not have.
+            wt_pressure = None
             ellingham_extrapolation = ellingham_authority_limit(
                 T_K,
                 species=species,
@@ -455,15 +456,12 @@ def _analytical_vapor_pressures_from_activities(
                     if reference_pressure > 0.0
                     else 0.0
                 ),
-                wt_fraction_activity_factor=(
-                    wt_pressure / reference_pressure
-                    if reference_pressure > 0.0
-                    else 0.0
-                ),
+                wt_fraction_activity_factor=None,
                 P_reference_Antoine_Pa=reference_pressure,
                 pO2_bar=pO2,
                 source_label=(
-                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction"
+                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction|"
+                    f"{_RAW_WEIGHT_FRACTION_CRYSTALLINE_K_LABEL}"
                 ),
             )
             continue
@@ -682,11 +680,9 @@ def _analytical_vapor_pressures_from_activities(
                 0.0,
                 float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0,
             )
-            wt_pressure = evaluator.evaluate(
-                T_K,
-                source_activity=wt_activity,
-                pO2_bar=pO2,
-            ).pressure_pa if wt_activity > 0.0 else 0.0
+            # The composition proxy lacks a declared standard state, so do
+            # not pass it to this crystalline-standard evaluator.
+            wt_pressure = None
             if reference.out_of_range:
                 extrapolations[str(species)] = {
                     "temperature_K": T_K,
@@ -700,11 +696,12 @@ def _analytical_vapor_pressures_from_activities(
                 melt_oxide_activity=activity,
                 wt_fraction_activity=wt_activity,
                 activity_factor=activity,
-                wt_fraction_activity_factor=wt_activity,
+                wt_fraction_activity_factor=None,
                 P_reference_Antoine_Pa=reference.pressure_pa,
                 pO2_bar=pO2,
                 source_label=(
-                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction"
+                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction|"
+                    f"{_RAW_WEIGHT_FRACTION_CRYSTALLINE_K_LABEL}"
                 ),
             )
             continue
@@ -903,11 +900,11 @@ def _species_payload(
     *,
     parent_oxide: str,
     P_eq_Pa: float,
-    P_eq_wt_fraction_Pa: float,
+    P_eq_wt_fraction_Pa: float | None,
     melt_oxide_activity: float,
     wt_fraction_activity: float,
     activity_factor: float,
-    wt_fraction_activity_factor: float,
+    wt_fraction_activity_factor: float | None,
     P_reference_Antoine_Pa: float,
     pO2_bar: float,
     source_label: str,
@@ -915,8 +912,16 @@ def _species_payload(
     return {
         "P_eq_Pa": P_eq_Pa,
         "P_eq_wt_fraction_Pa": P_eq_wt_fraction_Pa,
-        "P_eq_delta_vs_wt_fraction_Pa": P_eq_Pa - P_eq_wt_fraction_Pa,
-        "P_eq_ratio_vs_wt_fraction": _safe_ratio(P_eq_Pa, P_eq_wt_fraction_Pa),
+        "P_eq_delta_vs_wt_fraction_Pa": (
+            P_eq_Pa - P_eq_wt_fraction_Pa
+            if P_eq_wt_fraction_Pa is not None
+            else None
+        ),
+        "P_eq_ratio_vs_wt_fraction": (
+            _safe_ratio(P_eq_Pa, P_eq_wt_fraction_Pa)
+            if P_eq_wt_fraction_Pa is not None
+            else None
+        ),
         "parent_oxide": parent_oxide,
         "melt_oxide_activity": melt_oxide_activity,
         "wt_fraction_activity": wt_fraction_activity,
