@@ -1,0 +1,498 @@
+schema_version: literature_extract.v1
+source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+source:
+  citation: >-
+    Yamaguchi, S., Kaneko, Y. and Iguchi, Y. (1987). Activity Measurements of
+    Na2O in Na2O-Fe2O3 System by EMF Method Using Sodium Beta Alumina as a Solid
+    Electrolyte. Transactions of the Japan Institute of Metals, 28(12), 986–993.
+  doi: 10.2320/matertrans1960.28.986
+  year: 1987
+extraction:
+  method: >-
+    Transcribed from MinerU tables and markdown, reconciled with the born-digital
+    pdftotext layer, and render-checked for table layout and flagged table cells.
+    Figure-only numerical points were excluded.
+  date: '2026-11-05'
+  worker: w1105d-yama87
+  provenance_path: text/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity/pdftotext-layout.txt
+  source_note: >-
+    Printed discrepancies are retained at their own locators without
+    normalization: abstract versus Tables 3/4, inconsistent temperature
+    boundaries, Table 4's Eq. (A) label versus its caption/body reaction (B),
+    and the activity-ratio direction in Eq. (6). No value is inferred from
+    Figure 5. Printed uncertainties are statistical only, not total
+    experimental/reference uncertainty; confidence level is not stated.
+review_status: draft
+fidelity_samples:
+  - path: 'species.Na2O.observations[yki1987_activity_f_n3f5].values.fit_coefficients_as_printed.A'
+    value: '-0.0426'
+    locator: {page: 6, published_page: 991, table: '3', row: 'N3F5+F, <1405 K', column: A}
+  - path: 'species.Na2O.observations[yki1987_activity_n3f5_nf_mid].values.fit_coefficients_as_printed.A'
+    value: '-0.1100'
+    locator: {page: 6, published_page: 991, table: '3', row: 'N3F5+NF, 1053<T<1278 K', column: A}
+  - path: 'species.NaFeO2.observations[yki1987_gibbs_table4_na2fe2o4_mid].values.coefficients_as_printed.B_kJ_per_mol'
+    value: '-162.7'
+    locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (D), 1047<T<1278 K', column: B}
+  - path: 'species.Na3Fe5O9.observations[yki1987_gibbs_table4_na3fe5o9].values.coefficients_as_printed.B_kJ_per_mol'
+    value: '-497.2'
+    locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (A), <1405 K', column: B}
+  - path: 'species.NaFeO2.observations[yki1987_gibbs_table4_na2fe2o4_nf_lt1405].values.coefficients_as_printed.B_kJ_per_mol'
+    value: '-147.2'
+    locator: {page: 6, published_page: 991, table: '4', row: '−NF <1405 K', column: B}
+  - path: 'species.Na2O.context[yki1987_table2_emf_fits].values.printed_rows[0].A_mV'
+    value: '-747.8'
+    locator: {page: 4, published_page: 989, table: '2', row: 'No. 0, <1123 K', column: A}
+species:
+  Na2O:
+    observations:
+      - observation_id: yki1987_activity_f_n3f5
+        type: activity_coefficient
+        locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + F, <1405 K'}
+        phase: cr
+        units: log10 activity
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1405'}}
+            locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + F, <1405 K'}
+        derivation:
+          locator: {page: 6, published_page: 991, table: '3'}
+          relation: 'log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T'
+          output_unit: log10 activity
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, published_page: 989, figure: '2', note: 'Cell No. 0 EMF values used for activity reduction are plotted, not numerically tabulated.'}
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          printed_form: log10
+          status: typed_refused_schema_gap
+          equation_as_printed: 'log aNa2O = (−0.0426 ± 0.0207) + (−0.8658 ± 0.0038) × 10^4 K/T'
+          fit_coefficients_as_printed: {A: '-0.0426', dA: '0.0207', B: '-0.8658', dB: '0.0038'}
+          T_range_as_printed: <1405 K
+          phase_assemblage_as_printed: Fe2O3 + Na3Fe5O9
+          standard_state_as_printed: Pure solid Na2O below 1405 K.
+          schema_gap: Coefficient-only log-activity function; no numeric point value is printed.
+      - observation_id: yki1987_activity_n3f5_nf_lt1053
+        type: activity_coefficient
+        locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, <1053 K'}
+        phase: cr
+        units: log10 activity
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1053'}}
+            locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, <1053 K'}
+        derivation: &activity_fit_derivation
+          locator: {page: 6, published_page: 991, table: '3'}
+          relation: 'log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T'
+          output_unit: log10 activity
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 990, figure: '3', note: 'EMF values used for activity reduction are plotted, not numerically tabulated.'}
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          printed_form: log10
+          status: typed_refused_schema_gap
+          equation_as_printed: 'log aNa2O = (−0.4466 ± 0.0271) + (−0.7934 ± 0.0100) × 10^4 K/T'
+          fit_coefficients_as_printed: {A: '-0.4466', dA: '0.0271', B: '-0.7934', dB: '0.0100'}
+          T_range_as_printed: <1053 K
+          phase_assemblage_as_printed: Na3Fe5O9 + Na2Fe2O4 (α)
+          standard_state_as_printed: Pure solid Na2O below 1405 K.
+          schema_gap: Coefficient-only log-activity function; no numeric point value is printed.
+      - observation_id: yki1987_activity_n3f5_nf_mid
+        type: activity_coefficient
+        locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, 1053<T<1278 K'}
+        phase: cr
+        units: log10 activity
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: interval, interval_low: '1053', interval_high: '1278'}}
+            locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, 1053<T<1278 K'}
+        derivation: *activity_fit_derivation
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          printed_form: log10
+          status: typed_refused_schema_gap
+          equation_as_printed: 'log aNa2O = (−0.1100 ± 0.0265) + (−0.8265 ± 0.0083) × 10^4 K/T'
+          fit_coefficients_as_printed: {A: '-0.1100', dA: '0.0265', B: '-0.8265', dB: '0.0083'}
+          T_range_as_printed: 1053<T<1278 K
+          phase_assemblage_as_printed: Na3Fe5O9 + Na2Fe2O4 (β)
+          standard_state_as_printed: Pure solid Na2O below 1405 K.
+          schema_gap: Coefficient-only log-activity function; no numeric point value is printed.
+      - observation_id: yki1987_activity_n3f5_nf_gt1278
+        type: activity_coefficient
+        locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, >1278 K'}
+        phase: cr
+        units: log10 activity
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '>', bound_value: '1278'}}
+            locator: {page: 6, published_page: 991, table: '3', row: 'N3F5 + NF, >1278 K'}
+        derivation: *activity_fit_derivation
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          printed_form: log10
+          status: typed_refused_schema_gap
+          equation_as_printed: 'log aNa2O = (−1.6828 ± 0.0338) + (−0.6245 ± 0.0202) × 10^4 K/T'
+          fit_coefficients_as_printed: {A: '-1.6828', dA: '0.0338', B: '-0.6245', dB: '0.0202'}
+          T_range_as_printed: '>1278 K'
+          phase_assemblage_as_printed: Na3Fe5O9 + Na2Fe2O4 (γ)
+          standard_state_as_printed: The standard state of Na2O activity was taken as pure solid Na2O below the melting point of Na2O (1405 K) and pure liquid Na2O above the melting point.
+          schema_gap: Coefficient-only log-activity function; no numeric point value is printed.
+    context:
+      - observation_id: yki1987_table1_cell_assemblages
+        type: phase_assemblage_table
+        units: phase labels and formula amounts as printed
+        locator: {page: 3, published_page: 988, table: '1'}
+        values:
+          printed_count: 5
+          rows:
+            - {cell: '0', sample: '5Na2O + 21Fe2O3', sample_phases: 'Fe2O3 + Na3Fe5O9', reference: Na2CO3}
+            - {cell: '6', sample: '10Na2O + 13Fe2O3', sample_phases: 'Na3Fe5O9 + Na2Fe2O4', reference: '5Na2O + 21Fe2O3', reference_phases: 'Fe2O3 + Na3Fe5O9'}
+            - {cell: '9', sample: '10Na2O + 13Fe2O3', sample_phases: 'Na3Fe5O9 + Na2Fe2O4', reference: '5Na2O + 21Fe2O3'}
+            - {cell: '10', sample: '3Na2O + 7Fe2O3', sample_phases: 'Fe2O3 + Na3Fe5O9', reference: '5Na2O + 21Fe2O3'}
+            - {cell: '11', sample: '32Na2O + 68Fe2O3', sample_phases: 'Fe2O3 + Na3Fe5O9', reference: '5Na2O + 21Fe2O3'}
+          note: Five cell identities including paired repeats and controls, not five independent runs.
+      - observation_id: yki1987_table2_emf_fits
+        type: electrochemical_measurement_input
+        units: mV and mV/K
+        locator: {page: 4, published_page: 989, table: '2'}
+        values:
+          quantity: electromotive_force_fit_mV
+          printed_rows:
+            - {cell: 'No. 0', T_range_as_printed: '<1123 K', A_mV: '-747.8', dA_mV: '1.3', B_mV_per_K: '0.702', dB_mV_per_K: '0.007'}
+            - {cell: 'No. 0', T_range_as_printed: '1123<T<1405 K', A_mV: '-542.5', dA_mV: '2.0', B_mV_per_K: '0.519', dB_mV_per_K: '0.006'}
+            - {cell: 'No. 0', T_range_as_printed: '>1405 K', A_mV: '-1512.0', dA_mV: '2.0', B_mV_per_K: '1.212', dB_mV_per_K: '0.030'}
+            - {cell: 'No. 6 and 9', T_range_as_printed: '<1053 K', A_mV: '71.79', dA_mV: '1.60', B_mV_per_K: '-0.040', dB_mV_per_K: '0.009'}
+            - {cell: 'No. 6 and 9', T_range_as_printed: '1053<T<1278 K', A_mV: '38.59', dA_mV: '1.11', B_mV_per_K: '-0.006', dB_mV_per_K: '0.006'}
+            - {cell: 'No. 6 and 9', T_range_as_printed: '1278<T<1405 K', A_mV: '175.85', dA_mV: '1.48', B_mV_per_K: '-0.115', dB_mV_per_K: '0.006'}
+            - {cell: 'No. 6 and 9', T_range_as_printed: '1405<T<1428 K', A_mV: '212.66', dA_mV: '1.42', B_mV_per_K: '-0.141', dB_mV_per_K: '0.123'}
+            - {cell: 'No. 6 and 9', T_range_as_printed: '>1428 K', A_mV: '-1799.1', dA_mV: '5.3', B_mV_per_K: '1.265', dB_mV_per_K: '0.057'}
+          fit_as_printed: 'E/mV = (A ± dA) + (B ± dB) × T/K'
+          raw_inputs_by_cell:
+            - {cell: 'No. 0', state: not_printed, locator: {page: 4, published_page: 989, figure: '2'}}
+            - {cell: 'No. 6 and 9', state: not_printed, locator: {page: 5, published_page: 990, figure: '3'}}
+          schema_gap: >-
+            No exact EMF quantity exists in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES. The fitted EMF coefficients
+            are retained as located context, not mislabeled as activity.
+          conditions: >-
+            Cell 0 reference gases are reported as pCO2=80 kPa and pO2=20 kPa (0.8 and
+            0.2 atm); measured gas-sensor EMF was 5 ± 3 mV at 1150 K. Cells 6, 9, 10,
+            and 11 used purified air. No total pressure or numerical pO2 is reported
+            for the experimental cells. Table 2 combines cells 6 and 9; cells 10 and
+            11 are thermal-EMF controls. The EMF stability criterion was within 1 mV
+            for 1 hour, not a per-run uncertainty.
+      - observation_id: yki1987_equations_standard_state
+        type: method
+        units: as printed
+        locator: {page: 2, published_page: 987, section: 'II.1 Concentration cell', equations: '1–3'}
+        values:
+          cell_scheme_as_printed: 'Na2O(aNa2O) Sample (Na2O + Fe2O3), Pt/O2(g,pO2) | Na+ beta-alumina | Na2O(a*Na2O) Reference (5Na2O + 21Fe2O3), O2(g,p*O2), Pt'
+          cell_reaction_as_printed: '2 F E = R T ln(aNa2O/a*Na2O) − (1/2) R T ln(pO2/p*O2)'
+          equal_oxygen_pressure_relation_as_printed: '2 F E = R T ln(aNa2O/a*Na2O)'
+          carbonate_calibration_cell_as_printed: '5Na2O + 21Fe2O3 | Na+ beta-alumina | Na2CO3 (pure, liquid/solid), Pt/CO2(pCO2x), O2(pO2x)'
+          carbonate_reaction_as_printed: 'Na2O(sol. or liq.) + CO2(gas) = Na2CO3(sol. or liq.) (A)'
+          standard_state_sentence_as_printed: >-
+            The standard state of Na2O activity was taken as pure solid Na2O below
+            the melting point of Na2O (1405 K) and pure liquid Na2O above the melting point.
+          standard_state: Pure solid Na2O below 1405 K; pure liquid Na2O above 1405 K.
+          calibration_reference_as_printed: JANAF thermochemical tables (1971), formation free energies for Na2O, CO2, and Na2CO3.
+          total_pressure: {state: {tag: unknown, reason: not_published_as_total_pressure}}
+      - observation_id: yki1987_gibbs_reduction_equations
+        type: method
+        units: as printed
+        locator: {page: 6, published_page: 991, section: 'III.2 Estimation of thermochemical properties', equations: '4–6'}
+        values:
+          activity_fit_equation_as_printed: 'log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T'
+          na3fe5o9_reaction_as_printed: '3Na2O(s) + 5Fe2O3(s) = 2Na3Fe5O9 (B)'
+          na3fe5o9_reduction_as_printed: 'ΔG°(B) = 2ΔG°(Na3Fe5O9) = 3RT ln aNa2O(F/N3F5) (4)'
+          na2fe2o4_reaction_as_printed: '2Na3Fe5O9 + 2Na2O(s,l) = 5Na2Fe2O4 (C); Na2O(s,l) + Fe2O3 = Na2Fe2O4 (α,β,γ) (D)'
+          na2fe2o4_reduction_as_printed: 'ΔG°(C) = 2RT ln aNa2O(N3F5/NF) (5); ΔG°(Na2Fe2O4) = 1/5[ΔG°(B) + 2RT ln aNa2O(NF/N3F5)] (6)'
+          equation6_gibbs_identity_as_printed: 'ΔG°(Na2Fe2O4) = 1/5[ΔG°(B) + ΔG°(C)] (6)'
+          equation6_ratio_conflict: Eq. (6) prints NF/N3F5, while Eq. (5) and Table 3 identify N3F5/NF; preserved without inversion.
+          assumptions_as_printed: 'aFe2O3(solid hematite) is standard state; aNa3Fe5O9=1; Na3Fe5O9 assumed stoichiometric.'
+          standard_free_energy_calculation_limit: Below 1405 K because Na2O activity over the liquid phase was unknown.
+          uncertainty_as_printed: Statistical terms only; confidence level not stated; systematic/reference errors excluded.
+      - observation_id: yki1987_table1_phase_transition_rows
+        type: phase_transition_report
+        units: K
+        locator: {page: 5, published_page: 990, figure: '3', section: 'III.1 EMF measurement'}
+        values:
+          present_work_phase_boundaries_as_printed: ['α↔β Na2Fe2O4 at 1033 K', 'β↔γ Na2Fe2O4 at 1278 K', 'incongruent reaction at 1430 K']
+          prior_attribution: Thery [4] reports Na3Fe5O9 decomposition to Fe2O3 + Na2Fe2O4 at 1033 K; the authors report DTA/XRD did not detect that decomposition in their sample.
+          other_printed_boundaries: Table 2/3 use 1053 K; abstract/Table 4 use 1047 K. Preserved separately.
+      - observation_id: yki1987_attributed_auxiliary_values
+        type: comparison_data
+        units: as printed
+        locator: {page: 7, published_page: 992, section: 'III.3 Comparison with previous reports'}
+        values:
+          attributed_values:
+            - {attribution: 'Dai, Seetharaman and Staffansson [1]', value_as_printed: 'No numerical fit printed here', note: 'Authors discuss their earlier activity and Gibbs-energy work qualitatively.'}
+            - {attribution: 'Thery [4]', value_as_printed: '1033 K transition', phases_as_printed: 'Na3Fe5O9 to Fe2O3 + Na2Fe2O4', note: 'Prior interpretation discussed by the authors.'}
+            - {attribution: 'Lin and Elliott [9]', value_as_printed: 'Na2O activity in Na2O-WO3 used to determine sodium tungstate reference activity', note: 'No numeric value printed here.'}
+            - {attribution: 'Neudorf and Elliott [10]', value_as_printed: 'Na2O activity and thermodynamic properties in Na2O-SiO2', note: 'No numeric value printed here.'}
+          figure_only_candidates: 'Figs. 2–5 contain plotted EMF, activity, and mixing Gibbs values; numerical points were not extracted.'
+      - observation_id: yki1987_body_literal_conflict
+        type: source_note
+        units: text
+        locator: {page: 7, published_page: 992, section: 'III.2 Estimation of thermochemical properties'}
+        values:
+          alternate_formula_as_printed: Na3Fe5O5
+          note: Body text uses Na3Fe5O5 once where surrounding text uses Na3Fe5O9; not interpreted as another phase.
+      - observation_id: yki1987_schema_gap
+        type: schema_audit
+        units: not applicable
+        locator: {page: 4, published_page: 989, table: '2'}
+        values:
+          candidate_quantity: electromotive_force
+          schema_gap: >-
+            simulator/battery/enums.py::Quantity contains no exact EMF quantity,
+            and simulator/battery/migrate.py::QUANTITY_ALIASES contains no alias.
+            The source's eight EMF fit rows therefore remain typed located context.
+          similar_existing_data: data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml
+          fit_expression_gap: >-
+            The exact quantity tokens are present: simulator/battery/enums.py::Quantity.ACTIVITY and
+            Quantity.DELTA_FG; simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY
+            resolve the declared activity and gibbs_table types, and ::PHASE_MAP resolves cr.
+            The unsupported form is the printed coefficient-only fit: simulator/battery/migrate.py::select_declared_source
+            does not evaluate it into point observations. Existing coefficient-only fits such as
+            data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml retain typed refusals.
+          quantity_unknown_rows: all eight Gibbs fits; reaction-(B) and reaction-(D) energies have no exact reaction-extent quantity token.
+          reaction_extent_gap: >-
+            simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/migrate.py::QUANTITY_ALIASES plus ::TYPE_QUANTITY provide no exact reaction-extent Gibbs-energy quantity. Keep the printed reaction-(B) and reaction-(D) energies quantity-unknown rather than mapping them to per-formula delta_fG.
+  Na3Fe5O9:
+    observations:
+      - observation_id: yki1987_gibbs_abstract_na3fe5o9
+        type: gibbs_table
+        locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na3Fe5O9, <1405 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1405'}}
+            locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na3Fe5O9, <1405 K'}
+        derived_from: [yki1987_activity_f_n3f5]
+        derivation:
+          locator: {page: 6, published_page: 991, equation: '4'}
+          relation: 'ΔG°(B) = 2ΔG°(Na3Fe5O9) = 3RT ln aNa2O(F/N3F5)'
+          inputs: [yki1987_activity_f_n3f5]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_B
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG°(Na3Fe5O9) = −(248.6 ± 1.1) − (2.447 ± 1.188) × 10^−3 T/K'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-2.447', dA: '1.188', B_kJ_per_mol: '-248.6', dB: '1.1'}
+          T_range_as_printed: <1405 K
+          reaction_as_printed: '3Na2O(s) + 5Fe2O3(s) = 2Na3Fe5O9 (B); ΔG°(B)=2ΔG°(Na3Fe5O9)'
+          printed_basis_discrepancy: The abstract intercept is per Na3Fe5O9 formula unit, but its slope matches the full reaction-(B) slope; both abstract coefficients are retained as printed.
+          reaction_locator: {page: 6, published_page: 991, equation: '4'}
+          standard_state_as_printed: Pure solid Na2O and solid hematite Fe2O3.
+          schema_gap: Coefficient-only Gibbs-energy function; no numeric point value is printed.
+      - observation_id: yki1987_gibbs_table4_na3fe5o9
+        type: gibbs_table
+        locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (A), <1405 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1405'}}
+            locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (A), <1405 K'}
+        derived_from: [yki1987_activity_f_n3f5]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4', table: '3'}
+          relation: 'Table 4 coefficients calculated from the Table 3 log activity fit by equation (4).'
+          inputs: [yki1987_activity_f_n3f5]
+          output_unit: kJ/mol reaction as printed
+        phase: cr
+        units: kJ/mol reaction as printed
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_B
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG°/kJ·mol−1 = (−2.447 ± 1.188) × 10^−3 T/K + (−497.2 ± 2.2)'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-2.447', dA: '1.188', B_kJ_per_mol: '-497.2', dB: '2.2'}
+          T_range_as_printed: <1405 K
+          table_row_label_as_printed: Eq. (A)
+          table_caption_reaction_as_printed: '3Na2O + 5Fe2O3 = 2Na3Fe5O9 (B)'
+          body_reaction_as_printed: '3Na2O(s) + 5Fe2O3(s) = 2Na3Fe5O9 (B)'
+          reaction_basis_as_printed: ΔG°(B) for 3Na2O + 5Fe2O3 = 2Na3Fe5O9; two Na3Fe5O9 formula units, not per-mole formation energy of one Na3Fe5O9.
+          standard_state_as_printed: Pure solid Na2O and solid hematite Fe2O3.
+          schema_gap: >-
+            The printed value is the standard Gibbs energy of reaction (B), whose extent is two Na3Fe5O9 formula units. simulator/battery/enums.py::Quantity.DELTA_FG is the per-species formation-energy token and simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY provide no reaction-extent token. The descriptive quantity deliberately remains quantity-unknown rather than misframing the reaction energy as one-formula delta_fG. Coefficients and reaction basis remain as printed.
+    context: []
+  NaFeO2:
+    context:
+      - observation_id: yki1987_nafeo2_formula_registration
+        type: source_note
+        units: formula
+        locator: {page: 6, published_page: 991, table: '4'}
+        values:
+          formula_as_published: Na2Fe2O4
+          canonical_species: NaFeO2
+          formula_basis_note: Na2Fe2O4 has empirical formula NaFeO2; no coefficient, value, or energy normalization is applied.
+    observations:
+      - observation_id: yki1987_gibbs_table4_na2fe2o4_lt1047
+        type: gibbs_table
+        locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (D), <1047 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1047'}}
+            locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (D), <1047 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_lt1053]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Table 4 coefficients derived from the Table 3 activity fits using equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_lt1053]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG°/kJ·mol−1 = (−3.909 ± 1.245) × 10^−3 T/K + (−160.2 ± 2.5)'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-3.909', dA: '1.245', B_kJ_per_mol: '-160.2', dB: '2.5'}
+          T_range_as_printed: <1047 K
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s,l) + Fe2O3 = Na2Fe2O4 (α, β, γ) (D)'
+          standard_state_as_printed: Na2O solid/liquid as written; pure solid below 1405 K, pure liquid above; Fe2O3 standard is solid hematite.
+          phase_label_as_printed: '−NF <1047'
+          schema_gap: Coefficient-only Gibbs-energy function; no numeric point value is printed.
+      - observation_id: yki1987_gibbs_abstract_na2fe2o4_lt1047
+        type: gibbs_table
+        locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, <1047 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1047'}}
+            locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, <1047 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_lt1053]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Abstracted author fit based on Table 3 log activity functions and equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_lt1053]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG° = −(160.2 ± 2.5) − (3.909 ± 1.245) × 10^−3 T/K'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-3.909', dA: '1.245', B_kJ_per_mol: '-160.2', dB: '2.5'}
+          T_range_as_printed: <1047 K
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s) + Fe2O3(s) = Na2Fe2O4'
+          reaction_locator: {page: 6, published_page: 991, equation: 'D'}
+          standard_state_as_printed: Pure solid Na2O and solid hematite Fe2O3.
+          schema_gap: Coefficient-only Gibbs-energy function; no numeric point value is printed.
+      - observation_id: yki1987_gibbs_abstract_na2fe2o4_1047_1278
+        type: gibbs_table
+        locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, 1047<T<1278 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: interval, interval_low: '1047', interval_high: '1278'}}
+            locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, 1047<T<1278 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_mid]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Abstracted author fit based on the Table 3 activity segments overlapping 1047–1278 K and equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_mid]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG° = −(152.7 ± 2.4) − (1.332 ± 1.227) × 10^−3 T/K'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-1.332', dA: '1.227', B_kJ_per_mol: '-152.7', dB: '2.4'}
+          T_range_as_printed: 1047<T<1278 K
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s) + Fe2O3(s) = Na2Fe2O4'
+          reaction_locator: {page: 6, published_page: 991, equation: 'D'}
+          standard_state_as_printed: Pure solid Na2O and solid hematite Fe2O3.
+          schema_gap: Coefficient-only Gibbs-energy function; abstract's −152.7 differs from Table 4's −162.7.
+      - observation_id: yki1987_gibbs_table4_na2fe2o4_mid
+        type: gibbs_table
+        locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (D), 1047<T<1278 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: interval, interval_low: '1047', interval_high: '1278'}}
+            locator: {page: 6, published_page: 991, table: '4', row: 'Eq. (D), 1047<T<1278 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_mid]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Table 4 coefficients derived from the Table 3 activity segments overlapping 1047–1278 K using equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_mid]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG°/kJ·mol−1 = (−1.332 ± 1.227) × 10^−3 T/K + (−162.7 ± 2.4)'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-1.332', dA: '1.227', B_kJ_per_mol: '-162.7', dB: '2.4'}
+          T_range_as_printed: 1047<T<1278 K
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s,l) + Fe2O3 = Na2Fe2O4 (α, β, γ) (D)'
+          standard_state_as_printed: Na2O solid/liquid as written; pure solid below 1405 K, pure liquid above; Fe2O3 standard is solid hematite.
+          phase_label_as_printed: '−NF 1047<T<1278'
+          schema_gap: Coefficient-only Gibbs-energy function; abstract prints −152.7 ± 2.4 for this interval.
+      - observation_id: yki1987_gibbs_abstract_na2fe2o4_gt1278
+        type: gibbs_table
+        locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, 1278<T<1405 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: interval, interval_low: '1278', interval_high: '1405'}}
+            locator: {page: 1, published_page: 986, paragraph: abstract, row: 'Na2Fe2O4, 1278<T<1405 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_gt1278]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Abstracted author fit based on Table 3 log activity functions and equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_gt1278]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG° = −(147.3 ± 2.9) − (13.37 ± 1.268) × 10^−3 T/K'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-13.37', dA: '1.268', B_kJ_per_mol: '-147.3', dB: '2.9'}
+          T_range_as_printed: 1278<T<1405 K
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s) + Fe2O3(s) = Na2Fe2O4'
+          reaction_locator: {page: 6, published_page: 991, equation: 'D'}
+          standard_state_as_printed: Pure solid Na2O and solid hematite Fe2O3.
+          schema_gap: Coefficient-only Gibbs-energy function; abstract prints −147.3 ± 2.9 for this interval.
+      - observation_id: yki1987_gibbs_table4_na2fe2o4_nf_lt1405
+        type: gibbs_table
+        locator: {page: 6, published_page: 991, table: '4', row: '−NF <1405 K'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '1405'}}
+            locator: {page: 6, published_page: 991, table: '4', row: '−NF <1405 K'}
+        derived_from: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_gt1278]
+        derivation:
+          locator: {page: 6, published_page: 991, equations: '4–6', table: '3'}
+          relation: 'Table 4 coefficients derived from the Table 3 activity fits using equations (4)–(6).'
+          inputs: [yki1987_activity_f_n3f5, yki1987_activity_n3f5_nf_gt1278]
+          output_unit: kJ/mol
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_standard_gibbs_energy_for_reaction_D
+          method_class: measured_reduced
+          status: typed_refused_schema_gap
+          equation_as_printed: 'ΔG°/kJ·mol−1 = (−13.37 ± 1.268) × 10^−3 T/K + (−147.2 ± 2.9)'
+          coefficients_as_printed: {A_kJ_per_mol_K_times_1e3: '-13.37', dA: '1.268', B_kJ_per_mol: '-147.2', dB: '2.9'}
+          T_range_as_printed: '−NF <1405 K'
+          formula_as_published: Na2Fe2O4
+          reaction_as_printed: 'Na2O(s,l) + Fe2O3 = Na2Fe2O4 (α, β, γ) (D)'
+          standard_state_as_printed: Na2O solid/liquid as written; pure solid below 1405 K, pure liquid above; Fe2O3 standard is solid hematite.
+          phase_label_as_printed: '−NF <1405 K'
+          window_overlap_note: The printed <1405 K row overlaps the separate Eq. (D) rows <1047 K and 1047<T<1278 K; it is not the abstract's 1278<T<1405 K interval.
+          schema_gap: The equation/table do not resolve the literal −NF phase heading; abstract's intercept is −147.3 ± 2.9.
