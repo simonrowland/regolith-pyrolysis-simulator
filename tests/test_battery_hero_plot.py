@@ -1966,20 +1966,21 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     comparisons = data.hero_comparisons[("redox", "internal-analytical")][
         "comparisons"
     ]
-    assert comparisons == [
-        {
-            "engine": "vaporock",
-            "n_shared": 2,
-            "outside_rms_dex": "4.0",
-            "primary_rms_dex_on_shared": "3.0",
-        },
-        {
-            "engine": "thermoengine",
-            "n_shared": 1,
-            "outside_rms_dex": "2.0",
-            "primary_rms_dex_on_shared": "3.0",
-        },
+    assert [
+        (
+            comparison["engine"],
+            comparison["n_shared"],
+            comparison["outside_rms_dex"],
+            comparison["primary_rms_dex_on_shared"],
+        )
+        for comparison in comparisons
+    ] == [
+        ("vaporock", 2, "4.0", "3.0"),
+        ("thermoengine", 1, "2.0", "3.0"),
     ]
+    assert comparisons[0]["outside_sd_dex"] == "0"
+    assert comparisons[0]["outside_median_abs_dex"] == "4.0"
+    assert comparisons[0]["views"]["temperature_lt_1700"]["n_shared"] == 2
     assert data.hero_comparisons[("redox", "openimcc")]["comparisons"][0][
         "engine"
     ] == "thermoengine"
@@ -2022,7 +2023,39 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
     assert "vaporock" in svg and "n_shared=2" in svg
     assert "thermoengine" in svg and "n_shared=1" in svg
+    assert "cross-engine signed dex scorecard" in svg
+    assert "population sd (ddof=0)" in svg
     assert "benchmark" not in svg
+
+
+def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> None:
+    text = hero_plot._hero_scorecard_cell_text(
+        {
+            "n": 6,
+            "rms_dex": "1.2",
+            "sd_dex": "0.4",
+            "median_abs_dex": "0.9",
+            "no_temperature_n": 1,
+            "exposed_n": 1,
+            "held_out": {
+                "n": 5,
+                "minimum_n": 5,
+                "rms_dex": "1.1",
+                "sd_dex": "0.3",
+                "median_abs_dex": "0.8",
+            },
+        },
+        include_no_temperature=True,
+    )
+
+    assert "RMS 1.20 dex (n=6)" in text
+    assert "SD 0.40 dex (n=6)" in text
+    assert "median |dex| 0.90 dex (n=6)" in text
+    assert "no T n=1" in text
+    assert "exposed n=1" in text and "held-out n=5" in text
+    assert "held-out RMS 1.10 dex (n=5)" in text
+    assert "SD 0.30 dex (n=5)" in text
+    assert "median |dex| 0.80 dex (n=5)" in text
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
