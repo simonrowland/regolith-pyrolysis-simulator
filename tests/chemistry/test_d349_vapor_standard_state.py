@@ -108,6 +108,7 @@ def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
         feedstocks_data,
         setpoints_data,
     )
+    sim.melt.p_total_mbar = 1000.0
     provider, request = _lunar_mare_probe(
         vapor_pressure_data,
         feedstocks_data,
@@ -115,6 +116,7 @@ def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
         sim=sim,
     )
     diagnostic = dict(provider.dispatch(request).diagnostic)
+    diagnostic["source_reaction_fO2_bar"] = 1.0
     equilibrium = SimpleNamespace(
         temperature_C=1500.0,
         pO2_bar=1.0,
@@ -471,7 +473,7 @@ def test_d350_alphamelts_fallback_substitutes_builtin_mgo_cao_activity(
     diagnostics = backend._vapor_pressure_diagnostics({}, projection, "alphamelts")
     assert set(
         diagnostics["vapor_activity_standard_state_notices_by_species"]
-    ) == {"Mg", "Ca"}
+    ) == set(notices)
 
 
 def test_d350_alphamelts_volatility_diagnostic_uses_builtin_mgo_cao_activity(
@@ -534,6 +536,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = 1000.0
     expected_species = ("Mg", "Ca")
     if "Na2O" in composition_wt_pct:
         # Use the feedstock's actual Na/K/Mg/Ca proportions, normalized only
@@ -613,13 +616,28 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         vapor_pressures_source=sim._last_vapor_pressures_source,
     )
 
-    flux = sim._calculate_evaporation(equilibrium)
-
+    sim._calculate_evaporation(equilibrium)
+    batch = sim._last_vapour_batch
+    assert batch is not None
     for species in expected_species:
-        assert flux.species_kg_hr[species] > 0.0
-    for species in expected_species:
-        activity = diagnostics["activities"][species]
+        answer = batch.channel(species)
+        assert isinstance(answer.pressure, PressureValue)
         route = diagnostics["vapor_pressure_numerator_provenance"][species]
+        expected_gateway_pressure = sim.vapour_rail_catalog.species[
+            species
+        ].evaluator.evaluate(
+            1773.15,
+            source_activity=float(route["vapor_activity_for_crystalline_K"]),
+            pO2_bar=1.0,
+        ).pressure_pa
+        assert answer.pressure.pa == pytest.approx(
+            expected_gateway_pressure, rel=1e-12, abs=0
+        )
+        activity = diagnostics["activities"][species]
+        assert answer.source_reaction_activity is not None
+        assert answer.source_reaction_activity.as_pressure_activity() == pytest.approx(
+            activity, rel=1e-12, abs=0
+        )
         assert route["vapor_activity_for_crystalline_K"] > 0.0
         if species in {"Mg", "Ca"}:
             assert route["vapor_activity_for_crystalline_K"] != pytest.approx(
@@ -641,6 +659,14 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         assert notice["source_standard_state_substitution"] == (
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
+        )
+        assert notice["from_standard_state_id"] == (
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+        )
+        assert notice["to_standard_state_id"] == (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+            if species in {"Mg", "Ca"}
+            else MELT_OXIDE_ACTIVITY_REFERENCE_STATE
         )
 
     from simulator.runner import _vapor_pressure_source_report
