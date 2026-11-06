@@ -1688,6 +1688,7 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
         "missing_activity",
         "missing_provider",
         "missing_standard_state",
+        "standard_state_mismatch",
         "missing_pO2",
         "missing_temperature",
     ),
@@ -1709,6 +1710,13 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed_without_claims(
         state = replace(state, source_reaction_activity_provider=None)
     elif failure == "missing_standard_state":
         state = replace(state, source_reaction_activity_standard_states={})
+    elif failure == "standard_state_mismatch":
+        state = replace(
+            state,
+            source_reaction_activity_standard_states={
+                "K": replace(_TEST_ACTIVITY_STANDARD_STATE, phase="solid")
+            },
+        )
     elif failure == "missing_pO2":
         state = replace(state, source_reaction_fO2_bar=None)
     elif failure == "missing_temperature":
