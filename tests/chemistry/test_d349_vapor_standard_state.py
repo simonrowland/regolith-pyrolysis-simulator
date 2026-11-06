@@ -555,6 +555,12 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             rel=1e-10,
             abs=0,
         )
+    # This synthetic mixed melt also produces a legacy Na pressure from a
+    # Na2O proxy, but reports no Na activity contract. Keep that unsupported
+    # channel out of this gateway fixture; it tests the evidenced Mg/Ca routes.
+    gateway_projection = {
+        species: projection[species] for species in ("Mg", "Ca")
+    }
 
     diagnostics = backend._vapor_pressure_diagnostics(
         {
@@ -570,7 +576,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     )
     sim._last_vapor_pressure_diagnostic = diagnostics
     sim._last_vapor_pressures_source = backend._vapor_pressure_source_map(
-        projection,
+        gateway_projection,
         "alphamelts_fallback",
     )
     sim._last_backend_diagnostics = diagnostics
@@ -583,7 +589,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         pO2_bar=1.0,
         diagnostics=diagnostics,
         activity_coefficients=dict(diagnostics.get("activities", {})),
-        vapor_pressures_Pa=projection,
+        vapor_pressures_Pa=gateway_projection,
         vapor_pressures_source=sim._last_vapor_pressures_source,
     )
 
