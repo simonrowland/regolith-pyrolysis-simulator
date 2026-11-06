@@ -484,6 +484,12 @@ class SimSession:
                     "invalid_run_input",
                     f"runtime_campaign_overrides[{campaign!r}] must be a mapping",
                 )
+            # The frozen config's nested mappings can still be mutated after
+            # __post_init__. Admit raw pressure values here before the generic
+            # parser can coerce numeric strings, using the same owner as adjust.
+            sim.campaign_mgr._validate_runtime_pressure_overrides(
+                str(campaign), overrides,
+            )
             target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
             for field_name, value in overrides.items():
                 if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
