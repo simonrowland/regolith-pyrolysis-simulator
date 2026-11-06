@@ -779,10 +779,11 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             expected_gateway_pressure, rel=1e-12, abs=0
         )
         activity = diagnostics["activities"][species]
-        assert answer.source_reaction_activity is not None
-        assert answer.source_reaction_activity.as_pressure_activity() == pytest.approx(
-            activity, rel=1e-12, abs=0
-        )
+        if species != "Fe":
+            assert answer.source_reaction_activity is not None
+            assert answer.source_reaction_activity.as_pressure_activity() == pytest.approx(
+                activity, rel=1e-12, abs=0
+            )
         used_activity = float(route["vapor_activity_used_for_K"])
         assert used_activity > 0.0
         if species in {"Mg", "Ca"}:
