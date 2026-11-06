@@ -1,0 +1,61 @@
+From bb2ee5eb1fcbe4941bbd3d003f37e62df9142cfb Mon Sep 17 00:00:00 2001
+From: Simon Rowland <simon@simonrowland.com>
+Date: Thu, 5 Nov 2026 00:03:43 -0500
+Subject: [PATCH] Stop the legacy LP loop when the iteration cap is reached
+
+LP() cleared iterate only when both of these were true: the step had
+either converged or hit max_LP_ite, and PC_checked was 2.
+
+    (gamma_norm < 1e-6 || gi >= max_LP_ite) && PC_checked == 2
+
+PC_checked increments only while gamma_norm < 1.0, and only up to 2
+(PGE_function.c, the check at the top of the LP loop). A point whose
+chemical-potential step stays at or above 1 never increments
+PC_checked, so the iteration cap never fires.
+
+The diagnostic arrays PGE_mass_norm, gamma_norm and ite_time are
+allocated with it_f*2 elements. it_f and max_LP_ite are both 256, so
+the arrays hold 512 doubles. global_ite starts at 0 and is incremented
+before those three stores, so the write at global_ite == 512 is one
+past the end. Past that the loop keeps going.
+
+The cap is now independent of the pseudocompound re-check:
+
+    gi >= max_LP_ite
+        || (gamma_norm < 1e-6 && PC_checked == 2)
+
+A converged point still waits for two PC re-checks. A point that never
+drops below gamma_norm = 1 stops at max_LP_ite. The status assignment
+inside the block is unchanged.
+
+Not reproduced as a hang on this v1.9.6 tree. 164 ig solver=0 and
+sb11/sb21 points (25 C to 3500 C, 0.001 kbar to 800 kbar, including
+pyrolite, Fe-rich, equal-oxide and wet bulks) all exited 0. Single
+oxide, zero, NaN and cold-wet bulks did too. sb21 at T = 0 K does not
+return, but it is still in pure-phase initialisation (NaN gbase) and
+has not entered GLOBAL ITERATION, so that hang is not this loop. The
+change is kept because the control flow above does not terminate while
+gamma_norm stays >= 1.
+---
+ src/PGE_function.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/PGE_function.c b/src/PGE_function.c
+index 8f918b2..2c341c1 100644
+--- a/src/PGE_function.c
++++ b/src/PGE_function.c
+@@ -1628,7 +1628,13 @@ global_variable LP(		bulk_info 			z_b,
+ 		gv.ite_time[gv.global_ite] 		 = ((double)t)/CLOCKS_PER_SEC*1000;
+ 		gi += 1;
+ 
+-		if ((gv.gamma_norm[gv.global_ite-1] < 1e-6 || gi >= gv.max_LP_ite) && gv.PC_checked == 2){
++		/* Stop on (converged AND PC re-checked twice) OR the LP iteration
++		   cap. The previous form required PC_checked == 2 even for the
++		   max_LP_ite clause. PC_checked only increments when
++		   gamma_norm < 1.0, so a point that never drops below that
++		   threshold looped forever and then overflowed the it_f*2
++		   diagnostic arrays (PGE_mass_norm / gamma_norm / ite_time). */
++		if (gi >= gv.max_LP_ite || (gv.gamma_norm[gv.global_ite-1] < 1e-6 && gv.PC_checked == 2)){
+ 			iterate = 0;
+ 
+ 			if (gv.gamma_norm[gv.global_ite-1] < 1e-6){

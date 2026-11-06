@@ -128,6 +128,7 @@ REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
+_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
 _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
 
@@ -175,11 +176,23 @@ _DEFAULT_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
-# Per-cell wall around equilibrate(). ThermoEngine forwards this same budget
-# to its nested warm worker; its 60 s limit covers the measured 54.75 s D3
-# SiO2 maximum. The isolated-cell worker gets a separate 2 s response margin.
+# Five loaded-host runs each on 2026-11-04 for Rys Na, Stolyarova Al2O/TiO,
+# and the Costa/Stolyarova closures had CPU medians of 1.05, 0.57, 0.55, 0.89,
+# and 0.71 s; individual CPU times ranged 0.54–3.77 s (range 3.23 s, Costa
+# maximum). Set the per-request ITIMER_PROF budget to round_up_1(3.77 +
+# 1.9 × 3.23) = 10 s, using nearly twice the measured run-to-run CPU range
+# (6.14 s) as margin beyond the observed maximum. The largest wall time was
+# 6.55 s (Al2O row 14; max wall/CPU ratio 1.86). The 120 s wall backstop is
+# 12x the CPU budget and 18.3x the measured wall maximum; it refuses blocked
+# hangs. Extreme scheduling can still exhaust this residual wall budget.
+# Explicit in-process IA handles retain the wall cap because process CPU cannot
+# be isolated from their caller.
+# ThermoEngine forwards its budget to its nested warm worker; its 60 s limit
+# covers the measured 54.75 s D3 SiO2 maximum. Isolated-cell workers get a
+# separate 2 s response margin.
+_INTERNAL_ANALYTICAL_CPU_BUDGET_S = 10.0
 _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
-    "internal-analytical": 5.0,
+    "internal-analytical": 120.0,
     "alphamelts": 30.0,
     "thermoengine": 60.0,
     "vaporock": 70.0,
@@ -2120,9 +2133,19 @@ def _solve_vapor_engine_cell_oxygen_balance(
         last_admitted_po2_bar = pO2_bar
         return cells_by_po2[pO2_bar]
 
+    def _is_silicate_window_trial_refusal(
+        refusal: _OxygenBalanceEngineTrialRefusal,
+    ) -> bool:
+        return (
+            refusal.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
+            and "silicate_window" in refusal.backend_status_reason
+        )
+
     start_logp = -6.0
     start_cell = None
     starting_refusal_counts: dict[str, int] = {}
+    starting_grid_had_engine_crash = False
+    starting_grid_all_silicate_window_refusals = True
     # -6 is an arbitrary interior seed, not a domain boundary: refusing that
     # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
     # it first, then walk outward by 1 dex, preferring the higher side at each
@@ -2136,6 +2159,10 @@ def _solve_vapor_engine_cell_oxygen_balance(
         try:
             start_cell = cell_at_po2(10.0**candidate_logp)
         except _OxygenBalanceEngineTrialRefusal as exc:
+            if exc.reason_code == REFUSAL_ENGINE_CRASH:
+                starting_grid_had_engine_crash = True
+            if not _is_silicate_window_trial_refusal(exc):
+                starting_grid_all_silicate_window_refusals = False
             guard_reason = exc.reason_code
             engine_reason = getattr(exc.cell, "engine_reason", None)
             if engine_reason:
@@ -2152,8 +2179,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
             f"{reason}: {count}"
             for reason, count in sorted(starting_refusal_counts.items())
         )
+        # A recorded crash wins for a mixed refused grid; silicate applies only
+        # when every refusal is that gate, and all other mixes keep the family code.
+        if starting_grid_had_engine_crash:
+            starting_grid_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:engine_domain_crash"
+            )
+        elif starting_grid_all_silicate_window_refusals:
+            starting_grid_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:silicate_window_refusal"
+            )
+        else:
+            starting_grid_reason = _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
         raise _OxygenBalanceRefusal(
-            "oxygen_balance_no_admitted_bracket",
+            starting_grid_reason,
             "no admitted starting cell in log10(pO2/bar) range [-30, 0]; "
             f"last_admitted_pO2_bar=none; starting-cell guard refusals: {refusal_counts}",
         )
@@ -2212,6 +2251,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
             species_metadata,
         )
 
+    def bracket_residual_tokens(detail: str) -> tuple[str, str] | None:
+        match = re.search(
+            r"F\(low\)=([^,]+),\s*F\(high\)=([^\s;)]+)", detail
+        )
+        if match is None:
+            return None
+        low_text, high_text = (token.strip() for token in match.groups())
+        try:
+            float(low_text)
+            float(high_text)
+        except ValueError:
+            return None
+        return low_text, high_text
+
     previous_root_logp: float | None = None
     max_fixed_point_iterations = 8
     # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. Require the
@@ -2224,6 +2277,11 @@ def _solve_vapor_engine_cell_oxygen_balance(
         lower_stop: str | None = None
         upper_stop: str | None = None
         solution = None
+        bracket_edge_evidence: list[
+            tuple[float, float, str | None, str | None, str]
+        ] = []
+        all_bracket_residuals_same_sign = True
+        root_above_one_bar = False
         while lower_stop is None or upper_stop is None:
             for side in ("lower", "upper"):
                 if side == "lower":
@@ -2281,8 +2339,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
                         if last_refused_trial is None
                         else f"{last_refused_trial[0]:g}"
                     )
+                    if _is_silicate_window_trial_refusal(exc):
+                        refusal_reason = (
+                            f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
+                            "silicate_window_refusal"
+                        )
+                    elif exc.reason_code == REFUSAL_ENGINE_CRASH:
+                        refusal_reason = (
+                            f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
+                            "engine_domain_crash"
+                        )
+                    else:
+                        refusal_reason = _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
                     raise _OxygenBalanceRefusal(
-                        "oxygen_balance_no_admitted_bracket",
+                        refusal_reason,
                         "engine refused a trial while checking an admitted bracket; "
                         f"last_admitted_pO2_bar={last_admitted_po2_bar!r}; "
                         f"guard at pO2={refused_po2} bar: "
@@ -2296,18 +2366,74 @@ def _solve_vapor_engine_cell_oxygen_balance(
                     )
                     if not (no_sign_change or above_knudsen_limit):
                         raise
+                    root_above_one_bar = root_above_one_bar or above_knudsen_limit
+
+                    residual_tokens = bracket_residual_tokens(detail)
+                    if above_knudsen_limit and high_logp == 0.0:
+                        high_match = re.search(r"F\(1 bar\)=([^\s;)]+)", detail)
+                        if high_match is not None:
+                            high_text = high_match.group(1)
+                            try:
+                                float(high_text)
+                            except ValueError:
+                                high_text = None
+                            low_text = None
+                            if high_text is not None:
+                                # Reuse OpenIMCC at the same low edge and just
+                                # below log10(pO2/bar)=0 to expose F(low) without
+                                # reimplementing its flux calculation.
+                                try:
+                                    _solve_cell_oxygen_balance(
+                                        pressure_model,
+                                        species_metadata,
+                                        temperature_K=temperature_K,
+                                        cell_material=cell_material,
+                                        bracket=(
+                                            low_logp,
+                                            math.nextafter(high_logp, -math.inf),
+                                        ),
+                                    )
+                                except _OxygenBalanceRefusal as edge_exc:
+                                    edge_tokens = bracket_residual_tokens(
+                                        str(edge_exc)
+                                    )
+                                    if edge_tokens is not None:
+                                        low_text = edge_tokens[0]
+                                residual_tokens = (
+                                    None
+                                    if low_text is None
+                                    else (low_text, high_text)
+                                )
+
+                    if residual_tokens is None:
+                        all_bracket_residuals_same_sign = False
+                        low_text = high_text = None
+                    else:
+                        low_text, high_text = residual_tokens
+                        low_value, high_value = float(low_text), float(high_text)
+                        if not (
+                            (low_value > 0.0 and high_value > 0.0)
+                            or (low_value < 0.0 and high_value < 0.0)
+                        ):
+                            all_bracket_residuals_same_sign = False
+                    bracket_edge_evidence.append(
+                        (low_logp, high_logp, low_text, high_text, detail)
+                    )
 
             if solution is not None:
                 break
 
         if solution is None:
-            last_admitted = (
-                "none"
-                if last_admitted_po2_bar is None
-                else f"{last_admitted_po2_bar:g} bar"
+            same_sign_residual = (
+                bool(bracket_edge_evidence)
+                and all_bracket_residuals_same_sign
             )
-            raise _OxygenBalanceRefusal(
-                "oxygen_balance_no_admitted_bracket",
+            refusal_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:same_sign_residual"
+                if same_sign_residual
+                else _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
+            )
+            detail = (
                 "no sign-changing bracket was found in the admitted pO2 window "
                 "reachable from the chosen start; "
                 f"start_pO2_bar={10.0**activity_anchor_logp:g}; "
@@ -2316,8 +2442,32 @@ def _solve_vapor_engine_cell_oxygen_balance(
                 f"lower_stop={lower_stop}; upper_stop={upper_stop}; "
                 "expansion stops at the first refused one-dex trial or solver "
                 "limit on each side and does not establish whether a root exists "
-                "in another admitted window in log10(pO2/bar) range [-30, 0]",
+                "in another admitted window in log10(pO2/bar) range [-30, 0]"
             )
+            if bracket_edge_evidence:
+                recorded_edges = " | ".join(
+                    (
+                        f"log10(pO2/bar)=({low_logp:g}, {high_logp:g}), "
+                        f"F(low)={low_text}, F(high)={high_text}; "
+                        f"inner refusal: {inner_detail}"
+                    )
+                    if low_text is not None and high_text is not None
+                    else (
+                        f"log10(pO2/bar)=({low_logp:g}, {high_logp:g}); "
+                        f"inner refusal: {inner_detail}"
+                    )
+                    for low_logp, high_logp, low_text, high_text, inner_detail
+                    in bracket_edge_evidence
+                )
+                detail += f"; bracket edge evidence: {recorded_edges}"
+            if root_above_one_bar:
+                detail += (
+                    "; A root above 1 bar lies outside molecular-flow effusion "
+                    "validity (Kn << 1 at the orifice), so no admitted root exists. "
+                    "It is not a solver miss, and the admitted window must not be "
+                    "widened to find it."
+                )
+            raise _OxygenBalanceRefusal(refusal_reason, detail)
 
         if not fixed_point_activities:
             return solution
@@ -3604,12 +3754,13 @@ def _crash_cell_from_returncode(
     notices: Sequence[Mapping[str, Any]],
     authority: str | None,
     certified_band: Mapping[str, Any] | None,
+    timeout_reason: str | None = None,
 ) -> EquilibrateCell:
     if timed_out:
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_TIMEOUT,
-            "isolated cell exceeded hard timeout",
+            timeout_reason or "isolated cell exceeded hard timeout",
         )
         engine_status = "TimeoutError"
         exit_signal = None
@@ -3673,11 +3824,13 @@ class _IsolatedCellWorkerFailure(RuntimeError):
         timed_out: bool = False,
         returncode: int | None = None,
         detail: str = "",
+        timeout_reason: str | None = None,
     ) -> None:
         super().__init__(detail)
         self.timed_out = timed_out
         self.returncode = returncode
         self.detail = detail
+        self.timeout_reason = timeout_reason
 
 
 class _IsolatedCellEngine:
@@ -3700,11 +3853,46 @@ def _handle_isolated_cell_request(
     payload: Mapping[str, Any],
     _diagnostic_log: Any,
 ) -> dict[str, Any]:
-    handles = {resource.handle.name: resource.handle}
-    resource.handle, _owns_handle = open_cached_battery_engine_handle(
-        resource.handle.name, handles
-    )
-    return run_isolated_cell_worker(payload, handle=resource.handle)
+    def run_request() -> dict[str, Any]:
+        handles = {resource.handle.name: resource.handle}
+        resource.handle, _owns_handle = open_cached_battery_engine_handle(
+            resource.handle.name, handles
+        )
+        return run_isolated_cell_worker(payload, handle=resource.handle)
+
+    if resource.handle.name == "internal-analytical":
+        return _run_internal_analytical_with_cpu_budget(run_request)
+    return run_request()
+
+
+def _run_internal_analytical_with_cpu_budget(
+    call: Callable[[], dict[str, Any]],
+) -> dict[str, Any]:
+    """Run one IA cell under a child-process CPU timer.
+
+    SIGPROF's default action terminates this isolated child when its process
+    CPU budget expires. The parent recognizes that signal as engine_timeout;
+    terminating the child also stops any backend thread left inside native code.
+    """
+
+    if not all(
+        hasattr(signal, name)
+        for name in ("SIGPROF", "ITIMER_PROF", "setitimer", "getitimer")
+    ):
+        raise RuntimeError("internal-analytical CPU timer is unavailable")
+    budget_s = float(_INTERNAL_ANALYTICAL_CPU_BUDGET_S)
+    if not math.isfinite(budget_s) or budget_s <= 0.0:
+        raise ValueError("internal-analytical CPU budget must be positive")
+    previous_timer = signal.getitimer(signal.ITIMER_PROF)
+    if previous_timer != (0.0, 0.0):
+        raise RuntimeError("internal-analytical CPU timer is already active")
+    previous_handler = signal.signal(signal.SIGPROF, signal.SIG_DFL)
+    signal.setitimer(signal.ITIMER_PROF, budget_s)
+    try:
+        return call()
+    finally:
+        signal.setitimer(signal.ITIMER_PROF, 0.0)
+        signal.signal(signal.SIGPROF, previous_handler)
 
 
 class _IsolatedCellWorker:
@@ -3752,9 +3940,22 @@ class _IsolatedCellWorker:
                     detail=str(exc),
                 ) from exc
             except EngineWorkerDied as exc:
+                cpu_signal = getattr(signal, "SIGPROF", None)
+                cpu_budget_fired = (
+                    self.engine == "internal-analytical"
+                    and cpu_signal is not None
+                    and exc.returncode == -int(cpu_signal)
+                )
                 raise _IsolatedCellWorkerFailure(
+                    timed_out=cpu_budget_fired,
                     returncode=exc.returncode,
                     detail=exc.detail,
+                    timeout_reason=(
+                        "equilibrate exceeded hard CPU budget of "
+                        f"{_INTERNAL_ANALYTICAL_CPU_BUDGET_S:g}s"
+                        if cpu_budget_fired
+                        else None
+                    ),
                 ) from exc
             except EngineWorkerRemoteError as exc:
                 raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
@@ -3847,6 +4048,7 @@ def _run_cell_in_subprocess(
             notices=notices,
             authority=authority,
             certified_band=certified_band,
+            timeout_reason=exc.timeout_reason,
         )
     try:
         cell = EquilibrateCell.from_payload(raw)

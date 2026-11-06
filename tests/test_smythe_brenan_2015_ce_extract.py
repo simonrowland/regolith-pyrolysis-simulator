@@ -12,7 +12,8 @@ from simulator.battery.enums import (
     ValenceValueForm,
     ValueKind,
 )
-from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from simulator.battery import migrate as battery_migrate
+from simulator.battery.migrate import Migrator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -91,7 +92,15 @@ def test_table3_ce_log_ratio_rows_match_render_and_migrate_with_conditions():
             for oxide, value in source_row["composition_wt_pct"].items()
             if oxide != "total"
         }
-        expected = wt_pct_to_mole_fraction(printed)
+        # The anhydrous oxides total 90.85 wt%; the separately printed H2O
+        # closes the row, so b-704 must use the same row context as migration.
+        converted = battery_migrate._wt_percent_conversion_state(
+            printed,
+            closure_context=source_row,
+            declared_component_map=source_row["composition_wt_pct"],
+        )
+        assert converted.is_value
+        expected = converted.value
         assert migrated_row.identity.composition.is_value
         assert migrated_row.identity.composition.value.components == expected.components
         point_composition = migrated_row.point_conditions["composition"].state.value

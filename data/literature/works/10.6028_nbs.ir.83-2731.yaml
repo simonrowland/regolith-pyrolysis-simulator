@@ -109,27 +109,45 @@ experiments:
       state:
         tag: value
         value:
-          Al2O3: '4.75'
-          B2O3: '6.49'
-          CaO: '1.01'
-          Cs2O: '0.07'
-          Fe2O3: '11.49'
-          Li2O: '3.96'
-          MgO: '0.54'
-          MnO2: '3.57'
-          Na2O: '8.59'
-          NiO: '1.8'
-          Re2O7: '0.03'
-          RuO2: '0.11'
-          SiO2: '53.76'
-          SrO: '0.05'
-          ZrO2: '3.79'
+          nominal:
+            SiO2: '52'
+            Fe2O3: '12.96'
+            Al2O3: '4.86'
+            B2O3: '7.29'
+            Li2O: '5.1'
+            Na2O: '10.13'
+            MnO2: '3.25'
+            NiO: '1.05'
+            CaO: '1.59'
+            MgO: '0.68'
+            ZrO2: '0.7'
+            SrO: '0.09'
+            Cs2O: '0.1'
+            RuO2: '0.09'
+            Re2O7: '0.1'
+          analytical:
+            SiO2: '53.76'
+            Fe2O3: '11.49'
+            Al2O3: '4.75'
+            B2O3: '6.49'
+            Li2O: '3.96'
+            Na2O: '8.59'
+            MnO2: '3.57'
+            NiO: '1.8'
+            CaO: '1.01'
+            MgO: '0.54'
+            ZrO2: '3.79'
+            SrO: '0.05'
+            Cs2O: '0.07'
+            RuO2: '0.11'
+            Re2O7: '0.03'
       locator:
-        published_page: 16
-        pdf_page_index: 22
-        figure: '7'
-        note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence, from
-          P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: SNW glass Table 1 Weight % columns; labels nominal and analytical as printed; Mole % columns not copied into
+          printed_composition; title Simulated Nuclear Waste (SNW) Glass Composition; footnote a Soper 1982; footnote b see
+          text for selection (nominal used for thermodynamic estimates)
   conditions:
     temperature_K:
       state:

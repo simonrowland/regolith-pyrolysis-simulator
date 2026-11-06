@@ -1,0 +1,729 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+observations:
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_eq10_current
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [930, 998]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, formula, formula_as_published,
+      formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed, equation_as_printed, T_range_as_printed,
+      uncertainty_as_printed, uncertainty_kind_as_printed, confidence_level, status, schema_gap, method_class_reason, derivation'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 4
+    published_page: 178
+    equation: '10'
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+  derivation:
+    relation: Equation (10) is calculated from the authors' cell-I emf measurements and the Na2O activity of the α-Al2O3 plus
+      Na-β-Al2O3 reference electrode adopted from Kale [12].
+    inputs: []
+    parameters: []
+    output_unit: J/mol
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 177
+        figure: '2'
+        note: Numeric cell-I emf readings are plotted in Figure 2 and are not tabulated; the activity relation is printed
+          as Equation (8) on page 178.
+    references: []
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_dai
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [773, 1030]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Dai et al. [10], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Dai et al. [10]
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_shaiu
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [795, 1048]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Shaiu et al. [11], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Shaiu et al. [11]
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1047_1278
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1047, 1278]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Yamaguchi et al. [8], 1047–1278 K
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_1278_1405
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1278, 1405]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Yamaguchi et al. [8], 1278–1405 K
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_yamaguchi_930_1047
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [930, 1047]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Yamaguchi et al. [8], 930–1047 K
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_635_785
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [635, 785]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, table_footnote_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zhang et al. [1], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Zhang et al. [1], 635–785 K
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+- observation_id: kale-srikanth-2000-sodium-ferrite-gibbs::kale_srikanth_1999_table1_zhang_834_1004
+  experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Fe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [834, 1004]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      formula, formula_as_published, formula_basis_note, property_as_printed, reference_state_as_printed, polymorph_as_printed,
+      equation_as_printed, T_range_as_printed, table_header_marker_as_printed, equation_marker_as_printed, table_footnote_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zhang et al. [1], as cited in Table I by Kale and Srikanth
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Zhang et al. [1], 834–1004 K
+  read_from: pdf:kale-srikanth-2000-sodium-ferrite-gibbs

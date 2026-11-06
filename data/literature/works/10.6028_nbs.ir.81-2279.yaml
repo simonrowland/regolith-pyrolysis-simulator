@@ -49,20 +49,20 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09165385576989872858295440087'
-          - - CaO
-            - '0.05233525556470525650915578215'
-          - - Fe2O3
-            - '0.06916111716920942071948801596'
           - - K2O
             - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
           - - MgO
             - '0.01916228849103378096819570357'
-          - - Na2O
-            - '0.006230518606008781778364755852'
           - - SiO2
             - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
           amount_basis: mole_fraction
           proxy_flag: initial_charge_only
       locator:
@@ -77,6 +77,26 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 71
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -91,26 +111,6 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              page: 71
-              published_page: 61
-              pdf_page_index: 70
-              figure: '11'
-              note: report figure page after captions; PDF page 71
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.8'
-            locator:
-              page: 71
-              published_page: 61
-              pdf_page_index: 70
-              figure: '11'
-              note: report figure page after captions; PDF page 71
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
             locator:
               page: 71
               published_page: 61
@@ -137,20 +137,20 @@ experiments:
               pdf_page_index: 70
               figure: '11'
               note: report figure page after captions; PDF page 71
-        - - original_K2O_wt_pct
+        - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '19.5'
+              value: '3.8'
             locator:
               page: 71
               published_page: 61
               pdf_page_index: 70
               figure: '11'
               note: report figure page after captions; PDF page 71
-        - - M_K2O_g_mol
+        - - M_CaO_g_mol
           - state:
               tag: value
-              value: '94.1956'
+              value: '56.077000000000005'
             locator:
               page: 71
               published_page: 61
@@ -177,26 +177,6 @@ experiments:
               pdf_page_index: 70
               figure: '11'
               note: report figure page after captions; PDF page 71
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.5'
-            locator:
-              page: 71
-              published_page: 61
-              pdf_page_index: 70
-              figure: '11'
-              note: report figure page after captions; PDF page 71
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 71
-              published_page: 61
-              pdf_page_index: 70
-              figure: '11'
-              note: report figure page after captions; PDF page 71
         - - original_SiO2_wt_pct
           - state:
               tag: value
@@ -211,6 +191,26 @@ experiments:
           - state:
               tag: value
               value: '60.083'
+            locator:
+              page: 71
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 71
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
             locator:
               page: 71
               published_page: 61
@@ -778,20 +778,20 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09165385576989872858295440087'
-          - - CaO
-            - '0.05233525556470525650915578215'
-          - - Fe2O3
-            - '0.06916111716920942071948801596'
           - - K2O
             - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
           - - MgO
             - '0.01916228849103378096819570357'
-          - - Na2O
-            - '0.006230518606008781778364755852'
           - - SiO2
             - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
           amount_basis: mole_fraction
           proxy_flag: initial_charge_only
       locator:
@@ -807,6 +807,28 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 58
+              published_page: 52
+              pdf_page_index: 57
+              figure: '11'
+              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
+                11 on page 61 (PDF page 71).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 52
+              pdf_page_index: 57
+              figure: '11'
+              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
+                11 on page 61 (PDF page 71).
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -822,28 +844,6 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              page: 58
-              published_page: 52
-              pdf_page_index: 57
-              figure: '11'
-              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
-                11 on page 61 (PDF page 71).
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.8'
-            locator:
-              page: 58
-              published_page: 52
-              pdf_page_index: 57
-              figure: '11'
-              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
-                11 on page 61 (PDF page 71).
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
             locator:
               page: 58
               published_page: 52
@@ -873,10 +873,10 @@ experiments:
               figure: '11'
               note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
                 11 on page 61 (PDF page 71).
-        - - original_K2O_wt_pct
+        - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '19.5'
+              value: '3.8'
             locator:
               page: 58
               published_page: 52
@@ -884,10 +884,10 @@ experiments:
               figure: '11'
               note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
                 11 on page 61 (PDF page 71).
-        - - M_K2O_g_mol
+        - - M_CaO_g_mol
           - state:
               tag: value
-              value: '94.1956'
+              value: '56.077000000000005'
             locator:
               page: 58
               published_page: 52
@@ -917,28 +917,6 @@ experiments:
               figure: '11'
               note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
                 11 on page 61 (PDF page 71).
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.5'
-            locator:
-              page: 58
-              published_page: 52
-              pdf_page_index: 57
-              figure: '11'
-              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
-                11 on page 61 (PDF page 71).
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 58
-              published_page: 52
-              pdf_page_index: 57
-              figure: '11'
-              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
-                11 on page 61 (PDF page 71).
         - - original_SiO2_wt_pct
           - state:
               tag: value
@@ -954,6 +932,28 @@ experiments:
           - state:
               tag: value
               value: '60.083'
+            locator:
+              page: 58
+              published_page: 52
+              pdf_page_index: 57
+              figure: '11'
+              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
+                11 on page 61 (PDF page 71).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 58
+              published_page: 52
+              pdf_page_index: 57
+              figure: '11'
+              note: Caption identifies the open square as TMS, run 1, 1575 K. The plotted point was digitized from Figure
+                11 on page 61 (PDF page 71).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
             locator:
               page: 58
               published_page: 52
@@ -1062,10 +1062,10 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - CaO
-            - '0.1281402488755988200303977262'
           - - Na2O
             - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
           - - SiO2
             - '0.7076130412235072769887154639'
           amount_basis: mole_fraction
@@ -1081,26 +1081,6 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              page: 49
-              published_page: 43
-              pdf_page_index: 48
-              table: '3'
-              source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 49
-              published_page: 43
-              pdf_page_index: 48
-              table: '3'
-              source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
         - - original_Na2O_wt_pct
           - state:
               tag: value
@@ -1115,6 +1095,26 @@ experiments:
           - state:
               tag: value
               value: '61.978538560000004'
+            locator:
+              page: 49
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12'
+            locator:
+              page: 49
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
             locator:
               page: 49
               published_page: 43
@@ -1236,17 +1236,17 @@ experiments:
           basis: printed_oxides
           components:
           - - Al2O3
-            - '0.1797820613723733935429852059'
+            - '0.1797820613723733935429852061'
           - - Fe2O3
-            - '0.01942612938755720548152465747'
-          - - K2O
-            - '0.05538654380782761733608500684'
-          - - MgO
-            - '0.03673451472994322518534861615'
-          - - Na2O
-            - '0.002275054614640206303170828875'
+            - '0.01942612938755720548152465748'
           - - SiO2
-            - '0.7063956960876583521508856846'
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
           amount_basis: mole_fraction
           proxy_flag: initial_charge_only
       locator:
@@ -1296,6 +1296,24 @@ experiments:
               published_page: 58
               pdf_page_index: 63
               figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 64
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 64
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
         - - original_K2O_wt_pct
           - state:
               tag: value
@@ -1309,24 +1327,6 @@ experiments:
           - state:
               tag: value
               value: '94.1956'
-            locator:
-              page: 64
-              published_page: 58
-              pdf_page_index: 63
-              figure: '4'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '2.1'
-            locator:
-              page: 64
-              published_page: 58
-              pdf_page_index: 63
-              figure: '4'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
             locator:
               page: 64
               published_page: 58
@@ -1350,19 +1350,19 @@ experiments:
               published_page: 58
               pdf_page_index: 63
               figure: '4'
-        - - original_SiO2_wt_pct
+        - - original_MgO_wt_pct
           - state:
               tag: value
-              value: '60.2'
+              value: '2.1'
             locator:
               page: 64
               published_page: 58
               pdf_page_index: 63
               figure: '4'
-        - - M_SiO2_g_mol
+        - - M_MgO_g_mol
           - state:
               tag: value
-              value: '60.083'
+              value: '40.304'
             locator:
               page: 64
               published_page: 58

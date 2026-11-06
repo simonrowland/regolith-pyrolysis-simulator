@@ -728,11 +728,19 @@ observations:
       state:
         tag: value
         value:
-          SiO2: '79.26'
-          Na2O: '5.91'
-          B2O3: '8.41'
-          CaO: '0.89'
-          Al2O3: '5.53'
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '79.26'
+          - - Na2O
+            - '5.91'
+          - - B2O3
+            - '8.41'
+          - - CaO
+            - '0.89'
+          - - Al2O3
+            - '5.53'
       locator:
         page: 226
         pdf_page_index: 5

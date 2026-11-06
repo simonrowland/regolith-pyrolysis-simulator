@@ -5,12 +5,18 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO = Path(__file__).resolve().parents[2]
 SOSS = REPO / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
 AITHALA = REPO / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+KRESS = (
+    REPO
+    / "data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml"
+)
 AITHALA_ALLF_RUNS = {
     "aithala-2026-1800-30",
     "aithala-2026-1900-30",
@@ -32,6 +38,105 @@ def _composition(observation):
     state = observation.identity.composition
     assert state is not None and state.is_value
     return state.value
+
+
+def test_kress_table1_redox_rows_project_printed_conditions() -> None:
+    extract = yaml.safe_load(KRESS.read_text(encoding="utf-8"))
+    series = next(
+        item
+        for item in extract["species"]["Fe"]["observations"]
+        if item["observation_id"] == "kress_1988_table1_measured_redox_series"
+    )
+    experiment = next(
+        item
+        for item in extract["experiments"]
+        if item["experiment_id"] == "kress_1988_table1_equilibration_series"
+    )
+    assert experiment["ambient_pressure_evidence"] == {
+        "evidence_class": "gas_mixing",
+        "quote": (
+            "Oxygen fugacity was imposed by a furnace atmosphere consisting of a "
+            "CO-CO₂ gas mixture (Deines et al., 1974)."
+        ),
+        "locator": {
+            "published_page": 1269,
+            "pdf_page_index": 2,
+            "section": "Experimental Technique",
+        },
+    }
+    source_rows = series["values"]["rows"]
+    assert len(source_rows) == 63
+    printed_cells = {
+        "71": {
+            "T_C": "1461",
+            "log10_fO2": "-7.17",
+            "SiO2": "51.36",
+            "Fe2O3": "1.09",
+            "FeO": "10.34",
+        },
+        "B120": {
+            "T_C": "1632",
+            "log10_fO2": "-4.74",
+            "SiO2": "52.02",
+            "Fe2O3": "2.75",
+            "FeO": "10.01",
+        },
+    }
+    by_run = {str(row["experiment_id"]): row for row in source_rows}
+    run_101 = by_run["101"]
+    assert run_101["T_C"] == "1459"
+    assert run_101["log10_fO2"] == "-6.15"
+    assert run_101["oxide_wt_percent"] == {
+        "SiO2": "41.11",
+        "TiO2": "3.07",
+        "Al2O3": "14.36",
+        "Fe2O3": "2.06",
+        "Cr2O3": "0.02",
+        "FeO": "9.31",
+        "MnO": "0.41",
+        "MgO": "6.30",
+        "CaO": "18.02",
+        "Na2O": "1.42",
+        "K2O": "1.32",
+        "P2O5": "0.42",
+        "V2O3": "0.08",
+    }
+    for run_id, expected in printed_cells.items():
+        row = by_run[run_id]
+        assert row["T_C"] == expected["T_C"]
+        assert row["log10_fO2"] == expected["log10_fO2"]
+        assert row["oxide_wt_percent"]["SiO2"] == expected["SiO2"]
+        assert row["oxide_wt_percent"]["Fe2O3"] == expected["Fe2O3"]
+        assert row["Fe2O3_wt_pct"] == expected["Fe2O3"]
+        assert row["oxide_wt_percent"]["FeO"] == expected["FeO"]
+        assert str(row["FeO_wt_pct"]) == expected["FeO"]
+
+    result = _migrate(KRESS)
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "kress-carmichael-1988-iron-oxidation-stoichiometry"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(redox_rows) == 63
+    observed_runs = set()
+    for row in redox_rows:
+        conditions = row.point_conditions or {}
+        for key in ("temperature_K", "fO2_log", "composition"):
+            condition = conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table == "1"
+        run_id = conditions["fO2_log"].locator.record
+        observed_runs.add(run_id)
+        assert conditions["temperature_K"].locator.record == run_id
+        assert conditions["composition"].locator.record == run_id
+        assert row.identity.temperature_K is not None
+        assert row.identity.temperature_K.is_value
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_value
+    assert observed_runs == set(by_run)
 
 
 def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
@@ -136,10 +241,166 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
     assert all("fO2_log" in (row.point_conditions or {}) for row in redox_rows)
 
 
-def test_aithala_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
+def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
+    result = _migrate(AITHALA)
+    printed = {
+        "aithala-2026-vf271": {
+            "sample_id": "VF271",
+            "T_K": "1523.15",
+            "SiO2": "51.55",
+            "TiO2": "0.50",
+            "Al2O3": "11.65",
+            "FeOT": "12.07",
+            "MgO": "11.00",
+            "CaO": "8.32",
+            "Na2O": "3.07",
+            "K2O": "0.05",
+            "P2O5": "0.30",
+        },
+        "aithala-2026-vf267": {
+            "sample_id": "VF267",
+            "T_K": "1573.15",
+            "SiO2": "50.79",
+            "TiO2": "0.54",
+            "Al2O3": "9.98",
+            "FeOT": "14.26",
+            "MgO": "11.66",
+            "CaO": "6.85",
+            "Na2O": "3.05",
+            "K2O": "0.06",
+            "P2O5": "0.27",
+        },
+        "aithala-2026-vf231": {
+            "sample_id": "VF231",
+            "T_K": "1638.15",
+            "SiO2": "47.20",
+            "TiO2": "0.49",
+            "Al2O3": "10.68",
+            "FeOT": "15.94",
+            "MgO": "11.81",
+            "CaO": "7.67",
+            "Na2O": "3.28",
+            "K2O": "0.04",
+            "P2O5": "0.48",
+        },
+        "aithala-2026-vf268": {
+            "sample_id": "VF268",
+            "T_K": "1673.15",
+            "SiO2": "47.99",
+            "TiO2": "0.49",
+            "Al2O3": "10.95",
+            "FeOT": "14.94",
+            "MgO": "12.40",
+            "CaO": "7.67",
+            "Na2O": "2.72",
+            "K2O": "0.06",
+            "P2O5": "0.27",
+        },
+        "aithala-2026-vf270": {
+            "sample_id": "VF270",
+            "T_K": "1723.15",
+            "SiO2": "47.96",
+            "TiO2": "0.52",
+            "Al2O3": "11.04",
+            "FeOT": "14.87",
+            "MgO": "12.43",
+            "CaO": "7.66",
+            "Na2O": "3.00",
+            "K2O": "0.05",
+            "P2O5": "0.35",
+        },
+        "aithala-2026-vf274": {
+            "sample_id": "VF274",
+            "T_K": "1773.15",
+            "SiO2": "47.92",
+            "TiO2": "0.49",
+            "Al2O3": "11.16",
+            "FeOT": "15.04",
+            "MgO": "12.48",
+            "CaO": "7.76",
+            "Na2O": "3.06",
+            "K2O": "0.07",
+            "P2O5": "0.29",
+        },
+    }
+    extract = yaml.safe_load(AITHALA.read_text(encoding="utf-8"))
+    source_rows = {
+        item["observation_id"]: item
+        for item in extract["species"]["Fe"]["observations"]
+    }
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+        and row.experiment_id.rsplit("::", 1)[-1] in printed
+    ]
+    assert len(redox_rows) == 10
+    assert {row.experiment_id.rsplit("::", 1)[-1] for row in redox_rows} == set(
+        printed
+    )
+    for row in redox_rows:
+        run_id = row.experiment_id.rsplit("::", 1)[-1]
+        sample = printed[run_id]
+        source = source_rows[row.observation_id.rsplit("::", 1)[-1]]
+        assert source["values"]["sample_id"] == sample["sample_id"]
+        expected = wt_pct_to_mole_fraction(
+            {
+                key: Decimal(value)
+                for key, value in sample.items()
+                if key not in {"sample_id", "T_K"}
+            }
+        )
+        assert _composition(row) == expected
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == Decimal(sample["T_K"])
+        point = row.point_conditions
+        assert point["temperature_K"].state.is_value
+        assert point["temperature_K"].locator.table == "S-1"
+        assert point["fO2_log"].state.is_value
+        assert point["fO2_log"].state.value == Decimal("-0.68")
+        assert point["fO2_log"].locator.table == "S-1"
+        assert point["composition"].state.is_value
+        assert point["composition"].state.value == expected
+        assert point["composition"].locator.table == "S-2"
+
+
+def test_aithala_s1_uncertainties_keep_printed_cells_without_inferred_level() -> None:
+    extract = yaml.safe_load(AITHALA.read_text(encoding="utf-8"))
+    rows = [
+        item
+        for item in extract["species"]["Fe"]["observations"]
+        if item.get("locator", {}).get("table") == "S-1"
+        and item.get("values", {}).get("quantity") == "fe3_fe2_ratio"
+    ]
+    assert len(rows) == 16
+    assert all("Fig. 1" not in row["uncertainty"]["Fe3_over_FeT"] for row in rows)
+    vf271 = next(row for row in rows if row["values"]["sample_id"] == "VF271")
+    assert vf271["uncertainty"]["Fe3_over_FeT"] == (
+        "±0.019 (as printed; confidence level not specified in Table S-1)"
+    )
+
+
+def test_aithala_own_composition_retains_its_printed_map() -> None:
+    result = _migrate(AITHALA)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition"
+    ]
+    printed = observation.point_conditions["printed_composition"]
+
+    assert printed.state.is_value
+    assert printed.locator is not None
+    # Green 4e3a09d90 stores this map with canonical names and central values
+    # (FeO* is total iron as FeOT); the closure guard does not change that.
+    assert printed.state.value["FeOT"] == "15.01"
+    assert printed.state.value["SiO2"] == "49.17"
+
+
+def test_aithala_vf_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
     extract = AITHALA.read_text(encoding="utf-8")
     extract = extract.replace(
-        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n",
+        "        quantity: fe3_fe2_ratio\n        sample_id: VF271\n",
         "        quantity: fe3_fe2_ratio\n        sample_id: unmatched-run\n",
         1,
     )
@@ -148,7 +409,7 @@ def test_aithala_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> 
 
     result = _migrate(path)
     observation = result.observations[
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes"
     ]
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
@@ -210,14 +471,14 @@ def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
         )
     ]
     assert len(aithala_rows) == 28
-    assert len(feot_rows) == 18
+    assert len(feot_rows) == 28
     projected_redox_rows = [
         row
         for row in feot_rows
         if row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
     ]
-    assert len(projected_redox_rows) == 6
+    assert len(projected_redox_rows) == 16
     missing_aithala_notice = [
         row.observation_id
         for row in projected_redox_rows

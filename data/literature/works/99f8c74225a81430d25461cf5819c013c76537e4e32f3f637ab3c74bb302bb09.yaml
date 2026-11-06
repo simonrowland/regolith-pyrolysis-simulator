@@ -36,7 +36,18 @@ experiments:
     tag: unknown
     reason: regime "Authors' chemical analysis; analytical method is not stated." is not a closed method token (kems_effusion
       alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=65.28 wt%
+          is below 95 wt%'
+      locator:
+        page: 9
+        published_page: 2
+        pdf_page_index: 8
+        table: '1'
+        note: row=Na2CaSiO4; column=measured analysis
   conditions:
     temperature_K:
       state:

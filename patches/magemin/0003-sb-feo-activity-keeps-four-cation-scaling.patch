@@ -1,0 +1,68 @@
+From a40d1495ba0d2a61bfe1fb946da3f47e1f4c1efb Mon Sep 17 00:00:00 2001
+From: Simon Rowland <simon@simonrowland.com>
+Date: Thu, 5 Nov 2026 00:13:31 -0500
+Subject: [PATCH] Keep the four-cation scaling in the sb FeO activity
+
+compute_activities() set G0_fper from the sb wustite end member and
+divided by 4 for EM_database 1 and 2 (sb21 and sb24, where wu is
+Fe4O4). The next statement then stored PP_db.gbase unconditionally.
+That second store is what made the tc path use fper at all: fper is
+one FeO, and the tc branch never assigned gbase itself. It also
+threw away the sb /4.
+
+The tc branch now stores PP_db.gbase inside the branch, with no /4.
+The unconditional store is removed. The sb /4 for EM_database 1 and
+2 is unchanged. sb11 wu is one FeO (EM_database 0), so that path
+does not divide and its activity is unchanged. The later Fe+O block
+is not part of this change.
+
+Repro on v1.9.6 with the periclase-reference fix already applied.
+R = 0.0083144 kJ/mol/K. Printed Gamma and gbase are kJ.
+
+sb21, --Temp=1600 C (1873.15 K), --Pres=100 kbar, --sys_in=mol,
+    --Bulk=38,3,2,8,48,1 (SiO2 CaO Al2O3 FeO MgO Na2O). The mw end
+members are pe, wu, anao and the wu row is Fe = 4.
+G_wu = -1246.65837 kJ, Gamma_FeO = -323.30963 kJ.
+  before aFeO = 5.599946e+25 = exp((Gamma_FeO - G_wu)/RT)
+  after  aFeO = 4.734460e-01 = exp((Gamma_FeO - G_wu/4)/RT)
+  relative difference of the printed value from that exponential
+  is -1.3e-07
+  assemblage unchanged: ol 0.71429, gtmj 0.09292, cpx 0.19280,
+  17 iterations, status 0. aSiO2, aAl2O3 and aMgO unchanged.
+
+sb11, same bulk, --Temp=1400 C, --Pres=20 kbar. wu is Fe = 1.
+aFeO = 1.893221e-01 before and after, which is
+exp((Gamma_FeO - G_wu)/RT) and not G_wu/4.
+23 iterations, ol + cpx + sp, unchanged.
+
+ig, --Temp=1599.85 C, --buffer=qfm --buffer_n=-3.205734. Kume 2000
+sample 305 and the MgO-50 sanity bulk, at 1e-6 bar and at 1 bar:
+aFeO, aMgO, aSiO2, aAl2O3, phase list, mole modes and iteration
+count are identical to the binary without this change.
+---
+ src/toolkit.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/toolkit.c b/src/toolkit.c
+index 49281e4..48f66b3 100644
+--- a/src/toolkit.c
++++ b/src/toolkit.c
+@@ -2026,6 +2026,10 @@ global_variable compute_activities(			int					 EM_database,
+ 		double G0_fper  = 0.0;
+ 		if (strcmp(gv.research_group, "tc") 	== 0 ){
+ 			PP_db  			= G_EM_function(gv.research_group, gv.EM_dataset, gv.len_ox,z_b.id,z_b.bulk_rock, z_b.apo, z_b.P, z_b.T , "fper", "equilibrium");
++			/* fper is one FeO, so tc stores gbase with no /4.
++			   The sb branch scales the 4-cation wu end member.
++			   Assigning gbase again after the branch discarded that /4. */
++			G0_fper 		= PP_db.gbase;
+ 		}
+ 		else if (strcmp(gv.research_group, "sb") 	== 0 ){
+ 			PP_db  			= G_EM_function(gv.research_group, gv.EM_dataset, gv.len_ox,z_b.id,z_b.bulk_rock, z_b.apo, z_b.P, z_b.T , "wu", "equilibrium");
+@@ -2034,7 +2038,6 @@ global_variable compute_activities(			int					 EM_database,
+ 				G0_fper /= 4.0;
+ 			}
+ 		}
+-		G0_fper  		= PP_db.gbase;//*PP_db.factor;
+ 		gv.system_aFeO  = exp( (gv.gam_tot[FeO_ix] - G0_fper) / (z_b.R*z_b.T));
+ 	}
+ 

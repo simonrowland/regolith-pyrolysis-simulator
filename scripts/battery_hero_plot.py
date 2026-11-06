@@ -17,9 +17,9 @@ has ``schema_version`` and, per rail and engine, the scorer's numeric count,
 RMS and median |dex|, attempted refusal count and scorer-reason counts,
 non-observable count, and open predict-and-flag notice counts by kind. Each row
 also carries all-rail attempted-refusal and non-observable counts per engine.
-Same-row benchmark RMS is stored separately for openimcc and internal-analytical
-against the best comparison engine (vaporock, thermoengine, alphamelts, or
-magemin); unavailable benchmarks have a null engine and RMS with ``n=0``.
+Same-row comparisons are stored for openimcc and internal-analytical against
+every outside engine with shared rows, including both RMS values and the shared
+row count.
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ from simulator.battery.score import (  # noqa: E402
     _flagged_payload_strata,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
-    _paired_engine_rail_benchmarks,
+    _paired_engine_rail_comparisons,
     _residual_engine_observable,
 )
 
@@ -186,7 +186,7 @@ class ScorePlotData:
     hero_refusals: Mapping[tuple[str, str, str, str, str], int]
     hero_refusal_totals: Mapping[tuple[str, str, str], int]
     hero_diagnostics: Mapping[tuple[str, str], Mapping[str, object]]
-    hero_benchmarks: Mapping[tuple[str, str], Mapping[str, object]]
+    hero_comparisons: Mapping[tuple[str, str], Mapping[str, object]]
     hero_sweet_spot_cells: Mapping[
         tuple[str, str], tuple[Mapping[str, object], ...]
     ]
@@ -198,7 +198,7 @@ class ScorePlotData:
     hero_deck_metrics: Mapping[tuple[str, str], Mapping[str, object]] = field(
         default_factory=dict
     )
-    hero_deck_benchmarks: Mapping[tuple[str, str], Mapping[str, object]] = field(
+    hero_deck_comparisons: Mapping[tuple[str, str], Mapping[str, object]] = field(
         default_factory=dict
     )
     hero_deck_unavailable_axis_counts: Mapping[tuple[str, str], int] = field(
@@ -630,7 +630,7 @@ def read_scores(
     retained_rails = selected | HERO_AND_DECK_SOURCE_RAILS
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
-    benchmark_payloads: list[Mapping[str, object]] = []
+    comparison_payloads: list[Mapping[str, object]] = []
     deck_score_rows: list[Mapping[str, object]] = []
     sweet_spot_samples: list[tuple[str, str, object, object, object]] = []
     hero_composition_sio2: dict[str, float] = {}
@@ -755,7 +755,7 @@ def read_scores(
                         summary.non_dex_rows += 1
                     continue
                 if rail in HERO_RAILS:
-                    benchmark_payloads.append(row)
+                    comparison_payloads.append(row)
                 if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
                     deck_score_rows.append(_battery_hero_deck_payload(row))
 
@@ -905,10 +905,10 @@ def read_scores(
     else:
         x_limits = (0.0, bin_width_K)
 
-    hero_benchmarks = {
+    hero_comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_benchmarks(
-            benchmark_payloads,
+        for record in _paired_engine_rail_comparisons(
+            comparison_payloads,
             primary_engines=HERO_PRIMARY_ENGINES,
             comparison_engines=HERO_COMPARISON_ENGINES,
             rails=HERO_RAILS,
@@ -940,7 +940,7 @@ def read_scores(
         hero_refusals=dict(hero_refusals),
         hero_refusal_totals=dict(hero_refusal_totals),
         hero_diagnostics=_normalized_hero_diagnostics(hero_diagnostics),
-        hero_benchmarks=hero_benchmarks,
+        hero_comparisons=hero_comparisons,
         hero_sweet_spot_cells={
             key: tuple(cells)
             for key, cells in sorted(hero_sweet_spot_groups.items())
@@ -951,7 +951,7 @@ def read_scores(
         bin_width_K=bin_width_K,
         hero_deck_points=tuple(deck_records["points"]),
         hero_deck_metrics=deck_records["metrics"],
-        hero_deck_benchmarks=deck_records["benchmarks"],
+        hero_deck_comparisons=deck_records["comparisons"],
         hero_deck_unavailable_axis_counts=deck_records[
             "unavailable_axis_counts"
         ],
@@ -1022,9 +1022,9 @@ def _history_fields_from_scores(
                 and numeric.get("value") is not None
             ):
                 rows.append(row)
-    benchmarks = {
+    comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_benchmarks(
+        for record in _paired_engine_rail_comparisons(
             rows,
             primary_engines=HERO_PRIMARY_ENGINES,
             comparison_engines=HERO_COMPARISON_ENGINES,
@@ -1043,7 +1043,7 @@ def _history_fields_from_scores(
         for rail in sorted(rails)
         for engine in sorted(engines)
     ]
-    return benchmarks, _normalized_hero_diagnostics(diagnostics), coverage
+    return comparisons, _normalized_hero_diagnostics(diagnostics), coverage
 
 
 def _refusal_coverage_from_summaries(
@@ -1082,7 +1082,7 @@ def _history_record(
     summary: Mapping[str, Any],
     *,
     landing_sha: str,
-    benchmarks: Mapping[tuple[str, str], Mapping[str, object]],
+    comparisons: Mapping[tuple[str, str], Mapping[str, object]],
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
     refusal_coverage: Sequence[Mapping[str, object]] = (),
     commit_date: str | None = None,
@@ -1144,12 +1144,12 @@ def _history_record(
     store = store if isinstance(store, Mapping) else {}
     return {
         "kind": "battery_hero_history",
-        "schema_version": 1,
+        "schema_version": 2,
         "store_sha": landing_sha,
         "store_revision": store.get("revision"),
         "commit_date": commit_date or _git_commit_date(landing_sha),
         "metrics": metrics,
-        "benchmarks": [benchmarks[key] for key in sorted(benchmarks)],
+        "comparisons": [comparisons[key] for key in sorted(comparisons)],
         "refusal_coverage": [dict(item) for item in refusal_coverage],
     }
 
@@ -1158,17 +1158,17 @@ def history_record_from_archive(
     archive_path: Path,
     *,
     landing_sha: str,
-    benchmarks: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
+    comparisons: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     refusal_coverage: Sequence[Mapping[str, object]] | None = None,
 ) -> dict[str, Any]:
     summary = _archive_json_member(archive_path, "data/battery/score-summary.json")
-    if benchmarks is None or diagnostics is None or refusal_coverage is None:
-        streamed_benchmarks, streamed_diagnostics, streamed_coverage = (
+    if comparisons is None or diagnostics is None or refusal_coverage is None:
+        streamed_comparisons, streamed_diagnostics, streamed_coverage = (
             _history_fields_from_scores(archive_path)
         )
-        if benchmarks is None:
-            benchmarks = streamed_benchmarks
+        if comparisons is None:
+            comparisons = streamed_comparisons
         if diagnostics is None:
             diagnostics = streamed_diagnostics
         if refusal_coverage is None:
@@ -1176,7 +1176,7 @@ def history_record_from_archive(
     return _history_record(
         summary,
         landing_sha=landing_sha,
-        benchmarks=benchmarks,
+        comparisons=comparisons,
         diagnostics=diagnostics,
         refusal_coverage=refusal_coverage,
     )
@@ -2224,8 +2224,9 @@ def _draw_hero_history(
     metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
         lambda: {"rms_dex": [], "median_abs_dex": []}
     )
-    paired_primary_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
-    benchmark_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
+    comparison_points: dict[
+        tuple[str, str], list[tuple[float, float, float, int]]
+    ] = defaultdict(list)
     history_engines: set[str] = set()
     history_dates: list[float] = []
     history_rows = 0
@@ -2246,27 +2247,35 @@ def _draw_hero_history(
                     if value is not None:
                         metrics_by_engine[engine][field_name].append((date, value))
                         history_engines.add(engine)
-        benchmarks = entry.get("benchmarks")
-        if isinstance(benchmarks, Sequence) and not isinstance(benchmarks, (str, bytes)):
-            for benchmark in benchmarks:
-                if not isinstance(benchmark, Mapping) or benchmark.get("rail") != rail:
+        comparisons = entry.get("comparisons")
+        if isinstance(comparisons, Sequence) and not isinstance(comparisons, (str, bytes)):
+            for record in comparisons:
+                if not isinstance(record, Mapping) or record.get("rail") != rail:
                     continue
-                primary = str(benchmark.get("primary_engine") or "unknown")
-                primary_value = _finite_float(benchmark.get("primary_rms_dex"))
-                value = _finite_float(benchmark.get("benchmark_rms_dex"))
-                if (
-                    benchmark.get("benchmark_engine") is None
-                    or primary_value is None
-                    or value is None
-                    or int(benchmark.get("n") or 0) == 0
-                ):
+                primary = str(record.get("primary_engine") or "unknown")
+                rows = record.get("comparisons")
+                if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
                     continue
-                paired_primary_points[primary].append((date, primary_value))
-                benchmark_points[primary].append((date, value))
-                history_engines.add(primary)
-                history_engines.add(str(benchmark.get("benchmark_engine")))
+                for comparison in rows:
+                    if not isinstance(comparison, Mapping):
+                        continue
+                    engine = str(comparison.get("engine") or "unknown")
+                    primary_value = _finite_float(
+                        comparison.get("primary_rms_dex_on_shared")
+                    )
+                    outside_value = _finite_float(
+                        comparison.get("outside_rms_dex")
+                    )
+                    n_shared = int(comparison.get("n_shared") or 0)
+                    if primary_value is None or outside_value is None or n_shared < 1:
+                        continue
+                    comparison_points[(primary, engine)].append(
+                        (date, primary_value, outside_value, n_shared)
+                    )
+                    history_engines.add(primary)
+                    history_engines.add(engine)
 
-    if not metrics_by_engine and not paired_primary_points and not benchmark_points:
+    if not metrics_by_engine and not comparison_points:
         axis.set_axis_off()
         axis.text(
             0.5,
@@ -2301,30 +2310,40 @@ def _draw_hero_history(
                 label=f"{engine} {label}",
             )
     for primary in HERO_PRIMARY_ENGINES:
-        primary_points = sorted(paired_primary_points[primary])
-        if primary_points:
+        for outside_engine in HERO_COMPARISON_ENGINES:
+            points = sorted(comparison_points[(primary, outside_engine)])
+            if not points:
+                continue
+            dates = [date for date, _primary, _outside, _n in points]
             axis.plot(
-                [date for date, _value in primary_points],
-                [value for _date, value in primary_points],
+                dates,
+                [value for _date, value, _outside, _n in points],
                 color=engine_colors.get(primary, "#333333"),
                 linestyle="-.",
                 marker="s",
                 markersize=3,
                 linewidth=1.0,
-                label=f"{primary} same-row RMS",
+                label=f"{primary} paired with {outside_engine}",
             )
-        comparison_points = sorted(benchmark_points[primary])
-        if comparison_points:
             axis.plot(
-                [date for date, _value in comparison_points],
-                [value for _date, value in comparison_points],
-                color=engine_colors.get(primary, "#555555"),
+                dates,
+                [value for _date, _primary, value, _n in points],
+                color=engine_colors.get(outside_engine, "#555555"),
                 linestyle=":",
                 marker="D",
                 markersize=3,
                 linewidth=1.1,
-                label=f"best comparison vs {primary}",
+                label=f"{outside_engine} vs {primary}",
             )
+            for index, (date, _primary, value, n_shared) in enumerate(points):
+                axis.annotate(
+                    f"n_shared={_compact_count(n_shared)}",
+                    (date, value),
+                    textcoords="offset points",
+                    xytext=(0, 4 + index % 3 * 4),
+                    ha="center",
+                    fontsize=4.5,
+                )
 
     if history_rows == 0:
         axis.text(
@@ -2391,8 +2410,8 @@ def _hero_summary_payload(
                 )
                 for engine, metric in current_metrics.items()
             },
-            "same_row_benchmarks_by_primary_engine": {
-                engine: data.hero_benchmarks[(rail, engine)]
+            "same_row_comparisons_by_primary_engine": {
+                engine: data.hero_comparisons[(rail, engine)]
                 for engine in HERO_PRIMARY_ENGINES
             },
         }
@@ -2671,7 +2690,9 @@ def render_hero_charts(
 
         status_lines: list[str] = []
         for engine in HERO_PRIMARY_ENGINES:
-            benchmark = data.hero_benchmarks[(rail, engine)]
+            comparisons = data.hero_comparisons[(rail, engine)].get(
+                "comparisons", ()
+            )
             metric = data.hero_all_numeric_metrics.get((rail, engine))
             all_numeric_rms = _format_dex(None if metric is None else metric.get("rms_dex"))
             all_numeric_rms_label = (
@@ -2682,18 +2703,24 @@ def render_hero_charts(
             all_numeric_count = _compact_count(
                 0 if metric is None else metric.get("n_dex", 0)
             )
-            if benchmark.get("benchmark_engine") is None:
-                status_lines.append(
-                    f"{engine}: benchmark unavailable (same-row n=0) · "
-                    f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
-                )
-            else:
-                status_lines.append(
-                    f"{engine}: same-row RMS {_format_dex(benchmark.get('primary_rms_dex'))} dex "
-                    f"(n={_compact_count(benchmark.get('n'))}) vs "
-                    f"{benchmark.get('benchmark_engine')} {_format_dex(benchmark.get('benchmark_rms_dex'))} dex · "
-                    f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
-                )
+            comparison_labels = [
+                f"{comparison.get('engine')} RMS "
+                f"{_format_dex(comparison.get('outside_rms_dex'))} dex vs "
+                f"{engine} RMS "
+                f"{_format_dex(comparison.get('primary_rms_dex_on_shared'))} dex "
+                f"(n_shared={_compact_count(comparison.get('n_shared'))})"
+                for comparison in comparisons
+                if isinstance(comparison, Mapping)
+            ]
+            same_row_label = (
+                "; ".join(comparison_labels)
+                if comparison_labels
+                else "no same-row comparisons (n_shared=0)"
+            )
+            status_lines.append(
+                f"{engine}: {same_row_label} · "
+                f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
+            )
         not_observable = [
             f"{engine} {_compact_count(diagnostic.get('not_observable_count'))}"
             for (diagnostic_rail, engine), diagnostic in sorted(
@@ -2757,7 +2784,7 @@ def render_hero_charts(
             )
         caption = (
             "Scatter marker face=engine colour; flagged/extrapolated=white face with engine-coloured edge. "
-            "History: solid=RMS, dashed=median |dex|, dash-dot=paired RMS, dotted=best same-row benchmark. "
+            "History: solid=RMS, dashed=median |dex|, dash-dot=paired RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
             "Sweet-spot fill=median |dex|; cell label=n; 1≤n<3 is grey and hatched; n=0 is blank."
         )
         if rail == Rail.MELT_ACTIVITY.value:
@@ -2806,25 +2833,35 @@ def render_hero_charts(
     return files
 
 
-def _hero_deck_benchmark_caption(
+def _hero_deck_comparison_caption(
     data: ScorePlotData, chart: str
 ) -> str:
     entries: list[str] = []
     for primary in HERO_PRIMARY_ENGINES:
         metric = data.hero_deck_metrics.get((chart, primary), {})
-        benchmark = data.hero_deck_benchmarks.get((chart, primary), {})
+        record = data.hero_deck_comparisons.get((chart, primary), {})
         count = int(metric.get("n") or 0)
-        benchmark_engine = benchmark.get("benchmark_engine")
-        benchmark_count = int(benchmark.get("n") or 0)
-        if benchmark_engine is None or benchmark_count == 0:
-            entries.append(f"{primary}: best comparison unavailable (n=0)")
+        comparisons = record.get("comparisons", ())
+        if not isinstance(comparisons, Sequence) or isinstance(
+            comparisons, (str, bytes)
+        ):
+            comparisons = ()
+        if not comparisons:
+            entries.append(
+                f"{primary}: no shared chart rows (n_shared=0; scored n={_compact_count(count)})"
+            )
             continue
-        entries.append(
-            f"{primary} {_format_dex(benchmark.get('primary_rms_dex'))} vs "
-            f"{benchmark_engine} {_format_dex(benchmark.get('benchmark_rms_dex'))} "
-            f"dex (n={_compact_count(benchmark_count)}; scored n={_compact_count(count)})"
+        entries.extend(
+            f"{primary}: {comparison.get('engine')} RMS "
+            f"{_format_dex(comparison.get('outside_rms_dex'))} vs "
+            f"{primary} RMS "
+            f"{_format_dex(comparison.get('primary_rms_dex_on_shared'))} dex "
+            f"(n_shared={_compact_count(comparison.get('n_shared'))}; "
+            f"scored n={_compact_count(count)})"
+            for comparison in comparisons
+            if isinstance(comparison, Mapping)
         )
-    return "Best comparison on chart rows: " + "; ".join(entries)
+    return "Same-row comparisons on chart rows: " + "; ".join(entries)
 
 
 def _hero_deck_refusal_entries(
@@ -3046,7 +3083,7 @@ def render_hero_deck_charts(
             wspace=0.34,
         )
         figure.suptitle(title, fontsize=10, y=0.985)
-        caption = _hero_deck_benchmark_caption(data, chart)
+        caption = _hero_deck_comparison_caption(data, chart)
         if chart == "residue_composition":
             caption += " · fraction evaporated: no typed mass-loss value yet (t-1312)"
         elif chart in {"redox_sensitivity", "sio_evolution"}:
@@ -3651,7 +3688,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         record = _history_record(
             summary,
             landing_sha=args.landing_sha,
-            benchmarks=data.hero_benchmarks,
+            comparisons=data.hero_comparisons,
             diagnostics=data.hero_diagnostics,
             refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
         )

@@ -1,0 +1,74 @@
+source_id: barin-1995
+source:
+  citation: "Barin, I. (1995). Thermochemical Data of Pure Substances (3rd ed.). VCH."
+extraction:
+  method: >-
+    Map the unnumbered FeNaO2 table's printed Cp, S, H-H298, and delta Hf
+    columns, plus the separate References block. table_index is the MinerU
+    draft index used only to compare cells; the source prints no table number.
+  date: '2026-11-04'
+  worker: w1104nf-barin
+review_status: draft
+tables:
+- page: 823
+  published_page: 708
+  table_index: 4465
+  type: heat_capacity_and_heat_content_series
+  quantity: multiple_mapped_quantities
+  unit: as printed by column
+  values:
+  - column: 3
+    species: NaFeO2
+    quantity: cp
+    phase: cr
+    unit: J/mol/K
+    evidence_class: compilation_assessed
+  - column: 4
+    species: NaFeO2
+    quantity: S
+    phase: cr
+    unit: J/mol/K
+    evidence_class: compilation_assessed
+  - column: 7
+    species: NaFeO2
+    quantity: H_minus_H298
+    phase: cr
+    unit: kJ/mol
+    evidence_class: compilation_assessed
+  - column: 9
+    species: NaFeO2
+    quantity: delta_fH
+    phase: cr
+    unit: kJ/mol
+    evidence_class: compilation_assessed
+  render_verified:
+  - row: 13
+    column: 9
+  - row: 17
+    column: 7
+  - row: 18
+    column: 7
+  - row: 19
+    column: 4
+  - row: 19
+    column: 6
+  - row: 20
+    column: 7
+  - row: 21
+    column: 7
+- page: 823
+  published_page: 708
+  table_index: 4466
+  type: transition_point
+  quantity: transition_temperature
+  unit: K
+  values:
+  - column: 5
+    species: NaFeO2
+    quantity: transition_temperature
+    phase: cr
+    unit: K
+    evidence_class: compilation_assessed
+  render_verified:
+  - row: 2
+    column: 5

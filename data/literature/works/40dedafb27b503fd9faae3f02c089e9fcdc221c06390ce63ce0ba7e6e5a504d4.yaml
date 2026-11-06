@@ -1,0 +1,67 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 40dedafb27b503fd9faae3f02c089e9fcdc221c06390ce63ce0ba7e6e5a504d4
+  citation: 'Mysen, B.O., Virgo, D. & Seifert, F.A. (1984), Redox equilibria of iron in alkaline earth silicate melts: relationships
+    between melt structure, oxygen fugacity, temperature and properties of iron-bearing silicate liquids. American Mineralogist
+    69, 834–847.'
+  source_ids:
+  - mysen-1984-alkaline-earth-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
+    files:
+    - asset_id: pdf:mysen-1984-alkaline-earth-redox
+      role: pdf
+      path: raw/mysen-1984-alkaline-earth-redox/mysen-1984-alkaline-earth-redox.pdf
+      sha256:
+        tag: value
+        value: c5d27b6cb07ad5bc14ac84511c73394074ab2356c73a29a3c8a962b776f4418d
+    - asset_id: pdftotext:mysen-1984-alkaline-earth-redox
+      role: pdftotext
+      path: text/mysen-1984-alkaline-earth-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:mysen-1984-alkaline-earth-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 40dedafb27b503fd9faae3f02c089e9fcdc221c06390ce63ce0ba7e6e5a504d4::experiment::mysen_1984_alkaline_earth_redox
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'CO–CO2 gas mixing controlled furnace oxygen fugacity; Mössbauer spectra were fitted to determine Fe3+/ΣFe.'
+      is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 40dedafb27b503fd9faae3f02c089e9fcdc221c06390ce63ce0ba7e6e5a504d4
+  locator:
+    page: 2
+    published_page: 835
+    pdf_page_index: 1
+    section: Experimental methods

@@ -113,6 +113,17 @@ def test_series_row_extra_ignores_derived_from() -> None:
     )
 
 
+def test_series_row_extra_preserves_species_annotation_identity() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    row = {"sample": "FeTiO3", "T_C": 700.0, "mass_loss_pct": 37.0}
+    explicit = {**row, "species_as_printed": "FeTiO3"}
+    different = {**row, "species_as_printed": "FeO"}
+
+    assert series_row_extra(explicit) == series_row_extra(row)
+    assert series_row_extra(different) != series_row_extra(row)
+
+
 def test_series_row_extra_uses_sample_and_content_fingerprint() -> None:
     from simulator.battery.stable_ids import series_point_id, series_row_extra
 
