@@ -2314,8 +2314,10 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     ]["Ca"]["P_reference_Antoine_Pa"]
     assert ca_reference.hex() == "0x1.811d48ae3e8dbp+16"
     assert result.diagnostic["vapor_pressures_Pa"]["Ca"] > 0.0
+    # d-349 converts liquid-referenced CaO activity to the crystalline
+    # JANAF CaO(s) Ellingham basis before coupling the pressure.
     assert result.diagnostic["vapor_pressures_Pa"]["Ca"].hex() == (
-        "0x1.a2f3f64f221b0p-15"
+        "0x1.529aba65ce211p-11"
     )
     extrapolation = result.diagnostic[
         "extrapolated_beyond_valid_range_K"
