@@ -2074,6 +2074,7 @@ def _hero_metric_row(
     *,
     temperature_K: str | None = None,
     source_id: str | None = None,
+    source_disagreement_flagged: bool = False,
     species: str = "SiO",
     rail: str = "vapour",
 ) -> dict[str, object]:
@@ -2086,13 +2087,21 @@ def _hero_metric_row(
     }
     if source_id is not None:
         candidate["source_id"] = source_id
-    return {
+    row = {
         "rail": rail,
         "reference": reference,
         "candidate_request": {"engine": engine},
         "candidate_observation": candidate,
         "numeric": {"operation": "dex", "value": value},
     }
+    if source_disagreement_flagged:
+        row["notices"] = [
+            {
+                "kind": "source_disagreement",
+                "reason": "source_internally_inconsistent:JANAF cross-check",
+            }
+        ]
+    return row
 
 
 def test_hero_metrics_use_population_sd_and_measured_temperature_views() -> None:
@@ -2227,6 +2236,55 @@ def test_openimcc_vaporock_pair_metrics_split_by_species_and_temperature() -> No
     assert sio["views"]["temperature_ge_1700"]["n_shared"] == 1
     assert na["n_shared"] == 2
     assert na["views"]["all"]["outside_rms_dex"] is None
+
+
+def test_vapour_metrics_split_source_disagreement_rows_and_shared_pairs() -> None:
+    rows = [
+        _hero_metric_row(
+            engine,
+            "flagged",
+            value,
+            temperature_K="1800",
+            source_disagreement_flagged=True,
+        )
+        for engine, value in (("openimcc", "-3"), ("vaporock", "-2"))
+    ] + [
+        _hero_metric_row(
+            engine,
+            "unflagged",
+            value,
+            temperature_K="1500",
+        )
+        for engine, value in (("openimcc", "1"), ("vaporock", "2"))
+    ]
+
+    metrics = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    all_view = metrics["views"]["all"]
+    flagged = all_view["source_disagreement_flagged"]
+    unflagged = all_view["unflagged"]
+    assert flagged["n"] == unflagged["n"] == 1
+    assert flagged["rms_dex"] == "3"
+    assert flagged["sd_dex"] == "0"
+    assert flagged["median_abs_dex"] == "3"
+    assert unflagged["rms_dex"] == "1"
+    assert all_view["temperature_ge_1700"]["source_disagreement_flagged"]["n"] == 1
+    assert all_view["temperature_lt_1700"]["unflagged"]["n"] == 1
+
+    paired = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+    )[0]["comparisons"][0]
+    paired_all = paired["views"]["all"]
+    assert paired_all["source_disagreement_flagged"]["n_shared"] == 1
+    assert paired_all["source_disagreement_flagged"]["outside_rms_dex"] == "2"
+    assert paired_all["source_disagreement_flagged"]["primary_rms_dex_on_shared"] == "3"
+    assert paired_all["unflagged"]["n_shared"] == 1
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
