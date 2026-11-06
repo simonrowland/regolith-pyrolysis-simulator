@@ -15,6 +15,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    _activity_for_crystalline_vapor_k,
 )
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
@@ -307,22 +308,25 @@ def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
     assert notice["log10_activity_offset"] is None
 
 
-def test_d349_fe_vapor_pressure_is_continuous_at_1650k(
-    vapor_pressure_data,
-):
-    composition = {"FeO": 25.0, "SiO2": 75.0}
-    below = _builtin_pressure_projection(
-        vapor_pressure_data,
-        composition,
-        temperature_C=1650.0 - 1.0e-6 - 273.15,
-        pO2_bar=1.0,
-    )["vapor_pressures_Pa"]["Fe"]
-    above = _builtin_pressure_projection(
-        vapor_pressure_data,
-        composition,
-        temperature_C=1650.0 + 1.0e-6 - 273.15,
-        pO2_bar=1.0,
-    )["vapor_pressures_Pa"]["Fe"]
+def test_d349_fe_activity_conversion_is_continuous_at_1650k():
+    below = _activity_for_crystalline_vapor_k(
+        "FeO",
+        1.0,
+        1650.0 - 1.0e-6,
+        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="solid",
+    )[0]
+    above = _activity_for_crystalline_vapor_k(
+        "FeO",
+        1.0,
+        1650.0 + 1.0e-6,
+        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        target_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="liquid",
+    )[0]
 
     assert below == pytest.approx(above, rel=1.0e-6, abs=0.0)
 def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
