@@ -23,6 +23,12 @@ RENDERED_TABLE_8 = {
     "Na4FeO3": "-289180 + 82.69T",
 }
 
+TABLE_8_CAPTION_REACTIONS = {
+    "Na2FeO2": "2 Na(l) + Fe(s) + O2(g) -> Na2FeO2(s)",
+    "NaFeO2": "Na(l) + Fe(s) + O2(g) -> NaFeO2(s)",
+    "Na4FeO3": "4 Na(l) + Fe(s) + 1.5 O2(g) -> Na4FeO3(s)",
+}
+
 
 def _document() -> dict[str, object]:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -60,6 +66,18 @@ def test_fe_table_rows_and_rendered_cells_detect_mutation() -> None:
         if species in RENDERED_TABLE_8
     }
     assert stored == RENDERED_TABLE_8
+    stored_reactions = {
+        species: next(
+            row for row in observations["observations"]
+            if row["observation_id"] == f"shaiu_1976_table8_{species.lower()}"
+        )["values"]["reaction"]
+        for species, observations in document["species"].items()
+        if species in TABLE_8_CAPTION_REACTIONS
+    }
+    assert stored_reactions == TABLE_8_CAPTION_REACTIONS
+    assert document["species"]["Na4FeO3"]["context"][0]["values"][
+        "method_class"
+    ] == "quoted_attributed"
 
     na2feo2_rows = next(
         row for row in document["species"]["Na2FeO2"]["observations"]
@@ -70,6 +88,7 @@ def test_fe_table_rows_and_rendered_cells_detect_mutation() -> None:
         if row["observation_id"] == "shaiu_1976_table_a4_cell_vi"
     )["values"]["points"]
     assert len(na2feo2_rows) == 6
+    assert na2feo2_rows[0]["locator"] == {"page": 76, "row": "Cell V"}
     assert len(nafeo2_rows) == 20
     assert (nafeo2_rows[10]["T_K"], nafeo2_rows[10]["value"]) == (948, 1.2743)
     assert (nafeo2_rows[11]["T_K"], nafeo2_rows[11]["value"]) == (970, 1.2754)

@@ -79,7 +79,7 @@ species:
             note: Confidence level not stated.
           reduction: >-
             Formation-energy equation calculated from the Cell V emf fit and
-            literature thermodynamic functions, as stated in Table 8 footnote a.
+            literature thermodynamic functions.
           status: typed_refused_schema_gap
           schema_gap: >-
             The equation and temperature interval are preserved, but this
@@ -130,7 +130,7 @@ species:
           method: galvanic cell emf measurement
           cell_as_printed: Na2FeO2, NaF, FeO, Fe/CaF2/Ca
           points:
-            - {T_K: 843, value: 1.4248, locator: {page: 76, row: Cell V, point_conditions: {temperature_K: {state: {tag: value, value: {kind: point, point: '843'}}, locator: {page: 76, row: Cell V}}}}}
+            - {T_K: 843, value: 1.4248, locator: {page: 76, row: Cell V}}
             - {T_K: 858, value: 1.4220, locator: {page: 76, row: Cell V}}
             - {T_K: 870, value: 1.4246, locator: {page: 76, row: Cell V}}
             - {T_K: 889, value: 1.4249, locator: {page: 76, row: Cell V}}
@@ -166,7 +166,7 @@ species:
         values:
           quantity: delta_fG
           method_class: measured_reduced
-          reaction: 'Na(l) + 0.5 Fe(s) + 0.75 O2(g) -> NaFeO2(s)'
+          reaction: 'Na(l) + Fe(s) + O2(g) -> NaFeO2(s)'
           formula_as_printed: NaFeO2
           polymorph_as_printed: not stated
           equation_as_printed: '-173410 + 43.66T'
@@ -355,7 +355,7 @@ species:
           equation: '61-63'
         units: kcal/mol and cal/mol-K as printed
         values:
-          method_class: measured_reduced
+          method_class: quoted_attributed
           method: solution calorimetry
           calorimetry_attribution: Gross and Wilson [10]
           reaction: '2 Na2O + FeO -> Na4FeO3'
