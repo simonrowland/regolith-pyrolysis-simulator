@@ -217,6 +217,7 @@ species:
             table: '7'
             row: '1268.8'
             column: H_T-H_298.15
+            note: 'Table 7 footnote 1: shows pretransition effect.'
         - T_K: '1274.4'
           value: '26420'
           locator:
@@ -293,8 +294,7 @@ species:
       T_range_K:
       - 1549.1
       - 1619.2
-      phase: cr
-      phase_label_as_printed: measured values
+      phase: in melting range
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol
       values:
@@ -453,7 +453,8 @@ species:
       - 400.0
       - 870.0
       phase: cr
-      phase_label_as_printed: α
+      condensed_form:
+        polymorph: alpha
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol
       values:
@@ -527,18 +528,13 @@ species:
             column: H_T-H_298.15
             note: Table 8 marks this row as a transition point.
       per: mol_species
-      derived_from: &id001
+      derived_from:
       - cck60_nafeo2_table7_measured_cr_heat_content
-      - cck60_nafeo2_table7_melting_range_heat_content
-      - cck60_nafeo2_table7_measured_liquid_heat_content
       derivation:
         relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
           entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
         inputs:
         - cck60_nafeo2_table7_measured_cr_heat_content
-        - cck60_nafeo2_table7_melting_range_heat_content
-        - cck60_nafeo2_table7_measured_liquid_heat_content
-        - cck60_nafeo2_king_standard_entropy_29815
         page: 13
         table: '8'
     - observation_id: cck60_nafeo2_table8_α_entropy
@@ -554,7 +550,8 @@ species:
       - 400.0
       - 870.0
       phase: cr
-      phase_label_as_printed: α
+      condensed_form:
+        polymorph: alpha
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol/K
       values:
@@ -628,14 +625,13 @@ species:
             column: S_T°
             note: Table 8 marks this row as a transition point.
       per: mol_species
-      derived_from: *id001
+      derived_from:
+      - cck60_nafeo2_table7_measured_cr_heat_content
       derivation:
         relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
           entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
         inputs:
         - cck60_nafeo2_table7_measured_cr_heat_content
-        - cck60_nafeo2_table7_melting_range_heat_content
-        - cck60_nafeo2_table7_measured_liquid_heat_content
         - cck60_nafeo2_king_standard_entropy_29815
         page: 13
         table: '8'
@@ -652,7 +648,8 @@ species:
       - 870.0
       - 1270.0
       phase: cr
-      phase_label_as_printed: β
+      condensed_form:
+        polymorph: beta
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol
       values:
@@ -717,7 +714,10 @@ species:
             column: H_T-H_298.15
             note: Table 8 marks this row as a transition point.
       per: mol_species
-      derived_from: *id001
+      derived_from: &id001
+      - cck60_nafeo2_table7_measured_cr_heat_content
+      - cck60_nafeo2_table7_melting_range_heat_content
+      - cck60_nafeo2_table7_measured_liquid_heat_content
       derivation:
         relation: Authors smoothed the Table 7 measured heat-content values with the printed equations; Table 8
           entropies are calculated from the same smoothed heat-content functions and King’s S298.15 value.
@@ -741,7 +741,8 @@ species:
       - 870.0
       - 1270.0
       phase: cr
-      phase_label_as_printed: β
+      condensed_form:
+        polymorph: beta
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol/K
       values:
@@ -830,7 +831,8 @@ species:
       - 1270.0
       - 1620.0
       phase: cr
-      phase_label_as_printed: γ
+      condensed_form:
+        polymorph: gamma
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol
       values:
@@ -919,7 +921,8 @@ species:
       - 1270.0
       - 1620.0
       phase: cr
-      phase_label_as_printed: γ
+      condensed_form:
+        polymorph: gamma
       standard_state: Heat content is H(T) − H(298.15 K) as printed; no pressure is stated.
       units: cal/mol/K
       values:
@@ -1168,6 +1171,8 @@ species:
         column: property
       phase: cr
       phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
       units: cal/mol
       point_conditions:
         temperature_K:
@@ -1206,6 +1211,8 @@ species:
         column: property
       phase: cr
       phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
       units: cal/mol/K
       point_conditions:
         temperature_K:
@@ -1239,8 +1246,7 @@ species:
         page: 12
         published_page: 5
         pdf_page_index: 11
-        table: '6'
-        row: discussion after Figure 2
+        row: discussion after Figure 2, footnote 17
         column: S°298.15
       phase: cr
       units: cal/mol/K
@@ -1253,14 +1259,13 @@ species:
             page: 12
             published_page: 5
             pdf_page_index: 11
-            table: '6'
-            row: discussion after Figure 2
-            column: 298.15 K
+            row: discussion after Figure 2, footnote 17
+            column: S°298.15
       values:
         quantity: S
         method_class: quoted_attributed
         evidence_class: quoted_attributed
-        attribution: King, reference 15 (p. 3, as cited here)
+        attribution: King, reference 17 (p. 3, as cited here)
         points:
         - T_K: '298.15'
           value: '21.1'
@@ -1268,13 +1273,14 @@ species:
             page: 12
             published_page: 5
             pdf_page_index: 11
-            note: Printed as 21.1 ± 0.2 cal/deg mole.
-            section: '298.15'
-        uncertainty:
-          reported_status: printed
-          value: '0.2'
-          units: cal/mol/K
-          confidence_level: not_stated
+            row: discussion after Figure 2, footnote 17
+            column: S°298.15
+            note: King’s result (S°298.15 = 21.1±0.2 cal./deg. mole) was adopted.
+      uncertainty:
+        reported_status: printed
+        value: '0.2'
+        units: cal/mol/K
+        confidence_level: not_stated
       per: mol_species
     - observation_id: cck60_nafeo2_transition_enthalpy_870
       type: transition_point
@@ -1448,6 +1454,8 @@ species:
         column: T
       phase: cr
       phase_label_as_printed: γ→l fusion
+      condensed_form:
+        polymorph: gamma
       per: mol_species
       units: K
       point_conditions:
@@ -1520,14 +1528,15 @@ species:
       - 298.15
       - 870.0
       phase: cr
-      phase_label_as_printed: α
+      condensed_form:
+        polymorph: alpha
       standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
       values:
         quantity: cp
         method_class: measured_reduced
         evidence_class: measured_reduced
         enthalpy_equation_as_printed: H_T − H_298.15 = 17.92T + 7.05 × 10⁻³T² + 1.72 × 10⁵T⁻¹ − 6,546; T.P. = 870
-          K; ΔH₈₇₀ = 0 cal/mol.
+          K; ΔH₈₇₀ = 0.
         heat_capacity_equation_as_printed: Cₚ = 17.92 + 14.10 × 10⁻³T − 1.72 × 10⁵T⁻²
         note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
           equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
@@ -1548,14 +1557,15 @@ species:
       - 870.0
       - 1270.0
       phase: cr
-      phase_label_as_printed: β
+      condensed_form:
+        polymorph: beta
       standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
       values:
         quantity: cp
         method_class: measured_reduced
         evidence_class: measured_reduced
         enthalpy_equation_as_printed: H_T − H_298.15 = 22.55T + 2.55 × 10⁻³T² − 6,969; T.P. = 1,270 K; ΔH₁₂₇₀ =
-          520 cal/mol.
+          520.
         heat_capacity_equation_as_printed: Cₚ = 22.55 + 5.10 × 10⁻³T
         note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
           equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
@@ -1576,13 +1586,14 @@ species:
       - 1270.0
       - 1620.0
       phase: cr
-      phase_label_as_printed: γ
+      condensed_form:
+        polymorph: gamma
       standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
       values:
         quantity: cp
         method_class: measured_reduced
         evidence_class: measured_reduced
-        enthalpy_equation_as_printed: H_T − H_298.15 = 28.80T − 10,276; M.P. = 1,620 K; ΔH₁₆₂₀ = 11,760 cal/mol.
+        enthalpy_equation_as_printed: H_T − H_298.15 = 28.80T − 10,276; M.P. = 1,620 K; ΔH₁₆₂₀ = 11,760.
         heat_capacity_equation_as_printed: Cₚ = 28.80
         note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average
           equation deviations are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).

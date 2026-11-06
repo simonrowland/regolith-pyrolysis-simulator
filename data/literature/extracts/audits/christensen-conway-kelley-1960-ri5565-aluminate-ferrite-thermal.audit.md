@@ -26,3 +26,13 @@ The printed 870 K and 1270 K solid-solid transition enthalpies have no exact qua
 ## Comparison artifact
 
 The MinerU compare output reports 18 matched values, 74 OCR mismatches, and 0 locator errors. It is retained as a discrepancy index. Its mismatches are not silently treated as corrections: Table 7 and Table 8 stored cells are sourced from page renders as recorded in the paired cell audit CSV.
+
+## Review resolutions
+
+The seven Table 7 rows explicitly footnoted “in melting range” retain their rendered heat contents and now carry that phrase in `phase`. The migrator leaves their phase unknown because the source describes a mixed state rather than one of its closed phase tokens. They remain the exact unknown-phase set; the other 85 observations have a mapped phase. The 1268.8 K / 26110 cal/mol reading also carries Table 7 footnote 1, “Shows pretransition effect.”
+
+Table 8 α, β, and γ heat-content and entropy series now bind those printed forms through `condensed_form.polymorph`. The 1270 K β and γ entries remain separate identities at 25780 and 26300 cal/mol. Fusion rows bind the crystalline side as γ; the α→β and β→γ transition rows name two forms and therefore have no single polymorph. The α Table 8 `derived_from` points only to the Table 7 measured crystalline series; its entropy derivation also records King’s standard entropy baseline in `derivation.inputs`.
+
+King’s NaFeO2 S°298.15 = 21.1 ± 0.2 cal/deg mole is located in the sodium-ferrite discussion at footnote 17, not Table 6 or reference 15. The uncertainty is on the observation-level `uncertainty` field consumed by migration; its confidence level is not stated. The equation strings retain the printed ΔH numbers without appending a unit that is absent from those equations.
+
+The parenthesized Table 8 values at 1900 and 2000 K remain identified as extrapolations in their point locator notes. They migrate as ordinary `measured_reduced` rows because the current schema has no extract-only extrapolated-authority field. This is recorded without changing the migrator or assigning a different evidence class.

@@ -32,6 +32,15 @@ RENDER_PINS = {
     ("cck60_nafeo2_table8_γ_heat_content", 0): ("26300", 13, "8", "1270(γ)"),
     ("cck60_nafeo2_table8_l_entropy", 0): ("72.75", 13, "8", "1620(l)"),
 }
+MELTING_RANGE_TEMPERATURES = {
+    1549.1,
+    1574.6,
+    1595.9,
+    1596.2,
+    1596.9,
+    1617.2,
+    1619.2,
+}
 
 
 def _document() -> dict:
@@ -65,35 +74,98 @@ def _assert_printed_row_counts(document: dict) -> None:
             "cck60_nafeo2_table7_measured_liquid_heat_content",
         )
     )
-    table8 = sum(
+    table8_heat = sum(
         len(row["values"]["points"])
         for oid, row in rows.items()
-        if oid.startswith("cck60_nafeo2_table8_")
-    ) // 2
+        if oid.startswith("cck60_nafeo2_table8_") and oid.endswith("_heat_content")
+    )
+    table8_entropy = sum(
+        len(row["values"]["points"])
+        for oid, row in rows.items()
+        if oid.startswith("cck60_nafeo2_table8_") and oid.endswith("_entropy")
+    )
     assert table7 == 38
-    assert table8 == 23
+    assert table8_heat == 23
+    assert table8_entropy == 23
+
+
+def _assert_reviewed_semantic_pins(document: dict) -> None:
+    rows = _observations(document)
+    melting = rows["cck60_nafeo2_table7_melting_range_heat_content"]
+    assert melting["phase"] == "in melting range"
+    assert {
+        float(point["T_K"])
+        for point in melting["values"]["points"]
+        if point["locator"].get("note") == "Table 7 footnote: in melting range."
+    } == MELTING_RANGE_TEMPERATURES
+
+    pretransition = next(
+        point
+        for point in rows["cck60_nafeo2_table7_measured_cr_heat_content"]["values"]["points"]
+        if point["T_K"] == "1268.8"
+    )
+    assert pretransition["value"] == "26110"
+    assert pretransition["locator"]["note"] == "Table 7 footnote 1: shows pretransition effect."
+
+    for greek, token in (("α", "alpha"), ("β", "beta"), ("γ", "gamma")):
+        for prop in ("heat_content", "entropy"):
+            row = rows[f"cck60_nafeo2_table8_{greek}_{prop}"]
+            assert row["condensed_form"]["polymorph"] == token
+
+    beta_1270 = next(
+        point
+        for point in rows["cck60_nafeo2_table8_β_heat_content"]["values"]["points"]
+        if point["locator"]["row"] == "1270(β)"
+    )
+    gamma_1270 = next(
+        point
+        for point in rows["cck60_nafeo2_table8_γ_heat_content"]["values"]["points"]
+        if point["locator"]["row"] == "1270(γ)"
+    )
+    assert (beta_1270["value"], gamma_1270["value"]) == ("25780", "26300")
+    assert rows["cck60_nafeo2_table8_α_heat_content"]["derived_from"] == [
+        "cck60_nafeo2_table7_measured_cr_heat_content"
+    ]
+
+    king = rows["cck60_nafeo2_king_standard_entropy_29815"]
+    king_point = king["values"]["points"][0]
+    assert king_point["value"] == "21.1"
+    assert king_point["locator"]["row"] == "discussion after Figure 2, footnote 17"
+    assert "table" not in king_point["locator"]
+    assert king["values"]["attribution"] == "King, reference 17 (p. 3, as cited here)"
+    assert king["uncertainty"] == {
+        "reported_status": "printed",
+        "value": "0.2",
+        "units": "cal/mol/K",
+        "confidence_level": "not_stated",
+    }
 
 
 def test_render_cells_and_printed_row_counts_are_pinned() -> None:
     document = _document()
     _assert_render_pins(document)
     _assert_printed_row_counts(document)
+    _assert_reviewed_semantic_pins(document)
 
     rows = _observations(document)
     assert rows["cck60_nafeo2_transition_enthalpy_870"]["values"]["value"] == "0"
     assert rows["cck60_nafeo2_transition_enthalpy_1270"]["values"]["value"] == "520"
     assert rows["cck60_nafeo2_heat_of_fusion_1620"]["values"]["value"] == "11760"
     assert rows["cck60_nafeo2_entropy_of_fusion_1620"]["values"]["value"] == "7.26"
-    assert rows["cck60_nafeo2_king_standard_entropy_29815"]["values"]["points"][0]["value"] == "21.1"
-
     equations = {
         row["observation_id"]: row
         for row in document["species"]["NaFeO2"]["context"]
         if row["observation_id"].endswith("printed_thermochemical_equations")
     }
+    assert equations["cck60_nafeo2_α_printed_thermochemical_equations"]["values"][
+        "enthalpy_equation_as_printed"
+    ].endswith("ΔH₈₇₀ = 0.")
     assert equations["cck60_nafeo2_β_printed_thermochemical_equations"]["values"][
         "enthalpy_equation_as_printed"
-    ].endswith("ΔH₁₂₇₀ = 520 cal/mol.")
+    ].endswith("520.")
+    assert equations["cck60_nafeo2_γ_printed_thermochemical_equations"]["values"][
+        "enthalpy_equation_as_printed"
+    ].endswith("ΔH₁₆₂₀ = 11,760.")
     assert equations["cck60_nafeo2_l_printed_thermochemical_equations"]["values"][
         "heat_capacity_equation_as_printed"
     ] == "Cₚ = 37.30"
@@ -115,6 +187,18 @@ def test_render_value_and_printed_count_mutations_fail() -> None:
     with pytest.raises(AssertionError):
         _assert_printed_row_counts(mutated_count)
 
+    mutated_phase = deepcopy(document)
+    rows = _observations(mutated_phase)
+    rows["cck60_nafeo2_table7_melting_range_heat_content"]["phase"] = "cr"
+    with pytest.raises(AssertionError):
+        _assert_reviewed_semantic_pins(mutated_phase)
+
+    mutated_polymorph = deepcopy(document)
+    rows = _observations(mutated_polymorph)
+    rows["cck60_nafeo2_table8_β_heat_content"]["condensed_form"]["polymorph"] = "alpha"
+    with pytest.raises(AssertionError):
+        _assert_reviewed_semantic_pins(mutated_polymorph)
+
 
 def test_validator_and_isolated_migration() -> None:
     document = _document()
@@ -134,11 +218,43 @@ def test_validator_and_isolated_migration() -> None:
     }
     assert unknown_quantities == TYPED_REFUSALS
     unknown_phases = {
-        observation_id.rsplit("::", 1)[-1]
-        for observation_id, observation in migrator.result.observations.items()
+        observation.observation_id
+        for observation in migrator.result.observations.values()
         if not observation.identity.species.phase.is_value
     }
-    assert unknown_phases == set()
+    melting_range_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "cck60_nafeo2_table7_melting_range_heat_content" in observation.observation_id
+    ]
+    assert len(melting_range_rows) == 7
+    assert unknown_phases == {row.observation_id for row in melting_range_rows}
+    assert {
+        float(row.identity.temperature_K.value)
+        for row in melting_range_rows
+    } == MELTING_RANGE_TEMPERATURES
+
+    beta_1270 = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if "cck60_nafeo2_table8_β_heat_content" in observation.observation_id
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == 1270
+    )
+    gamma_1270 = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if "cck60_nafeo2_table8_γ_heat_content" in observation.observation_id
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == 1270
+    )
+    assert beta_1270.identity.species.polymorph.is_value
+    assert gamma_1270.identity.species.polymorph.is_value
+    assert beta_1270.identity.species.polymorph.value.value == "beta"
+    assert gamma_1270.identity.species.polymorph.value.value == "gamma"
+    assert beta_1270.identity.species.polymorph != gamma_1270.identity.species.polymorph
+    assert str(beta_1270.value.point) == "107.86352"
+    assert str(gamma_1270.value.point) == "110.0392"
 
     for observation in migrator.result.observations.values():
         temperature = observation.identity.temperature_K
@@ -178,3 +294,12 @@ def test_validator_and_isolated_migration() -> None:
     )
     assert transition.point_conditions["temperature_K"].state.is_value
     assert transition.identity.total_pressure_Pa.is_unknown
+
+    king = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if "cck60_nafeo2_king_standard_entropy_29815" in observation.observation_id
+    )
+    assert king.uncertainty.kind.value == "printed"
+    assert king.uncertainty.verbatim["value"] == "0.2"
+    assert king.uncertainty.verbatim["units"] == "cal/mol/K"
