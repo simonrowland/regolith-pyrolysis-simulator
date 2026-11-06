@@ -43,24 +43,24 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1018135974216813105666661448'
-          - - CaO
-            - '0.1296990502225264349969819782'
-          - - FeO
-            - '0.09635846436686307280176800377'
-          - - K2O
-            - '0.01715081195378051990893623378'
+          - - Na2O
+            - '0.02376295692011644397393066023'
           - - MgO
             - '0.1141337377032675754490912716'
-          - - Na2O
-            - '0.02376295692011644397393066021'
-          - - Rb2O
-            - '0.006455638547163228438046996244'
-          - - SiO2
-            - '0.4960841329630148976092099898'
+          - - CaO
+            - '0.1296990502225264349969819782'
           - - TiO2
-            - '0.0145416099015865162553687213'
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
           amount_basis: mole_fraction
       locator:
         page: 71
@@ -72,18 +72,34 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
+        - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '16'
+              value: '2.27'
             locator:
               page: 71
               table: '1'
               note: row=Bas1400C0m1
-        - - M_Al2O3_g_mol
+        - - M_Na2O_g_mol
           - state:
               tag: value
-              value: '101.960077'
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
             locator:
               page: 71
               table: '1'
@@ -100,6 +116,54 @@ experiments:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               page: 71
               table: '1'
@@ -136,38 +200,6 @@ experiments:
               page: 71
               table: '1'
               note: row=Bas1400C0m1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '7.09'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.27'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
         - - original_Rb2O_wt_pct
           - state:
               tag: value
@@ -180,38 +212,6 @@ experiments:
           - state:
               tag: value
               value: '186.9346'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '45.94'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.79'
-            locator:
-              page: 71
-              table: '1'
-              note: row=Bas1400C0m1
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
             locator:
               page: 71
               table: '1'

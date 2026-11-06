@@ -35,7 +35,15 @@ experiments:
   method:
     tag: unknown
     reason: regime 'compiled_lunar_chemical_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: missing major oxides: SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O'
+      locator:
+        page: 1
+        table: A8.1
+        note: Each value is under its printed oxide column and statistic row header.; row_group=Apollo 11 MBAS
   conditions:
     temperature_K:
       state:

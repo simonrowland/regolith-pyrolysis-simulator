@@ -452,6 +452,10 @@ observations:
       charge:
         tag: value
         value: 0
+    composition:
+      tag: unknown
+      reason: 'missing major oxides: SiO2, P2O5; mass-percent composition is a partial analysis: kept sum=50.59 wt% is below
+        95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'chemical_composition'; refusing to pick a number
@@ -477,6 +481,32 @@ observations:
     table: '1'
     note: column=Warren78; technique=INAA
   read_from: pdf:jsc-lunar-catalog-12023
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: missing major oxides: SiO2, P2O5; mass-percent composition is a partial
+          analysis: kept sum=50.59 wt% is below 95 wt%'
+      locator:
+        pdf_page_index: 7
+        table: '1'
+        note: column=Warren78; technique=INAA
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.77'
+          CaO: '9.24'
+          FeO: '15.3'
+          K2O: '0.26'
+          MgO: '11.94'
+          MnO: '0.2'
+          Na2O: '0.43'
+          TiO2: '2.45'
+      locator:
+        pdf_page_index: 7
+        table: '1'
+        note: column=Warren78; technique=INAA
 - observation_id: jsc-lunar-catalog-12023::jsc_12024_coarse_particle_masses
   experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
   identity:
