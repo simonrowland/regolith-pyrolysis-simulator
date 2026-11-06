@@ -41,7 +41,10 @@ from simulator.cost_parameters import (
 from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.optimize.canonical import canonical_json_dumps
-from simulator.optimize.doe import active_sampler_name
+from simulator.optimize.doe import (
+    PRESSURE_PAIR_SAMPLER_DESCRIPTION,
+    active_sampler_name,
+)
 from simulator.optimize.determinism import pin_seeds
 from simulator.optimize.evaluate import (
     _CandidateAdmissionError,
@@ -5340,6 +5343,7 @@ def _study_manifest_payload(
         "corpus_version": current_corpus_version(),
         "result_scope": None,
         "sampler_name": sampler_name,
+        "sampler_description": PRESSURE_PAIR_SAMPLER_DESCRIPTION,
         "scipy_version": _package_version("scipy"),
         "optuna_version": _package_version("optuna"),
         "cache_tier_policy": _jsonable_value(
