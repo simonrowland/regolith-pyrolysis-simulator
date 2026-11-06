@@ -161,12 +161,26 @@ def test_yamaguchi_1987_isolated_migration_keeps_fits_typed_and_conditions_uninv
     assert len(observations) == 12
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 12
     assert sum(row.identity.quantity.is_value and row.identity.quantity.value is Quantity.ACTIVITY for row in observations) == 4
-    assert sum(row.identity.quantity.is_value and row.identity.quantity.value is Quantity.DELTA_FG for row in observations) == 7
+    assert sum(row.identity.quantity.is_value and row.identity.quantity.value is Quantity.DELTA_FG for row in observations) == 0
     quantity_unknown_ids = {
         row.observation_id.rsplit("::", 1)[-1]
         for row in observations if row.identity.quantity.is_unknown
     }
-    assert quantity_unknown_ids == {"yki1987_gibbs_table4_na3fe5o9"}
+    expected_reaction_quantities = {
+        "yki1987_gibbs_abstract_na3fe5o9": "reaction_standard_gibbs_energy_for_reaction_B",
+        "yki1987_gibbs_table4_na3fe5o9": "reaction_standard_gibbs_energy_for_reaction_B",
+        "yki1987_gibbs_table4_na2fe2o4_lt1047": "reaction_standard_gibbs_energy_for_reaction_D",
+        "yki1987_gibbs_abstract_na2fe2o4_lt1047": "reaction_standard_gibbs_energy_for_reaction_D",
+        "yki1987_gibbs_abstract_na2fe2o4_1047_1278": "reaction_standard_gibbs_energy_for_reaction_D",
+        "yki1987_gibbs_table4_na2fe2o4_mid": "reaction_standard_gibbs_energy_for_reaction_D",
+        "yki1987_gibbs_abstract_na2fe2o4_gt1278": "reaction_standard_gibbs_energy_for_reaction_D",
+        "yki1987_gibbs_table4_na2fe2o4_nf_lt1405": "reaction_standard_gibbs_energy_for_reaction_D",
+    }
+    assert quantity_unknown_ids == set(expected_reaction_quantities)
+    assert {
+        observation_id: _observations(document)[observation_id]["values"]["quantity"]
+        for observation_id in expected_reaction_quantities
+    } == expected_reaction_quantities
     table4_reaction_b = _observations(document)["yki1987_gibbs_table4_na3fe5o9"]
     assert table4_reaction_b["values"]["quantity"] == "reaction_standard_gibbs_energy_for_reaction_B"
     reaction_energy = next(

@@ -13,11 +13,11 @@ and absolute PDF page numbers.
 | Table 1, p. 988 / PDF p. 3 | 5 cell identities: 0, 6, 9, 10, 11 | All five bulk formulas and phase assemblages retained in context. Cells 6/9 are repeat cells; 10/11 are thermal-EMF controls, not independent activity rows. |
 | Table 2, p. 989 / PDF p. 4 | 8 fit rows: 3 for cell 0 and 5 for cells 6/9 | All 8 piecewise EMF fits, including A, dA, B and dB, retained as measured-reduced context. The raw points are plotted and not tabulated. |
 | Table 3, p. 991 / PDF p. 6 | 4 log-activity fit rows | All four coefficient fits are stored as measured-reduced `activity` observations in printed log10 form, typed-refused because no numeric points are printed. |
-| Table 4, p. 991 / PDF p. 6 | 4 Gibbs fit rows: one Na3Fe5O9 and three Na2Fe2O4 | Three fits are measured-reduced `delta_fG` observations; the Na3Fe5O9 row is a reaction-(B) energy for two formula units and remains quantity-unknown under a descriptive label. All are typed-refused as coefficient functions. |
+| Table 4, p. 991 / PDF p. 6 | 4 Gibbs fit rows: one Na3Fe5O9 and three Na2Fe2O4 | All four are reaction-(B) or reaction-(D) Gibbs fits, retained quantity-unknown under descriptive labels. All remain typed-refused as coefficient functions. |
 | Abstract, p. 986 / PDF p. 1 | 4 coefficient fits | Retained separately from Table 4 so the printed disagreements remain visible. |
 
-The extraction therefore contains 12 migrated fit observations (4 activity,
-7 `delta_fG`, and one quantity-unknown reaction-(B) Gibbs fit), plus 8 located
+The extraction therefore contains 12 migrated fit observations (4 activity
+fits and 8 quantity-unknown reaction-(B)/(D) Gibbs fits), plus 8 located
 Table 2 EMF fit rows in source context. It does
 not create points by evaluating an equation or reading values from a figure.
 The cell audit CSV records all 100 numeric cells across the printed fit tables
@@ -148,7 +148,7 @@ temperature bound or interval. No total pressure or fO2 condition is added.
 |---|---|---|---|---|---|
 | `yki1987_activity_f_n3f5` | unknown; no numeric composition printed | unknown | unknown | unknown; fit has no single T | `<1405 K`, Table 3, p. 991 |
 | `yki1987_gibbs_table4_na3fe5o9` | unknown; reaction quantity has no profile | unknown | unknown | unknown; fit has no single T | `<1405 K`, Table 4, p. 991 |
-| `yki1987_gibbs_table4_na2fe2o4_mid` | not applicable to delta_fG | not applicable | not applicable | unknown; fit has no single T | `1047<T<1278 K`, Table 4, p. 991 |
+| `yki1987_gibbs_table4_na2fe2o4_mid` | not applicable to unknown reaction Gibbs energy | not applicable | not applicable | unknown; fit has no single T | `1047<T<1278 K`, Table 4, p. 991 |
 
 The isolated migration preserves every printed range as a bound or interval
 condition and leaves the identity temperature unknown because the paper gives

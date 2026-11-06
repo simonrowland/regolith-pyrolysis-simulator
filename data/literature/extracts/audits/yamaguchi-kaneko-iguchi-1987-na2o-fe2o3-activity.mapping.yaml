@@ -52,11 +52,22 @@ source_tables:
       B: intercept in kJ/mol on the printed reaction basis
       dB: printed coefficient uncertainty
     printed_rows: 4
-    quantity: delta_fG
+    quantity: reaction_standard_gibbs_energy_for_reaction_B_or_D
     method_class: measured_reduced
     derived_from: Table 3 activity fit observation identifiers; see each row's derivation.inputs
-    quantity_unknown_row: yki1987_gibbs_table4_na3fe5o9
-    quantity_unknown_reason: Reaction (B) Gibbs energy is for two Na3Fe5O9 formula units; no exact reaction-extent quantity token exists, so its printed coefficients remain unnormalized and typed-refused.
+    quantity_unknown_rows:
+      - yki1987_gibbs_abstract_na3fe5o9
+      - yki1987_gibbs_table4_na3fe5o9
+      - yki1987_gibbs_table4_na2fe2o4_lt1047
+      - yki1987_gibbs_abstract_na2fe2o4_lt1047
+      - yki1987_gibbs_abstract_na2fe2o4_1047_1278
+      - yki1987_gibbs_table4_na2fe2o4_mid
+      - yki1987_gibbs_abstract_na2fe2o4_gt1278
+      - yki1987_gibbs_table4_na2fe2o4_nf_lt1405
+    quantity_unknown_reason: >-
+      All eight Gibbs fits describe reaction (B) or (D), not formation from
+      elements. No exact reaction-extent Gibbs-energy quantity token exists;
+      printed coefficients and bases remain unchanged and typed-refused.
   - printed_section: Abstract
     published_page: 986
     pdf_page: 1

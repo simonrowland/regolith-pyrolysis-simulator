@@ -269,7 +269,7 @@ species:
         derived_from: [shaiu_1976_eq62_gross_wilson_enthalpy]
         derivation:
           locator:
-            page: 47
+            page: 48
             equation: '61-63'
           relation: Formation relation estimated by combining Gross and Wilson solution calorimetry with reference oxide data.
           inputs: [shaiu_1976_eq62_gross_wilson_enthalpy]
@@ -279,7 +279,7 @@ species:
           per formula as printed.
         values:
           quantity: delta_fG
-          method_class: measured_reduced
+          method_class: author_estimate
           reaction: '4 Na(l) + Fe(s) + 1.5 O2(g) -> Na4FeO3(s)'
           formula_as_printed: Na4FeO3
           equation_as_printed: '-289180 + 82.69T'
@@ -295,7 +295,7 @@ species:
       - observation_id: shaiu_1976_eq62_gross_wilson_enthalpy
         type: gibbs_table
         locator:
-          page: 47
+          page: 48
           equation: '62'
         phase: cr
         units: kcal/mol as printed
@@ -332,7 +332,7 @@ species:
           inputs: [shaiu_1976_table8_na4feo3]
         values:
           quantity: critical_oxygen_concentration_for_formation
-          method_class: measured_reduced
+          method_class: author_estimate
           values_as_printed:
             - {T_K: 773, concentration_ppm: '1.81×10^3'}
             - {T_K: 873, concentration_ppm: '3.53×10^3'}
@@ -351,7 +351,7 @@ species:
       - observation_id: shaiu_1976_na4feo3_calorimetry_method
         type: method_context
         locator:
-          page: 47
+          page: 48
           equation: '61-63'
         units: kcal/mol and cal/mol-K as printed
         values:
@@ -371,8 +371,8 @@ species:
           row: (Na2O)2·FeO, 973 K
         units: Values in columns headed -kcal/mol and cal/mol-K as printed
         values:
-          method_class: measured_reduced
-          this_work: {delta_Hf_column_value: '289.2', delta_Sf: '82.69', delta_Gf_column_value: '208.7', method: estimated, method_class: measured_reduced}
+          method_class: author_estimate
+          this_work: {delta_Hf_column_value: '289.2', delta_Sf: '82.69', delta_Gf_column_value: '208.7', method: estimated, method_class: author_estimate}
           wu_6: {delta_Hf_column_value: '276.4', delta_Sf: '80.6', delta_Gf_column_value: '198.0', method: estimated, method_class: quoted_attributed, attribution: '[6]'}
           source_note: The printed ΔHf and ΔGf column headings carry a leading minus sign; values are preserved as printed without re-signing.
       - observation_id: shaiu_1976_table11_fe_oxide_reactions
@@ -386,13 +386,13 @@ species:
             - {reaction: 'Na2O + FeO -> Na2FeO2', T_K: 298, delta_G_as_printed: '-18.86', method: galvanic cell, attribution: This work, method_class: measured_reduced}
             - {reaction: 'Na2O + FeO -> Na2FeO2', T_K: 298, delta_G_as_printed: '-18.0', method: estimated, attribution: '[35]', method_class: quoted_attributed}
             - {reaction: '2Na2O + Fe -> Na2FeO2 + 2Na(l)', T_K: 298, delta_G_as_printed: '+13.4', method: galvanic cell, attribution: This work, method_class: measured_reduced}
-            - {reaction: '2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-83.4', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-83.4', method: estimated, attribution: This work, method_class: author_estimate}
             - {reaction: '2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-88.8', method: estimated, attribution: '[10]', method_class: quoted_attributed}
-            - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-25.1', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-25.1', method: estimated, attribution: This work, method_class: author_estimate}
             - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-25.07', method: calorimetry, attribution: '[10]', method_class: quoted_attributed}
             - {reaction: '2Na2O + FeO -> (Na2O)2·FeO', T_K: 298, delta_G_as_printed: '-24.8', method: Knudsen effusion, attribution: '[65]', method_class: quoted_attributed}
-            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 298, delta_G_as_printed: '+7.2', method: estimated, attribution: This work, method_class: measured_reduced}
-            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-3.2', method: estimated, attribution: This work, method_class: measured_reduced}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 298, delta_G_as_printed: '+7.2', method: estimated, attribution: This work, method_class: author_estimate}
+            - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-3.2', method: estimated, attribution: This work, method_class: author_estimate}
             - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-2.2', method: calorimetry, attribution: '[10]', method_class: quoted_attributed}
             - {reaction: '3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)', T_K: 873, delta_G_as_printed: '-2.5', method: calorimetry, attribution: '[18]', method_class: quoted_attributed}
             - {reaction: 'Na2O + Fe -> FeO + 2Na(l)', T_K: 298, delta_G_as_printed: '+32.2', method: estimated, attribution: This work, method_class: measured_reduced}

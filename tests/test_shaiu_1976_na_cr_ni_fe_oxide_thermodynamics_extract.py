@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import EvidenceClass, ValueKind
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
@@ -121,6 +121,25 @@ def test_isolated_migration_keeps_known_schema_gaps_and_no_invented_conditions()
         "table": "8",
         "row": "NaFeO2",
     }
+    table8_estimate = next(
+        row for row in document["species"]["Na4FeO3"]["observations"]
+        if row["observation_id"] == "shaiu_1976_table8_na4feo3"
+    )
+    assert table8_estimate["locator"]["page"] == 47
+    assert table8_estimate["derivation"]["locator"] == {
+        "page": 48,
+        "equation": "61-63",
+    }
+    equation_62 = next(
+        row for row in document["species"]["Na4FeO3"]["observations"]
+        if row["observation_id"] == "shaiu_1976_eq62_gross_wilson_enthalpy"
+    )
+    assert equation_62["locator"] == {"page": 48, "equation": "62"}
+    method_context = next(
+        row for row in document["species"]["Na4FeO3"]["context"]
+        if row["observation_id"] == "shaiu_1976_na4feo3_calorimetry_method"
+    )
+    assert method_context["locator"] == {"page": 48, "equation": "61-63"}
     assert document["species"]["NaFeO2"]["observations"][2]["locator"] == {
         "page": 76,
         "table": "A4",
@@ -149,6 +168,32 @@ def test_isolated_migration_keeps_known_schema_gaps_and_no_invented_conditions()
     ) == 30
     assert all(row.identity.species.phase is not None for row in migrated.values())
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 33
+    assert migrated[f"{SOURCE_ID}::shaiu_1976_table8_na4feo3"].evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+    assert migrated[f"{SOURCE_ID}::shaiu_1976_eq62_gross_wilson_enthalpy"].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    table9_estimates = [
+        row for observation_id, row in migrated.items()
+        if "::shaiu_1976_table9_na4feo3_critical_oxygen" in observation_id
+    ]
+    assert len(table9_estimates) == 1
+    assert all(row.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE for row in table9_estimates)
+
+    assert table8_estimate["values"]["method_class"] == "author_estimate"
+    assert equation_62["values"]["method_class"] == "quoted_attributed"
+    table10_context = next(
+        row for row in document["species"]["Na4FeO3"]["context"]
+        if row["observation_id"] == "shaiu_1976_table10_na4feo3_comparison"
+    )
+    assert table10_context["values"]["method_class"] == "author_estimate"
+    assert table10_context["values"]["this_work"]["method_class"] == "author_estimate"
+    table11_context = next(
+        row for row in document["species"]["Na4FeO3"]["context"]
+        if row["observation_id"] == "shaiu_1976_table11_fe_oxide_reactions"
+    )
+    estimates = [
+        row for row in table11_context["values"]["rows"]
+        if "(Na2O)2·FeO" in row["reaction"] and row.get("attribution") == "This work"
+    ]
+    assert estimates and all(row["method_class"] == "author_estimate" for row in estimates)
 
     emf_points = [
         row for observation_id, row in migrated.items()
