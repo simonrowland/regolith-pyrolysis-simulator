@@ -90,6 +90,12 @@ def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
 
     authority = result.condensation_authority_by_species["SiO"]
     assert authority["authority_level"] == "extrapolated"
+    # An extrapolated route is never authoritative, so a missing cartridge
+    # cannot read as authoritative terminal offgas downstream.
+    assert authority["authoritative_for_condensation"] is False
+    # The terminal-offgas flag may be unset (None) when nothing escapes; it
+    # must never be True.
+    assert authority.get("authoritative_for_terminal_offgas") is not True
     outcomes = result.condensation_refusals_by_species["SiO"]["stage_outcomes"]
     if cartridge_area is None:
         refusal = next(item for item in outcomes if item.get("parameter") == "k_stage4b")
