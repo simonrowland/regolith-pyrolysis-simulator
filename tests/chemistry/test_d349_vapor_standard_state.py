@@ -45,6 +45,7 @@ def _lunar_mare_probe(
     setpoints_data,
     *,
     sim=None,
+    temperature_C=1500.0,
 ):
     if sim is None:
         sim = _build_sim(
@@ -63,7 +64,7 @@ def _lunar_mare_probe(
             },
             species_formula_registry=sim.species_formula_registry,
         ),
-        temperature_C=1500.0,
+        temperature_C=temperature_C,
         pressure_bar=1.0,
         fO2_log=0.0,
         control_inputs={"pO2_bar": 1.0, "intrinsic_fO2_log": 0.0},
@@ -103,7 +104,13 @@ def _builtin_pressure_projection(
     return dict(result.diagnostic)
 
 
-def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
+def _live_gateway_probe(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    *,
+    temperature_C=1500.0,
+):
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,
@@ -116,11 +123,12 @@ def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
         feedstocks_data,
         setpoints_data,
         sim=sim,
+        temperature_C=temperature_C,
     )
     diagnostic = dict(provider.dispatch(request).diagnostic)
     diagnostic["source_reaction_fO2_bar"] = 1.0
     equilibrium = SimpleNamespace(
-        temperature_C=1500.0,
+        temperature_C=temperature_C,
         pO2_bar=1.0,
         fO2_log=0.0,
         diagnostics={},
@@ -156,11 +164,18 @@ def _diagnostic_with_route_provenance(
     return mutated
 
 
-def _resolve_live_gateway_batch(sim, diagnostic, equilibrium, effective_source):
+def _resolve_live_gateway_batch(
+    sim,
+    diagnostic,
+    equilibrium,
+    effective_source,
+    *,
+    temperature_K=1773.15,
+):
     sim._last_vapor_pressure_diagnostic = diagnostic
     return sim._resolve_evaporation_vapour_batch(
         equilibrium,
-        temperature_K=1773.15,
+        temperature_K=temperature_K,
         effective_pressure_source=effective_source,
     )
 
@@ -603,18 +618,63 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
             equilibrium,
             effective_source,
         )
-        assert batch is not None, species
-        answer = batch.channel(species)
-        assert isinstance(answer.pressure, PressureValue), species
-        correct_pressure = (
-            diagnostic["vapor_pressures_Pa"][species]
-            * _D349_GATEWAY_TO_PROVIDER_PRESSURE_RATIO[species]
-        )
-        assert answer.pressure.pa != pytest.approx(
-            correct_pressure,
-            rel=1e-9,
-            abs=0,
-        ), species
+        assert batch is None, species
+        assert species in sim._last_vapour_batch_resolve_error["detail"]
+
+
+def test_d349_fe_conversion_reaches_live_gateway_guard_below_1650k(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    temperature_K = 1500.0
+    sim, diagnostic, equilibrium, effective_source = _live_gateway_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        temperature_C=temperature_K - 273.15,
+    )
+    route = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    notice = route["activity_standard_state_conversion"]
+    assert notice["conversion_performed"] is True
+    assert notice["from_standard_state_id"] == (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    )
+    assert notice["to_standard_state_id"] == (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
+    assert route["vapor_activity_used_for_K"] != diagnostic["activities"]["Fe"]
+
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+    assert batch is not None
+    assert isinstance(batch.channel("Fe").pressure, PressureValue)
+    assert sim.vapour_rail_catalog.species["Fe"].evaluator.activity_exponent == 0.0
+    # Fe's activity-independent catalog evaluator does not consume a typed
+    # source_reaction_activity. The built-in provider applies the converted
+    # activity before producing Fe's effective pressure, which the gateway
+    # carries as a typed pressure value.
+    assert batch.channel("Fe").source_reaction_activity is None
+
+    raw_assignment = _diagnostic_with_route_provenance(
+        diagnostic,
+        "Fe",
+        vapor_activity_for_crystalline_K=diagnostic["activities"]["Fe"],
+    )
+    refused = _resolve_live_gateway_batch(
+        sim,
+        raw_assignment,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+    assert refused is None
+    assert "Fe" in sim._last_vapour_batch_resolve_error["detail"]
 
 
 @pytest.mark.parametrize(
