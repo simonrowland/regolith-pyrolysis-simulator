@@ -44,17 +44,18 @@ value. The exact candidate tokens checked were
   [13]. Part I's 25 pressure and reaction rows remain in
   `huang-furukawa-aoto-2003-sodium-iron-oxides-kems`; they are not duplicated as
   Part II measurements. The Part II Table 1 formation Gibbs value is recorded
-  as quoted from Part I. The Part II estimates of formation enthalpy and
-  entropy retain located derivation notes.
+  as quoted from Part I. The Part II Na3FeO3 formation enthalpy is
+  model_derived by the Eq. (3) treatment using the stored Gibbs value and
+  estimated entropy; the entropy is an author_estimate.
 - Na5FeO4 formation enthalpy and entropy are attributed to Lindemer et al. [3].
   The authors report no phase transitions to 1000 K and estimate heat capacity.
 - Na8Fe2O7 formation enthalpy is attributed to Stuve et al. [14], and entropy
   to Lindemer et al. [3]. Its heat-capacity parameters are described as
   estimated from Na3FeO3 and Na5FeO4.
 - Equation (4) and the Na3FeO3 formation-Gibbs fit are Part I overlap. The
-  Part II formation enthalpy and entropy estimates are marked measured_reduced;
-  their raw inputs are the authors' Part I vapor-pressure measurements, which
-  are not printed in this Part II paper and are located at its section 2.2.3.
+  Table 1 Gibbs value remains quoted_attributed to Part I. The Part II
+  formation enthalpy is model_derived using equation (3) and the stored Gibbs
+  and entropy rows; its entropy is marked author_estimate.
   Equations (7)–(10) are Part II results: the text says the authors
   confirmed them by vapor-pressure measurements and XRD in their laboratory,
   so they are marked measured_direct. Their reaction stoichiometry and ranges
@@ -63,14 +64,19 @@ value. The exact candidate tokens checked were
   exactly.
 
 The controller ruled that the paper's computations from literature-attributed
-thermodynamic inputs are model_derived. The Na4FeO3 Table 1 enthalpy is
-recorded that way, with its equation (3) method and the Table 1 Gibbs-energy
-and entropy inputs. For Na8Fe2O7, Table 1 governs the stored quantities:
+thermodynamic inputs are model_derived. The Na4FeO3 and Na3FeO3 Table 1
+enthalpies are recorded that way, with their equation (3) method and stored
+Gibbs-energy and entropy inputs. For Na8Fe2O7, Table 1 governs the stored quantities:
 −2524.3 is ΔfG° and is model_derived from Stuve's ΔfH° and Lindemer's S°;
 −2746.0 is ΔfH° and is quoted_attributed to Stuve. The page 3 prose instead
 labels −2524.3 ΔfH°. The 600 dpi render confirms the H glyph; this printed
 discrepancy is attached to the −2524.3 ΔfG° row, not stored as a second
 quantity.
+For that row, the cited printed Eq. (2) is actually
+`ΔfG°(Na4FeO3) = −1212202 + 351.10×T` and does not evaluate to −2524.3;
+Table 1's S° is an absolute standard entropy, not ΔfS°. The source's method
+claim is retained alongside this located discrepancy, without changing the
+Table 1 values.
 
 ## Phase equilibria and conditions
 
@@ -78,9 +84,14 @@ The paper contains no table of invariant or three-phase equilibrium data. The
 Na–Fe–O diagrams and their invariant geometry are figures, deferred as required.
 The prose reports Na(l), Fe(s), and Na4FeO3(s) coexisting over 694 K. It lists
 four reaction equations over 1288–1380 K, 823–1023 K, 603–673 K, and 590–717 K.
-It explicitly says oxygen partial pressures in those conditions were too low
-to measure; no numeric oxygen potential is printed. No pressure or fO2 is
+For the Na4FeO3 stability limit, it prints a calculated highest oxygen
+potential of about −536 kJ mol−1 at 800 K (page 5 / published page 71). The
+separate statement that oxygen partial pressures were too low to measure
+applies to reactions (7)–(10). The same prose says Na8Fe2O7 appears over about
+637 K and tends to replace Na5FeO4 above about 944 K. No pressure or fO2 is
 invented for the Table 1 thermodynamic values.
+The page 5 / published page 71 oxygen-potential value was checked against the
+render; its cell-audit entry records the printed value and temperature.
 
 The other adopted data identified in the introduction and thermodynamic
 sections are indexed in the extract context: Dai et al. [1,2], Lindemer et al.

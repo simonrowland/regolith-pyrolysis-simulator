@@ -72,10 +72,14 @@ def test_table_1_render_pins_and_numeric_cell_count() -> None:
         row["values"]["quantity"]: row
         for row in document["species"]["Na3FeO3"]["observations"]
     }
-    for quantity in ("delta_fH", "S"):
-        assert na3_rows[quantity]["values"]["method_class"] == "measured_reduced"
-        assert na3_rows[quantity]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-        assert na3_rows[quantity]["derivation"]["raw_inputs"]["locator"]["page"] == 3
+    assert na3_rows["delta_fH"]["values"]["method_class"] == "model_derived"
+    assert na3_rows["delta_fH"]["derivation"]["method"]["locator"]["equation"] == "3"
+    assert na3_rows["delta_fH"]["derived_from"] == [
+        "huang2003p2_Na3FeO3_table1_delta_fG",
+        "huang2003p2_Na3FeO3_table1_entropy",
+    ]
+    assert na3_rows["S"]["values"]["method_class"] == "author_estimate"
+    assert na3_rows["delta_fG"]["values"]["method_class"] == "quoted_attributed"
     reactions = next(
         row
         for row in document["species"]["Na(l)"]["context"]
@@ -98,11 +102,26 @@ def test_table_1_render_pins_and_numeric_cell_count() -> None:
     assert na8_g["values"]["printed_discrepancy"].startswith(
         "In section 2.2.5 the prose says ΔfH°(Na8Fe2O7) was calculated"
     )
+    assert "ΔfH°(298) = -2524.3 kJ mol−1" in na8_g["values"]["printed_discrepancy"]
+    assert "ΔfG°(Na4FeO3) = −1212202 + 351.10×T" in na8_g["values"]["derivation_note"]
+    assert "does not evaluate" in na8_g["values"]["derivation_note"]
+    assert "not ΔfS°" in na8_g["values"]["derivation_note"]
     assert na8_g["derivation"]["method"]["locator"]["page"] == 3
     assert na8_g["derived_from"] == [
         "huang2003p2_Na8Fe2O7_table1_delta_fH",
         "huang2003p2_Na8Fe2O7_table1_entropy",
     ]
+    context_rows = {
+        row["observation_id"]: row
+        for payload in document["species"].values()
+        for row in payload.get("context", [])
+    }
+    oxygen_limit = context_rows["huang2003p2_Na4FeO3_oxygen_potential_limit"]
+    assert oxygen_limit["values"]["value_as_printed"] == "about −536"
+    assert oxygen_limit["values"]["temperature_as_printed"] == "800 K"
+    stability = context_rows["huang2003p2_Na8Fe2O7_temperature_stability_prose"]
+    assert stability["values"]["appears_over_temperature_as_printed"] == "about 637 K"
+    assert stability["values"]["tends_to_replace_Na5FeO4_above_temperature_as_printed"] == "about 944 K"
     assert len(TABLE_VALUES) + sum(
         len(heat_capacity) + len(gibbs)
         for heat_capacity, gibbs in TABLE_COEFFICIENTS.values()
@@ -130,6 +149,9 @@ def test_isolated_migration_binds_all_15_table_values_and_conditions(tmp_path: P
         for row in migrated
     }
     assert len(by_species_quantity) == 15
+    assert by_species_quantity[("Na3FeO3", "delta_fG")].evidence.class_.value.value == "quoted_attributed"
+    assert by_species_quantity[("Na3FeO3", "delta_fH")].evidence.class_.value.value == "model_derived"
+    assert by_species_quantity[("Na3FeO3", "S")].evidence.class_.value.value == "author_estimate"
     for (species, quantity), printed_value in TABLE_VALUES.items():
         row = by_species_quantity[(species, quantity)]
         assert row.value.point == Decimal(printed_value)
