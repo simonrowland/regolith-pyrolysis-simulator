@@ -426,14 +426,15 @@ species:
           note: Fit retained as printed; it is not a new set of activity observations.
       - observation_id: itoh_1985_thermochemical_equations_12_13_14_15_context
         type: thermochemical_context
-        locator: {page: 6, pdf_page_index: 5, published_page: 358}
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, equation: '11–15'}
         phase: beta-alumina and the printed Na2O·11Al2O3 compounds
         units: J per printed equation
         values:
           quantity: standard Gibbs-energy equations and reaction printed on physical page 6
           equations_as_printed:
-            - 'ΔG°f,β/J = −19056000 + 3542.9 T/K, 874–933 K (12); this is the standard Gibbs energy of formation of Na2O·11Al2O3 from oxides.'
-            - 'ΔG°f,β/J = −19274100 + 3778.2 T/K, 933–1055 K (13); the paper distinguishes the formation-from-elements quantity in the following definition.'
+            - 'ΔG°f,β′/J = −232400 − 7.7 T/K, 874–1055 K (11); standard Gibbs energy of formation of Na2O·11Al2O3 from oxides.'
+            - 'ΔG°f,β/J = −19056000 + 3542.9 T/K, 874–933 K (12); standard Gibbs energy of formation of Na2O·11Al2O3 from the elements.'
+            - 'ΔG°f,β/J = −19274100 + 3778.2 T/K, 933–1055 K (13); continuation of the standard Gibbs energy of formation of Na2O·11Al2O3 from the elements.'
             - 'Na2O(s) + c/(b−c)(Na2O·bAl2O3) = b/(b−c)(Na2O·cAl2O3) (14).'
             - 'ΔG°/J = RT ln aNa2O(in (β+β″)-alumina) = −217900 + 16.3 T/K (15).'
           note: These are printed equations, not independently scored formation values. Equation (14) names Na2O(s), which with the 1000 K activity measurements and JANAF Na-014 Tm=1405.200 K supports the crystalline Na2O activity reference.

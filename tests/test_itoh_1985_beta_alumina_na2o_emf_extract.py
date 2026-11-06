@@ -156,7 +156,13 @@ def test_printed_equations_and_abstract_body_range_discrepancy_are_retained() ->
         for record in _document()["species"]["Na2O"]["context"]
     }
     thermochemical = records["itoh_1985_thermochemical_equations_12_13_14_15_context"]
-    assert len(thermochemical["values"]["equations_as_printed"]) == 4
+    equations = thermochemical["values"]["equations_as_printed"]
+    assert len(equations) == 5
+    assert equations[:3] == [
+        "ΔG°f,β′/J = −232400 − 7.7 T/K, 874–1055 K (11); standard Gibbs energy of formation of Na2O·11Al2O3 from oxides.",
+        "ΔG°f,β/J = −19056000 + 3542.9 T/K, 874–933 K (12); standard Gibbs energy of formation of Na2O·11Al2O3 from the elements.",
+        "ΔG°f,β/J = −19274100 + 3778.2 T/K, 933–1055 K (13); continuation of the standard Gibbs energy of formation of Na2O·11Al2O3 from the elements.",
+    ]
     vapor = records["itoh_1985_sodium_vapor_pressure_equations_19_20_context"]
     assert vapor["values"]["pressure_as_printed"] == "P = 101325 Pa"
     assert len(vapor["values"]["equations_as_printed"]) == 2
