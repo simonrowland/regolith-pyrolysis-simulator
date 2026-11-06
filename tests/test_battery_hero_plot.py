@@ -50,6 +50,7 @@ from scripts.battery_hero_plot import (
 from matplotlib.colors import ListedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
+from matplotlib.transforms import Bbox
 from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
 
@@ -2292,6 +2293,129 @@ def test_vapour_metrics_split_source_disagreement_rows_and_shared_pairs() -> Non
     assert paired_all["source_disagreement_flagged"]["outside_rms_dex"] == "2"
     assert paired_all["source_disagreement_flagged"]["primary_rms_dex_on_shared"] == "3"
     assert paired_all["unflagged"]["n_shared"] == 1
+
+
+def test_source_disagreement_flag_uses_notice_kind_for_other_reason_strings() -> None:
+    rows = [
+        _hero_metric_row(
+            engine,
+            "initial-charge",
+            value,
+            temperature_K="1800",
+            source_disagreement_flagged=True,
+        )
+        for engine, value in (("openimcc", "-1"), ("vaporock", "-2"))
+    ]
+    for row in rows:
+        row["notices"][0]["reason"] = (
+            "composition_role=initial_charge_only: printed initial charge is "
+            "sample context; per-run composition is not published"
+        )
+
+    metric = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    assert metric["views"]["all"]["source_disagreement_flagged"]["n"] == 1
+    assert metric["views"]["all"]["unflagged"]["n"] == 0
+
+    paired = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+    )[0]["comparisons"][0]
+    assert paired["views"]["all"]["source_disagreement_flagged"][
+        "n_shared"
+    ] == 1
+    assert paired["views"]["all"]["unflagged"]["n_shared"] == 0
+
+
+def _write_hero_layout_score_file(path: Path) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "green-shaped-layout"}
+    ]
+    for index in range(6):
+        for engine, residual in (("openimcc", index / 10), ("vaporock", index / 8)):
+            row = _record(
+                engine=engine,
+                experiment=f"layout-run-{index}",
+                formula="SiO",
+                temperature_K=1500 + index * 100,
+                residual=residual,
+            )
+            row["reference"] = f"layout-reference-{index}"
+            rows.append(row)
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+
+
+def _render_hero_layout_sample(tmp_path: Path, monkeypatch) -> list[Figure]:
+    residuals = tmp_path / "green-shaped-layout.jsonl"
+    _write_hero_layout_score_file(residuals)
+    data = read_scores(residuals)
+    figures: list[Figure] = []
+    close = plt.close
+
+    def capture_close(figure=None) -> None:
+        if isinstance(figure, Figure):
+            figures.append(figure)
+        close(figure)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(hero_plot.plt, "close", capture_close)
+        render_hero_charts(data, tmp_path / "green-shaped-hero")
+    return figures
+
+
+def test_hero_comparison_text_does_not_overlap_scatter_axes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    figures = _render_hero_layout_sample(tmp_path, monkeypatch)
+    figure = figures[0]
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    status = next(
+        artist
+        for artist in figure.texts
+        if "OpenIMCC vs VapoRock on shared vapour rows" in artist.get_text()
+    )
+    status_bbox = status.get_window_extent(renderer)
+    scatter_axes = [axis for axis in figure.axes if axis.get_ylabel() == "signed dex"]
+    assert scatter_axes
+    assert all(
+        not status_bbox.overlaps(axis.get_window_extent(renderer))
+        for axis in scatter_axes
+    )
+
+
+def test_hero_scorecard_row_text_does_not_overlap_adjacent_rows(
+    tmp_path: Path, monkeypatch
+) -> None:
+    figures = _render_hero_layout_sample(tmp_path, monkeypatch)
+    figure = figures[0]
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    scorecard_axis = next(axis for axis in figure.axes if axis.tables)
+    table = scorecard_axis.tables[0]
+    row_ids = sorted({row for row, _column in table.get_celld() if row > 0})
+    row_bboxes = []
+    for row_id in row_ids:
+        text_bboxes = [
+            cell.get_text().get_window_extent(renderer)
+            for (row, _column), cell in table.get_celld().items()
+            if row == row_id and cell.get_text().get_text()
+        ]
+        row_bboxes.append(
+            Bbox.union(text_bboxes)
+        )
+    assert len(row_bboxes) > 1
+    assert all(
+        not first.overlaps(second)
+        for first, second in zip(row_bboxes, row_bboxes[1:])
+    )
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
