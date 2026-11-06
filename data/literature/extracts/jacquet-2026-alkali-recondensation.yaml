@@ -54,30 +54,25 @@ species:
       units: ratio as CI-normalized
       values:
         quantity: ci_normalized_alkali_ratios
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_class: model_derived
         admission_status: typed_refusal
         refusal_reason: 'No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.'
         schema_gap: ci_normalized_alkali_ratios
+        basis_as_printed: 'CI-normalized (Lodders, 2003)'
         uncertainty: one standard error of the mean as printed; confidence level not stated.
-        points:
-        - {group: EH, Na_Al_mean: '1.0', Na_Al_SE: '0.1', K_Al_mean: '1.1', K_Al_SE: '0.2', n: 56, value: '1.0', table_row_number: 2, locator: {page: 34, table: '3', row: EH}}
-        - {group: OC, Na_Al_mean: '0.30', Na_Al_SE: '0.02', K_Al_mean: '0.23', K_Al_SE: '0.02', n: 171, value: '0.30', table_row_number: 3, locator: {page: 34, table: '3', row: OC}}
-        - {group: CMO, Na_Al_mean: '0.19', Na_Al_SE: '0.02', K_Al_mean: '0.19', K_Al_SE: '0.02', n: 75, value: '0.19', table_row_number: 4, locator: {page: 34, table: '3', row: CMO}}
-        - {group: CR, Na_Al_mean: '0.13', Na_Al_SE: '0.02', K_Al_mean: '0.26', K_Al_SE: '0.09', n: 58, value: '0.13', table_row_number: 5, locator: {page: 34, table: '3', row: CR}}
-        - {group: CHB, Na_Al_mean: '0.16', Na_Al_SE: '0.02', K_Al_mean: '0.09', K_Al_SE: '0.02', n: 39, value: '0.16', table_row_number: 6, locator: {page: 34, table: '3', row: CHB}}
-      derivation:
-        relation: >-
-          Table 3 reports the authors' averages of their compiled chondrule mesostasis compositions, normalized to Lodders (2003) CI; the printed errors are one standard error of the mean.
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', section: '5.2. NC/C comparison; Table 3 caption'}
-        method:
-          state: {tag: value, value: averaging compiled chondrule mesostasis compositions and CI-normalizing to Lodders (2003)}
-          locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', section: '5.2. NC/C comparison; Table 3 caption'}
-        references:
+        method_as_printed: >-
+          The data are CI-normalized (Lodders, 2003) and based on the averaged composition of chondrule mesostases in our compilation (number n of analyses specified) and errors are one standard error of the mean.
+        method_locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', section: '5.2. NC/C comparison; Table 3 caption'}
+        method_references_as_printed:
         - 'Lodders (2003), CI normalization.'
-        - 'none_printed: Table 3 does not list the input-paper references for its compiled mesostasis analyses row by row.'
+        points:
+        - {group: EH, Na_Al_mean: '1.0', Na_Al_SE: '0.1', K_Al_mean: '1.1', K_Al_SE: '0.2', n: 56, value: '1.0', value_as_printed: '1.0', table_row_number: 2, locator: {page: 34, table: '3', row: EH}}
+        - {group: OC, Na_Al_mean: '0.30', Na_Al_SE: '0.02', K_Al_mean: '0.23', K_Al_SE: '0.02', n: 171, value: '0.30', value_as_printed: '0.30', table_row_number: 3, locator: {page: 34, table: '3', row: OC}}
+        - {group: CMO, Na_Al_mean: '0.19', Na_Al_SE: '0.02', K_Al_mean: '0.19', K_Al_SE: '0.02', n: 75, value: '0.19', value_as_printed: '0.19', table_row_number: 4, locator: {page: 34, table: '3', row: CMO}}
+        - {group: CR, Na_Al_mean: '0.13', Na_Al_SE: '0.02', K_Al_mean: '0.26', K_Al_SE: '0.09', n: 58, value: '0.13', value_as_printed: '0.13', table_row_number: 5, locator: {page: 34, table: '3', row: CR}}
+        - {group: CHB, Na_Al_mean: '0.16', Na_Al_SE: '0.02', K_Al_mean: '0.09', K_Al_SE: '0.02', n: 39, value: '0.16', value_as_printed: '0.16', table_row_number: 6, locator: {page: 34, table: '3', row: CHB}}
   Li:
     observations:
     - observation_id: jacquet_2026_li_table2_quoted_isotope_data

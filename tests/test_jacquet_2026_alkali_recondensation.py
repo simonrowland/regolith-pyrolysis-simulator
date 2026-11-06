@@ -20,22 +20,44 @@ def _assert_sc456_model_rows(document: dict) -> None:
         for row in species.get("observations", [])
     }
     expected = {
-        "jacquet_2026_table3_ci_normalized_alkali_averages": "Lodders (2003)",
-        "jacquet_2026_table_a5_na_activity_coefficient": "Mathieu (2009)",
+        "jacquet_2026_table3_ci_normalized_alkali_averages": (
+            "typed_refusal",
+            "Lodders (2003)",
+        ),
+        "jacquet_2026_table_a5_na_activity_coefficient": (
+            "model_derived",
+            "Mathieu (2009)",
+        ),
     }
-    for observation_id, reference in expected.items():
+    for observation_id, (method_class, reference) in expected.items():
         row = rows[observation_id]
         values = row["values"]
-        assert values["method_class"] == "model_derived"
+        assert values["method_class"] == method_class
+        assert values.get("method_class_as_printed", "model_derived") == "model_derived"
         assert values["evidence_class"] == "model_derived"
         assert "attribution" not in values
-        derivation = row["derivation"]
-        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-        assert derivation["method"]["state"]["value"]
-        assert derivation["method"]["locator"]["page"] > 0
-        assert derivation["method"]["locator"]["section"]
-        assert derivation["references"]
-        assert any(reference in item for item in derivation["references"])
+        if method_class == "typed_refusal":
+            assert values["method_as_printed"].startswith(
+                "The data are CI-normalized (Lodders, 2003)"
+            )
+            assert values["method_locator"]["page"] == 34
+            assert values["method_locator"]["section"].startswith("5.2.")
+            assert values["method_references_as_printed"] == [
+                "Lodders (2003), CI normalization."
+            ]
+            assert "No schema token" in values["refusal_reason"]
+            assert all(
+                point["value_as_printed"] == point["value"]
+                for point in values["points"]
+            )
+        else:
+            derivation = row["derivation"]
+            assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+            assert derivation["method"]["state"]["value"]
+            assert derivation["method"]["locator"]["page"] > 0
+            assert derivation["method"]["locator"]["section"]
+            assert derivation["references"]
+            assert any(reference in item for item in derivation["references"])
 
 
 def test_sc456_author_calculations_are_model_derived_and_mutation_sensitive():
