@@ -5471,7 +5471,11 @@ class EvaporationMixin:
             # ledger.move marks the credit after apply; the debit has to
             # be a declared pool first or mixed origins refuse.
             self.atom_ledger.mark_amalgamated_pool(
-                move.debit_account, (move.species,),
+                move.debit_account,
+                resolve_species_formula(
+                    move.species,
+                    self.atom_ledger.registry,
+                ).elements,
             )
             self._move_ledger_species(
                 move.name,
