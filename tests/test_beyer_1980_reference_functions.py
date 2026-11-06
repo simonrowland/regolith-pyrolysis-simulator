@@ -139,10 +139,10 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         "bey80_k2si2o5_heat_content_crystal_table3"
     )
 
-    table10_main = source_observations[
+    table10_printed = source_observations[
         "bey80_k2si2o5_oxide_formation_g_table10"
-    ]["values"]["series"]
-    at_867 = [row for row in table10_main if Decimal(str(row["T_K"])) == 867]
+    ]["values"]["series_as_printed"]
+    at_867 = [row for row in table10_printed if Decimal(str(row["T_K"])) == 867]
     assert len(at_867) == 1
     assert Decimal(str(at_867[0]["delta_fG"])) == Decimal("-79.8")
 
@@ -154,7 +154,7 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         for key, observation in migrator.result.observations.items()
         if observation.source_id == document["source_id"]
     }
-    assert len(stored) == 628
+    assert len(stored) == 545
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
     unavailable_ids = {
@@ -175,7 +175,7 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         "bey80_k2sio3_oxide_formation_h_table8",
         "bey80_k2sio3_oxide_formation_g_table8",
     }
-    assert sum(observation.value.kind.value == "unavailable" for observation in stored.values()) == 94
+    assert sum(observation.value.kind.value == "unavailable" for observation in stored.values()) == 11
 
     def assert_noticed(table, formula, phase, quantity, temperature, kind):
         matches = [
