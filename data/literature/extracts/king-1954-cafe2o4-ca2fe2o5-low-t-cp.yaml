@@ -1,0 +1,343 @@
+schema_version: literature_extract.v1
+source_id: king-1954-cafe2o4-ca2fe2o5-low-t-cp
+source:
+  citation: King, E. G. (1954), “Heat Capacities at Low Temperatures and Entropies at 298.16° K. of Calcium
+    and Magnesium Ferrites,” J. Am. Chem. Soc., 76(22), 5849–5850. doi:10.1021/ja01651a092
+  url: https://doi.org/10.1021/ja01651a092
+  year: 1954
+extraction:
+  method: MinerU and pdftotext transcription; rendered flagged cells and checked table layout.
+  date: '2026-11-05'
+  worker: w1105b-king54
+review_status: draft
+fidelity_samples:
+- path: species.CaFe2O4.observations[king1954_cafe2o4_table1_cp].values.points[0]
+  value:
+    T_K: '52.99'
+    value: '3.458'
+  locator:
+    published_page: 5849
+    table: I
+- path: species.CaFe2O4.observations[king1954_cafe2o4_table1_cp].values.points[41]
+  value:
+    T_K: '298.16'
+    value: '36.72'
+    printed_value: (36.72)
+    extrapolated: true
+  locator:
+    published_page: 5849
+    table: I
+- path: species.Ca2Fe2O5.observations[king1954_ca2fe2o5_table1_cp].values.points[29]
+  value:
+    T_K: '298.16'
+    value: '46.10'
+    printed_value: (46.10)
+    extrapolated: true
+  locator:
+    published_page: 5849
+    table: I
+- path: species.CaFe2O4.observations[king1954_cafe2o4_table2_s29816].values.entropy
+  value: 34.7
+  locator:
+    published_page: 5850
+    table: II
+- path: species.Ca2Fe2O5.observations[king1954_ca2fe2o5_table2_s29816].values.entropy
+  value: 45.1
+  locator:
+    published_page: 5850
+    table: II
+scope_assessment:
+  document_type: Primary calorimetric study of calcium ferrites.
+  note: 'Only CaFe2O4 and Ca2Fe2O5 included; magnesium ferrite and figure-only values excluded. Consumer
+    target: openimcc/physics Ca-ferrite model card; use within-source comparisons only.'
+  absent_from_source:
+  - experimental total pressure
+species:
+  CaFe2O4:
+    observations:
+    - observation_id: king1954_cafe2o4_table1_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: corpus/raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/king-1954-cafe2o4-ca2fe2o5-low-t-cp.pdf
+        page: 1
+        published_page: 5849
+        table: I
+      T_range_K:
+      - 52.99
+      - 298.16
+      phase: cr
+      phase_label_as_printed: CaFe2O4
+      standard_state: CaFe2O4, Table I; molar heat capacity per mole of formula units.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: measured_direct
+        points:
+        - T_K: '52.99'
+          value: '3.458'
+        - T_K: '159.83'
+          value: '25.34'
+        - T_K: '195.63'
+          value: '30.32'
+        - T_K: '56.73'
+          value: '4.061'
+        - T_K: '161.86'
+          value: '25.84'
+        - T_K: '197.44'
+          value: '30.46'
+        - T_K: '60.89'
+          value: '4.822'
+        - T_K: '164.20'
+          value: '26.19'
+        - T_K: '200.50'
+          value: '30.78'
+        - T_K: '65.35'
+          value: '5.701'
+        - T_K: '165.55'
+          value: '26.33'
+        - T_K: '206.15'
+          value: '31.37'
+        - T_K: '69.81'
+          value: '6.570'
+        - T_K: '166.51'
+          value: '26.44'
+        - T_K: '216.04'
+          value: '32.36'
+        - T_K: '74.42'
+          value: '7.495'
+        - T_K: '168.42'
+          value: '26.73'
+        - T_K: '228.40'
+          value: '33.40'
+        - T_K: '80.11'
+          value: '8.672'
+        - T_K: '170.27'
+          value: '27.04'
+        - T_K: '237.14'
+          value: '33.95'
+        - T_K: '84.04'
+          value: '9.509'
+        - T_K: '172.76'
+          value: '27.38'
+        - T_K: '245.81'
+          value: '34.46'
+        - T_K: '94.62'
+          value: '11.78'
+        - T_K: '175.74'
+          value: '27.77'
+        - T_K: '256.00'
+          value: '34.98'
+        - T_K: '105.31'
+          value: '14.03'
+        - T_K: '179.87'
+          value: '28.32'
+        - T_K: '266.30'
+          value: '35.41'
+        - T_K: '114.23'
+          value: '15.95'
+        - T_K: '183.47'
+          value: '28.89'
+        - T_K: '276.19'
+          value: '35.90'
+        - T_K: '124.50'
+          value: '18.05'
+        - T_K: '186.25'
+          value: '29.29'
+        - T_K: '286.53'
+          value: '36.33'
+        - T_K: '135.79'
+          value: '20.30'
+        - T_K: '187.92'
+          value: '29.46'
+        - T_K: '296.08'
+          value: '36.65'
+        - T_K: '146.13'
+          value: '22.32'
+        - T_K: '191.39'
+          value: '29.83'
+        - T_K: '298.16'
+          value: '36.72'
+          printed_value: (36.72)
+          extrapolated: true
+        - T_K: '155.88'
+          value: '24.30'
+        - T_K: '194.45'
+          value: '30.16'
+        table_row_count: 44
+        note: Table I values as printed; parenthesized final Cp is extrapolated.
+      uncertainty:
+        reported_status: not_reported_for_individual_points
+      units_note: Printed as cal./deg. mole; temperature is in K.
+    - observation_id: king1954_cafe2o4_table2_s29816
+      type: gibbs_table
+      locator:
+        source_path: corpus/raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/king-1954-cafe2o4-ca2fe2o5-low-t-cp.pdf
+        page: 2
+        published_page: 5850
+        table: II
+      T_range_K:
+      - 298.16
+      - 298.16
+      phase: cr
+      phase_label_as_printed: CaFe2O4
+      standard_state: S°298.16 for CaFe2O4, Table II.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: measured_reduced
+        S0_51_extrapolated_cal_per_deg_mol: 1.16
+        S0_29816_minus_S0_51_measured_cal_per_deg_mol: 33.58
+        extrapolation_model_as_printed: D(249/T) + 3E(355/T) + 3E(595/T) (1.0%, 51–125 K)
+        reduction: Simpson-rule integration of Cp against log T plots; Debye/Einstein extrapolation below
+          51 K.
+        uncertainty_note: Confidence level not stated; assigned from ±0.3% measured portion and ±5% extrapolated
+          portion.
+        extrapolation_below_lowest_T_verbatim: The extrapolated entropy increments below 51°K. were calculated
+          from the following empirical combinations of Debye and Einstein functions, which fit the measured
+          heat capacity data within the deviation limits and over the temperature ranges given in parentheses.
+        entropy: 34.7
+        derived_from:
+        - king1954_cafe2o4_table1_cp
+        derivation_note: Author integration and low-temperature extrapolation of the measured Table I
+          heat-capacity data.
+        uncertainty_cal_per_deg_mol: 0.2
+        derivation:
+          relation: Simpson-rule integration of the measured Table I Cp values against log T; empirical
+            Debye/Einstein extrapolation below 51 K.
+          inputs:
+          - king1954_cafe2o4_table1_cp
+      uncertainty:
+        reported_status: reported
+        value: 0.2
+        confidence_level: not_stated
+      units_note: Printed as cal./deg. mole; temperature is in K.
+  Ca2Fe2O5:
+    observations:
+    - observation_id: king1954_ca2fe2o5_table1_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: corpus/raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/king-1954-cafe2o4-ca2fe2o5-low-t-cp.pdf
+        page: 1
+        published_page: 5849
+        table: I
+      T_range_K:
+      - 53.29
+      - 298.16
+      phase: cr
+      phase_label_as_printed: Ca2Fe2O5
+      standard_state: Ca2Fe2O5, Table I; molar heat capacity per mole of formula units.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: measured_direct
+        points:
+        - T_K: '53.29'
+          value: '6.139'
+        - T_K: '115.15'
+          value: '21.33'
+        - T_K: '216.27'
+          value: '38.52'
+        - T_K: '57.16'
+          value: '7.012'
+        - T_K: '124.54'
+          value: '23.39'
+        - T_K: '230.81'
+          value: '40.12'
+        - T_K: '61.71'
+          value: '8.166'
+        - T_K: '135.95'
+          value: '25.79'
+        - T_K: '238.04'
+          value: '40.84'
+        - T_K: '66.48'
+          value: '9.367'
+        - T_K: '145.94'
+          value: '27.78'
+        - T_K: '245.80'
+          value: '41.65'
+        - T_K: '71.15'
+          value: '10.54'
+        - T_K: '156.09'
+          value: '29.64'
+        - T_K: '255.71'
+          value: '42.57'
+        - T_K: '75.76'
+          value: '11.68'
+        - T_K: '165.90'
+          value: '31.38'
+        - T_K: '266.41'
+          value: '43.53'
+        - T_K: '80.26'
+          value: '12.86'
+        - T_K: '175.88'
+          value: '33.02'
+        - T_K: '275.94'
+          value: '44.37'
+        - T_K: '85.17'
+          value: '14.09'
+        - T_K: '185.97'
+          value: '34.54'
+        - T_K: '286.17'
+          value: '45.22'
+        - T_K: '94.75'
+          value: '16.47'
+        - T_K: '195.88'
+          value: '35.91'
+        - T_K: '296.09'
+          value: '45.92'
+        - T_K: '105.70'
+          value: '19.08'
+        - T_K: '206.34'
+          value: '37.22'
+        - T_K: '298.16'
+          value: '46.10'
+          printed_value: (46.10)
+          extrapolated: true
+        table_row_count: 30
+        note: Table I values as printed; parenthesized final Cp is extrapolated.
+      uncertainty:
+        reported_status: not_reported_for_individual_points
+      units_note: Printed as cal./deg. mole; temperature is in K.
+    - observation_id: king1954_ca2fe2o5_table2_s29816
+      type: gibbs_table
+      locator:
+        source_path: corpus/raw/king-1954-cafe2o4-ca2fe2o5-low-t-cp/king-1954-cafe2o4-ca2fe2o5-low-t-cp.pdf
+        page: 2
+        published_page: 5850
+        table: II
+      T_range_K:
+      - 298.16
+      - 298.16
+      phase: cr
+      phase_label_as_printed: Ca2Fe2O5
+      standard_state: S°298.16 for Ca2Fe2O5, Table II.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: measured_reduced
+        S0_51_extrapolated_cal_per_deg_mol: 2.5
+        S0_29816_minus_S0_51_measured_cal_per_deg_mol: 42.61
+        extrapolation_model_as_printed: D(175/T) + 3E(284/T) + 3E(610/T) + 2E(547/T) (1.4%, 51–225 K)
+        reduction: Simpson-rule integration of Cp against log T plots; Debye/Einstein extrapolation below
+          51 K.
+        uncertainty_note: Confidence level not stated; assigned from ±0.3% measured portion and ±5% extrapolated
+          portion.
+        extrapolation_below_lowest_T_verbatim: The extrapolated entropy increments below 51°K. were calculated
+          from the following empirical combinations of Debye and Einstein functions, which fit the measured
+          heat capacity data within the deviation limits and over the temperature ranges given in parentheses.
+        entropy: 45.1
+        derived_from:
+        - king1954_ca2fe2o5_table1_cp
+        derivation_note: Author integration and low-temperature extrapolation of the measured Table I
+          heat-capacity data.
+        uncertainty_cal_per_deg_mol: 0.3
+        derivation:
+          relation: Simpson-rule integration of the measured Table I Cp values against log T; empirical
+            Debye/Einstein extrapolation below 51 K.
+          inputs:
+          - king1954_ca2fe2o5_table1_cp
+      uncertainty:
+        reported_status: reported
+        value: 0.3
+        confidence_level: not_stated
+      units_note: Printed as cal./deg. mole; temperature is in K.
