@@ -33,29 +33,45 @@ def _rows(document: dict) -> dict[str, dict]:
     }
 
 
-def _assert_model_evidence(document: dict) -> None:
+def _assert_figure_only_model_refusals(document: dict) -> None:
     rows = _rows(document)
     for observation_id in IDS:
         row = rows[observation_id]
-        assert row["values"]["method_class"] == "model_derived"
-        assert row["derivation"]["method"]["state"]["value"].endswith("GLTAS)")
-        assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-        assert row["derivation"]["references"] == [
-            "GLTAS [50], as cited in the figure caption."
-        ]
-        page, pdf_page_index = PHYSICAL_PAGES[observation_id]
-        for locator in (
-            row["derivation"]["method"]["locator"],
-            row["derivation"]["raw_inputs"]["locator"],
-        ):
-            assert locator["page"] == page
-            assert locator["pdf_page_index"] == pdf_page_index
-            assert locator["published_page"] == row["locator"]["published_page"]
+        values = row["values"]
+        assert values["method_class"] == "typed_refusal"
+        assert values["method_class_as_printed"] == "model_derived"
+        assert values["admission_status"] == "typed_refusal"
+        assert "Figure-only model" in values["refusal_reason"]
+        assert "GLTAS" in values["method_as_printed"]
+        assert values["method_locator"]["page"] == PHYSICAL_PAGES[observation_id][0]
+        assert values["method_locator"]["pdf_page_index"] == PHYSICAL_PAGES[observation_id][1]
+        assert values["method_locator"]["figure"] == row["locator"]["figure"]
+        assert values["method_references_as_printed"] == ["Stolyarova and Shilov [50]"]
+        if observation_id != IDS[4]:
+            assert values["method_references_locator"]["published_page"] == "65"
+            assert values["method_references_locator"]["paragraph"] == (
+                "the other computational procedure was suggested [50]."
+            )
+        assert "derivation" not in row
+        if observation_id == IDS[4]:
+            assert values["quote"] == values["method_as_printed"]
+        else:
+            assert "solid lines are results of modeling using GLTAS" in values["quote"]
 
 
-def test_gltas_figure_outputs_are_model_derived() -> None:
+def test_gltas_figure_outputs_remain_unavailable_without_sampled_points() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    _assert_model_evidence(document)
+    _assert_figure_only_model_refusals(document)
+    rows = _rows(document)
+    assert rows[IDS[0]]["values"]["contour_levels_as_printed"] == [
+        "-4",
+        "-5",
+        "-8",
+        "-11",
+    ]
+    assert rows[IDS[4]]["values"]["completeness_note"] == (
+        "Curves are figure-only; no points were digitised."
+    )
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -64,14 +80,14 @@ def test_gltas_figure_outputs_are_model_derived() -> None:
     assert not migrator.result.validation.hard_issues
 
 
-def test_gltas_class_pin_rejects_quoted_reversion() -> None:
+def test_gltas_class_pin_rejects_figure_refusal_reversion() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    _assert_model_evidence(document)
+    _assert_figure_only_model_refusals(document)
     mutated = deepcopy(document)
     rows = _rows(mutated)
-    rows[IDS[0]]["values"]["method_class"] = "quoted_attributed"
+    rows[IDS[0]]["values"]["method_class"] = "model_derived"
     try:
-        _assert_model_evidence(mutated)
+        _assert_figure_only_model_refusals(mutated)
     except AssertionError:
         return
-    raise AssertionError("quoted reversion passed the model_derived pin")
+    raise AssertionError("a calculated figure line was admitted as a sampled value")

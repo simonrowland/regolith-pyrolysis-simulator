@@ -147,27 +147,6 @@ species:
         reported_status: not_reported
         note: Figure 2 prints no uncertainties.
     - observation_id: stolyarova_2013_fig2_bao_gltas_contours_model
-      derivation:
-        relation: "The Figure 2 model output is calculated according to GLTAS [50], as stated in the paper."
-        method:
-          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
-          locator:
-            page: 6
-            pdf_page_index: 5
-            published_page: "62"
-            figure: "2"
-            section: "Figure 2 caption"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 6
-            pdf_page_index: 5
-            published_page: "62"
-            figure: "2"
-            section: "Figure 2 caption"
-            note: The figure does not report the numeric GLTAS model inputs for these curves.
-        references:
-        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -179,13 +158,14 @@ species:
       units: log10 activity
       values:
         quantity: BaO_GLTAS_isoactivity_contours
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
         status: typed_refusal
-        admission_status: rejected_model_output_not_measurement
-        refusal_reason: model_output_not_measurement
+        admission_status: typed_refusal
+        refusal_reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled from the curves.'
         temperature_K_as_published: '1650'
         contour_levels_as_printed: ['-4', '-5', '-8', '-11']
         line_style_as_published: solid
@@ -193,6 +173,11 @@ species:
         quote: >-
           The BaO isoactivities lines in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
           -4; -5; -8; -11.
+        method_as_printed: 'solid lines are results of modeling using GLTAS.'
+        method_locator: {page: 6, pdf_page_index: 5, published_page: '62', figure: '2', section: 'Figure 2 caption'}
+        method_references_as_printed:
+        - 'Stolyarova and Shilov [50]'
+        method_references_locator: {page: 9, pdf_page_index: 8, published_page: '65', paragraph: 'the other computational procedure was suggested [50].'}
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   B2O3:
@@ -227,27 +212,6 @@ species:
         reported_status: not_reported
         note: Figure 3 prints no uncertainties.
     - observation_id: stolyarova_2013_fig3_b2o3_gltas_contours_model
-      derivation:
-        relation: "The Figure 3 model output is calculated according to GLTAS [50], as stated in the paper."
-        method:
-          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
-          locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: "63"
-            figure: "3"
-            section: "Figure 3 caption"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: "63"
-            figure: "3"
-            section: "Figure 3 caption"
-            note: The figure does not report the numeric GLTAS model inputs for these curves.
-        references:
-        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -260,13 +224,14 @@ species:
       units: log10 activity
       values:
         quantity: B2O3_GLTAS_isoactivity_contours
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
         status: typed_refusal
-        admission_status: rejected_model_output_not_measurement
-        refusal_reason: model_output_not_measurement
+        admission_status: typed_refusal
+        refusal_reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled from the curves.'
         temperature_K_as_published: '1650'
         contour_levels_as_printed: ['-8', '-6', '-4', '-1']
         line_style_as_published: solid
@@ -274,6 +239,11 @@ species:
         quote: >-
           The B2O3 isoactivities lines in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
           -8; -6; -4; -1.
+        method_as_printed: 'solid lines are results of modeling using GLTAS.'
+        method_locator: {page: 7, pdf_page_index: 6, published_page: '63', figure: '3', section: 'Figure 3 caption'}
+        method_references_as_printed:
+        - 'Stolyarova and Shilov [50]'
+        method_references_locator: {page: 9, pdf_page_index: 8, published_page: '65', paragraph: 'the other computational procedure was suggested [50].'}
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   SiO2:
@@ -307,27 +277,6 @@ species:
         reported_status: not_reported
         note: Figure 4 prints no uncertainties.
     - observation_id: stolyarova_2013_fig4_sio2_gltas_contours_model
-      derivation:
-        relation: "The Figure 4 model output is calculated according to GLTAS [50], as stated in the paper."
-        method:
-          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
-          locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: "63"
-            figure: "4"
-            section: "Figure 4 caption"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: "63"
-            figure: "4"
-            section: "Figure 4 caption"
-            note: The figure does not report the numeric GLTAS model inputs for these curves.
-        references:
-        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -339,13 +288,14 @@ species:
       units: log10 activity
       values:
         quantity: SiO2_GLTAS_isoactivity_contours
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
         status: typed_refusal
-        admission_status: rejected_model_output_not_measurement
-        refusal_reason: model_output_not_measurement
+        admission_status: typed_refusal
+        refusal_reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled from the curves.'
         temperature_K_as_published: '1650'
         contour_levels_as_printed: ['-1', '-2', '-3', '-4']
         line_style_as_published: solid
@@ -353,6 +303,11 @@ species:
         quote: >-
           The SiO2 isoactivities lines in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
           -1; -2; -3; -4.
+        method_as_printed: 'solid lines are results of modeling using GLTAS.'
+        method_locator: {page: 7, pdf_page_index: 6, published_page: '63', figure: '4', section: 'Figure 4 caption'}
+        method_references_as_printed:
+        - 'Stolyarova and Shilov [50]'
+        method_references_locator: {page: 9, pdf_page_index: 8, published_page: '65', paragraph: 'the other computational procedure was suggested [50].'}
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
     - observation_id: stolyarova_2013_fig5_gibbs_kems_contours_figure_only
@@ -384,27 +339,6 @@ species:
         reported_status: not_reported
         note: Figure 5 prints no uncertainties.
     - observation_id: stolyarova_2013_fig5_gibbs_gltas_contours_model
-      derivation:
-        relation: "The Figure 5 model output is calculated according to GLTAS [50], as stated in the paper."
-        method:
-          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
-          locator:
-            page: 8
-            pdf_page_index: 7
-            published_page: "64"
-            figure: "5"
-            section: "Figure 5 caption"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 8
-            pdf_page_index: 7
-            published_page: "64"
-            figure: "5"
-            section: "Figure 5 caption"
-            note: The figure does not report the numeric GLTAS model inputs for these curves.
-        references:
-        - "GLTAS [50], as cited in the figure caption."
       type: gibbs_table
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -416,13 +350,14 @@ species:
       units: not stated in figure or caption
       values:
         quantity: GLTAS_Gibbs_energy_of_formation_contours
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
         status: typed_refusal
-        admission_status: rejected_model_output_not_measurement
-        refusal_reason: model_output_not_measurement
+        admission_status: typed_refusal
+        refusal_reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled from the curves.'
         temperature_K_as_published: '1650'
         contour_labels_as_printed: ['-30', '-40', '-50', '-55']
         line_style_as_published: solid
@@ -430,30 +365,14 @@ species:
         quote: >-
           The lines with the constant values of Gibbs energy of formation in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
           -30; -40; -50; -55.
+        method_as_printed: 'solid lines are results of modeling using GLTAS.'
+        method_locator: {page: 8, pdf_page_index: 7, published_page: '64', figure: '5', section: 'Figure 5 caption'}
+        method_references_as_printed:
+        - 'Stolyarova and Shilov [50]'
+        method_references_locator: {page: 9, pdf_page_index: 8, published_page: '65', paragraph: 'the other computational procedure was suggested [50].'}
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
     - observation_id: stolyarova_2013_fig6_gibbs_gltas_model_figure_only
-      derivation:
-        relation: "The Figure 6 model output is calculated according to GLTAS [50], as stated in the paper."
-        method:
-          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: "65"
-            figure: "6"
-            section: "Figure 6 caption"
-        raw_inputs:
-          state: {tag: value, value: not_printed}
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: "65"
-            figure: "6"
-            section: "Figure 6 caption"
-            note: The figure does not report the numeric GLTAS model inputs for these curves.
-        references:
-        - "GLTAS [50], as cited in the figure caption."
       type: gibbs_table
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -465,18 +384,23 @@ species:
       units: kJ/mol as printed on the figure y axis
       values:
         quantity: GLTAS_Gibbs_energy_curves
-        method_class: model_derived
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
         status: typed_refusal
-        admission_status: rejected_model_output_not_measurement
-        refusal_reason: model_output_not_measurement
+        admission_status: typed_refusal
+        refusal_reason: 'Figure-only model curves: no composition-value points are sampled from the curves.'
         systems_as_published: ['CaO-B2O3-SiO2 (1)', 'SrO-B2O3-SiO2 (2)', 'BaO-B2O3-SiO2 (3)']
         temperature_range_K_as_published: '1650-1800'
         mole_fraction_SiO2_as_published: '0.50'
         locator: {published_page: '65', figure: '6'}
         quote: 'The values of the Gibbs energies in the melts of the CaO-B2O3-SiO2 (1), SrO-B2O3-SiO2 (2) and BaO-B2O3-SiO2 (3) systems in the temperature range 1650-1800 K calculated according to GLTAS [50] at the mole fraction of SiO2= 0.50 as a function of the melt concentration.'
+        method_as_printed: 'The values of the Gibbs energies in the melts of the CaO-B2O3-SiO2 (1), SrO-B2O3-SiO2 (2) and BaO-B2O3-SiO2 (3) systems in the temperature range 1650-1800 K calculated according to GLTAS [50] at the mole fraction of SiO2= 0.50 as a function of the melt concentration.'
+        method_locator: {page: 9, pdf_page_index: 8, published_page: '65', figure: '6', section: 'Figure 6 caption'}
+        method_references_as_printed:
+        - 'Stolyarova and Shilov [50]'
         completeness_note: Curves are figure-only; no points were digitised.
       uncertainty:
         note: Model output; no model uncertainty is printed.
