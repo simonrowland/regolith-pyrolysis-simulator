@@ -628,7 +628,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 raw_margin_V,
                 raw_margin_refusal,
             ) = _mre_raw_margin_assessment(
-                oxide=oxide,
                 voltage_V=voltage_V,
                 fallback_requirement_V=E_nernst,
                 fallback_margin_V=fallback_margin_V,

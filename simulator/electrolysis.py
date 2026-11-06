@@ -137,12 +137,10 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
-MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 
 
 def _mre_raw_margin_assessment(
     *,
-    oxide: str,
     voltage_V: float,
     fallback_requirement_V: float,
     fallback_margin_V: float,
@@ -164,7 +162,6 @@ def _mre_raw_margin_assessment(
     refusal = None
     if (
         fallback_margin_V > 0.0
-        and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
         and not reference.authoritative
         and raw_margin_V <= 0.0
     ):
@@ -994,7 +991,6 @@ class ElectrolysisModel:
             fallback_margin_V = voltage_V - E_nernst
             raw_requirement_V, raw_margin_V, raw_margin_refusal = (
                 _mre_raw_margin_assessment(
-                    oxide=oxide,
                     voltage_V=voltage_V,
                     fallback_requirement_V=E_nernst,
                     fallback_margin_V=fallback_margin_V,
