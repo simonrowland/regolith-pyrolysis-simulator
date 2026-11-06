@@ -452,6 +452,37 @@ def test_knudsen_effusion_balance_requires_composition_and_temperature(
     assert resolved is None
 
 
+def test_unprinted_knudsen_fo2_prefers_effusion_to_kress_composition_inversion() -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    observation, experiment = _kems_partial(cell_material=None)
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("FeO", Decimal("0.2")),
+            ("Fe2O3", Decimal("0.2")),
+            ("SiO2", Decimal("0.6")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(observation.identity, composition=State.of(composition))
+    observation = replace(observation, identity=identity)
+    temperature = float(identity.temperature_K.value)
+
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.PT,)),
+        observation,
+        composition=composition,
+        temperature_K=temperature,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert resolved is not None
+    assert resolved.closure
+    assert resolved.route == "effusion_oxygen_balance"
+
+
 def test_knudsen_effusion_balance_uses_hertz_knudsen_flux_weighting() -> None:
     from openimcc import oxygen_balance_from_pressure_model, oxygen_balance_species_metadata
     from simulator.diagnostic_helpers.binary_pot_battery import (
