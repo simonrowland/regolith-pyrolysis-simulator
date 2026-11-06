@@ -1536,7 +1536,7 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
     refused = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1500.0),
-        flux_activation_context=_pre_rg_activation_context(),
+        flux_activation_context=_rg_activation_context(),
     ).channel("K")
     assert isinstance(refused.pressure, PressureRefusal)
     assert refused.source_reaction_activity is not None
@@ -1642,7 +1642,7 @@ def test_malformed_reported_activity_becomes_typed_refusal() -> None:
     answer = catalog.resolve_batch(
         ledger,
         state,
-        flux_activation_context=_pre_rg_activation_context(),
+        flux_activation_context=_rg_activation_context(),
     ).channel("K")
     assert isinstance(answer.pressure, PressureRefusal)
     assert answer.source_reaction_activity is not None
@@ -1672,7 +1672,7 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
     answer = catalog.resolve_batch(
         ledger,
         state,
-        flux_activation_context=_pre_rg_activation_context(),
+        flux_activation_context=_rg_activation_context(),
     ).channel("K")
     assert isinstance(answer.pressure, PressureRefusal)
     assert answer.source_reaction_activity is not None
@@ -1680,6 +1680,171 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
         answer.source_reaction_activity.refusal_code
         is ActivityRefusalCode.STANDARD_STATE_MISMATCH
     )
+
+
+@pytest.mark.parametrize(
+    "failure",
+    (
+        "missing_activity",
+        "missing_provider",
+        "missing_standard_state",
+        "missing_pO2",
+        "missing_temperature",
+    ),
+)
+def test_pre_rg_contract_and_run_state_refusals_fail_closed_without_claims(
+    failure: str,
+) -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    state = _state_with_k_activity(temperature_K=1500.0)
+    if failure == "missing_activity":
+        state = VapourResolveState(
+            temperature_K=1500.0,
+            source_reaction_fO2_bar=1.0e-8,
+        )
+    elif failure == "missing_provider":
+        state = replace(state, source_reaction_activity_provider=None)
+    elif failure == "missing_standard_state":
+        state = replace(state, source_reaction_activity_standard_states={})
+    elif failure == "missing_pO2":
+        state = replace(state, source_reaction_fO2_bar=None)
+    elif failure == "missing_temperature":
+        state = replace(state, temperature_K=None)
+
+    with pytest.raises(VapourRequestConstructionError):
+        catalog.resolve_batch(
+            ledger,
+            state,
+            # Run-level outcome state remains mandatory when the legacy
+            # effective-pressure seam carries no activation claims.
+            flux_activation_context=_pre_rg_activation_context(),
+        )
+
+
+@pytest.mark.parametrize(
+    "refusal_code",
+    (ActivityRefusalCode.UNMAPPED_PHASE, ActivityRefusalCode.UNMAPPED_ENDMEMBER),
+)
+def test_pre_rg_demotes_species_local_activity_refusals(
+    refusal_code: ActivityRefusalCode,
+) -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+
+    def refuse_one_species(declaration, **kwargs):
+        return SourceReactionActivity(
+            component_id=declaration.component_id,
+            value=None,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason=refusal_code.value,
+            standard_state=declaration.standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=kwargs.get("state_fingerprint"),
+            solve_group_id=kwargs.get("solve_group_id"),
+            provider="test_species_local_activity_source",
+            refusal_code=refusal_code,
+            detail="activity source has no usable value for this species",
+        )
+
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}},
+        _state_with_k_activity(temperature_K=1500.0),
+        activity_provider=SimpleNamespace(
+            resolve_source_reaction_activity=refuse_one_species
+        ),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+
+    assert batch.channel("K").refusal_code == refusal_code.value
+    assert batch.flux_active_species_ids == frozenset()
+
+
+def test_pre_rg_missing_activity_declaration_fails_closed_without_claims() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    rules = tuple(
+        replace(rule, source_reaction_activity=None)
+        for rule in catalog.request_rules
+    )
+    with pytest.raises(VapourRequestConstructionError):
+        resolve_vapour_batch(
+            rules=rules,
+            ledger_snapshot={
+                "process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}
+            },
+            state=_state_with_k_activity(temperature_K=1500.0),
+            catalog_species=catalog._species,
+            flux_activation_context=_pre_rg_activation_context(),
+        )
+
+
+def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None:
+    declaration = ActivityInputDeclaration(
+        component_id="MgO",
+        standard_state=_TEST_ACTIVITY_STANDARD_STATE,
+        activity_model="provider_reported_thermodynamic_activity",
+        require_assemblage_match=False,
+    )
+    rule = RequestRule(
+        species_id="Mg",
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"MgO"}),
+        required_source_atoms=frozenset({"Mg", "O"}),
+        solve_group_id="mg_test",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id="Mg",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+        source_reaction_activity=declaration,
+    )
+
+    class Evaluator:
+        activity_exponent = 1.0
+        pO2_exponent = 0.0
+        pO2_reference_bar = 1.0
+        oxygen_fugacity_channel = None
+        valid_temperature_K = (298.15, 4000.0)
+
+        def evaluate(self, temperature_K, *, source_activity=1.0, pO2_bar=None):
+            return SimpleNamespace(pressure_pa=float(source_activity))
+
+    state = VapourResolveState(
+        temperature_K=1773.15,
+        source_reaction_activities={"Mg": 0.25},
+        source_reaction_activity_provider="builtin-vapor-pressure",
+        source_reaction_activity_evidence_refs={"Mg": "test:d349"},
+        source_reaction_activity_standard_states={
+            "Mg": _TEST_ACTIVITY_STANDARD_STATE
+        },
+    )
+
+    with pytest.raises(VapourRequestConstructionError):
+        resolve_vapour_batch(
+            rules=(rule,),
+            ledger_snapshot={"process.cleaned_melt": {"MgO": 1.0}},
+            state=state,
+            catalog_species={
+                "Mg": SimpleNamespace(
+                    species_id="Mg",
+                    evaluator=Evaluator(),
+                    vaporisation_coefficients=SimpleNamespace(
+                        evaporation_alpha={"value": 1.0}
+                    ),
+                )
+            },
+            flux_activation_context=_pre_rg_activation_context(),
+        )
 
 
 # ---------------------------------------------------------------------------

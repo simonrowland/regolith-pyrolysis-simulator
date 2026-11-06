@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import math
 import os
 from types import SimpleNamespace
 
@@ -17,6 +18,7 @@ from simulator.diagnostic_helpers.alphamelts_volatility import (
     alphamelts_activity_volatility_diagnostic,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.vapour_rail.catalog import CompiledPressureEvaluator
 
 
 _SIO_VAPOR_DATA = {
@@ -125,6 +127,67 @@ def test_activity_volatility_uses_the_solved_liquid_for_builtin_substitution() -
             expected["species"][species]["P_eq_Pa"],
             rel=1e-12,
             abs=0,
+        )
+
+
+def test_raw_weight_fraction_comparison_stays_out_of_crystalline_k(
+    monkeypatch,
+) -> None:
+    vapor_pressure_data = volatility_module._load_default_vapor_pressure_data()
+    composition = _domain_composition()
+    activity_inputs: dict[str, list[float]] = {}
+    original_evaluate = CompiledPressureEvaluator.evaluate
+
+    def record_crystalline_k_input(
+        evaluator,
+        temperature_K,
+        *,
+        source_activity=None,
+        pO2_bar=None,
+        reaction_inputs=None,
+    ):
+        if evaluator.species_id in {
+            "Mg", "Ca", "Mg2", "Ca2", "MgO_gas", "CaO_gas"
+        }:
+            activity_inputs.setdefault(evaluator.species_id, []).append(
+                float(source_activity)
+            )
+        return original_evaluate(
+            evaluator,
+            temperature_K,
+            source_activity=source_activity,
+            pO2_bar=pO2_bar,
+            reaction_inputs=reaction_inputs,
+        )
+
+    monkeypatch.setattr(
+        CompiledPressureEvaluator, "evaluate", record_crystalline_k_input
+    )
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=composition,
+        pO2_grid_bar=[1.0],
+        temperature_C=1600.0,
+        activity_source=StubActivitySource(
+            {1.0: {"MgO": 0.4, "CaO": 0.3}, 10.0: {"MgO": 0.4, "CaO": 0.3}}
+        ),
+        vapor_pressure_data=vapor_pressure_data,
+    )
+
+    rows = diagnostic["grid"][0]["species"]
+    for species in ("Mg", "Ca", "Mg2", "Ca2", "MgO_gas", "CaO_gas"):
+        row = rows[species]
+        raw_fraction = row["wt_fraction_activity"]
+        assert raw_fraction > 0.0
+        assert row["P_eq_wt_fraction_Pa"] is None
+        assert row["P_eq_delta_vs_wt_fraction_Pa"] is None
+        assert row["P_eq_ratio_vs_wt_fraction"] is None
+        assert "raw_weight_fraction_comparison=not_evaluated_against_crystalline_K" in (
+            row["source_label"]
+        )
+        assert activity_inputs[species]
+        assert all(
+            not math.isclose(value, raw_fraction, rel_tol=0.0, abs_tol=1e-14)
+            for value in activity_inputs[species]
         )
 
 
