@@ -17873,7 +17873,7 @@ def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> No
 def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
     from simulator.battery.enums import CellMaterial
     from simulator.battery.records import union_notices
-    from simulator.battery.score import _reactive_cell_not_modelled_notice
+    from simulator.battery.score import _cell_oxygen_not_modelled_notice
 
     reference, context, bench, prediction = _cell_material_score_case(
         CellMaterial.TA,
@@ -17892,7 +17892,7 @@ def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
             notices=union_notices(
                 base.notices,
                 (
-                    _reactive_cell_not_modelled_notice(
+                    _cell_oxygen_not_modelled_notice(
                         Quantity.P_PARTIAL, bench.cell_materials
                     ),
                 ),
