@@ -157,7 +157,11 @@ from simulator.melt_backend.pure_phase import (
 )
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import finite_float, is_declared_real_scalar
-from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.feedstock_composition import (
+    feot_equivalent_moles,
+    iron_oxide_values,
+    total_fe,
+)
 
 
 # dump_function.c:1514 prints log10(fO2) with %e (six fractional digits).
@@ -1275,6 +1279,76 @@ def _assert_magemin_bulk_echo(
             )
 
 
+def _fold_ferric_split_into_feo_total(
+    composition: Mapping[str, float],
+    *,
+    moles: bool,
+) -> Mapping[str, float]:
+    """Fold a positive Fe2O3 split onto FeO. Absent Fe2O3 is unchanged.
+
+    Premise: one Fe2O3 formula holds two Fe atoms. The mole identity is
+    owned by ``feot_equivalent_moles``:
+        n(FeO)_new = n(FeO) + 2 * n(Fe2O3).
+    The mass identity is owned by ``total_fe``:
+        m(FeO)_new = m(FeO) + m(Fe2O3) * (2 * M_FeO / M_Fe2O3).
+    Unit check: 1 mol Fe2O3 (159.687 g) becomes 2 mol FeO (143.688 g).
+    The 15.999 g excess O is not kept on Fe2O3; the FeO_T peel then
+    provisions qfm buffer O from the combined FeO inventory.
+    Limiting case: Fe2O3 <= 0 leaves the mapping object unchanged.
+    """
+    _feo, fe2o3 = iron_oxide_values(composition)
+    if fe2o3 <= 0.0:
+        return composition
+    folded = {
+        str(name): value
+        for name, value in composition.items()
+        if str(name) != 'Fe2O3'
+    }
+    folded['FeO'] = (
+        feot_equivalent_moles(composition) if moles else total_fe(composition)
+    )
+    return folded
+
+
+def _liquidus_inputs_on_feo_total_iron_basis(
+    *,
+    composition_kg: Optional[Mapping[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]],
+) -> tuple[
+    Optional[Mapping[str, float]],
+    Optional[Mapping[str, float]],
+    Optional[Mapping[str, Mapping[str, float]]],
+]:
+    """Present imposed-fO2 liquidus iron as FeO_T.
+
+    ``_build_db_bulk_projection`` peels buffer O from FeO only while Fe2O3
+    is absent, because an explicit ferric analysis is a closed oxygen budget.
+    A ledger redox split writes trace Fe2O3 into an FeO_T melt and that guard
+    then drops buffer O to the ferric excess. The qfm buffer does not
+    participate, native fO2 misses the request, and the freeze gate holds
+    the last honoured curve. Direct ``equilibrate`` keeps the closed-budget
+    rule. Only the cleaned-melt account is the liquidus bulk.
+    """
+    kg = (
+        None if composition_kg is None
+        else _fold_ferric_split_into_feo_total(composition_kg, moles=False)
+    )
+    mol = (
+        None if composition_mol is None
+        else _fold_ferric_split_into_feo_total(composition_mol, moles=True)
+    )
+    if composition_mol_by_account is None:
+        return kg, mol, None
+    accounts = dict(composition_mol_by_account)
+    melt = accounts.get(CLEANED_MELT_ACCOUNT)
+    if isinstance(melt, Mapping):
+        accounts[CLEANED_MELT_ACCOUNT] = _fold_ferric_split_into_feo_total(
+            melt, moles=True,
+        )
+    return kg, mol, accounts
+
+
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
@@ -1964,6 +2038,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'invalid liquidus_finder_budget_s: must be finite and positive',
                 ),
                 diagnostics={'reason': 'invalid_input'},
+            )
+
+        # An already-projected ig bulk (the composition_projected retry) is
+        # FeOt+O, not FeO/Fe2O3. Folding it again would treat buffer O as
+        # ferric oxide. The outer search folds the ledger split first, so
+        # the projection that builds this retry still gets the FeO_T peel.
+        if not projected_retry:
+            (
+                composition_kg,
+                composition_mol,
+                composition_mol_by_account,
+            ) = _liquidus_inputs_on_feo_total_iron_basis(
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
             )
 
         def sample_fraction(
