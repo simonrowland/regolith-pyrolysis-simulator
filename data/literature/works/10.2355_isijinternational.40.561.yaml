@@ -42,7 +42,15 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 562
+        table: '1'
+        note: Equilibrium alloy composition for sample 1; paired with CaO activity observation kume_2000_table1_sample_1.
   conditions:
     temperature_K:
       state:
@@ -126,7 +134,15 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 562
+        table: '1'
+        note: Equilibrium alloy composition for sample 6; paired with CaO activity observation kume_2000_table1_sample_6.
   conditions:
     temperature_K:
       state:
@@ -210,7 +226,15 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 563
+        table: '2'
+        note: Equilibrium alloy composition for sample 101; paired with CaO activity observation kume_2000_table2_sample_101.
   conditions:
     temperature_K:
       state:
@@ -313,7 +337,15 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 564
+        table: '3'
+        note: Equilibrium alloy composition for sample 201; paired with CaO activity observation kume_2000_table3_sample_201.
   conditions:
     temperature_K:
       state:
@@ -416,7 +448,15 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 565
+        table: '4'
+        note: Equilibrium alloy composition for sample 301; paired with CaO activity observation kume_2000_table4_sample_301.
   conditions:
     temperature_K:
       state:

@@ -199,7 +199,7 @@ observations:
       reason: source condensed reservoir not grounded
     composition:
       tag: unknown
-      reason: 'printed oxide wt% map has unsupported numeric component(s): CO2'
+      reason: 'mass-percent composition is a partial analysis: kept sum=93.136 wt% is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -247,6 +247,14 @@ observations:
     section: Results and discussion
   read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value: boiler slag; Table I composition
+      locator:
+        page: 2
+        published_page: 616
+        table: I
     printed_composition:
       state:
         tag: value
@@ -305,14 +313,6 @@ observations:
         page: 2
         published_page: 616
         section: Results and discussion
-    composition:
-      state:
-        tag: value
-        value: boiler slag; Table I composition
-      locator:
-        page: 2
-        published_page: 616
-        table: I
   derivation:
     relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
       sigma_i); c was calibrated by a partial-pressure measurement with pure silver.
@@ -525,7 +525,7 @@ observations:
       reason: source condensed reservoir not grounded
     composition:
       tag: unknown
-      reason: 'printed oxide wt% map has unsupported numeric component(s): CO2'
+      reason: 'mass-percent composition is a partial analysis: kept sum=93.136 wt% is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -573,6 +573,14 @@ observations:
     section: Results and discussion
   read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value: boiler slag; Table I composition
+      locator:
+        page: 2
+        published_page: 616
+        table: I
     printed_composition:
       state:
         tag: value
@@ -631,14 +639,6 @@ observations:
         page: 2
         published_page: 616
         section: Results and discussion
-    composition:
-      state:
-        tag: value
-        value: boiler slag; Table I composition
-      locator:
-        page: 2
-        published_page: 616
-        table: I
   derivation:
     relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
       sigma_i); c was calibrated by a partial-pressure measurement with pure silver.

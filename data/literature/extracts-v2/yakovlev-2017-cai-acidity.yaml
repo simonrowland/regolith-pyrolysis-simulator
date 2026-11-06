@@ -27,7 +27,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.78 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -83,6 +84,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '0.78'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2808.0, 1625.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 0.78 ± 0.08 wt%. Material loss = 2.38 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.78 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2808.0, 1625.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 0.78 ± 0.08 wt%. Material loss = 2.38 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -140,7 +173,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.53 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -196,6 +230,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '11.53'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2985.5, 1622.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 11.53 ± 0.08 wt%. Material loss = 2.64
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.53 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2985.5, 1622.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 11.53 ± 0.08 wt%. Material loss = 2.64
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -253,7 +319,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.52 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -309,6 +376,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '18.52'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3101.0, 1617.9) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 18.52 ± 0.08 wt%. Material loss = 2.94
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.52 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3101.0, 1617.9) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 18.52 ± 0.08 wt%. Material loss = 2.94
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -366,7 +465,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -422,6 +522,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '21.54'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3150.9, 1616.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 21.54 ± 0.08 wt%. Material loss = 3.08
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3150.9, 1616.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 21.54 ± 0.08 wt%. Material loss = 3.08
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -479,7 +611,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.58 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -535,6 +668,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '37.58'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3416.0, 1604.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 37.58 ± 0.08 wt%. Material loss = 3.97
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.58 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3416.0, 1604.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 37.58 ± 0.08 wt%. Material loss = 3.97
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -592,7 +757,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.68 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -648,6 +814,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '61.68'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3814.0, 1567.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 61.68 ± 0.08 wt%. Material loss = 6.68
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.68 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (3814.0, 1567.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 61.68 ± 0.08 wt%. Material loss = 6.68
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -705,7 +903,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.72 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -761,6 +960,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '84.72'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4194.6, 1420.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 84.72 ± 0.08 wt%. Material loss = 17.64
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.72 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4194.6, 1420.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 84.72 ± 0.08 wt%. Material loss = 17.64
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -874,6 +1105,82 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '95.81'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4377.9, 875.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 95.81 ± 0.08 wt%. Material loss = 58.08
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4377.9, 875.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 95.81 ± 0.08 wt%. Material loss = 58.08
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '95.81'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4377.9, 875.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 95.81 ± 0.08
+                wt%. Material loss = 58.08 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4377.9, 875.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 95.81 ± 0.08
+                wt%. Material loss = 58.08 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -987,6 +1294,82 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '96.79'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4394.0, 681.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 96.79 ± 0.08 wt%. Material loss = 72.52
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4394.0, 681.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 96.79 ± 0.08 wt%. Material loss = 72.52
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '96.79'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4394.0, 681.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 96.79 ± 0.08
+                wt%. Material loss = 72.52 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4394.0, 681.0) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 96.79 ± 0.08
+                wt%. Material loss = 72.52 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -1100,6 +1483,82 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '97.78'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4410.5, 511.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 97.78 ± 0.08 wt%. Material loss = 85.11
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (4410.5, 511.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 97.78 ± 0.08 wt%. Material loss = 85.11
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '97.78'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4410.5, 511.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 97.78 ± 0.08
+                wt%. Material loss = 85.11 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                4 open square Al2O3. Page pixel (4410.5, 511.5) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 97.78 ± 0.08
+                wt%. Material loss = 85.11 ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.;
+                series=4
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -1157,7 +1616,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.44 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -1213,6 +1673,38 @@ observations:
       is not emitted as a mass_loss_fraction. hole centroid.; series=4
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.44'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2852.0, 1624.1) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 3.44 ± 0.08 wt%. Material loss = 2.48 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.44 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 4 open square Al2O3.
+          Page pixel (2852.0, 1624.1) at 600 dpi. Centre allowance 1.0 px. Al2O3 = 3.44 ± 0.08 wt%. Material loss = 2.48 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=4
     atmosphere:
       state:
         tag: unknown
@@ -1270,7 +1762,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.68 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -1327,6 +1820,40 @@ observations:
       series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '61.68'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (3814.1, 1602.5) at 600 dpi. Centre allowance 1.5 px. CaO = 61.68 ± 0.10 wt%. Material
+          loss = 4.08 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper, clear
+          of the square above and of the axis.; series=3
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.68 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (3814.1, 1602.5) at 600 dpi. Centre allowance 1.5 px. CaO = 61.68 ± 0.10 wt%. Material
+          loss = 4.08 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper, clear
+          of the square above and of the axis.; series=3
     atmosphere:
       state:
         tag: unknown
@@ -1384,7 +1911,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -1441,6 +1969,42 @@ observations:
       height 46 is that of the unobstructed triangles and the centre is one third of that height below the base.; series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '84.77'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4195.5, 1490.3) at 600 dpi. Centre allowance 4.0 px. CaO = 84.77 ± 0.25 wt%. Material
+          loss = 12.42 ± 0.30 wt%. The same marker is not emitted as a mass_loss_fraction. base measured at y=1475 width 58;
+          a curve crosses the apex, so the height 46 is that of the unobstructed triangles and the centre is one third of
+          that height below the base.; series=3
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4195.5, 1490.3) at 600 dpi. Centre allowance 4.0 px. CaO = 84.77 ± 0.25 wt%. Material
+          loss = 12.42 ± 0.30 wt%. The same marker is not emitted as a mass_loss_fraction. base measured at y=1475 width 58;
+          a curve crosses the apex, so the height 46 is that of the unobstructed triangles and the centre is one third of
+          that height below the base.; series=3
     atmosphere:
       state:
         tag: unknown
@@ -1554,6 +2118,82 @@ observations:
       same marker is not emitted as a mass_loss_fraction. ink centroid of the taper.; series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '95.8'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4377.8, 1178.1) at 600 dpi. Centre allowance 2.0 px. CaO = 95.80 ± 0.13 wt%. Material
+          loss = 35.60 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper.; series=3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4377.8, 1178.1) at 600 dpi. Centre allowance 2.0 px. CaO = 95.80 ± 0.13 wt%. Material
+          loss = 35.60 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper.; series=3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '95.8'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4377.8, 1178.1) at 600 dpi. Centre allowance 2.0 px. CaO = 95.80
+                ± 0.13 wt%. Material loss = 35.60 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper.; series=3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4377.8, 1178.1) at 600 dpi. Centre allowance 2.0 px. CaO = 95.80
+                ± 0.13 wt%. Material loss = 35.60 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper.; series=3
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -1668,6 +2308,84 @@ observations:
       2 px.; series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '96.81'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4394.4, 1313.9) at 600 dpi. Centre allowance 2.0 px. CaO = 96.81 ± 0.13 wt%. Material
+          loss = 25.52 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper; a stem
+          continues below the apex, allowance 2 px.; series=3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4394.4, 1313.9) at 600 dpi. Centre allowance 2.0 px. CaO = 96.81 ± 0.13 wt%. Material
+          loss = 25.52 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper; a stem
+          continues below the apex, allowance 2 px.; series=3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '96.81'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4394.4, 1313.9) at 600 dpi. Centre allowance 2.0 px. CaO = 96.81
+                ± 0.13 wt%. Material loss = 25.52 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper; a stem continues below the apex, allowance 2 px.; series=3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4394.4, 1313.9) at 600 dpi. Centre allowance 2.0 px. CaO = 96.81
+                ± 0.13 wt%. Material loss = 25.52 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper; a stem continues below the apex, allowance 2 px.; series=3
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -1782,6 +2500,84 @@ observations:
       y=1493.; series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '97.83'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4411.3, 1463.0) at 600 dpi. Centre allowance 1.5 px. CaO = 97.83 ± 0.10 wt%. Material
+          loss = 14.45 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper from
+          the base at y=1447 to the apex at y=1493.; series=3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (4411.3, 1463.0) at 600 dpi. Centre allowance 1.5 px. CaO = 97.83 ± 0.10 wt%. Material
+          loss = 14.45 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the taper from
+          the base at y=1447 to the apex at y=1493.; series=3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '97.83'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4411.3, 1463.0) at 600 dpi. Centre allowance 1.5 px. CaO = 97.83
+                ± 0.10 wt%. Material loss = 14.45 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper from the base at y=1447 to the apex at y=1493.; series=3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                3 filled downward triangle CaO. Page pixel (4411.3, 1463.0) at 600 dpi. Centre allowance 1.5 px. CaO = 97.83
+                ± 0.10 wt%. Material loss = 14.45 ± 0.12 wt%. The same marker is not emitted as a mass_loss_fraction. ink
+                centroid of the taper from the base at y=1447 to the apex at y=1493.; series=3
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -1839,7 +2635,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.59 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -1896,6 +2693,40 @@ observations:
       triangle touches the square.; series=3
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '37.59'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (3416.1, 1633.2) at 600 dpi. Centre allowance 2.0 px. CaO = 37.59 ± 0.13 wt%. Material
+          loss = 1.81 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the solid taper
+          below the open square; the top of the triangle touches the square.; series=3
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.59 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 3 filled downward
+          triangle CaO. Page pixel (3416.1, 1633.2) at 600 dpi. Centre allowance 2.0 px. CaO = 37.59 ± 0.13 wt%. Material
+          loss = 1.81 ± 0.15 wt%. The same marker is not emitted as a mass_loss_fraction. ink centroid of the solid taper
+          below the open square; the top of the triangle touches the square.; series=3
     atmosphere:
       state:
         tag: unknown
@@ -1953,7 +2784,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.49 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2009,6 +2841,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2985,1270), shift 0.3 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '11.49'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2984.9, 1270.3) at 600 dpi. Centre allowance 1.0 px. MgO = 11.49 ± 0.08 wt%. Material loss = 28.76 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2985,1270), shift
+          0.3 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.49 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2984.9, 1270.3) at 600 dpi. Centre allowance 1.0 px. MgO = 11.49 ± 0.08 wt%. Material loss = 28.76 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2985,1270), shift
+          0.3 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2066,7 +2932,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.50 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2122,6 +2989,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3101,1238), shift 0.3 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '18.50'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3100.7, 1238.0) at 600 dpi. Centre allowance 1.0 px. MgO = 18.50 ± 0.08 wt%. Material loss = 31.16 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3101,1238), shift
+          0.3 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.50 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3100.7, 1238.0) at 600 dpi. Centre allowance 1.0 px. MgO = 18.50 ± 0.08 wt%. Material loss = 31.16 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3101,1238), shift
+          0.3 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2179,7 +3080,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2235,6 +3137,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3151,1227), shift 0.5 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '21.54'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3150.9, 1226.5) at 600 dpi. Centre allowance 1.0 px. MgO = 21.54 ± 0.08 wt%. Material loss = 32.01 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3151,1227), shift
+          0.5 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3150.9, 1226.5) at 600 dpi. Centre allowance 1.0 px. MgO = 21.54 ± 0.08 wt%. Material loss = 32.01 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3151,1227), shift
+          0.5 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2292,7 +3228,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.95 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2348,6 +3285,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2811,1309), shift 0.7 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '0.95'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2810.8, 1309.7) at 600 dpi. Centre allowance 1.0 px. MgO = 0.95 ± 0.08 wt%. Material loss = 25.83 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2811,1309), shift
+          0.7 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.95 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2810.8, 1309.7) at 600 dpi. Centre allowance 1.0 px. MgO = 0.95 ± 0.08 wt%. Material loss = 25.83 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2811,1309), shift
+          0.7 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2405,7 +3376,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.60 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2461,6 +3433,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3416,1132), shift 1.1 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '37.60'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3416.2, 1130.9) at 600 dpi. Centre allowance 1.0 px. MgO = 37.60 ± 0.08 wt%. Material loss = 39.11 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3416,1132), shift
+          1.1 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.60 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3416.2, 1130.9) at 600 dpi. Centre allowance 1.0 px. MgO = 37.60 ± 0.08 wt%. Material loss = 39.11 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3416,1132), shift
+          1.1 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2518,7 +3524,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.66 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2574,6 +3581,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3814,957), shift 0.7 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '61.66'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3813.7, 957.6) at 600 dpi. Centre allowance 1.0 px. MgO = 61.66 ± 0.08 wt%. Material loss = 51.98 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3814,957), shift
+          0.7 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.66 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (3813.7, 957.6) at 600 dpi. Centre allowance 1.0 px. MgO = 61.66 ± 0.08 wt%. Material loss = 51.98 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (3814,957), shift
+          0.7 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2631,7 +3672,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2687,6 +3729,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (4195,898), shift 0.6 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '84.77'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (4195.5, 897.8) at 600 dpi. Centre allowance 1.0 px. MgO = 84.77 ± 0.08 wt%. Material loss = 56.42 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (4195,898), shift
+          0.6 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (4195.5, 897.8) at 600 dpi. Centre allowance 1.0 px. MgO = 84.77 ± 0.08 wt%. Material loss = 56.42 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (4195,898), shift
+          0.6 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2744,7 +3820,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.38 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2800,6 +3877,40 @@ observations:
       is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2852,1300), shift 1.0 px.; series=1
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '3.38'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2851.0, 1300.0) at 600 dpi. Centre allowance 1.0 px. MgO = 3.38 ± 0.08 wt%. Material loss = 26.55 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2852,1300), shift
+          1.0 px.; series=1
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.38 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 1 filled circle MgO.
+          Page pixel (2851.0, 1300.0) at 600 dpi. Centre allowance 1.0 px. MgO = 3.38 ± 0.08 wt%. Material loss = 26.55 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. thick-ink centroid; raw peak (2852,1300), shift
+          1.0 px.; series=1
     atmosphere:
       state:
         tag: unknown
@@ -2857,7 +3968,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.83 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -2913,6 +4025,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0.83'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2808.8, 1096.6) at 600 dpi. Centre allowance 1.0 px. SiO2 = 0.83 ± 0.08 wt%. Material loss = 41.66 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0.83 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2808.8, 1096.6) at 600 dpi. Centre allowance 1.0 px. SiO2 = 0.83 ± 0.08 wt%. Material loss = 41.66 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -2970,7 +4114,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.48 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3026,6 +4171,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '11.48'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2984.8, 1060.3) at 600 dpi. Centre allowance 1.0 px. SiO2 = 11.48 ± 0.08 wt%. Material loss = 44.35
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=11.48 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2984.8, 1060.3) at 600 dpi. Centre allowance 1.0 px. SiO2 = 11.48 ± 0.08 wt%. Material loss = 44.35
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3083,7 +4260,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.49 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3139,6 +4317,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '18.49'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3100.6, 1052.4) at 600 dpi. Centre allowance 1.0 px. SiO2 = 18.49 ± 0.08 wt%. Material loss = 44.94
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=18.49 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3100.6, 1052.4) at 600 dpi. Centre allowance 1.0 px. SiO2 = 18.49 ± 0.08 wt%. Material loss = 44.94
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3196,7 +4406,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3252,6 +4463,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '21.54'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3151.0, 1048.0) at 600 dpi. Centre allowance 1.0 px. SiO2 = 21.54 ± 0.08 wt%. Material loss = 45.27
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=21.54 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3151.0, 1048.0) at 600 dpi. Centre allowance 1.0 px. SiO2 = 21.54 ± 0.08 wt%. Material loss = 45.27
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3309,7 +4552,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.59 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3365,6 +4609,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '37.59'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3416.1, 1084.7) at 600 dpi. Centre allowance 1.0 px. SiO2 = 37.59 ± 0.08 wt%. Material loss = 42.54
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=37.59 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3416.1, 1084.7) at 600 dpi. Centre allowance 1.0 px. SiO2 = 37.59 ± 0.08 wt%. Material loss = 42.54
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3422,7 +4698,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.66 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3478,6 +4755,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '61.66'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3813.7, 1244.4) at 600 dpi. Centre allowance 1.0 px. SiO2 = 61.66 ± 0.08 wt%. Material loss = 30.68
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=61.66 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (3813.7, 1244.4) at 600 dpi. Centre allowance 1.0 px. SiO2 = 61.66 ± 0.08 wt%. Material loss = 30.68
+          ± 0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3535,7 +4844,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+        is below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3591,6 +4901,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '84.77'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (4195.5, 1546.1) at 600 dpi. Centre allowance 1.0 px. SiO2 = 84.77 ± 0.08 wt%. Material loss = 8.27 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=84.77 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (4195.5, 1546.1) at 600 dpi. Centre allowance 1.0 px. SiO2 = 84.77 ± 0.08 wt%. Material loss = 8.27 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown
@@ -3705,6 +5047,84 @@ observations:
       px, so the centre allowance is 8 px.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '95.34'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (4370.2, 1642.1) at 600 dpi. Centre allowance 8.0 px. SiO2 = 95.34 ± 0.49 wt%. Material loss = 1.14 ±
+          0.59 wt%. The same marker is not emitted as a mass_loss_fraction. open circle on the x-axis. Visible hole is 31x27
+          against the series hole of about 39 px, so the centre allowance is 8 px.; series=2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (4370.2, 1642.1) at 600 dpi. Centre allowance 8.0 px. SiO2 = 95.34 ± 0.49 wt%. Material loss = 1.14 ±
+          0.59 wt%. The same marker is not emitted as a mass_loss_fraction. open circle on the x-axis. Visible hole is 31x27
+          against the series hole of about 39 px, so the centre allowance is 8 px.; series=2
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '95.34'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                2 open circle SiO2. Page pixel (4370.2, 1642.1) at 600 dpi. Centre allowance 8.0 px. SiO2 = 95.34 ± 0.49 wt%.
+                Material loss = 1.14 ± 0.59 wt%. The same marker is not emitted as a mass_loss_fraction. open circle on the
+                x-axis. Visible hole is 31x27 against the series hole of about 39 px, so the centre allowance is 8 px.; series=2
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 253
+              pdf_page_index: 2
+              figure: '3'
+              note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares
+                residual max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed
+                log value. Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's
+                Voronoi cell. Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series
+                2 open circle SiO2. Page pixel (4370.2, 1642.1) at 600 dpi. Centre allowance 8.0 px. SiO2 = 95.34 ± 0.49 wt%.
+                Material loss = 1.14 ± 0.59 wt%. The same marker is not emitted as a mass_loss_fraction. open circle on the
+                x-axis. Visible hole is 31x27 against the series hole of about 39 px, so the centre allowance is 8 px.; series=2
+        output_unit: mole_fraction
+        references: []
     atmosphere:
       state:
         tag: unknown
@@ -3762,7 +5182,8 @@ observations:
       reason: no single temperature_K mapped from source
     composition:
       tag: unknown
-      reason: source has no located starting composition for this run
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.43 wt% is
+        below 95 wt%'
     fO2_Pa:
       tag: unknown
       reason: source has no located oxygen condition for this run
@@ -3818,6 +5239,38 @@ observations:
       emitted as a mass_loss_fraction. hole centroid.; series=2
   read_from: pdf:yakovlev-2017-cai-acidity
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '3.43'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2851.7, 1084.7) at 600 dpi. Centre allowance 1.0 px. SiO2 = 3.43 ± 0.08 wt%. Material loss = 42.54 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=3.43 wt%
+          is below 95 wt%'
+      locator:
+        page: 3
+        published_page: 253
+        pdf_page_index: 2
+        figure: '3'
+        note: 600 dpi render. Calibrated on labelled tick lines only. x = -169.194663 + 0.06053262*px, least-squares residual
+          max 0.04840. y = 123.096857 + -0.07426656*px, residual max 0.02971. Log axes are fitted in the printed log value.
+          Filled-marker centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell.
+          Open-marker centre is the hole centroid. The centre allowance is stated on this point. Series 2 open circle SiO2.
+          Page pixel (2851.7, 1084.7) at 600 dpi. Centre allowance 1.0 px. SiO2 = 3.43 ± 0.08 wt%. Material loss = 42.54 ±
+          0.08 wt%. The same marker is not emitted as a mass_loss_fraction. hole centroid.; series=2
     atmosphere:
       state:
         tag: unknown

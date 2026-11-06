@@ -204,6 +204,15 @@ experiments:
               note: 0.3 g sample, converted to kg.
         output_unit: kg
         references: []
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has no positive mass'
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 18; measured mass percent and mole fraction with ion counts tabulated at each temperature.
     characterization:
       state:
         tag: value
