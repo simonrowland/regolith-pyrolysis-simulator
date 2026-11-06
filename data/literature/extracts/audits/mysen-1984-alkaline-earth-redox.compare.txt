@@ -1,0 +1,37 @@
+# Direct compare of the extract reports all 34 values as mismatch because the compare matcher rejects phase token "glass" in tools/mineru_table_draft.py::_phase_matches_column (the table has no phase-specific value columns).
+# Diagnostic compare with only the phase label omitted matched all 34 values to the row/column cells. The source extract retains phase: glass; every mismatch was separately render-checked.
+species,observation_id,point_index,pdf_page,value,status,matched_cell,draft_candidate_count,locator_issue,path
+Fe,mysen_1984_table1_r01_cs2f23,,2,0.249,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r01_cs2f23].values.value
+Fe,mysen_1984_table1_r02_cs2f46,,2,0.396,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r02_cs2f46].values.value
+Fe,mysen_1984_table1_r03_cs2f91,,2,0.443,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r03_cs2f91].values.value
+Fe,mysen_1984_table1_r04_cs2f5,,2,0.584,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r04_cs2f5].values.value
+Fe,mysen_1984_table1_r05_cs2f5,,2,0.247,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r05_cs2f5].values.value
+Fe,mysen_1984_table1_r06_cs14f5,,2,0.614,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r06_cs14f5].values.value
+Fe,mysen_1984_table1_r07_cs14f5,,2,0.288,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r07_cs14f5].values.value
+Fe,mysen_1984_table1_r08_cs14f5,,2,0.117,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r08_cs14f5].values.value
+Fe,mysen_1984_table1_r09_cs14f5,,2,0.000,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r09_cs14f5].values.value
+Fe,mysen_1984_table1_r10_cs12f5,,2,0.638,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r10_cs12f5].values.value
+Fe,mysen_1984_table1_r11_cs12f5,,2,0.356,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r11_cs12f5].values.value
+Fe,mysen_1984_table1_r12_csf5,,2,0.675,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r12_csf5].values.value
+Fe,mysen_1984_table1_r13_csf5,,2,0.417,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r13_csf5].values.value
+Fe,mysen_1984_table1_r14_csf5,,2,0.228,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r14_csf5].values.value
+Fe,mysen_1984_table1_r15_cs8f5,,2,0.710,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r15_cs8f5].values.value
+Fe,mysen_1984_table1_r16_cs8f5,,2,0.472,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r16_cs8f5].values.value
+Fe,mysen_1984_table1_r17_cs7f5,,2,0.823,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r17_cs7f5].values.value
+Fe,mysen_1984_table1_r18_cs14f10,,2,0.677,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r18_cs14f10].values.value
+Fe,mysen_1984_table1_r19_cs14f10,,2,0.397,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r19_cs14f10].values.value
+Fe,mysen_1984_table1_r20_cs14f10,,2,0.231,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r20_cs14f10].values.value
+Fe,mysen_1984_table1_r21_ms14f5,,2,0.523,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r21_ms14f5].values.value
+Fe,mysen_1984_table1_r22_ms14f5,,2,0.188,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r22_ms14f5].values.value
+Fe,mysen_1984_table1_r23_ms14f5,,2,0.065,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r23_ms14f5].values.value
+Fe,mysen_1984_table1_r24_ms14f5,,2,0.000,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r24_ms14f5].values.value
+Fe,mysen_1984_table1_r25_ms12f5,,2,0.482,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r25_ms12f5].values.value
+Fe,mysen_1984_table1_r26_ms12f5,,2,0.222,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r26_ms12f5].values.value
+Fe,mysen_1984_table1_r27_srsf5,,2,0.746,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r27_srsf5].values.value
+Fe,mysen_1984_table1_r28_bs4f5,,2,0.684,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r28_bs4f5].values.value
+Fe,mysen_1984_table1_r29_bs3f5,,2,0.684,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r29_bs3f5].values.value
+Fe,mysen_1984_table1_r30_bs2f5,,2,0.699,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r30_bs2f5].values.value
+Fe,mysen_1984_table1_r31_bs15f5,,2,0.731,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r31_bs15f5].values.value
+Fe,mysen_1984_table1_r32_bs12f5,,2,0.771,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r32_bs12f5].values.value
+Fe,mysen_1984_table1_r33_bs11f5,,2,0.784,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r33_bs11f5].values.value
+Fe,mysen_1984_table1_r34_bsf5,,2,0.833,mismatch,null,280,,species.Fe.observations[mysen_1984_table1_r34_bsf5].values.value

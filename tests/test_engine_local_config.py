@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ctypes
 import json
+import logging
 import os
 import sqlite3
 import subprocess
@@ -106,11 +107,27 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
 
 
-def test_config_absent_legacy_fallback_emits_warning(
+def test_alphamelts_cache_version_drops_host_metadata() -> None:
+    identity = EngineIdentity(
+        name="alphamelts",
+        version=(
+            "alphamelts2 2.3.1 "
+            "(path=/Users/operator/engines/alphamelts2 "
+            "server=Mac-Studio-256-1)"
+        ),
+        digest="sha256:abc111",
+    )
+
+    assert identity.cache_version() == "alphaMELTS 2.3.1 (digest=sha256:abc111)"
+
+
+def test_config_absent_fallback_uses_binary_digest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(engine_local_config, "_LEGACY_WARNED", set())
+    monkeypatch.setattr(
+        "simulator.engine_local_config._WARNING_REPEAT_COUNTS", {}
+    )
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "simulator.engine_local_config.config_path",
@@ -118,23 +135,80 @@ def test_config_absent_legacy_fallback_emits_warning(
     )
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
-    backend._binary_path = tmp_path / "alphamelts2"
+    binary_path = tmp_path / "alphamelts2"
+    binary_path.write_bytes(b"fake-alphaMELTS-build")
+    backend._binary_path = binary_path
     backend._engine_path = backend._binary_path
+    reported_version = (
+        "alphamelts2 2.3.1 "
+        "(path=/Users/operator/engines/alphamelts2 "
+        "server=Mac-Studio-256-1)"
+    )
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 0, stdout=reported_version, stderr=""
+        ),
+    )
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         version = backend.get_engine_version()
 
-    assert version == f"alphaMELTS subprocess ({backend._binary_path})"
-    assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
+    expected = engine_local_config._cache_version_for_binary(
+        "alphamelts", binary_path, reported_version
+    )
+    assert expected is not None
+    assert version == expected
+    assert not any(
+        marker.casefold() in version.casefold()
+        for marker in ("/Users/", "/home/", "server=")
+    )
+    assert any(
+        "binary SHA-256 identity" in str(item.message)
+        for item in caught
+    )
 
 
-def test_warn_legacy_once_is_single_shot() -> None:
+def test_warn_legacy_once_respects_always_filter() -> None:
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
-    assert len(caught) == 1
+    assert [str(item.message) for item in caught] == [
+        "legacy once",
+        "legacy once",
+    ]
+
+
+def test_warn_once_with_summary_always_filter_emits_every_call(
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "_WARNING_REPEAT_COUNTS",
+        {},
+        raising=False,
+    )
+    key = "test.engine.warning"
+    message = "native fallback warning with detail"
+    caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        for _ in range(50):
+            engine_local_config.warn_once_with_summary(key, message)
+
+    assert len(caught) == 50
+    assert {str(item.message) for item in caught} == {message}
+    assert engine_local_config._WARNING_REPEAT_COUNTS == {key: 1}
+
+    engine_local_config._flush_warning_repeat_summaries()
+
+    assert caplog.records == []
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(
@@ -330,8 +404,13 @@ else:
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:
     legacy = "alphaMELTS subprocess (/opt/alphamelts2)"
+    legacy_with_digest = (
+        "alphamelts2 2.3.1 (path=/Users/operator/alphamelts2 "
+        "server=Mac-Studio-256-1) (digest=sha256:deadbeef)"
+    )
     modern = "alphaMELTS 2.3.1 (digest=sha256:deadbeef)"
     assert is_legacy_cache_version(legacy) is True
+    assert is_legacy_cache_version(legacy_with_digest) is True
     assert is_legacy_cache_version(modern) is False
 
 

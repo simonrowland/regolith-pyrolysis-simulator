@@ -4056,7 +4056,7 @@ def compilation_tier_census(
         is_compilation_source,
         is_internal_consistency,
         is_sf04_workbook,
-        predict_with_engine,
+        _score_predict_with_engine,
         rail_for_quantity,
         NO_HEADLINE_RAIL_TOKEN,
     )
@@ -4183,7 +4183,7 @@ def compilation_tier_census(
                 )
                 return _prediction_from_attempt(engine, observation, attempt)
         if engine is Engine.INTERNAL_ANALYTICAL:
-            return predict_with_engine(engine, observation, **kwargs)
+            return _score_predict_with_engine(engine, observation, **kwargs)
         cache_key = (parent_observation_id(observation.observation_id), engine)
         vaporock_gas_table = (
             engine is Engine.VAPOROCK

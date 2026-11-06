@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 89572
-records out (observations): 179594
-works: 756
-experiments: 6874
-queue size: 120608
+rows in: 89683
+records out (observations): 179816
+works: 762
+experiments: 6881
+queue size: 120466
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 754
+index sources: 760
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,22 +197,22 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 753 (mismatch) |
+| citations | 147 | 759 (mismatch) |
 | doi_works | 56 | 408 (mismatch) |
-| no_doi_works | 91 | 348 (mismatch) |
-| admission_statuses | 374 | 30757 (mismatch) |
+| no_doi_works | 91 | 354 (mismatch) |
+| admission_statuses | 374 | 30794 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1369 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 22022 (mismatch) |
+| formulas | 1625 | 22030 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15689 (mismatch) |
+| absent_admissions | 3511 | 15763 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2921 (mismatch) |
-| system_like_phases | 1065 | 3811 (mismatch) |
-| missing_phases | 237 | 1357 (mismatch) |
+| range_only_T | 3125 | 2937 (mismatch) |
+| system_like_phases | 1065 | 3809 (mismatch) |
+| missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -245,12 +245,13 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 108
+degradations: 177
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
 | token | count |
 |---|---:|
+| `SOL-B` | 69 |
 | `Cristobalite` | 33 |
 | `2MgO·SiO2` | 21 |
 | `TiO2` | 18 |
@@ -18407,59 +18408,59 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0332-fluor-phlogopite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0333-talc.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0334-chrysotile.json` | 1 | 1 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json` | 1 | 97 | 10 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0002-aluminum-reference-state.json` | 1 | 91 | 8 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json` | 1 | 95 | 69 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0004-gold-reference-state.json` | 1 | 97 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json` | 1 | 97 | 7 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0002-aluminum-reference-state.json` | 1 | 91 | 5 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json` | 1 | 95 | 66 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0004-gold-reference-state.json` | 1 | 97 | 7 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0005-boron-reference-state.json` | 1 | 73 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json` | 1 | 109 | 30 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json` | 1 | 109 | 19 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0007-p38.json` | 1 | 97 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0008-bismuth-reference-state.json` | 1 | 102 | 10 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0009-bromine-reference-state.json` | 1 | 97 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0008-bismuth-reference-state.json` | 1 | 102 | 7 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0009-bromine-reference-state.json` | 1 | 97 | 7 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0010-carbon-reference-state.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0011-diamond.json` | 1 | 50 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0012-calcium-reference-state.json` | 1 | 111 | 28 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0013-cadmium-reference-state.json` | 1 | 103 | 18 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json` | 1 | 103 | 20 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0012-calcium-reference-state.json` | 1 | 111 | 19 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0013-cadmium-reference-state.json` | 1 | 103 | 12 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json` | 1 | 103 | 14 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0015-chlorine-reference-state.json` | 1 | 90 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0016-co.json` | 1 | 103 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0017-chromium-reference-state.json` | 1 | 40 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0018-copper-reference-state.json` | 1 | 96 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0018-copper-reference-state.json` | 1 | 96 | 7 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0019-fluorine-reference-state.json` | 1 | 85 | 16 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json` | 1 | 109 | 28 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json` | 1 | 109 | 19 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0021-hydrogen-reference-state.json` | 1 | 87 | 4 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0022-hafnium-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0023-mercury-reference-state.json` | 1 | 96 | 8 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json` | 1 | 102 | 19 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0025-potassium-reference-state.json` | 1 | 104 | 18 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0023-mercury-reference-state.json` | 1 | 96 | 5 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json` | 1 | 102 | 13 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0025-potassium-reference-state.json` | 1 | 104 | 12 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0026-lithium-reference-sta-te.json` | 1 | 101 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json` | 1 | 103 | 18 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json` | 1 | 109 | 30 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json` | 1 | 103 | 12 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json` | 1 | 109 | 21 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json` | 1 | 39 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0030-nitrogen-reference-state.json` | 1 | 87 | 3 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0031-sodium-reference-state.json` | 1 | 104 | 18 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0031-sodium-reference-state.json` | 1 | 104 | 12 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0032-niobium-reference-state.json` | 1 | 88 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json` | 1 | 102 | 15 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json` | 1 | 102 | 12 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0034-oxygen-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0035-phosphorus-reference-state.json` | 1 | 95 | 10 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0036-lead-reference-state.json` | 1 | 103 | 20 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0035-phosphorus-reference-state.json` | 1 | 95 | 7 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0036-lead-reference-state.json` | 1 | 103 | 14 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0037-platinum-reference-state.json` | 1 | 89 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json` | 1 | 77 | 64 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json` | 1 | 77 | 55 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0039-diatomic-sulfur-ideal-gas.json` | 1 | 88 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0040-octa-atomic-sulfur.json` | 1 | 87 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json` | 1 | 104 | 25 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0042-selenium-reference-state.json` | 1 | 100 | 72 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0043-silicon-reference-state.json` | 1 | 65 | 10 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0044-tin-reference-state.json` | 1 | 97 | 10 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0045-strontium-reference-state.json` | 1 | 109 | 33 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json` | 1 | 103 | 59 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0047-thorium-reference-state.json` | 1 | 103 | 19 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json` | 1 | 103 | 19 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json` | 1 | 110 | 29 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json` | 1 | 104 | 19 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0042-selenium-reference-state.json` | 1 | 100 | 66 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0043-silicon-reference-state.json` | 1 | 65 | 7 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0044-tin-reference-state.json` | 1 | 97 | 7 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0045-strontium-reference-state.json` | 1 | 109 | 24 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json` | 1 | 103 | 53 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0047-thorium-reference-state.json` | 1 | 103 | 14 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json` | 1 | 103 | 13 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json` | 1 | 110 | 21 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0050-vanadium-reference-state.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0051-tungsten-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0052-zinc-reference-state.json` | 1 | 102 | 24 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json` | 1 | 95 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0052-zinc-reference-state.json` | 1 | 102 | 18 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json` | 1 | 95 | 7 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0054-ammonia-ideal-gas.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0055-methane-ideal-gas.json` | 1 | 70 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0056-cenentite.json` | 1 | 25 | 0 |
@@ -19062,6 +19063,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 |
+| `data/literature/extracts/barin-1995.yaml` | 13 | 89 | 93 |
 | `data/literature/extracts/basu-2008-feo-steelmaking.yaml` | 216 | 216 | 0 |
 | `data/literature/extracts/beckett-2002-silicate-melt-activities.yaml` | 14 | 14 | 84 |
 | `data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml` | 4 | 4 | 4 |
@@ -19234,6 +19236,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/jsc-a16-special-samples.yaml` | 3 | 18 | 27 |
 | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` | 12 | 16 | 52 |
 | `data/literature/extracts/jugo-2010-sulfur-xanes.yaml` | 2 | 8 | 4 |
+| `data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml` | 8 | 8 | 24 |
 | `data/literature/extracts/kambayashi-kato-1984-mgo-sio2-1973k.yaml` | 77 | 77 | 15 |
 | `data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml` | 66 | 66 | 110 |
 | `data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml` | 4 | 16 | 10 |
@@ -19253,7 +19256,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 84 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 183 | 643 | 146 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 37 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 152 | 666 | 101 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 152 | 666 | 66 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 39 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 4 |
@@ -19346,7 +19349,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kramer-1991-glass-basicity-gas-solubility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/krawczynski-grove-2012-high-ti-lunar-melts.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 3 | 127 | 134 |
+| `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 2 | 64 | 3 |
 | `data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml` | 260 | 260 | 52 |
 | `data/literature/extracts/kress-carmichael-1991-iron-redox-calibration.yaml` | 881 | 881 | 884 |
 | `data/literature/extracts/kroger-fingas-1935-alkali-silicate-equilibria.yaml` | 17 | 194 | 25 |
@@ -19434,6 +19437,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 81 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 |
+| `data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml` | 34 | 34 | 34 |
+| `data/literature/extracts/mysen-1985-cmas-redox.yaml` | 3 | 100 | 15 |
+| `data/literature/extracts/mysen-virgo-1989-nas-redox.yaml` | 53 | 53 | 53 |
 | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 48 |
 | `data/literature/extracts/nagahara-2000-metsoc63-5166.yaml` | 0 | 0 | 1 |
@@ -19677,6 +19683,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/stolyarova-2021-ti-al-kems-ru.yaml` | 205 | 205 | 26 |
 | `data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml` | 190 | 1037 | 6 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
+| `data/literature/extracts/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
 | `data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml` | 32 | 32 | 80 |
@@ -19781,9 +19788,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/gibbs_battery_residual_ledger.yaml` | 58 | 58 | 63 |
 | `data/literature/kems_measurements.yaml` | 6 | 6 | 18 |
 | `data/literature/langmuir_knudsen_flux_validation.yaml` | 3 | 3 | 6 |
-| `data/literature/mre_measurements.yaml` | 12 | 12 | 48 |
+| `data/literature/mre_measurements.yaml` | 12 | 12 | 36 |
 | `data/literature/refractory_vaporization_validation.yaml` | 9 | 9 | 9 |
-| `data/literature/species_rail_differential_ledger.yaml` | 23677 | 23673 | 29200 |
+| `data/literature/species_rail_differential_ledger.yaml` | 23677 | 23673 | 29196 |
 | `data/literature/vacuum_pyrolysis_measurements.yaml` | 1 | 1 | 1 |
 
 ## Hard issue census
@@ -19854,8 +19861,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 297004
+advisory issues: 297457
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 297004 |
+| `identity_incomplete` | 297457 |

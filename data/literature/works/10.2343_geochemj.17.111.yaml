@@ -86,16 +86,16 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.0177605412496463051663569829'
-          - - CaO
-            - '0.02585443302100830695634774454'
-          - - FeO
-            - '0.279494240044188115007600164'
-          - - MgO
-            - '0.338966961036585759784575344'
           - - SiO2
-            - '0.3379238246485715130851197642'
+            - '0.3379238246485715130851197644'
+          - - Al2O3
+            - '0.01776054124964630516635698291'
+          - - FeO
+            - '0.2794942400441881150076001642'
+          - - MgO
+            - '0.3389669610365857597845753442'
+          - - CaO
+            - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
           proxy_flag: initial_charge_only
       locator:
@@ -109,6 +109,24 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 122
+              pdf_page_index: 11
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 122
+              pdf_page_index: 11
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -122,24 +140,6 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              published_page: 122
-              pdf_page_index: 11
-              table: '5'
-              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.53'
-            locator:
-              published_page: 122
-              pdf_page_index: 11
-              table: '5'
-              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
             locator:
               published_page: 122
               pdf_page_index: 11
@@ -181,19 +181,19 @@ experiments:
               pdf_page_index: 11
               table: '5'
               note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-        - - original_SiO2_wt_pct
+        - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '35.43'
+              value: '2.53'
             locator:
               published_page: 122
               pdf_page_index: 11
               table: '5'
               note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-        - - M_SiO2_g_mol
+        - - M_CaO_g_mol
           - state:
               tag: value
-              value: '60.083'
+              value: '56.077000000000005'
             locator:
               published_page: 122
               pdf_page_index: 11

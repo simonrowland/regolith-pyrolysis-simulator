@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 754
-  extracts: 752
+  sources: 760
+  extracts: 758
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 752
+  extracts_without_pdf: 758
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -57,6 +57,7 @@ gaps:
   - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
   - banya-watanabe-1977-feto-p2o5-solid-iron
   - barcza-1979-mn-slag-metal-equilibrium
+  - barin-1995
   - basu-2008-feo-steelmaking
   - beckett-2002-silicate-melt-activities
   - beerkens-2001-industrial-glass-evaporation
@@ -228,6 +229,7 @@ gaps:
   - jsc-a16-special-samples
   - jsc-lunar-catalog-12023
   - jugo-2010-sulfur-xanes
+  - kale-srikanth-2000-sodium-ferrite-gibbs
   - kambayashi-kato-1984-mgo-sio2-1973k
   - kang-2007-sio2-activity-cas-low-silica
   - kassis-frischat-1981-silicate-glass-vapour
@@ -428,6 +430,9 @@ gaps:
   - murchison-degassing-2023-springer
   - murchison-hydropyrolysis-1990s-gca
   - myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  - mysen-1984-alkaline-earth-redox
+  - mysen-1985-cmas-redox
+  - mysen-virgo-1989-nas-redox
   - naess-2014-liquid-silicon-oxidation-fume-flux
   - nagabayashi-hino-banya-1989-phosphorus
   - nagahara-2000-metsoc63-5166
@@ -671,6 +676,7 @@ gaps:
   - stolyarova-2021-ti-al-kems-ru
   - stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
   - street-2010-thermal-properties-simulants
+  - stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
   - su-2024-lunar-volatiles-thesis
   - sublimation-kinetics-2023-minerals
   - sugawara-2011-sodium-silicate-fusion-mixing
@@ -3643,6 +3649,63 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: barin-1995
+  aliases: []
+  citation: Barin, I. (1995). Thermochemical Data of Pure Substances (3rd ed.). VCH.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/barin-1995.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/barin-1995/barin-1995.pdf
+      present: true
+      sha256: 36440a97bf06c3406790119f0a82f9de7554a6c6af3b1064ecaa5c5e4b075739
+      matches_simulator: null
+    sidecar:
+      path: raw/barin-1995/sidecar.yaml
+      present: true
+    text:
+      path: text/barin-1995
+      exists: true
+      file_count: 5466
+    tables:
+      path: tables/barin-1995
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/barin-1995.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/barin-1995.yaml
+      present: true
+      error: null
+      last_stage: located
+      date: '2026-09-06'
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
 - source_id: basu-2008-feo-steelmaking
   aliases: []
   citation: Basu, S., Lahiri, A. K. & Seetharaman, S. (2008), "Activity of Iron Oxide in Steelmaking Slag",
@@ -13650,6 +13713,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  aliases: []
+  citation: Kale, G. M. and Srikanth, S. (1999). Electrochemical Determination of the Gibbs Energy of
+    Formation of Na2Fe2O4 and Na3Fe5O9 Employing Na-β-Al2O3 Solid Electrolyte. Journal of the American
+    Ceramic Society, 83(1), 175–180.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kale-srikanth-2000-sodium-ferrite-gibbs/kale-srikanth-2000-sodium-ferrite-gibbs.pdf
+      present: true
+      sha256: 08fd694484ae8488206bf7cef9241dbd3f4f5c9e564d86b51f7d8dc115ac21ab
+      matches_simulator: null
+    sidecar:
+      path: raw/kale-srikanth-2000-sodium-ferrite-gibbs/sidecar.yaml
+      present: true
+    text:
+      path: text/kale-srikanth-2000-sodium-ferrite-gibbs
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/kale-srikanth-2000-sodium-ferrite-gibbs
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kale-srikanth-2000-sodium-ferrite-gibbs.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
 - source_id: kambayashi-kato-1984-mgo-sio2-1973k
   aliases: []
   citation: Kambayashi, S. and Kato, E. (1984), “A thermodynamic study of (magnesium oxide + silicon dioxide)
@@ -20124,7 +20246,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml
     review_status: draft
-    rows: 3
+    rows: 2
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -25264,6 +25386,184 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: mysen-1984-alkaline-earth-redox
+  aliases: []
+  citation: 'Mysen, B.O., Virgo, D. & Seifert, F.A. (1984), Redox equilibria of iron in alkaline earth
+    silicate melts: relationships between melt structure, oxygen fugacity, temperature and properties
+    of iron-bearing silicate liquids. American Mineralogist 69, 834–847.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml
+    review_status: draft
+    rows: 34
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mysen-1984-alkaline-earth-redox/mysen-1984-alkaline-earth-redox.pdf
+      present: true
+      sha256: c5d27b6cb07ad5bc14ac84511c73394074ab2356c73a29a3c8a962b776f4418d
+      matches_simulator: null
+    sidecar:
+      path: raw/mysen-1984-alkaline-earth-redox/sidecar.yaml
+      present: true
+    text:
+      path: text/mysen-1984-alkaline-earth-redox
+      exists: true
+      file_count: 49
+    tables:
+      path: tables/mysen-1984-alkaline-earth-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mysen-1984-alkaline-earth-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mysen-1984-alkaline-earth-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
+- source_id: mysen-1985-cmas-redox
+  aliases: []
+  citation: 'Mysen, B. O., Virgo, D., Neumann, E.-R. and Seifert, F. A. (1985), Redox equilibria and the
+    structural states of ferric and ferrous iron in melts in the system CaO-MgO-Al2O3-SiO2-FeO: relationships
+    between redox equilibria, melt structure and liquidus phase equilibria, American Mineralogist 70,
+    317-331.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mysen-1985-cmas-redox.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mysen-1985-cmas-redox/mysen-1985-cmas-redox.pdf
+      present: true
+      sha256: 410b96876168c6644200e148fabfac59d8a8b8cc0840686f490f6d749ff3b262
+      matches_simulator: null
+    sidecar:
+      path: raw/mysen-1985-cmas-redox/sidecar.yaml
+      present: true
+    text:
+      path: text/mysen-1985-cmas-redox
+      exists: true
+      file_count: 57
+    tables:
+      path: tables/mysen-1985-cmas-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mysen-1985-cmas-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mysen-1985-cmas-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
+- source_id: mysen-virgo-1989-nas-redox
+  aliases: []
+  citation: 'Mysen, B. O. and Virgo, D. (1989). Redox equilibria, structure, and properties of Fe-bearing
+    aluminosilicate melts: Relationships among temperature, composition, and oxygen fugacity in the system
+    Na2O-Al2O3-SiO2-Fe-O. American Mineralogist, 74, 58–76.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mysen-virgo-1989-nas-redox.yaml
+    review_status: draft
+    rows: 53
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mysen-virgo-1989-nas-redox/mysen-virgo-1989-nas-redox.pdf
+      present: true
+      sha256: 0427ff457220fbe23cdeb21f1a07c1a63ce6004741a67cf647931060b265819e
+      matches_simulator: null
+    sidecar:
+      path: raw/mysen-virgo-1989-nas-redox/sidecar.yaml
+      present: true
+    text:
+      path: text/mysen-virgo-1989-nas-redox
+      exists: true
+      file_count: 76
+    tables:
+      path: tables/mysen-virgo-1989-nas-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mysen-virgo-1989-nas-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mysen-virgo-1989-nas-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
 - source_id: naess-2014-liquid-silicon-oxidation-fume-flux
   aliases: []
   citation: M. K. Næss, J. E. Olsen, S. Andersson, G. Tranell (2014), "Parameters Affecting the Rate and
@@ -39528,6 +39828,64 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
+  aliases: []
+  citation: Stuve, J. M., Pankratz, L. B. & Richardson, D. W. (1971), “Thermodynamic Properties of (Na₂O)₄·Fe₂O₃,
+    6° to 1,200° K,” U.S. Bureau of Mines Report of Investigations 7535.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.pdf
+      present: true
+      sha256: 78fb9b7dc7ebfbe3204f058ebd0bef046b1caa30c56ade1e5683b8f2df66726c
+      matches_simulator: null
+    sidecar:
+      path: raw/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite/sidecar.yaml
+      present: true
+    text:
+      path: text/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
+      exists: true
+      file_count: 25
+    tables:
+      path: tables/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
 - source_id: su-2024-lunar-volatiles-thesis
   aliases: []
   citation: 'Su, Xue (2024), Lunar Stories Unfolded by Volatile Elements: From Water in the Lunar Mantle

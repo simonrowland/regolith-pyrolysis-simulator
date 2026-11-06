@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import atexit
 import ctypes
 import hashlib
 import json
@@ -12,6 +13,8 @@ import re
 import shutil
 import socket
 import subprocess
+import sys
+import threading
 import tomllib
 import warnings
 from dataclasses import dataclass, field
@@ -20,7 +23,8 @@ from pathlib import PurePosixPath
 from typing import Any, Mapping
 
 logger = logging.getLogger(__name__)
-_LEGACY_WARNED: set[str] = set()
+_WARNING_REPEAT_COUNTS: dict[str, int] = {}
+_WARNING_REPEAT_LOCK = threading.RLock()
 _ALPHAMELTS_BINARY_NAMES = (
     "alphamelts2",
     "alphamelts_macos",
@@ -935,13 +939,103 @@ def is_legacy_cache_version(version: str) -> bool:
     return False
 
 
+def _effective_warning_action(
+    message: str,
+    category: type[Warning],
+    module: str,
+    lineno: int,
+) -> str:
+    """Return the first warnings.filterwarnings rule matching this warning."""
+    # Match warnings.warn_explicit: first matching message/category/module/line
+    # rule wins, and a line number of zero matches every line.
+    for (
+        action,
+        message_pattern,
+        filter_category,
+        module_pattern,
+        filter_lineno,
+    ) in warnings.filters:
+        if not issubclass(category, filter_category):
+            continue
+        if message_pattern is not None and message_pattern.match(message) is None:
+            continue
+        if module_pattern is not None and module_pattern.match(module) is None:
+            continue
+        if filter_lineno != 0 and filter_lineno != lineno:
+            continue
+        return action
+    return "default"
+
+
+def warn_once_with_summary(
+    key: str,
+    message: str,
+    *,
+    category: type[Warning] = UserWarning,
+    stacklevel: int = 2,
+) -> bool:
+    """Emit according to the active filter and summarize process repeats.
+
+    ``default``, ``once`` and ``module`` filters dedupe by the explicit key,
+    so changes to ``warnings.filters`` cannot invalidate the once registry and
+    re-flood scorer stderr. ``always`` and ``error`` still reach ``warn`` on
+    every call for tests and warnings-as-errors.
+    """
+    # Preserve the callsite of the direct warnings.warn this helper replaces.
+    stacklevel += 1
+    warning_key = str(key)
+    try:
+        warning_frame = sys._getframe(stacklevel - 1)
+    except ValueError:
+        warning_module = ""
+        warning_lineno = 0
+    else:
+        warning_module = str(warning_frame.f_globals.get("__name__", ""))
+        warning_lineno = warning_frame.f_lineno
+
+    with _WARNING_REPEAT_LOCK:
+        previous_count = _WARNING_REPEAT_COUNTS.get(warning_key, 0)
+        action = _effective_warning_action(
+            message, category, warning_module, warning_lineno
+        )
+        if action == "ignore":
+            return False
+        if action in {"default", "once", "module"} and previous_count:
+            _WARNING_REPEAT_COUNTS[warning_key] = previous_count + 1
+            return False
+
+        # Production keys have distinct text; warnings' module action can
+        # collapse distinct keys if their message text becomes identical.
+        warnings.warn(message, category, stacklevel=stacklevel)
+        if previous_count == 0:
+            _WARNING_REPEAT_COUNTS[warning_key] = 1
+        return previous_count == 0
+
+
+def _flush_warning_repeat_summaries() -> None:
+    with _WARNING_REPEAT_LOCK:
+        summaries = tuple(
+            (key, count - 1)
+            for key, count in sorted(_WARNING_REPEAT_COUNTS.items())
+            if count > 1
+        )
+        for key in _WARNING_REPEAT_COUNTS:
+            _WARNING_REPEAT_COUNTS[key] = 1
+    for key, count in summaries:
+        logger.warning("%s: %d repeats suppressed", key, count)
+
+
+atexit.register(_flush_warning_repeat_summaries)
+
+
 def warn_legacy_once(engine: str, message: str) -> None:
     key = str(engine).strip().lower()
-    if key in _LEGACY_WARNED:
-        return
-    _LEGACY_WARNED.add(key)
-    warnings.warn(message, stacklevel=3)
-    logger.warning(message)
+    if warn_once_with_summary(
+        f"legacy_engine_identity:{key}",
+        message,
+        stacklevel=3,
+    ):
+        logger.warning(message)
 
 
 def _legacy_engine_path_command(engine: str) -> str | None:

@@ -1,0 +1,53 @@
+source_id: mysen-1985-cmas-redox
+source:
+  citation: >-
+    Mysen, B. O., Virgo, D., Neumann, E.-R. and Seifert, F. A. (1985), Redox equilibria and the structural states of ferric and ferrous iron in melts in the system CaO-MgO-Al2O3-SiO2-FeO: relationships between redox equilibria, melt structure and liquidus phase equilibria, American Mineralogist 70, 317-331.
+extraction:
+  method: MinerU and pdftotext machine reads with complete render checks of the stored cells.
+  date: '2026-11-04'
+  worker: w1104fer-m85
+review_status: draft
+tables:
+- page: 4
+  table_index: 1
+  type: concentration_series
+  quantity: Fe3plus_over_total_Fe
+  evidence_class: measured_reduced
+  unit: fraction
+  phase: glass
+  rows: Table 1 has six sample rows. MinerU draft rows 2-7 map to printed sample rows 1-6.
+  values:
+  - column: 2
+    species: Fe
+    phase: glass
+    evidence_class: quoted_attributed
+    unit: fraction
+    quantity: Fe3plus_over_total_Fe
+    uncertainty: The cell prints value ± width.
+  - column: 3
+    species: Fe
+    phase: glass
+    evidence_class: measured_reduced
+    unit: fraction
+    quantity: Fe3plus_over_total_Fe
+    uncertainty: The cell prints value ± width.
+  conditions: >-
+    Table 1 prints Fe3+/ΣFe fractions and sample labels. The wet-chemistry values are attributed in the footnote. No per-sample temperature, oxygen fugacity or total pressure is printed.
+- page: 6
+  table_index: 2
+  type: concentration_series
+  quantity: Fe3plus_over_total_Fe
+  evidence_class: measured_reduced
+  unit: fraction
+  phase: glass
+  rows: >-
+    Printed Table 2 has 88 sample rows: 53 CAS and 35 MAS. MinerU draft row 57 is a system heading, not a data row. Rows 4-56 and 58-92 map to the printed sample rows.
+  values:
+  - column: 10
+    species: Fe
+    phase: glass
+    evidence_class: measured_reduced
+    unit: fraction
+    quantity: Fe3plus_over_total_Fe
+  conditions: >-
+    Column 2 is temperature in C. Column 3 is -log fO2 as printed. Total pressure is stated as 1 atm in the abstract. Nominal sample compositions are identified by the row label; the oxide vectors are in Figure 2 and are not digitized.

@@ -199,15 +199,17 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             warnings.simplefilter('ignore', UserWarning)
             self._vaporock_helper.initialize({})
         self._vaporock_available = self._vaporock_helper.is_available()
-        if not self._vaporock_available and not self._vaporock_unavailable_logged:
-            warnings.warn(
+        if not self._vaporock_available:
+            from simulator.engine_local_config import warn_once_with_summary
+
+            warn_once_with_summary(
+                'simulator.melt_backend.thermoengine.vaporock_unavailable',
                 'VapoRock vapor-melt library unavailable; ThermoEngine vapor '
                 'pressures fall back to activity x Antoine rows; '
                 'vapor_pressures_source distinguishes pure-component '
                 'first-principles rows from backsolved VapoRock curve-fit rows.',
                 stacklevel=2,
             )
-            self._vaporock_unavailable_logged = True
 
     def close(self) -> None:
         transport = self._thermoengine_transport

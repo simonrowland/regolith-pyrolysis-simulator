@@ -1,0 +1,97 @@
+schema_version: literature_extract.v1
+source_id: stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
+source:
+  citation: 'Stuve, J. M., Pankratz, L. B. & Richardson, D. W. (1971), “Thermodynamic Properties of (Na₂O)₄·Fe₂O₃, 6° to 1,200° K,” U.S. Bureau of Mines Report of Investigations 7535.'
+  url: https://books.google.com/books?vid=UOM:39015078522094
+  year: 1971
+extraction:
+  method: >-
+    MinerU table block and pdftotext transcription; the NaFeO₂ cell and Table 8
+    row/column assignment were checked against the rendered PDF page.
+  date: '2026-11-04'
+  worker: w1104nf-ri7535
+  provenance_path: text/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite/pdftotext-layout.txt
+  source_note: >-
+    Scope is limited to the NaFeO₂ comparison row in Table 8. The report's other
+    thermochemical tables and its incongruent-melting discussion concern
+    (Na₂O)₄·Fe₂O₃ and are outside this extract. Table 8 gives energy per gram-atom
+    of oxygen; the printed denominator is retained as mol_atom, with its wording
+    recorded separately.
+review_status: draft
+fidelity_samples:
+  - path: species.NaFeO2.observations[stuve_1971_table8_nafeo2_delta_fG_1000K].values.value
+    value: '-60.1'
+    locator: {page: 18, published_page: 11, pdf_page_index: 17, table: '8', row: 'NaFeO₂(c)'}
+    note: Table 8 render, NaFeO₂(c) row, ΔGf° column
+  - path: species.NaFeO2.observations[stuve_1971_table8_nafeo2_delta_fG_1000K].values.T_K
+    value: '1000'
+    locator: {page: 18, published_page: 11, pdf_page_index: 17, table: '8'}
+    note: Table 8 caption gives 1,000 K
+  - path: species.NaFeO2.observations[stuve_1971_table8_nafeo2_delta_fG_1000K].values.per_as_printed
+    value: per gram-atom of oxygen
+    locator: {page: 18, published_page: 11, pdf_page_index: 17, table: '8'}
+    note: Table 8 caption states the denominator
+  - path: species.NaFeO2.observations[stuve_1971_table8_nafeo2_delta_fG_1000K].values.attribution
+    value: Koehler and coworkers (10).
+    locator: {page: 18, published_page: 11, pdf_page_index: 17, table: '8', row: 'NaFeO₂(c)'}
+    note: Table 8 reference column
+  - path: species.NaFeO2.context[stuve_1971_discussion_nafeo2_koehler_citation].values.statement_as_printed
+    value: 'The thermodynamic properties of a simpler sodium iron(III) ferrite, NaFeO₂(c), were investigated by Koehler and coworkers (10).'
+    locator: {page: 18, published_page: 11, pdf_page_index: 17, section: DISCUSSION}
+    note: Discussion citation for the Table 8 comparator
+species:
+  NaFeO2:
+    observations:
+      - observation_id: stuve_1971_table8_nafeo2_delta_fG_1000K
+        type: gibbs_table
+        locator:
+          page: 18
+          published_page: 11
+          pdf_page_index: 17
+          table: '8'
+          row: NaFeO₂(c)
+          column_header: 'ΔGf°, kcal'
+          note: Render confirms the NaFeO₂(c) row and ΔGf° cell.
+        phase: cr
+        standard_state: >-
+          Standard free energy of formation (ΔGf°), as labeled in Table 8. The
+          report does not print a formation equation or elemental reference forms
+          for this comparison value.
+        per: mol_atom
+        units: kcal/mol
+        uncertainty:
+          reported_status: not_reported
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          value: '-60.1'
+          value_as_printed: '-60.1'
+          T_K: '1000'
+          phase_as_printed: NaFeO₂(c)
+          per_as_printed: per gram-atom of oxygen
+          attribution: Koehler and coworkers (10).
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1000'
+              locator:
+                page: 18
+                published_page: 11
+                pdf_page_index: 17
+                table: '8'
+    context:
+      - observation_id: stuve_1971_discussion_nafeo2_koehler_citation
+        type: citation_context
+        locator:
+          page: 18
+          published_page: 11
+          pdf_page_index: 17
+          section: DISCUSSION
+        units: as printed
+        values:
+          statement_as_printed: >-
+            The thermodynamic properties of a simpler sodium iron(III) ferrite,
+            NaFeO₂(c), were investigated by Koehler and coworkers (10).

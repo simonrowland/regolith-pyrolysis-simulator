@@ -1,0 +1,5693 @@
+schema_version: literature_extract.v1
+source_id: mysen-virgo-1989-nas-redox
+figure_policy: No plotted numeric points are included. Figure-only redox relationships in Figs. 9 and
+  15 are deferred to a figure pass; Figs. 3–5 are representative Mössbauer spectra used only to locate
+  the unprinted fit inputs.
+source:
+  citation: 'Mysen, B. O. and Virgo, D. (1989). Redox equilibria, structure, and properties of Fe-bearing
+    aluminosilicate melts: Relationships among temperature, composition, and oxygen fugacity in the system
+    Na2O-Al2O3-SiO2-Fe-O. American Mineralogist, 74, 58–76.'
+  year: 1989
+  corpus_asset: raw/mysen-virgo-1989-nas-redox/mysen-virgo-1989-nas-redox.pdf
+extraction:
+  method: Transcribed from the MinerU Table 1 and Table 2 blocks and pdftotext-layout, then checked against
+    the 400 dpi renders of PDF pages 2 and 3. All 52 composition cells and all 159 stored Table 2 value/condition
+    cells were render-checked; the row and column layout of all four detected tables was checked against
+    its render. QA-flagged cells in Tables 1-4 were settled from renders of PDF pages 2, 3, 15, and 16.
+    Table 1 nominal starting compositions are weight percent, supported by the methods' 5 wt% Fe2O3 addition
+    and the Figure 2 wt% key. Table 2 prints absolute log fO2 in bars; the method controls it with CO-CO2
+    mixing but prints no gas ratio. Table 2 contains 53 experimental body rows; all are retained. The
+    double-starred spectra are kept as separate rows and the printed 77 K measurement note is preserved.
+    Table 3 is a Chayes natural-rock compilation, not an experimental NAS melt series; Table 4 contains
+    regression coefficients rather than sample points, so neither is included. No fO2, gas ratio, total
+    pressure, or individual fit areas were inferred.
+  date: '2026-11-04'
+  worker: w1104fer-mv89
+  provenance_path: text/mysen-virgo-1989-nas-redox/pdftotext-layout.txt
+  render_audit:
+    physical_pages_400dpi:
+    - 2
+    - 3
+    - 4
+    - 15
+    - 16
+    numeric_cells_checked: 211
+    table_row_layout_checked:
+    - 1
+    - 2
+    - 3
+    - 4
+    check_note: Table 1 and Table 2 values stored in this extract were checked against their page renders;
+      QA-flagged cells in out-of-scope Tables 3 and 4 were also render-checked. The quench-preservation
+      statement was checked on PDF page 4.
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[mysen_virgo_1989_p003_t02_r003_c010].values.value
+  value: '0.797'
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    table: '2'
+    row: NASI
+    column: Fe3+/ΣFe
+- path: species.Fe.observations[mysen_virgo_1989_p003_t02_r025_c010].values.value
+  value: '0.683'
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    table: '2'
+    row: NASIV
+    column: Fe3+/ΣFe
+- path: species.Fe.observations[mysen_virgo_1989_p003_t02_r055_c010].values.value
+  value: '0.200'
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    table: '2'
+    row: NASXIII
+    column: Fe3+/ΣFe
+species:
+  Fe:
+    observations:
+    - observation_id: mysen_virgo_1989_p003_t02_r003_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASI
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASI
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASI
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASI
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASI
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '78.97'
+                Al2O3: '5.63'
+                Na2O: '10.39'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASI; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASI
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASI
+        composition_sample_as_published: NASI
+        value: '0.797'
+        value_as_published: '0.797'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r004_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id001
+                SiO2: '71.08'
+                Al2O3: '8.42'
+                Na2O: '15.50'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASII
+        composition_sample_as_published: NASII
+        value: '0.730'
+        value_as_published: '0.730'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r005_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASII**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASII**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASII**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id001
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASII**
+        composition_sample_as_published: NASII
+        spectrum_measurement_temperature_K: '77'
+        value: '0.754'
+        value_as_published: '0.754'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r006_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '55.54'
+                Al2O3: '13.89'
+                Na2O: '25.58'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIII
+        composition_sample_as_published: NASIII
+        value: '0.745'
+        value_as_published: '0.745'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r007_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id002
+                SiO2: '43.97'
+                Al2O3: '18.70'
+                Na2O: '32.33'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.790'
+        value_as_published: '0.790'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r008_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '33.75'
+                Al2O3: '21.56'
+                Na2O: '39.69'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASV
+        composition_sample_as_published: NASV
+        value: '0.799'
+        value_as_published: '0.799'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r009_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVI
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVI
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVI
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVI
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVI
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '35.06'
+                Al2O3: '14.89'
+                Na2O: '45.05'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASVI; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASVI
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVI
+        composition_sample_as_published: NASVI
+        value: '0.843'
+        value_as_published: '0.843'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r010_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id003
+                SiO2: '39.42'
+                Al2O3: '16.77'
+                Na2O: '38.82'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-VII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-VII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVII
+        composition_sample_as_published: NAS-VII
+        value: '0.827'
+        value_as_published: '0.827'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r011_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id004
+                SiO2: '47.32'
+                Al2O3: '20.12'
+                Na2O: '27.56'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-VIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-VIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVIII
+        composition_sample_as_published: NAS-VIII
+        value: '0.743'
+        value_as_published: '0.743'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r012_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id005
+                SiO2: '52.43'
+                Al2O3: '22.30'
+                Na2O: '20.27'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.779'
+        value_as_published: '0.779'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r013_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '37.61'
+                Al2O3: '21.89'
+                Na2O: '35.50'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASX
+        composition_sample_as_published: NASX
+        value: '0.816'
+        value_as_published: '0.816'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r014_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXI
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXI
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXI
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXI
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXI
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '49.63'
+                Al2O3: '14.30'
+                Na2O: '31.34'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASXI; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASXI
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXI
+        composition_sample_as_published: NASXI
+        value: '0.763'
+        value_as_published: '0.763'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r015_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components:
+                SiO2: '53.63'
+                Al2O3: '11.37'
+                Na2O: '30.00'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXII
+        composition_sample_as_published: NAS-XII
+        value: '0.748'
+        value_as_published: '0.748'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r016_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: &id006
+                SiO2: '58.69'
+                Al2O3: '7.97'
+                Na2O: '28.35'
+                Fe2O3: '5.00'
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.761'
+        value_as_published: '0.761'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r017_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.858'
+        value_as_published: '0.858'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r018_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id003
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-VII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-VII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVII
+        composition_sample_as_published: NAS-VII
+        value: '0.871'
+        value_as_published: '0.871'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r019_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id004
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-VIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-VIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVIII
+        composition_sample_as_published: NAS-VIII
+        value: '0.848'
+        value_as_published: '0.848'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r020_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.862'
+        value_as_published: '0.862'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r021_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.823'
+        value_as_published: '0.823'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r022_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.918'
+        value_as_published: '0.918'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r023_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.893'
+        value_as_published: '0.893'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r024_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-0.68'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.895'
+        value_as_published: '0.895'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r025_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-2.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.683'
+        value_as_published: '0.683'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r026_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-2.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV**
+        composition_sample_as_published: NASIV
+        spectrum_measurement_temperature_K: '77'
+        value: '0.676'
+        value_as_published: '0.676'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r027_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.472'
+        value_as_published: '0.472'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r028_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV**
+        composition_sample_as_published: NASIV
+        spectrum_measurement_temperature_K: '77'
+        value: '0.487'
+        value_as_published: '0.487'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r029_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.355'
+        value_as_published: '0.355'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r030_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.340'
+        value_as_published: '0.340'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r031_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.655'
+        value_as_published: '0.655'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r032_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASVIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASVIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASVIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id004
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-VIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-VIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASVIII
+        composition_sample_as_published: NAS-VIII
+        value: '0.749'
+        value_as_published: '0.749'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r033_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.811'
+        value_as_published: '0.811'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r034_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.815'
+        value_as_published: '0.815'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r035_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-3.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.800'
+        value_as_published: '0.800'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r036_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-4.50'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.297'
+        value_as_published: '0.297'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r037_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-4.50'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV**
+        composition_sample_as_published: NASIV
+        spectrum_measurement_temperature_K: '77'
+        value: '0.256'
+        value_as_published: '0.256'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r038_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.200'
+        value_as_published: '0.200'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r039_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV**
+        composition_sample_as_published: NASIV
+        spectrum_measurement_temperature_K: '77'
+        value: '0.184'
+        value_as_published: '0.184'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r040_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.101'
+        value_as_published: '0.101'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r041_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.087'
+        value_as_published: '0.087'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r042_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII**
+        composition_sample_as_published: NAS-XIII
+        spectrum_measurement_temperature_K: '77'
+        value: '0.136'
+        value_as_published: '0.136'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r043_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.475'
+        value_as_published: '0.475'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r044_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.572'
+        value_as_published: '0.572'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r045_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.628'
+        value_as_published: '0.628'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r046_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-6.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.444'
+        value_as_published: '0.444'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r047_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-7.50'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.188'
+        value_as_published: '0.188'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r048_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.000'
+        value_as_published: '0.000'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r049_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV**
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV**
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV**
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV**
+        composition_sample_as_published: NASIV
+        spectrum_measurement_temperature_K: '77'
+        value: '0.000'
+        value_as_published: '0.000'
+        spectrum_measurement_temperature_note: 'Table 2 footnote: spectrum obtained at 77 K.'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r050_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.000'
+        value_as_published: '0.000'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r051_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1550'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.000'
+        value_as_published: '0.000'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r052_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1400'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.121'
+        value_as_published: '0.121'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r053_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIV
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIV
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIV
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id002
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIV; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIV
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIV
+        composition_sample_as_published: NASIV
+        value: '0.234'
+        value_as_published: '0.234'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r054_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASIX
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASIX
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASIX
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id005
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NASIX; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NASIX
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASIX
+        composition_sample_as_published: NASIX
+        value: '0.395'
+        value_as_published: '0.395'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    - observation_id: mysen_virgo_1989_p003_t02_r055_c010
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        table: '2'
+        row: NASXIII
+        column: Fe3+/ΣFe
+        phase: null
+      T_C: '1250'
+      phase: glass
+      regime: quenched_glass_analysis
+      units: dimensionless fraction as printed
+      method_as_printed: 57Fe Mössbauer spectroscopy; spectra fitted statistically with Lorentzian lines.
+      uncertainty:
+        note: Table 2 prints no row-specific uncertainty for Fe3+/ΣFe.
+      quench_statement:
+        preservation: asserted_preserved
+        text: The reported Fe3+/ΣFe and types of oxygen coordination polyhedra are the same in the melts
+          as in the quenched melts (glasses).
+        locator:
+          page: 4
+          published_page: 61
+          pdf_page_index: 3
+          section: Experimental Methods
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: NASXIII
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: Composition
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.00'
+          units: log10(bar)
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: log fO2*
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The experimental total pressure is not printed for this Table 2 run.
+          locator:
+            page: 3
+            published_page: 60
+            pdf_page_index: 2
+            table: '2'
+            row: NASXIII
+            column: total pressure (not printed)
+        composition:
+          state:
+            tag: value
+            value:
+              basis: Nominal starting composition; Table 1 values are weight percent
+              amount_basis: mass_percent
+              components: *id006
+          locator:
+            page: 2
+            published_page: 59
+            pdf_page_index: 1
+            table: '1'
+            row: nominal composition column NAS-XIII; oxide rows SiO2, Al2O3, Na2O, Fe2O3
+            column: NAS-XIII
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe3+/ΣFe
+        sample_as_published: NASXIII
+        composition_sample_as_published: NAS-XIII
+        value: '0.200'
+        value_as_published: '0.200'
+      derivation:
+        relation: Fe3+/ΣFe is the area of the Fe3+ Mössbauer doublet divided by the total absorption envelope,
+          from the authors' fitted spectra.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            published_page: 61
+            pdf_page_index: 3
+            figure: '3'
+            section: Experimental Methods
+            note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
+              a numeric area table.
+    context:
+    - observation_id: mysen_virgo_1989_figure_9_fe_redox_deferred
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 67
+        pdf_page_index: 9
+        figure: '9'
+      panel: whole figure
+      units: figure axes as printed
+      values:
+        quantity: valence_ratio
+        method_class: figure_only
+        species: Fe
+        axes_as_printed:
+          composition: Al/(Al + Si)
+          dependencies: temperature and oxygen fugacity
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        context_only_reason: Figure-only Fe redox relationship; numeric coordinates are not tabulated and
+          are deferred by this extraction wave.
+    - observation_id: mysen_virgo_1989_figure_15_fe_redox_deferred
+      type: figure_record
+      locator:
+        page: 13
+        published_page: 70
+        pdf_page_index: 12
+        figure: '15'
+      panel: whole figure
+      units: figure axes as printed
+      values:
+        quantity: valence_ratio
+        method_class: figure_only
+        species: Fe
+        axes_as_printed:
+          x: log fO2
+          series_dimensions: temperature, NBO/T, and Al/(Al + Si)
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        context_only_reason: Figure-only Fe redox relationship; numeric coordinates are not tabulated and
+          are deferred by this extraction wave.

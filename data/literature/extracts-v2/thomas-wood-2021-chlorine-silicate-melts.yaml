@@ -3833,164 +3833,13 @@ observations:
         note: row=AgI/Cl-045; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.48 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-045; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-045; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1573.15:row=agi/cl-020:h=c70615ef1d09
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -4122,104 +3971,13 @@ observations:
         note: row=AgI/Cl-020; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-020; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-020; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1573.15:row=agi/cl-044:h=6ca4b1b9ade9
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -4354,164 +4112,13 @@ observations:
         note: row=AgI/Cl-044; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.52 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-044; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-044; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-002:h=e985e8f75bc8
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -4643,104 +4250,13 @@ observations:
         note: row=AgI/Cl-002; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-002; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-002; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-005:h=aae7cf23c1fa
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -4872,104 +4388,13 @@ observations:
         note: row=AgI/Cl-005; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-005; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-005:h=c898259dace4
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -5101,104 +4526,13 @@ observations:
         note: row=AgI/Cl-005; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-005; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-005:h=dc33b71a2a2f
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -5330,104 +4664,13 @@ observations:
         note: row=AgI/Cl-005; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-005; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-005:h=f5f7fd3d06a4
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -5559,104 +4802,13 @@ observations:
         note: row=AgI/Cl-005; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-005; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-005; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-006:h=2229a59c9c15
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -5788,104 +4940,13 @@ observations:
         note: row=AgI/Cl-006; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-006; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-006; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-007:h=2067ce283460
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -6017,104 +5078,13 @@ observations:
         note: row=AgI/Cl-007; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-007; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-007; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-008:h=8f49d36e91bb
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -6246,104 +5216,13 @@ observations:
         note: row=AgI/Cl-008; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-008; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-008:h=db01d6d99b4e
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -6475,104 +5354,13 @@ observations:
         note: row=AgI/Cl-008; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-008; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-008; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-009:h=e7c0279b5d11
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -6704,104 +5492,13 @@ observations:
         note: row=AgI/Cl-009; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-009; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-009; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-010:h=bea524ebf15a
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -6933,104 +5630,13 @@ observations:
         note: row=AgI/Cl-010; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-010; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-010; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-013:h=f82411fff50d
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -7162,104 +5768,13 @@ observations:
         note: row=AgI/Cl-013; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-013; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-013; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-018:h=ef1428505168
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -7391,104 +5906,13 @@ observations:
         note: row=AgI/Cl-018; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-018; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-018; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-019:h=3fe3d65e9dc3
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -7620,104 +6044,13 @@ observations:
         note: row=AgI/Cl-019; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-019; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-019; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-021:h=a1cccb87b962
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -7849,104 +6182,13 @@ observations:
         note: row=AgI/Cl-021; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-021; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-021; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-023:h=56163f8156a3
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -8081,164 +6323,13 @@ observations:
         note: row=AgI/Cl-023; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=0.77 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-023; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-023; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-024:h=a0a22ec6fdad
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -8721,164 +6812,13 @@ observations:
         note: row=AgI/Cl-027; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.6 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-027; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-027:h=f3e7661bb83c
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -9013,164 +6953,13 @@ observations:
         note: row=AgI/Cl-027; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.6 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-027; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-027:h=f8ba540ee387
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -9305,164 +7094,13 @@ observations:
         note: row=AgI/Cl-027; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.6 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-027; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-027; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-029:h=d107bbec3b25
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -9594,104 +7232,13 @@ observations:
         note: row=AgI/Cl-029; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-029; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-029; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-031:h=d53479292117
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -9855,6 +7402,9 @@ observations:
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
+        - 'omitted trace components: Cl'
+        - 'projected trace components omitted from engine composition: Cl=0.33 wt%'
+        - 'projected trace mass fraction: 0.003294399520814615154237795747'
         parameters:
         - - original_SiO2_wt_pct
           - state:
@@ -10115,104 +7665,13 @@ observations:
         note: row=AgI/Cl-032; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-032; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-032; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-037:h=e98dd381a8ae
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -10376,6 +7835,9 @@ observations:
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
+        - 'omitted trace components: Cl'
+        - 'projected trace components omitted from engine composition: Cl=0.41 wt%'
+        - 'projected trace mass fraction: 0.004093041828890885494659079565'
         parameters:
         - - original_SiO2_wt_pct
           - state:
@@ -10668,6 +8130,9 @@ observations:
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
+        - 'omitted trace components: Cl'
+        - 'projected trace components omitted from engine composition: Cl=0.32 wt%'
+        - 'projected trace mass fraction: 0.003194569232305081361685135270'
         parameters:
         - - original_SiO2_wt_pct
           - state:
@@ -10931,164 +8396,13 @@ observations:
         note: row=AgI/Cl-048; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=2.05 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-048; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-048; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-049:h=40cb1bcf5d19
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -11223,164 +8537,13 @@ observations:
         note: row=AgI/Cl-049; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.62 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-049; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-049; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-050:h=93de92a2d731
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -11515,164 +8678,13 @@ observations:
         note: row=AgI/Cl-050; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=2.19 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-050; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-050; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-051:h=5d56d3155302
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -11804,104 +8816,13 @@ observations:
         note: row=AgI/Cl-051; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-051; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-051; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-052:h=bd206e2e3b8b
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -12033,104 +8954,13 @@ observations:
         note: row=AgI/Cl-052; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-052; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-052; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1773.15:row=agi/cl-028:h=7313b070b943
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -12262,104 +9092,13 @@ observations:
         note: row=AgI/Cl-028; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4541080981480069101206661198'
-          - - Al2O3
-            - '0.1054168691611334661572578274'
-          - - MgO
-            - '0.259261096252777077854074821'
-          - - CaO
-            - '0.1812139364380825458680012321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'missing major oxides: FeO'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-028; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46.53'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '18.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '17.82'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '17.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-028; column=all
-        output_unit: mole_fraction
-        references: []
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1773.15:row=agi/cl-043:h=29f277bb981e
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -12494,161 +9233,10 @@ observations:
         note: row=AgI/Cl-043; column=all
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5212770477871351476042370672'
-          - - TiO2
-            - '0.007880291352433021182015208986'
-          - - Al2O3
-            - '0.09271013413096325875982558792'
-          - - FeO
-            - '0.08253373179694932299806996364'
-          - - MgO
-            - '0.1406908845432157063495890661'
-          - - CaO
-            - '0.134897623055569156030630957'
-          - - Na2O
-            - '0.02001028733373438707563214928'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'partial analysis contains unsupported component(s) above 0.5 wt%: Cl=1.77 wt%'
       locator:
         published_page: 6
         pdf_page_index: 7
         table: '2'
         note: row=AgI/Cl-043; column=all
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.76'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.02'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.32'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.61'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '9.19'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.26'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.01'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 7
-              table: '2'
-              note: row=AgI/Cl-043; column=all
-        output_unit: mole_fraction
-        references: []

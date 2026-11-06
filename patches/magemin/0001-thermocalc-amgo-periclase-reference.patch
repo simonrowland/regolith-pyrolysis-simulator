@@ -1,0 +1,68 @@
+From 20a869bdbd30966333130f5fb5a83157acfee885 Mon Sep 17 00:00:00 2001
+From: Simon Rowland <simon@simonrowland.com>
+Date: Wed, 4 Nov 2026 23:54:23 -0500
+Subject: [PATCH] Fix THERMOCALC aMgO by storing the periclase reference energy
+
+compute_activities() initialises G0_per to 0. The tc branch calls
+G_EM_function(..., "per", ...) and never copies PP_db.gbase, so
+
+    system_aMgO = exp(Gamma_MgO / RT)
+
+which is about 1e-21 at 1873 K. The sb branch does assign gbase,
+and divides by 4 for EM_database 1 and 2 (the 4-cation Mg4O4
+end-member). That sb assignment is unchanged.
+
+The other tc oxide references store PP_db.gbase with no extra
+scaling. Al2O3, TiO2 and H2O assign gbase after the research-group
+branch. The tc SiO2 branch assigns quartz and coesite gbase inside
+the branch. The factor multiply is commented out on every one of
+those assignments, and none of them applies the sb /4. The tc MgO
+fix is the same store of PP_db.gbase, with no factor and no /4.
+
+Repro on v1.9.6, --db=ig, --Temp=1599.85 C (1873.00 K),
+    --buffer=qfm --buffer_n=-3.205734 (log10 fO2 = -8). R = 0.0083144
+kJ/mol/K, the value initialise sets. Printed Gamma and gbase are
+in kJ despite the Gamma[J] heading.
+
+Kume 2000 Table 4 sample 305, wt% SiO2 34.6, Al2O3 39, CaO 19.6,
+MgO 6.8, Pres=1e-9 kbar (1e-6 bar):
+  before aMgO = 1.568821e-21 = exp(Gamma_MgO/RT)
+  after  aMgO = 5.679362e-01
+  Gamma_MgO = -746.00224 kJ, G_per = -737.19195 kJ
+  exp((Gamma_MgO - G_per)/RT) = 0.567936
+  aSiO2 = 4.556864e-02 and aAl2O3 = 1.000000e+00 unchanged
+  assemblage unchanged: fsp 0.18391, liq 0.50317, cpx 0.11432,
+  cor 0.19860, status 0
+
+Same bulk at Pres=0.001 kbar (1 bar):
+  before aMgO = 1.287131e-21, after 4.659243e-01
+  aSiO2 = 1.960119e-02 and aAl2O3 = 1 unchanged
+  assemblage unchanged (fsp, cpx, liq, liq, ne, cor)
+
+Periclase-saturated Fe-free bulk, wt% SiO2 25, Al2O3 10, CaO 15,
+MgO 50, 1e-6 bar, assemblage liq + fper:
+  before aMgO = 2.761891e-21, after 9.998449e-01
+  aSiO2 and aAl2O3 unchanged
+
+The FeO reference is not changed. On the sb path G0_fper is
+divided by 4 for EM_database 1 and 2 and then overwritten by
+PP_db.gbase. That overwrite is left for upstream to confirm.
+---
+ src/toolkit.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/toolkit.c b/src/toolkit.c
+index 8ff080f..49281e4 100644
+--- a/src/toolkit.c
++++ b/src/toolkit.c
+@@ -2006,6 +2006,10 @@ global_variable compute_activities(			int					 EM_database,
+ 		double G0_per = 0.0;
+ 		if (strcmp(gv.research_group, "tc") 	== 0 ){
+ 			PP_db  			= G_EM_function(gv.research_group, gv.EM_dataset, gv.len_ox,z_b.id,z_b.bulk_rock, z_b.apo, z_b.P, z_b.T , "per", "equilibrium");
++			/* tc oxide references store gbase with no factor and no /4.
++			   Al2O3, TiO2, H2O and the tc SiO2 branch do the same.
++			   G0_per stayed 0 here, so aMgO was exp(Gamma_MgO/RT). */
++			G0_per 			= PP_db.gbase;
+ 		}
+ 		else if (strcmp(gv.research_group, "sb") 	== 0 ){
+ 			PP_db  			= G_EM_function(gv.research_group, gv.EM_dataset, gv.len_ox,z_b.id,z_b.bulk_rock, z_b.apo, z_b.P, z_b.T , "pe", "equilibrium");

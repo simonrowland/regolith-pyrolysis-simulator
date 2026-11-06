@@ -9169,6 +9169,13 @@ def predict_with_engine(
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
+    if isolated is None and engine is Engine.INTERNAL_ANALYTICAL:
+        # Only an IA handle means the caller explicitly owns an in-process IA
+        # backend. Other engines in the shared score cache do not suppress the
+        # child CPU budget.
+        isolated = not bool(
+            handles and handles.get(Engine.INTERNAL_ANALYTICAL.value) is not None
+        )
     if isinstance(handles, dict):
         return _engine_prediction_or_unparseable_component(
             engine,
@@ -9202,6 +9209,35 @@ def predict_with_engine(
             exclude=provided_handles,
             active_error=sys.exc_info()[1],
         )
+
+
+_BUILTIN_SCORE_PREDICTOR = predict_with_engine
+
+
+def _score_predict_with_engine(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode | None = None,
+) -> EnginePrediction:
+    """Route scorer calls while preserving custom predictor keyword contracts."""
+
+    predictor = predict_with_engine
+    kwargs: dict[str, object] = {"handles": handles, "experiment": experiment}
+    if predictor is _BUILTIN_SCORE_PREDICTOR:
+        if bench is not None:
+            kwargs["bench"] = bench
+        if fo2_mode is not None:
+            kwargs["fo2_mode"] = fo2_mode
+        if engine is Engine.INTERNAL_ANALYTICAL:
+            # Scoring owns a shared handle cache, but every IA row still uses
+            # the CPU-budgeted child. Direct predictor callers keep their own
+            # default, which may deliberately use an IA handle in-process.
+            kwargs["isolated"] = True
+    return predictor(engine, observation, **kwargs)
 
 
 def _predict_with_engine(
@@ -10348,7 +10384,7 @@ def _predict_with_engine(
             experiment=experiment,
             bench=bench,
             handles=handle_map,
-            isolated=use_isolated,
+            isolated=isolated,
             notices=extra_notices,
         )
         if isinstance(borrowed, EnginePrediction):
@@ -12285,9 +12321,20 @@ def compile_residual(
     ):
         prediction = _knudsen_residue_prediction(context, reference, engine)
     if prediction is None:
-        predictor = predict or predict_with_engine
+        builtin_predictor = (
+            predict is _BUILTIN_SCORE_PREDICTOR
+            or (
+                predict is None
+                and predict_with_engine is _BUILTIN_SCORE_PREDICTOR
+            )
+        )
+        predictor = (
+            _score_predict_with_engine
+            if predict is None or predict is _BUILTIN_SCORE_PREDICTOR
+            else predict
+        )
         if (
-            predictor is predict_with_engine
+            builtin_predictor
             and _knudsen_vapour_equilibrium(quantity, experiment)
         ):
             # Identity, whether fO2 is printed or supplied by the selector.
@@ -12362,16 +12409,14 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        # The recorded bench goes to the built-in predictor whether it is
-        # selected implicitly (predict=None) or explicitly
-        # (predict=predict_with_engine): the reactive-cell label follows the
-        # bench, not the call style (b-693/b-691 r2 finding 6). Caller-supplied
-        # predictors keep the handles/experiment keyword contract.
-        if predictor is predict_with_engine and experiment is not None:
+        # The recorded bench follows the built-in predictor whether it is
+        # selected implicitly or explicitly. Caller-supplied predictors keep
+        # the handles/experiment keyword contract.
+        if builtin_predictor and experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
-        if predictor is predict_with_engine and fo2_mode is not None:
+        if builtin_predictor and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
         prediction = predictor(
             engine,
@@ -15070,19 +15115,19 @@ def measured_engine_rail_records(
     return records
 
 
-def _paired_engine_rail_benchmarks(
+def _paired_engine_rail_comparisons(
     residuals: Iterable[Mapping[str, object]],
     *,
     primary_engines: Sequence[str],
     comparison_engines: Sequence[str],
     rails: Sequence[str],
 ) -> list[dict[str, object]]:
-    """Choose each primary's lowest-RMS comparison on pairwise shared rows.
+    """Return every comparison engine's RMS on pairwise shared rows.
 
     Only one numeric dex row per engine/reference/rail is unambiguous enough
     to pair. Missing rows and duplicates are excluded from that comparison.
-    A result is returned for every requested rail and primary, including an
-    explicit unavailable record when no comparison engine shares rows.
+    Each requested rail and primary receives a record, with comparisons sorted
+    by shared-row count descending and engine name for ties.
     """
 
     values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
@@ -15112,7 +15157,7 @@ def _paired_engine_rail_benchmarks(
         values[(rail, reference)][engine].append(value)
 
     records: list[dict[str, object]] = []
-    comparison_names = set(comparison_engines) - set(primary_engines)
+    comparison_names = sorted(set(comparison_engines) - set(primary_engines))
     for rail in sorted(set(rails)):
         for primary_engine in primary_engines:
             pairs_by_engine: dict[str, list[tuple[Decimal, Decimal]]] = defaultdict(list)
@@ -15130,38 +15175,28 @@ def _paired_engine_rail_benchmarks(
                             (primary_value, comparison_values[0])
                         )
 
-            candidates: list[tuple[Decimal, str, Decimal, int]] = []
+            candidates: list[tuple[int, str, Decimal, Decimal]] = []
             for engine, pairs in pairs_by_engine.items():
-                benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+                outside_rms = _rms([comparison for _primary, comparison in pairs])
                 primary_rms = _rms([primary for primary, _comparison in pairs])
-                if benchmark_rms is not None and primary_rms is not None:
+                if outside_rms is not None and primary_rms is not None:
                     candidates.append(
-                        (benchmark_rms, engine, primary_rms, len(pairs))
+                        (len(pairs), engine, outside_rms, primary_rms)
                     )
-            if not candidates:
-                records.append(
-                    {
-                        "rail": rail,
-                        "primary_engine": primary_engine,
-                        "benchmark_engine": None,
-                        "n": 0,
-                        "primary_rms_dex": None,
-                        "benchmark_rms_dex": None,
-                    }
-                )
-                continue
-
-            benchmark_rms, engine, primary_rms, count = min(
-                candidates, key=lambda candidate: (candidate[0], candidate[1])
-            )
+            candidates.sort(key=lambda candidate: (-candidate[0], candidate[1]))
             records.append(
                 {
                     "rail": rail,
                     "primary_engine": primary_engine,
-                    "benchmark_engine": engine,
-                    "n": count,
-                    "primary_rms_dex": str(primary_rms),
-                    "benchmark_rms_dex": str(benchmark_rms),
+                    "comparisons": [
+                        {
+                            "engine": engine,
+                            "n_shared": n_shared,
+                            "outside_rms_dex": str(outside_rms),
+                            "primary_rms_dex_on_shared": str(primary_rms),
+                        }
+                        for n_shared, engine, outside_rms, primary_rms in candidates
+                    ],
                 }
             )
     return records
@@ -15475,7 +15510,7 @@ def _battery_hero_deck_records(
 
     observations = observations or {}
     points: list[dict[str, object]] = []
-    benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    comparison_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
     metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
     unavailable: dict[tuple[str, str], int] = defaultdict(int)
     axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
@@ -15523,7 +15558,7 @@ def _battery_hero_deck_records(
             **fields,
         }
         points.append(point)
-        benchmark_rows[chart].append({**row, "rail": chart})
+        comparison_rows[chart].append({**row, "rail": chart})
 
     for row in rows:
         rail = str(row.get("rail") or "")
@@ -15772,10 +15807,10 @@ def _battery_hero_deck_records(
                     None if not values else str(_median_abs(values))
                 ),
             }
-    benchmarks = {
+    comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_benchmarks(
-            (row for chart_rows in benchmark_rows.values() for row in chart_rows),
+        for record in _paired_engine_rail_comparisons(
+            (row for chart_rows in comparison_rows.values() for row in chart_rows),
             primary_engines=primary_engines,
             comparison_engines=comparison_engines,
             rails=_BATTERY_HERO_DECK_CHART_IDS,
@@ -15784,7 +15819,7 @@ def _battery_hero_deck_records(
     return {
         "points": tuple(points),
         "metrics": metrics,
-        "benchmarks": benchmarks,
+        "comparisons": comparisons,
         "unavailable_axis_counts": dict(unavailable),
         "axis_refusals": dict(axis_refusals),
         "axis_refusal_details": {

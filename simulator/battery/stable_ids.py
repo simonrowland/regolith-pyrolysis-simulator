@@ -89,10 +89,8 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
             label = loc.get("paragraph") or loc.get("row")
     if label is not None and str(label).strip():
         parts.append(f"row={_name_slug(str(label))}")
-    # ``composition_role`` (b-716) annotates what the row's printed oxide map
-    # stands for. ``derived_from`` names the row's measured parents. Neither
-    # is part of the printed row, so declaring either must not rename the
-    # point id.
+    # These fields annotate a row's identity or provenance without changing
+    # its printed content, so declaring them must not rename the point id.
     skip = {
         "T_K",
         "T_C",
@@ -102,6 +100,13 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
         "composition_role",
         "derived_from",
     }
+    printed_species = raw_item.get("species_as_printed")
+    if isinstance(printed_species, str) and printed_species in (
+        raw_item.get("sample"),
+        raw_item.get("formula"),
+    ):
+        # Repeating the row's sample/formula must not change its stable id.
+        skip.add("species_as_printed")
     if not include_locator:
         skip.add("locator")
     residual = {k: raw_item[k] for k in raw_item if k not in skip}

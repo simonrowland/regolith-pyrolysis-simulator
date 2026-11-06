@@ -1,0 +1,29 @@
+source_id: stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
+method: MinerU and pdftotext table transcription with page-render verification
+printed_table:
+  label: '8'
+  pdf_page: 18
+  published_page: 11
+  mineru_table_key: p018-t08
+  caption: Oxide stabilities per gram-atom of oxygen at 1,000° K
+  row_count: 5
+  columns:
+    compound: Printed compound and phase label
+    delta_Gf: ΔGf°, kcal; caption supplies per gram-atom of oxygen
+    reference: Attribution as printed
+  render_verified: true
+  render_verification: >-
+    At 300 dpi, checked all five body-row assignments and the NaFeO₂(c) entry:
+    body row 3 has −60.1 in the ΔGf° column and Koehler and coworkers (10) in
+    the reference column. PDF page 18 is printed page 11.
+extraction_decision:
+  included: NaFeO₂(c), body row 3 only
+  stored_observation_count: 1
+  printed_body_row_count: 5
+  excluded_rows: 4
+  reason: The other four rows identify different oxide compounds.
+  quantity: delta_fG
+  value_basis: mol_atom, with per_as_printed preserving “per gram-atom of oxygen”
+  evidence_class: quoted_attributed
+  attribution: Koehler and coworkers (10).
+  conditions: Temperature 1,000 K only; no pressure, fO2, or composition is printed for this comparison.

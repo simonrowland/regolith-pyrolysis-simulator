@@ -22,6 +22,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    AmountBasis,
     PerBasis,
     AdmissionStatus,
     BenchIdentityBasis,
@@ -2400,6 +2401,8 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
                 "per-run composition is not published"
                 in point_composition.state.reason
             )
+
+
             role_notices = [
                 notice
                 for notice in observation.notices
@@ -2537,6 +2540,33 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
         observation.identity.species.phase.is_value
         and observation.identity.species.phase.value is Phase.G
         for observation in na_kms_migrated
+    )
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "kems-020-hastie-1981-nbsir.yaml",
+        "kang-2007-sio2-activity-cas-low-silica.yaml",
+    ],
+)
+def test_empirical_composition_locators_survive_migration(
+    tmp_path: Path, name: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, name)
+
+    missing_locator_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.detail == "empirical Located value requires a locator"
+        and (
+            issue.path.endswith(".initial_composition")
+            or ".initial_composition.inference.parameters[" in issue.path
+            or issue.path.endswith(".printed_composition")
+        )
+    ]
+    assert not missing_locator_issues, "\n".join(
+        f"{issue.path}: {issue.detail}" for issue in missing_locator_issues
     )
 
 
@@ -3261,6 +3291,119 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
         for p in points
     )
     assert all(p.derivation.output_unit == "Pa" for p in points)
+
+
+def test_near_complete_phase_sample_composition_round_trips_as_value(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "partial-phase",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "oxide_weight_percent_as_published",
+                            "amount_basis": "mass_percent",
+                            "components": [["SiO2", "70"], ["MgO", "27.55"]],
+                        },
+                    },
+                    "locator": {"table": "1", "row": "4"},
+                }
+            },
+        }
+    ]
+    extract["species"] = {
+        "SiO2": {
+            "observations": [
+                {
+                    "observation_id": "partial-phase-silica",
+                    "experiment": "partial-phase",
+                    "type": "composition_series",
+                    "units": "wt_percent",
+                    "phase": "melt",
+                    "values": {
+                        "quantity": "equilibrium_phase_composition",
+                        "formula": "SiO2",
+                        "phase_label": "melt",
+                        "basis": "wt_percent",
+                        "component_amount": "70",
+                        "admission_status": "admitted",
+                    },
+                }
+            ]
+        }
+    }
+
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _works, _experiments, observations = load_migrated_store(root)
+
+    composition = observations[
+        "fixture-source::partial-phase-silica"
+    ].identity.composition
+    assert composition is not None
+    # The source assay is 70.00 + 27.55 = 97.55 wt%, above b-704's 95 wt% floor.
+    assert composition.is_value
+
+    for case, initial_row in (
+        (
+            "flagged-initial-charge",
+            {
+                "T_C": 0,
+                "T_C_is_initial_composition": True,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+        (
+            "zero-loss-initial-charge",
+            {
+                "T_C": 0,
+                "mass_loss_pct": 0,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+    ):
+        initial_extract = _scalar_extract(
+            quantity="equilibrium_phase_composition",
+            units="wt percent",
+            obs_type="composition_series",
+            values={
+                "quantity": "equilibrium_phase_composition",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "phase_label": "melt",
+                "basis": "wt_percent",
+                "points": [initial_row, {"T_C": 1300, "component_amount": 70}],
+            },
+        )
+        initial_extract["species"]["Na"]["observations"][0]["observation_id"] = case
+        initial_root = _write_min_tree(tmp_path / case, initial_extract)
+        migrate(initial_root, write=True)
+        _works, initial_experiments, initial_observations = load_migrated_store(
+            initial_root
+        )
+
+        migrated_rows = [
+            observation
+            for observation_id, observation in initial_observations.items()
+            if observation_id.startswith(f"fixture-source::{case}")
+        ]
+        assert migrated_rows
+        assert any(
+            observation.identity.composition is not None
+            and observation.identity.composition.is_value
+            for observation in migrated_rows
+        )
+        experiment = initial_experiments[migrated_rows[0].experiment_id]
+        assert experiment.sample.initial_composition is not None
+        assert experiment.sample.initial_composition.state.is_value
 
 
 def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
@@ -12421,14 +12564,14 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
     assert result.validation is not None
-    # 829ce3701 withholds two owner-selected initials (samples 10017 and
-    # 12073) instead of picking one. 243fb508c admits both Na series.
+    # The 10017 and 12073 proxy totals (99.79 and 99.48 wt%) are in b-704's
+    # 95–102 interval, so the selected initials expose their source conflict.
     issues = result.validation.hard_issues
     assert len(issues) == 1
     assert issues[0].reason is RefusalReason.INVALID_SOURCE
     assert "initial_composition_conflict" in issues[0].detail
-    assert "10017" in issues[0].detail
-    assert "12073" in issues[0].detail
+    assert "lpi-compendium-10017" in issues[0].detail
+    assert "lpi-compendium-12073" in issues[0].detail
     rows = [
         obs
         for obs in result.observations.values()
@@ -15712,13 +15855,13 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert len(points) == 2
     by_value = {o.value.point: o for o in points}
     sio2 = by_value[as_decimal("0.011")]
-    assert sio2.identity.species.formula == "SiO2"
+    assert sio2.identity.species.formula == "Na"
     assert quantity_token(sio2.identity) is Quantity.MASS_LOSS_FRACTION
     assert sio2.value.kind is ValueKind.POINT
     assert float(sio2.identity.temperature_K.value) == 1673.15
     assert sio2.admission.status is AdmissionStatus.ADMITTED
     ms2 = by_value[as_decimal("0.032")]
-    assert ms2.identity.species.formula == "unknown"
+    assert ms2.identity.species.formula == "Na"
     assert float(ms2.identity.temperature_K.value) == 1836.15
     assert ms2.admission.status is AdmissionStatus.ADMITTED
 
@@ -15853,6 +15996,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
                 {
                     "test": "2b",
                     "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
                     "Tmax_C": None,
                     "Tmax_C_as_printed": ">800",
                     "mass_loss_pct": 16.0,
@@ -15860,6 +16004,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
                 {
                     "test": 3,
                     "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
                     "Tmax_C": 700.0,
                     "mass_loss_pct": 37.0,
                 },
@@ -15894,7 +16039,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
     assert len(points) == 3
     by_value = {float(o.value.point): o for o in points}
     mls = by_value[0.101]
-    assert mls.identity.species.formula == "unknown"
+    assert mls.identity.species.formula == "Na"
     assert float(mls.identity.temperature_K.value) == 1474.0 + 273.15
     assert mls.admission.status is AdmissionStatus.ADMITTED
     bound = by_value[0.16]
@@ -15932,6 +16077,154 @@ def test_partial_pressure_point_sample_is_not_species_formula(tmp_path: Path) ->
         if quantity_token(o.identity) is Quantity.P_PARTIAL
     )
     assert observation.identity.species.formula == "O2"
+
+
+def test_point_sample_label_different_from_printed_species_never_infers(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {"T_K": 1200.0, "p_Pa": 2.0, "sample": "Cu12.1"},
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 3.0,
+                    "sample": "Cu13.1",
+                    "species_as_printed": "Cu",
+                },
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    extract["species"] = {"Cu": {"observations": [row]}}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(observations) == 2
+    assert {observation.identity.species.formula for observation in observations} == {
+        "Cu"
+    }
+
+
+def test_bare_sample_label_equal_to_parent_species_still_infers(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [{"T_K": 1200.0, "p_Pa": 2.0, "sample": "Cu"}],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    extract["species"] = {"Cu": {"observations": [row]}}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "Cu"
+
+
+def test_point_species_as_printed_overrides_parent_formula(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 2.0,
+                    "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "FeTiO3"
+
+
+def test_nonformula_point_species_as_printed_keeps_formula_unknown(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 2.0,
+                    "sample": "SC-4",
+                    "species_as_printed": "Fo92 olivine",
+                }
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    extract["species"] = {"forsterite": {"observations": [row]}}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "unknown"
+
+
+def test_species_formula_with_printed_activity_annotation_is_used(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 2.0,
+                    "species_as_printed": "Na2O Activity[c]",
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "Na2O"
 
 
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
@@ -18445,7 +18738,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        assert identity.composition.value.amount_basis.value == "mass_percent"
+        # The source reports five major oxides totaling 99.75 wt%, within b-704's 95–102 interval.
+        assert (
+            sum(expected_start_composition.values(), Decimal("0"))
+            == Decimal("99.75")
+        )
+        assert identity.composition.is_value
+        assert identity.composition.value.amount_basis is AmountBasis.MASS_PERCENT
         assert identity.composition.value.basis == "printed_oxides"
         assert dict(identity.composition.value.components) == expected_start_composition
         assert identity.temperature_K.value == run_key[1]
