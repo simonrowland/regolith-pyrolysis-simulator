@@ -366,7 +366,10 @@ def test_d349_fe_activity_conversion_is_continuous_at_1650k():
         target_standard_state_phase="liquid",
     )[0]
 
-    assert below == pytest.approx(above, rel=1.0e-6, abs=0.0)
+    # JANAF's rounded transition rows give ΔG_tr=-0.00065 kJ/mol at 1650 K;
+    # this relative tolerance covers that source precision without shifting
+    # the branch values by an unsupported constant.
+    assert below == pytest.approx(above, rel=5.0e-5, abs=0.0)
 
 
 def test_d349_fe_provider_pressure_exposes_ellingham_transition_step(
@@ -904,14 +907,15 @@ def test_d350_alphamelts_volatility_diagnostic_uses_builtin_mgo_cao_activity(
             abs=0,
         )
     for species in ("Mg", "Ca"):
+        source_id, k_id = _D349_SOURCE_K_STANDARD_IDS[species]
         assert any(
             f"species={species} " in notice
             and "reason=activity_standard_state_substitution" in notice
             and "source_standard_state_substitution="
             "alphamelts_oxide_activity_no_declared_standard->"
             "builtin_declared_standard" in notice
-            and MELT_OXIDE_ACTIVITY_REFERENCE_STATE in notice
-            and MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE in notice
+            and source_id in notice
+            and k_id in notice
             and "log10_activity_offset=" in notice
             for notice in result["warnings"]
         )
