@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 760
-  extracts: 758
+  sources: 762
+  extracts: 760
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 758
+  extracts_without_pdf: 760
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -134,6 +134,7 @@ gaps:
   - deguzman-2026-simulant-physicochemical
   - delgado-2015-mg-thermite-regolith
   - di-donato-granati-2000
+  - dikov-2009-luna16-condensate-iron
   - distin-1971-ferrous-silicate-melts
   - dohmen-2003-coupled-kinetics
   - dong-2009-cr-v-slag-activities
@@ -416,6 +417,7 @@ gaps:
   - metsoc-2024-6224
   - miao-li-yan-2023-fe-v-spinel-gibbs
   - miki-1999-si-alloy-thermodynamics
+  - moeller-2007-silicon-oxide-evaporation-condensation
   - mogul-2023-pioneer-venus-co2-icarus
   - moosavi-khoonsari-2015-na-fe-cmas-thesis
   - morey-1964-usgs-pp440l-phase-equilibria
@@ -8154,6 +8156,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: dikov-2009-luna16-condensate-iron
+  aliases: []
+  citation: Dikov, Yu. P., Gerasimov, M. V., Yakovlev, O. I. & Ivanov, A. V. (2009), "Valence State of
+    Iron in a Condensate from the Luna 16 Regolith", Petrology 17(5):429–438. DOI 10.1134/S0869591109050014.
+  doi: 10.1134/S0869591109050014
+  report_number: null
+  identifier: 10.1134/S0869591109050014
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/dikov-2009-luna16-condensate-iron/dikov-2009-luna16-condensate-iron.pdf
+      present: true
+      sha256: 6f2f39dd5f465e06bae9e721478520e0810a04ee7d60109c1edf52364c2d4b4d
+      matches_simulator: null
+    sidecar:
+      path: raw/dikov-2009-luna16-condensate-iron/sidecar.yaml
+      present: true
+    text:
+      path: text/dikov-2009-luna16-condensate-iron
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/dikov-2009-luna16-condensate-iron
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/dikov-2009-luna16-condensate-iron.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/dikov-2009-luna16-condensate-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: distin-1971-ferrous-silicate-melts
   aliases: []
   citation: Distin, P. A., Whiteway, S. G. & Masson, C. R. (1971), "Thermodynamics and constitution of
@@ -24561,6 +24621,65 @@ sources:
       last_stage: extracted
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  aliases: []
+  citation: Michael Möller (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation
+    und des Temperns von Siliziumoxid, Diplomarbeit, Ruprecht-Karls-Universität Heidelberg, Kirchhoff-Institut
+    für Physik, HD-KIP 07-37.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/moeller-2007-silicon-oxide-evaporation-condensation/moeller-2007-silicon-oxide-evaporation-condensation.pdf
+      present: true
+      sha256: fcb1940aba122cb6f4c2a93130266e41f0fbc6fd8d5ba8883dac264b713ccbbe
+      matches_simulator: null
+    sidecar:
+      path: raw/moeller-2007-silicon-oxide-evaporation-condensation/sidecar.yaml
+      present: true
+    text:
+      path: text/moeller-2007-silicon-oxide-evaporation-condensation
+      exists: true
+      file_count: 253
+    tables:
+      path: tables/moeller-2007-silicon-oxide-evaporation-condensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: mogul-2023-pioneer-venus-co2-icarus
   aliases: []
   citation: 'Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical
