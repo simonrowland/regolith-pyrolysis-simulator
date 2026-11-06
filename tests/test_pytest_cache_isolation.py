@@ -215,3 +215,86 @@ print(json.dumps({
         "symlink_child_exists": True,
         "current_exists": True,
     }
+
+
+def test_sessionfinish_removes_empty_controller_root(tmp_path):
+    repo_root = Path(__file__).resolve().parents[1]
+    cache_root = tmp_path / "current-checkout"
+    env = os.environ.copy()
+    env.pop("PYTEST_XDIST_WORKER", None)
+    env["PYTHONPATH"] = str(repo_root)
+    env["REGOLITH_PYTEST_WORKER_CACHE_ROOT"] = str(cache_root)
+
+    result = _run_import_conftest(
+        """
+import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+
+import conftest
+
+cache_root = Path(os.environ["REGOLITH_PYTEST_WORKER_CACHE_ROOT"])
+cache_root.mkdir(parents=True)
+conftest.pytest_sessionfinish(SimpleNamespace(), 0)
+print(json.dumps(cache_root.exists()))
+""",
+        env,
+    )
+
+    assert result is False
+
+
+def test_sessionfinish_reaps_dead_cache_and_preserves_live_overlapping_run(tmp_path):
+    repo_root = Path(__file__).resolve().parents[1]
+    cache_root = tmp_path / "shared-cache-root"
+    env = os.environ.copy()
+    env.pop("PYTEST_XDIST_WORKER", None)
+    env["PYTHONPATH"] = str(repo_root)
+    env["REGOLITH_PYTEST_WORKER_CACHE_ROOT"] = str(cache_root)
+
+    result = _run_import_conftest(
+        """
+import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+
+import conftest
+
+cache_root = Path(os.environ["REGOLITH_PYTEST_WORKER_CACHE_ROOT"])
+cache_root.mkdir(parents=True)
+owner_file = conftest._WORKER_CACHE_OWNER_FILE
+live_root = cache_root / f"gw-live-regolith-{'a' * 32}"
+live_root.mkdir()
+start = conftest._process_start_times({os.getpid()})[os.getpid()]
+(live_root / owner_file).write_text(f"{os.getpid()}\\t{start}\\n", encoding="ascii")
+
+dead_pid = 987654321
+dead_root = cache_root / f"gw-dead-regolith-{'b' * 32}"
+dead_root.mkdir()
+(dead_root / owner_file).write_text(f"{dead_pid}\\tdead-owner\\n", encoding="ascii")
+original_kill = conftest.os.kill
+def kill_with_synthetic_dead_pid(pid, signal):
+    if pid == dead_pid:
+        raise ProcessLookupError()
+    return original_kill(pid, signal)
+conftest.os.kill = kill_with_synthetic_dead_pid
+
+conftest.pytest_sessionfinish(SimpleNamespace(), 0)
+print(json.dumps({
+    "cache_root_exists": cache_root.exists(),
+    "live_root_exists": live_root.exists(),
+    "live_owner_exists": (live_root / owner_file).exists(),
+    "dead_root_exists": dead_root.exists(),
+}))
+""",
+        env,
+    )
+
+    assert result == {
+        "cache_root_exists": True,
+        "live_root_exists": True,
+        "live_owner_exists": True,
+        "dead_root_exists": False,
+    }
