@@ -1118,7 +1118,7 @@ class EvaporationMixin:
                     'zero_by_physics',
                     'upper_bound',
                     'dormant_by_epoch',
-                    'refused',
+                    'refusal',
                 }
             )
             if (
