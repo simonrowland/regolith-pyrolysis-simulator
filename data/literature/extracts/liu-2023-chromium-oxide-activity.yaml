@@ -2485,7 +2485,11 @@ species:
             state: {tag: value, value: not_printed}
             locator: {page: 5, published_page: 317, pdf_page_index: 4, section: '3.3. Activity of Chromium Oxide in Slags', table: '3'}
           method:
-            state: {tag: value, value: "aCr calculated according to the Kobayashi equation [27] using the chromium-in-copper activity coefficient."}
+            state:
+              tag: value
+              value: >-
+                The activity coefficient of chromium in copper was measured by Kobayashi et al. [27].
+                In the present research, it is calculated to be 11.91 at 1 823 K (1 550°C).
             locator: {page: 5, published_page: 317, pdf_page_index: 4, section: '3.3. Activity of Chromium Oxide in Slags', table: '3'}
           references:
             - "Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]"
