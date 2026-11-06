@@ -169,7 +169,7 @@ def test_authoritative_vapor_pressure_no_liquid_gate_zeroes_evaporation():
 
 
 @pytest.mark.parametrize('temperature_C', [0.0, 1000.0, 1600.0])
-def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
+def test_active_liquid_all_species_refused_returns_zero_flux(temperature_C):
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=temperature_C),
         setpoints={},
@@ -195,11 +195,41 @@ def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
         status='ok',
     )
 
-    with pytest.raises(EvaporationFluxRefusal) as exc_info:
-        PyrolysisSimulator._calculate_evaporation(sim, result)
-    assert exc_info.value.reason == 'vapour_batch_no_debiting_pressure_outcome'
+    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
+    assert flux.species_kg_hr == {}
+    assert sim._last_evaporation_flux_diagnostic['reason'] == (
+        'vapour_batch_all_channels_non_debiting'
+    )
     assert refused_batch.requested_species_ids == frozenset({'K'})
     assert refused_batch.channel('K').is_refused
+
+
+def test_run_level_pO2_resolution_refusal_still_aborts_evaporation():
+    sim = _with_empty_vapour_batch(
+        types.SimpleNamespace(melt=types.SimpleNamespace(temperature_C=1600.0))
+    )
+
+    def refuse_missing_pO2(_equilibrium, *, temperature_K, effective_pressure_source):
+        del temperature_K, effective_pressure_source
+        sim._last_vapour_batch_resolve_error = {
+            'status': 'unavailable',
+            'reason': 'missing_run_level_pO2',
+        }
+        return None
+
+    sim._resolve_evaporation_vapour_batch = refuse_missing_pO2
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={'K': 1.0},
+        status='ok',
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert exc_info.value.reason == 'missing_run_level_pO2'
 
 
 def test_kernel_ok_empty_with_proven_empty_request_is_physical_zero():

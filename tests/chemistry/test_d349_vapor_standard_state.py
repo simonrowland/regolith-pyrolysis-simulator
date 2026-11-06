@@ -510,3 +510,109 @@ def test_d350_alphamelts_volatility_diagnostic_uses_builtin_mgo_cao_activity(
             and "log10_activity_offset=" in notice
             for notice in result["warnings"]
         )
+
+
+@pytest.mark.parametrize(
+    ("composition_wt_pct", "activities"),
+    (
+        ({"MgO": 50.0, "CaO": 40.0, "Na2O": 10.0}, {"Na2O": 0.2}),
+        ({"MgO": 50.0, "CaO": 50.0}, {}),
+    ),
+    ids=("mixed", "all-mg-ca"),
+)
+def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    composition_wt_pct,
+    activities,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1500.0
+    backend = AlphaMELTSBackend()
+    projection = backend._activities_times_antoine_or_fail(
+        1500.0,
+        activities,
+        composition_wt_pct,
+        pO2_bar=1.0,
+        context="d-350 evaporation gateway integration test",
+    )
+    assert isinstance(projection, dict)
+    expected = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition_wt_pct,
+        temperature_C=1500.0,
+        pO2_bar=1.0,
+    )
+    for species in ("Mg", "Ca"):
+        assert projection[species] == pytest.approx(
+            expected["vapor_pressures_Pa"][species],
+            rel=1e-10,
+            abs=0,
+        )
+
+    diagnostics = backend._vapor_pressure_diagnostics(
+        {
+            "pO2_bar": 1.0,
+            "source_reaction_fO2_bar": 1.0,
+            "source_reaction_fO2_log10": 0.0,
+            "source_reaction_activity_pressure_bar": 1.0,
+            "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
+            "source_reaction_composition_wt_pct": dict(composition_wt_pct),
+        },
+        projection,
+        "alphamelts_fallback",
+    )
+    sim._last_vapor_pressure_diagnostic = diagnostics
+    sim._last_vapor_pressures_source = backend._vapor_pressure_source_map(
+        projection,
+        "alphamelts_fallback",
+    )
+    sim._last_backend_diagnostics = diagnostics
+    equilibrium = SimpleNamespace(
+        status="ok",
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        liquid_fraction=0.5,
+        fO2_log=0.0,
+        pO2_bar=1.0,
+        diagnostics=diagnostics,
+        activity_coefficients=dict(diagnostics.get("activities", {})),
+        vapor_pressures_Pa=projection,
+        vapor_pressures_source=sim._last_vapor_pressures_source,
+    )
+
+    flux = sim._calculate_evaporation(equilibrium)
+
+    assert flux.species_kg_hr["Mg"] > 0.0
+    assert flux.species_kg_hr["Ca"] > 0.0
+    for species in ("Mg", "Ca"):
+        activity = diagnostics["activities"][species]
+        route = diagnostics["vapor_pressure_numerator_provenance"][species]
+        assert route["vapor_activity_for_crystalline_K"] > 0.0
+        assert route["vapor_activity_for_crystalline_K"] != pytest.approx(
+            activity,
+            rel=1e-6,
+            abs=0,
+        )
+        notice = diagnostics[
+            "vapor_activity_standard_state_notices_by_species"
+        ][species]
+        assert notice["reason"] == "activity_standard_state_substitution"
+        assert notice["source_standard_state_substitution"] == (
+            "alphamelts_oxide_activity_no_declared_standard -> "
+            "builtin_declared_standard"
+        )
+
+    from simulator.runner import _vapor_pressure_source_report
+
+    report = _vapor_pressure_source_report(sim)
+    assert set(report["vapor_activity_standard_state_notices_by_species"]) >= {
+        "Mg",
+        "Ca",
+    }

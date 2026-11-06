@@ -1080,7 +1080,6 @@ VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
     "vapor_pressure_backend_status_reason",
     "vapor_pressure_fallback_source",
     "authoritative_for_requested_vapor_pressure",
-    "vapor_activity_standard_state_notices_by_species",
 })
 
 
@@ -1772,6 +1771,7 @@ def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
         == "antoine_fallback_from_vaporock"
     )
     assert report["authoritative_for_requested_vapor_pressure"] is False
+    assert "vapor_activity_standard_state_notices_by_species" not in report
 
 
 def test_vapor_pressure_source_report_surfaces_activity_standard_state_notices():

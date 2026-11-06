@@ -86,6 +86,48 @@ def _domain_composition() -> dict[str, float]:
     }
 
 
+def test_activity_volatility_uses_the_solved_liquid_for_builtin_substitution() -> None:
+    vapor_pressure_data = volatility_module._load_default_vapor_pressure_data()
+    bulk = _domain_composition()
+    solved_liquid = {
+        **bulk,
+        "MgO": 25.0,
+        "CaO": 4.0,
+        "SiO2": 61.0,
+    }
+    activities = {"MgO": 0.4, "CaO": 0.3}
+    sample = {
+        "activity_coefficients": activities,
+        "liquid_composition_wt_pct": solved_liquid,
+    }
+    source = StubActivitySource({1.0: sample, 10.0: sample})
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=bulk,
+        pO2_grid_bar=[1.0],
+        temperature_C=1500.0,
+        activity_source=source,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    expected = volatility_module._analytical_vapor_pressures_from_activities(
+        vapor_pressure_data=vapor_pressure_data,
+        temperature_C=1500.0,
+        pO2_bar=1.0,
+        melt_oxide_activities=activities,
+        composition_wt_pct=solved_liquid,
+    )
+
+    assert diagnostic["activity_samples"]["primary"][
+        "liquid_composition_wt_pct"
+    ] == solved_liquid
+    for species in ("Mg", "Ca"):
+        assert diagnostic["grid"][0]["species"][species]["P_eq_Pa"] == pytest.approx(
+            expected["species"][species]["P_eq_Pa"],
+            rel=1e-12,
+            abs=0,
+        )
+
+
 @pytest.mark.parametrize(
     ("a_value", "reason"),
     ((None, "missing_antoine_A"), (-1.0, "nonpositive_antoine_A")),

@@ -194,6 +194,37 @@ def test_petthermotools_blank_and_none_preserve_base_model_keywords() -> None:
     assert blank_backend._melts_model_code() == 1
 
 
+def test_alphamelts_antoine_fallback_uses_solved_liquid_composition():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._vaporock_available = False
+    bulk = {"MgO": 8.0, "CaO": 12.0, "SiO2": 80.0}
+    solved_liquid = {"MgO": 30.0, "CaO": 10.0, "SiO2": 60.0}
+    backend._require_petthermotools_runtime = lambda: object()
+    backend._to_petthermotools_liq_comp = lambda composition: composition
+    backend._run_petthermotools_isolated = lambda *_args, **_kwargs: {}
+    backend._parse_petthermotools_result = lambda *_args, **_kwargs: EquilibriumResult(
+        status="ok",
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        liquid_fraction=0.5,
+        liquid_composition_wt_pct=dict(solved_liquid),
+        activity_coefficients={"MgO": 0.2, "CaO": 0.3},
+    )
+    seen = {}
+
+    def record_projection(_temperature_C, _activities, composition_wt_pct, **_kwargs):
+        seen["composition_wt_pct"] = dict(composition_wt_pct)
+        return {}
+
+    backend._activities_times_antoine_or_fail = record_projection
+
+    backend._equilibrate_python(1600.0, bulk, -9.0, 1.0)
+
+    assert seen["composition_wt_pct"] == solved_liquid
+
+
 @pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])
 def test_petthermotools_unknown_model_refuses_before_worker_start(
     monkeypatch,
