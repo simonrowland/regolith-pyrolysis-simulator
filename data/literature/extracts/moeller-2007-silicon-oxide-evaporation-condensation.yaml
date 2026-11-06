@@ -1,13 +1,13 @@
 schema_version: literature_extract.v1
 source_id: moeller-2007-silicon-oxide-evaporation-condensation
 source:
-  citation: "Moeller, S. (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation und des Temperns von Siliziumoxid, Diplomarbeit, Universität Duisburg-Essen."
+  citation: "Michael Möller (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation und des Temperns von Siliziumoxid, Diplomarbeit, Ruprecht-Karls-Universität Heidelberg, Kirchhoff-Institut für Physik, HD-KIP 07-37."
   year: 2007
 extraction:
   method: Machine-text transcription from MinerU tables and pdftotext-layout; table rows cross-checked between reads and row/column layout checked against the printed table.
   date: '2026-11-06'
   worker: w1106a-moel07
-  scope_note: Numeric data limited to tabulated IR band positions, printed deposition conditions/rates/thicknesses, and annealing temperature-duration data. Figure-only vapor-pressure points, spectra, and figure-read values are deferred.
+  scope_note: Numeric data limited to tabulated IR band positions, printed deposition conditions/rates/thicknesses, and annealing temperature-duration data. The printed qualitative vapor-pressure bounds are retained as context; figure-only vapor-pressure points, spectra, and figure-read values are deferred.
   schema_gap: >-
     IR band wavenumber has no exact quantity token in simulator/battery/enums.py::Quantity or
     simulator/battery/migrate.py::QUANTITY_ALIASES / TYPE_QUANTITY, and table_record is not an
@@ -37,6 +37,10 @@ extraction:
     - {locator: {page: 74, pdf_page_index: 73, section: '4.3.1'}, row_count: 1 prose comparison, numeric_cells: 4, evidence: 'The 104,8 nm / 166 nm / about 60 nm comparison and 0,2 · 10−10 mbar pressure change checked against both machine reads and PDF render.'}
     - {locator: {page: 84, pdf_page_index: 83, section: '4.4'}, row_count: 1 prose condition, numeric_cells: 2, evidence: '10 min / 1 min pulse duration by substrate verified against rendered PDF page 84 and both machine reads.'}
     - {locator: {page: 85, pdf_page_index: 84, section: '4.4'}, row_count: 1 prose condition series, numeric_cells: 4, evidence: 'Annealing pressure, first temperature, 100-degree steps and upper temperature checked against MinerU markdown, pdftotext, and PDF render.'}
+    - {locator: {page: 70, pdf_page_index: 69, section: '4.2.2'}, row_count: 1 prose result, numeric_cells: 3, evidence: 'The >1 mbar bound, order-of-magnitude difference, and ∆T = ±50 °C were checked against pdftotext and rendered PDF page 70.'}
+    - {locator: {page: 78, pdf_page_index: 77, section: '4.3.3'}, row_count: 1 prose result, numeric_cells: 1, evidence: 'Ta deposit thickness 78 nm checked against pdftotext and rendered PDF page 78.'}
+    - {locator: {page: 80, pdf_page_index: 79, section: '4.3.3'}, row_count: 1 prose comparison, numeric_cells: 2, evidence: 'Fitted 19 nm versus calculated 78 nm and the stated aperture/beam explanation checked against pdftotext and rendered PDF page 80.'}
+    - {locator: {page: 81, pdf_page_index: 80, table: '4.4'}, row_count: 1, numeric_cells: 1, evidence: 'Tabelle 4.4 Schichtdicke 19 nm checked against pdftotext and rendered PDF page 81.'}
   figure_read_candidates:
     - 'Figures 4.3–4.7: vapor-pressure values, spectra-derived curves and thickness-labelled spectral series; figure-only numeric values excluded.'
     - 'Figures 4.14–4.20: spectral curves and annealing trends; only the tabulated Table 4.6 values were transcribed.'
@@ -53,7 +57,7 @@ fidelity_samples:
     locator: {page: 82, pdf_page_index: 81, published_page: 77, table: '4.5', row: 2, column: 5, note: paired MinerU and pdftotext reads; table layout checked against the printed table}
   - path: species.SiO.context[moeller2007_table46_anneal_series].values.rows[7].nu_TO_cm_1
     value: '1076'
-    locator: {page: 86, pdf_page_index: 85, published_page: 81, table: '4.6', row: 9, column: 2, note: MinerU and pdftotext agree; PDF render confirms the table cell}
+    locator: {page: 86, pdf_page_index: 85, published_page: 81, table: '4.6', row: 9, column: 2, note: No MinerU table block exists for PDF page 86; pdftotext and the rendered page confirm the table cell}
   - path: species.SiO.context[moeller2007_tableA2_anneal_rocking_bending].values.rows[1].resonance_frequency_cm_1
     value: '422'
     locator: {page: 100, pdf_page_index: 99, published_page: 95, table: 'A.2', row: 4, column: 2, note: rendered page confirms second rocking row}
@@ -70,7 +74,8 @@ species:
         units: cm-1
         values:
           quantity: SiO2_transversal_optical_band_wavenumber
-          quantity_as_printed: transversal optical characteristic vibration bands
+          quantity_as_printed: 'Literaturwerte für die drei transversal optischen charakteristischen Schwingungsbanden von SiO2 im IR. Dabei steht exp für experimentell und theo für theoretisch bestimmte Frequenzen.'
+          quantity_gloss_en: 'Literature values for the three characteristic transverse optical vibration bands of SiO2 in IR; exp denotes experimentally determined and theo theoretically determined frequencies.'
           disposition: quoted_attributed
           method_class: quoted_attributed
           schema_gap: IR band wavenumber lacks an exact quantity token and table_record is outside the closed observation type set; retained as typed-refused context.
@@ -89,7 +94,8 @@ species:
         units: cm-1
         values:
           quantity: SiO2_longitudinal_optical_band_wavenumber
-          quantity_as_printed: longitudinal optical characteristic vibration bands
+          quantity_as_printed: 'Literaturwerte für die drei longitudinal optischen charakteristischen Schwingungsbanden von SiO2 im IR.'
+          quantity_gloss_en: 'Literature values for the three characteristic longitudinal optical vibration bands of SiO2 in IR.'
           disposition: quoted_attributed
           method_class: quoted_attributed
           schema_gap: IR band wavenumber lacks an exact quantity token and table_record is outside the closed observation type set; retained as typed-refused context.
@@ -108,17 +114,19 @@ species:
         units: resonance frequency cm-1; fitted thickness nm
         values:
           quantity: SiO_fitted_transversal_optical_band_wavenumbers_and_film_thickness
-          quantity_as_printed: Variables and fit parameters for modelling SiO
+          quantity_as_printed: 'Variablen mit Werten der Fitparametern für die Modellierung von SiO.'
+          quantity_gloss_en: 'Variables with fit-parameter values for modelling SiO.'
           method_class: measured_reduced
           schema_gap: IR band wavenumber and fitted film thickness in this table are retained as typed-refused context because table_record is outside the closed observation type set; no exact wavenumber quantity token exists.
           rows:
-            - {assignment_as_printed: stretching mode, resonance_frequency_cm_1: '996', oscillator_strength_cm_1: '833', damping_cm_1: '0,02', gaussian_width_cm_1: '73'}
-            - {assignment_as_printed: bending mode, resonance_frequency_cm_1: '697', oscillator_strength_cm_1: '303', damping_cm_1: '0,07', gaussian_width_cm_1: '68'}
-            - {assignment_as_printed: rocking mode, resonance_frequency_cm_1: '442', oscillator_strength_cm_1: '336', damping_cm_1: '0,02', gaussian_width_cm_1: '65'}
+            - {resonance_frequency_cm_1: '996', oscillator_strength_cm_1: '833', damping_cm_1: '0,02', gaussian_width_cm_1: '73', mode_as_printed: Streckschwingung, mode_gloss_en: stretching vibration}
+            - {resonance_frequency_cm_1: '697', oscillator_strength_cm_1: '303', damping_cm_1: '0,07', gaussian_width_cm_1: '68', mode_as_printed: Biegeschwingung, mode_gloss_en: bending vibration}
+            - {resonance_frequency_cm_1: '442', oscillator_strength_cm_1: '336', damping_cm_1: '0,02', gaussian_width_cm_1: '65', mode_as_printed: Schaukelschwingung, mode_gloss_en: rocking vibration}
           dielectric_background: {real_part: '4,02', imaginary_part: '0'}
           fitted_film_thickness_nm: '166'
           film_thickness_from_deposition_rates_nm: '104,8'
           printed_row_count: 3 oscillators plus dielectric-background and thickness records
+          mode_assignment_locator: {page: 72, pdf_page_index: 71, published_page: 67, section: '4.3.1', note: 'Paragraph states Streck-, Biege- und Schaukelschwingung in this oscillator order; assignments correspond to the three table rows.'}
           label_glossary: {rocking mode: Schaukelschwingung, bending mode: Biegeschwingung, stretching mode: Streckschwingung}
       - observation_id: moeller2007_table45_to_band_positions
         type: table_record
@@ -199,6 +207,20 @@ species:
             source_atmosphere: UHV chamber; pressure '<5 · 10−10 mbar'
             source_pressure: '<5 · 10−10 mbar'
           disposition: 'Evaporation condition recorded as printed; source temperature appears only in Figure 4.3 and is excluded.'
+      - observation_id: moeller2007_text_evaporation_pressure_bounds
+        type: table_context
+        locator: {page: 70, pdf_page_index: 69, published_page: 65, section: '4.2.2'}
+        units: mbar; °C
+        values:
+          quantity: SiO_evaporation_vapor_pressure_text_bounds
+          method_class: measured_direct
+          printed_results:
+            measured_vapor_pressures: 'Die gemessenen Dampfdrücke lagen fast alle über 1 mbar.'
+            difference_between_two_series: 'Die Messungen weisen einen Unterschied von etwa einer Größenordnung auf.'
+            temperature_oscillations: 'gelegentlich zu stärkeren Temperaturoszillationen (∆T = ±50 °C)'
+            equation_2_20: 'Die Gleichung (2.20) konnte wegen der meist über 1 mbar liegenden gemessenen Dampfdrücke nicht mehr verwendet werden.'
+            reproducibility: 'Die gemessenen Dampfdrücke konnten nicht reproduziert werden.'
+          disposition: Prose bounds and methodological caveats only; the Figure 4.3 pressure series is not transcribed or mapped to p_sat.
       - observation_id: moeller2007_text_condensation_conditions
         type: table_context
         locator: {page: 71, pdf_page_index: 70, published_page: 66, section: '4.3'}
@@ -247,3 +269,20 @@ species:
           disposition: >-
             The 104.8 nm value is derived from pre/post deposition rates; 166 nm is the authors' spectral fit.
             The approximate 60 nm difference is the authors' comparison, not an independent measurement.
+      - observation_id: moeller2007_ta_deposition_thickness
+        type: table_context
+        locator: {page: 81, pdf_page_index: 80, published_page: 76, table: '4.4'}
+        units: nm
+        values:
+          quantity: SiO_deposition_thickness_on_tantalum
+          method_class: measured_reduced
+          schema_gap: Film thickness is geometric length and no exact film-thickness quantity token is available; retained as typed-refused context.
+          printed_values:
+            fitted_film_thickness: '19 nm'
+            previously_calculated_film_thickness: '78 nm'
+          printed_value_locators:
+            fitted_film_thickness: {page: 81, pdf_page_index: 80, published_page: 76, table: '4.4'}
+            previously_calculated_film_thickness: {page: 78, pdf_page_index: 77, published_page: 73, section: '4.3.3'}
+          author_explanation: 'The 2 mm aperture was too large for the off-centre approximately 11 mm deposit under a beam exceeding 10 mm at the sample; reflection also came from bare substrate. Anisotropy or inhomogeneity may also explain the discrepancy.'
+          explanation_locator: {page: 80, pdf_page_index: 79, published_page: 75, section: '4.3.3'}
+          disposition: The fitted and previously calculated Ta thicknesses are both retained as printed; reflectance spectra are not digitized.
