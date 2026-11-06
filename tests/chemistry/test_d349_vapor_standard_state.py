@@ -261,7 +261,7 @@ def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
     assert result.diagnostic["activities_standard_state"]["phase"] == "liquid"
 
 
-def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
+def test_d349_catalog_identity_mismatch_does_not_override_runtime_source(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -302,7 +302,7 @@ def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
         "activity_standard_state_conversion"
     ]
     assert notice["from_standard_state_id"] == (
-        "synthetic_distinct_liquid_activity_source"
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
     )
     assert notice["to_standard_state_id"] == (
         "synthetic_distinct_liquid_K_standard"
