@@ -96,24 +96,25 @@ species:
       values:
         quantity: second_law_reaction_enthalpy_0K
         evidence_kind: model
-        method_class: model_derived
-        derivation:
-          relation: Table Cr.T3 reports the compilation's second-law reprocessing of the cited Gorokhov KEMS data, dated 3.12.2009.
-          raw_inputs:
-            state: {tag: value, value: not_printed}
-            locator:
-              page: "HTML table Cr.T3"
-              source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
-              section: "[77ГОР/ГУС] AlO + Cr = Al + CrO, 2242-2690 K, 12 points"
-              note: "The 12 original KEMS points are not reproduced on the OA HTML page."
-          method:
-            state: {tag: value, value: "Second-law (II-law) fit of the AlO + Cr = Al + CrO KEMS data; the compilation prints the calculation date 3.12.2009."}
-            locator:
-              page: "HTML table Cr.T3"
-              source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
-              section: "CrO formation enthalpies, II-law column"
-          references:
-          - "Gorokhov, Gusarov et al. (1977), Report 43-77, record [77ГОР/ГУС]"
+        method_class: typed_refusal
+        method_class_as_printed: model_derived
+        admission_status: typed_refusal
+        reason: >-
+          Printed model_derived value retained as typed refusal: the primary
+          report PDF is unavailable and the OA compilation's table method cell
+          is not the required page-located prose method from that report.
+        value_as_printed: "88.7 ± 38"
+        units_as_printed: kJ mol-1 at T = 0 K
+        basis_as_printed: second-law reaction enthalpy at 0 K
+        method_as_printed: 'То же, AlO + Cr = Al + CrO, 2242-2690 K, 12 точек'
+        method_locator_as_printed:
+          page: "HTML table Cr.T3"
+          table: "Cr.T3"
+          source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+          record: "[77ГОР/ГУС]"
+          section: "CrO formation enthalpies, II-law column"
+        references_as_printed:
+        - "Gorokhov, Gusarov et al. (1977), Report 43-77, record [77ГОР/ГУС]"
         law: II
         reaction_as_printed: AlO + Cr = Al + CrO
         T_range_K_as_printed: 2242-2690 K
@@ -125,9 +126,31 @@ species:
         compilation_computed_date: "3.12.2009"
         report_internal_points: unseen
         note: >
-          Second-law fit of the compilation's 2009 reprocessing. Battery must
-          refuse as typed-refusal:model_output_not_measurement. The 12 KEMS
-          points of report 43-77 are not on the OA HTML (unseen, not 0).
+          The OA HTML compilation labels this result as second-law reprocessing.
+          The 12 KEMS points of report 43-77 are not on the OA HTML (unseen,
+          not 0); the value stays recorded with its printed model-derived class.
+      source_quotes:
+      - locator:
+          page: "HTML table Cr.T3"
+          table: "Cr.T3"
+          source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+          record: "[77ГОР/ГУС]"
+          column_header: "ΔrH°0 II закон"
+        quote: "II закон"
+      - locator:
+          page: "HTML table Cr.T3"
+          table: "Cr.T3"
+          source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+          record: "[77ГОР/ГУС]"
+          column_header: "Метод"
+        quote: "То же, AlO + Cr = Al + CrO, 2242-2690 K, 12 точек"
+      - locator:
+          page: "HTML table Cr.T3"
+          table: "Cr.T3"
+          source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+          record: "[77ГОР/ГУС]"
+          column_header: "ΔrH°0 II закон"
+        quote: "88.7 ± 38"
     - observation_id: gorokhov_1977_t3_cro_alo_exchange_third_law_d0
       type: gibbs_table
       locator:
