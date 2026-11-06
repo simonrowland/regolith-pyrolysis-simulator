@@ -26,6 +26,48 @@ RENDERED_CELLS = (
     ("O2", "shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06", "0.000", Phase.G),
 )
 
+# Every printed Gibbs value in Table 1, transcribed from the PDF page 2 render.
+GIBBS_TABLE_VALUES = (
+    ("CaO", "cr", "-421.511"),
+    ("CaO", "l", "-409.450"),
+    ("CaO", "g", "-74.308"),
+    ("Ca", "g", "-21.080"),
+    ("CaSiO3", "cr", "-1058.628"),
+    ("CaSiO3", "l", "-1064.401"),
+    ("Ca2", "g", "77.075"),
+    ("Ca2SiO4", "cr", "-1531.242"),
+    ("Ca2SiO4", "l", "-1522.120"),
+    ("Ca3SiO5", "cr", "-1945.934"),
+    ("Mg", "g", "-57.263"),
+    ("Ca3Si2O7", "cr", "-2577.486"),
+    ("Mg2", "g", "34.314"),
+    ("MgO", "cr", "-376.430"),
+    ("MgO", "l", "-345.380"),
+    ("MgO", "g", "-108.759"),
+    ("MgSiO3", "cr", "-956.936"),
+    ("Si", "g", "167.228"),
+    ("Mg2SiO4", "cr", "-1360.399"),
+    ("Mg2SiO4", "l", "-1351.811"),
+    ("Si2", "g", "216.304"),
+    ("CaMgSiO4", "cr", "-1461.894"),
+    ("Si3", "g", "265.892"),
+    ("CaMgSi2O6", "cr", "-2038.188"),
+    ("CaMgSi2O6", "l", "-2065.893"),
+    ("Si4", "g", "409.396"),
+    ("Ca2MgSi2O7", "cr", "-2478.460"),
+    ("Ca2MgSi2O7", "l", "-2498.156"),
+    ("SiO", "g", "-248.438"),
+    ("Ca3MgSi2O8", "cr", "-2976.156"),
+    ("SiO2", "g", "-314.875"),
+    ("SiO2", "cr", "-550.476"),
+    ("SiO2", "l", "-550.520"),
+    ("Si2O2", "g", "-546.135"),
+    ("O", "g", "121.662"),
+    ("O2", "g", "0.000"),
+    ("O3", "g", "273.851"),
+    ("O4", "g", "193.351"),
+)
+
 # Experimental Rein–Chipman centres. Read 1 is the stored disk peak on the
 # embedded JPEG. Read 2 is a visual centre of the filled disk on a fresh
 # 600 dpi page crop. T, activity, both pixel reads, and the half-difference
@@ -121,6 +163,15 @@ def _assert_rendered_cells(document) -> None:
         assert row["locator"]["page"] == 2
 
 
+def _assert_all_gibbs_table_values(document) -> None:
+    actual = sorted(
+        (formula, row["phase"], row["values"]["value"])
+        for formula, row in _observations(document)
+        if row["type"] == "gibbs_table"
+    )
+    assert actual == sorted(GIBBS_TABLE_VALUES)
+
+
 def _assert_sc456_model_classes(document) -> None:
     rows = _observations(document)
     model_rows = [
@@ -139,6 +190,28 @@ def _assert_sc456_model_classes(document) -> None:
     ]
     assert len(model_rows) == 44
     assert all(row["values"]["method_class"] == "model_derived" for row in model_rows)
+    gibbs_rows = [row for row in model_rows if row["type"] == "gibbs_table"]
+    assert len(gibbs_rows) == 38
+    for row in gibbs_rows:
+        values = row["values"]
+        assert values.get("standard_pressure") == "not_printed"
+        assert values["formation_basis_as_published"] == "Gibbs formation energies from elements"
+        assert values["standard_state_as_published"] == "Δ_fG°_{2000}"
+        assert values["value"]
+        derivation = values["derivation"]
+        method_locator = derivation["method"]["locator"]
+        assert method_locator["page"] == 1
+        assert method_locator["published_page"] == 40
+        assert method_locator["section"] == "Thermodynamic properties of minerals and fluids"
+        note = method_locator.get("note", "")
+        assert "ideal associated solutions theory" in note
+        assert "Gibbs energy minimization method" in note
+        assert "equation" not in method_locator
+        assert derivation["references"] == [
+            "Glushko et al. (1978–1982)",
+            "Bale et al. (2009)",
+            "Shornikov and Yakovlev (2015)",
+        ]
 
 
 def test_table_and_figure_reads_are_pinned():
@@ -155,6 +228,7 @@ def test_table_and_figure_reads_are_pinned():
     assert sum(row["phase"] == "l" for row in gibbs) == 8
     assert sum(row["phase"] == "g" for row in gibbs) == 17
     _assert_rendered_cells(document)
+    _assert_all_gibbs_table_values(document)
 
     activity_points = []
     for _formula, row in _observations(document):
@@ -276,7 +350,7 @@ def test_table_and_figure_reads_are_pinned():
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
     document = _load()
-    _assert_rendered_cells(document)
+    _assert_all_gibbs_table_values(document)
     solid = next(
         row
         for row in document["species"]["CaO"]["observations"]
@@ -284,7 +358,7 @@ def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
     )
     solid["values"]["value"] = "-999"
     with pytest.raises(AssertionError):
-        _assert_rendered_cells(document)
+        _assert_all_gibbs_table_values(document)
 
     document = _load()
     assert any(
@@ -302,7 +376,8 @@ def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
         if row["type"] == "gibbs_table"
     ]
     assert len(remaining) == 37
-    assert len(remaining) != 38
+    with pytest.raises(AssertionError):
+        _assert_all_gibbs_table_values(document)
 
 
 def test_isolated_migration_reaches_temperature_on_every_row():
@@ -344,6 +419,12 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     for row in migrated:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value
+        condition = row.point_conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        temperature = condition.state.value
+        point = temperature.point if hasattr(temperature, "point") else temperature
+        assert point == row.identity.temperature_K.value
 
     sample = next(row for row in activities if "fig1a_CaO_rein1965_activity" in row.observation_id)
     assert sample.identity.temperature_K.value == Decimal("1873")
@@ -374,7 +455,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     assert not result.validation.hard_issues
 
 
-def test_sc456_model_class_pin_rejects_quote_reversion():
+def test_sc456_model_provenance_pin_rejects_class_locator_reference_and_pressure_regression():
     document = _load()
     target = next(
         row
@@ -382,5 +463,35 @@ def test_sc456_model_class_pin_rejects_quote_reversion():
         if row["type"] == "gibbs_table"
     )
     target["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_classes(document)
+
+    document = _load()
+    target = next(
+        row
+        for _formula, row in _observations(document)
+        if row["type"] == "gibbs_table"
+    )
+    target["values"]["derivation"]["method"]["locator"].pop("note")
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_classes(document)
+
+    document = _load()
+    target = next(
+        row
+        for _formula, row in _observations(document)
+        if row["type"] == "gibbs_table"
+    )
+    target["values"]["derivation"]["references"][0] = "none_printed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_classes(document)
+
+    document = _load()
+    target = next(
+        row
+        for _formula, row in _observations(document)
+        if row["type"] == "gibbs_table"
+    )
+    target["values"].pop("standard_pressure")
     with pytest.raises(AssertionError):
         _assert_sc456_model_classes(document)
