@@ -76,6 +76,7 @@ from simulator.runner import (
     build_sio_yield_report,
     _vapor_pressure_source_report,
 )
+from tests.golden_sections import nodes
 from simulator.condensation import (
     STAGE_PURITY_NO_CAPTURED_MASS,
     STAGE_PURITY_VERDICT_INDETERMINATE,
@@ -1178,6 +1179,22 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         "final_state": payload["final_state"],
     }
     return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+
+
+def test_runner_payload_engine_versions_have_no_host_identity(runner_golden_loader):
+    payload, _, _ = runner_golden_loader(SCENARIOS[0])
+    versions = [
+        token["value"]
+        for path, token in nodes(payload).items()
+        if path.rsplit("/", 1)[-1] == "engine_version"
+    ]
+
+    assert versions
+    assert all(
+        marker.casefold() not in version.casefold()
+        for version in versions
+        for marker in ("/Users/", "/home/", "server=")
+    )
 
 
 def _flux_ledger_pins(capture: dict) -> dict[str, str]:

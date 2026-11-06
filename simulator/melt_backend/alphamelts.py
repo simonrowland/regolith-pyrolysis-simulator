@@ -1603,6 +1603,7 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _subprocess_engine_version(self) -> Optional[str]:
         from simulator.engine_local_config import (
+            _cache_version_for_binary,
             cache_version_for,
             warn_legacy_once,
         )
@@ -1611,9 +1612,10 @@ class _MELTSBackendSupport(MeltBackend):
         if config_version is not None:
             return config_version
 
-        if self._binary_path is None and self._engine_path is None:
+        binary = self._binary_path
+        if binary is None:
             return None
-        binary = self._binary_path or self._engine_path
+        reported_version = ""
         try:
             result = _run_alphamelts_subprocess(
                 [str(binary), '--version'],
@@ -1623,17 +1625,20 @@ class _MELTSBackendSupport(MeltBackend):
             )
             text = (result.stdout or result.stderr).strip().splitlines()
             if result.returncode == 0 and text:
-                legacy = text[0]
-            else:
-                legacy = f'alphaMELTS subprocess ({binary})'
+                reported_version = text[0]
         except (OSError, subprocess.TimeoutExpired):
-            legacy = f'alphaMELTS subprocess ({binary})'
+            pass
+        cache_version = _cache_version_for_binary(
+            'alphamelts', binary, reported_version
+        )
+        if cache_version is None:
+            return None
         warn_legacy_once(
             'alphamelts',
-            'engines.local.toml absent; using legacy alphaMELTS '
-            'path-based identity for cache comparison',
+            'engines.local.toml absent; using the alphaMELTS binary SHA-256 '
+            'identity for cache comparison',
         )
-        return legacy
+        return cache_version
 
     def capabilities(self) -> Dict[str, object]:
         caps = super().capabilities()
