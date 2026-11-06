@@ -5069,6 +5069,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _melt_redox_gate_authority_provenance(
         gate_authority: _MeltRedoxGateAuthority,
     ) -> Dict[str, Any]:
+        from simulator.reduced_real_determinism import copy_gate_curve_notices
+
         if isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback):
             return {
                 'kind': 'fallback',
@@ -5085,6 +5087,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'source': gate_authority.get('source', 'liquidus_solidus'),
                 'solidus_T_C': gate_authority.get('solidus_T_C'),
                 'liquidus_T_C': gate_authority.get('liquidus_T_C'),
+                **copy_gate_curve_notices(gate_authority),
             }
         return {
             'kind': 'real',
@@ -5578,11 +5581,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'solidus_T_C': curve.get('solidus_T_C'),
             'liquidus_T_C': curve.get('liquidus_T_C'),
         }
-        projected_notice = curve.get('composition_projected_notice')
-        if isinstance(projected_notice, Mapping):
-            fraction_diagnostic['composition_projected_notice'] = dict(
-                projected_notice
-            )
+        from simulator.reduced_real_determinism import copy_gate_curve_notices
+
+        fraction_diagnostic.update(copy_gate_curve_notices(curve))
         self._stamp_kress_floor_diagnostic(fraction_diagnostic)
         self._last_melt_redox_liquid_fraction_diagnostic = fraction_diagnostic
         return liquid_fraction
