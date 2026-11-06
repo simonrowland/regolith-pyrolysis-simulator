@@ -21,6 +21,7 @@ from simulator.diagnostic_helpers.alphamelts_volatility import (
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.vapour_rail.batch import PressureValue
+from simulator.vapour_rail.batch import FluxEligible
 from simulator.vapour_rail.instrumentation import EffectivePressureSource
 from tests.chemistry.conftest import _build_sim
 
@@ -255,7 +256,11 @@ def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     monkeypatch.setattr(
         vapor_pressure_module,
         "_activity_for_crystalline_vapor_k",
-        lambda parent_oxide, activity, temperature_K: (float(activity), None, None),
+        lambda parent_oxide, activity, temperature_K, **_standards: (
+            float(activity),
+            None,
+            None,
+        ),
     )
     unconverted = provider.dispatch(request).diagnostic["vapor_pressures_Pa"]["Mg"]
 
@@ -267,7 +272,11 @@ def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
 def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     above_melting, above_notice, _warning = (
         vapor_pressure_module._activity_for_crystalline_vapor_k(
-            "MgO", 0.5, 3200.0
+            "MgO",
+            0.5,
+            3200.0,
+            source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
         )
     )
     assert above_notice["delta_g_fus_kJ_per_mol"] < 0.0
@@ -276,7 +285,11 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
 
     extrapolated_activity, notice, warning = (
         vapor_pressure_module._activity_for_crystalline_vapor_k(
-            "MgO", 0.5, 4001.0
+            "MgO",
+            0.5,
+            4001.0,
+            source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
         )
     )
     # JANAF d-144 owner value at 4001 K; independently pinned from the
@@ -289,6 +302,43 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     assert notice["to_standard_state_id"] in warning
     assert "log10_activity_offset=" in warning
     assert "authority_level=extrapolated" in warning
+
+
+def test_d349_builtin_notices_follow_mno_and_coo_declared_standards(
+    vapor_pressure_data,
+):
+    result = _builtin_pressure_projection(
+        vapor_pressure_data,
+        {"MnO": 50.0, "CoO": 50.0},
+        temperature_C=1500.0,
+        pO2_bar=1.0,
+    )
+    provenance = result["vapor_pressure_numerator_provenance"]
+
+    for species in ("Mn", "MnO_gas"):
+        notice = provenance[species]["activity_standard_state_conversion"]
+        assert notice["reason"] == "standard_mismatch_unconverted"
+        assert notice["from_standard_state_id"] == (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        )
+        assert notice["to_standard_state_id"] == (
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+        )
+        assert provenance[species]["vapor_activity_for_crystalline_K"] == pytest.approx(
+            provenance[species]["melt_oxide_activity"]
+        )
+
+    coo_notice = provenance["CoO_gas"]["activity_standard_state_conversion"]
+    assert coo_notice["reason"] == "standard_mismatch_unconverted"
+    assert coo_notice["from_standard_state_id"] == (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    )
+    assert coo_notice["to_standard_state_id"] == (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
+    assert provenance["CoO_gas"]["vapor_activity_for_crystalline_K"] == pytest.approx(
+        provenance["CoO_gas"]["melt_oxide_activity"]
+    )
 
 
 def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
@@ -539,11 +589,11 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     sim.melt.p_total_mbar = 1000.0
     expected_species = ("Mg", "Ca")
     if "Na2O" in composition_wt_pct:
-        # Use the feedstock's actual Na/K/Mg/Ca proportions, normalized only
-        # across these four volatile parents so this exercises the full mixed
-        # fallback without adding unrelated oxide channels to the fixture.
+        # Use the feedstock's actual Na/K/Mg/Ca/FeO proportions, normalized
+        # only across these volatile parents so the FeO substitution is tested
+        # through the same mixed fallback.
         account_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-        target_oxides = ("Na2O", "K2O", "MgO", "CaO")
+        target_oxides = ("Na2O", "K2O", "MgO", "CaO", "FeO")
         target_weights = {
             oxide: float(account_mol.get(oxide, 0.0))
             * resolve_species_formula(oxide).molar_mass_kg_per_mol()
@@ -561,8 +611,9 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             "K2O": 0.1,
             "MgO": 0.4,
             "CaO": 0.3,
+            "FeO": 0.2,
         }
-        expected_species = ("Na", "K", "Mg", "Ca")
+        expected_species = ("Na", "K", "Mg", "Ca", "Fe")
     backend = AlphaMELTSBackend()
     projection = backend._activities_times_antoine_or_fail(
         1500.0,
@@ -622,6 +673,8 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     for species in expected_species:
         answer = batch.channel(species)
         assert isinstance(answer.pressure, PressureValue)
+        assert answer.pressure.pa > 0.0
+        assert isinstance(answer.flux, FluxEligible)
         route = diagnostics["vapor_pressure_numerator_provenance"][species]
         expected_gateway_pressure = sim.vapour_rail_catalog.species[
             species
@@ -675,3 +728,19 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     assert set(report["vapor_activity_standard_state_notices_by_species"]) >= set(
         expected_species
     )
+
+    reported_flux = sim._last_evaporation_flux_diagnostic[
+        "evaporation_flux_kg_hr"
+    ]
+    below_threshold = sim._last_evaporation_flux_diagnostic[
+        "below_threshold_evaporation_flux"
+    ]
+    for species in set(expected_species) - {"Ca"}:
+        assert reported_flux[species] > 0.0
+    # Ca has a positive pressure and an eligible channel. The flux provider
+    # retains its positive rate in below_threshold_evaporation_flux because
+    # it is <= the existing 1e-12 kg/hr sparse-output threshold.
+    assert "Ca" not in reported_flux
+    assert 0.0 < below_threshold["fluxes_kg_hr"]["Ca"] <= below_threshold[
+        "threshold_kg_hr"
+    ]

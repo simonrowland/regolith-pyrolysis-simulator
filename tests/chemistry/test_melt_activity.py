@@ -14,6 +14,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     P2O5_ACTIVITY_COEFFICIENT,
     crystalline_vapor_activity_standard_state_matches,
+    _activity_for_crystalline_vapor_k,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
     na_reductant_activity_shift_kj_per_mol_o2,
@@ -58,6 +59,67 @@ def test_crystalline_vapor_activity_guard_requires_the_crystalline_id() -> None:
     )
     assert not crystalline_vapor_activity_standard_state_matches("MgO", None)
     assert crystalline_vapor_activity_standard_state_matches("SiO2", None)
+
+
+@pytest.mark.parametrize(
+    "parent",
+    ("Na2O", "K2O", "SiO2", "TiO2", "Al2O3", "Cr2O3", "P2O5", "NiO", "FeO"),
+)
+def test_vapor_activity_matching_declared_standards_are_identity(parent: str) -> None:
+    activity, notice, warning = _activity_for_crystalline_vapor_k(
+        parent,
+        0.25,
+        1773.15,
+        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        target_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    )
+
+    assert activity == 0.25
+    assert notice is not None
+    assert notice["reason"] == "source_and_K_standard_states_match"
+    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["log10_activity_offset"] == 0.0
+    assert warning is not None
+
+
+@pytest.mark.parametrize(
+    ("parent", "source_id", "target_id"),
+    (
+        (
+            "MnO",
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        ),
+        (
+            "CoO",
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        ),
+        ("SyntheticOxide", "source-standard-v1", "reaction-standard-v2"),
+    ),
+)
+def test_vapor_activity_mismatch_is_reported_without_claiming_identity(
+    parent: str, source_id: str, target_id: str
+) -> None:
+    activity, notice, warning = _activity_for_crystalline_vapor_k(
+        parent,
+        0.25,
+        1773.15,
+        source_standard_state_id=source_id,
+        target_standard_state_id=target_id,
+    )
+
+    assert activity == 0.25
+    assert notice is not None
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["from_standard_state_id"] == source_id
+    assert notice["to_standard_state_id"] == target_id
+    assert notice["log10_activity_offset"] is None
+    assert notice["conversion_performed"] is False
+    assert warning is not None
+    assert "standard_mismatch_unconverted" in warning
+    assert "declared_standard_identity" not in warning
 
 
 def test_table2_range_rows_remain_geometric_midpoints_without_domains() -> None:
@@ -226,8 +288,13 @@ def test_reference_state_notice_comes_from_primary_evidence(
     )
     assert activity is not None
     assert activity.gamma == pytest.approx(gamma)
+    expected_reference_state = (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        if parent == "MnO"
+        else MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    )
     assert activity.provenance()["melt_oxide_activity_reference_state"] == (
-        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+        expected_reference_state
     )
     provenance = activity.provenance()
     assert activity.warning is None

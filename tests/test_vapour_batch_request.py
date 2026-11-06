@@ -1908,15 +1908,33 @@ def test_pre_rg_fails_closed_when_activity_declaration_lacks_standard_state() ->
 
 
 @pytest.mark.parametrize(
-    "refusal_code",
+    ("refusal_code", "detail"),
     (
-        ActivityRefusalCode.MISSING_EVIDENCE,
-        ActivityRefusalCode.UNMAPPED_PHASE,
-        ActivityRefusalCode.UNMAPPED_ENDMEMBER,
+        (ActivityRefusalCode.MISSING_EVIDENCE, "no assemblage/potential evidence"),
+        (ActivityRefusalCode.UNMAPPED_PHASE, "phase absent from this assemblage"),
+        (ActivityRefusalCode.UNMAPPED_ENDMEMBER, "endmember absent from this assemblage"),
+        (ActivityRefusalCode.TIMEOUT, "magemin call exceeded declared deadline (30s)"),
+        (ActivityRefusalCode.EXPIRED, "thermoengine evidence expired"),
+        (ActivityRefusalCode.STANDARD_STATE_UNRESOLVED, "registry evidence row is unresolved"),
+        (ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED, "valid T/P lies outside the admitted row domain"),
+        (ActivityRefusalCode.REDOX_MODEL_OUT_OF_DOMAIN, "Kress calibration does not cover this temperature"),
+        (ActivityRefusalCode.UNSUPPORTED_VALENCE_RESERVOIR, "no admitted owner for this valence reservoir"),
+        (ActivityRefusalCode.SULFUR_RESERVOIR_OWNER_MISSING, "no melt-side sulfur owner is admitted"),
+        (ActivityRefusalCode.HALIDE_RESERVOIR_OWNER_MISSING, "no melt-side halide owner is admitted"),
+        (ActivityRefusalCode.UNMODELED_RESERVOIR_PRESENT, "nonzero spectator reservoir has no model policy"),
+        (
+            ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY,
+            "Tier A requires a complete ordered reservoir inventory",
+        ),
+        (
+            ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+            "Kress-Carmichael requires complete composition and Fe inventory",
+        ),
     ),
 )
 def test_pre_rg_demotes_species_local_activity_refusals(
     refusal_code: ActivityRefusalCode,
+    detail: str,
 ) -> None:
     catalog = compile_vapour_rail_catalog(
         _minimal_family("K"), u0_manifest=_u0_stub("K")
@@ -1936,7 +1954,7 @@ def test_pre_rg_demotes_species_local_activity_refusals(
             solve_group_id=kwargs.get("solve_group_id"),
             provider="test_species_local_activity_source",
             refusal_code=refusal_code,
-            detail="activity source has no usable value for this species",
+            detail=detail,
         )
 
     batch = catalog.resolve_batch(
@@ -1950,6 +1968,71 @@ def test_pre_rg_demotes_species_local_activity_refusals(
 
     assert batch.channel("K").refusal_code == refusal_code.value
     assert batch.flux_active_species_ids == frozenset()
+
+
+@pytest.mark.parametrize(
+    ("refusal_code", "detail"),
+    (
+        (ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH, "MAGEMin and ThermoEngine states differ"),
+        (ActivityRefusalCode.ASSEMBLAGE_MISMATCH, "ThermoEngine and MAGEMin assemblages differ"),
+        (ActivityRefusalCode.STANDARD_STATE_MISMATCH, "activity and declaration standards differ"),
+        (ActivityRefusalCode.COMPONENT_IDENTITY_MISMATCH, "ThermoEngine component identity differs"),
+        (ActivityRefusalCode.CRASH, "thermoengine call crashed"),
+        (ActivityRefusalCode.NON_FINITE_POTENTIAL, "chemical potential is non-finite"),
+        (ActivityRefusalCode.CONSISTENCY_GATE_FAILED, "independent consistency gate failed"),
+        (ActivityRefusalCode.MONOTONICITY_UNPROVED, "non-finite activity_exponent=nan"),
+        (ActivityRefusalCode.UNITY_NOT_UPPER_BOUND, "component basis cannot prove the declared bound"),
+        (ActivityRefusalCode.COMPOUND_PROXY_FORBIDDEN, "compound proxy cannot answer this contract"),
+        (ActivityRefusalCode.BASIS_TRANSFORM_FAILED, "basis coefficients do not match the admitted row"),
+        (ActivityRefusalCode.VALIDATION_BAND_UNAVAILABLE, "continuation band must be finite"),
+        (
+            ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY,
+            "Tier C mole fractions do not reconcile to the ordered inventory digest",
+        ),
+        (
+            ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+            "Fe redox basis/model identity does not match the admitted row",
+        ),
+        (
+            ActivityRefusalCode.MISSING_EVIDENCE,
+            "reported activity must be finite and positive",
+        ),
+    ),
+)
+def test_pre_rg_fails_closed_for_contract_and_invalid_evidence_refusals(
+    refusal_code: ActivityRefusalCode,
+    detail: str,
+) -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+
+    def refuse_one_species(declaration, **kwargs):
+        return SourceReactionActivity(
+            component_id=declaration.component_id,
+            value=None,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason=refusal_code.value,
+            standard_state=declaration.standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=kwargs.get("state_fingerprint"),
+            solve_group_id=kwargs.get("solve_group_id"),
+            provider="test_contract_activity_source",
+            refusal_code=refusal_code,
+            detail=detail,
+        )
+
+    with pytest.raises(VapourRequestConstructionError):
+        catalog.resolve_batch(
+            {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}},
+            _state_with_k_activity(temperature_K=1500.0),
+            activity_provider=SimpleNamespace(
+                resolve_source_reaction_activity=refuse_one_species
+            ),
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
 
 
 @pytest.mark.parametrize(
