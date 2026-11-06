@@ -115,8 +115,11 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
 )
 from simulator.chemistry.melt_activity import (  # noqa: E402
     ALPHAMELTS_CROSS_CHECK_STATUS,
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_TIER,
+    _convert_melt_oxide_activity_reference_state,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
     single_cation_mole_fractions,
@@ -1783,6 +1786,59 @@ def _high_t_activity_for_parent(
         evidence_tier="PREDICT_AND_FLAG",
         authority_status="openimcc",
     )
+
+
+def _activity_for_crystalline_vapor_k(
+    parent_oxide: str,
+    activity: float,
+    temperature_K: float,
+) -> tuple[float, dict[str, Any] | None, str | None]:
+    """Return the activity on the crystalline K basis for MgO/CaO vapor rows."""
+
+    if parent_oxide not in {"MgO", "CaO"}:
+        return float(activity), None, None
+    conversion = _convert_melt_oxide_activity_reference_state(
+        parent_oxide,
+        activity,
+        temperature_K,
+        source_phase="liquid",
+        target_phase="solid",
+    )
+    verdict = conversion.domain_verdict
+    notice = {
+        "oxide": parent_oxide,
+        "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        "to_standard_state_id": (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        ),
+        "temperature_K": float(temperature_K),
+        "log10_activity_offset": conversion.log10_activity_offset,
+        "delta_g_fus_kJ_per_mol": conversion.delta_g_fus_kJ_per_mol,
+        "authority": verdict.authority.value,
+        "authority_level": (
+            "extrapolated"
+            if verdict.authority.value == "extrapolated"
+            else "predict_and_flag"
+        ),
+        "reason": verdict.reason,
+        "certified_band_K": [
+            float(bound) for bound in verdict.certified_band_K
+        ],
+    }
+    warning = (
+        "vapor_activity_standard_state_conversion|"
+        f"oxide={parent_oxide}|"
+        f"from_standard_state_id={MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
+        "to_standard_state_id="
+        f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}|"
+        f"temperature_K={temperature_K:.2f}|"
+        f"log10_activity_offset={conversion.log10_activity_offset:+.12g}|"
+        f"authority={verdict.authority.value}|"
+        f"authority_level={notice['authority_level']}"
+    )
+    if verdict.reason:
+        warning += f"|reason={verdict.reason}"
+    return conversion.activity, notice, warning
 
 
 def _high_t_fe_activity_selected(authority: Mapping[str, Any] | None) -> bool:
@@ -3882,6 +3938,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 continue
 
+            vapor_activity_conversion = None
+            activity_for_k = None
             fe_degraded_activity_basis = None
             fe_activity_basis = None
             if parent_oxide == 'FeO':
@@ -3927,6 +3985,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "intrinsic_fO2_log absent; using FeO wt%/100 "
                         "(documented degraded public-caller path, uncertified)"
                     )
+                activity_for_k = oxide_activity
             else:
                 oxide_activity = _high_t_activity_for_parent(
                     parent_oxide,
@@ -3936,21 +3995,35 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
+                activity_for_k_value, vapor_activity_conversion, conversion_warning = (
+                    _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        oxide_activity.activity,
+                        T_K,
+                    )
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
+                activity_for_k = (
+                    replace(oxide_activity, activity=activity_for_k_value)
+                    if vapor_activity_conversion is not None
+                    else oxide_activity
+                )
                 # provenance: gamma_alkali_melt_activity
                 # Sossi & Fegley 2018 Eq.25 is linear in single-cation
                 # a_MOx = gamma_MOx * X_MOx. The JANAF Ellingham row here is
                 # still written on the parent oxide (Na2O, Al2O3, Cr2O3), so
                 # feed an equivalent parent activity whose legacy exponent
                 # produces the single-cation activity.
-                a_oxide = oxide_activity.equivalent_parent_activity(n_ox / n_M)
+                a_oxide = activity_for_k.equivalent_parent_activity(n_ox / n_M)
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
             if (
                 oxide_activity is None
                 and a_oxide <= 1e-10
             ) or (
-                oxide_activity is not None
-                and oxide_activity.activity <= 1e-10
+                activity_for_k is not None
+                and activity_for_k.activity <= 1e-10
             ):
                 continue
 
@@ -4005,9 +4078,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     pO2_reference_bar=1.0,
                 ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
-            # not the later surface-flux boundary condition. For MgO(l) ->
-            # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
-            # is normalized per mol O2, so K2=K1**2 and
+            # not the later surface-flux boundary condition. For MgO(s) ->
+            # Mg(g) + 1/2 O2, the JANAF Ellingham K uses crystalline MgO; d-349
+            # converts the liquid melt activity to that basis before this solve.
+            # K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row is normalized per
+            # mol O2, so K2=K1**2 and
             # K2=(f_Mg/p0)**2*(fO2/p0)/a_MgO**2. Therefore the generic solve is
             # root=(K2*a_oxide**n_ox/fO2_bar)**(1/n_M), n_ox=n_M=2.
             # Unit check: K, activities, and fugacity/standard-pressure ratios
@@ -4164,6 +4239,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species][
                         "equivalent_parent_oxide_activity"
                     ] = a_oxide
+                if vapor_activity_conversion is not None:
+                    vapor_pressure_provenance[species][
+                        "activity_standard_state_conversion"
+                    ] = vapor_activity_conversion
+                    vapor_pressure_provenance[species][
+                        "vapor_activity_for_crystalline_K"
+                    ] = activity_for_k.activity
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
@@ -4273,19 +4355,37 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
+                activity_for_k_value, vapor_activity_conversion, conversion_warning = (
+                    _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        oxide_activity.activity,
+                        T_K,
+                    )
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
+                activity_for_k = (
+                    replace(oxide_activity, activity=activity_for_k_value)
+                    if vapor_activity_conversion is not None
+                    else oxide_activity
+                )
                 if data.get("source_activity_basis") == "parent_oxide":
-                    a_ox = oxide_activity.thermodynamic_parent_activity()
-                    reported_activity = a_ox
+                    a_ox = activity_for_k.thermodynamic_parent_activity()
+                    reported_activity = (
+                        oxide_activity.thermodynamic_parent_activity()
+                    )
+                    source_activity_for_k = a_ox
                 else:
                     # Legacy single-cation reaction fits declare their own
                     # exponent-adjusted compatibility basis.
-                    a_ox = oxide_activity.equivalent_parent_activity(
+                    a_ox = activity_for_k.equivalent_parent_activity(
                         activity_exponent
                     )
                     reported_activity = oxide_activity.activity
-                if oxide_activity.activity <= 0.0 or (
+                    source_activity_for_k = activity_for_k.activity
+                if activity_for_k.activity <= 0.0 or (
                     not retain_analytical_channel
-                    and oxide_activity.activity <= 1e-10
+                    and activity_for_k.activity <= 1e-10
                 ):
                     continue
                 if oxide_activity.warning:
@@ -4302,7 +4402,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # quarter pressure when activity halves.  Calling
                     # equivalent_parent_activity(2) here would take sqrt(a)
                     # and silently flatten that physical square to a.
-                    activity_factor = max(reported_activity, 0.0) ** float(
+                    activity_factor = max(source_activity_for_k, 0.0) ** float(
                         compiled_evaluator.activity_exponent
                     )
                 else:
@@ -4369,7 +4469,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 assert compiled_species is not None
                 if (
                     parent_oxide
-                    and reported_activity < COMPILED_SOURCE_ACTIVITY_FLOOR
+                    and source_activity_for_k < COMPILED_SOURCE_ACTIVITY_FLOOR
                 ):
                     source_activity_floor_notice = {
                         "authority_level": "extrapolated",
@@ -4380,7 +4480,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 1.0,
                             )
                         },
-                        "source_activity_used": float(reported_activity),
+                        "source_activity_used": float(source_activity_for_k),
                     }
                 try:
                     domain_transition = declared_domain_transition(
@@ -4419,7 +4519,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     T_K,
                     source_activity=(
                         max(
-                            reported_activity,
+                            source_activity_for_k,
                             COMPILED_SOURCE_ACTIVITY_FLOOR,
                         )
                         if parent_oxide
@@ -4644,6 +4744,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name][
                         "equivalent_parent_oxide_activity"
                     ] = a_ox
+                if vapor_activity_conversion is not None:
+                    vapor_pressure_provenance[name][
+                        "activity_standard_state_conversion"
+                    ] = vapor_activity_conversion
+                    vapor_pressure_provenance[name][
+                        "vapor_activity_for_crystalline_K"
+                    ] = source_activity_for_k
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,
