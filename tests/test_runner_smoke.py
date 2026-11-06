@@ -117,9 +117,10 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        # constack merge: repin on gate box
-        "flux_maps_sha256": "75be8cdf429296d6eb66b69d568c2f4eeb9c528635b4bb06b4960d0b31562ee6",
-        "ledger_sha256": "85df2fc8d3dcf4639ecd900358c55851b1be5cf19af52fa6e3104ee57a083160",
+        # constack merge: repin on gate box. Freeze-gate liquidus fix
+        # (285420627): studio-3 actuals at d40255b8d.
+        "flux_maps_sha256": "f35a18fca674c3e6eb14bd01621c007a941d4b9029bf876bb8ed7a9663f62eae",
+        "ledger_sha256": "7569fdaa31127ae0fd5f00b48482b58da8f04822a33378cba5299b4d1a349bb2",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
