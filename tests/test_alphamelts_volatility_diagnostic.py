@@ -444,9 +444,10 @@ def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
     notice = diagnostic[
         "vapor_activity_standard_state_notices_by_species"
     ]["SiO"]
-    assert notice["reason"] == "activity_standard_state_substitution"
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["conversion_performed"] is False
     assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-    assert notice["to_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] != MELT_OXIDE_ACTIVITY_REFERENCE_STATE
 
     oxidized = diagnostic["grid"][1]["species"]["SiO"]
     expected_oxidized_pressure, _ = _oxide_vapor_pressure_Pa(

@@ -9058,7 +9058,10 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
 
     table = backend._load_vapor_pressure_table()
     builtin_activities = _builtin_vapor_activities_from_weight_composition(
-        comp_wt, 1600.0 + CELSIUS_TO_KELVIN_OFFSET
+        comp_wt,
+        1600.0 + CELSIUS_TO_KELVIN_OFFSET,
+        vapor_pressure_data=backend._vapor_pressure_catalog_payload,
+        pO2_bar=1e-9,
     )
     expected_substitutions = {
         species
@@ -9069,10 +9072,14 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     assert set(backend._antoine_activity_standard_state_notices) == (
         expected_substitutions
     )
-    assert all(
-        notice['reason'] == 'activity_standard_state_substitution'
-        for notice in backend._antoine_activity_standard_state_notices.values()
-    )
+    for notice in backend._antoine_activity_standard_state_notices.values():
+        expected_reason = (
+            'standard_mismatch_unconverted'
+            if notice.get('source_standard_state_relation_reason')
+            == 'standard_mismatch_unconverted'
+            else 'activity_standard_state_substitution'
+        )
+        assert notice['reason'] == expected_reason
     for species in required:
         spec = table[species]
         parent_oxide = str(spec.get('parent_oxide', '') or '')

@@ -57,6 +57,7 @@ from simulator.chemistry import melt_activity
 from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
     MELT_OXIDE_TABLE_GAMMA_MODEL,
@@ -1420,7 +1421,9 @@ def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     assert activity.activity == pytest.approx(1.0)
     provenance = activity.provenance()
     assert provenance["melt_oxide_activity_reference_state"] == (
-        "single_cation_Raoultian_pure_liquid_reference"
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        if oxide == "MnO"
+        else "single_cation_Raoultian_pure_liquid_reference"
     )
     if oxide == "P2O5":
         assert provenance["melt_parent_oxide_activity"] == pytest.approx(
