@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import copy
 from types import SimpleNamespace
 
 import pytest
@@ -240,6 +241,72 @@ def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
     assert result.diagnostic["activities_standard_state"]["phase"] == "liquid"
 
 
+def test_d349_catalog_identity_mismatch_is_visible_on_real_vapor_route(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    _, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    catalog = copy.deepcopy(vapor_pressure_data.catalog_payload)
+    changed = 0
+    for family in catalog["families"].values():
+        rows = family["physical_properties"]["species"]
+        for row in rows.values():
+            if row.get("parent_oxide") != "Na2O":
+                continue
+            reaction_id = row["pressure_models"][0]["source_reaction_id"]
+            reaction = next(
+                entry
+                for entry in row["source_reactions"]
+                if entry["id"] == reaction_id
+            )
+            standard = reaction.setdefault(
+                "thermodynamic_standard_state",
+                copy.deepcopy(reaction["activity_input"]["standard_state"]),
+            )
+            standard["id"] = "synthetic_distinct_liquid_K_standard"
+            changed += 1
+    assert changed > 0
+
+    result = BuiltinVaporPressureProvider(catalog).dispatch(request)
+
+    assert result.status == "ok"
+    notice = result.diagnostic["vapor_pressure_numerator_provenance"]["Na"][
+        "activity_standard_state_conversion"
+    ]
+    assert notice["from_standard_state_id"] == (
+        "single_cation_Raoultian_pure_liquid_reference"
+    )
+    assert notice["to_standard_state_id"] == (
+        "synthetic_distinct_liquid_K_standard"
+    )
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["conversion_performed"] is False
+    assert notice["log10_activity_offset"] is None
+
+
+def test_d349_fe_vapor_pressure_is_continuous_at_1650k(
+    vapor_pressure_data,
+):
+    composition = {"FeO": 25.0, "SiO2": 75.0}
+    below = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=1650.0 - 1.0e-6 - 273.15,
+        pO2_bar=1.0,
+    )["vapor_pressures_Pa"]["Fe"]
+    above = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=1650.0 + 1.0e-6 - 273.15,
+        pO2_bar=1.0,
+    )["vapor_pressures_Pa"]["Fe"]
+
+    assert below == pytest.approx(above, rel=1.0e-6, abs=0.0)
 def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     vapor_pressure_data,
     feedstocks_data,
@@ -344,8 +411,11 @@ def test_d349_fe_vapor_uses_fe020_crystal_standard_below_1650k(
         temperature_C=temperature_K - 273.15,
         pO2_bar=1.0,
     )
+    # JANAF Fe-019 minus Fe-020 gives 2.158 kJ/mol at 1500 K and
+    # 0.363 kJ/mol at the 1650 K K transition; the owner anchors the
+    # conversion there, so the applied difference is 1.795 kJ/mol.
     assert raw["vapor_pressures_Pa"]["Fe"] / pressure == pytest.approx(
-        math.exp(-2.158 / (8.31446261815324e-3 * temperature_K)),
+        math.exp(-1.795 / (8.31446261815324e-3 * temperature_K)),
         rel=1e-9,
     )
 

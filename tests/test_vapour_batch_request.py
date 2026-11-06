@@ -1911,6 +1911,9 @@ def test_pre_rg_fails_closed_when_activity_declaration_lacks_standard_state() ->
     ("refusal_code", "detail"),
     (
         (ActivityRefusalCode.MISSING_EVIDENCE, "no assemblage/potential evidence"),
+        # The local/fail-closed decision depends on the typed code. An old
+        # numeric-error detail cannot override MISSING_EVIDENCE semantics.
+        (ActivityRefusalCode.MISSING_EVIDENCE, "reported activity must be finite and positive"),
         (ActivityRefusalCode.UNMAPPED_PHASE, "phase absent from this assemblage"),
         (ActivityRefusalCode.UNMAPPED_ENDMEMBER, "endmember absent from this assemblage"),
         (ActivityRefusalCode.TIMEOUT, "magemin call exceeded declared deadline (30s)"),
@@ -1986,15 +1989,15 @@ def test_pre_rg_demotes_species_local_activity_refusals(
         (ActivityRefusalCode.BASIS_TRANSFORM_FAILED, "basis coefficients do not match the admitted row"),
         (ActivityRefusalCode.VALIDATION_BAND_UNAVAILABLE, "continuation band must be finite"),
         (
-            ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY,
+            ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH,
             "Tier C mole fractions do not reconcile to the ordered inventory digest",
         ),
         (
-            ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+            ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH,
             "Fe redox basis/model identity does not match the admitted row",
         ),
         (
-            ActivityRefusalCode.MISSING_EVIDENCE,
+            ActivityRefusalCode.NON_FINITE_POTENTIAL,
             "reported activity must be finite and positive",
         ),
     ),

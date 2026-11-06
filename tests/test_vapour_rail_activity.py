@@ -182,7 +182,7 @@ def test_henrian_bound_refuses_solid_reference_gamma_without_temperature():
         mole_fraction=0.25,
     )
     assert answer.verdict is ActivityVerdictKind.REFUSAL
-    assert answer.refusal_code is ActivityRefusalCode.MONOTONICITY_UNPROVED
+    assert answer.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
     assert "temperature_K required" in (answer.detail or "")
 
 

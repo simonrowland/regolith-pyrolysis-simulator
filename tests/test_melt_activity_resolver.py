@@ -1097,6 +1097,73 @@ def test_tier_a_rejects_wrong_engine_identity_and_out_of_domain_temperature() ->
     assert out_of_domain.refusal_code is ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED
 
 
+def test_tier_a_matrix_domain_receipt_mismatch_is_fail_closed_identity() -> None:
+    resolver = MeltActivityResolver()
+    query = _query(
+        "CaO",
+        fractions={"CaO": 0.1, "SiO2": 0.9},
+        temperature_K=1600.0,
+    )
+    query = MeltActivityQuery(
+        **{
+            **query.__dict__,
+            "matrix_domain_ref": "matrix_domain.synthetic_other_melt.v1",
+        }
+    )
+
+    answer = resolver.resolve_engine_basis(
+        query,
+        TierAEngineInput(
+            engine_component_ids=("CaO",),
+            basis_coefficients=(1.0,),
+            target_mu0_J_per_mol=0.0,
+            mixture_mu_J_per_mol=(0.0,),
+            source_standard_state=_tier_a_source_state(resolver, "CaO"),
+        ),
+    )
+
+    assert answer.refusal_code is ActivityRefusalCode.STATE_FINGERPRINT_MISMATCH
+
+
+def test_tier_c_malformed_fraction_is_fail_closed_numeric_contract() -> None:
+    query = _query(
+        "LiO0.5",
+        fractions={"LiO0.5": 0.25, "SiO2": 0.75},
+    )
+    query = MeltActivityQuery(
+        **{
+            **query.__dict__,
+            "component_mole_fractions": {
+                "LiO0.5": math.nan,
+                "SiO2": 0.75,
+            },
+        }
+    )
+
+    answer = MeltActivityResolver().resolve_tier_c(query)
+
+    assert answer.refusal_code is ActivityRefusalCode.NON_FINITE_POTENTIAL
+
+
+def test_feo_nonfinite_redox_pressure_control_is_fail_closed_numeric_contract() -> None:
+    query = _query(
+        "FeO",
+        fractions={"FeO": 0.2, "SiO2": 0.8},
+    )
+    query = MeltActivityQuery(
+        **{
+            **query.__dict__,
+            "intrinsic_fO2_log10": -10.0,
+            "composition_wt_pct": {"FeO": 20.0, "SiO2": 80.0},
+            "redox_model_pressure_bar": math.nan,
+        }
+    )
+
+    answer = MeltActivityResolver().resolve_feo_shadow(query)
+
+    assert answer.refusal_code is ActivityRefusalCode.NON_FINITE_POTENTIAL
+
+
 def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None:
     composition = {
         "SiO2": 50.0,

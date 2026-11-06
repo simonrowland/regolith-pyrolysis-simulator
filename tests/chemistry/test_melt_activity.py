@@ -25,6 +25,7 @@ from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.reference_data.janaf_fusion import (
     FusionDomainAuthority,
     _d144_fusion_conversion,
+    _fusion_crossing_temperature,
     d144_fusion_table_pair,
 )
 
@@ -230,7 +231,7 @@ def test_d144_fusion_owner_returns_typed_domain_verdict() -> None:
 
 @pytest.mark.parametrize(
     ("temperature_K", "delta_g_fus_kJ_per_mol"),
-    ((1400.0, 3.557), (1500.0, 2.158), (1600.0, 0.726)),
+    ((1400.0, 3.194), (1500.0, 1.795), (1600.0, 0.363)),
 )
 def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
     temperature_K: float,
@@ -265,6 +266,24 @@ def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
         Decimal("5000.0"),
     )
     assert "metastable (supercooled) liquid" in conversion.domain_verdict.reason
+
+
+def test_d144_feo_fusion_chord_is_anchored_at_ellingham_transition() -> None:
+    at_transition = _d144_fusion_conversion("FeO", Decimal("1650"))
+    assert at_transition.delta_g_fus_kJ_per_mol == Decimal(0)
+
+
+@pytest.mark.parametrize("oxide", ["MgO", "CaO"])
+def test_d144_existing_oxide_chords_are_zero_at_their_own_transition(
+    oxide: str,
+) -> None:
+    pair = d144_fusion_table_pair(oxide)
+    assert pair is not None
+    transition = _fusion_crossing_temperature(oxide, *pair)
+
+    conversion = _d144_fusion_conversion(oxide, transition)
+
+    assert conversion.delta_g_fus_kJ_per_mol == 0
 
 
 @pytest.mark.parametrize("parent", ["CaO", "MgO"])
