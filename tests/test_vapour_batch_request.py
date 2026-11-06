@@ -1693,7 +1693,7 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
         "missing_temperature",
     ),
 )
-def test_pre_rg_contract_and_run_state_refusals_fail_closed_without_claims(
+def test_pre_rg_contract_and_run_state_refusals_fail_closed(
     failure: str,
 ) -> None:
     catalog = compile_vapour_rail_catalog(
@@ -1722,13 +1722,18 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed_without_claims(
     elif failure == "missing_temperature":
         state = replace(state, temperature_K=None)
 
+    # Activity-contract failures matter when the channel is claimed. Missing
+    # process state still fails closed with an empty activation claim set.
+    activation_context = (
+        _pre_rg_activation_context()
+        if failure in {"missing_pO2", "missing_temperature"}
+        else _pre_rg_activation_context("K")
+    )
     with pytest.raises(VapourRequestConstructionError):
         catalog.resolve_batch(
             ledger,
             state,
-            # Run-level outcome state remains mandatory when the legacy
-            # effective-pressure seam carries no activation claims.
-            flux_activation_context=_pre_rg_activation_context(),
+            flux_activation_context=activation_context,
         )
 
 
@@ -1819,7 +1824,7 @@ def test_pre_rg_keeps_request_local_refusals_species_scoped(
     assert batch.flux_active_species_ids == frozenset()
 
 
-def test_pre_rg_missing_activity_declaration_fails_closed_without_claims() -> None:
+def test_pre_rg_missing_activity_declaration_fails_closed_for_claimed_channel() -> None:
     catalog = compile_vapour_rail_catalog(
         _minimal_family("K"), u0_manifest=_u0_stub("K")
     )
@@ -1835,7 +1840,7 @@ def test_pre_rg_missing_activity_declaration_fails_closed_without_claims() -> No
             },
             state=_state_with_k_activity(temperature_K=1500.0),
             catalog_species=catalog._species,
-            flux_activation_context=_pre_rg_activation_context(),
+            flux_activation_context=_pre_rg_activation_context("K"),
         )
 
 
@@ -1897,7 +1902,7 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
                     ),
                 )
             },
-            flux_activation_context=_pre_rg_activation_context(),
+            flux_activation_context=_pre_rg_activation_context("Mg"),
         )
 
 
