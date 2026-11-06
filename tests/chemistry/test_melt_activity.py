@@ -25,6 +25,7 @@ from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.reference_data.janaf_fusion import (
     FusionDomainAuthority,
     _d144_fusion_conversion,
+    d144_fusion_table_pair,
 )
 
 
@@ -225,6 +226,40 @@ def test_d144_fusion_owner_returns_typed_domain_verdict() -> None:
     conversion = _d144_fusion_conversion("MgO", Decimal("418.15"))
 
     assert conversion.domain_verdict.authority is FusionDomainAuthority.BRIDGE
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "delta_g_fus_kJ_per_mol"),
+    ((1400.0, 3.557), (1500.0, 2.158), (1600.0, 0.726)),
+)
+def test_d144_feo_owner_converts_janaf_liquid_to_crystal(
+    temperature_K: float,
+    delta_g_fus_kJ_per_mol: float,
+) -> None:
+    assert d144_fusion_table_pair("FeO") == ("Fe-020", "Fe-019")
+    conversion = _d144_fusion_conversion("FeO", Decimal(str(temperature_K)))
+    assert float(conversion.delta_g_fus_kJ_per_mol) == pytest.approx(
+        delta_g_fus_kJ_per_mol,
+        abs=1e-12,
+    )
+
+    activity, notice, _warning = _activity_for_crystalline_vapor_k(
+        "FeO",
+        0.25,
+        temperature_K,
+        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    )
+    expected = 0.25 * math.exp(
+        delta_g_fus_kJ_per_mol
+        / (8.31446261815324e-3 * temperature_K)
+    )
+    assert activity == pytest.approx(expected, rel=1e-12)
+    assert notice["conversion_performed"] is True
+    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] == (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
     assert conversion.domain_verdict.certified_band_K == (
         Decimal("298.15"),
         Decimal("4000.0"),

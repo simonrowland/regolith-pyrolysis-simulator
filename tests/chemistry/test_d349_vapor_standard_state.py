@@ -304,6 +304,89 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     assert "authority_level=extrapolated" in warning
 
 
+def test_d349_fe_vapor_uses_fe020_crystal_standard_below_1650k(
+    vapor_pressure_data,
+    monkeypatch,
+):
+    temperature_K = 1500.0
+    composition = {"FeO": 25.0, "SiO2": 75.0}
+    converted = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=temperature_K - 273.15,
+        pO2_bar=1.0,
+    )
+    pressure = converted["vapor_pressures_Pa"]["Fe"]
+    notice = converted["vapor_activity_standard_state_notices_by_species"]["Fe"]
+
+    assert pressure > 0.0
+    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] == (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
+    assert notice["conversion_performed"] is True
+
+    # The mutation goes through the same production vapor route and removes
+    # only the shared activity-standard conversion.
+    monkeypatch.setattr(
+        vapor_pressure_module,
+        "_activity_for_crystalline_vapor_k",
+        lambda parent_oxide, activity, temperature_K, **_standards: (
+            float(activity),
+            None,
+            None,
+        ),
+    )
+    raw = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=temperature_K - 273.15,
+        pO2_bar=1.0,
+    )
+    assert raw["vapor_pressures_Pa"]["Fe"] / pressure == pytest.approx(
+        math.exp(-2.158 / (8.31446261815324e-3 * temperature_K)),
+        rel=1e-9,
+    )
+
+
+def test_d349_alphamelts_fe_fallback_uses_same_fe020_conversion(
+    vapor_pressure_data,
+):
+    temperature_K = 1500.0
+    temperature_C = temperature_K - 273.15
+    composition = {"FeO": 25.0, "SiO2": 75.0}
+    expected = _builtin_pressure_projection(
+        vapor_pressure_data,
+        composition,
+        temperature_C=temperature_C,
+        pO2_bar=1.0,
+    )
+    backend = AlphaMELTSBackend()
+    projected = backend._activities_times_antoine_or_fail(
+        temperature_C,
+        {"FeO": 0.2},
+        composition,
+        pO2_bar=1.0,
+        context="d-349 FeO standard substitution test",
+    )
+
+    assert projected["Fe"] == pytest.approx(
+        expected["vapor_pressures_Pa"]["Fe"],
+        rel=1e-10,
+        abs=0,
+    )
+    notice = backend._antoine_activity_standard_state_notices["Fe"]
+    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+    assert notice["to_standard_state_id"] == (
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+    )
+    assert notice["conversion_performed"] is True
+    assert notice["source_standard_state_substitution"] == (
+        "alphamelts_oxide_activity_no_declared_standard -> "
+        "builtin_declared_standard"
+    )
+
+
 def test_d349_builtin_notices_follow_mno_and_coo_declared_standards(
     vapor_pressure_data,
 ):
