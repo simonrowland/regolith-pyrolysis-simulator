@@ -490,6 +490,7 @@ def test_reported_out_of_domain_and_ideal_activities_stay_numeric_but_not_points
 @pytest.mark.parametrize(
     "fault,code",
     [
+        ("identity", "component_identity_mismatch"),
         ("timeout", ActivityRefusalCode.TIMEOUT),
         ("crash", ActivityRefusalCode.CRASH),
         ("expired", ActivityRefusalCode.EXPIRED),
@@ -574,7 +575,7 @@ def test_provider_refuses_mismatch_timeout_unmapped(fault, code):
         thermo_assemblage_ref = magemin.assemblage.fingerprint()
 
     thermo = ThermoEnginePotentialEvidence(
-        component_id="MgO",
+        component_id="CaO" if fault == "identity" else "MgO",
         state=thermo_state,
         standard_state=thermo_ss,
         assemblage_ref=thermo_assemblage_ref,
@@ -591,7 +592,9 @@ def test_provider_refuses_mismatch_timeout_unmapped(fault, code):
         compound_bearing_state=True,
     )
     assert answer.verdict is ActivityVerdictKind.REFUSAL
-    assert answer.refusal_code is code
+    expected_code = code.value if isinstance(code, ActivityRefusalCode) else code
+    assert answer.refusal_code is not None
+    assert answer.refusal_code.value == expected_code
     assert answer.authority is False
     assert answer.value is None
 

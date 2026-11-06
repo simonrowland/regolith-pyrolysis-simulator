@@ -534,6 +534,32 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    expected_species = ("Mg", "Ca")
+    if "Na2O" in composition_wt_pct:
+        # Use the feedstock's actual Na/K/Mg/Ca proportions, normalized only
+        # across these four volatile parents so this exercises the full mixed
+        # fallback without adding unrelated oxide channels to the fixture.
+        account_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+        target_oxides = ("Na2O", "K2O", "MgO", "CaO")
+        target_weights = {
+            oxide: float(account_mol.get(oxide, 0.0))
+            * resolve_species_formula(oxide).molar_mass_kg_per_mol()
+            for oxide in target_oxides
+            if float(account_mol.get(oxide, 0.0)) > 0.0
+        }
+        assert set(target_weights) == set(target_oxides)
+        target_total = sum(target_weights.values())
+        composition_wt_pct = {
+            oxide: weight / target_total * 100.0
+            for oxide, weight in target_weights.items()
+        }
+        activities = {
+            "Na2O": 0.2,
+            "K2O": 0.1,
+            "MgO": 0.4,
+            "CaO": 0.3,
+        }
+        expected_species = ("Na", "K", "Mg", "Ca")
     backend = AlphaMELTSBackend()
     projection = backend._activities_times_antoine_or_fail(
         1500.0,
@@ -549,18 +575,12 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         temperature_C=1500.0,
         pO2_bar=1.0,
     )
-    for species in ("Mg", "Ca"):
+    for species in expected_species:
         assert projection[species] == pytest.approx(
             expected["vapor_pressures_Pa"][species],
             rel=1e-10,
             abs=0,
         )
-    # This synthetic mixed melt also produces a legacy Na pressure from a
-    # Na2O proxy, but reports no Na activity contract. Keep that unsupported
-    # channel out of this gateway fixture; it tests the evidenced Mg/Ca routes.
-    gateway_projection = {
-        species: projection[species] for species in ("Mg", "Ca")
-    }
 
     diagnostics = backend._vapor_pressure_diagnostics(
         {
@@ -576,7 +596,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     )
     sim._last_vapor_pressure_diagnostic = diagnostics
     sim._last_vapor_pressures_source = backend._vapor_pressure_source_map(
-        gateway_projection,
+        projection,
         "alphamelts_fallback",
     )
     sim._last_backend_diagnostics = diagnostics
@@ -589,27 +609,35 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         pO2_bar=1.0,
         diagnostics=diagnostics,
         activity_coefficients=dict(diagnostics.get("activities", {})),
-        vapor_pressures_Pa=gateway_projection,
+        vapor_pressures_Pa=projection,
         vapor_pressures_source=sim._last_vapor_pressures_source,
     )
 
     flux = sim._calculate_evaporation(equilibrium)
 
-    assert flux.species_kg_hr["Mg"] > 0.0
-    assert flux.species_kg_hr["Ca"] > 0.0
-    for species in ("Mg", "Ca"):
+    for species in expected_species:
+        assert flux.species_kg_hr[species] > 0.0
+    for species in expected_species:
         activity = diagnostics["activities"][species]
         route = diagnostics["vapor_pressure_numerator_provenance"][species]
         assert route["vapor_activity_for_crystalline_K"] > 0.0
-        assert route["vapor_activity_for_crystalline_K"] != pytest.approx(
-            activity,
-            rel=1e-6,
-            abs=0,
-        )
+        if species in {"Mg", "Ca"}:
+            assert route["vapor_activity_for_crystalline_K"] != pytest.approx(
+                activity,
+                rel=1e-6,
+                abs=0,
+            )
+        else:
+            assert route["vapor_activity_for_crystalline_K"] == pytest.approx(
+                activity,
+                rel=1e-10,
+                abs=0,
+            )
         notice = diagnostics[
             "vapor_activity_standard_state_notices_by_species"
         ][species]
         assert notice["reason"] == "activity_standard_state_substitution"
+        assert math.isfinite(float(notice["log10_activity_offset"]))
         assert notice["source_standard_state_substitution"] == (
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
@@ -618,7 +646,6 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     from simulator.runner import _vapor_pressure_source_report
 
     report = _vapor_pressure_source_report(sim)
-    assert set(report["vapor_activity_standard_state_notices_by_species"]) >= {
-        "Mg",
-        "Ca",
-    }
+    assert set(report["vapor_activity_standard_state_notices_by_species"]) >= set(
+        expected_species
+    )

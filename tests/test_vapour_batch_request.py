@@ -1685,7 +1685,6 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
 @pytest.mark.parametrize(
     "failure",
     (
-        "missing_activity",
         "missing_provider",
         "missing_standard_state",
         "standard_state_mismatch",
@@ -1701,12 +1700,7 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
     )
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
     state = _state_with_k_activity(temperature_K=1500.0)
-    if failure == "missing_activity":
-        state = VapourResolveState(
-            temperature_K=1500.0,
-            source_reaction_fO2_bar=1.0e-8,
-        )
-    elif failure == "missing_provider":
+    if failure == "missing_provider":
         state = replace(state, source_reaction_activity_provider=None)
     elif failure == "missing_standard_state":
         state = replace(state, source_reaction_activity_standard_states={})
@@ -1723,7 +1717,7 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
         state = replace(state, temperature_K=None)
 
     # Activity-contract failures matter when the channel is claimed. Missing
-    # process state still fails closed with an empty activation claim set.
+    # process state is checked before closure, including with no claims.
     activation_context = (
         _pre_rg_activation_context()
         if failure in {"missing_pO2", "missing_temperature"}
@@ -1737,9 +1731,155 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
         )
 
 
+@pytest.mark.parametrize("missing_field", ("temperature_K", "intrinsic_pO2"))
+@pytest.mark.parametrize("channel_refuses", (False, True))
+def test_pre_rg_run_state_is_validated_before_channel_answers(
+    missing_field: str,
+    channel_refuses: bool,
+) -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    state = _state_with_k_activity(temperature_K=1500.0)
+    if missing_field == "temperature_K":
+        state = replace(state, temperature_K=None)
+    else:
+        state = replace(state, source_reaction_fO2_bar=None)
+    ledger = (
+        {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+        if channel_refuses
+        else {}
+    )
+
+    def refuse_activity(declaration, **kwargs):
+        return SourceReactionActivity(
+            component_id=declaration.component_id,
+            value=None,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason=ActivityRefusalCode.MISSING_EVIDENCE.value,
+            standard_state=declaration.standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=kwargs.get("state_fingerprint"),
+            solve_group_id=kwargs.get("solve_group_id"),
+            provider="test_species_local_activity_source",
+            refusal_code=ActivityRefusalCode.MISSING_EVIDENCE,
+            detail="activity evidence row is absent for this species",
+        )
+
+    with pytest.raises(VapourRequestConstructionError):
+        catalog.resolve_batch(
+            ledger,
+            state,
+            activity_provider=(
+                SimpleNamespace(resolve_source_reaction_activity=refuse_activity)
+                if channel_refuses
+                else None
+            ),
+            flux_activation_context=(
+                _pre_rg_activation_context("K")
+                if channel_refuses
+                else _pre_rg_activation_context()
+            ),
+        )
+
+
+def test_pre_rg_fails_closed_on_component_identity_mismatch() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+
+    def refuse_identity(declaration, **kwargs):
+        return SourceReactionActivity(
+            component_id=declaration.component_id,
+            value=None,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason="component_identity_mismatch",
+            standard_state=declaration.standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=kwargs.get("state_fingerprint"),
+            solve_group_id=kwargs.get("solve_group_id"),
+            provider="test_identity_mismatch",
+            refusal_code=SimpleNamespace(value="component_identity_mismatch"),
+            detail="ThermoEngine component does not match declaration",
+        )
+
+    with pytest.raises(VapourRequestConstructionError):
+        catalog.resolve_batch(
+            {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}},
+            _state_with_k_activity(temperature_K=1500.0),
+            activity_provider=SimpleNamespace(
+                resolve_source_reaction_activity=refuse_identity
+            ),
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
+
+
+def test_pre_rg_fails_closed_when_activity_conversion_provenance_is_missing() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("Mg"), u0_manifest=_u0_stub("Mg")
+    )
+    rule = next(rule for rule in catalog.request_rules if rule.species_id == "Mg")
+    declaration = rule.source_reaction_activity
+    assert declaration is not None
+    state = VapourResolveState(
+        temperature_K=1500.0,
+        source_reaction_fO2_bar=1.0e-8,
+        source_reaction_activities={"Mg": 0.25},
+        source_reaction_activity_provider="test_activity_provider",
+        source_reaction_activity_evidence_refs={
+            "Mg": "doi:10.1234/test-activity"
+        },
+        source_reaction_activity_standard_states={
+            "Mg": declaration.standard_state
+        },
+    )
+    with pytest.raises(VapourRequestConstructionError):
+        catalog.resolve_batch(
+            {"process.cleaned_melt": {"MgO": 1.0}},
+            state,
+            flux_activation_context=_pre_rg_activation_context("Mg"),
+        )
+
+
+def test_pre_rg_fails_closed_when_activity_declaration_lacks_standard_state() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    rules = tuple(
+        replace(
+            rule,
+            source_reaction_activity=replace(
+                rule.source_reaction_activity,
+                standard_state=None,
+            ),
+        )
+        if rule.source_reaction_activity is not None
+        else rule
+        for rule in catalog.request_rules
+    )
+    with pytest.raises(VapourRequestConstructionError):
+        resolve_vapour_batch(
+            rules=rules,
+            ledger_snapshot={
+                "process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}
+            },
+            state=_state_with_k_activity(temperature_K=1500.0),
+            catalog_species=catalog._species,
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
+
+
 @pytest.mark.parametrize(
     "refusal_code",
-    (ActivityRefusalCode.UNMAPPED_PHASE, ActivityRefusalCode.UNMAPPED_ENDMEMBER),
+    (
+        ActivityRefusalCode.MISSING_EVIDENCE,
+        ActivityRefusalCode.UNMAPPED_PHASE,
+        ActivityRefusalCode.UNMAPPED_ENDMEMBER,
+    ),
 )
 def test_pre_rg_demotes_species_local_activity_refusals(
     refusal_code: ActivityRefusalCode,
