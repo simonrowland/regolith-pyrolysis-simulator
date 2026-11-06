@@ -190,11 +190,22 @@ species:
         locator: {page: 2, published_page: 68, pdf_page_index: 1, table: '1', row: 2, column: 3, note: 'Table 1, standard formation enthalpy at 298, calculated by the authors using equation (3).'}
         phase: cr
         units: kJ/mol
+        standard_state_as_printed: Standard formation enthalpy of Na4FeO3(s) at 298 K; no balanced formation reaction is printed.
         derived_from:
           - huang2003p2_Na4FeO3_table1_delta_fG
           - huang2003p2_Na4FeO3_table1_entropy
         derivation:
           relation: Formation enthalpy calculated from formation Gibbs energy and formation entropy with equation (3).
+          method:
+            state:
+              tag: value
+              value: Equation (3), ΔfH°(298) = ΔfG°(298) + T ΔfS°(298).
+            locator:
+              page: 3
+              published_page: 69
+              pdf_page_index: 2
+              section: 2.2.2
+              equation: '3'
           inputs:
             - huang2003p2_Na4FeO3_table1_delta_fG
             - huang2003p2_Na4FeO3_table1_entropy
@@ -516,6 +527,16 @@ species:
           - huang2003p2_Na8Fe2O7_table1_entropy
         derivation:
           relation: Authors' formation Gibbs energy function evaluated at the printed 298 K table reference.
+          method:
+            state:
+              tag: value
+              value: The source states that the formation value was calculated by equation (2).
+            locator:
+              page: 3
+              published_page: 69
+              pdf_page_index: 2
+              section: 2.2.5
+              equation: '2'
           inputs:
             - huang2003p2_Na8Fe2O7_table1_delta_fH
             - huang2003p2_Na8Fe2O7_table1_entropy
@@ -545,6 +566,7 @@ species:
         locator: {page: 2, published_page: 68, pdf_page_index: 1, table: '1', row: 2, column: 6, note: 'Table 1, standard formation enthalpy at 298.'}
         phase: cr
         units: kJ/mol
+        standard_state_as_printed: Standard formation enthalpy of Na8Fe2O7(s) at 298 K; no balanced formation reaction is printed.
         point_conditions:
           temperature_K:
             state:
@@ -561,7 +583,7 @@ species:
         values:
           quantity: delta_fH
           method_class: quoted_attributed
-          attribution: Stuve et al. [14], with the authors' equation (2) calculation noted in section 2.2.5
+          attribution: Stuve et al. [14]
           admission_status: admitted
           value: '-2746.0'
           temperature_K: '298'
@@ -607,6 +629,17 @@ species:
           schema_gap_symbols:
             - simulator/battery/enums.py::Quantity.CP
             - simulator/battery/enums.py::Quantity.DELTA_FG
+      - observation_id: huang2003p3_Na8Fe2O7_enthalpy_statement_conflict
+        type: thermodynamic_statement_context
+        units: as_printed
+        locator: {page: 3, published_page: 69, pdf_page_index: 2, section: 2.2.5}
+        values:
+          method_class: model_derived
+          quantity_as_printed: ΔfH°(Na8Fe2O7)
+          value_as_printed: '-2524.3 kJ mol−1'
+          method_as_printed: The authors say the value was calculated by equation (2) from Stuve et al.'s ΔfH°(Na8Fe2O7) = −2746.0 kJ mol−1 and Lindemer et al.'s S°(298) = 438.1 J mol−1 K−1.
+          conflicting_table_1_assignment: Table 1 assigns −2524.3 to ΔfG°(298) and −2746.0 to ΔfH°(298), with the latter attributed to Stuve et al. [14].
+          render_check: PDF page 3 at 600 dpi confirms the prose glyph is ΔfH°; it matches the MinerU and pdftotext reads.
   Na(g):
     observations: []
     context:

@@ -62,13 +62,16 @@ value. The exact candidate tokens checked were
   printed relation; equations (1), (2), (4), (5), and (6) are transcribed
   exactly.
 
-The evidence class for formation enthalpies calculated by the authors from
-literature-attributed formation Gibbs energy and entropy remains a ruling
-question: the shared rules classify authors' reductions of their own data as
-measured_reduced and model outputs as model_derived, but do not specify simple
-calculations from other authors' adopted values. This affects the Na4FeO3 and
-Na8Fe2O7 Table 1 enthalpies; both are currently represented as model_derived
-pending the controller's ruling.
+The controller ruled that calculations from literature-attributed formation
+Gibbs energy and entropy are model_derived. The Na4FeO3 Table 1 enthalpy is
+recorded that way, with its equation (3) method and the Table 1 Gibbs-energy
+and entropy inputs. For Na8Fe2O7, the source is internally inconsistent: the
+600 dpi render of page 3 confirms prose labels −2524.3 as ΔfH°, while Table 1
+labels that same number ΔfG° and labels −2746.0 ΔfH°; the preceding sentence
+attributes −2746.0 to Stuve et al. The extract preserves the Table 1
+attribution and records the conflicting prose as a separate model-derived
+context statement. Controller clarification is pending on which Na8Fe2O7
+enthalpy record the ruling applies to.
 
 ## Phase equilibria and conditions
 
