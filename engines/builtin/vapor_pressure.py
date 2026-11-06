@@ -119,6 +119,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_TIER,
+    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
     _convert_melt_oxide_activity_reference_state,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
@@ -1802,7 +1803,7 @@ def _activity_for_crystalline_vapor_k(
     # crystalline standard, for both the built-in and above-1950 K OpenIMCC
     # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
     # by declared standard ID is a follow-up after t-1637 lands.
-    if parent_oxide not in {"MgO", "CaO"}:
+    if parent_oxide not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
         return float(activity), None, None
     conversion = _convert_melt_oxide_activity_reference_state(
         parent_oxide,
@@ -4253,6 +4254,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species][
                         "vapor_activity_for_crystalline_K"
                     ] = activity_for_k.activity
+                    vapor_pressure_provenance[species][
+                        "vapor_activity_for_crystalline_K_standard_state_id"
+                    ] = vapor_activity_conversion["to_standard_state_id"]
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
@@ -4758,6 +4762,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name][
                         "vapor_activity_for_crystalline_K"
                     ] = source_activity_for_k
+                    vapor_pressure_provenance[name][
+                        "vapor_activity_for_crystalline_K_standard_state_id"
+                    ] = vapor_activity_conversion["to_standard_state_id"]
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,

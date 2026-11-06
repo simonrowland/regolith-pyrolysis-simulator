@@ -56,6 +56,7 @@ MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
 MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_crystalline_reference"
 )
+MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY = frozenset({"MgO", "CaO"})
 HIGH_T_MELT_ACTIVITY_MODES = frozenset({"openimcc", "constant_gamma"})
 
 

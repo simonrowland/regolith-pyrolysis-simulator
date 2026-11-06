@@ -38,6 +38,9 @@ from simulator.backend_names import (
 )
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
@@ -1402,6 +1405,56 @@ def refusal_closure(
                         source_reaction_activity=source_reaction_activity,
                     )
                 source_activity = numeric_activity
+                if declaration.component_id in (
+                    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
+                ):
+                    conversion = reported_provenance.get(
+                        "activity_standard_state_conversion"
+                    )
+                    vapor_activity = reported_provenance.get(
+                        "vapor_activity_for_crystalline_K"
+                    )
+                    vapor_activity_standard_state_id = reported_provenance.get(
+                        "vapor_activity_for_crystalline_K_standard_state_id"
+                    )
+                    if (
+                        reported_standard_state is None
+                        or reported_standard_state.phase != "liquid"
+                        or not isinstance(conversion, Mapping)
+                        or conversion.get("from_standard_state_id")
+                        != MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                        or conversion.get("to_standard_state_id")
+                        != MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                        or vapor_activity_standard_state_id
+                        != MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                        or not is_declared_real_scalar(vapor_activity)
+                    ):
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "crystalline vapor K requires its d-349 converted "
+                            "activity and matching standard-state ID",
+                            source_reaction_activity=source_reaction_activity,
+                        )
+                    try:
+                        vapor_activity_value = float(vapor_activity)
+                    except (TypeError, ValueError):
+                        vapor_activity_value = math.nan
+                    if not math.isfinite(vapor_activity_value) or (
+                        vapor_activity_value <= 0.0
+                    ):
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "crystalline vapor K activity must be finite and "
+                            "positive",
+                            source_reaction_activity=source_reaction_activity,
+                        )
+                    # The converted operand and K standard-state ID travel
+                    # together in this species' provenance. Keep the liquid
+                    # activity above for handshake validation; only this value
+                    # enters the crystalline K.
+                    source_activity = vapor_activity_value
             else:
                 # Pure-component / activity-independent evaluator: a=1 is
                 # the correct dimensionless unit activity, but it was

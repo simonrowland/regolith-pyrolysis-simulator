@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.vapour_rail.batch import PressureValue
+from simulator.vapour_rail.instrumentation import EffectivePressureSource
 from tests.chemistry.conftest import _build_sim
 
 
@@ -95,6 +99,20 @@ def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
         )
         assert notice["authority"] == "bridge"
         assert notice["authority_level"] == "predict_and_flag"
+        assert notice["reason"] == (
+            "JANAF tabulates the liquid phase below its solid-liquid Gibbs "
+            "crossing; this is JANAF's metastable (supercooled) liquid branch"
+        )
+        assert notice["delta_g_fus_kJ_per_mol"] == pytest.approx(
+            30.6109325 if oxide == "MgO" else 35.005622,
+            abs=1e-7,
+        )
+        assert notice["certified_band_K"] == pytest.approx(
+            [298.15, 4000.0 if oxide == "MgO" else 3600.0]
+        )
+        assert provenance[species][
+            "vapor_activity_for_crystalline_K_standard_state_id"
+        ] == notice["to_standard_state_id"]
     assert result.diagnostic["activities_standard_state"]["phase"] == "liquid"
 
 
@@ -133,11 +151,14 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     assert above_notice["log10_activity_offset"] < 0.0
     assert above_melting < 0.5
 
-    _activity, notice, warning = (
+    extrapolated_activity, notice, warning = (
         vapor_pressure_module._activity_for_crystalline_vapor_k(
             "MgO", 0.5, 4001.0
         )
     )
+    # JANAF d-144 owner value at 4001 K; independently pinned from the
+    # production fusion resolver, including its terminal-chord extrapolation.
+    assert extrapolated_activity == pytest.approx(0.24878736429300258, rel=1e-12)
     assert notice["authority"] == "extrapolated"
     assert notice["authority_level"] == "extrapolated"
     assert notice["temperature_K"] == pytest.approx(4001.0)
@@ -145,3 +166,91 @@ def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     assert notice["to_standard_state_id"] in warning
     assert "log10_activity_offset=" in warning
     assert "authority_level=extrapolated" in warning
+
+
+def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider_result = provider.dispatch(request)
+    diagnostic = dict(provider_result.diagnostic)
+    sim._last_vapor_pressure_diagnostic = diagnostic
+    equilibrium = SimpleNamespace(
+        temperature_C=1500.0,
+        pO2_bar=1.0,
+        fO2_log=0.0,
+        diagnostics={},
+        activity_coefficients=diagnostic["activities"],
+        vapor_pressures_Pa=diagnostic["vapor_pressures_Pa"],
+    )
+    effective_source = EffectivePressureSource(
+        "d349-live-gateway",
+        diagnostic["vapor_pressures_Pa"],
+    )
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=1773.15,
+        effective_pressure_source=effective_source,
+    )
+    assert batch is not None
+
+    for species in ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas"):
+        answer = batch.channel(species)
+        assert isinstance(answer.pressure, PressureValue)
+        assert answer.pressure.pa == pytest.approx(
+            diagnostic["vapor_pressures_Pa"][species], rel=1e-5
+        )
+        source_activity = answer.source_reaction_activity
+        assert source_activity is not None
+        assert source_activity.standard_state.phase == "liquid"
+        reported = source_activity.derivation[
+            "reported_activity_provenance"
+        ]
+        conversion = reported["activity_standard_state_conversion"]
+        assert reported["vapor_activity_for_crystalline_K_standard_state_id"] == (
+            conversion["to_standard_state_id"]
+        )
+        assert conversion["to_standard_state_id"] == (
+            "single_cation_Raoultian_pure_crystalline_reference"
+        )
+
+    # A crystalline-K route cannot fall back to the liquid handshake value if
+    # its converted operand and standard-state ID are absent at the gateway.
+    mutated_diagnostic = dict(diagnostic)
+    mutated_provenance = {
+        species: dict(provenance)
+        for species, provenance in diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ].items()
+    }
+    mutated_provenance["MgO_gas"].pop("activity_standard_state_conversion")
+    mutated_provenance["MgO_gas"].pop("vapor_activity_for_crystalline_K")
+    mutated_provenance["MgO_gas"].pop(
+        "vapor_activity_for_crystalline_K_standard_state_id"
+    )
+    mutated_diagnostic["vapor_pressure_numerator_provenance"] = (
+        mutated_provenance
+    )
+    sim._last_vapor_pressure_diagnostic = mutated_diagnostic
+    refused_batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=1773.15,
+        effective_pressure_source=effective_source,
+    )
+    assert refused_batch is None
+    assert sim._last_vapour_batch_resolve_error["reason"] == (
+        "vapour_batch_resolve_failed"
+    )
+    assert "MgO_gas" in sim._last_vapour_batch_resolve_error["detail"]
