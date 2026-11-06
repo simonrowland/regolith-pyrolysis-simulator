@@ -21,15 +21,6 @@ def _row(document, species, section, observation_id):
     )
 
 
-def _context_row(document, observation_id):
-    return next(
-        row
-        for species in document["species"].values()
-        for row in species.get("context", [])
-        if row["observation_id"] == observation_id
-    )
-
-
 def _assert_render_pins(document):
     expected = {
         "forsberg2002_eq19_dfG_caFe2o4": (
@@ -50,11 +41,24 @@ def _assert_render_pins(document):
         assert row["locator"]["page"] == page
         assert row["locator"]["equation"] == equation
     cell2 = _row(document, "CaFe2O4", "context", "forsberg2002_cell2_emf_fit")
-    cell3 = _context_row(document, "forsberg2002_cell3_emf_fit")
+    cell3 = _row(document, "Ca2Fe2O5", "context", "forsberg2002_cell3_emf_fit")
     assert cell2["values"]["fit_as_printed"] == "E(2/mV) = 163.3 + 0.01664 T ±2.2 mV"
+    assert cell2["values"]["temperature_range_as_printed"] == "1030 < T/K < 1280"
+    assert cell2["values"]["temperature_range_locator"] == {"page": 4, "published_page": 388}
     assert cell3["values"]["fit_as_printed"] == "E(3/mV) = −31.20 + 0.1267 T ±2.9 mV"
+    assert cell3["values"]["reaction_as_printed"] == "CaO(s) + CaFe2O4(s) → Ca2Fe2O5(s)"
     assert cell2["locator"] == {"page": 3, "equation": "4", "published_page": 387}
     assert cell3["locator"] == {"page": 4, "equation": "5", "published_page": 388}
+    assert all(
+        row["observation_id"] != "forsberg2002_cell3_emf_fit"
+        for row in document["species"]["CaFe2O4"]["context"]
+    )
+    assert "385–392" in document["source"]["citation"]
+    eq14 = _row(document, "Ca2Fe2O5", "observations", "forsberg2002_eq14_reaction_gibbs_ca2fe2o5")
+    assert eq14["values"]["reaction_as_printed"] == "2CaO(s) + Fe2O3(s) → Ca2Fe2O5(s)"
+    assert "Equation (13) plus Equation (12)" in eq14["derivation"]["relation"]
+    assert "cell [3] reaction [10]" in eq14["values"]["lineage_note"]
+    assert "Equation (13) reaction fit" in eq14["values"]["lineage_note"]
 
 
 def test_render_pins_equations_and_row_counts_fail_after_value_mutation():
