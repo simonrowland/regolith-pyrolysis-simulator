@@ -346,6 +346,54 @@ def test_d349_unknown_mgo_catalog_k_id_is_not_converted(
     assert notice["log10_activity_offset"] is None
 
 
+def test_d349_unknown_runtime_mgo_id_is_not_relabelled(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monkeypatch,
+):
+    from simulator.chemistry import melt_activity as melt_activity_module
+
+    _, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    original_standard_state_id = (
+        melt_activity_module._melt_oxide_activity_standard_state_id
+    )
+
+    def unknown_runtime_standard_state_id(parent_oxide):
+        if parent_oxide == "MgO":
+            return "synthetic_unknown_runtime_MgO"
+        return original_standard_state_id(parent_oxide)
+
+    monkeypatch.setattr(
+        melt_activity_module,
+        "_melt_oxide_activity_standard_state_id",
+        unknown_runtime_standard_state_id,
+    )
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+
+    assert result.status == "ok"
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
+    notice = provenance["activity_standard_state_conversion"]
+    assert provenance["melt_oxide_activity_reference_state"] == (
+        "synthetic_unknown_runtime_MgO"
+    )
+    assert notice["from_standard_state_id"] == "synthetic_unknown_runtime_MgO"
+    assert notice["to_standard_state_id"] == "Mg-010"
+    assert notice["reason"] == "standard_mismatch_unconverted"
+    assert notice["conversion_performed"] is False
+    assert notice["log10_activity_offset"] is None
+    assert provenance["vapor_activity_used_for_K"] == pytest.approx(
+        provenance["melt_oxide_activity"]
+    )
+    assert provenance["vapor_activity_standard_state_id_used_for_K"] == (
+        "synthetic_unknown_runtime_MgO"
+    )
+
+
 def test_d349_fe_activity_conversion_is_continuous_at_1650k():
     below = _activity_for_crystalline_vapor_k(
         "FeO",
