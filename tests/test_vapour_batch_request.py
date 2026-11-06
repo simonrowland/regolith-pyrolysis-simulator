@@ -1243,6 +1243,7 @@ def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
         stage="stage0",
         total_pressure_Pa=1.0e5,
         fO2_bar=1.0,
+        source_reaction_fO2_bar=1.0e-8,
         source_reaction_activities={species_id: 0.4},
         source_reaction_activity_provider="t622_real_file_probe",
         source_reaction_activity_evidence_refs={
@@ -1535,7 +1536,10 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
 
     refused = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0),
+        VapourResolveState(
+            temperature_K=1500.0,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
         flux_activation_context=_rg_activation_context(),
     ).channel("K")
     assert isinstance(refused.pressure, PressureRefusal)
@@ -1631,6 +1635,7 @@ def test_malformed_reported_activity_becomes_typed_refusal() -> None:
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
     state = VapourResolveState(
         temperature_K=1500.0,
+        source_reaction_fO2_bar=1.0e-8,
         source_reaction_activities={"K": "bogus"},  # type: ignore[dict-item]
         source_reaction_activity_provider="test_activity_provider",
         source_reaction_activity_evidence_refs={"K": "doi:10.1234/test-activity"},
@@ -2932,6 +2937,21 @@ def test_numeric_subclass_fingerprint_uses_underlying_value(
         "numeric-subclass", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, {"K": 149.0},
         evaluation_state=ordinary_state,
     )
+    if not finite and field_name in {
+        "temperature_K",
+        "total_pressure_Pa",
+        "source_reaction_fO2_bar",
+    }:
+        with pytest.raises(VapourRequestConstructionError):
+            resolve_vapour_batch(
+                rules=(_selector_rule("K"),),
+                ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+                state=state,
+                provider_candidates_by_species={"K": (candidate,)},
+                catalog_species=_selector_catalog_species("K"),
+                flux_activation_context=_rg_activation_context(),
+            )
+        return
     batch = resolve_vapour_batch(
         rules=(_selector_rule("K"),),
         ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
@@ -4183,6 +4203,7 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
     # Empty ledger → empty request set, still a valid exact-key batch
     batch = sim.build_vapour_batch(
         temperature_K=1600.0,
+        source_reaction_fO2_bar=1.0e-8,
         flux_activation_context=_pre_rg_activation_context(),
     )
     assert batch is not None
@@ -4192,6 +4213,7 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
 
     diagnostic_batch = sim.build_vapour_batch(
         temperature_K=1600.0,
+        source_reaction_fO2_bar=1.0e-8,
         melt_activity_shadow_enabled=True,
         flux_activation_context=_pre_rg_activation_context(),
     )
@@ -4205,41 +4227,20 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
-    """codex P1 / kimi P1-3: missing state must never fabricate PressureValue(0).
-
-    Null hypothesis: resolve with inventory + complete contract + state=None
-    yields PressureValue(0.0) + FluxEligible and a solve bundle.
-    Refutation: channel is PressureRefusal/FluxRefusal, not flux-active, and
-    forms no solve bundle. Reachable via the public core default path too.
-    """
+def test_missing_temperature_fails_run_state_validation_before_channels() -> None:
+    """Missing temperature is rejected before channel answers are built."""
 
     payload = _minimal_family("K")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
 
-    # Direct resolve: explicit state=None
-    batch = catalog.resolve_batch(
-        ledger,
-        state=None,
-        flux_activation_context=_rg_activation_context(),
-    )
-    assert "K" in batch.requested_species_ids
-    answer = batch.channel("K")
-    assert answer.is_refused
-    assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
-    assert isinstance(answer.pressure, PressureRefusal)
-    assert isinstance(answer.flux, FluxRefusal)
-    assert "K" not in batch.flux_active_species_ids
-    assert all("K" not in members for members in batch.solve_bundle_ids.values())
-    assert batch.metadata["refusal_closure_fixed_point"] is True
-
-    # The batch may not silently run a strict subset of the typed source set.
-    # Missing physical state refuses K, so pre-RG activation fails closed.
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match="pre-RG request has a fail-closed channel contract or outcome-state refusal",
-    ):
+    with pytest.raises(VapourRequestConstructionError, match="temperature_K"):
+        catalog.resolve_batch(
+            ledger,
+            state=None,
+            flux_activation_context=_rg_activation_context(),
+        )
+    with pytest.raises(VapourRequestConstructionError, match="temperature_K"):
         catalog.resolve_batch(
             ledger,
             state=None,
@@ -4264,26 +4265,10 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
         source="test_missing_temperature_inventory",
         material_origin="feedstock",
     )
-    core_batch = sim.build_vapour_batch(
-        flux_activation_context=_rg_activation_context()
-    )  # all physical-state params default None
-    assert core_batch is not None
-    assert core_batch.requested_species_ids  # inventory activated something
-    missing_state_refusals = [
-        sid
-        for sid in core_batch.requested_species_ids
-        if core_batch.channel(sid).refusal_code == REFUSAL_MISSING_OUTCOME_STATE
-    ]
-    assert missing_state_refusals, (
-        "default build_vapour_batch with inventory must surface typed "
-        "missing-state refusals, not silent zeros"
-    )
-    for sid in missing_state_refusals:
-        channel = core_batch.channel(sid)
-        assert not channel.is_flux_active
-        assert isinstance(channel.pressure, PressureRefusal)
-        assert isinstance(channel.flux, FluxRefusal)
-    assert core_batch.flux_active_species_ids == frozenset()
+    with pytest.raises(VapourRequestConstructionError, match="temperature_K"):
+        sim.build_vapour_batch(
+            flux_activation_context=_rg_activation_context()
+        )  # all physical-state params default None
 
 
 def test_absent_source_atom_no_substring_credit_for_f_in_fe2o3() -> None:
@@ -4404,7 +4389,10 @@ def test_validation_anchors_propagate_to_rule_and_answer() -> None:
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
     batch = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0),
+        VapourResolveState(
+            temperature_K=1500.0,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
         flux_activation_context=_rg_activation_context(),
     )
     answer = batch.channel("K")
