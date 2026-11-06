@@ -3345,3 +3345,35 @@ def test_hero_summary_exposes_split_metrics_for_every_residual_engine(
     assert "sd_dex" in metrics["openimcc"]
     assert "temperature_ge_1700" in metrics["openimcc"]["views"]
     assert metrics["magemin"]["n"] == 0
+
+
+def test_hero_summary_source_disagreement_descriptor_matches_notice_kind(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals-with-source-reasons.jsonl"
+    _score_file(residuals)
+    reasons = (
+        "source_internally_inconsistent:JANAF cross-check",
+        "curated source disagreement from paired tables",
+        "source_internally_inconsistent:JANAF cross-check",
+    )
+    with residuals.open("a", encoding="utf-8") as output:
+        for index, reason in enumerate(reasons):
+            row = _hero_metric_row(
+                "openimcc",
+                f"source-reason-{index}",
+                "0.25",
+                temperature_K="1800",
+                source_disagreement_flagged=True,
+            )
+            row["notices"][0]["reason"] = reason
+            output.write(json.dumps(row) + "\n")
+
+    descriptor = hero_plot._hero_summary_payload(read_scores(residuals))["vapour"][
+        "source_disagreement_split"
+    ]
+
+    assert descriptor["rule"] == "notice.kind == source_disagreement"
+    assert descriptor["enum"] == "SOURCE_DISAGREEMENT"
+    assert "reason_prefix" not in descriptor
+    assert descriptor["reasons"] == sorted(set(reasons))
