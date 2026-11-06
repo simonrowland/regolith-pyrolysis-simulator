@@ -911,6 +911,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `deguzman-2026-simulant-physicochemical`
 - `delgado-2015-mg-thermite-regolith`
 - `di-donato-granati-2000`
+- `dikov-2009-luna16-condensate-iron`
 - `distin-1971-ferrous-silicate-melts`
 - `dohmen-2003-coupled-kinetics`
 - `dong-2009-cr-v-slag-activities`
@@ -1193,6 +1194,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `metsoc-2024-6224`
 - `miao-li-yan-2023-fe-v-spinel-gibbs`
 - `miki-1999-si-alloy-thermodynamics`
+- `moeller-2007-silicon-oxide-evaporation-condensation`
 - `mogul-2023-pioneer-venus-co2-icarus`
 - `moosavi-khoonsari-2015-na-fe-cmas-thesis`
 - `morey-1964-usgs-pp440l-phase-equilibria`
