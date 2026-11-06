@@ -13,17 +13,17 @@ extraction:
 review_status: draft
 fidelity_samples:
 - path: species.CaFe2O4.observations[bonnickson_1954_tablei_cafe2o4_cr_heat_content].values.points[0].value
-  value: '4220.0'
+  value: 4220.0
   locator:
     page: 2
     table: I
 - path: species.CaFe2O4.observations[bonnickson_1954_tablei_cafe2o4_cr_heat_content].values.points[1].value
-  value: '43870.0'
+  value: 43870.0
   locator:
     page: 2
     table: I
 - path: species.Ca2Fe2O5.observations[bonnickson_1954_tableii_ca2fe2o5_cr_heat_content].values.points[0].value
-  value: '4870.0'
+  value: 4870.0
   locator:
     page: 2
     table: II
@@ -344,7 +344,7 @@ species:
           note_as_printed: (Note results labeled a in Table I.)
         marker_as_printed: a
         admission_status: typed_refusal
-        phase_refusal_reason: The printed measurement lies in the source-stated incongruent-melting interval and
+        refusal_reason: The printed measurement lies in the source-stated incongruent-melting interval and
           the row has no phase label; preserve the numeric value without assigning a phase.
     - observation_id: bonnickson_1954_tableii_cafe2o4_cr_heat_content
       type: heat_capacity_and_heat_content_series
@@ -530,7 +530,6 @@ species:
             column: 2
         derived_from:
         - bonnickson_1954_tablei_cafe2o4_l_heat_content
-        - bonnickson_1954_tablei_cafe2o4_unknown_a_heat_content
     - observation_id: bonnickson_1954_cafe2o4_heat_of_fusion
       type: heat_capacity_and_heat_content_series
       locator: &id001
@@ -964,6 +963,16 @@ species:
             table: II
             row: 22
             column: 4
+        - T_K: 1750.0
+          value: 82760.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 23
+            column: 4
+          mark_as_printed: c
+          phase_as_printed: c
         derived_from:
         - bonnickson_1954_tablei_ca2fe2o5_cr_heat_content
     - observation_id: bonnickson_1954_tableii_ca2fe2o5_l_heat_content
@@ -987,14 +996,6 @@ species:
         method_class: measured_reduced
         points:
         - T_K: 1750.0
-          value: 82760.0
-          locator:
-            page: 2
-            published_page: 1481
-            table: II
-            row: 23
-            column: 4
-        - T_K: 1750.0
           value: 118870.0
           locator:
             page: 2
@@ -1002,6 +1003,8 @@ species:
             table: II
             row: 24
             column: 4
+          mark_as_printed: l
+          phase_as_printed: l
         - T_K: 1800.0
           value: 122580.0
           locator:
@@ -1084,8 +1087,8 @@ species:
       units: cal/mol; cal/(deg mol); K, as applicable to printed statement
       values:
         statement_as_printed: 'CaFe2O5(l) [printed label; contextual formula misprint resolved as Ca2Fe2O5]: H_T
-          − H_298.16 = 74.20T − 10,980; (0.1%; 1750–1850 K).'
+          − H_293.16 = 74.20T − 10,980; (0.1%; 1750–1850 K).'
         phase_as_printed: CaFe2O5(l)
         notes: 'Printed formula misprint resolved by context: the preceding Ca2Fe2O5 paragraph gives complete melting
           at 1752 K, matching this fit interval of 1750–1850 K. CaFe2O5 is not charge-balanced for Ca2+ and Fe3+
-          with O5.'
+          with O5. The printed H_293.16 reference is a probable misprint for H_298.16; it is preserved verbatim.'
