@@ -460,7 +460,11 @@ def test_real_hastie_quoted_table2_illite_stays_on_body_row_16() -> None:
         if printed is not None and printed.state.is_value:
             owners.append(child)
             assert dict(printed.state.value) == {
-                "K2O": "7.4", "Al2O3": "26", "Fe2O3": "4.4", "MgO": "2.1", "SiO2": "60.2"
+                "K2O": "7.4",
+                "Al2O3": "26",
+                "Fe2O3": "4.4",
+                "MgO": "2.1",
+                "SiO2": "60.2",
             }
         else:
             assert normalized_composition(experiment, None, child).selected is None

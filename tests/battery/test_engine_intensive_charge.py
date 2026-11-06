@@ -8,11 +8,17 @@ import pytest
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import AmountBasis
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
-from simulator.battery.records import Composition, Derivation, Located, Sample, State
+from simulator.battery.records import Composition, Derivation, Located, Locator, Sample, State, Value
 from simulator.battery.migrate import (
-    load_yaml, _sample_from_plain, wt_pct_to_mole_fraction, wt_pct_to_mole_fraction_derivation,
+    load_yaml, _sample_from_plain, _wt_percent_conversion_state,
+    wt_pct_to_mole_fraction_derivation,
 )
-from simulator.battery.waypoints import GapReason, ReadinessStatus, WaypointAuthority
+from simulator.battery.waypoints import (
+    GapReason,
+    ReadinessStatus,
+    WaypointAuthority,
+    charge_moles_by_species,
+)
 from tests.battery import factories as f
 from tests.battery.test_bench_generators import case, complete_kems, complete_rps
 
@@ -47,23 +53,185 @@ def test_massless_wt_percent_derivation():
     assert all(r.payload is not None for r in engine_point_requests(inputs))
 
 
-def test_payload_scale_invariance():
+def test_partial_printed_composition_does_not_reach_engine_point():
+    experiment, bench, observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located({"SiO2": D("45"), "MgO": D("45")}),
+            initial_composition=Located(State.unknown("not reported")),
+        ),
+    )
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    requests = engine_point_requests(inputs)
+    assert requests
+    assert all(request.payload is None for request in requests)
+    assert all(
+        any(gap.waypoint == "normalized_composition" for gap in request.readiness.gaps)
+        for request in requests
+    )
+
+
+def test_printed_wt_percent_outside_closure_refuses_even_with_derived_initial_composition():
     experiment, bench, observation = case()
     source = load_yaml(Path(__file__).resolve().parents[2] /
                        "data/literature/extracts/ta-badro-2021.yaml")
     sample = _sample_from_plain(source["experiments"][0]["sample"])
     assert not sample.mass_kg.state.is_value
     weights = source["laboratory_parameters"]["starting_composition"]["composition_wt_pct"]
-    payloads = []
-    for scale in (1, 10):
-        scaled = replace(experiment, sample=replace(sample,
-            printed_composition=replace(sample.printed_composition,
-                state=State.of({species: D(weight) * scale for species, weight in weights.items()}))))
-        payloads.append([r.payload for r in engine_point_requests(
-            collect_consumer_inputs(scaled, bench, observation))])
-    assert all(payload is not None for payload in payloads[0])
-    assert payloads[0] == payloads[1]
-    assert sum(payloads[0][0]["composition_mol"].values()) == pytest.approx(1)
+    scale_one = replace(experiment, sample=replace(sample,
+        printed_composition=replace(sample.printed_composition,
+            state=State.of({species: D(weight) for species, weight in weights.items()}))))
+    scale_ten_map = {species: D(weight) * 10 for species, weight in weights.items()}
+    scale_ten = replace(experiment, sample=replace(sample,
+        printed_composition=replace(sample.printed_composition,
+            state=State.of(scale_ten_map))))
+    closure = _wt_percent_conversion_state(
+        scale_ten_map,
+        closure_context=scale_ten_map,
+        declared_component_map=scale_ten_map,
+    )
+    assert closure.is_unknown
+    assert "sum=1000 wt% is above 105 wt%" in closure.reason
+
+    valid_requests = engine_point_requests(
+        collect_consumer_inputs(scale_one, bench, observation)
+    )
+    assert all(request.payload is not None for request in valid_requests)
+    assert sum(valid_requests[0].payload["composition_mol"].values()) == pytest.approx(1)
+
+    invalid_inputs = collect_consumer_inputs(scale_ten, bench, observation)
+    waypoint = invalid_inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert "experiment.sample.printed_composition" in waypoint.absence.missing
+    assert "experiment.sample.initial_composition" in waypoint.absence.missing
+    invalid_requests = engine_point_requests(invalid_inputs)
+    assert invalid_requests
+    assert all(request.payload is None for request in invalid_requests)
+    assert all(any(
+        gap.waypoint == "normalized_composition"
+        and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        for gap in request.readiness.gaps
+    ) for request in invalid_requests)
+
+    # The derived initial composition is another representation of this
+    # malformed recipe. Its own recorded weight inputs must also fail closure.
+    invalid_initial = replace(
+        sample.initial_composition,
+        inference=wt_pct_to_mole_fraction_derivation(
+            scale_ten_map, sample.initial_composition.locator
+        ),
+    )
+    invalid_derived = replace(scale_ten, sample=replace(
+        scale_ten.sample, initial_composition=invalid_initial
+    ))
+    derived_inputs = collect_consumer_inputs(invalid_derived, bench, observation)
+    assert derived_inputs.waypoints["normalized_composition"].selected is None
+    assert all(request.payload is None for request in engine_point_requests(derived_inputs))
+
+
+def test_mass_inventory_scale_preserves_engine_composition():
+    experiment, bench, observation = case()
+    compositions = []
+    charges = []
+    for mass_kg in (D("0.001"), D("0.010")):
+        sample = Sample(
+            mass_kg=f.located(Value.point_of(mass_kg)),
+            initial_composition=f.located(Composition(
+                "mix", (("MgO", D("0.25")), ("SiO2", D("0.75"))),
+                AmountBasis.MOLE_FRACTION,
+            )),
+        )
+        inputs = collect_consumer_inputs(
+            replace(experiment, sample=sample), bench, observation
+        )
+        requests = engine_point_requests(inputs)
+        assert all(request.payload is not None for request in requests)
+        compositions.append([request.payload["composition_mol"] for request in requests])
+        charges.append({
+            species: waypoint.selected.value.point
+            for species, waypoint in inputs.charges.items()
+        })
+    assert compositions[0] == compositions[1]
+    assert charges[1] == {species: amount * 10 for species, amount in charges[0].items()}
+
+
+def test_rejected_print_does_not_veto_independent_initial_mole_fraction():
+    experiment, bench, observation = case()
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=Located(State.unknown("would_invent")),
+        printed_composition=f.located({"MgO": D("500"), "SiO2": D("500")}),
+        initial_composition=f.located(Composition(
+            "measured", (("MgO", D("0.25")), ("SiO2", D("0.75"))),
+            AmountBasis.MOLE_FRACTION,
+        )),
+    ))
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    selected = inputs.waypoints["normalized_composition"].selected
+    assert selected is not None
+    assert selected.route == "normalized_initial_composition"
+    assert selected.value == {"MgO": D("0.25"), "SiO2": D("0.75")}
+    requests = engine_point_requests(inputs)
+    assert all(request.payload is not None for request in requests)
+    assert all(
+        request.payload["composition_mol"] == {"MgO": 0.25, "SiO2": 0.75}
+        for request in requests
+    )
+
+
+def test_closing_derived_initial_from_another_printed_column_is_usable():
+    experiment, bench, observation = case()
+    wt = {"MgO": D("50"), "SiO2": D("50")}
+    converted = _wt_percent_conversion_state(
+        wt, closure_context=wt, declared_component_map=wt
+    )
+    assert converted.is_value
+    print_locator = Locator(published_page=105, pdf_page_index=5, table="1")
+    initial_locators = (
+        Locator(
+            published_page=105,
+            pdf_page_index=5,
+            table="1",
+            note="closing composition in another column",
+        ),
+        Locator(note="closing composition from a separate printed column"),
+    )
+    expected = dict(converted.value.components)
+
+    for initial_locator in initial_locators:
+        experiment_with_two_prints = replace(experiment, sample=Sample(
+            mass_kg=Located(State.unknown("would_invent")),
+            printed_composition=Located(
+                State.of({"MgO": D("500"), "SiO2": D("500")}),
+                locator=print_locator,
+            ),
+            initial_composition=Located(
+                State.of(converted.value),
+                locator=initial_locator,
+                inference=wt_pct_to_mole_fraction_derivation(wt, initial_locator),
+            ),
+        ))
+        inputs = collect_consumer_inputs(
+            experiment_with_two_prints, bench, observation
+        )
+        selected = inputs.waypoints["normalized_composition"].selected
+        assert selected is not None
+        assert selected.route == "normalized_initial_composition"
+        assert selected.value == expected
+        requests = engine_point_requests(inputs)
+        assert all(request.payload is not None for request in requests)
+        assert all(
+            request.payload["composition_mol"]
+            == {species: float(amount) for species, amount in expected.items()}
+            for request in requests
+        )
 
 
 def test_printed_inventory_precedes_wt_derivation():
@@ -91,29 +259,88 @@ def test_printed_mole_fraction_precedes_wt_derivation():
         assert result.payload["composition_mol"] == {"MgO": 0.25, "SiO2": 0.75}
 
 
+def test_real_printed_mole_fraction_stays_unchanged_at_waypoint():
+    from simulator.battery.migrate import REPO_ROOT
+    from simulator.battery.waypoints import normalized_composition
+
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/nakano-hashimoto-2020-bubbles-to-chondrites-i.yaml"
+    )
+    migrator = f.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.1186/s40645-020-00354-0::experiment::allende-laser-boiling"
+    ]
+    waypoint = normalized_composition(
+        experiment, migrator.result.benches[experiment.bench_id]
+    )
+
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert waypoint.selected is not None
+    assert waypoint.selected.route == "normalized_initial_composition"
+    assert waypoint.selected.value == {
+        "NaO0.5": D("0.0084"),
+        "MgO": D("0.3519"),
+        "AlO1.5": D("0.0340"),
+        "SiO2": D("0.3282"),
+        "KO0.5": D("0.0004"),
+        "CaO": D("0.0247"),
+        "TiO2": D("0.0010"),
+        "CrO1.5": D("0.0039"),
+        "MnO": D("0.0015"),
+        "FeO": D("0.2460"),
+    }
+
+
 @pytest.mark.parametrize("extra", [{"LOI": D(20)}, {"Total": D(100)}])
 def test_printed_species_dropped_by_sibling_refuses(extra):
     experiment, bench, observation = case()
     wt = {"SiO2": D(50), "MgO": D(30)}
     key = next(iter(extra))
+    printed = {**wt, **extra}
+    closure = _wt_percent_conversion_state(
+        wt, closure_context=printed, declared_component_map=printed
+    )
+    if key == "LOI":
+        assert closure.is_value
+    else:
+        # b-704 excludes the printed total and refuses the remaining 80 wt%.
+        assert closure.is_unknown
+        assert "kept sum=80 wt% is below 95 wt%" in closure.reason
     experiment = replace(experiment, sample=Sample(
         mass_kg=Located(State.unknown("would_invent")),
-        printed_composition=f.located({**wt, **extra}),
+        printed_composition=f.located(printed),
         initial_composition=Located(
-            State.of(wt_pct_to_mole_fraction(wt)), locator=f.loc(),
-            inference=wt_pct_to_mole_fraction_derivation(wt, f.loc()))))
+            State.of(Composition(
+                "printed_oxides",
+                (("SiO2", D(".5")), ("MgO", D(".5"))),
+                AmountBasis.MOLE_FRACTION,
+            )), locator=f.loc())))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     waypoint = inputs.waypoints["normalized_composition"]
-    assert waypoint.selected is None
-    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert waypoint.absence.missing == (f"experiment.sample.printed_composition.{key}",)
-    for result in engine_point_requests(inputs):
-        assert result.payload is None
-        assert result.readiness.status is ReadinessStatus.GAP
-        assert any(g.waypoint == "normalized_composition"
-                   and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
-                   and any(key in path for path in g.missing)
-                   for g in result.readiness.gaps)
+    if key == "Total":
+        # b-704 rejects this 80 wt% print, but it does not veto the
+        # independently measured mole-fraction initial composition.
+        assert waypoint.selected is not None
+        assert waypoint.selected.route == "normalized_initial_composition"
+        assert waypoint.selected.value == {"SiO2": D(".5"), "MgO": D(".5")}
+        for result in engine_point_requests(inputs):
+            assert result.payload is not None
+            assert result.payload["composition_mol"] == {"SiO2": 0.5, "MgO": 0.5}
+    else:
+        assert waypoint.selected is None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert waypoint.absence.missing == (f"experiment.sample.printed_composition.{key}",)
+        for result in engine_point_requests(inputs):
+            assert result.payload is None
+            assert result.readiness.status is ReadinessStatus.GAP
+            assert any(g.waypoint == "normalized_composition"
+                       and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                       and any(key in path for path in g.missing)
+                       for g in result.readiness.gaps)
 
 
 def test_losing_single_species_charge_does_not_veto_intensive():
@@ -150,6 +377,166 @@ def test_unsupported_print_reports_refusal_not_single_species():
                    and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
                    for g in result.readiness.gaps)
         assert not any(g.reason is GapReason.SINGLE_SPECIES_CHARGE for g in result.readiness.gaps)
+
+
+def test_charge_keeps_verbatim_mass_percent_component_keys():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located(
+                {"MgO": D(50), "SiO2_wt_pct": D(50)}
+            ),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert list(charge.by_species) == ["MgO"]
+
+
+def test_charge_keeps_routes_for_ambiguous_feot_and_feo_map():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            mass_kg=f.located(Value.point_of("0.001")),
+            printed_composition=f.located(
+                {"SiO2": D("50"), "FeOT": D("20"), "FeO": D("30")}
+            ),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert set(charge.by_species) == {"SiO2", "FeO"}
+    assert charge["SiO2"].selected is not None
+    assert charge["FeO"].selected is not None
+
+
+def test_charge_renormalizes_104_wt_percent_map_and_refuses_above_105():
+    experiment, bench, _observation = case()
+    sample = replace(
+        experiment.sample,
+        initial_composition=None,
+        mass_kg=f.located(Value.point_of("0.001")),
+        printed_composition=f.located(
+            {"MgO": D("40"), "SiO2": D("64"), "XxO": D("0.4")}
+        ),
+    )
+    charge = charge_moles_by_species(replace(experiment, sample=sample), bench)
+
+    assert set(charge.by_species) == {"MgO", "SiO2"}
+    expected = {
+        "MgO": D("0.001") * D("40") / D("104") / D("0.040304"),
+        "SiO2": D("0.001") * D("64") / D("104") / D("0.060083"),
+    }
+    for species, moles in expected.items():
+        assert charge[species].selected is not None
+        assert charge[species].selected.route == "mass_times_printed_wt_percent"
+        assert float(charge[species].selected.value.point) == pytest.approx(
+            float(moles), rel=1e-12
+        )
+
+    at_kept_limit = replace(
+        sample,
+        printed_composition=f.located({"MgO": D("40"), "SiO2": D("65")}),
+    )
+    limit_charge = charge_moles_by_species(
+        replace(experiment, sample=at_kept_limit), bench
+    )
+    assert set(limit_charge.by_species) == {"MgO", "SiO2"}
+    for species, wt_percent, molar_mass in (
+        ("MgO", D("40"), D("0.040304")),
+        ("SiO2", D("65"), D("0.060083")),
+    ):
+        waypoint = limit_charge[species].selected
+        assert waypoint is not None
+        expected_moles = D("0.001") * wt_percent / D("105") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(
+            float(expected_moles), rel=1e-12
+        )
+
+    over_limit = replace(
+        sample,
+        printed_composition=f.located({"MgO": D("50"), "SiO2": D("55.01")}),
+    )
+    refused = charge_moles_by_species(replace(experiment, sample=over_limit), bench)
+    assert not refused.by_species
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.MISSING_EVIDENCE
+
+
+def test_charge_uses_migration_kept_total_for_trace_feot_and_volatiles():
+    experiment, bench, _observation = case()
+
+    def charge_for(components):
+        sample = replace(
+            experiment.sample,
+            initial_composition=None,
+            mass_kg=f.located(Value.point_of("0.001")),
+            printed_composition=f.located(components),
+        )
+        return charge_moles_by_species(replace(experiment, sample=sample), bench)
+
+    # This pins charge admission to migration's kept-S guard, retaining Fe's route.
+    trace = charge_for(
+        {"SiO2": D("50"), "MgO": D("52"), "Fe": D("0.4")}
+    )
+    assert set(trace.by_species) == {"SiO2", "MgO", "Fe"}
+    for species, wt_percent, molar_mass in (
+        ("SiO2", D("50"), D("0.060083")),
+        ("MgO", D("52"), D("0.040304")),
+        ("Fe", D("0.4"), D("0.055845")),
+    ):
+        waypoint = trace[species].selected
+        assert waypoint is not None
+        expected = D("0.001") * wt_percent / D("100") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(float(expected), rel=1e-12)
+
+    feot = charge_for({"SiO2": D("50"), "FeOT": D("54")})
+    assert set(feot.by_species) == {"SiO2"}
+    feot_silica = feot["SiO2"].selected
+    assert feot_silica is not None
+    expected_feot_silica = D("0.001") * D("50") / D("104") / D("0.060083")
+    assert float(feot_silica.value.point) == pytest.approx(
+        float(expected_feot_silica), rel=1e-12
+    )
+
+    volatile = charge_for(
+        {"SiO2": D("50"), "MgO": D("47"), "H2O": D("7")}
+    )
+    for species, wt_percent, molar_mass in (
+        ("SiO2", D("50"), D("0.060083")),
+        ("MgO", D("47"), D("0.040304")),
+        ("H2O", D("7"), D("0.018015")),
+    ):
+        waypoint = volatile[species].selected
+        assert waypoint is not None
+        expected = D("0.001") * wt_percent / D("104") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(float(expected), rel=1e-12)
+
+
+def test_charge_refuses_duplicate_normalized_mass_percent_species():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located({"MgO": D(50), "mgo": D(50)}),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert not charge.by_species
+    assert charge.absence is not None
+    assert charge.absence.reason is GapReason.MISSING_EVIDENCE
 
 
 @pytest.mark.parametrize("weights", [{"MgO": 0, "SiO2": 0}, {"unknown_species": 50, "MgO": 50}])

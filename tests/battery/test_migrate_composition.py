@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import re
+from collections import Counter, OrderedDict
 from copy import deepcopy
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from unittest.mock import patch
 
@@ -21,6 +22,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    Quantity,
     RefusalReason,
     ValueKind,
 )
@@ -46,6 +48,7 @@ from simulator.battery.records import (
     Composition,
     Located,
     Locator,
+    State,
     as_decimal,
 )
 from tests.battery.factories import migrate_one_extract, tabulation_experiment
@@ -73,12 +76,57 @@ _SAMPLE_CODE_FORMULA = re.compile(r"(?i)^(MLS[-_]?|MS)\d")
 _MARKOVA_VI_PREFIX = (
     "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
 )
+
+
+def _projection_notice_from_printed_map(
+    wt,
+    *,
+    closure_context,
+    quantity,
+    origin,
+    declared_component_map=None,
+):
+    context = closure_context if closure_context is not None else wt
+    declared = declared_component_map if declared_component_map is not None else wt
+    composition = migrate_module._mass_percent_composition_located(
+        wt,
+        basis="printed_oxides",
+        locator=None,
+        closure_context=context,
+        declared_component_map=declared,
+    )
+    return migrate_module._composition_projection_notice(
+        composition,
+        quantity=quantity,
+        origin=origin,
+    )
+
+
 _SWEPT_COMPOSITION_MAPS = (
-    ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 12),
-    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 4),
-    ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3),
-    ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2),
-    ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1),
+    # Zhang repeats a 99.32 wt% starting-glass map in twelve rows; each is in
+    # b-704's accepted 95–102 wt% kept-sum interval.
+    ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 12, 0),
+    # LPI totals are 99.85, 100.26, 99.21, and 99.47 wt%; all are in 95–102.
+    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 4, 0),
+    ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3, 0),
+    # Hendrix LMS-1 sums to 100.66 wt%, within b-704's 95–102 interval.
+    (
+        "Hendrix",
+        "hendrix-2024-reactivity-reduced-simulants",
+        "composition_wt_pct",
+        "SO3",
+        2,
+        0,
+    ),
+    # Flemetakis starting glass sums to 99.37 wt%, within b-704's 95–102 interval.
+    (
+        "Flemetakis",
+        "ta-flemetakis-2024",
+        "composition_wt_pct",
+        "B2O3",
+        1,
+        0,
+    ),
 )
 _MLS_BULK_ID_PREFIXES = {
     "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:",
@@ -280,7 +328,7 @@ def test_noncomposition_values_are_not_scanned_or_refused_as_oxides() -> None:
     assert not hasattr(migrate_module, "_is_formula_component_key")
 
 
-def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+def test_flemetakis_starting_glass_within_mass_closure_window_converts(tmp_path) -> None:
     source = "ta-flemetakis-2024.yaml"
     source_path = REPO_ROOT / "data/literature/extracts" / source
     document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
@@ -309,6 +357,12 @@ def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> Non
     assert point_composition.state.is_value
     assert isinstance(point_composition.state.value, Composition)
     assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    raw_composition = source_row["values"]["composition_wt_pct"]
+    # The published starting glass totals 99.37 wt%, within b-704's 95–102 interval.
+    expected = wt_pct_to_mole_fraction(
+        {name: as_decimal(value) for name, value in raw_composition.items()}
+    )
+    assert point_composition.state.value.components == expected.components
 
     initial = result.experiments[observation.experiment_id].sample.initial_composition
     assert initial is not None and initial.state.is_value
@@ -316,6 +370,7 @@ def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> Non
     assert initial.locator.section == "2.1 Starting material"
     assert isinstance(initial.state.value, Composition)
     assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert initial.state.value.components == expected.components
     assert not migrate_module._initial_compositions_conflict(
         initial, point_composition
     )
@@ -345,7 +400,7 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert source_experiment.sample.initial_composition is None
 
 
-def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+def test_hastie_typed_initial_charge_at_inclusive_mass_closure_boundary_converts() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
     observation = next(
@@ -360,6 +415,15 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
     assert selected.initial_composition is not None
+    # Its seven printed oxide values sum to exactly 98.0 wt%, inside 95–102.
+    expected = wt_pct_to_mole_fraction(
+        {
+            name: as_decimal(value)
+            for name, value in observation["values"]["composition_wt_pct"].items()
+        }
+    )
+    assert selected.initial_composition.state.is_value
+    assert selected.initial_composition.state.value.components == expected.components
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -369,12 +433,10 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
 
     actual = experiment.sample.initial_composition
     assert actual is not None and actual.state.is_value
-    assert dict(actual.state.value.components) == dict(
-        selected.initial_composition.state.value.components
-    )
+    assert actual.state.value.components == expected.components
 
 
-def test_volovetskii_starting_glass_material_state_is_initial() -> None:
+def test_volovetskii_starting_glass_with_excess_chloride_is_refused() -> None:
     path = REPO_ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
     observation = next(
@@ -390,8 +452,17 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
     expected = selected.initial_composition
-    assert expected is not None and not expected.state.is_value
-    assert "unsupported numeric component(s): Cl" in expected.state.reason
+    assert expected is not None and expected.state.is_unknown
+    assert "Cl=0.81 wt%" in expected.state.reason
+    assert selected.printed_composition is not None
+    assert selected.printed_composition.state.is_value
+    source_map = observation["values"]["composition_wt_pct"]
+    # The source oxide cells sum to 95.68 wt%; printed Cl is 0.81 wt%, above
+    # the shared 0.5 wt% dropped-component limit.
+    assert as_decimal(source_map["Cl"]) == Decimal("0.81")
+    assert as_decimal(selected.printed_composition.state.value["Cl"]) == Decimal(
+        "0.81"
+    )
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -528,7 +599,7 @@ def test_plante_section_4_1_detection_limits_have_no_vacuum_conditions() -> None
     ),
 )
 def test_plante_glass_initials_use_analyzed_printed_map_by_name(
-    monkeypatch, experiment_id: str, bench: str
+    experiment_id: str, bench: str
 ) -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -543,15 +614,6 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
         name: float(value) for name, value in analytical_wt.items()
     }
 
-    convert = migrate_module.wt_pct_to_mole_fraction
-    seen: list[dict[str, Decimal]] = []
-
-    def record_map(wt):
-        if "Li2O" in wt:
-            seen.append({name: as_decimal(value) for name, value in wt.items()})
-        return convert(wt)
-
-    monkeypatch.setattr(migrate_module, "wt_pct_to_mole_fraction", record_map)
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrated_id = next(
         key
@@ -561,7 +623,7 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
     experiment = migrator.result.experiments[migrated_id]
 
     assert experiment.bench_id.endswith(f"::bench::{bench}")
-    assert analytical_wt in seen
+    # Table 1 already carries a typed initial; final map checks prove it survived selection.
     _assert_plante_samples_use_analyzed_composition(migrator.result, expected)
     _assert_plante_observations_use_analyzed_composition(migrator.result, expected)
 
@@ -990,9 +1052,333 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
         {"composition_wt_pct": values["composition_wt_pct"]},
         refusal_reason=refusal,
     ) is None
+    # Green refused the combined label, so (a) outranks the partial-analysis (b) reason.
     assert refusal == [
-        "printed oxide wt% map has unsupported numeric component(s): Na2O_plus_K2O"
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "Na2O_plus_K2O=4.2 wt%"
     ]
+
+
+def test_refused_nested_composition_does_not_absorb_sibling_conditions() -> None:
+    refusal: list[str] = []
+    values = {
+        "quantity": "composition",
+        "composition_wt_pct": {"SiO2": "55", "MgO": "40", "XxO": "10"},
+        "p_atm": "0.2",
+        "delta_IW": "-1.0",
+        "run": 7,
+    }
+
+    assert (
+        migrate_module._initial_oxide_map_from_values(
+            values, refusal_reason=refusal, declared_map=True
+        )
+        is None
+    )
+    assert len(refusal) == 1
+    assert "XxO=10 wt%" in refusal[0]
+    assert "p_atm" not in refusal[0]
+    assert "delta_IW" not in refusal[0]
+    assert "run" not in refusal[0]
+
+
+def test_declared_unknown_label_counts_as_dropped_mass() -> None:
+    printed = {
+        "SiO2": "60",
+        "MgO": "40",
+        "unknown-component": "40",
+    }
+    refusal: list[str] = []
+    assert _initial_oxide_map_from_values(
+        {"composition_wt_pct": printed},
+        refusal_reason=refusal,
+        declared_map=True,
+    ) is None
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    ]
+
+    sample = sample_from_equipment(
+        {},
+        values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "composition_wt_pct": printed,
+        },
+    )
+
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert (
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    ) in sample.initial_composition.state.reason
+
+
+def test_declared_unknown_trace_projects_with_notice() -> None:
+    source = {
+        "composition_wt_pct": {
+            "SiO2": "59.7",
+            "MgO": "40",
+            "unknown-component": "0.3",
+        }
+    }
+    wt = _initial_oxide_map_from_values(
+        source,
+        declared_map=True,
+    )
+    assert wt == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
+    notice = _projection_notice_from_printed_map(
+        wt,
+        closure_context=source,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
+    )
+    assert notice is not None
+    assert notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
+
+
+def test_scalar_reserved_metadata_in_explicit_map_is_malformed() -> None:
+    rejected_map = {
+        "SiO2": "50",
+        "MgO": "49",
+        "basis": "1",
+    }
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        {"composition_wt_pct": rejected_map},
+        refusal_reason=refusal,
+        refusal_classification=classification,
+    ) is None
+    # The record format reserves basis, so scalar content is malformed and unflagged.
+    assert refusal == [
+        "composition map has a scalar value under reserved key 'basis'"
+    ]
+    assert len(classification) == 1 and not classification[0].closure_refusal
+
+    string_source = {
+        "composition_wt_pct": {
+            "SiO2": "50",
+            "MgO": "50",
+            "basis": "oxide",
+        }
+    }
+    # The string basis remains metadata and is ignored inside the explicit map.
+    assert _oxide_map_from_mapping(string_source) == {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("50"),
+    }
+
+
+def test_nested_printed_composition_walk_metadata_is_value_aware() -> None:
+    rejected_context = {
+        "point_conditions": {
+            "printed_composition": {"SiO2": "50", "MgO": "50", "note": "1"}
+        }
+    }
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context=rejected_context,
+    )
+    # Green accepted the oxide map because it never read this nested note; m1 flags its >0.5 wt% contribution.
+    assert converted is None
+    assert refusal is not None and refusal.closure_refusal
+    assert "note=1 wt%" in refusal.reason
+
+    trace_context = {
+        "point_conditions": {
+            "printed_composition": {
+                "SiO2": "49.85",
+                "MgO": "49.85",
+                "note": "0.3",
+            }
+        }
+    }
+    trace, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")},
+        closure_context=trace_context,
+    )
+    # Green accepted the oxide map without reading the nested note; m1 accepts and discloses its trace.
+    assert refusal is None and trace is not None
+    notice = _projection_notice_from_printed_map(
+        {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")},
+        closure_context=trace_context,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+    )
+    assert notice is not None and notice.dropped == ("note",)
+    assert "note=0.3 wt%" in notice.reason
+
+    text_context = {
+        "point_conditions": {
+            "printed_composition": {"SiO2": "50", "MgO": "50", "note": "text"}
+        }
+    }
+    text_result, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context=text_context,
+    )
+    # Green accepted the oxide map without reading this non-numeric nested note; m1 ignores the metadata.
+    assert refusal is None and text_result is not None
+
+
+def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
+    rejected = {
+        "SiO2": "50",
+        "MgO": "49",
+        "unknown-component": "1",
+    }
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        rejected,
+        refusal_reason=refusal,
+        refusal_classification=classification,
+        declared_map=True,
+    ) is None
+    # Green read and refused the unsupported numeric label, so the refusal is unflagged (a).
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=1 wt%"
+    ]
+    assert len(classification) == 1 and not classification[0].closure_refusal
+
+    trace = {
+        "SiO2": "50.2",
+        "MgO": "49.5",
+        "unknown-component": "0.3",
+    }
+    parsed = _oxide_map_from_mapping(trace, declared_map=True)
+    assert parsed == {"SiO2": Decimal("50.2"), "MgO": Decimal("49.5")}
+    notice = _projection_notice_from_printed_map(
+        parsed,
+        closure_context=trace,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=trace,
+    )
+    # Green accepted the trace label; the approved rule accepts it with disclosure.
+    assert notice is not None and notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
+
+
+def test_declared_flat_map_counts_bare_phosphorus() -> None:
+    values = {"SiO2": "50", "MgO": "49", "P": "1"}
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        values,
+        refusal_reason=refusal,
+        refusal_classification=classification,
+        declared_map=True,
+    ) is None
+    # Green accepted elemental P as a non-oxide; its 1 wt% excess is a flagged closure refusal (b).
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "P=1 wt%"
+    ]
+    assert len(classification) == 1 and classification[0].closure_refusal
+
+
+def test_formula_unknown_trace_projects_with_notice() -> None:
+    source = {
+        "composition_wt_pct": {
+            "SiO2": "49.85",
+            "MgO": "49.85",
+            "XxO": "0.3",
+        }
+    }
+    wt = _initial_oxide_map_from_values(source, declared_map=True)
+    assert wt == {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")}
+
+    notice = _projection_notice_from_printed_map(
+        wt,
+        closure_context=source,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
+    )
+
+    assert notice is not None
+    assert notice.dropped == ("XxO",)
+    assert "XxO=0.3 wt%" in notice.reason
+
+
+@pytest.mark.parametrize("has_quantity", (False, True))
+@pytest.mark.parametrize("has_closure_context", (False, True))
+@pytest.mark.parametrize("has_unknown_oxide", (False, True))
+def test_initial_map_declaredness_comes_from_named_field_structure(
+    has_quantity: bool,
+    has_closure_context: bool,
+    has_unknown_oxide: bool,
+) -> None:
+    flat_row: dict[str, object] = {
+        "SiO2": "60",
+        "MgO": "40",
+        "p_Pa": "101325",
+        "invT_times_1e4_K_inv": "5.2",
+        "residual": "0.03",
+    }
+    if has_quantity:
+        flat_row["quantity"] = "composition"
+    if has_unknown_oxide:
+        flat_row["XxO"] = "10"
+    refusal: list[str] = []
+    if has_closure_context:
+        parsed = _initial_oxide_map_from_values(
+            flat_row,
+            refusal_reason=refusal,
+            declared_map=True,
+            closure_context=flat_row,
+        )
+    else:
+        parsed = _initial_oxide_map_from_values(
+            flat_row, refusal_reason=refusal, declared_map=True
+        )
+
+    if has_unknown_oxide:
+        assert parsed is None
+        assert len(refusal) == 1 and "XxO=10 wt%" in refusal[0]
+    else:
+        assert parsed == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+        assert refusal == []
+
+
+def test_named_initial_map_unknown_mass_is_refused_and_trace_is_noticed() -> None:
+    rejected = {
+        "composition_wt_pct": {
+            "SiO2": "60",
+            "MgO": "40",
+            "unknown-component": "40",
+        }
+    }
+    refusal: list[str] = []
+    assert _initial_oxide_map_from_values(
+        rejected, refusal_reason=refusal, declared_map=True
+    ) is None
+    assert len(refusal) == 1 and "unknown-component=40 wt%" in refusal[0]
+
+    trace = {
+        "composition_wt_pct": {
+            "SiO2": "59.7",
+            "MgO": "40",
+            "unknown-component": "0.3",
+        }
+    }
+    parsed = _initial_oxide_map_from_values(trace, declared_map=True)
+    assert parsed == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
+    notice = _projection_notice_from_printed_map(
+        parsed,
+        closure_context=trace,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=trace["composition_wt_pct"],
+    )
+    assert notice is not None and notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
 
 
 def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
@@ -1085,6 +1471,11 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     point["composition_wt_pct"] = dict(
         point["composition_wt_pct"], XxO=10
     )
+    expected_printed_map = {
+        name: Decimal(str(amount))
+        for name, amount in point["composition_wt_pct"].items()
+    }
+    expected_printed_map["XxO"] = Decimal("10")
     prefix = f"{doc['source_id']}::{raw['observation_id']}"
     target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
     migrator = Migrator(REPO_ROOT)
@@ -1107,7 +1498,7 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     assert composition is not None and composition.is_unknown
     assert "per-run composition is not published" in composition.reason
     printed = row.point_conditions["printed_composition"]
-    assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
+    assert printed.state.is_value and printed.state.value == expected_printed_map
     condition = row.point_conditions["composition"]
     assert condition.state.is_unknown
     assert "per-run composition is not published" in condition.state.reason
@@ -1145,8 +1536,23 @@ def test_markova_initial_charge_stays_context_under_refusal_mutation(
     point["composition_wt_pct"] = dict(point["composition_wt_pct"], XxO=10)
     original_parse = migrate_module._oxide_map_from_mapping
 
-    def discard_refusal(obj, *, refusal_reason=None, declared_map=False):
-        return original_parse(obj, declared_map=declared_map)
+    def discard_refusal(
+        obj,
+        *,
+        refusal_reason=None,
+        refusal_classification=None,
+        declared_map=False,
+        declared_component_map=None,
+        closure_context=None,
+        preserve_printed_map_on_refusal=False,
+    ):
+        return original_parse(
+            obj,
+            declared_map=declared_map,
+            declared_component_map=declared_component_map,
+            closure_context=closure_context,
+            preserve_printed_map_on_refusal=preserve_printed_map_on_refusal,
+        )
 
     monkeypatch.setattr(migrate_module, "_oxide_map_from_mapping", discard_refusal)
     original_load_yaml = migrate_module.load_yaml
@@ -1185,9 +1591,20 @@ def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> 
     )
     original_reader = migrate_module._initial_oxide_map_from_values
 
-    def drop_declaration(values, *, refusal_reason=None, declared_map=False):
+    def drop_declaration(
+        values,
+        *,
+        refusal_reason=None,
+        declared_map=False,
+        declared_component_map=None,
+        closure_context=None,
+    ):
         return original_reader(
-            values, refusal_reason=refusal_reason, declared_map=False
+            values,
+            refusal_reason=refusal_reason,
+            declared_map=False,
+            declared_component_map=declared_component_map,
+            closure_context=closure_context,
         )
 
     monkeypatch.setattr(
@@ -1235,18 +1652,21 @@ def test_wt_percent_derivation_ignores_printed_totals() -> None:
     assert "M_Total_g_mol" not in dict(derivation.parameters)
 
 
-def test_nested_and_flat_composition_maps_skip_mass_loss_conditions() -> None:
-    components = {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+def test_nested_map_counts_numeric_conditions_but_flat_row_skips_them() -> None:
+    components = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    refusal: list[str] = []
     assert _initial_oxide_map_from_values(
-        {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}}
-    ) == components
+        {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}},
+        refusal_reason=refusal,
+    ) is None
+    assert len(refusal) == 1 and "mass_loss_wt_pct=10 wt%" in refusal[0]
     assert _initial_oxide_map_from_values(
         {**components, "mass_loss_wt_pct": 10}, declared_map=True
     ) == components
 
 
 def test_declared_map_skips_sample_codes_flags_and_condition_fields() -> None:
-    components = {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    components = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
 
     assert _initial_oxide_map_from_values(
         {
@@ -1539,6 +1959,289 @@ def test_activity_row_without_numeric_point_keeps_explicit_point_composition(
     assert mutated_row.point_conditions["composition"].locator.table == "1"
 
 
+def test_exploded_activity_child_renormalizes_high_mass_percent_composition(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "composition_wt_pct": {
+                            "SiO2": "55",
+                            "MgO": "47.8",
+                            "XxO": "0.2",
+                        },
+                        "locator": {"table": "2", "page": 3},
+                    }
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "exploded", extract), write=False)
+    children = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    ]
+    assert len(children) == 1
+    child = children[0]
+
+    condition = child.point_conditions["composition"]
+    assert condition.state.is_value
+    composition = condition.state.value
+    expected = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("55"), "MgO": Decimal("47.8")}
+    )
+    actual = (
+        composition
+        if composition.amount_basis is AmountBasis.MOLE_FRACTION
+        else wt_pct_to_mole_fraction(composition.as_map())
+    )
+    assert actual == expected
+    projection_notices = [
+        notice
+        for notice in child.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert len(projection_notices) == 1
+    projection_notice = projection_notices[0]
+    assert projection_notice.dropped == ("XxO",)
+    renormalization_notices = [
+        notice
+        for notice in child.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+    assert len(renormalization_notices) == 1
+    renormalization_notice = renormalization_notices[0]
+    assert renormalization_notice.original == Decimal("102.8")
+    assert renormalization_notice.affected_quantities == (
+        Quantity.ACTIVITY_COEFFICIENT,
+    )
+    assert "renormalized to 100 wt%" in renormalization_notice.reason
+    assert "d-336 item 2" in renormalization_notice.reason
+    carried = child.point_conditions["composition"]
+    assert carried.inference is not None
+    assert any(
+        item.startswith(
+            "projected trace components omitted from engine composition: XxO=0.2 wt%"
+        )
+        for item in carried.inference.inputs
+    )
+    assert any(
+        item.startswith("projected trace mass fraction: ")
+        for item in carried.inference.inputs
+    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+    assert condition.locator is not None
+    assert condition.locator.table == "2"
+    assert condition.locator.page == 3
+
+
+def test_exploded_children_recompute_renormalization_notice_after_closure(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                    },
+                    {
+                        "T_K": 1573,
+                        "gamma": "0.4",
+                        "composition_wt_pct": {"SiO2": "56", "MgO": "50"},
+                    },
+                    {
+                        "T_K": 1673,
+                        "gamma": "0.3",
+                        "composition_wt_pct": {"SiO2": "55", "MgO": "48"},
+                    },
+                    {
+                        "T_K": 1773,
+                        "gamma": "0.2",
+                        "composition_wt_pct": {"SiO2": "52", "MgO": "48"},
+                    },
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    children = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=")
+    ]
+    inherited = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1473")
+    )
+    refused = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1573")
+    )
+    admitted = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1673")
+    )
+    normalized = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1773")
+    )
+
+    assert inherited.identity.composition is not None
+    assert inherited.identity.composition.is_value
+    inherited_notices = [
+        notice
+        for notice in inherited.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+    assert len(inherited_notices) == 1
+    assert inherited_notices[0].original == Decimal("104")
+
+    assert refused.identity.composition is not None
+    refused_condition = refused.point_conditions["composition"]
+    assert refused_condition.state.is_unknown
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+        for notice in refused.notices
+    )
+    admitted_notices = [
+        notice
+        for notice in admitted.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+    assert len(admitted_notices) == 1
+    assert admitted_notices[0].original == Decimal("103")
+    assert normalized.identity.composition is not None
+    assert normalized.identity.composition.is_value
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+        for notice in normalized.notices
+    )
+
+
+
+@pytest.mark.parametrize(
+    ("identity_fields", "catalogue"),
+    (
+        # Green refused the parallel ambiguous mass map and wrote unknown identity.
+        pytest.param(
+            {"composition_mol": {"SiO2": "0.5", "MgO": "0.5"}},
+            False,
+            id="green-refusal-overwrites-mole-identity",
+        ),
+        # Green refused the parallel ambiguous mass map and wrote unknown identity.
+        pytest.param(
+            {
+                "composition_from_sample_catalog": True,
+                "composition_source": "fixture catalogue source",
+                "sample_oxide_composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+            },
+            True,
+            id="green-refusal-overwrites-catalogue-identity",
+        ),
+    ),
+)
+def test_unflagged_mass_refusal_overwrites_parallel_point_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    identity_fields: dict[str, object],
+    catalogue: bool,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        **identity_fields,
+                        "composition_wt_pct": {
+                            "SiO2": "50",
+                            "FeO": "20",
+                            "FeOT": "30",
+                        },
+                    }
+                ],
+            },
+        }
+    )
+    catalogue_calls: list[object] = []
+    if catalogue:
+        valid_catalogue = _catalogue_composition_located_from_values(
+            {
+                "composition_from_sample_catalog": True,
+                "sample_oxide_composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+            },
+            None,
+        )
+        assert valid_catalogue is not None
+
+        def return_catalogue(values: object, locator: Locator | None):
+            catalogue_calls.append(values)
+            return replace(valid_catalogue, locator=locator)
+
+        monkeypatch.setattr(
+            migrate_module,
+            "_catalogue_composition_located_from_values",
+            return_catalogue,
+        )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    )
+
+    if catalogue:
+        assert catalogue_calls
+    assert child.identity.composition is not None
+    assert child.identity.composition.is_unknown
+    assert child.identity.composition.reason == (
+        "ambiguous total iron components: FeOT with FeO"
+    )
+
+
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
     tmp_path: Path,
 ) -> None:
@@ -1719,7 +2422,7 @@ def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
             "points": [
                 {
                     "composition_wt_pct": {
-                        "SiO2": Decimal("50"),
+                        "SiO2": Decimal("60"),
                         "MgO": Decimal("40"),
                     },
                     "T_C": Decimal("0"),
@@ -1727,7 +2430,7 @@ def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
                 }
             ]
         }
-    ) == {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    ) == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
 
 
 def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
@@ -1758,6 +2461,218 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
+def test_typed_mass_percent_initial_preserves_blank_printed_component() -> None:
+    initial = {
+        "locator": {"table": "3"},
+        "state": {
+            "tag": "value",
+            "value": {
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [["SiO2", None], ["MgO", "100"]],
+            },
+        },
+    }
+
+    printed = migrate_module._mass_percent_printed_from_plain(initial)
+    sample = _sample_from_plain({"initial_composition": initial})
+
+    assert printed is not None
+    assert printed.state.is_value
+    assert printed.state.value == {"SiO2": None, "MgO": "100"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == printed.state.value
+
+
+def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() -> None:
+    composition = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "50"], ["MgO", "50"], ["H2O", None]],
+    }
+    serialized = {"tag": "value", "value": composition}
+
+    located = migrate_module._composition_located_from_plain(serialized)
+    printed = migrate_module._mass_percent_printed_from_plain(composition)
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": serialized,
+        }
+    )
+
+    assert located.state.is_value
+    assert set(dict(located.state.value.components)) == {"SiO2", "MgO"}
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value == {"SiO2": "50", "MgO": "50", "H2O": None}
+    assert identity.composition is not None and identity.composition.is_value
+    assert set(dict(identity.composition.value.components)) == {"SiO2", "MgO"}
+
+
+def test_typed_mass_percent_as_printed_echo_is_ignored_before_classification() -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [
+            ["SiO2", "100"],
+            ["H2O", "0"],
+            ["H2O_wt_pct_as_printed", "″"],
+        ],
+    }
+
+    located = migrate_module._composition_located_from_plain(payload)
+    wt = migrate_module._mass_percent_components(payload)
+
+    assert located.state.is_value
+    assert wt == {"SiO2": Decimal("100"), "H2O": Decimal("0")}
+    assert migrate_module._printed_volatile_mass_percent(
+        {"composition_mass_percent": payload}
+    ) == {"H2O": Decimal("0")}
+
+
+def test_typed_mass_percent_printed_map_keeps_uncertainty_text_verbatim() -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "50.0 ± 2.0"], ["MgO", "50.0"]],
+    }
+
+    printed = migrate_module._mass_percent_printed_from_plain(payload)
+
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value == {"SiO2": "50.0 ± 2.0", "MgO": "50.0"}
+
+
+def test_point_condition_printed_map_keeps_uncertainty_text_verbatim() -> None:
+    payload = {
+        "state": {
+            "tag": "value",
+            "value": {"SiO2": "50 ± 1", "MgO": "50.0"},
+        }
+    }
+
+    printed = migrate_module._point_condition_from_plain(
+        payload, key="printed_composition"
+    )
+
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": "50 ± 1",
+        "MgO": Decimal("50.0"),
+    }
+
+
+def test_point_condition_printed_map_refuses_scalar_locator_and_ignores_real_locator() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "locator": 1},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'locator'" in (
+        printed.state.reason or ""
+    )
+    refused, reason = migrate_module._printed_mass_percent_map_refusal(
+        {"SiO2": "50", "MgO": "50", "locator": 1},
+        {},
+        reject_dropped_components=True,
+    )
+    assert refused
+    assert reason is not None and "reserved key 'locator'" in reason
+
+    real_locator = {"page": 2, "table": "1", "note": "printed composition"}
+    with_real_locator = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "locator": real_locator},
+        key="printed_composition",
+    )
+    assert with_real_locator.state.is_value
+    assert with_real_locator.state.value == {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("50"),
+    }
+    assert with_real_locator.locator is not None
+
+
+@pytest.mark.parametrize(
+    ("reserved_key", "value"),
+    (
+        ("state", Decimal("1")),
+        ("tag", Decimal("1")),
+        ("kind", Decimal("1")),
+        ("components", Decimal("0.3")),
+        ("amount_basis", "0.3"),
+        ("basis", Decimal("1")),
+        ("locator", Decimal("1")),
+        ("value", Decimal("1")),
+    ),
+)
+def test_reserved_scalar_composition_keys_are_unflagged_malformed_input(
+    reserved_key: str, value: object
+) -> None:
+    wt = {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85"), reserved_key: value}
+
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        wt, closure_context=wt, declared_component_map=wt
+    )
+
+    assert converted is None
+    assert refusal is not None and not refusal.closure_refusal
+    assert refusal.reason == (
+        "composition map has a scalar value under reserved key "
+        f"'{reserved_key}'"
+    )
+
+
+def test_point_condition_printed_map_kind_scalar_is_refused_without_decoding() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "kind": "0.3"},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'kind'" in (
+        printed.state.reason or ""
+    )
+
+
+def test_point_condition_printed_map_tag_scalar_is_refused() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "tag": 1},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'tag'" in (
+        printed.state.reason or ""
+    )
+
+
+def test_point_condition_invalid_state_tag_is_refused_without_decoding() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"state": {"tag": 1, "value": {"SiO2": "50", "MgO": "50"}}},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert printed.state.reason == "malformed point-condition state wrapper: invalid tag"
+
+
+def test_reserved_key_inside_typed_components_map_is_refused() -> None:
+    refused, reason = migrate_module._printed_mass_percent_map_refusal(
+        {
+            "amount_basis": "mass_percent",
+            "components": {"SiO2": "49.85", "MgO": "49.85", "basis": 1},
+        },
+        {},
+        reject_dropped_components=True,
+    )
+
+    assert refused
+    assert reason == "composition map has a scalar value under reserved key 'basis'"
+
+
 @pytest.mark.parametrize(
     ("amount_basis", "components_parser"),
     (
@@ -1781,12 +2696,18 @@ def test_percent_component_identity_validation_is_pinned(
     assert components_parser(
         payload([["SiO2", "60"], ["SiO2", "40"]])
     ) is None
-    assert components_parser(
-        payload([["SiO2", "60"], ["unknown-component", "40"]])
-    ) is None
+    unsupported = payload([["SiO2", "60"], ["unknown-component", "40"]])
+    if amount_basis is AmountBasis.MASS_PERCENT:
+        assert components_parser(unsupported) == {
+            "SiO2": Decimal("60"),
+            "unknown-component": Decimal("40"),
+        }
+    else:
+        assert components_parser(unsupported) is None
 
 
-def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> None:
+def test_mass_percent_map_with_small_assay_closure_error_converts() -> None:
+    # The printed 60.00 + 39.75 wt% assay totals 99.75, inside 95–102.
     composition = migrate_module._composition_located_from_plain(
         {
             "state": {
@@ -1794,7 +2715,7 @@ def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> Non
                 "value": {
                     "basis": "printed_oxides",
                     "amount_basis": "mass_percent",
-                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                    "components": [["SiO2", "60.00"], ["MgO", "39.75"]],
                 },
             }
         }
@@ -1802,7 +2723,2319 @@ def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> Non
 
     assert composition.state.is_value
     assert composition.state.value == wt_pct_to_mole_fraction(
-        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
+        {"SiO2": Decimal("60.00"), "MgO": Decimal("39.75")}
+    )
+
+
+@pytest.mark.parametrize(
+    ("total", "accepted"),
+    (
+        ("94.99", False),
+        ("95", True),
+        ("102", True),
+        ("102.01", True),
+        ("105", True),
+        ("105.01", False),
+    ),
+)
+def test_b704_kept_mass_acceptance_boundaries(total: str, accepted: bool) -> None:
+    # Kept mass from 95 through 105 wt% is accepted; totals above 102 normalize.
+    half = Decimal(total) / Decimal("2")
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": half, "MgO": half}
+    )
+    assert (converted is not None) is accepted
+    assert (refusal is None) is accepted
+
+
+def test_b1128_mass_percent_migration_renormalizes_kept_map() -> None:
+    printed = {"SiO2": Decimal("40"), "MgO": Decimal("64")}
+    state = migrate_module._mass_percent_composition_state(
+        printed, basis="printed_phase_composition"
+    )
+
+    assert state.is_value
+    assert state.value.amount_basis is AmountBasis.MASS_PERCENT
+    assert sum(state.value.as_map().values(), Decimal("0")) == Decimal("100")
+    expected_moles = wt_pct_to_mole_fraction(
+        {
+            name: amount * Decimal("100") / Decimal("104")
+            for name, amount in printed.items()
+        }
+    )
+    assert wt_pct_to_mole_fraction(state.value.as_map()) == expected_moles
+
+
+@pytest.mark.parametrize(
+    "basis", ("printed_oxides", "printed_phase_composition")
+)
+def test_b1128_renormalization_input_is_additive_to_base_store_load(
+    basis: str,
+) -> None:
+    written = migrate_module._mass_percent_composition_located(
+        {"SiO2": Decimal("55"), "MgO": Decimal("49")},
+        basis=basis,
+        locator=None,
+    )
+    serialized = to_plain(written)
+    assert isinstance(serialized, dict)
+    # The base loader ignored serialized inference and recomputed this derivation.
+    base_payload = {
+        key: value for key, value in serialized.items() if key != "inference"
+    }
+    base_loaded = migrate_module._point_condition_from_plain(
+        base_payload, key="composition"
+    )
+    loaded = migrate_module._point_condition_from_plain(
+        serialized, key="composition"
+    )
+
+    assert loaded.state == base_loaded.state
+    assert loaded.locator == base_loaded.locator
+    assert loaded.inference is not None
+    assert base_loaded.inference is not None
+    renormalization_input = (
+        "renormalized to 100 wt% from kept oxide total S=104 wt% "
+        "(d-336 item 2)"
+    )
+    assert renormalization_input not in base_loaded.inference.inputs
+    assert loaded.inference == replace(
+        base_loaded.inference,
+        inputs=(*base_loaded.inference.inputs, renormalization_input),
+    )
+    assert (
+        renormalization_input in loaded.inference.inputs
+    )
+
+
+def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data/literature/extracts/taniguchi-1997-feo-cas.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+    observation = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "taniguchi_1997_table5_sample_407_slag_fe_composition"
+        )
+    )
+    written = (observation.point_conditions or {})["composition"]
+    serialized = to_plain(written)
+    assert isinstance(serialized, dict)
+    # The serialized inference carries the dropped Fe trace through store load.
+    base_payload = {
+        key: value for key, value in serialized.items() if key != "inference"
+    }
+
+    base_loaded = migrate_module._point_condition_from_plain(
+        base_payload, key="composition"
+    )
+    loaded = migrate_module._point_condition_from_plain(
+        serialized, key="composition"
+    )
+
+    assert loaded.state == base_loaded.state
+    assert loaded.locator == base_loaded.locator
+    assert loaded.state.is_value
+    assert loaded.state.value.basis == "printed_oxides"
+    assert loaded.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert loaded.state.value.components == base_loaded.state.value.components
+    assert loaded.inference is not None
+    assert any(
+        item.startswith(
+            "projected trace components omitted from engine composition: Fe=0.0524 wt%"
+        )
+        for item in loaded.inference.inputs
+    )
+    assert any(
+        item.startswith("projected trace mass fraction: ")
+        for item in loaded.inference.inputs
+    )
+
+
+def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
+    printed = {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("47"),
+        "H2O": Decimal("7"),
+    }
+    located = migrate_module._mass_percent_composition_located(
+        printed,
+        basis="printed_oxides",
+        locator=None,
+        closure_context=printed,
+    )
+
+    assert located.state.is_value
+    assert located.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert migrate_module._mass_percent_kept_total(
+        printed, closure_context=printed
+    ) == Decimal("104")
+    assert located.inference is not None
+    assert (
+        "renormalized to 100 wt% from kept oxide total S=104 wt% (d-336 item 2)"
+        in located.inference.inputs
+    )
+
+
+@pytest.mark.parametrize(
+    ("echo", "resolved", "oxide_total", "expected_water"),
+    (
+        ("″", "0", "100", Decimal("0")),
+        ("5.21", "5.21", "99.5", Decimal("5.21")),
+        ("5.21", None, "99.5", None),
+    ),
+)
+def test_m1_as_printed_fields_are_not_composition_or_closure_components(
+    echo: str,
+    resolved: str | None,
+    oxide_total: str,
+    expected_water: Decimal | None,
+) -> None:
+    oxides = {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal(oxide_total) - Decimal("50"),
+    }
+    payload = {
+        "composition_wt_pct": oxides,
+        "H2O_WT_PCT_AS_PRINTED": echo,
+        "_migrate_closure_only_components": {
+            "H2O_wt_pct_as_printed": echo,
+        },
+    }
+    if resolved is not None:
+        payload["H2O_wt_pct"] = resolved
+
+    diagnostics: list[tuple[str, str]] = []
+    expected_volatile = (
+        {} if expected_water is None else {"H2O": expected_water}
+    )
+    assert migrate_module._printed_volatile_mass_percent(
+        payload, diagnostics=diagnostics
+    ) == expected_volatile
+    assert diagnostics == []
+    assert migrate_module._mass_percent_kept_total(
+        oxides, closure_context=payload
+    ) == Decimal(oxide_total) + (expected_water or Decimal("0"))
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        oxides, closure_context=payload, declared_component_map=oxides
+    )
+    assert converted is not None
+    assert refusal is None
+
+    assert migrate_module._printed_composition_map(
+        {"components": {"SiO2": "50", "FeO_as_printed": "″"}}
+    ) == {"SiO2": "50"}
+    oxide_diagnostics: list[tuple[str, str]] = []
+    assert migrate_module._oxide_mass_percent_components(
+        {
+            "SiO2": "50",
+            "MgO": "50",
+            "FeO_AS_PRINTED": "″",
+        },
+        diagnostics=oxide_diagnostics,
+    ) == {"SiO2": Decimal("50"), "MgO": Decimal("50")}
+    assert oxide_diagnostics == []
+    closure_only_diagnostics: list[tuple[str, str]] = []
+    assert migrate_module._printed_composition_closure_components(
+        {
+            "_migrate_closure_only_components": {
+                "FeO_AS_PRINTED": "″"
+            }
+        },
+        diagnostics=closure_only_diagnostics,
+    ) == {}
+    assert closure_only_diagnostics == []
+
+
+def test_gaillard_as_printed_water_echoes_keep_live_compositions() -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml"
+    )
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    series_rows = [
+        row
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        for row in (observation.get("values", {}).get("series", []) or [])
+        if isinstance(row, dict) and "H2O_wt_pct_as_printed" in row
+    ]
+    ditto_row = next(
+        row
+        for row in series_rows
+        if row["H2O_wt_pct_as_printed"] == "″"
+        and row.get("H2O_wt_pct") == "0"
+    )
+    numeric_row = next(
+        row
+        for row in series_rows
+        if row["H2O_wt_pct_as_printed"] == "5.21"
+        and row.get("H2O_wt_pct") == "5.21"
+    )
+    for row, water in ((ditto_row, Decimal("0")), (numeric_row, Decimal("5.21"))):
+        diagnostics: list[tuple[str, str]] = []
+        assert migrate_module._printed_volatile_mass_percent(
+            row, diagnostics=diagnostics
+        ) == {"H2O": water}
+        assert diagnostics == []
+        source_map = migrate_module._printed_composition_source_map(row)
+        assert source_map is not None
+        oxide_total = sum(
+            migrate_module._oxide_mass_percent_components(source_map).values(),
+            Decimal("0"),
+        )
+        assert migrate_module._mass_percent_kept_total(
+            {}, closure_context=row
+        ) == oxide_total + water
+        converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+            {
+                name: Decimal(str(amount))
+                for name, amount in source_map.items()
+            },
+            closure_context=row,
+            declared_component_map=source_map,
+        )
+        assert converted is not None
+        assert refusal is None
+
+    migrator = migrate_one_extract(REPO_ROOT, extract_path)
+    migrator.finalize()
+    compositions = [
+        observation.point_conditions["composition"]
+        for observation in migrator.result.observations.values()
+        if observation.source_id == extract_path.stem
+        and observation.point_conditions is not None
+        and "composition" in observation.point_conditions
+    ]
+    assert len(compositions) == 24
+    assert all(composition.state.is_value for composition in compositions)
+    source_map = migrate_module._printed_composition_source_map(ditto_row)
+    assert source_map is not None
+    expected_composition, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {
+            name: Decimal(str(amount))
+            for name, amount in source_map.items()
+        },
+        closure_context=ditto_row,
+        declared_component_map=source_map,
+    )
+    assert expected_composition is not None
+    assert refusal is None
+    assert any(
+        composition.state.is_value
+        and composition.state.value.as_map() == expected_composition.as_map()
+        for composition in compositions
+    )
+    assert not any(
+        "_as_printed" in (composition.state.reason or "")
+        for composition in compositions
+        if not composition.state.is_value
+    )
+
+
+def test_refused_high_kept_total_has_no_projection_notice() -> None:
+    printed = {
+        "SiO2": Decimal("40"),
+        "MgO": Decimal("64"),
+        "XxO": Decimal("1"),
+    }
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        printed,
+        closure_context=printed,
+        declared_component_map=printed,
+    )
+
+    assert converted is None
+    assert refusal is not None
+    notice = _projection_notice_from_printed_map(
+        printed,
+        closure_context=printed,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        origin="fixture",
+        declared_component_map=printed,
+    )
+    assert notice is None
+
+
+@pytest.mark.parametrize(
+    "components",
+    (
+        {"SiO2": "60.00", "MgO": "39.75"},
+        {"SiO2": "49.85", "MgO": "49.85", "unknown-component": "0.3"},
+        {"SiO2": "55.00", "MgO": "40.00", "H2O": "5.00"},
+    ),
+    ids=("near-complete", "trace-unsupported", "hydrous"),
+)
+def test_mass_closure_is_identical_through_plain_and_full_migration(
+    tmp_path: Path,
+    components: dict[str, str],
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["composition_role"] = "datum_state"
+    row["values"]["composition_wt_pct"] = components
+    plain = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": list(components.items()),
+                },
+            }
+        }
+    )
+    assert plain.state.is_value
+    public = wt_pct_to_mole_fraction(
+        {name: Decimal(value) for name, value in components.items()}
+    )
+    assert plain.state.value == public
+    if "unknown-component" in components:
+        assert plain.inference is not None
+        assert any("unknown-component" in item for item in plain.inference.inputs)
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    migrated = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::")
+    )
+    # A p_sat identity does not compare composition; the migrated row stores it in point_conditions.
+    composition = (migrated.point_conditions or {}).get("composition")
+    assert isinstance(composition, Located)
+    assert composition.state.is_value
+    assert composition.state.value == plain.state.value
+    if "unknown-component" in components:
+        assert composition.inference is not None
+        assert any("unknown-component" in item for item in composition.inference.inputs)
+        projected = [
+            notice
+            for notice in migrated.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(projected) == 1
+        assert projected[0].dropped == ("unknown-component",)
+
+
+@pytest.mark.parametrize(
+    ("trace_amount", "accepted"),
+    (("0.3", True), ("10", False)),
+    ids=("trace-start-accepted", "large-unknown-start-refused"),
+)
+def test_equilibrium_starting_bulk_uses_mass_closure_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    trace_amount: str,
+    accepted: bool,
+) -> None:
+    trace_name = "Na2O_plus_K2O" if accepted else "XxO"
+    wt = {"SiO2": "49.85", "MgO": "49.85", trace_name: trace_amount}
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "phase-start",
+            "sample": {
+                "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "printed_oxides",
+                            "amount_basis": "mass_percent",
+                            "components": list(wt.items()),
+                        },
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                },
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "phase-starting-bulk",
+            "experiment": "phase-start",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    row["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "49.85",
+    }
+
+    mass_closure_checks: list[dict[str, Decimal]] = []
+    convert = migrate_module._wt_percent_conversion_or_refusal
+
+    def track_mass_closure(
+        components: dict[str, Decimal],
+        *,
+        closure_context: object = None,
+        declared_component_map: dict[str, object] | None = None,
+    ):
+        mass_closure_checks.append(dict(components))
+        return convert(
+            components,
+            closure_context=closure_context,
+            declared_component_map=declared_component_map,
+        )
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_wt_percent_conversion_or_refusal",
+        track_mass_closure,
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    experiment = result.experiments[observation.experiment_id]
+    initial = experiment.sample.initial_composition
+    assert initial is not None
+    assert (initial.state.is_value) is accepted
+    # Exact count rejects a skipped guard (0) and a repeated guard (2).
+    assert len(mass_closure_checks) == 1, mass_closure_checks
+
+    composition = observation.identity.composition
+    assert composition is not None
+    assert (composition.is_value) is accepted
+    if accepted:
+        projection_notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(projection_notices) == 1
+        assert projection_notices[0].dropped == (trace_name,)
+        assert f"{trace_name}=0.3 wt%" in projection_notices[0].reason
+        assert initial.inference is not None
+        assert any(trace_name in item for item in initial.inference.inputs)
+        assert composition == initial.state
+        assert composition.value.components == wt_pct_to_mole_fraction(
+            {
+                name: Decimal(value)
+                for name, value in wt.items()
+                if name != trace_name
+            }
+        ).components
+    else:
+        assert "XxO=10 wt%" in initial.state.reason
+        assert composition.reason == initial.state.reason
+
+
+def test_phase_printed_blank_major_oxide_is_refused(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "phase-blank-major",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": None, "MgO": "50", "CaO": "50"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "phase-blank-major",
+            "experiment": "phase-blank-major",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    row["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "50",
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
+def test_printed_phase_vector_checks_mass_closure_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "phase-vector",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": "60", "MgO": "40"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "phase-vector",
+            "experiment": "phase-vector",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    row["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "60",
+    }
+
+    mass_closure_checks: list[dict[str, Decimal]] = []
+    convert = migrate_module._wt_percent_conversion_or_refusal
+
+    def track_mass_closure(
+        components: dict[str, Decimal],
+        *,
+        closure_context: object = None,
+        declared_component_map: dict[str, object] | None = None,
+    ):
+        mass_closure_checks.append(dict(components))
+        return convert(
+            components,
+            closure_context=closure_context,
+            declared_component_map=declared_component_map,
+        )
+
+    monkeypatch.setattr(
+        migrate_module, "_wt_percent_conversion_or_refusal", track_mass_closure
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert len(mass_closure_checks) == 1, mass_closure_checks
+    assert mass_closure_checks[0] == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+
+
+def _residue_ppm_extract(
+    printed_composition: dict[str, str | None], observation_id: str
+) -> dict:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "residue-run",
+            "sample": {
+                "initial_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "measured",
+                            "amount_basis": "mole_fraction",
+                            "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+                        },
+                    },
+                    "locator": {"table": "1"},
+                },
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": printed_composition,
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                },
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": observation_id,
+            "experiment": "residue-run",
+            "type": "residue_component_composition",
+            "units": "ppm",
+        }
+    )
+    row["values"] = {
+        "quantity": "residue_component_composition",
+        "method_class": "measured_direct",
+        "series": [
+            {"T_C": "1200", "run_id": "residue-run", "residue_ppm": "12.59"}
+        ],
+    }
+    return extract
+
+
+def _residue_ppm_observation(result):
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and item.identity.temperature_K.is_value
+        and item.identity.temperature_K.value == Decimal("1473.15")
+    )
+    return observation
+
+
+def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": None, "MgO": "50", "CaO": "50"}, "residue-blank-major"
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
+def test_residue_ppm_experiment_inherited_renormalization_notice(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": "55", "MgO": "49"}, "residue-renormalized"
+    )
+    result = migrate(_write_min_tree(tmp_path / "residue", extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+def test_residue_ppm_inherited_projection_uses_full_printed_total(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"CaO": "39.9", "Al2O3": "59.6", "Fe": "0.435"},
+        "residue-inherited-projection",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+
+    assert len(notices) == 1
+    assert notices[0].dropped == ("Fe",)
+    assert notices[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+        "99.935"
+    )
+    composition = observation.point_conditions["composition"]
+    assert composition.inference is not None
+    projection_inputs = [
+        item
+        for item in composition.inference.inputs
+        if item.startswith("projected trace mass fraction: ")
+    ]
+    assert projection_inputs == [
+        "projected trace mass fraction: "
+        + str(Decimal("0.435") / Decimal("99.935"))
+    ]
+
+
+def test_residue_ppm_inherited_renormalization_uses_closure_kept_total(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": "50", "MgO": "47", "H2O": "7"},
+        "residue-inherited-renormalization",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = _renormalization_notices(observation)
+
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+    composition = observation.point_conditions["composition"]
+    assert composition.inference is not None
+    renormalization_inputs = [
+        item
+        for item in composition.inference.inputs
+        if item.startswith("renormalized to 100 wt% from kept oxide total S=")
+    ]
+    assert renormalization_inputs == [
+        "renormalized to 100 wt% from kept oxide total S=104 wt% "
+        "(d-336 item 2)"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("components", "notice_kind"),
+    (
+        (
+            {"CaO": "39.9", "Al2O3": "59.6", "Fe": "0.435"},
+            NoticeKind.COMPOSITION_PROJECTED,
+        ),
+        (
+            {"SiO2": "50", "MgO": "47", "H2O": "7"},
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
+        ),
+    ),
+    ids=("projection", "renormalization"),
+)
+def test_row_local_composition_notices_use_closure_result(
+    tmp_path: Path,
+    components: dict[str, str],
+    notice_kind: NoticeKind,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "composition_wt_pct": components,
+                    }
+                ],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    )
+    condition = observation.point_conditions["composition"]
+    assert condition.inference is not None
+
+    if notice_kind is NoticeKind.COMPOSITION_PROJECTED:
+        notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(notices) == 1
+        assert notices[0].dropped == ("Fe",)
+        assert notices[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+            "99.935"
+        )
+        assert sum(
+            item.startswith("projected trace mass fraction: ")
+            for item in condition.inference.inputs
+        ) == 1
+    else:
+        notices = _renormalization_notices(observation)
+        assert len(notices) == 1
+        assert notices[0].original == Decimal("104")
+        assert sum(
+            item.startswith(
+                "renormalized to 100 wt% from kept oxide total S="
+            )
+            for item in condition.inference.inputs
+        ) == 1
+
+
+def _renormalization_notices(observation):
+    return tuple(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    )
+
+
+def test_liu_child_rebuild_keeps_composition_renormalization_notice(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["source_id"] = "liu-2023-chromium-oxide-activity"
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "phase_as_printed": "melt",
+                        "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                    }
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "liu", extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(
+            "liu-2023-chromium-oxide-activity::na_psat::T=1473"
+        )
+    )
+
+    notices = _renormalization_notices(child)
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+@pytest.mark.parametrize(
+    ("quantity", "point_value", "units", "valence_basis"),
+    (
+        ("density", {"density_kg_m3": "3000"}, "kg/m3", None),
+        (
+            "valence_ratio",
+            {"value": "0.5"},
+            "dimensionless",
+            {
+                "numerator_oxidation_states": [1],
+                "denominator_kind": "total_element",
+                "value_form": "fraction",
+            },
+        ),
+    ),
+)
+def test_late_child_composition_conversion_keeps_renormalization_notice(
+    tmp_path: Path,
+    quantity: str,
+    point_value: dict[str, str],
+    units: str,
+    valence_basis: dict | None,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    values = {
+        "quantity": quantity,
+        "method_class": "measured_direct",
+        "series": [
+            {
+                "T_K": 1473,
+                **point_value,
+                "point_conditions": {
+                    "composition": {
+                        "state": {
+                            "tag": "value",
+                            "value": {"SiO2": "55", "MgO": "49"},
+                        },
+                        "locator": {"table": "2", "page": 3},
+                    }
+                },
+            }
+        ],
+    }
+    if valence_basis is not None:
+        values["valence_basis"] = valence_basis
+    row.update(
+        {
+            "type": quantity,
+            "phase": "l",
+            "units": units,
+            "values": values,
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / quantity, extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(f"fixture-source::na_psat::T=1473")
+    )
+
+    notices = _renormalization_notices(child)
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+_INDEPENDENT_KEPT_COMPONENTS = {
+    "Al2O3",
+    "CaF2",
+    "CaO",
+    "FeO",
+    "K2O",
+    "MgO",
+    "Na2O",
+    "P2O5",
+    "SiO2",
+    "T.Fe",
+    "TiO2",
+}
+
+_INDEPENDENT_TOTAL_IRON_ELEMENT_KEYS = {
+    "t.fe",
+    "tfe",
+    "total fe",
+    "total iron",
+}
+
+
+def _independent_kept_oxide_total(cells: object) -> Decimal | None:
+    if not isinstance(cells, dict):
+        return None
+    total = Decimal("0")
+    for name, raw in cells.items():
+        if name not in _INDEPENDENT_KEPT_COMPONENTS:
+            continue
+        try:
+            amount = Decimal(str(raw))
+        except (InvalidOperation, TypeError):
+            continue
+        if amount.is_finite() and amount >= 0:
+            total += amount
+    return total
+
+
+def _independent_total_iron_element_only(cells: object) -> bool:
+    if not isinstance(cells, dict):
+        return False
+    names = {str(name).strip().casefold() for name in cells}
+    return bool(names & _INDEPENDENT_TOTAL_IRON_ELEMENT_KEYS) and not bool(
+        names & {"feo", "fe2o3", "feot", "feo_t", "feo*"}
+    )
+
+
+def _printed_cells_for_source_row(row: dict, experiments: dict) -> object:
+    values = row.get("values") or {}
+    for field in (
+        "oxide_wt_pct_as_printed",
+        "composition_wt_percent_as_printed",
+        "composition_wt_pct",
+    ):
+        cells = values.get(field)
+        if isinstance(cells, dict):
+            return cells
+    experiment = experiments.get(row.get("experiment"))
+    sample = experiment.get("sample") if isinstance(experiment, dict) else None
+    printed = sample.get("printed_composition") if isinstance(sample, dict) else None
+    state = printed.get("state") if isinstance(printed, dict) else None
+    cells = state.get("value") if isinstance(state, dict) else None
+    return cells if isinstance(cells, dict) else None
+
+
+def test_renormalization_notice_follows_composition_across_source_stores() -> None:
+    extract_names = (
+        "doyle-1988-feo-activity-multicomponent-magma.yaml",
+        "doyle-1989-tio2-feo-activity-magma.yaml",
+        "kunisada-1986-na-silicate-dephosphorization.yaml",
+        "taniguchi-1997-feo-cas.yaml",
+    )
+    band = "95-102 wt% kept oxide total"
+    kunisada_flux_eh_refusals = 0
+
+    for name in extract_names:
+        extract_path = REPO_ROOT / "data/literature/extracts" / name
+        source = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+        source_id = source["source_id"]
+        source_rows = [
+            row
+            for species in source["species"].values()
+            for row in species["observations"]
+        ]
+        experiments = {
+            experiment["experiment_id"]: experiment
+            for experiment in source.get("experiments", [])
+        }
+        migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+        migrator._migrate_extract(extract_path)
+        migrator.finalize()
+        for observation in migrator.result.observations.values():
+            source_observation_id = observation.observation_id.removeprefix(
+                f"{source_id}::"
+            )
+            source_row = max(
+                (
+                    row
+                    for row in source_rows
+                    if source_observation_id == row.get("observation_id")
+                    or source_observation_id.startswith(
+                        f"{row.get('observation_id')}::"
+                    )
+                ),
+                key=lambda row: len(str(row.get("observation_id", ""))),
+                default=None,
+            )
+            assert source_row is not None, observation.observation_id
+            cells = _printed_cells_for_source_row(source_row, experiments)
+            kept_total = _independent_kept_oxide_total(cells)
+            elemental_total_iron = _independent_total_iron_element_only(cells)
+            composition = observation.identity.composition
+            admitted_composition = composition is not None and composition.is_value
+            if admitted_composition:
+                assert cells is not None, observation.observation_id
+            notices = tuple(
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == band
+            )
+            should_notice = (
+                admitted_composition
+                and kept_total is not None
+                and Decimal("102") < kept_total <= Decimal("105")
+                and not elemental_total_iron
+            )
+            assert len(notices) == int(should_notice), observation.observation_id
+            if should_notice:
+                assert len(notices) == 1
+                assert notices[0].original == kept_total
+            source_experiment = str(source_row.get("experiment") or "")
+            if (
+                source_id == "kunisada-1986-na-silicate-dephosphorization"
+                and source_experiment
+                in {
+                    "kunisada-1986-na2co3-flux-e",
+                    "kunisada-1986-na2co3-flux-h",
+                }
+                and composition is not None
+                and elemental_total_iron
+                and kept_total is not None
+                and Decimal("102") < kept_total <= Decimal("105")
+            ):
+                kunisada_flux_eh_refusals += 1
+                assert composition is not None and composition.is_unknown
+                assert (
+                    "total iron printed as element: renormalisation depends on "
+                    "the iron valence convention, pending an owner ruling"
+                    in composition.reason
+                )
+            loaded = migrate_module.observation_from_plain(to_plain(observation))
+            loaded_notices = _renormalization_notices(loaded)
+            assert len(loaded_notices) == int(should_notice), observation.observation_id
+            if should_notice:
+                assert loaded_notices[0].original == kept_total
+                composition = (loaded.point_conditions or {}).get("composition")
+                assert isinstance(composition, Located)
+                assert composition.inference is not None
+                assert (
+                    "renormalized to 100 wt% from kept oxide total "
+                    f"S={kept_total} wt% (d-336 item 2)"
+                    in composition.inference.inputs
+                ), observation.observation_id
+    assert kunisada_flux_eh_refusals == 16
+
+
+def test_initial_charge_mass_loss_map_refuses_blank_suffixed_major_oxide() -> None:
+    values = {
+        "quantity": "composition_wt_pct",
+        "points": [
+            {
+                "T_C": 0,
+                "mass_loss_pct": 0,
+                "SiO2_wt_pct": None,
+                "MgO_wt_pct": 50,
+                "CaO_wt_pct": 50,
+            }
+        ],
+    }
+    refusal: list[str] = []
+
+    assert (
+        _initial_oxide_map_from_values(
+            values,
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        is None
+    )
+    assert refusal and "missing major oxides: SiO2" in refusal[0]
+
+
+def test_nested_oxide_wt_percent_parser_refuses_blank_major_oxide() -> None:
+    values = {
+        "quantity": "composition_wt_pct",
+        "oxide_wt_percent": {"SiO2": None, "MgO": 50, "CaO": 50},
+    }
+    refusal: list[str] = []
+
+    assert (
+        _initial_oxide_map_from_values(
+            values,
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        is None
+    )
+    assert refusal and "missing major oxides: SiO2" in refusal[0]
+
+
+def test_equipment_printed_fingerprint_retains_blank_major_oxide() -> None:
+    sample = sample_from_equipment(
+        {
+            "locator": {"table": "1"},
+            "starting_glass_wt_pct": {
+                "SiO2": None,
+                "MgO": "50",
+                "CaO": "50",
+            },
+        },
+        values={},
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.is_value
+    assert sample.printed_composition.state.value["SiO2"] is None
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "missing major oxides: SiO2" in sample.initial_composition.state.reason
+
+
+_BLANK_MAJOR_READERS = (
+    "untyped_observation",
+    "nested_oxide_wt_percent",
+    "mass_loss_t0",
+    "equipment_starting_glass",
+    "residue_ppm",
+    "phase_vector",
+)
+_BLANK_MAJOR_KEYS = (
+    "SiO2",
+    "SiO2_wt_pct",
+    "SiO2_wt_percent",
+    "SiO2 wt%",
+    "AlO1.5",
+)
+_BAD_COMPOSITION_CELLS = (
+    None,
+    "",
+    " ",
+    "n/a",
+    "not reported",
+    False,
+    "abc",
+    "50 (1)",
+)
+
+
+def _composition_map_with_bad_major(key: str, cell: object) -> dict:
+    if key == "AlO1.5":
+        return {"SiO2": "50", "MgO": "25", "CaO": "25", key: cell}
+    return {"MgO": "50", "CaO": "50", key: cell}
+
+
+def _migrate_composition_reader_case(
+    tmp_path: Path,
+    reader: str,
+    printed_map: dict,
+):
+    extract = deepcopy(FIXTURE_EXTRACT)
+    experiment_id = f"blank-cell-{reader}"
+    sample = {
+        "printed_composition": {
+            "state": {"tag": "value", "value": printed_map},
+            "locator": {"table": "1", "row": "1"},
+        }
+    }
+    if reader == "residue_ppm":
+        sample["initial_composition"] = {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "measured",
+                    "amount_basis": "mole_fraction",
+                    "components": [
+                        ["SiO2", "0.5"],
+                        ["MgO", "0.25"],
+                        ["CaO", "0.25"],
+                    ],
+                },
+            },
+            "locator": {"table": "1"},
+        }
+    else:
+        sample["composition_role"] = INITIAL_CHARGE_ONLY_PROXY_FLAG
+    extract["experiments"] = [
+        {"experiment_id": experiment_id, "sample": sample}
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": experiment_id,
+            "experiment": experiment_id,
+            "type": (
+                "residue_component_composition"
+                if reader == "residue_ppm"
+                else "composition_series"
+            ),
+            "units": "ppm" if reader == "residue_ppm" else "wt percent",
+        }
+    )
+    if reader == "residue_ppm":
+        row["values"] = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "series": [
+                {
+                    "T_C": "1200",
+                    "run_id": experiment_id,
+                    "residue_ppm": "12.59",
+                }
+            ],
+        }
+    else:
+        row["values"] = {
+            "quantity": "equilibrium_phase_composition",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "phase_label": "melt",
+            "basis": "wt_percent",
+            "component_amount": "50",
+        }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            f"fixture-source::{experiment_id}"
+        )
+    )
+    return observation.identity.composition
+
+
+def _composition_reader_outcome(
+    tmp_path: Path,
+    reader: str,
+    printed_map: dict,
+) -> tuple[bool, str | None, object]:
+    if reader == "untyped_observation":
+        _printed, initial = migrate_module._located_printed_and_initial(
+            printed_map,
+            Locator(table="1"),
+            closure_context=printed_map,
+            declared_component_map=printed_map,
+        )
+        assert initial is not None
+        if initial.state.is_unknown:
+            return False, initial.state.reason, None
+        return True, None, initial.state.value.components
+    if reader == "nested_oxide_wt_percent":
+        refusal: list[str] = []
+        components = _initial_oxide_map_from_values(
+            {"quantity": "composition_wt_pct", "oxide_wt_percent": printed_map},
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        return components is not None, "; ".join(refusal) or None, components
+    if reader == "mass_loss_t0":
+        refusal = []
+        components = _initial_oxide_map_from_values(
+            {
+                "quantity": "composition_wt_pct",
+                "points": [
+                    {
+                        "T_C": 0,
+                        "mass_loss_pct": 0,
+                        **printed_map,
+                    }
+                ],
+            },
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        return components is not None, "; ".join(refusal) or None, components
+    if reader == "equipment_starting_glass":
+        sample = sample_from_equipment(
+            {
+                "locator": {"table": "1"},
+                "starting_glass_wt_pct": printed_map,
+            },
+            values={},
+        )
+        initial = sample.initial_composition
+        if initial is None:
+            return False, "equipment reader did not produce an initial state", None
+        if initial.state.is_unknown:
+            return False, initial.state.reason, None
+        return True, None, initial.state.value.components
+
+    composition = _migrate_composition_reader_case(tmp_path, reader, printed_map)
+    if composition is None:
+        return False, "migration reader did not produce a composition state", None
+    if composition.is_unknown:
+        return False, composition.reason, None
+    return True, None, composition.value.components
+
+
+@pytest.mark.parametrize(
+    ("reader", "key", "cell"),
+    [
+        (reader, key, cell)
+        for reader in _BLANK_MAJOR_READERS
+        for key in _BLANK_MAJOR_KEYS
+        for cell in _BAD_COMPOSITION_CELLS
+    ],
+)
+def test_bad_declared_major_cells_refuse_through_every_reader(
+    tmp_path: Path,
+    reader: str,
+    key: str,
+    cell: object,
+) -> None:
+    printed_map = _composition_map_with_bad_major(key, cell)
+    valid, refusal, _components = _composition_reader_outcome(
+        tmp_path, reader, printed_map
+    )
+
+    assert not valid, (reader, key, cell)
+    assert refusal
+
+
+@pytest.mark.parametrize("reader", _BLANK_MAJOR_READERS)
+def test_valid_major_map_is_unchanged_through_every_reader(
+    tmp_path: Path,
+    reader: str,
+) -> None:
+    printed_map = {"SiO2": "50", "MgO": "25", "CaO": "25"}
+    valid, refusal, components = _composition_reader_outcome(
+        tmp_path, reader, printed_map
+    )
+
+    assert valid, refusal
+    expected = wt_pct_to_mole_fraction(
+        {name: Decimal(value) for name, value in printed_map.items()}
+    ).components
+    if reader in {"nested_oxide_wt_percent", "mass_loss_t0", "residue_ppm"}:
+        assert dict(components) == {
+            name: Decimal(value) for name, value in printed_map.items()
+        }
+    else:
+        assert dict(components) == dict(expected)
+
+
+def test_malformed_minor_component_is_not_treated_as_missing_major() -> None:
+    printed_map = {
+        "SiO2": "50",
+        "MgO": "25",
+        "CaO": "25",
+        "ZrO2": "abc",
+    }
+    _printed, initial = migrate_module._located_printed_and_initial(
+        printed_map,
+        Locator(table="1"),
+        closure_context=printed_map,
+        declared_component_map=printed_map,
+    )
+
+    assert initial is not None
+    assert initial.state.is_unknown
+    assert "missing major oxides" not in initial.state.reason
+
+
+@pytest.mark.parametrize(
+    ("printed", "expected"),
+    [
+        ("50 ± 1", Decimal("50")),
+        ("50±1", Decimal("50")),
+        ("50 +/- 1", Decimal("50")),
+        ("50+/-1", Decimal("50")),
+        ("50 (1)", None),
+    ],
+)
+def test_composition_cell_classifier_matches_printed_amount_reader(
+    printed: str,
+    expected: Decimal | None,
+) -> None:
+    assert migrate_module._printed_composition_amount(printed) == expected
+    kind, amount = migrate_module._classify_composition_cell(printed)
+
+    if expected is None:
+        assert kind == "malformed"
+        assert amount is None
+    else:
+        assert (kind, amount) == ("number", expected)
+
+
+def test_composition_cell_classifier_matches_green_numeric_reader_union() -> None:
+    # Green's typed map / point-map scalar readers use as_decimal via
+    # _as_dec_or_none; its printed-oxide reader additionally strips ±, and
+    # _point_condition_from_plain unwraps state/value wrappers.
+    cases = (
+        ("decimal string", "5.00", Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
+        ("decimal object", Decimal("5.00"), Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
+        ("integer", 5, Decimal("5"), Decimal("5"), Decimal("5")),
+        ("float", 5.0, Decimal("5.0"), Decimal("5.0"), Decimal("5.0")),
+        ("exponent", "5e0", Decimal("5"), Decimal("5"), Decimal("5")),
+        ("unicode uncertainty", "5.00 ± 0.1", None, Decimal("5.00"), None),
+        ("ascii uncertainty", "5.00+/-0.1", None, Decimal("5.00"), None),
+        (
+            "state wrapper",
+            {"state": {"tag": "value", "value": "5.00"}},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        (
+            "implicit value state wrapper",
+            {"state": {"value": "5.00"}},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        (
+            "bare value wrapper",
+            {"value": "5.00"},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        (
+            "tagged value wrapper",
+            {"tag": "value", "value": "5.00"},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        ("sigma uncertainty", "5.00 (1σ)", None, None, None),
+        ("sigma marker", "5.00 (σ)", None, None, None),
+        ("range", "5.00–6.00", None, None, None),
+        ("bound", ">5.00", None, None, None),
+        (
+            "structured bound",
+            {"kind": "bound", "bound_operator": ">", "bound_value": "5.00"},
+            None,
+            None,
+            None,
+        ),
+        ("structured range", {"range": ["5.00", "6.00"]}, None, None, None),
+    )
+
+    for label, raw, strict_amount, printed_amount, located_amount in cases:
+        assert migrate_module._as_dec_or_none(raw) == strict_amount, label
+        assert migrate_module._printed_composition_amount(raw) == printed_amount, label
+        try:
+            located = migrate_module._point_condition_from_plain(
+                raw, key="H2O_EMPA"
+            )
+        except (TypeError, ValueError, ArithmeticError):
+            located_amount_read = None
+        else:
+            located_amount_read = (
+                located.state.value
+                if located.state.is_value
+                and isinstance(located.state.value, Decimal)
+                else None
+            )
+        assert located_amount_read == located_amount, label
+
+        kind, amount = migrate_module._classify_composition_cell(raw)
+        expected = next(
+            (
+                amount
+                for amount in (strict_amount, printed_amount, located_amount)
+                if amount is not None
+            ),
+            None,
+        )
+        typed_components = migrate_module._mass_percent_components(
+            {"amount_basis": "mass_percent", "components": [["SiO2", raw]]}
+        )
+        assert (
+            typed_components.get("SiO2") if typed_components is not None else None
+        ) == expected, label
+        assert migrate_module._printed_mass_percent_number(raw) == expected, label
+        assert (kind, amount) == (
+            ("number", expected) if expected is not None else ("malformed", None)
+        ), label
+
+
+def test_uncertainty_cells_count_as_a_declared_wt_composition_point() -> None:
+    assert _declared_wt_composition_point_map(
+        {
+            "quantity": "equilibrium_phase_composition",
+            "points": [{"SiO2": "50 ± 1", "MgO": "50±1"}],
+        },
+        "wt percent",
+    )
+
+
+def test_residue_component_reader_uses_printed_central_amount() -> None:
+    selection = migrate_module.select_declared_source(
+        migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        "ppm",
+        {"residue_ppm": "12.59 ± 0.2"},
+    )
+
+    assert selection.available
+    assert selection.amount == Decimal("12.59")
+
+
+@pytest.mark.parametrize(
+    ("printed", "amount"),
+    [
+        ("50 ± 1", Decimal("50")),
+        ("50±1", Decimal("50")),
+        ("50 +/- 1", Decimal("50")),
+        ("50+/-1", Decimal("50")),
+    ],
+)
+@pytest.mark.parametrize("reader", _BLANK_MAJOR_READERS)
+def test_printed_composition_uncertainty_uses_central_amount_in_every_reader(
+    tmp_path: Path,
+    reader: str,
+    printed: str,
+    amount: Decimal,
+) -> None:
+    printed_map = {"SiO2": printed, "MgO": "25", "CaO": "25"}
+    valid, refusal, components = _composition_reader_outcome(
+        tmp_path / "uncertainty", reader, printed_map
+    )
+
+    assert valid, refusal
+    baseline_valid, baseline_refusal, baseline = _composition_reader_outcome(
+        tmp_path / "baseline", reader, {"SiO2": "50", "MgO": "25", "CaO": "25"}
+    )
+    assert baseline_valid, baseline_refusal
+    assert components == baseline
+    assert migrate_module._printed_composition_amount(printed) == amount
+
+
+def _migrate_residue_oxide_columns(
+    tmp_path: Path,
+    columns: dict[str, object],
+    *,
+    printed_starting_map: dict[str, object] | None = None,
+    include_initial_composition: bool = True,
+):
+    extract = deepcopy(FIXTURE_EXTRACT)
+    experiment_id = "residue-oxide-columns"
+    sample = {
+        "printed_composition": {
+            "state": {
+                "tag": "value",
+                "value": printed_starting_map
+                or {"SiO2": "50", "MgO": "50"},
+            },
+            "locator": {"table": "1", "row": "1"},
+        }
+    }
+    if include_initial_composition:
+        sample["initial_composition"] = {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "measured",
+                    "amount_basis": "mole_fraction",
+                    "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+                },
+            },
+            "locator": {"table": "1"},
+        }
+    extract["experiments"] = [
+        {
+            "experiment_id": experiment_id,
+            "sample": sample,
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": experiment_id,
+            "experiment": experiment_id,
+            "type": "residue_component_composition",
+            "units": "ppm",
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_C": "1200",
+                        "run_id": experiment_id,
+                        **columns,
+                    }
+                ],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(f"fixture-source::{experiment_id}")
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+
+def test_residue_fallback_refuses_malformed_printed_start_without_aborting(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path,
+        {"residue_ppm": "12"},
+        printed_starting_map={"SiO2": "abc", "MgO": "100"},
+        include_initial_composition=False,
+    )
+
+    assert len(observations) == 1
+    composition = observations[0].identity.composition
+    assert composition is not None
+    assert composition.is_unknown
+    # SiO2's malformed cell is in the Green-read oxide map, so (a) wins.
+    assert "malformed printed component amount for 'SiO2'" in composition.reason
+
+
+def test_mass_percent_printed_provenance_keeps_noncanonical_source_envelope() -> None:
+    raw = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "amount_basis": "mass_percent",
+                "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
+            },
+        },
+        "locator": {"table": "2", "row": "4"},
+    }
+    sample = migrate_module._sample_from_plain({"printed_composition": raw})
+    printed = sample.printed_composition
+
+    assert printed is not None
+    assert printed.state.is_value
+    assert printed.state.value == raw["state"]["value"]
+
+
+def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator.result.works["work"] = None
+    entries = [
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [1, "a"]}},
+            ["composition", "phase"], "same", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"nested": {"row": [1, "a"]}, "table": "2"},
+            ["composition", "phase"], "same", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [2, "a"]}},
+            ["composition", "phase"], "different", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [1, "a"]}},
+            ["phase", "composition"], "same", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "3", "raw": b"x"},
+            ["composition"], "unhashable duplicate", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": bytearray(b"x"), "table": "3"},
+            ["composition"], "unhashable duplicate", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "3", "raw": bytearray(b"y")},
+            ["composition"], "unhashable distinct", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": b"y", "table": "3"},
+            ["composition"], "unhashable distinct", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": OrderedDict((("a", 1), ("b", 2)))},
+            ["composition"], "ordered mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": OrderedDict((("b", 2), ("a", 1)))},
+            ["composition"], "ordered mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Counter(a=1)},
+            ["composition"], "counter mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Counter(a=1, b=0)},
+            ["composition"], "counter mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": [1]},
+            ["composition"], "list and tuple", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": (1,)},
+            ["composition"], "list and tuple", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": 1},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": 1.0},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": True},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Decimal("1")},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+    ]
+    expected = []
+    for entry in entries:
+        if entry not in expected:
+            expected.append(entry)
+    migrator.result.queue[:] = entries
+
+    migrator._resolve_queue_ids()
+
+    assert migrator.result.queue == expected
+    assert [
+        next(index for index, original in enumerate(entries) if original is entry)
+        for entry in migrator.result.queue
+    ] == [0, 2, 3, 4, 6, 8, 9, 10, 12, 13, 14]
+
+
+@pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))
+def test_residue_explosion_keeps_blank_oxide_sibling_for_closure(
+    tmp_path: Path,
+    surviving_numeric_count: int,
+) -> None:
+    columns: dict[str, object] = {
+        "SiO2_wt_pct": None,
+        "MgO_wt_pct": None,
+        "CaO_wt_pct": None,
+    }
+    if surviving_numeric_count == 1:
+        columns["MgO_wt_pct"] = "100"
+    elif surviving_numeric_count == 2:
+        columns["MgO_wt_pct"] = "50"
+        columns["CaO_wt_pct"] = "50"
+
+    if surviving_numeric_count == 0:
+        printed, composition = migrate_module._located_printed_and_initial(
+            {}, None, closure_context=columns, declared_component_map=columns
+        )
+        assert printed is not None
+        assert printed.state.value == columns
+        assert composition is not None
+        assert composition.state.is_unknown
+        # Green rejects the zero-positive-mass oxide map before m1 closure.
+        assert (
+            "printed oxide wt% map has no positive mass"
+            in composition.state.reason
+        )
+        return
+
+    observations = _migrate_residue_oxide_columns(tmp_path, columns)
+    component_rows = [
+        observation
+        for observation in observations
+        if observation.identity.species.formula in {"MgO", "CaO"}
+    ]
+    assert len(component_rows) == surviving_numeric_count
+    for observation in component_rows:
+        composition = (observation.point_conditions or {}).get("composition")
+        assert isinstance(composition, Located)
+        assert composition.state.is_unknown
+        assert "missing major oxides: SiO2" in composition.state.reason
+        printed = (observation.point_conditions or {}).get("printed_composition")
+        assert isinstance(printed, Located)
+        assert printed.state.is_value
+        assert printed.state.value == columns
+
+
+def test_residue_explosion_accepts_a_declared_pure_oxide_map(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path, {"MgO_wt_pct": "100"}
+    )
+
+    component_rows = [
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "MgO"
+    ]
+    assert len(component_rows) == 1
+    composition = component_rows[0].point_conditions["composition"]
+    assert isinstance(composition, Located)
+    assert composition.state.is_value
+    assert dict(composition.state.value.components) == {"MgO": Decimal("1")}
+
+
+def test_residue_ppm_without_oxide_cells_skips_point_composition_guard(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path, {"residue_ppm": "12"}
+    )
+
+    assert len(observations) == 1
+    assert "printed_composition" not in (observations[0].point_conditions or {})
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("MgO_wt_pct", "MgO_wt_percent", "MgO wt%", "MgO_wt%"),
+)
+def test_residue_oxide_column_suffix_selects_its_species(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path,
+        {"SiO2_wt_pct": "50", field: "50"},
+    )
+
+    assert any(
+        observation.identity.species.formula == "MgO"
+        for observation in observations
+    )
+
+
+def test_owner_starting_map_ambiguous_iron_is_typed_unknown() -> None:
+    printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
+    sample = _sample_from_plain(
+        {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "printed_composition": {
+                "state": {"tag": "value", "value": printed_map},
+                "locator": {"table": "1"},
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "FeOT with FeO" in sample.initial_composition.state.reason
+
+
+def test_located_starting_map_ambiguous_iron_is_typed_unknown() -> None:
+    printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
+    _printed, initial = migrate_module._located_printed_and_initial(
+        printed_map,
+        None,
+        closure_context={"printed_composition": printed_map},
+        declared_component_map=printed_map,
+    )
+
+    assert initial is not None
+    assert initial.state.is_unknown
+    assert "FeOT with FeO" in initial.state.reason
+
+
+def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
+    tmp_path: Path,
+) -> None:
+    components = {
+        "SiO2": "54.90",
+        "MgO": "40.00",
+        "XxO": "10",
+        "H2O_wt_pct": "5.10",
+    }
+    plain = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": list(components.items()),
+                },
+            }
+        }
+    )
+    assert plain.state.is_unknown
+    assert "XxO=10 wt%" in plain.state.reason
+    with pytest.raises(ValueError, match="XxO=10 wt%"):
+        wt_pct_to_mole_fraction(
+            {name: Decimal(value) for name, value in components.items()}
+        )
+
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            **components,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_unknown
+    assert "XxO=10 wt%" in point.identity.composition.reason
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": Decimal("54.90"),
+        "MgO": Decimal("40.00"),
+        "XxO": Decimal("10"),
+        "H2O_wt_pct": Decimal("5.10"),
+    }
+
+
+def test_b704_projection_fraction_uses_as_printed_alias_total() -> None:
+    source = {
+        "composition_wt_pct": {
+            "SiO2": "69.7",
+            "FeO*": "30",
+            "unknown-component": "0.3",
+        }
+    }
+    wt = migrate_module._oxide_map_from_mapping(
+        source,
+        declared_map=True,
+        closure_context=source,
+    )
+    assert wt is not None
+
+    notice = _projection_notice_from_printed_map(
+        wt,
+        closure_context=source,
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
+    )
+
+    assert notice is not None
+    assert notice.dropped_mass_fraction == Decimal("0.003")
+
+
+def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_composition() -> None:
+    sample = _sample_from_plain(
+        {
+            "initial_composition": {
+                "locator": {"table": "1"},
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mass_percent",
+                        "components": [["SiO2", "45"], ["MgO", "45"]],
+                    },
+                },
+            }
+        }
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "45", "MgO": "45"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert sample.initial_composition.state.reason == (
+        "mass-percent composition is not usable: mass-percent composition is a partial analysis: "
+        "kept sum=90 wt% is below 95 wt%"
+    )
+
+
+def test_plain_composition_reader_refuses_suffixed_nonclosing_oxide_map() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": {"SiO2_wt_pct": "45", "MgO_wt_pct": "45"},
+                },
+            }
+        }
+    )
+
+    assert composition.state.is_unknown
+    assert composition.state.reason == (
+        "mass-percent composition is not usable: mass-percent composition is a partial analysis: "
+        "kept sum=90 wt% is below 95 wt%"
+    )
+
+
+def test_plain_identity_reader_turns_nonoxide_mass_assay_into_unknown() -> None:
+    # Taniguchi Table 1 row 101 prints metallic Fe alone, with no oxide map.
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["Fe", "0.437"]],
+                },
+            },
+        }
+    )
+
+    assert identity.composition is not None
+    assert identity.composition.is_unknown
+    # Fe is a recognized element trace; this Fe-only map has no oxide mass.
+    assert identity.composition.reason == (
+        "printed oxide wt% map has no positive mass"
+    )
+
+
+def test_plain_identity_reader_refuses_large_unsupported_mass_component() -> None:
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [
+                        ["SiO2", "60"],
+                        ["MgO", "40"],
+                        ["unknown-component", "40"],
+                    ],
+                },
+            },
+        }
+    )
+
+    assert identity.composition is not None
+    assert identity.composition.is_unknown
+    assert identity.composition.reason == (
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    )
+
+
+def test_plain_mass_percent_trace_accepts_and_retains_dropped_name_provenance() -> None:
+    serialized_composition = {
+        "tag": "value",
+        "value": {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [
+                ["SiO2", "60"],
+                ["MgO", "40"],
+                ["unknown-component", "0.3"],
+            ],
+        },
+    }
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": serialized_composition,
+        }
+    )
+    composition = migrate_module._composition_located_from_plain(
+        serialized_composition
+    )
+
+    assert identity.composition is not None and identity.composition.is_value
+    assert composition.state.is_value
+    assert composition.state.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    )
+    assert composition.inference is not None
+    assert "omitted trace components: unknown-component" in composition.inference.inputs
+
+
+def test_plain_identity_with_recognized_oxide_composition_round_trips() -> None:
+    payload = {
+        "quantity": {"tag": "value", "value": "activity"},
+        "composition": {
+            "tag": "value",
+            "value": {
+                "basis": "printed_oxides",
+                "amount_basis": "mole_fraction",
+                "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+            },
+        },
+    }
+
+    assert to_plain(migrate_module._identity_from_plain(payload)) == payload
+
+
+@pytest.mark.parametrize(
+    "water_context",
+    (
+        {"H2O_wt_pct": "5.00"},
+        {"H2O_wt_pct": {"state": {"tag": "value", "value": "5.00"}}},
+        {
+            "point_conditions": {
+                "H2O_EMPA": {"state": {"tag": "value", "value": "5.00"}}
+            }
+        },
+    ),
+)
+def test_b704_hydrous_mass_percent_closes_only_with_row_printed_water(
+    water_context: dict[str, object],
+) -> None:
+    # The dry sum is 94.90 wt%; printed water raises the closure sum to 99.90.
+    oxides = {"SiO2": Decimal("54.90"), "MgO": Decimal("40.00")}
+    hydrous_row = {
+        "composition_wt_pct": {name: str(amount) for name, amount in oxides.items()},
+        **water_context,
+    }
+    refusal: list[str] = []
+
+    parsed = migrate_module._oxide_map_from_mapping(
+        hydrous_row, refusal_reason=refusal, declared_map=True
+    )
+    assert parsed == oxides
+    assert refusal == []
+
+    _printed, initial = migrate_module._located_printed_and_initial(
+        parsed, None, closure_context=hydrous_row
+    )
+    assert initial is not None and initial.state.is_value
+    assert set(dict(initial.state.value.components)) == set(oxides)
+    assert _printed is not None and _printed.state.is_value
+    assert set(_printed.state.value) == set(oxides)
+
+    dry_row = {
+        "composition_wt_pct": {
+            name: str(amount) for name, amount in oxides.items()
+        }
+    }
+    refusal = []
+    assert (
+        migrate_module._oxide_map_from_mapping(
+            dry_row, refusal_reason=refusal, declared_map=True
+        )
+        is None
+    )
+    assert refusal == [
+        "mass-percent composition is a partial analysis: kept sum=94.90 wt% is below 95 wt%"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("water", "converts"),
+    (("abc", False), (None, True), ("n/a", True)),
+)
+def test_b704_volatile_cells_are_classified_before_closure(
+    water: object,
+    converts: bool,
+) -> None:
+    declared = {"SiO2": "50", "MgO": "50", "H2O": water}
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context={"composition_wt_pct": declared},
+        declared_component_map=declared,
+    )
+
+    assert (converted is not None) is converts
+    if converts:
+        assert refusal is None
+    else:
+        assert refusal is not None
+        # Green did not read the volatile; its rejection is an m1 closure refusal.
+        assert refusal.closure_refusal
+        assert (
+            "malformed printed volatile component amount for 'H2O'"
+            in refusal.reason
+        )
+
+
+def test_b704_hydrous_datum_state_completes_full_migration(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["composition_role"] = "datum_state"
+    row["values"]["composition_wt_pct"] = {
+        "SiO2": "55.00",
+        "MgO": "40.00",
+        "H2O": "5.00",
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::")
+    )
+    # A p_sat identity does not compare composition; this datum's mixture is row-local.
+    composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(composition, Located) and composition.state.is_value
+    assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert set(composition.state.value.as_map()) == {"SiO2", "MgO"}
+    # At 28-digit Decimal precision, about ten divisions leave at most n*1e-28 residue.
+    assert (
+        abs(sum(composition.state.value.as_map().values()) - Decimal("1"))
+        <= Decimal("1e-25")
+    )
+    printed = (observation.point_conditions or {}).get("printed_composition")
+    assert isinstance(printed, Located)
+    assert printed is not None and printed.state.is_value
+    assert as_decimal(str(printed.state.value["H2O"])) == Decimal("5.00")
+
+
+def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_major() -> None:
+    path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "jsc_12023_table1_warren78_composition"
+    )
+    assert {"SiO2", "P2O5"} <= set(source_row["values"]["absent_table_entries"])
+    assert sum(
+        Decimal(str(amount))
+        for amount in source_row["values"]["oxide_wt_pct"].values()
+    ) == Decimal("50.59")
+
+    sample = sample_from_equipment(
+        None,
+        values=source_row["values"],
+        locator=migrate_module.locator_from_mapping(source_row["locator"]),
+    )
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {
+        name: str(amount)
+        for name, amount in source_row["values"]["oxide_wt_pct"].items()
+    }
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    observation = migrator.result.observations[
+        "jsc-lunar-catalog-12023::jsc_12023_table1_warren78_composition"
+    ]
+    row_printed = observation.point_conditions["printed_composition"]
+    assert row_printed.state.is_value
+    assert row_printed.state.value == sample.printed_composition.state.value
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert observation.identity.composition.reason == (
+        "missing major oxides: SiO2, P2O5; "
+        "mass-percent composition is a partial analysis: "
+        "kept sum=50.59 wt% is below 95 wt%"
     )
 
 
@@ -1829,6 +5062,69 @@ def test_mole_percent_composition_converts_to_mole_fraction() -> None:
     }
     assert composition.locator is not None
     assert composition.locator.table == "1"
+
+
+def test_composition_mol_as_printed_ditto_is_skipped_before_amount_parse() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "H2O": "0",
+                "H2O_wt_pct_as_printed": "″",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+        "H2O": Decimal("0"),
+    }
+    assert omitted == ()
+
+
+def test_numeric_composition_mol_echo_is_not_an_omitted_component() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "H2O": "0",
+                "H2O_wt_pct_as_printed": "5.21",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+        "H2O": Decimal("0"),
+    }
+    assert omitted == ()
+
+
+def test_numeric_composition_mole_fraction_echo_is_not_omitted() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mole_fraction": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "SiO2_AS_PRINTED": "0.1",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+    }
+    assert omitted == ()
 
 
 def test_nonclosing_mole_percent_composition_is_flagged() -> None:
@@ -2051,10 +5347,26 @@ def test_real_pretyped_experiment_initials_match_printed_composition_owner(
 
 def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
     migrator = Migrator()
-    for _label, source, _field, _species, _count in _SWEPT_COMPOSITION_MAPS:
+    count_mismatches: list[str] = []
+    source_count_report: list[str] = []
+    for (
+        _label,
+        source,
+        _field,
+        _species,
+        _count,
+        _refusal_count,
+    ) in _SWEPT_COMPOSITION_MAPS:
         migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
 
-    for label, source, field, species, expected_count in _SWEPT_COMPOSITION_MAPS:
+    for (
+        label,
+        source,
+        field,
+        species,
+        expected_count,
+        expected_refusal_count,
+    ) in _SWEPT_COMPOSITION_MAPS:
         doc = yaml.safe_load(
             (REPO_ROOT / "data/literature/extracts" / f"{source}.yaml").read_text()
         )
@@ -2088,11 +5400,21 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                 for observation in rows:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
-                        # This sweep pins composition conversion; the typed
-                        # initial-charge proxy is asserted by its owner test.
+                    # This sweep pins composition conversion; the typed initial-charge proxy is asserted by its owner test.
                     assert replace(composition.value, proxy_flag=None) == expected, (
                         observation.observation_id
                     )
+                    if label == "LPI" and "S" in raw_composition:
+                        assert expected.as_map()["S"] > 0
+                        # Four distinct specimen maps share these experiments, so sulfur stays row-local.
+                        row_printed = (observation.point_conditions or {}).get(
+                            "printed_composition"
+                        )
+                        assert row_printed is not None and row_printed.state.is_value
+                        assert isinstance(row_printed.state.value["S"], str)
+                        assert row_printed.state.value["S"] == dict(
+                            migrate_module._printed_fingerprint(raw_composition)
+                        )["S"]
                     if "FeOT" in raw_composition:
                         assert observation.identity.quantity.is_unknown
                         assert not any(
@@ -2110,9 +5432,29 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                         )
                         feot_derivations += 1
                 converted += 1
-        assert (refused, converted) == (0, expected_count), label
-        if label == "Britt":
-            assert feot_derivations == expected_count
+        expected_counts = (expected_refusal_count, expected_count)
+        actual_counts = (refused, converted)
+        source_count_report.append(
+            f"{label}: refused/converted expected={expected_counts}, "
+            f"actual={actual_counts}"
+        )
+        if actual_counts != expected_counts:
+            count_mismatches.append(
+                f"{label}: expected refused/converted={expected_counts}, "
+                f"got {actual_counts}"
+            )
+        if label == "Britt" and feot_derivations != expected_count:
+            count_mismatches.append(
+                f"{label}: expected FeOT derivations={expected_count}, "
+                f"got {feot_derivations}"
+            )
+
+    assert not count_mismatches, (
+        "composition sweep counts differ:\n"
+        + "\n".join(source_count_report)
+        + "\nMismatches:\n"
+        + "\n".join(count_mismatches)
+    )
 
 
 def test_untyped_printed_composition_note_does_not_create_initial_composition() -> None:
@@ -2136,6 +5478,7 @@ def test_untyped_printed_composition_note_does_not_create_initial_composition() 
 
     sample = _sample_from_plain(raw)
 
+    # Cl closes the printed mass map but stays outside the oxide engine vector.
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
     assert sample.initial_composition is None
@@ -2595,7 +5938,7 @@ def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     )
 
 
-def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+def test_volatile_mass_percent_initial_refuses_excess_chloride() -> None:
     raw = {
         "initial_composition": {
             "locator": {"table": "2", "page": 14},
@@ -2613,9 +5956,12 @@ def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical(
     sample = _sample_from_plain(raw)
 
     assert sample.printed_composition is not None
-    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
+    assert sample.printed_composition.state.value == raw["initial_composition"][
+        "state"
+    ]["value"]
     assert sample.initial_composition is not None
     assert sample.initial_composition.state.is_unknown
+    assert "Cl=40 wt%" in sample.initial_composition.state.reason
 
 
 def _iter_store_observations() -> list[dict]:
@@ -2743,6 +6089,183 @@ def _markova_vi_extract() -> dict:
     }
 
 
+def test_initial_charge_row_ignores_measurement_columns_as_components() -> None:
+    row = {
+        "T_C": 0,
+        "T_C_is_initial_composition": True,
+        "SiO2_wt_pct": 70,
+        "MgO_wt_pct": 27.55,
+        "component_amount": 70,
+    }
+    refusal: list[str] = []
+    # Green treats these as row conditions and a measurement, not components.
+    assert _initial_oxide_map_from_values(
+        row, refusal_reason=refusal, declared_map=True
+    ) == {"SiO2": Decimal("70"), "MgO": Decimal("27.55")}
+    assert refusal == []
+
+
+def test_flat_refused_point_ignores_numeric_condition_columns(tmp_path: Path) -> None:
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            "SiO2": "45",
+            "MgO": "45",
+            "p_atm": "0.2",
+            "delta_IW": "-1.0",
+            "run": 7,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+    # The flat point's oxides total 90 wt%; condition columns do not become components.
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_unknown
+    assert point.identity.composition.reason == (
+        "mass-percent composition is a partial analysis: "
+        "kept sum=90 wt% is below 95 wt%"
+    )
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert set(printed.state.value) == {"SiO2", "MgO"}
+
+
+@pytest.mark.parametrize(
+    "missing_marker",
+    (None, "", "-", "–", "—", "n.d.", "nd", "bdl", "--"),
+)
+def test_flat_refused_point_preserves_blank_and_missing_major_oxide(
+    tmp_path: Path,
+    missing_marker: str | None,
+) -> None:
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            "SiO2": "54.90",
+            "MgO": "40.00",
+            "FeO": missing_marker,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_unknown
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value["FeO"] == missing_marker
+    assert printed.state.value["SiO2"] == Decimal("54.90")
+    assert printed.state.value["MgO"] == Decimal("40.00")
+
+
+def test_flat_point_refuses_large_unknown_and_preserves_printed_components(
+    tmp_path: Path,
+) -> None:
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            "SiO2": "60",
+            "MgO": "40",
+            "XxO": "10",
+            "p_atm": "0.2",
+            "delta_IW": "-1.0",
+            "run": 7,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_unknown
+    assert "XxO=10 wt%" in point.identity.composition.reason
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": Decimal("60"),
+        "MgO": Decimal("40"),
+        "XxO": Decimal("10"),
+    }
+
+
+def test_flat_point_projects_recognized_trace_with_notice_and_ignores_conditions(
+    tmp_path: Path,
+) -> None:
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            "SiO2": "49.85",
+            "MgO": "49.85",
+            "Na2O_plus_K2O": "0.3",
+            "p_atm": "0.2",
+            "delta_IW": "-1.0",
+            "run": 7,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_value
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": "49.85",
+        "MgO": "49.85",
+        "Na2O_plus_K2O": "0.3",
+    }
+    projected = [
+        notice
+        for notice in point.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert len(projected) == 1
+    assert projected[0].dropped == ("Na2O_plus_K2O",)
+    assert "Na2O_plus_K2O=0.3 wt%" in projected[0].reason
+    assert projected[0].dropped_mass_fraction == Decimal("0.003")
+
+
 def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path, _markova_vi_extract())
     result = migrate(root, write=False)
@@ -2760,6 +6283,11 @@ def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     ident = t0.identity.composition
     assert ident is not None and ident.is_value
     assert ident.value.amount_basis is AmountBasis.MOLE_FRACTION
+    t0_expected = wt_pct_to_mole_fraction(
+        {name: as_decimal(value) for name, value in printed.items()}
+    )
+    assert dict(ident.value.components) == dict(t0_expected.components)
+    assert dict(ident.value.components)["SiO2"] > 0
     experiment = result.experiments[t0.experiment_id]
     assert experiment.sample.printed_composition is not None
     assert as_decimal(experiment.sample.printed_composition.state.value["SiO2"]) == as_decimal(
@@ -2770,7 +6298,15 @@ def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     assert experiment.sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
     later_printed = later.point_conditions["printed_composition"].state.value
     assert as_decimal(later_printed["SiO2"]) == as_decimal("0.0")
+    assert as_decimal(later_printed["Al2O3"]) == as_decimal("79.28")
     assert later_printed != printed
+    later_composition = later.point_conditions["composition"]
+    # The recast residue totals 101.00 wt%, within b-704's 95–102 interval.
+    later_expected = wt_pct_to_mole_fraction(
+        {name: as_decimal(value) for name, value in later_printed.items()}
+    )
+    assert later_composition.state.is_value
+    assert later_composition.state.value.components == later_expected.components
 
 
 def test_migrate_keeps_ilmenite_and_drops_sample_code(tmp_path: Path) -> None:
@@ -2929,6 +6465,101 @@ def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> 
             ), (panel, row.get("observation_id"), identity_x0)
 
 
+def test_markova_1984_live_mass_loss_identity_uses_its_own_panel_initial_charge() -> None:
+    extract = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "kems-026-markova-1984.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    observation = migrator.result.observations[
+        "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
+        "::mass_loss_fraction::T=2156.15:h=e9110f31a14b"
+    ]
+
+    starting_charge = observation.point_conditions["starting_composition"]
+    assert starting_charge.state.is_value
+    assert sum(
+        (as_decimal(amount) for amount in starting_charge.state.value.values()),
+        Decimal("0"),
+    ) == Decimal("100.01")
+    identity_composition = observation.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    # Green puts the panel X0 in identity and the residual map in
+    # point_conditions.composition; closure refusal applies only to the latter.
+    assert identity_composition.value == wt_pct_to_mole_fraction(
+        starting_charge.state.value
+    )
+
+    residual = observation.point_conditions["composition"]
+    assert residual.state.is_unknown
+    assert "kept sum=91.43 wt%" in (residual.state.reason or "")
+
+
+def test_taniguchi_1997_live_sample_401_slag_drops_fe_with_notice() -> None:
+    # These rows carry composition from the sample panel, not a row-local map.
+    # The projection still needs a notice when that carried identity is emitted.
+    extract = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "taniguchi-1997-feo-cas.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observation_ids = (
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_fe_composition",
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_cao_composition",
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_al2o3_composition",
+    )
+    for observation_id in observation_ids:
+        observation = migrator.result.observations[observation_id]
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.basis == "printed_phase_composition"
+        assert composition.value.amount_basis is AmountBasis.MASS_PERCENT
+        assert dict(composition.value.components) == {
+            "CaO": Decimal("39.9"),
+            "Al2O3": Decimal("59.6"),
+        }
+
+        experiment = migrator.result.experiments[observation.experiment_id]
+        printed = experiment.sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        assert printed.state.value == {
+            "Fe": "0.435",
+            "CaO": "39.9",
+            "Al2O3": "59.6",
+        }
+        carried = observation.point_conditions["composition"]
+        assert carried.state == composition
+        assert carried.locator == printed.locator
+        assert carried.inference is not None
+        assert any(
+            item.startswith(
+                "projected trace components omitted from engine composition: Fe=0.435 wt%"
+            )
+            for item in carried.inference.inputs
+        )
+        projected = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(projected) == 1
+        assert projected[0].dropped == ("Fe",)
+        assert projected[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+            "99.935"
+        )
+
+
 def test_markova_1983_initial_charge_maps_reach_their_own_rows(
     tmp_path: Path,
 ) -> None:
@@ -3075,6 +6706,847 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         }
 
 
+@pytest.mark.parametrize(
+    ("observation_token", "temperature_C"),
+    (
+        (
+            "hashimoto_1983_table3_sio2_residue_series_quoted::T=1973.15:row=c5-(1)",
+            1700.0,
+        ),
+        ("hashimoto_1983_table3_cao_residue_series_quoted__run_20b2", 2000.0),
+    ),
+)
+def test_hashimoto_single_oxide_observations_keep_green_starting_composition(
+    tmp_path: Path, observation_token: str, temperature_C: float
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-015-hashimoto-1983.yaml", write=False
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if observation_token in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+    inputs = collect_consumer_inputs(
+        experiment, result.benches[experiment.bench_id], observation
+    )
+    waypoint = inputs.waypoints["normalized_composition"].selected
+    assert waypoint is not None
+    assert waypoint.route == "normalized_printed_composition"
+    assert waypoint.inputs == ("experiment.sample.printed_composition",)
+
+    requests = engine_point_requests(inputs)
+    assert requests
+    expected_composition = {
+        "SiO2": 0.3379238246485715,
+        "Al2O3": 0.017760541249646305,
+        "FeO": 0.27949424004418816,
+        "MgO": 0.33896696103658575,
+        "CaO": 0.02585443302100831,
+    }
+    for request in requests:
+        assert request.readiness.status.value == "ready"
+        assert request.payload is not None
+        assert request.payload["temperature_C"] == temperature_C
+        assert request.payload["composition_mol"] == expected_composition
+
+
+def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
+    from simulator.battery.waypoints import normalized_composition
+
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/ta-badro-2021.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_experiment = next(
+        item for item in document["experiments"]
+        if item["experiment_id"] == "vp-series"
+    )
+    sample = _sample_from_plain(raw_experiment["sample"])
+    experiment = replace(tabulation_experiment(), sample=sample)
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is not None
+    assert waypoint.selected.route == "normalized_initial_composition"
+
+
+@pytest.mark.parametrize(
+    ("source", "row_token", "expected"),
+    (
+        (
+            "burnham-2015-europium-redox.yaml",
+            "burnham_2015_eu_glasses_ad_1400_fm10p5::T=1673.15",
+            {
+                "SiO2": Decimal("0.5049458537553273816542552134"),
+                "Al2O3": Decimal("0.08953938926861110424495235825"),
+                "MgO": Decimal("0.1530185996607377846056063220"),
+                "CaO": Decimal("0.2524961573153237294951861064"),
+            },
+        ),
+        (
+            "kress-carmichael-1991-iron-redox-calibration.yaml",
+            "kc91_fe3_t5_B27::T=1710.15",
+            {
+                "SiO2": Decimal("0.5547006776234626671942286324"),
+                "TiO2": Decimal("0.01554763773103709860256304399"),
+                "Al2O3": Decimal("0.08984819686101508537518088147"),
+                "Fe2O3": Decimal("0.03945861816145157104309105157"),
+                "FeO": Decimal("0.03144116729029423686753613424"),
+                "MnO": Decimal("0.001582846840746962967156111480"),
+                "MgO": Decimal("0.1120910690156758058306665902"),
+                "CaO": Decimal("0.1254376460586280468178866151"),
+                "Na2O": Decimal("0.02855988945220116658624516451"),
+                "K2O": Decimal("0.001332250965487358715445775201"),
+            },
+        ),
+        (
+            "cacciatore-zajacz-2026-v-sc-oxybarometer.yaml",
+            "cacciatore-zajacz-2026-v-sc-oxybarometer_e7_0_ii_sb_a_glass_sio2",
+            {
+                "SiO2": Decimal("0.5237582458997467157482953345"),
+                "TiO2": Decimal("0.007008385449743635387759676297"),
+                "Al2O3": Decimal("0.09759370232179106209878110540"),
+                "MnO": Decimal("0.001753431783019619387703747408"),
+                "MgO": Decimal("0.1481341018774051528806595342"),
+                "CaO": Decimal("0.1131220758010614130892965607"),
+                "P2O5": Decimal("0.0008762931927754530146293270149"),
+                "Na2O": Decimal("0.02608939345180641525337614298"),
+                "K2O": Decimal("0.004621674859555161565835116089"),
+                "FeO": Decimal("0.07704269536309537157366345464"),
+            },
+        ),
+        (
+            "lpi-lunar-soils.yaml",
+            "lpi_1983_soil_10002_provenance_and_characterization",
+            {
+                "SiO2": Decimal("0.4482179563822329719411890738"),
+                "TiO2": Decimal("0.06198483717310117768844669253"),
+                "Al2O3": Decimal("0.08520184745324768904604932940"),
+                "Cr2O3": Decimal("0.001260807500710294509781235738"),
+                "FeO": Decimal("0.1363876711001578529321725113"),
+                "MnO": Decimal("0.001800931385365283375364425907"),
+                "MgO": Decimal("0.1229854768329683614376478292"),
+                "CaO": Decimal("0.1360065465485117312513237041"),
+                "Na2O": Decimal("0.004843918023047031788070297471"),
+                "K2O": Decimal("0.001084999714845602663994452366"),
+                "P2O5": Decimal("0.0002250078858120033659604482770"),
+            },
+        ),
+        (
+            "kems-015-hashimoto-1983.yaml",
+            "table3_residue_composition_series::T=2273.15:row=20b2:",
+            {
+                "SiO2": Decimal("0.3704143841895679608300598825"),
+                "Al2O3": Decimal("0.02211082773740152264158571330"),
+                "FeO": Decimal("0.1550779101975305617296293917"),
+                "MgO": Decimal("0.4162731149967589246044486619"),
+                "CaO": Decimal("0.03612376287874103019427635068"),
+            },
+        ),
+        (
+            "stolyarova-1995-cao-alumina-kems.yaml",
+            "stolyarova_1995_ca_partial_pressure_table2::T=1933",
+            {"CaO": Decimal("0.143"), "Al2O3": Decimal("0.857")},
+        ),
+    ),
+)
+def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
+    tmp_path: Path,
+    source: str,
+    row_token: str,
+    expected: dict[str, Decimal],
+) -> None:
+    from simulator.battery.waypoints import normalized_composition
+
+    result = _migrate_real_extract(tmp_path, source, write=False)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row_token in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+
+    waypoint = normalized_composition(experiment, _bench(), observation)
+
+    assert waypoint.absence is None
+    assert waypoint.selected is not None
+    assert waypoint.selected.value == expected
+
+
+def test_burnham_redox_engine_point_keeps_green_composition_payload(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "burnham-2015-europium-redox.yaml", write=False
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if "burnham_2015_eu_glasses_ad_qz_1400_fm9p5" in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+    assert "printed_composition" not in (observation.point_conditions or {})
+
+    request = next(
+        item
+        for item in engine_point_requests(
+            collect_consumer_inputs(
+                experiment, _bench(), observation
+            )
+        )
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert request.payload == {
+        "engine": "internal-analytical",
+        "temperature_C": 1400.0,
+        "pressure_bar": 1.01325,
+        "fO2_log": -9.5,
+        "composition_mol": {
+            "SiO2": 0.6335121030470231,
+            "Al2O3": 0.06561522757749116,
+            "MgO": 0.11638849242068056,
+            "CaO": 0.18448417695480515,
+        },
+        "composition_method_class": "calculated",
+        "composition_notice": (
+            "calculated from printed oxide wt% composition; "
+            "relation=wt_pct_to_mole_fraction; "
+            "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+            "original_unit=wt_pct; locator=Locator(page=33, published_page=254, "
+            "pdf_page_index=32, page_verification=None, table_caption_page=None, "
+            "table_continued=None, table='1', figure=None, paragraph=None, "
+            "section=None, equation=None, line_range=None, note='Table 1 "
+            "composition for AD+qz; wt % oxide. Eu2O3 is retained separately "
+            "as printed.', source_path=None, record=None)"
+        ),
+    }
+
+
+def _internal_engine_point_for_real_extract(
+    extract_name: str, observation_fragment: str
+):
+    path = REPO_ROOT / "data" / "literature" / "extracts" / extract_name
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if observation_fragment in row.observation_id
+    )
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = (
+        migrator.result.benches.get(experiment.bench_id)
+        if experiment.bench_id
+        else None
+    )
+    if bench is None:
+        bench = _bench()
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    return next(
+        request
+        for request in engine_point_requests(inputs)
+        if request.readiness.engine == "internal-analytical"
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "extract_name,observation_fragment,expected_composition,"
+        "expected_method,expected_notice"
+    ),
+    [
+        pytest.param(
+            "kems-042-plante-1979.yaml",
+            "plante1979_table2_s1126_r011_quoted",
+            {"K2O": 0.33331181591376485, "SiO2": 0.6666881840862351},
+            None,
+            None,
+            id="plante-composition-remains-selected",
+        ),
+        pytest.param(
+            "burnham-2015-europium-redox.yaml",
+            "burnham_2015_eu_glasses_morb_1400_fm3p1::T=1673.15:h=9c0023663d9e",
+            {
+                "SiO2": 0.5437123616112215,
+                "Al2O3": 0.07464658136836831,
+                "FeO": 0.08461239030570825,
+                "MgO": 0.12032361639854668,
+                "CaO": 0.17670505031615533,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct; locator=Locator(page=33, "
+                "published_page=254, pdf_page_index=32, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='1', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note='Table 1 composition for MORB; "
+                "wt % oxide. Eu2O3 is retained separately as printed.', "
+                "source_path=None, record=None)"
+            ),
+            id="burnham-calculated-provenance-restored",
+        ),
+        pytest.param(
+            "ts1985.yaml",
+            "ts1985_na2o_table2_X0p40_T1300C",
+            {"Na2O": 0.4, "SiO2": 0.6},
+            None,
+            None,
+            id="ts1985-accepted-print-restored",
+        ),
+        pytest.param(
+            "sossi-2020-magma-ocean-redox.yaml",
+            "sossi_2020_per_f_o2_6_xanes",
+            {
+                "SiO2": 0.4068489528220175,
+                "Al2O3": 0.022117146419593673,
+                "FeO": 0.06248542978669028,
+                "MgO": 0.48915300024874675,
+                "CaO": 0.019313792063263995,
+                "Na2O": 0.0,
+                "K2O": 0.0,
+                "SO2": 8.167865968775996e-05,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct | FeOT (total iron) treated as FeO; "
+                "printed key FeOT; locator=Locator(page=14, "
+                "published_page=None, pdf_page_index=None, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='S4', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note=None, source_path=None, record=None)"
+            ),
+            id="sossi-sulfur-bearing-print-restored",
+        ),
+        pytest.param(
+            "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+            "aithala_2026_1800_30_xanes",
+            {
+                "Al2O3": 0.06887361206879163,
+                "CaO": 0.08717220545569997,
+                "FeO": 0.13850021506701168,
+                "K2O": 0.00019098707132811764,
+                "MgO": 0.19301273927716192,
+                "Na2O": 0.019818028418173754,
+                "P2O5": 0.0005681557637797296,
+                "SiO2": 0.4877472929677143,
+                "TiO2": 0.004116763910338897,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct | FeOT (total iron) treated as FeO; "
+                "printed key FeOT; locator=Locator(page=14, "
+                "published_page='SI-8', pdf_page_index=None, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='S-2', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note='WDS EPMA composition for 1800-30; "
+                "all oxide columns in wt.% as printed.', source_path=None, "
+                "record=None)"
+            ),
+            id="aithala-green-notice-has-one-feot-clause",
+        ),
+        pytest.param(
+            "smythe-brenan-2015-cerium-redox.yaml",
+            "row=ds09-c3-37",
+            {
+                "SiO2": 0.7829848990705266,
+                "TiO2": 0.0030057828571927255,
+                "Al2O3": 0.09126840011594776,
+                "MgO": 0.010160498722650815,
+                "CaO": 0.020271051941312426,
+                "Na2O": 0.06345254501714619,
+                "K2O": 0.026684223119929712,
+                "Ce2O3": 0.002172599155293784,
+            },
+            None,
+            None,
+            id="smythe-volatile-sibling-preserved",
+        ),
+        pytest.param(
+            "kems-015-hashimoto-1983.yaml",
+            "T=2073.15:row=c5-(1)",
+            {
+                "SiO2": 0.40709580956160435,
+                "Al2O3": 0.02700382669858546,
+                "FeO": 0.030054813370486367,
+                "MgO": 0.49255019146982815,
+                "CaO": 0.04329535889949569,
+            },
+            None,
+            None,
+            id="hashimoto-wt-percent-keys-canonicalized",
+        ),
+    ],
+)
+def test_m1_regression_rows_keep_green_internal_engine_point_composition(
+    extract_name: str,
+    observation_fragment: str,
+    expected_composition: dict[str, float],
+    expected_method: str | None,
+    expected_notice: str | None,
+) -> None:
+    request = _internal_engine_point_for_real_extract(
+        extract_name, observation_fragment
+    )
+
+    assert request.readiness.status.value == "ready"
+    assert request.payload is not None
+    assert request.payload["composition_mol"] == expected_composition
+    assert request.payload.get("composition_method_class") == expected_method
+    assert request.payload.get("composition_notice") == expected_notice
+
+
+def test_m1_kang_row_keeps_green_missing_evidence_gap() -> None:
+    from simulator.battery.waypoints import GapReason
+
+    request = _internal_engine_point_for_real_extract(
+        "kang-2007-sio2-activity-cas-low-silica.yaml",
+        "kang_2007_t3_sample_404_sio2_activity",
+    )
+
+    assert request.readiness.status.value == "gap"
+    assert request.payload is None
+    assert any(
+        gap.reason is GapReason.MISSING_EVIDENCE
+        for gap in request.readiness.gaps
+    )
+
+
+def test_aithala_named_printed_map_keeps_green_waypoint_precedence() -> None:
+    request = _internal_engine_point_for_real_extract(
+        "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+        "aithala_2026_2100_30_wdsepma_composition",
+    )
+
+    assert request.readiness.status.value == "ready"
+    assert request.payload is not None
+    assert request.payload["composition_mol"] == {
+        "SiO2": 0.5030149189926973,
+        "TiO2": 0.004232904404515707,
+        "Al2O3": 0.07083370833170857,
+        "FeO": 0.12841698080949054,
+        "MgO": 0.19764649559059078,
+        "CaO": 0.08900277026118869,
+        "Na2O": 0.006743724941578754,
+        "K2O": 5.2202540287216184e-05,
+        "P2O5": 5.629412794243211e-05,
+    }
+    assert request.payload["composition_notice"] == (
+        "calculated from printed FeOT; relation=total_iron_as_FeO; "
+        "inputs=FeOT; total iron reported as FeO; Fe3+/Fe2+ not printed"
+    )
+
+
+def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.waypoints import GapReason, normalized_composition
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "thomas-wood-2021-chlorine-silicate-melts.yaml",
+        write=False,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if "row=agi/cl-027:" in row.observation_id
+    )
+    composition = observation.point_conditions["composition"]
+    assert not composition.state.is_value
+    assert "Cl=1.6 wt%" in composition.state.reason
+    assert "partial analysis contains unsupported component(s) above 0.5 wt%" in (
+        composition.state.reason
+    )
+
+    experiment = result.experiments[observation.experiment_id]
+    waypoint = normalized_composition(experiment, _bench(), observation)
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+@pytest.mark.parametrize(
+    ("case", "wt", "closure_context", "declared", "closure_refusal"),
+    (
+        # (a) Green rejected this oxide map because it had no positive mass.
+        pytest.param(
+            "zero-total",
+            {"SiO2": "0", "MgO": "0"},
+            None,
+            None,
+            False,
+            id="green-no-positive-oxide-mass",
+        ),
+        # (a) Green read and rejected the negative oxide cell.
+        pytest.param(
+            "negative-oxide",
+            {"SiO2": "101", "MgO": "-1"},
+            None,
+            None,
+            False,
+            id="green-negative-amount",
+        ),
+        # (a) Green read and rejected the non-finite oxide cell.
+        pytest.param(
+            "non-finite-oxide",
+            {"SiO2": Decimal("NaN"), "MgO": "50"},
+            None,
+            None,
+            False,
+            id="green-non-finite-amount",
+        ),
+        # (a) Green rejected the ambiguous FeOT and FeO entries.
+        pytest.param(
+            "ambiguous-feot",
+            {"SiO2": "50", "FeO": "20", "FeOT": "30"},
+            None,
+            None,
+            False,
+            id="green-ambiguous-feot",
+        ),
+        # (a) Green rejected an unknown formula token above the drop limit.
+        pytest.param(
+            "unknown-token",
+            {"SiO2": "60", "MgO": "39", "XxO": "1"},
+            None,
+            None,
+            False,
+            id="green-unknown-token",
+        ),
+        # (a) Green read and refused in-map XxO; the nested duplicate cannot replace that source.
+        pytest.param(
+            "in-map-and-nested-unknown-token",
+            {"SiO2": "50", "MgO": "49", "XxO": "1"},
+            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            None,
+            False,
+            id="green-unknown-token-source-wins-over-nested-copy",
+        ),
+        # (b) Green never read nested XxO; only m1 sees its unsupported mass.
+        pytest.param(
+            "nested-unknown-token",
+            {"SiO2": "50", "MgO": "50"},
+            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            None,
+            True,
+            id="m1-nested-unknown-token",
+        ),
+        # (a) Green read and rejected the numeric unsupported label in its map.
+        pytest.param(
+            "unknown-label",
+            {"SiO2": "50", "MgO": "49", "unknown-component": "1"},
+            None,
+            None,
+            False,
+            id="green-unknown-label-over-trace-limit",
+        ),
+        # (b) Green never read a nested unsupported label; m1 flags its excess.
+        pytest.param(
+            "nested-unknown-label",
+            {"SiO2": "50", "MgO": "50"},
+            {
+                "point_conditions": {
+                    "printed_composition": {"unknown-component": "1"}
+                }
+            },
+            None,
+            True,
+            id="m1-nested-unknown-label-over-trace-limit",
+        ),
+        # (a) The over-limit unsupported total includes a token Green rejected.
+        pytest.param(
+            "formula-unknown-and-chloride-traces",
+            {"SiO2": "50", "MgO": "49.3", "XxO": "0.3", "Cl": "0.4"},
+            None,
+            None,
+            False,
+            id="green-unknown-token-makes-combined-traces-unflagged",
+        ),
+        # (a) Green read XxO inside the map; nested Cl pushes dropped mass above 0.5.
+        pytest.param(
+            "unknown-token-and-nested-chloride-trace",
+            {"SiO2": "50", "MgO": "49.7", "XxO": "0.3"},
+            {"point_conditions": {"printed_composition": {"Cl": "0.4"}}},
+            None,
+            False,
+            id="green-unknown-token-plus-nested-chloride-over-limit",
+        ),
+        # (a) Green read and rejected the malformed oxide cell.
+        pytest.param(
+            "malformed-oxide-cell",
+            {"SiO2": "50", "MgO": "unreadable"},
+            None,
+            None,
+            False,
+            id="green-malformed-oxide-cell",
+        ),
+        # (a) Green read S inside the converted map because S is a component key.
+        pytest.param(
+            "malformed-map-sulfur",
+            {"SiO2": "50", "MgO": "50", "S": "unreadable"},
+            None,
+            None,
+            False,
+            id="green-malformed-sulfur-in-oxide-map",
+        ),
+        # (b) Green accepted the oxide map; m1 found a missing major oxide.
+        pytest.param(
+            "missing-major",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            None,
+            None,
+            True,
+            id="m1-missing-major",
+        ),
+        # (b) Green accepted the oxide map; m1 found only 94.9 wt% kept mass.
+        pytest.param(
+            "partial-94.9",
+            {"SiO2": "50", "MgO": "44.9"},
+            None,
+            None,
+            True,
+            id="m1-kept-total-below-95",
+        ),
+        # (b) Green accepted the oxide map; m1 found 105.1 wt% kept mass.
+        pytest.param(
+            "over-limit-105.1",
+            {"SiO2": "60", "MgO": "45.1"},
+            None,
+            None,
+            True,
+            id="m1-kept-total-above-105",
+        ),
+        # (b) Green ignores sibling Cl; m1 rejects recognized mass above the limit.
+        pytest.param(
+            "chloride-trace",
+            {"SiO2": "50", "MgO": "49"},
+            {
+                "composition_wt_pct": {"SiO2": "50", "MgO": "49"},
+                "Cl_wt_pct": "1.0",
+            },
+            {"SiO2": "50", "MgO": "49"},
+            True,
+            id="m1-recognized-non-oxide-over-limit",
+        ),
+        # (b) Green supports these oxides; m1 finds no engine-supported oxide mass.
+        pytest.param(
+            "green-supported-engine-unsupported-oxides",
+            {"B2O3": "50", "Li2O": "50"},
+            None,
+            None,
+            True,
+            id="green-supported-oxides-fail-m1-kept-total",
+        ),
+        # (b) Green did not read this sibling volatile; m1 rejects its negative amount.
+        pytest.param(
+            "sibling-volatile-negative",
+            {"SiO2": "50", "MgO": "50"},
+            {"H2O_wt_pct": "-1"},
+            None,
+            True,
+            id="m1-negative-sibling-volatile",
+        ),
+        # (b) Green did not read this unreadable sibling volatile.
+        pytest.param(
+            "sibling-volatile-malformed",
+            {"SiO2": "50", "MgO": "50"},
+            {"H2O_wt_pct": "unreadable"},
+            None,
+            True,
+            id="m1-malformed-sibling-volatile",
+        ),
+        # (b) Green did not read sibling S outside the converted map; m1 rejects it.
+        pytest.param(
+            "sibling-sulfur-malformed",
+            {"SiO2": "50", "MgO": "50"},
+            {"S": "unreadable"},
+            None,
+            True,
+            id="m1-malformed-sibling-sulfur",
+        ),
+        # (b) Green did not read the nested printed volatile.
+        pytest.param(
+            "nested-printed-volatile-malformed",
+            {"SiO2": "50", "MgO": "50"},
+            {"point_conditions": {"printed_composition": {"H2O": "unreadable"}}},
+            None,
+            True,
+            id="m1-malformed-nested-printed-volatile",
+        ),
+        # (b) Green did not read this closure-only sulfur value.
+        pytest.param(
+            "closure-only-negative",
+            {"SiO2": "50", "MgO": "50"},
+            {"_migrate_closure_only_components": {"S": "-1"}},
+            None,
+            True,
+            id="m1-negative-closure-only-component",
+        ),
+        # (b) Green ignores both aliases; m1 reports malformed nested H2O.
+        pytest.param(
+            "duplicate-volatile-alias-malformed",
+            {"SiO2": "100"},
+            {
+                "composition_wt_pct": {"SiO2": "100"},
+                "H2O_wt_pct": "0",
+                "point_conditions": {"printed_composition": {"H2O": "unreadable"}},
+            },
+            {"SiO2": "100"},
+            True,
+            id="malformed-duplicate-volatile-alias",
+        ),
+        # Accepted with disclosure: unknown XxO is within the 0.5 wt% drop limit.
+        pytest.param(
+            "formula-unknown-trace",
+            {"SiO2": "49.85", "MgO": "49.85"},
+            {"composition_wt_pct": {"SiO2": "49.85", "MgO": "49.85", "XxO": "0.3"}},
+            {"SiO2": "49.85", "MgO": "49.85", "XxO": "0.3"},
+            None,
+            id="m1-unknown-formula-trace-disclosed",
+        ),
+        # Accepted with disclosure: unknown label is within the 0.5 wt% drop limit.
+        pytest.param(
+            "unknown-component-trace",
+            {
+                "SiO2": "49.85",
+                "MgO": "49.85",
+                "unknown-component": "0.3",
+            },
+            None,
+            None,
+            None,
+            id="m1-unknown-label-trace-disclosed",
+        ),
+        # Wrapper metadata is ignored while the numeric oxide map is accepted.
+        pytest.param(
+            "metadata-basis",
+            {"SiO2": "50", "MgO": "50", "basis": "oxide"},
+            None,
+            None,
+            None,
+            id="metadata-basis-string-is-ignored",
+        ),
+        # (a) Green's negative oxide refusal wins over the volatile diagnostic.
+        pytest.param(
+            "oxide-negative-and-volatile-negative",
+            {"SiO2": "101", "MgO": "-1"},
+            {"H2O_wt_pct": "-1"},
+            None,
+            False,
+            id="green-oxide-negative-wins-over-m1-volatile-negative",
+        ),
+    ),
+)
+def test_mass_closure_refusal_check_order(
+    case: str,
+    wt: dict[str, object],
+    closure_context: object,
+    declared: dict[str, object] | None,
+    closure_refusal: bool | None,
+) -> None:
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared,
+    )
+
+    if closure_refusal is None:
+        assert converted is not None, case
+        assert refusal is None, case
+        if case in {
+            "formula-unknown-trace",
+            "unknown-component-trace",
+        }:
+            notice = _projection_notice_from_printed_map(
+                wt,
+                closure_context=closure_context,
+                quantity=Quantity.ACTIVITY,
+                origin="test",
+                declared_component_map=declared,
+            )
+            assert notice is not None, case
+            expected_dropped = (
+                "XxO" if case == "formula-unknown-trace" else "unknown-component"
+            )
+            assert notice.dropped == (expected_dropped,), case
+        return
+
+    assert converted is None, case
+    assert refusal is not None, case
+    assert refusal.closure_refusal is closure_refusal, (case, refusal)
+    if case == "sibling-volatile-negative":
+        assert "negative or non-finite amount" in refusal.reason
+    if case == "sibling-volatile-malformed":
+        assert "malformed printed volatile component amount" in refusal.reason
+    if case == "malformed-map-sulfur":
+        assert "malformed printed component amount for 'S'" in refusal.reason
+    if case == "sibling-sulfur-malformed":
+        assert "malformed printed component amount for 'S'" in refusal.reason
+    if case == "nested-printed-volatile-malformed":
+        assert "malformed printed volatile component amount" in refusal.reason
+    if case == "closure-only-negative":
+        assert "negative or non-finite amount" in refusal.reason
+    if case == "duplicate-volatile-alias-malformed":
+        assert "malformed printed volatile component amount" in refusal.reason
+    if case == "oxide-negative-and-volatile-negative":
+        assert "printed component has negative or non-finite amount" in refusal.reason
+    if case in {"unknown-token", "formula-unknown-and-chloride-traces"}:
+        assert "partial analysis contains unsupported component(s) above" in (
+            refusal.reason
+        )
+    if case in {"nested-unknown-token", "unknown-token-and-nested-chloride-trace"}:
+        assert "partial analysis contains unsupported component(s) above" in (
+            refusal.reason
+        )
+    if case == "green-supported-engine-unsupported-oxides":
+        assert "no engine-supported oxide mass" in refusal.reason
+
+
+def test_malformed_closure_only_component_is_flagged() -> None:
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": "50", "MgO": "50"},
+        closure_context={"_migrate_closure_only_components": {"S": "unreadable"}},
+    )
+
+    assert converted is None
+    assert refusal is not None and refusal.closure_refusal
+    assert "malformed printed closure component amount" in refusal.reason
+
+
+@pytest.mark.parametrize(
+    ("payload", "declared_map"),
+    (
+        pytest.param(None, False, id="non-mapping-input"),
+        pytest.param(
+            {"SiO2": "50", "MgO": "50"},
+            False,
+            id="unmarked-flat-map",
+        ),
+    ),
+)
+def test_green_parser_refuses_unmapped_inputs(
+    payload: object,
+    declared_map: bool,
+) -> None:
+    # Green 0418c0fd9 returned no map for both parser-level refusal shapes.
+    assert _oxide_map_from_mapping(payload, declared_map=declared_map) is None
+
+
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path,
@@ -3199,6 +7671,13 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         if observation["values"].get("quantity") == "residue_composition_vs_time"
     }
     for panel, charge in charges.items():
+        assert sum(charge.values(), Decimal("0")) == {
+            "VI": Decimal("100.01"),
+            "V": Decimal("100.00"),
+        }[panel]
+        assert migrate_module._percent_composition_closure_error(
+            charge, "mass"
+        ) is None
         series = source_values[panel]["series"]
         panel_rows = [
             row
@@ -3217,6 +7696,7 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
             )
             assert _printed_wt_map(row) == expected
 
+    refused_residue_rows = {}
     for panel in charges:
         for row in residue.values():
             if not row["experiment_id"].endswith(f"::{panel}"):
@@ -3236,15 +7716,35 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 for oxide in charges[panel]
             }
             assert _printed_wt_map(row) == expected
-            composition = _state_value(
-                (row.get("point_conditions") or {}).get("composition")
+            composition_entry = (
+                (row.get("point_conditions") or {}).get("composition") or {}
             )
-            assert composition["amount_basis"] == "mole_fraction"
-            actual_moles = {
-                oxide: as_decimal(amount)
-                for oxide, amount in composition["components"]
-            }
-            assert actual_moles == dict(wt_pct_to_mole_fraction(expected).components)
+            composition_state = composition_entry.get("state") or {}
+            converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+                expected
+            )
+            if refusal is not None:
+                assert converted is None
+                assert composition_state["tag"] == "unknown"
+                assert composition_state["reason"] == refusal.reason
+                refused_residue_rows[(panel, temperature_c)] = sum(
+                    expected.values(), Decimal("0")
+                )
+            else:
+                assert converted is not None
+                composition = _state_value(
+                    (row.get("point_conditions") or {}).get("composition")
+                )
+                assert composition["amount_basis"] == "mole_fraction"
+                actual_moles = {
+                    oxide: as_decimal(amount)
+                    for oxide, amount in composition["components"]
+                }
+                assert actual_moles == dict(converted.components)
+    # The 91.43 wt% VI residue is below b-704's 95 wt% floor; 95.01 converts.
+    assert refused_residue_rows == {
+        ("VI", Decimal("1883")): Decimal("91.43"),
+    }
 
     for panel, charge in charges.items():
         panel_rows = [
@@ -3912,12 +8412,259 @@ def test_mass_percent_parser_behavior_is_pinned(components) -> None:
     ) is None
 
 
-def test_mass_percent_conversion_behavior_is_pinned() -> None:
+def test_nonclosing_mass_percent_conversion_is_refused() -> None:
     payload = {
         "amount_basis": "mass_percent",
         "components": [["SiO2", "45"], ["MgO", "45"]],
     }
-    composition = migrate_module._composition_from_plain(payload)
-    assert composition.as_map() == migrate_module.wt_pct_to_mole_fraction(
-        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
-    ).as_map()
+    with pytest.raises(
+        ValueError,
+        match="mass-percent composition is a partial analysis: kept sum=90 wt%",
+    ):
+        migrate_module._composition_from_plain(
+            payload,
+            declared_component_map=migrate_module._declared_printed_composition_map(
+                payload
+            ),
+        )
+
+
+def test_miki_explicit_mole_composition_is_not_lost_for_unknown_quantity() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT
+        / "data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::miki_1999_t1_sample_1_si_rich_composition"
+        )
+    )
+
+    composition = observation.identity.composition
+    assert observation.identity.quantity.is_unknown
+    assert composition is not None and composition.is_value
+    assert composition.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert dict(composition.value.components) == {
+        "Al": Decimal("0.00199"),
+        "Pb": Decimal("0.0231"),
+        "Si": Decimal("0.975"),
+    }
+
+
+def test_thomas_wood_row_composition_refusal_stays_on_point_condition() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT
+        / "data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.startswith(
+            "thomas-wood-2021-chlorine-silicate-melts::"
+            "thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-007:"
+        )
+    )
+
+    # Green does not use this row map for identity. The m1 closure refusal
+    # stays with the point condition instead of replacing an absent identity.
+    assert observation.identity.composition is None
+    composition = observation.point_conditions["composition"]
+    assert composition.state.is_unknown
+    assert "missing major oxides: FeO" in composition.state.reason
+
+
+def test_nasa_bulk_oxide_row_keeps_its_closure_refusal() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/nasa-tm-2024-simulant-guide.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::nasa_tm_2024_table7_bulk_chemistry::rows:h=278c5b9d52be"
+        )
+    )
+
+    # Green placed the accepted row map in point_conditions, not identity;
+    # m1 keeps the closure refusal at that same target.
+    assert observation.identity.composition is None
+    composition = observation.point_conditions["composition"]
+    assert composition.state.is_unknown
+    assert "kept sum=92.7 wt% is below 95 wt%" in composition.state.reason
+
+
+def test_richter_starting_bulk_map_is_identity_for_evaporation_rows() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith("::richter_2007_mg_rate_series_geometry")
+    )
+
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value == wt_pct_to_mole_fraction(
+        {
+            "MgO": Decimal("11.48"),
+            "SiO2": Decimal("46.0"),
+            "Al2O3": Decimal("19.39"),
+            "CaO": Decimal("23.12"),
+        }
+    )
+
+
+def test_hashimoto_starting_average_columns_do_not_fill_identity_composition() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::hashimoto_1983_table1_starting_composition"
+        )
+    )
+
+    # Green leaves identity composition absent. The accepted starting_Ave_ map
+    # is source data, and this identity profile does not require composition.
+    assert observation.identity.composition is None
+
+
+def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/lu-2024-mgsio3-levitation.yaml"
+    )
+    migrator.finalize()
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(
+            "lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::"
+            "T=2623:row=m01:"
+        )
+    ]
+
+    assert rows
+    expected = wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("63.26"),
+            "MgO": Decimal("35.19"),
+            "CaO": Decimal("1.27"),
+        }
+    )
+    for observation in rows:
+        starting = observation.point_conditions["starting_composition"]
+        assert starting.state.value["Nb_ppm"] == "84"
+        assert starting.state.value["Ta_ppm"] == "204"
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert observation.identity.composition.value == expected
+
+
+# Restored from green ce375cb5b: these pins still hold under the b-704 closure rule.
+def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+    source = "ta-flemetakis-2024.yaml"
+    source_path = REPO_ROOT / "data/literature/extracts" / source
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "flemetakis_2024_starting_glass_composition"
+    )
+    assert source_row["values"]["composition_role"] == {
+        "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "locator": source_row["locator"],
+        "quote": source_row["quote"],
+    }
+
+    result = _migrate_real_extract(tmp_path, source)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "flemetakis_2024_starting_glass_composition"
+        )
+    )
+    point_composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_value
+    assert isinstance(point_composition.state.value, Composition)
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+
+    initial = result.experiments[observation.experiment_id].sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.locator is not None
+    assert initial.locator.section == "2.1 Starting material"
+    assert isinstance(initial.state.value, Composition)
+    assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert not migrate_module._initial_compositions_conflict(
+        initial, point_composition
+    )
+
+
+def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in document["species"]["K2O"]["observations"]
+        if item["observation_id"] == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    assert observation["values"]["composition_role"]["value"] == "initial_charge_only"
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
+    assert selected.initial_composition is not None
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
+    ]
+
+    actual = experiment.sample.initial_composition
+    assert actual is not None and actual.state.is_value
+    assert dict(actual.state.value.components) == dict(
+        selected.initial_composition.state.value.components
+    )
+
+
+def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+    raw = {
+        "initial_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["Cl", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
