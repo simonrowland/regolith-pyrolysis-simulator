@@ -53,6 +53,9 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
 )
+MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE = (
+    "single_cation_Raoultian_pure_crystalline_reference"
+)
 HIGH_T_MELT_ACTIVITY_MODES = frozenset({"openimcc", "constant_gamma"})
 
 
@@ -626,6 +629,55 @@ def _gamma_reference_state_notice(parent_oxide: str) -> str | None:
     return None
 
 
+@dataclass(frozen=True)
+class _MeltOxideActivityReferenceConversion:
+    activity: float
+    log10_activity_offset: float
+    delta_g_fus_kJ_per_mol: float
+    domain_verdict: FusionDomainVerdict
+
+
+def _convert_melt_oxide_activity_reference_state(
+    parent_oxide: str,
+    activity: float,
+    temperature_K: float,
+    *,
+    source_phase: str,
+    target_phase: str,
+) -> _MeltOxideActivityReferenceConversion:
+    """Convert a d-144 oxide activity between its solid and liquid references."""
+
+    if (source_phase, target_phase) == ("solid", "liquid"):
+        sign = -1.0
+    elif (source_phase, target_phase) == ("liquid", "solid"):
+        sign = 1.0
+    else:
+        raise ValueError(
+            "d-144 activity conversion requires solid and liquid phases; got "
+            f"{source_phase!r} -> {target_phase!r}"
+        )
+
+    temperature = float(temperature_K)
+    fusion = _d144_fusion_conversion(
+        parent_oxide, Decimal(str(temperature))
+    )
+    delta_g_fus = float(fusion.delta_g_fus_kJ_per_mol)
+    exponent = sign * delta_g_fus / (R_KJ_PER_MOL_K * temperature)
+    # Both standards use mu = G° + RT ln(a). Equating mu_s and mu_l gives
+    # G_s° + RT ln(a_s) = G_l° + RT ln(a_l), hence
+    # a_s = a_l * exp((G_l° - G_s°)/RT) = a_l * exp(+DeltaG_fus/RT).
+    # Thus liquid -> solid uses the positive sign and solid -> liquid the
+    # negative sign. DeltaG_fus -> 0 gives a_s = a_l; above Tm, JANAF has
+    # DeltaG_fus < 0, so liquid -> solid decreases the activity as expected.
+    multiplier = math.exp(exponent)
+    return _MeltOxideActivityReferenceConversion(
+        activity=float(activity) * multiplier,
+        log10_activity_offset=exponent / math.log(10.0),
+        delta_g_fus_kJ_per_mol=delta_g_fus,
+        domain_verdict=fusion.domain_verdict,
+    )
+
+
 def _melt_oxide_gamma_for_activity(
     parent_oxide: str,
     gamma_s: float,
@@ -645,22 +697,15 @@ def _melt_oxide_gamma_for_activity(
                 raise ValueError(
                     f"temperature_K required for solid-referenced {parent_oxide} gamma"
                 )
-            temperature = float(temperature_K)
-            conversion = _d144_fusion_conversion(
-                parent_oxide, Decimal(str(temperature))
+            conversion = _convert_melt_oxide_activity_reference_state(
+                parent_oxide,
+                gamma,
+                temperature_K,
+                source_phase="solid",
+                target_phase="liquid",
             )
-            delta_g_fus = float(conversion.delta_g_fus_kJ_per_mol)
+            gamma = conversion.activity
             fusion_domain_verdict = conversion.domain_verdict
-            # mu = mu_s° + RT ln(a_s) = mu_l° + RT ln(a_l), so
-            # a_l = a_s exp(-(mu_l° - mu_s°)/RT). At the same X,
-            # gamma_l = gamma_s exp(-dG_fus/RT). JANAF supplies dG in
-            # kJ/mol; R is kJ/(mol K) and T is K, making the exponent
-            # dimensionless. Below T_fus, dG_fus > 0 and gamma_l < gamma_s.
-            # Sanity: at 1873 K, MgO's rough fusion-enthalpy estimate
-            # (dH_fus ~77 kJ/mol, T_m ~3098 K) gives dG ~30.4 kJ/mol
-            # and a factor ~0.14; the JANAF chord gives the Kume row
-            # a_l/a_s factor ~0.16.
-            gamma *= math.exp(-delta_g_fus / (R_KJ_PER_MOL_K * temperature))
     return (
         gamma,
         _gamma_reference_state_notice(parent_oxide),
