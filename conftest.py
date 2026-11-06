@@ -728,6 +728,8 @@ def pytest_sessionfinish(
     if _SESSION_WATCHDOG is not None:
         _SESSION_WATCHDOG.stop()
         _SESSION_WATCHDOG = None
+    if not os.environ.get("PYTEST_XDIST_WORKER"):
+        shutil.rmtree(_worker_cache_root(), ignore_errors=True)
 
 
 @pytest.fixture

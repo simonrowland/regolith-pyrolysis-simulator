@@ -215,3 +215,52 @@ print(json.dumps({
         "symlink_child_exists": True,
         "current_exists": True,
     }
+
+
+def test_sessionfinish_removes_controller_root_and_preserves_live_sibling(tmp_path):
+    repo_root = Path(__file__).resolve().parents[1]
+    cache_root = tmp_path / "current-checkout"
+    env = os.environ.copy()
+    env.pop("PYTEST_XDIST_WORKER", None)
+    env["PYTHONPATH"] = str(repo_root)
+    env["REGOLITH_PYTEST_WORKER_CACHE_ROOT"] = str(cache_root)
+
+    result = _run_import_conftest(
+        """
+import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+
+import conftest
+
+cache_root = Path(os.environ["REGOLITH_PYTEST_WORKER_CACHE_ROOT"])
+sibling_root = cache_root.parent / "live-checkout"
+cache_root.mkdir(parents=True)
+(cache_root / "worker-output").mkdir()
+sibling_root.mkdir(parents=True)
+owner_file = sibling_root / conftest._WORKER_CACHE_OWNER_FILE
+start = conftest._process_start_times({os.getpid()})[os.getpid()]
+owner_file.write_text(f"{os.getpid()}\\t{start}\\n", encoding="ascii")
+
+conftest.pytest_sessionfinish(SimpleNamespace(), 0)
+controller_root_exists = cache_root.exists()
+cache_root.mkdir(exist_ok=True)
+os.environ["PYTEST_XDIST_WORKER"] = "gw-test"
+conftest.pytest_sessionfinish(SimpleNamespace(), 0)
+print(json.dumps({
+    "controller_root_exists": controller_root_exists,
+    "worker_root_exists": cache_root.exists(),
+    "live_sibling_exists": sibling_root.exists(),
+    "live_owner_exists": owner_file.exists(),
+}))
+""",
+        env,
+    )
+
+    assert result == {
+        "controller_root_exists": False,
+        "worker_root_exists": True,
+        "live_sibling_exists": True,
+        "live_owner_exists": True,
+    }
