@@ -6053,11 +6053,22 @@ class _MELTSBackendSupport(MeltBackend):
                 'because it would silently zero evaporation flux'
             )
 
+        from simulator.chemistry.melt_activity import (
+            _builtin_crystalline_vapor_activities_from_weight_composition,
+        )
+
+        builtin_vapor_activities = (
+            _builtin_crystalline_vapor_activities_from_weight_composition(
+                comp_wt,
+                float(T_C) + CELSIUS_TO_KELVIN_OFFSET,
+            )
+        )
         pressures = self._activities_times_antoine(
             T_C,
             activities,
             comp_wt,
             pO2_bar=pO2_bar,
+            builtin_vapor_activities=builtin_vapor_activities,
         )
         # Partial activity maps that omit melt-present volatiles (e.g. Na/K
         # when only FeO/SiO2 activities are present) would debit those
@@ -6066,6 +6077,9 @@ class _MELTSBackendSupport(MeltBackend):
             comp_wt,
             table,
             activities,
+            builtin_activity_parent_oxides=frozenset(
+                builtin_vapor_activities
+            ),
         )
         if missing_precursor_species:
             return VaporPressureActivityRefusal(
@@ -6074,12 +6088,6 @@ class _MELTSBackendSupport(MeltBackend):
             )
         if pressures:
             return pressures
-        if getattr(self, "_antoine_activity_standard_state_notices", None):
-            return VaporPressureActivityRefusal(
-                missing_precursor_species=(),
-                context=str(context),
-                reason="activity_standard_state_undeclared",
-            )
 
         if not self._melt_has_antoine_vapor_precursor(comp_wt, table):
             return {}
@@ -6256,11 +6264,15 @@ class _MELTSBackendSupport(MeltBackend):
             )
         return payload
 
-    def _activities_times_antoine(self, T_C: float,
-                                    activities: dict,
-                                    _comp_wt: dict,
-                                    *,
-                                    pO2_bar: float | None = None) -> Dict[str, float]:
+    def _activities_times_antoine(
+        self,
+        T_C: float,
+        activities: dict,
+        _comp_wt: dict,
+        *,
+        pO2_bar: float | None = None,
+        builtin_vapor_activities: Mapping[str, object] | None = None,
+    ) -> Dict[str, float]:
         """Project melt-source reactions when VapoRock is unavailable.
 
         Activities may come from direct tables, gamma*x, or mu/mu0. Missing
@@ -6268,7 +6280,19 @@ class _MELTSBackendSupport(MeltBackend):
         Pressure math belongs to the catalog/Ellingham owner, never to a
         pure-component wall-saturation sidecar in this adapter.
         """
-        if not activities:
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+        if builtin_vapor_activities is None:
+            from simulator.chemistry.melt_activity import (
+                _builtin_crystalline_vapor_activities_from_weight_composition,
+            )
+
+            builtin_vapor_activities = (
+                _builtin_crystalline_vapor_activities_from_weight_composition(
+                    _comp_wt,
+                    T_K,
+                )
+            )
+        if not activities and not builtin_vapor_activities:
             return {}
         table = self._load_vapor_pressure_table()
         if not table:
@@ -6287,11 +6311,10 @@ class _MELTSBackendSupport(MeltBackend):
             validate_physical_pO2_bar, _pO2_evaluation_notice,
         )
         from simulator.chemistry.melt_activity import (
+            MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
-            crystalline_vapor_activity_standard_state_matches,
+            MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
         )
-
-        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
         self._antoine_activity_standard_state_notices = {}
@@ -6299,25 +6322,37 @@ class _MELTSBackendSupport(MeltBackend):
             if species not in ELLINGHAM_THERMO and not spec.get('antoine'):
                 # Retain this bridge's original oxide-gas request surface.
                 continue
-            raw_activity = self._activity_for_vapor_species(species, activities)
-            if raw_activity is None or not self._is_number(raw_activity):
-                continue
             reaction = spec.get('liquid_oxide_standard_reaction') or spec
             pO2_exponent = float(reaction.get('pO2_exponent', 0.0) or 0.0)
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
             parent_oxide = str(spec.get('parent_oxide', '') or '')
-            if self._antoine_uses_reaction_pressure(spec) and not (
-                crystalline_vapor_activity_standard_state_matches(
-                    parent_oxide,
-                    None,
+            builtin_vapor_activity = (
+                builtin_vapor_activities.get(parent_oxide)
+                if self._antoine_uses_reaction_pressure(spec)
+                else None
+            )
+            if builtin_vapor_activity is not None:
+                raw_activity = float(builtin_vapor_activity.activity)
+                notice = dict(builtin_vapor_activity.notice)
+                notice.update(
+                    {
+                        'reason': 'activity_standard_state_substitution',
+                        'parent_oxide': parent_oxide,
+                        'source_standard_state_substitution': (
+                            'alphamelts_oxide_activity_no_declared_standard '
+                            '-> builtin_declared_standard'
+                        ),
+                    }
                 )
+                self._antoine_activity_standard_state_notices[
+                    str(species)
+                ] = notice
+            elif (
+                self._antoine_uses_reaction_pressure(spec)
+                and parent_oxide
+                in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
             ):
-                # AlphaMELTS supplies liquid endmember activities and component
-                # proxies. Its bridge does not declare a pure MgO/CaO activity
-                # standard, so d-144 cannot convert these operands to the
-                # crystalline K basis. Refuse this route instead of evaluating
-                # the catalog with an untyped activity.
                 self._antoine_activity_standard_state_notices[str(species)] = {
                     'reason': 'activity_standard_state_undeclared',
                     'parent_oxide': parent_oxide,
@@ -6326,7 +6361,16 @@ class _MELTSBackendSupport(MeltBackend):
                     'required_standard_state_id': (
                         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
                     ),
+                    'from_standard_state_id': (
+                        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                    ),
                 }
+                continue
+            else:
+                raw_activity = self._activity_for_vapor_species(
+                    species, activities
+                )
+            if raw_activity is None or not self._is_number(raw_activity):
                 continue
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
                 raise RuntimeError(
@@ -6396,6 +6440,8 @@ class _MELTSBackendSupport(MeltBackend):
         comp_wt: Mapping[str, float],
         table: Mapping[str, Mapping[str, object]],
         activities: Mapping[str, object],
+        *,
+        builtin_activity_parent_oxides: frozenset[str] = frozenset(),
     ) -> list[str]:
         """Vapor species whose melt precursor is present but activity is not.
 
@@ -6404,6 +6450,13 @@ class _MELTSBackendSupport(MeltBackend):
         """
         missing: list[str] = []
         for vapor_species in table:
+            spec = table.get(str(vapor_species), {}) or {}
+            parent_oxide = str(spec.get('parent_oxide', '') or '')
+            if (
+                parent_oxide in builtin_activity_parent_oxides
+                and self._antoine_uses_reaction_pressure(spec)
+            ):
+                continue
             activity_keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
                 str(vapor_species), (str(vapor_species),)
             )

@@ -39,6 +39,7 @@ from simulator.backend_names import (
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
     crystalline_vapor_activity_standard_state_matches,
     melt_oxide_activity_coefficient,
@@ -1296,6 +1297,7 @@ def refusal_closure(
         # must resolve or refuse. Instrument the pure-component default so
         # the unit activity is typed, not silent.
         source_activity = 1.0
+        crystalline_vapor_activity_value: float | None = None
         _unit_activity_note: dict[str, Any] | None = None
         if (
             compiled is not None
@@ -1459,6 +1461,7 @@ def refusal_closure(
                     # activity above for handshake validation; only this value
                     # enters the crystalline K.
                     source_activity = vapor_activity_value
+                    crystalline_vapor_activity_value = vapor_activity_value
             else:
                 # Pure-component / activity-independent evaluator: a=1 is
                 # the correct dimensionless unit activity, but it was
@@ -1588,6 +1591,47 @@ def refusal_closure(
                             if declaration is not None
                             else source_reaction_activity_shadow.standard_state
                         )
+                        shadow_activity = source_reaction_activity_shadow
+                        if (
+                            declaration is not None
+                            and declaration.component_id
+                            in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
+                            and crystalline_vapor_activity_value is not None
+                        ):
+                            expected_shadow_standard_state = replace(
+                                declaration.standard_state,
+                                phase="crystalline",
+                                identity_id=(
+                                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+                                ),
+                            )
+                            shadow_source_standard_state = (
+                                shadow_activity.source_standard_state
+                                or shadow_activity.standard_state
+                            )
+                            shadow_value = shadow_activity.as_pressure_activity()
+                            if (
+                                shadow_value is not None
+                                and math.isfinite(float(shadow_value))
+                                and float(shadow_value) > 0.0
+                            ):
+                                converted_shadow_value = (
+                                    float(shadow_value)
+                                    * crystalline_vapor_activity_value
+                                    / numeric_activity
+                                )
+                                shadow_activity = replace(
+                                    shadow_activity,
+                                    value=converted_shadow_value,
+                                    ln_value=math.log(converted_shadow_value),
+                                )
+                            shadow_activity = replace(
+                                shadow_activity,
+                                standard_state=expected_shadow_standard_state,
+                                target_standard_state=expected_shadow_standard_state,
+                                source_standard_state=shadow_source_standard_state,
+                            )
+                            source_reaction_activity_shadow = shadow_activity
                         if expected_shadow_standard_state is None:
                             raise ValueError(
                                 "typed shadow has no standard-state identity"
@@ -1595,7 +1639,7 @@ def refusal_closure(
                         typed_activity_evaluation = (
                             compiled.evaluator.evaluate_typed_shadow(
                                 state.temperature_K,
-                                activity=source_reaction_activity_shadow,
+                                activity=shadow_activity,
                                 pO2_bar=evaluator_fO2_bar,
                                 expected_component_id=expected_shadow_component,
                                 expected_standard_state=(

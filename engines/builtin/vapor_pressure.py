@@ -115,12 +115,9 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
 )
 from simulator.chemistry.melt_activity import (  # noqa: E402
     ALPHAMELTS_CROSS_CHECK_STATUS,
-    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     MELT_OXIDE_ACTIVITY_LIMITATION,
     MELT_OXIDE_ACTIVITY_TIER,
-    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
-    _convert_melt_oxide_activity_reference_state,
+    _activity_for_crystalline_vapor_k,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
     single_cation_mole_fractions,
@@ -1787,66 +1784,6 @@ def _high_t_activity_for_parent(
         evidence_tier="PREDICT_AND_FLAG",
         authority_status="openimcc",
     )
-
-
-def _activity_for_crystalline_vapor_k(
-    parent_oxide: str,
-    activity: float,
-    temperature_K: float,
-) -> tuple[float, dict[str, Any] | None, str | None]:
-    """Return the activity on the crystalline K basis for MgO/CaO vapor rows."""
-
-    # OpenIMCC 9f25dfe's t-1637 liquid-standards registry declares MgO=Mg-009
-    # and CaO=Ca-028 in sf04-v1.0.2, sf04-ext-v4, D066 sf04-d066-v1,
-    # d066-v1-kcaalsi2o7, and d066-ext-v1; these match d-144's JANAF liquid
-    # standards. Convert from the source's declared standard to the K's
-    # crystalline standard, for both the built-in and above-1950 K OpenIMCC
-    # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
-    # by declared standard ID is a follow-up after t-1637 lands.
-    if parent_oxide not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
-        return float(activity), None, None
-    conversion = _convert_melt_oxide_activity_reference_state(
-        parent_oxide,
-        activity,
-        temperature_K,
-        source_phase="liquid",
-        target_phase="solid",
-    )
-    verdict = conversion.domain_verdict
-    notice = {
-        "oxide": parent_oxide,
-        "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        "to_standard_state_id": (
-            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-        ),
-        "temperature_K": float(temperature_K),
-        "log10_activity_offset": conversion.log10_activity_offset,
-        "delta_g_fus_kJ_per_mol": conversion.delta_g_fus_kJ_per_mol,
-        "authority": verdict.authority.value,
-        "authority_level": (
-            "extrapolated"
-            if verdict.authority.value == "extrapolated"
-            else "predict_and_flag"
-        ),
-        "reason": verdict.reason,
-        "certified_band_K": [
-            float(bound) for bound in verdict.certified_band_K
-        ],
-    }
-    warning = (
-        "vapor_activity_standard_state_conversion|"
-        f"oxide={parent_oxide}|"
-        f"from_standard_state_id={MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
-        "to_standard_state_id="
-        f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}|"
-        f"temperature_K={temperature_K:.2f}|"
-        f"log10_activity_offset={conversion.log10_activity_offset:+.12g}|"
-        f"authority={verdict.authority.value}|"
-        f"authority_level={notice['authority_level']}"
-    )
-    if verdict.reason:
-        warning += f"|reason={verdict.reason}"
-    return conversion.activity, notice, warning
 
 
 def _high_t_fe_activity_selected(authority: Mapping[str, Any] | None) -> bool:

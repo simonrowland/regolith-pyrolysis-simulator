@@ -176,6 +176,8 @@ def alphamelts_activity_volatility_diagnostic(
     grid = []
     vapor_model_limits: dict[str, Any] = {}
     antoine_skip_notices: list[str] = []
+    activity_standard_state_warnings: list[str] = []
+    activity_standard_state_notices: dict[str, dict[str, Any]] = {}
     for pO2_bar in pO2_values:
         computed = _analytical_vapor_pressures_from_activities(
             vapor_pressure_data=vapor_data,
@@ -186,6 +188,17 @@ def alphamelts_activity_volatility_diagnostic(
             vacuum_floor_bar=float(vacuum_floor_bar),
         )
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
+        activity_standard_state_notices.update(
+            computed.get("vapor_activity_standard_state_notices_by_species", {})
+        )
+        for notice in computed.get("warnings", ()):
+            if (
+                str(notice).startswith(
+                    "vapor_activity_standard_state_substitution|"
+                )
+                and notice not in activity_standard_state_warnings
+            ):
+                activity_standard_state_warnings.append(str(notice))
         for notice in _antoine_skip_notices_for_omitted_species(
             computed.get("warnings", ()),
             {
@@ -239,6 +252,9 @@ def alphamelts_activity_volatility_diagnostic(
         "pO2_grid_bar": tuple(pO2_values),
         "grid": tuple(grid),
         "vapor_model_extrapolated_beyond_valid_range_K": vapor_model_limits,
+        "vapor_activity_standard_state_notices_by_species": (
+            activity_standard_state_notices
+        ),
         "ellingham_authority": ellingham_authority,
         "activity_samples": {
             "primary": primary,
@@ -248,6 +264,7 @@ def alphamelts_activity_volatility_diagnostic(
             list(domain.get("warnings", ()))
             + list(primary.get("warnings", ()))
             + list(comparison.get("warnings", ()))
+            + activity_standard_state_warnings
             + antoine_skip_notices
         ),
     }
@@ -305,6 +322,7 @@ def _analytical_vapor_pressures_from_activities(
         return {
             "species": {},
             "extrapolated_beyond_valid_range_K": {},
+            "vapor_activity_standard_state_notices_by_species": {},
             "warnings": [],
         }
     pO2 = _finite_positive("pO2_bar", pO2_bar)
@@ -314,12 +332,20 @@ def _analytical_vapor_pressures_from_activities(
     by_species: dict[str, dict[str, Any]] = {}
     extrapolations: dict[str, Any] = {}
     warnings: list[str] = []
+    activity_standard_state_notices: dict[str, dict[str, Any]] = {}
     antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
     from simulator.vapour_rail.catalog import compiled_catalog_for
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
-        crystalline_vapor_activity_standard_state_matches,
+        MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
+        _builtin_crystalline_vapor_activities_from_weight_composition,
+    )
+    builtin_vapor_activities = (
+        _builtin_crystalline_vapor_activities_from_weight_composition(
+            comp_wt,
+            T_K,
+        )
     )
 
     catalog_payload = getattr(vapor_pressure_data, "catalog_payload", vapor_pressure_data)
@@ -328,6 +354,46 @@ def _analytical_vapor_pressures_from_activities(
         if catalog_payload.get("schema_version") == 2 else None
     )
 
+    def selected_activity(species: str, parent_oxide: str) -> float | None:
+        builtin_activity = builtin_vapor_activities.get(parent_oxide)
+        if builtin_activity is None:
+            if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+                warnings.append(
+                    "catalog_k_activity_skipped: "
+                    f"species={species} parent_oxide={parent_oxide} "
+                    "reason=activity_standard_state_undeclared "
+                    "source_standard_state_id=undeclared "
+                    "required_standard_state_id="
+                    f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}"
+                )
+                return None
+            return float(activities.get(parent_oxide, 0.0) or 0.0)
+        notice = dict(builtin_activity.notice)
+        notice.update(
+            {
+                "species": str(species),
+                "parent_oxide": parent_oxide,
+                "reason": "activity_standard_state_substitution",
+                "source_standard_state_substitution": (
+                    "alphamelts_oxide_activity_no_declared_standard -> "
+                    "builtin_declared_standard"
+                ),
+            }
+        )
+        activity_standard_state_notices[str(species)] = notice
+        warnings.append(
+            builtin_activity.warning.replace(
+                "vapor_activity_standard_state_conversion",
+                "vapor_activity_standard_state_substitution",
+                1,
+            )
+            + f"|species={species} reason=activity_standard_state_substitution|"
+            "source_standard_state_substitution="
+            "alphamelts_oxide_activity_no_declared_standard->"
+            "builtin_declared_standard"
+        )
+        return float(builtin_activity.activity)
+
     for species in _ELLINGHAM_THERMO:
         sp_data = (vapor_pressure_data.get("metals", {}) or {}).get(species, {}) or {}
         if not sp_data or str(sp_data.get("consumer_status", "")).lower() == "inactive":
@@ -335,17 +401,68 @@ def _analytical_vapor_pressures_from_activities(
         parent_oxide = str(sp_data.get("parent_oxide", "") or "")
         if not parent_oxide:
             continue
-        if not crystalline_vapor_activity_standard_state_matches(
-            parent_oxide,
-            None,
-        ):
-            warnings.append(
-                "catalog_k_activity_skipped: "
-                f"species={species} parent_oxide={parent_oxide} "
-                "reason=activity_standard_state_undeclared "
-                "source_standard_state_id=undeclared "
-                "required_standard_state_id="
-                f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}"
+        activity = selected_activity(species, parent_oxide)
+        if activity is None:
+            continue
+        if parent_oxide in builtin_vapor_activities:
+            from simulator.chemistry.ellingham_graph import (
+                effective_equilibrium_pressure_Pa,
+            )
+
+            route_data = {"metals": {species: sp_data}}
+            reference_pressure = effective_equilibrium_pressure_Pa(
+                species,
+                T_K,
+                pO2,
+                a_oxide=1.0,
+                vapor_pressure_data=route_data,
+            )
+            pressure = effective_equilibrium_pressure_Pa(
+                species,
+                T_K,
+                pO2,
+                a_oxide=activity,
+                vapor_pressure_data=route_data,
+            )
+            wt_activity = max(
+                0.0,
+                float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0,
+            )
+            wt_pressure = effective_equilibrium_pressure_Pa(
+                species,
+                T_K,
+                pO2,
+                a_oxide=wt_activity,
+                vapor_pressure_data=route_data,
+            )
+            ellingham_extrapolation = ellingham_authority_limit(
+                T_K,
+                species=species,
+                consumer="alphamelts-volatility-diagnostic",
+            )
+            if ellingham_extrapolation is not None:
+                extrapolations[species] = ellingham_extrapolation
+            by_species[species] = _species_payload(
+                parent_oxide=parent_oxide,
+                P_eq_Pa=pressure,
+                P_eq_wt_fraction_Pa=wt_pressure,
+                melt_oxide_activity=activity,
+                wt_fraction_activity=wt_activity,
+                activity_factor=(
+                    pressure / reference_pressure
+                    if reference_pressure > 0.0
+                    else 0.0
+                ),
+                wt_fraction_activity_factor=(
+                    wt_pressure / reference_pressure
+                    if reference_pressure > 0.0
+                    else 0.0
+                ),
+                P_reference_Antoine_Pa=reference_pressure,
+                pO2_bar=pO2,
+                source_label=(
+                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction"
+                ),
             )
             continue
         if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
@@ -353,7 +470,6 @@ def _analytical_vapor_pressures_from_activities(
                 raise RuntimeError(f"{species} requires its melt-source catalog reaction")
             # b-189-exempt: diagnostic pressure comparison, not a hot-train read.
             evaluator = catalog.evaluator_for(species)
-            activity = float(activities.get(parent_oxide, 0.0) or 0.0)
             wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
             if activity <= 0.0 and wt_activity <= 0.0:
                 continue
@@ -538,6 +654,58 @@ def _analytical_vapor_pressures_from_activities(
 
     for species, data in (vapor_pressure_data.get("oxide_vapors", {}) or {}).items():
         data = data or {}
+        parent_oxide = str(data.get("parent_oxide", "") or "")
+        if not parent_oxide:
+            continue
+        activity = selected_activity(str(species), parent_oxide)
+        if activity is None:
+            continue
+        if parent_oxide in builtin_vapor_activities:
+            if catalog is None:
+                raise RuntimeError(
+                    f"{species} requires its crystalline-K catalog reaction"
+                )
+            evaluator = catalog.evaluator_for(str(species))
+            reference = evaluator.evaluate(
+                T_K,
+                source_activity=1.0,
+                pO2_bar=evaluator.pO2_reference_bar,
+            )
+            pressure = evaluator.evaluate(
+                T_K,
+                source_activity=activity,
+                pO2_bar=pO2,
+            ).pressure_pa
+            wt_activity = max(
+                0.0,
+                float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0,
+            )
+            wt_pressure = evaluator.evaluate(
+                T_K,
+                source_activity=wt_activity,
+                pO2_bar=pO2,
+            ).pressure_pa if wt_activity > 0.0 else 0.0
+            if reference.out_of_range:
+                extrapolations[str(species)] = {
+                    "temperature_K": T_K,
+                    "valid_range_K": evaluator.valid_temperature_K,
+                    "authority_status": "extrapolation_limited",
+                }
+            by_species[str(species)] = _species_payload(
+                parent_oxide=parent_oxide,
+                P_eq_Pa=pressure,
+                P_eq_wt_fraction_Pa=wt_pressure,
+                melt_oxide_activity=activity,
+                wt_fraction_activity=wt_activity,
+                activity_factor=activity,
+                wt_fraction_activity_factor=wt_activity,
+                P_reference_Antoine_Pa=reference.pressure_pa,
+                pO2_bar=pO2,
+                source_label=(
+                    "alphamelts_activity_diagnostic:catalog_melt_source_reaction"
+                ),
+            )
+            continue
         antoine = data.get("antoine", {}) or {}
         try:
             A, B, C = _read_antoine_coefficients(antoine)
@@ -557,10 +725,6 @@ def _analytical_vapor_pressures_from_activities(
                 reason=_antoine_skip_reason_for_refusal(exc),
             )
             continue
-        parent_oxide = str(data.get("parent_oxide", "") or "")
-        if not parent_oxide:
-            continue
-        activity = float(activities.get(parent_oxide, 0.0) or 0.0)
         wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
         if activity <= 0.0 and wt_activity <= 0.0:
             continue
@@ -638,6 +802,9 @@ def _analytical_vapor_pressures_from_activities(
     return {
         "species": by_species,
         "extrapolated_beyond_valid_range_K": extrapolations,
+        "vapor_activity_standard_state_notices_by_species": (
+            activity_standard_state_notices
+        ),
         "warnings": warnings,
     }
 

@@ -652,6 +652,13 @@ class _MeltOxideActivityReferenceConversion:
     domain_verdict: FusionDomainVerdict
 
 
+@dataclass(frozen=True)
+class _BuiltinCrystallineVaporActivity:
+    activity: float
+    notice: dict[str, Any]
+    warning: str
+
+
 def _convert_melt_oxide_activity_reference_state(
     parent_oxide: str,
     activity: float,
@@ -691,6 +698,66 @@ def _convert_melt_oxide_activity_reference_state(
         delta_g_fus_kJ_per_mol=delta_g_fus,
         domain_verdict=fusion.domain_verdict,
     )
+
+
+def _activity_for_crystalline_vapor_k(
+    parent_oxide: str,
+    activity: float,
+    temperature_K: float,
+) -> tuple[float, dict[str, Any] | None, str | None]:
+    """Convert a declared liquid oxide activity to its crystalline K basis."""
+
+    # OpenIMCC 9f25dfe's t-1637 liquid-standards registry declares MgO=Mg-009
+    # and CaO=Ca-028 in sf04-v1.0.2, sf04-ext-v4, D066 sf04-d066-v1,
+    # d066-v1-kcaalsi2o7, and d066-ext-v1; these match d-144's JANAF liquid
+    # standards. Convert from the source's declared standard to the K's
+    # crystalline standard, for both the built-in and above-1950 K OpenIMCC
+    # paths. The b-1119 OpenIMCC pin 66ec4a3 predates this registry, so selecting
+    # by declared standard ID is a follow-up after t-1637 lands.
+    if parent_oxide not in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+        return float(activity), None, None
+    conversion = _convert_melt_oxide_activity_reference_state(
+        parent_oxide,
+        activity,
+        temperature_K,
+        source_phase="liquid",
+        target_phase="solid",
+    )
+    verdict = conversion.domain_verdict
+    notice = {
+        "oxide": parent_oxide,
+        "from_standard_state_id": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        "to_standard_state_id": (
+            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+        ),
+        "temperature_K": float(temperature_K),
+        "log10_activity_offset": conversion.log10_activity_offset,
+        "delta_g_fus_kJ_per_mol": conversion.delta_g_fus_kJ_per_mol,
+        "authority": verdict.authority.value,
+        "authority_level": (
+            "extrapolated"
+            if verdict.authority.value == "extrapolated"
+            else "predict_and_flag"
+        ),
+        "reason": verdict.reason,
+        "certified_band_K": [
+            float(bound) for bound in verdict.certified_band_K
+        ],
+    }
+    warning = (
+        "vapor_activity_standard_state_conversion|"
+        f"oxide={parent_oxide}|"
+        f"from_standard_state_id={MELT_OXIDE_ACTIVITY_REFERENCE_STATE}|"
+        "to_standard_state_id="
+        f"{MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE}|"
+        f"temperature_K={temperature_K:.2f}|"
+        f"log10_activity_offset={conversion.log10_activity_offset:+.12g}|"
+        f"authority={verdict.authority.value}|"
+        f"authority_level={notice['authority_level']}"
+    )
+    if verdict.reason:
+        warning += f"|reason={verdict.reason}"
+    return conversion.activity, notice, warning
 
 
 def _melt_oxide_gamma_for_activity(
@@ -913,6 +980,57 @@ def melt_oxide_activity(
         valid_range_K=activity_valid_range_K,
         authority_status=activity_authority_status,
     )
+
+
+def _builtin_crystalline_vapor_activities_from_weight_composition(
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+) -> dict[str, _BuiltinCrystallineVaporActivity]:
+    """Project AlphaMELTS weight composition onto the built-in vapor basis."""
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    composition_mol: dict[str, float] = {}
+    for raw_parent, raw_weight in composition_wt_pct.items():
+        parent = str(raw_parent)
+        if parent not in MELT_OXIDE_CATIONS_PER_FORMULA:
+            continue
+        weight = float(raw_weight)
+        if not math.isfinite(weight) or weight < 0.0:
+            raise ValueError(
+                f"melt composition for {parent!r} must be finite and non-negative"
+            )
+        if weight == 0.0:
+            continue
+        molar_mass = resolve_species_formula(
+            parent
+        ).molar_mass_kg_per_mol()
+        composition_mol[parent] = weight / molar_mass
+
+    projected: dict[str, _BuiltinCrystallineVaporActivity] = {}
+    for parent in sorted(MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY):
+        liquid = melt_oxide_activity(
+            parent,
+            composition_mol,
+            temperature_K=temperature_K,
+        )
+        if liquid is None or liquid.activity <= 0.0:
+            continue
+        activity, notice, warning = _activity_for_crystalline_vapor_k(
+            parent,
+            liquid.activity,
+            temperature_K,
+        )
+        if notice is None or warning is None:
+            raise RuntimeError(
+                f"{parent}: crystalline vapor activity conversion was not reported"
+            )
+        projected[parent] = _BuiltinCrystallineVaporActivity(
+            activity=activity,
+            notice=notice,
+            warning=warning,
+        )
+    return projected
 
 
 @lru_cache(maxsize=1)
