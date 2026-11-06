@@ -14,18 +14,33 @@ from simulator.vapour_rail.batch import PressureValue
 from simulator.vapour_rail.instrumentation import EffectivePressureSource
 from tests.chemistry.conftest import _build_sim
 
+_D349_VAPOR_ROUTES = ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas")
+# Same T, pO2, and activity. These measured metal-route ratios preserve the
+# legacy provider's rounded simulator.state R against the catalog's CODATA R.
+_D349_GATEWAY_TO_PROVIDER_PRESSURE_RATIO = {
+    "Mg": 1.00000782778,
+    "Mg2": 1.0,
+    "MgO_gas": 1.0,
+    "Ca": 1.00000951030,
+    "Ca2": 1.0,
+    "CaO_gas": 1.0,
+}
+
 
 def _lunar_mare_probe(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    *,
+    sim=None,
 ):
-    sim = _build_sim(
-        "lunar_mare_low_ti",
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-    )
+    if sim is None:
+        sim = _build_sim(
+            "lunar_mare_low_ti",
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+        )
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
@@ -42,6 +57,66 @@ def _lunar_mare_probe(
         control_inputs={"pO2_bar": 1.0, "intrinsic_fO2_log": 0.0},
     )
     return BuiltinVaporPressureProvider(vapor_pressure_data), request
+
+
+def _live_gateway_probe(vapor_pressure_data, feedstocks_data, setpoints_data):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        sim=sim,
+    )
+    diagnostic = dict(provider.dispatch(request).diagnostic)
+    equilibrium = SimpleNamespace(
+        temperature_C=1500.0,
+        pO2_bar=1.0,
+        fO2_log=0.0,
+        diagnostics={},
+        activity_coefficients=diagnostic["activities"],
+        vapor_pressures_Pa=diagnostic["vapor_pressures_Pa"],
+    )
+    effective_source = EffectivePressureSource(
+        "d349-live-gateway",
+        diagnostic["vapor_pressures_Pa"],
+    )
+    return sim, diagnostic, equilibrium, effective_source
+
+
+def _diagnostic_with_route_provenance(
+    diagnostic,
+    species,
+    *,
+    remove=(),
+    **updates,
+):
+    mutated = dict(diagnostic)
+    provenance = {
+        route: dict(route_provenance)
+        for route, route_provenance in diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ].items()
+    }
+    route_provenance = provenance[species]
+    for key in remove:
+        route_provenance.pop(key, None)
+    route_provenance.update(updates)
+    mutated["vapor_pressure_numerator_provenance"] = provenance
+    return mutated
+
+
+def _resolve_live_gateway_batch(sim, diagnostic, equilibrium, effective_source):
+    sim._last_vapor_pressure_diagnostic = diagnostic
+    return sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=1773.15,
+        effective_pressure_source=effective_source,
+    )
 
 
 def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
@@ -70,7 +145,11 @@ def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
     pressures = result.diagnostic["vapor_pressures_Pa"]
     assert result.status == "ok"
     for species, pressure in expected.items():
-        assert pressures[species] == pytest.approx(pressure, rel=1e-6)
+        assert pressures[species] == pytest.approx(
+            pressure,
+            rel=1e-6,
+            abs=0,
+        )
 
     # All six Mg/Ca parent routes use crystalline K: monatomic metal, dimers,
     # and monatomic oxide gas. The producer activity handshake itself remains
@@ -173,44 +252,30 @@ def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
     feedstocks_data,
     setpoints_data,
 ):
-    sim = _build_sim(
-        "lunar_mare_low_ti",
+    sim, diagnostic, equilibrium, effective_source = _live_gateway_probe(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
     )
-    provider, request = _lunar_mare_probe(
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-    )
-    provider_result = provider.dispatch(request)
-    diagnostic = dict(provider_result.diagnostic)
-    sim._last_vapor_pressure_diagnostic = diagnostic
-    equilibrium = SimpleNamespace(
-        temperature_C=1500.0,
-        pO2_bar=1.0,
-        fO2_log=0.0,
-        diagnostics={},
-        activity_coefficients=diagnostic["activities"],
-        vapor_pressures_Pa=diagnostic["vapor_pressures_Pa"],
-    )
-    effective_source = EffectivePressureSource(
-        "d349-live-gateway",
-        diagnostic["vapor_pressures_Pa"],
-    )
-    batch = sim._resolve_evaporation_vapour_batch(
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
         equilibrium,
-        temperature_K=1773.15,
-        effective_pressure_source=effective_source,
+        effective_source,
     )
     assert batch is not None
 
-    for species in ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas"):
+    for species in _D349_VAPOR_ROUTES:
         answer = batch.channel(species)
         assert isinstance(answer.pressure, PressureValue)
-        assert answer.pressure.pa == pytest.approx(
-            diagnostic["vapor_pressures_Pa"][species], rel=1e-5
+        gateway_provider_ratio = (
+            answer.pressure.pa
+            / diagnostic["vapor_pressures_Pa"][species]
+        )
+        assert gateway_provider_ratio == pytest.approx(
+            _D349_GATEWAY_TO_PROVIDER_PRESSURE_RATIO[species],
+            rel=1e-9,
+            abs=0,
         )
         source_activity = answer.source_reaction_activity
         assert source_activity is not None
@@ -226,31 +291,71 @@ def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
             "single_cation_Raoultian_pure_crystalline_reference"
         )
 
-    # A crystalline-K route cannot fall back to the liquid handshake value if
-    # its converted operand and standard-state ID are absent at the gateway.
-    mutated_diagnostic = dict(diagnostic)
-    mutated_provenance = {
-        species: dict(provenance)
-        for species, provenance in diagnostic[
-            "vapor_pressure_numerator_provenance"
-        ].items()
-    }
-    mutated_provenance["MgO_gas"].pop("activity_standard_state_conversion")
-    mutated_provenance["MgO_gas"].pop("vapor_activity_for_crystalline_K")
-    mutated_provenance["MgO_gas"].pop(
-        "vapor_activity_for_crystalline_K_standard_state_id"
+def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim, diagnostic, equilibrium, effective_source = _live_gateway_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
     )
-    mutated_diagnostic["vapor_pressure_numerator_provenance"] = (
-        mutated_provenance
+    required_fields = (
+        "activity_standard_state_conversion",
+        "vapor_activity_for_crystalline_K",
+        "vapor_activity_for_crystalline_K_standard_state_id",
     )
-    sim._last_vapor_pressure_diagnostic = mutated_diagnostic
-    refused_batch = sim._resolve_evaporation_vapour_batch(
-        equilibrium,
-        temperature_K=1773.15,
-        effective_pressure_source=effective_source,
+    for species in _D349_VAPOR_ROUTES:
+        mutated = _diagnostic_with_route_provenance(
+            diagnostic,
+            species,
+            remove=required_fields,
+        )
+        refused_batch = _resolve_live_gateway_batch(
+            sim,
+            mutated,
+            equilibrium,
+            effective_source,
+        )
+        assert refused_batch is None, species
+        assert sim._last_vapour_batch_resolve_error["reason"] == (
+            "vapour_batch_resolve_failed"
+        )
+        assert species in sim._last_vapour_batch_resolve_error["detail"]
+
+
+def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim, diagnostic, equilibrium, effective_source = _live_gateway_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
     )
-    assert refused_batch is None
-    assert sim._last_vapour_batch_resolve_error["reason"] == (
-        "vapour_batch_resolve_failed"
-    )
-    assert "MgO_gas" in sim._last_vapour_batch_resolve_error["detail"]
+    for species in _D349_VAPOR_ROUTES:
+        mutated = _diagnostic_with_route_provenance(
+            diagnostic,
+            species,
+            vapor_activity_for_crystalline_K=diagnostic["activities"][species],
+        )
+        batch = _resolve_live_gateway_batch(
+            sim,
+            mutated,
+            equilibrium,
+            effective_source,
+        )
+        assert batch is not None, species
+        answer = batch.channel(species)
+        assert isinstance(answer.pressure, PressureValue), species
+        correct_pressure = (
+            diagnostic["vapor_pressures_Pa"][species]
+            * _D349_GATEWAY_TO_PROVIDER_PRESSURE_RATIO[species]
+        )
+        assert answer.pressure.pa != pytest.approx(
+            correct_pressure,
+            rel=1e-9,
+            abs=0,
+        ), species
