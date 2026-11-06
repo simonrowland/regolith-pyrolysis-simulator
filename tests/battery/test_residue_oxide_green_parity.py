@@ -1,4 +1,4 @@
-"""write=False residue migrations match green a822c275f.
+"""write=False residue migrations match green 0418c0fd9.
 
 The temp-root setup copies tests/battery/test_migrate.py::_migrate_real_extract
 (original extract text, one INDEX row, migrate(root, write=False)). Importing
@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-GREEN = "a822c275f29fe3e16fad41f4ccfe16606c01aa73"
+GREEN = "0418c0fd9"
 SOURCES = (
     "ivanova-2018-spinel-rich-cai-evaporation",
     "kems-026-markova-1984",
@@ -93,11 +93,38 @@ def fingerprint(result) -> list[dict[str, object]]:
             if value.expression_parameters
             else None,
         }
+        composition = obs.identity.composition
+        identity_composition = None
+        identity_composition_text = None
+        if composition is not None:
+            if composition.is_value:
+                value = composition.value
+                ordered_components = sorted(value.components)
+                identity_composition = {
+                    "tag": composition.tag.value,
+                    "basis": value.basis,
+                    "amount_basis": value.amount_basis.value,
+                    "components": [
+                        [name, _dec(amount)] for name, amount in ordered_components
+                    ],
+                    "proxy_flag": value.proxy_flag,
+                }
+                identity_composition_text = [
+                    [name, _raw_dec(amount)] for name, amount in ordered_components
+                ]
+            else:
+                identity_composition = {
+                    "tag": composition.tag.value,
+                    "reason": composition.reason,
+                }
+                identity_composition_text = identity_composition
         rows.append(
             {
                 "id": obs.observation_id,
                 "quantity": quantity_label,
                 "species": obs.identity.species.formula,
+                "identity_composition": identity_composition,
+                "identity_composition_text": identity_composition_text,
                 "value": numeric,
                 "value_text": text,
                 "admission": obs.admission.status.value,
@@ -175,7 +202,11 @@ def _rebind_green_paths() -> None:
 
 
 def _without_text(row: dict[str, object]) -> dict[str, object]:
-    return {key: value for key, value in row.items() if key != "value_text"}
+    return {
+        key: value
+        for key, value in row.items()
+        if key not in {"value_text", "identity_composition_text"}
+    }
 
 
 def _brief(row: dict[str, object]) -> str:
@@ -195,6 +226,7 @@ def diff_payloads(
 ) -> dict[str, object]:
     report: dict[str, object] = {}
     real_total = 0
+    identity_composition_changes_total = 0
     text_total = 0
     first: str | None = None
     for source_id in SOURCES:
@@ -203,11 +235,22 @@ def diff_payloads(
         only_tip = sorted(set(tip_rows) - set(green_rows))
         only_green = sorted(set(green_rows) - set(tip_rows))
         real = []
+        identity_composition_changes = []
         text_only = []
         for obs_id in sorted(set(tip_rows) & set(green_rows)):
             left = tip_rows[obs_id]
             right = green_rows[obs_id]
-            if _without_text(left) != _without_text(right):
+            left_without_identity_composition = {
+                key: value
+                for key, value in _without_text(left).items()
+                if key != "identity_composition"
+            }
+            right_without_identity_composition = {
+                key: value
+                for key, value in _without_text(right).items()
+                if key != "identity_composition"
+            }
+            if left_without_identity_composition != right_without_identity_composition:
                 real.append(obs_id)
                 if first is None:
                     first = (
@@ -215,9 +258,16 @@ def diff_payloads(
                         f"tip   {_brief(left)}\n"
                         f"green {_brief(right)}"
                     )
-            elif left["value_text"] != right["value_text"]:
+            elif left["identity_composition"] != right["identity_composition"]:
+                identity_composition_changes.append(obs_id)
+            elif (
+                left["value_text"] != right["value_text"]
+                or left["identity_composition_text"]
+                != right["identity_composition_text"]
+            ):
                 text_only.append(obs_id)
         real_total += len(real) + len(only_tip) + len(only_green)
+        identity_composition_changes_total += len(identity_composition_changes)
         text_total += len(text_only)
         if first is None and only_tip:
             missing = tip_rows[only_tip[0]]
@@ -231,15 +281,17 @@ def diff_payloads(
             "only_tip": only_tip[:8],
             "only_green": only_green[:8],
             "real": real[:8],
+            "identity_composition_changes": identity_composition_changes[:8],
             "decimal_text_only": len(text_only),
         }
     report["real_total"] = real_total
+    report["identity_composition_changes_total"] = identity_composition_changes_total
     report["decimal_text_only_total"] = text_total
     report["first"] = first
     return report
 
 
-def test_printed_residue_migrations_match_green_a822c275f(tmp_path: Path) -> None:
+def test_printed_residue_migrations_match_green_0418c0fd9(tmp_path: Path) -> None:
     green_src = tmp_path / "green-migrate.py"
     with green_src.open("w") as handle:
         subprocess.run(
@@ -266,6 +318,26 @@ def test_printed_residue_migrations_match_green_a822c275f(tmp_path: Path) -> Non
     assert loaded == green_src.resolve(), loaded
     report = diff_payloads(tip, green_payload["sources"])
     assert report["real_total"] == 0, report.get("first") or report
+    composition_changes = {
+        source_id: source_report["identity_composition_changes"]
+        for source_id, source_report in report.items()
+        if isinstance(source_report, dict)
+        and source_report["identity_composition_changes"]
+    }
+    row_id = (
+        "kems-015-hashimoto-1983::"
+        "hashimoto_1983_table1_starting_composition"
+    )
+    assert composition_changes == {}, composition_changes
+    tip_rows = {str(row["id"]): row for row in tip["kems-015-hashimoto-1983"]}
+    green_rows = {
+        str(row["id"]): row
+        for row in green_payload["sources"]["kems-015-hashimoto-1983"]
+    }
+    # Green leaves Hashimoto's starting_Ave_ row out of identity composition;
+    # an accepted printed mass map does not add a composition identity axis.
+    assert tip_rows[row_id]["identity_composition"] is None
+    assert green_rows[row_id]["identity_composition"] is None
     assert report["decimal_text_only_total"] == 0, report
 
 
@@ -273,9 +345,6 @@ if __name__ == "__main__":
     import sys
 
     green_src = Path(os.environ["PARITY_GREEN_SRC"]).resolve()
-    # e47e33186 adds phase_for_sample_form; 81256c01a imports it from migrate.
-    # Bind that name from the worktree module before a822c275f, which does
-    # not define it, replaces simulator.battery.migrate.
     import simulator.battery as battery_pkg
 
     sys.modules.pop("simulator.battery.migrate", None)
