@@ -1,0 +1,35 @@
+source_id: moeller-2007-silicon-oxide-evaporation-condensation
+extraction:
+  disposition: Typed-refused table context because no exact IR-wavenumber quantity and no table_record observation type exist.
+  comparison_note: page/table_index selects MinerU draft blocks for the compare tool; the extract locators retain printed table captions (2.2, 2.3, 4.2, 4.5, 4.6, A.2).
+tables:
+  - page: 43
+    table_index: 2
+    type: table_record
+    quantity: SiO2_transversal_optical_band_wavenumber
+    unit: cm-1
+    values: [{column: 1, species: SiO2, unit: cm-1, quantity: SiO2_rocking_wavenumber, evidence_class: quoted_attributed}, {column: 2, species: SiO2, unit: cm-1, quantity: SiO2_bending_wavenumber, evidence_class: quoted_attributed}, {column: 3, species: SiO2, unit: cm-1, quantity: SiO2_stretching_wavenumber, evidence_class: quoted_attributed}]
+  - page: 43
+    table_index: 3
+    type: table_record
+    quantity: SiO2_longitudinal_optical_band_wavenumber
+    unit: cm-1
+    values: [{column: 1, species: SiO2, unit: cm-1, quantity: SiO2_rocking_wavenumber, evidence_class: quoted_attributed}, {column: 2, species: SiO2, unit: cm-1, quantity: SiO2_bending_wavenumber, evidence_class: quoted_attributed}, {column: 3, species: SiO2, unit: cm-1, quantity: SiO2_stretching_wavenumber, evidence_class: quoted_attributed}]
+  - page: 73
+    table_index: 7
+    type: table_record
+    quantity: SiO_fitted_transversal_optical_band_wavenumbers_and_film_thickness
+    unit: cm-1
+    values: [{column: 1, species: SiO, unit: cm-1, quantity: SiO_resonance_wavenumber, evidence_class: measured_reduced}]
+  - page: 82
+    table_index: 8
+    type: table_record
+    quantity: SiO_transversal_optical_resonance_wavenumber
+    unit: cm-1
+    values: [{column: 2, species: SiO, unit: cm-1, quantity: SiO_resonance_wavenumber, evidence_class: measured_reduced}]
+  - page: 100
+    table_index: 10
+    type: table_record
+    quantity: SiO_annealing_rocking_and_bending_band_parameters
+    unit: cm-1
+    values: [{column: 2, species: SiO, unit: cm-1, quantity: SiO_rocking_and_bending_wavenumber, evidence_class: measured_reduced}]
