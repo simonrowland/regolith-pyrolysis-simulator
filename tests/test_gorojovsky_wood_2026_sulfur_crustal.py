@@ -76,6 +76,15 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         observation.observation_id.rsplit("::", 1)[-1]: observation
         for observation in all_rows
     }
+    high_mg_basalt = migrated_by_raw_id["t2-r016-capacity"]
+    high_mg_composition = (high_mg_basalt.point_conditions or {}).get(
+        "composition"
+    )
+    assert high_mg_composition is not None
+    assert high_mg_composition.state.is_unknown
+    assert "kept sum=94.37 wt% is below 95 wt%" in high_mg_composition.state.reason
+    assert high_mg_composition.locator is not None
+
     experiment_by_id = {
         experiment["experiment_id"]: experiment for experiment in doc["experiments"]
     }

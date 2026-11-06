@@ -191,6 +191,16 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     assert len(migrated) == 186
     assert result.validation.hard_issues == ()
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 66
+    for source_row in table1:
+        observation = migrated[source_row["observation_id"]]
+        condition = (observation.point_conditions or {}).get("composition")
+        assert condition is not None
+        assert condition.state.is_unknown
+        assert condition.state.reason.startswith(
+            "mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum="
+        )
+        assert condition.state.reason.endswith("is below 95 wt%")
+        assert condition.locator == observation.locator
     quantity_unknown = {
         observation_id
         for observation_id, row in migrated.items()

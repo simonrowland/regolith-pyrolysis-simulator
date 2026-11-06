@@ -21928,6 +21928,65 @@ class Migrator:
             ),
             locator=locator,
         )
+        refused_sample_composition = None
+        if (
+            not composition_role_refusal
+            and composition_role_error is None
+            and row_sample.printed_composition is not None
+            and row_sample.printed_composition.state.is_value
+            and isinstance(row_sample.printed_composition.state.value, Mapping)
+        ):
+            printed_wt_map = _printed_composition_map(
+                row_sample.printed_composition.state.value
+            )
+            if printed_wt_map is not None:
+                _printed, candidate_sample_composition = (
+                    _located_printed_and_initial(
+                        printed_wt_map,
+                        row_sample.printed_composition.locator or locator,
+                        closure_context=composition_closure_context,
+                        declared_component_map=_named_printed_composition_map(
+                            composition_closure_context
+                        ),
+                    )
+                )
+                if (
+                    candidate_sample_composition is not None
+                    and candidate_sample_composition.state.is_unknown
+                ):
+                    refused_sample_composition = candidate_sample_composition
+        if (
+            refused_sample_composition is None
+            and row_sample.initial_composition is not None
+            and row_sample.initial_composition.state.is_unknown
+        ):
+            refused_sample_composition = row_sample.initial_composition
+        if refused_sample_composition is not None and not (
+            refused_sample_composition.state.is_unknown
+            and (refused_sample_composition.state.reason or "").startswith(
+                "mass-percent composition is not usable:"
+            )
+            and "partial analysis: kept sum="
+            in (refused_sample_composition.state.reason or "")
+            and (refused_sample_composition.state.reason or "").endswith(
+                "is below 95 wt%"
+            )
+        ):
+            refused_sample_composition = None
+        if (
+            not composition_role_refusal
+            and composition_role_error is None
+            and "composition" not in (point_conditions or {})
+            and refused_sample_composition is not None
+            and refused_sample_composition.state.is_unknown
+            and (refused_sample_composition.state.reason or "").startswith(
+                "mass-percent composition is not usable:"
+            )
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": refused_sample_composition,
+            }
         if (
             row_sample.printed_composition is not None
             and row_sample.printed_composition.state.is_value
