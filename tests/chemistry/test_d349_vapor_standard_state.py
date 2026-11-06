@@ -28,6 +28,14 @@ from simulator.vapour_rail.instrumentation import EffectivePressureSource
 from tests.chemistry.conftest import _build_sim
 
 _D349_VAPOR_ROUTES = ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas")
+_D349_SOURCE_K_STANDARD_IDS = {
+    "Mg": ("Mg-009", "Mg-010"),
+    "Mg2": ("Mg-009", "Mg-010"),
+    "MgO_gas": ("Mg-009", "Mg-010"),
+    "Ca": ("Ca-028", "Ca-029"),
+    "Ca2": ("Ca-028", "Ca-029"),
+    "CaO_gas": ("Ca-028", "Ca-029"),
+}
 # Same T, pO2, and activity. These measured metal-route ratios preserve the
 # legacy provider's rounded simulator.state R against the catalog's CODATA R.
 _D349_GATEWAY_TO_PROVIDER_PRESSURE_RATIO = {
@@ -494,10 +502,8 @@ def test_d349_fe_vapor_uses_fe020_crystal_standard_below_1650k(
     notice = route["activity_standard_state_conversion"]
 
     assert pressure > 0.0
-    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-    assert notice["to_standard_state_id"] == (
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-    )
+    assert notice["from_standard_state_id"] == "Fe-020"
+    assert notice["to_standard_state_id"] == "Fe-020"
     assert notice["conversion_performed"] is True
 
     # The mutation goes through the same production vapor route and removes
@@ -517,11 +523,10 @@ def test_d349_fe_vapor_uses_fe020_crystal_standard_below_1650k(
         temperature_C=temperature_K - 273.15,
         pO2_bar=1.0,
     )
-    # JANAF Fe-019 minus Fe-020 gives 2.158 kJ/mol at 1500 K and
-    # 0.363 kJ/mol at the 1650 K K transition; the owner anchors the
-    # conversion there, so the applied difference is 1.795 kJ/mol.
+    # Branch-wise JANAF Fe-019 minus crystalline Fe-020 gives 2.158 kJ/mol
+    # at 1500 K; raw activity omits that full liquid-to-crystal difference.
     assert raw["vapor_pressures_Pa"]["Fe"] / pressure == pytest.approx(
-        math.exp(-1.795 / (8.31446261815324e-3 * temperature_K)),
+        math.exp(-2.158 / (8.31446261815324e-3 * temperature_K)),
         rel=1e-9,
     )
 
@@ -553,10 +558,8 @@ def test_d349_alphamelts_fe_fallback_uses_same_fe020_conversion(
         abs=0,
     )
     notice = backend._antoine_activity_standard_state_notices["Fe"]
-    assert notice["from_standard_state_id"] == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-    assert notice["to_standard_state_id"] == (
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-    )
+    assert notice["from_standard_state_id"] == "Fe-020"
+    assert notice["to_standard_state_id"] == "Fe-020"
     assert notice["conversion_performed"] is True
     assert notice["source_standard_state_substitution"] == (
         "alphamelts_oxide_activity_no_declared_standard -> "
@@ -649,9 +652,9 @@ def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
         assert reported["vapor_activity_for_crystalline_K_standard_state_id"] == (
             conversion["to_standard_state_id"]
         )
-        assert conversion["to_standard_state_id"] == (
-            "single_cation_Raoultian_pure_crystalline_reference"
-        )
+        source_id, k_id = _D349_SOURCE_K_STANDARD_IDS[species]
+        assert conversion["from_standard_state_id"] == source_id
+        assert conversion["to_standard_state_id"] == k_id
 
 def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
     vapor_pressure_data,
@@ -772,12 +775,8 @@ def test_d349_fe_conversion_reaches_live_gateway_guard_below_1650k(
     route = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
     notice = route["activity_standard_state_conversion"]
     assert notice["conversion_performed"] is True
-    assert notice["from_standard_state_id"] == (
-        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-    )
-    assert notice["to_standard_state_id"] == (
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-    )
+    assert notice["from_standard_state_id"] == "Fe-020"
+    assert notice["to_standard_state_id"] == "Fe-020"
     assert route["vapor_activity_used_for_K"] != diagnostic["activities"]["Fe"]
 
     batch = _resolve_live_gateway_batch(
@@ -869,12 +868,9 @@ def test_d350_alphamelts_fallback_substitutes_builtin_mgo_cao_activity(
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
         )
-        assert notice["from_standard_state_id"] == (
-            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-        )
-        assert notice["to_standard_state_id"] == (
-            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-        )
+        source_id, k_id = _D349_SOURCE_K_STANDARD_IDS[species]
+        assert notice["from_standard_state_id"] == source_id
+        assert notice["to_standard_state_id"] == k_id
         assert math.isfinite(float(notice["log10_activity_offset"]))
 
     diagnostics = backend._vapor_pressure_diagnostics({}, projection, "alphamelts")
@@ -1075,22 +1071,23 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         assert notice["reason"] == "activity_standard_state_substitution"
         assert math.isfinite(float(notice["log10_activity_offset"]))
         if species == "Fe":
-            assert notice["conversion_performed"] is False
-            assert notice["source_standard_state_relation_reason"] == (
-                "source_and_K_standard_states_match"
-            )
+            assert notice["conversion_performed"] is True
         assert notice["source_standard_state_substitution"] == (
             "alphamelts_oxide_activity_no_declared_standard -> "
             "builtin_declared_standard"
         )
-        assert notice["from_standard_state_id"] == (
-            MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-        )
-        assert notice["to_standard_state_id"] == (
-            MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-            if species in {"Mg", "Ca"}
-            else MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-        )
+        if species in _D349_SOURCE_K_STANDARD_IDS:
+            expected_source_id, expected_k_id = (
+                _D349_SOURCE_K_STANDARD_IDS[species]
+            )
+        elif species == "Fe":
+            expected_source_id = expected_k_id = "Fe-020"
+        else:
+            expected_source_id = expected_k_id = (
+                MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+            )
+        assert notice["from_standard_state_id"] == expected_source_id
+        assert notice["to_standard_state_id"] == expected_k_id
 
     from simulator.runner import _vapor_pressure_source_report
 
