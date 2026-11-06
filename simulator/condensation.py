@@ -4660,7 +4660,9 @@ class CondensationModel:
                     (item for item in outcomes if item.get('status') == 'extrapolated'),
                     None,
                 )
-                if domain_outcome is not None and refused_outcome is None:
+                # Keep the local refusal in stage_outcomes without erasing
+                # extrapolation evidence from the stages that did run.
+                if domain_outcome is not None:
                     authority = condensation_authority_by_species.get(species)
                     if authority is not None:
                         authority.update({
@@ -5287,12 +5289,11 @@ class CondensationModel:
         if p_local == 0.0:
             return _zero('nonpositive_local_pressure', p_local_pa=0.0)
         area_m2 = self._stage_area_m2_for_stage(stage)
-        # A missing key and an explicit zero are the same surface: this
-        # geometry has no cartridge. Pass the parcel through. Raising here
-        # made one missing area a species-level refusal and dropped the
-        # Antoine extrapolation recorded on the stages that did run.
-        # Shipped setpoints set k_stage4b, so that train still captures.
-        if area_m2 is None or area_m2 == 0.0:
+        if area_m2 is None:
+            raise DepositionInputRefusal(
+                'k_stage4b', None, 'cartridge capture area is required',
+            )
+        if area_m2 == 0.0:
             return _zero('no_configured_capture_area')
         wall_K = _stage_midpoint_temperature_K(stage)
         # Same wall-saturation owner as the HKL stages. A refusal there

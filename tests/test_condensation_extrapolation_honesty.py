@@ -57,7 +57,8 @@ def test_stage3_unavailable_psat_missing_flow_refuses():
 
 def test_missing_collector_area_refuses_capture_quantity_without_aborting_route():
     model = _stage3_unavailable_psat_model()
-    model.stage_area_m2_by_stage = {}
+    # Isolate the missing collector input; this geometry has no K cartridge.
+    model.stage_area_m2_by_stage = {"k_stage4b": 0.0}
     result = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -72,6 +73,36 @@ def test_missing_collector_area_refuses_capture_quantity_without_aborting_route(
                for item in missing_area)
     assert result.retained_in_source_by_species.get("SiO", 0.0) == 0.0
     assert result.remaining_by_species["SiO"] == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize("cartridge_area", [None, 0.0], ids=["missing", "off"])
+def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
+    model = _stage3_unavailable_psat_model()
+    model.stage_area_m2_by_stage.pop("4")
+    model.stage_area_m2_by_stage["alkali_stage4"] = 1.0
+    if cartridge_area is not None:
+        model.stage_area_m2_by_stage["k_stage4b"] = cartridge_area
+
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authority_level"] == "extrapolated"
+    outcomes = result.condensation_refusals_by_species["SiO"]["stage_outcomes"]
+    if cartridge_area is None:
+        refusal = next(item for item in outcomes if item.get("parameter") == "k_stage4b")
+        assert refusal["status"] == "refused"
+        assert refusal["refusal_type"] == "DepositionInputRefusal"
+        assert refusal["eta"] is None
+    else:
+        pass_through = next(
+            item for item in outcomes
+            if item.get("reason") == "no_configured_capture_area"
+        )
+        assert pass_through["status"] == "pass_through"
+        assert pass_through["output_status"] == "status_bearing"
 
 
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
