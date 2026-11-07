@@ -152,6 +152,25 @@ def test_owner_recipe_surface_constants_are_shared():
     )
 
 
+def test_owner_certification_row_selects_exact_literal_recipe_vector():
+    owner_row = {
+        "temperature_C": 1650.0,
+        "requested_pO2_mbar": 1.0e-6,
+        "requested_pN2_mbar": 10.0,
+        "dose_fraction_of_full_FeO_equiv": 1.0,
+    }
+    different_pO2_row = {**owner_row, "requested_pO2_mbar": 1.0e-4}
+    half_dose_row = {**owner_row, "dose_fraction_of_full_FeO_equiv": 0.5}
+    float_noise_row = {**owner_row, "requested_pN2_mbar": 10.0 + 1e-12}
+
+    assert sso_r_owner_surface.owner_certification_row(
+        [different_pO2_row, half_dose_row, float_noise_row, owner_row]
+    ) is owner_row
+    assert sso_r_owner_surface.owner_certification_row([different_pO2_row]) is None
+    assert sso_r_owner_surface.owner_certification_row([half_dose_row]) is None
+    assert sso_r_owner_surface.owner_certification_row([float_noise_row]) is None
+
+
 def _assertion(payload, name):
     return {a["name"]: a for a in payload["assertions"]}[name]
 
