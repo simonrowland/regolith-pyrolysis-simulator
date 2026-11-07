@@ -8,9 +8,16 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.battery.factories import migrate_one_extract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/visscher-fegley-2013-debris-disks.yaml"
+TABLE1_PARENT = "visscher_2013_table1_bulk_silicate_compositions"
+PROSE_RESULT_IDS = (
+    "visscher_2013_low_temperature_volatile_dominance",
+    "visscher_2013_low_temperature_volatile_dominance_zinc",
+)
 MODEL_RESULT_IDS = (
     "visscher_2013_sio_partial_pressure_equilibrium",
     "visscher_2013_low_temperature_volatile_dominance",
@@ -45,15 +52,29 @@ def _assert_model_result_classes(document: dict) -> None:
         values = row["values"]
         derivation = row["derivation"]
         assert values["method_class"] == "model_derived"
-        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-        assert derivation["raw_inputs"]["locator"]["section"] == "2.1. Chemical Model"
+        if observation_id in PROSE_RESULT_IDS:
+            assert "raw_inputs" not in derivation
+            assert row["derived_from"] == [TABLE1_PARENT]
+            assert derivation["inputs"] == [TABLE1_PARENT]
+            assert row["standard_state"] == "saturated vapor in chemical equilibrium with molten silicate"
+            assert row["standard_state_locator"]["published_page"] == 2
+            assert "mole-fraction dominance" in row["basis"]
+            assert values["value_as_printed"]
+        else:
+            assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+            assert derivation["raw_inputs"]["locator"]["section"] == "2.1. Chemical Model"
         assert derivation["method"]["state"]["value"]
         assert derivation["method"]["locator"]["page"] > 0
         assert derivation["method"]["locator"]["section"]
-        assert derivation["references"] == [
+        expected_references = [
             "Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.",
             "Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.",
         ]
+        if observation_id == "visscher_2013_low_temperature_volatile_dominance_zinc":
+            expected_references.append(
+                "Paniello, R. C., Day, J. M. D., & Moynier, F. 2012, Nature, 490, 376."
+            )
+        assert derivation["references"] == expected_references
 
 
 def test_magma_results_are_pinned_as_authors_model_outputs() -> None:
@@ -69,6 +90,32 @@ def test_magma_results_are_pinned_as_authors_model_outputs() -> None:
     oxygen_context = _rows(document)["visscher_2013_o2_vapor_fraction"]
     assert oxygen_context["values"]["method_class"] == "quoted_attributed"
     assert oxygen_context["quote"] == "Visscher and Fegley (2013), MAGMA equilibrium calculation"
+
+    rows = _rows(document)
+    sodium = rows["visscher_2013_low_temperature_volatile_dominance"]
+    assert sodium["values"]["transition_locator"]["published_page"] == 4
+    assert "3000-3500 K" in sodium["values"]["transition_statement_as_printed"]
+    zinc = rows["visscher_2013_low_temperature_volatile_dominance_zinc"]
+    assert "Zn-dominated regime" in zinc["values"]["value_as_printed"]
+    assert zinc["derivation"]["method"]["locator"]["published_page"] == 2
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    assert migrator.result.validation.hard_issues == ()
+
+
+def test_unresolved_magma_composition_parent_is_a_hard_issue(tmp_path) -> None:
+    document = _document()
+    rows = _rows(document)
+    target = rows["visscher_2013_low_temperature_volatile_dominance"]
+    target["derived_from"] = ["missing_melt_composition"]
+    target["derivation"]["inputs"] = ["missing_melt_composition"]
+    mutated = tmp_path / EXTRACT.name
+    mutated.write_text(yaml.safe_dump(document, allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+    migrator = migrate_one_extract(ROOT, mutated, index={}, aliases={})
+    migrator.finalize()
+    assert migrator.result.validation.hard_issues
 
 
 def test_model_result_class_pin_detects_a_flip_back_to_quote() -> None:

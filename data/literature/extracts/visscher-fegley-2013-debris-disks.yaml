@@ -86,22 +86,61 @@ species:
   Na:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance
+      derived_from: [visscher_2013_table1_bulk_silicate_compositions]
       derivation:
-        relation: "The MAGMA chemical-equilibrium model predicts volatile-rich vapor at lower temperatures; transition temperatures vary with melt composition."
-        raw_inputs: *visscher_magma_raw_inputs
+        relation: >-
+          The MAGMA calculations compare saturated vapor compositions across the printed melt compositions;
+          the paper states that volatile abundance controls the temperature transition.
+        inputs: [visscher_2013_table1_bulk_silicate_compositions]
         method:
-          state: {tag: value, value: "MAGMA temperature-dependent silicate melt-vapor equilibrium calculations."}
-          locator: {page: 2, pdf_page_index: 1, published_page: 2, section: '2.1. Chemical Model'}
+          state:
+            tag: value
+            value: >-
+              We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the
+              temperature-dependent chemical equilibrium composition of silicate melt and coexisting vapor.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2
+            section: '2.1. Chemical Model'
         references: *visscher_magma_references
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
       regime: MAGMA_IMCC_equilibrium
-      units: temperature K; qualitative model trend
+      standard_state: saturated vapor in chemical equilibrium with molten silicate
+      standard_state_locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2
+        section: '2.1. Chemical Model'
+        note: The authors describe the calculated equilibrium composition of silicate melt and coexisting vapor.
+      basis: >-
+        Qualitative mole-fraction dominance in the saturated vapor as a function of temperature; the
+        transition depends on volatile-element abundances in the melt.
+      basis_locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.1'
+        note: The discussion links the SiO/Na/Zn transition temperature to volatile abundances in each melt.
+      units: qualitative mole-fraction dominance; transition temperatures in K
       values:
         quantity: evolved_gas_yield
         method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+        value_as_printed: >-
+          At high temperatures (> 3000 K), the disk atmosphere is dominated by SiO, O2, and O, whereas more
+          volatile species such as Na and Zn tend to dominate the silicate vapor at lower temperatures.
+        transition_statement_as_printed: >-
+          For bulk compositions with relatively higher abundances of volatiles (BSE, Mars, Ureilite) this
+          transition occurs between 3000-3500 K. For melt compositions with lower volatile abundances
+          (Moon, EPB, Angrite), this transition occurs at temperatures near 2500 K.
+        transition_locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 4
+          section: '3.1'
         lower_temperature_dominant_species: [Na, Zn, O2]
         lower_temperature_regime: below 3000 K generally; transition is composition-dependent
         transition_temperature_K_as_printed: {volatile_rich_compositions: '3000-3500', volatile_poor_compositions: 'near 2500'}
@@ -109,22 +148,65 @@ species:
   Zn:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance_zinc
+      derived_from: [visscher_2013_table1_bulk_silicate_compositions]
       derivation:
-        relation: "The MAGMA chemical-equilibrium model predicts volatile-rich vapor at lower temperatures; transition temperatures vary with melt composition."
-        raw_inputs: *visscher_magma_raw_inputs
+        relation: >-
+          The MAGMA zinc-bearing vapor calculation depends on the relative abundances of volatile elements
+          in the printed melt compositions.
+        inputs: [visscher_2013_table1_bulk_silicate_compositions]
         method:
-          state: {tag: value, value: "MAGMA temperature-dependent silicate melt-vapor equilibrium calculations with zinc thermochemistry."}
-          locator: {page: 2, pdf_page_index: 1, published_page: 2, section: '2.1. Chemical Model'}
-        references: *visscher_magma_references
+          state:
+            tag: value
+            value: >-
+              We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the
+              temperature-dependent chemical equilibrium composition of silicate melt and coexisting vapor.
+              Zinc thermochemistry was recently added to the code calculations in order to explore the
+              chemical behavior and potential volatile loss of Zn-bearing gases from the protolunar disk
+              atmosphere (e.g., Paniello et al. 2012).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2
+            section: '2.1. Chemical Model'
+        references:
+        - "Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207."
+        - "Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216."
+        - "Paniello, R. C., Day, J. M. D., & Moynier, F. 2012, Nature, 490, 376."
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
       regime: MAGMA_IMCC_equilibrium
-      units: temperature K; qualitative model trend
+      standard_state: saturated vapor in chemical equilibrium with molten silicate
+      standard_state_locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2
+        section: '2.1. Chemical Model'
+        note: The authors describe the calculated equilibrium composition of silicate melt and coexisting vapor.
+      basis: >-
+        Qualitative mole-fraction dominance of zinc-bearing vapor as a function of temperature and melt
+        volatile-element abundance.
+      basis_locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 4
+        section: '3.1'
+        note: The paper states that the Zn-dominated transition depends on volatile abundances in the melt.
+      units: qualitative mole-fraction dominance; transition temperatures in K
       values:
         quantity: evolved_gas_yield
         method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+        value_as_printed: >-
+          The Zn-dominated regime depends upon the relative abundances of the volatiles in the melt. For bulk
+          compositions with relatively higher abundances of volatiles (BSE, Mars, Ureilite) this transition
+          occurs between 3000-3500 K. For melt compositions with lower volatile abundances (Moon, EPB,
+          Angrite), this transition occurs at temperatures near 2500 K.
+        value_locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 4
+          section: '3.1'
         dominant_with_lower_temperature_volatile_species: [Na, Zn, O2]
         composition_sensitivity: relative abundance of volatile elements in melt
       uncertainty: no model uncertainty reported
