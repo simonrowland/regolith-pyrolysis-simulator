@@ -503,16 +503,25 @@ def test_d349_fe_provider_pressure_exposes_ellingham_transition_step(
         k_basis_ratio * activity_ratio, rel=2e-6
     )
     assert pressure_ratio != pytest.approx(1.0, rel=1e-4)
+
+
+@pytest.mark.parametrize(
+    ("temperature_C", "unconverted_over_converted"),
+    ((1500.0, 0.1253892371), (1600.0, 0.16075853005858642)),
+)
 def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
     monkeypatch,
+    temperature_C,
+    unconverted_over_converted,
 ):
     provider, request = _lunar_mare_probe(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
+        temperature_C=temperature_C,
     )
     converted = provider.dispatch(request).diagnostic["vapor_pressures_Pa"]["Mg"]
 
@@ -527,9 +536,11 @@ def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     )
     unconverted = provider.dispatch(request).diagnostic["vapor_pressures_Pa"]["Mg"]
 
-    # 0.1253892371 is q79's independent JANAF Mg-008/Mg-009
-    # exp(-DeltaG_fus/RT) factor at 1773.15 K.
-    assert unconverted / converted == pytest.approx(0.1253892371, rel=1e-6)
+    # The independent JANAF MgO fusion factors are evaluated at the probe T:
+    # the 1873.15 K case is the 6.2205 source-to-K multiplier from the receipt.
+    assert unconverted / converted == pytest.approx(
+        unconverted_over_converted, rel=1e-6
+    )
 
 
 @pytest.mark.parametrize(
@@ -539,6 +550,7 @@ def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
         ("Ca", "Ca-028", "Ca-029"),
     ),
 )
+@pytest.mark.parametrize("temperature_C", (1500.0, 1600.0))
 def test_d349_internal_metal_fallback_uses_the_converted_activity(
     species,
     source_standard_state_id,
@@ -546,6 +558,7 @@ def test_d349_internal_metal_fallback_uses_the_converted_activity(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    temperature_C,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -553,7 +566,8 @@ def test_d349_internal_metal_fallback_uses_the_converted_activity(
         feedstocks_data,
         setpoints_data,
     )
-    sim.melt.temperature_C = 1500.0
+    temperature_K = temperature_C + 273.15
+    sim.melt.temperature_C = temperature_C
     sim.melt.p_total_mbar = 1000.0
 
     legacy = sim._internal_analytical_equilibrium()
@@ -562,7 +576,7 @@ def test_d349_internal_metal_fallback_uses_the_converted_activity(
         feedstocks_data,
         setpoints_data,
         sim=sim,
-        temperature_C=1500.0,
+        temperature_C=temperature_C,
     )
     request = IntentRequest(
         intent=request.intent,
@@ -583,7 +597,7 @@ def test_d349_internal_metal_fallback_uses_the_converted_activity(
         _activity_for_crystalline_vapor_k(
             "MgO" if species == "Mg" else "CaO",
             float(route["melt_oxide_activity"]),
-            1773.15,
+            temperature_K,
             source_standard_state_id=source_standard_state_id,
             target_standard_state_id=target_standard_state_id,
             source_standard_state_phase="liquid",
@@ -993,6 +1007,7 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
         setpoints_data,
     )
     for species in _D349_VAPOR_ROUTES:
+        source_standard_state_id, _ = _D349_SOURCE_K_STANDARD_IDS[species]
         mutated = _diagnostic_with_route_provenance(
             diagnostic,
             species,
@@ -1001,6 +1016,25 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
         batch = _resolve_live_gateway_batch(
             sim,
             mutated,
+            equilibrium,
+            effective_source,
+        )
+        assert batch is None, species
+        assert species in sim._last_vapour_batch_resolve_error["detail"]
+
+        # A converted value carrying the liquid source ID is just as invalid
+        # as a liquid value carrying the crystalline K ID. Keep both guards
+        # at the request gateway that feeds the pressure evaluator.
+        mislabeled = _diagnostic_with_route_provenance(
+            diagnostic,
+            species,
+            vapor_activity_for_crystalline_K_standard_state_id=(
+                source_standard_state_id
+            ),
+        )
+        batch = _resolve_live_gateway_batch(
+            sim,
+            mislabeled,
             equilibrium,
             effective_source,
         )

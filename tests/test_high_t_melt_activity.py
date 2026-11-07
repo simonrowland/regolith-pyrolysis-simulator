@@ -514,7 +514,7 @@ def _history_request(composition, temperature_K, hour, previous=None):
     })
 
 
-def test_successful_openimcc_physics_is_bit_identical() -> None:
+def test_successful_openimcc_activity_map_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
     # from e975edd to e1423d8. Keep the numeric maps separate from metadata;
@@ -525,10 +525,15 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # d349 moves the Ca/Mg vapor pressures onto their crystalline JANAF K
+    # standard. The OpenIMCC activity map remains bit-identical to green;
+    # only the coupled pressures and their provenance move.
+    assert hashlib.sha256(
+        json.dumps(numeric_payload[1], sort_keys=True).encode()
+    ).hexdigest() == "ab9e680f773fce3cee408127e6bfe666d33d5d822db5df26643d260ed056a54b"
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
+    ).hexdigest() == "fe0a9abccb93c6eb94063247ed279ddec90282a86023bbe97ec43cf3e8f7b8cf"
     # Re-decoded against R3 (443ec6ed6): the numeric payload is bit-identical.
     # The metadata delta is the R4 split of oxide reference-state reasons from
     # melt_oxide_activity_warning into the structured
@@ -539,10 +544,11 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # 9f781b5bb's projected notices are now deduplicated at their owner. At
     # 2400.65 K, the K2O domain warning falls from three copies to one and
     # out_of_range_conservative_continuation falls from 20 copies to one;
-    # per-species provenance is unchanged.
+    # per-species provenance is unchanged apart from d349's Ca/Mg K-basis
+    # conversion fields and pressures.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "67229670652480bf5e639e05bbc75f3558b38fabec56cbd0e1608ce0f11ee16a"
+    ).hexdigest() == "dcf087a774c7f331a149efddb089a6ae7dd91853ab1520cf2f8a240939a2867e"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -572,26 +578,28 @@ def test_1800_k_pre_switch_physics_pin() -> None:
             "d144_fusion_conversion|"
         )
     } == {"Ca", "Ca2", "CaO_gas", "Mg", "Mg2", "MgO_gas"}
-    # Re-decoded against R3 (443ec6ed6): the numeric payload is bit-identical.
-    # The metadata delta is the R4 split of oxide reference-state reasons from
-    # melt_oxide_activity_warning into the structured
-    # melt_oxide_activity_reference_state_notice field (Al2O3, K2O, SiO2 and
-    # TiO2 species records here); K2O's domain warning loses only its appended
-    # reference-state reason. The projected warnings lose those same notice
-    # reasons.
+    # The liquid-reference activity map and pressure map have separate
+    # contracts here. Activities now expose the declared liquid source basis;
+    # the Mg crystalline-K conversion restores the pressure within one ULP of
+    # green. Provenance still records the same d144 conversion notices.
+    assert hashlib.sha256(
+        json.dumps(numeric_payload[1], sort_keys=True).encode()
+    ).hexdigest() == "b0a61164331cbb3143dbfad69e932116b2700b08fe5e6fdd1994f3d7f4085f48"
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "81eff0369d7c3cfed06705c05b9d6dd697cde2869bcc1f647263320c8971d69a"
+    ).hexdigest() == "5c16197329a31934c4038fe86711de03fdb101c44e08d11369f22ca60a1bc8a0"
     # 9f781b5bb introduced the d-144 bridge warnings. The projected warnings
     # now keep one copy in first-seen order: CaO and MgO fusion reasons each
     # fall from three copies to one, Na2O and K2O domain reasons do the same,
     # and out_of_range_conservative_continuation falls from four to one. The
     # Ca/Ca2/CaO_gas and Mg/Mg2/MgO_gas provenance records remain intact. At
     # 1800 K the JANAF metastable-liquid reasons carry bands [298.15, 3600]
-    # and [298.15, 4000] K. The decoded digest move is warning metadata only.
+    # and [298.15, 4000] K. The combined digest includes the revised
+    # liquid-source activities and d349 conversion provenance as well as
+    # warning metadata.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "03ee957b0e26bd578c79171089375f5e3ad4fa84e3e26f2bc2ebdd2b0da25438"
+    ).hexdigest() == "cc58ce94bbbc42e5f14e781e23bddebe094260e6660686c574a5912faf90d3df"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])

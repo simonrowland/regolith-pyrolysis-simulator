@@ -718,7 +718,7 @@ def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
     assert operands != equilibrium.activity_coefficients
 
 
-def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
+def test_catalog_probe_and_flux_seam_share_the_crystalline_activity_basis():
     """RG-1 gateway: catalog P_eff class without a flux-value cutover.
 
     Each species' band is derived from its verifier-probed effective-vs-pure
@@ -756,21 +756,16 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         # at this T is only +0.565 dex; the extra pin motion is band-based
         # (old pin sat below old live). SIGN CHECK: pressure UP.
         # docs-private/research/2026-08-07-mgfix/report.md
-        # d-144 (5b5d2a080): liquid-reference gamma multiplies the MgO
-        # pressure by 0.16075 at this probe, from 0.0939769 to 0.0151076 Pa.
-        "Mg": 0.015107591765935,
+        # The old 0.015107591765935 Pa probe used liquid MgO activity directly
+        # against the crystalline Mg-010 K. At 1873.15 K, the shared
+        # Mg-009 -> Mg-010 conversion multiplies it by 6.2205097, giving the
+        # measured 0.09397692153837496 Pa pressure on the K basis.
+        "Mg": 0.09397692153837496,
         # Constant table gamma (no T*/T / pseudo-binary mid-range).
         # t-538: seam pin unchanged (pre-rg Builtin path); catalog OOR value
         # moves via physical 1/T tangent (see K branch below).
         "K": 0.469,
         "Al": 1.4e-8,
-    }
-    flux_seam_probe_pa = {
-        **verifier_probe_pa,
-        # The pre-RG flux source still uses the unconverted liquid activity.
-        # Studio-2 reports 0.09397692153837496 Pa here; the catalog's
-        # crystalline-standard conversion is pinned separately above.
-        "Mg": 0.09397692153837496,
     }
     pure_component_probe_pa = {
         "Ca": 8.35e5,
@@ -814,8 +809,12 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
         assert within_probe_band(
-            species_id, float(seam_pa), flux_seam_probe_pa[species_id]
+            species_id, float(seam_pa), probe_pa
         )
+        if species_id == "Mg":
+            assert float(seam_pa) == pytest.approx(
+                0.09397692153837496, rel=1e-9, abs=0.0
+            )
         if species_id == "K":
             # K fit domain ends at 1600 K; this probe is at 1873.15 K → OOR.
             # t-538: OOR value is the physical 1/T-tangent continuation of the
@@ -839,10 +838,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
-            if species_id != "Mg":
-                assert within_probe_band(
-                    species_id, catalog_pa, float(seam_pa)
-                )
+            assert within_probe_band(species_id, catalog_pa, float(seam_pa))
         activity = answer.source_reaction_activity
         assert activity is not None
         assert activity.provider == "BuiltinVaporPressureProvider"

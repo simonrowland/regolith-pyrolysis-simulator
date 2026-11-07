@@ -1149,19 +1149,20 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     expected_rates = {
         "Al": 1.776974630811854e-10,
         "AlO": 2.622990526227972e-10,
-        # d-144 (5b5d2a080) applies exp(-ΔG_fus/RT) to CaO/MgO gamma.
-        # At this hot C4 state the changed liquid activities lower the Ca
-        # rates by 85.2% (factor 0.148) and Mg rates by 81.2% (factor 0.188).
-        "Ca": 8.859911435293591e-10,
-        "CaO_gas": 3.052599740004471e-12,
+        # These Studio-2 values match the parent nonbinding baseline. d349's
+        # source-to-crystalline-K conversion restores Ca/Mg pressures after
+        # the liquid-reference gamma change; the previous R2 pin applied only
+        # the gamma decrease and incorrectly lowered these four rates.
+        "Ca": 6.001432293554031e-09,
+        "CaO_gas": 2.067737447801073e-11,
         "Cr": 4.355218555260953e-05,
         "CrO": 9.136286575214734e-06,
         "CrO2": 3.1730720722299763e-06,
         "CrO3": 9.294384109563237e-10,
         "K": 1.8395070246088384e-04,
         "K2": 1.6813544178336032e-11,
-        "Mg": 1.362821873227701e-05,
-        "MgO_gas": 1.942156078509903e-08,
+        "Mg": 7.232662096170073e-05,
+        "MgO_gas": 1.0307259466430573e-07,
         "Mn": 2.2585292315558916e-05,
         "Na": 5.142690508092712e-03,
         "Na2": 3.013634463408095e-08,

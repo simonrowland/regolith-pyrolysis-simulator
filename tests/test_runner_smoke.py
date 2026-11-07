@@ -821,11 +821,12 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
     # this production row total; the next row transfers it to reagent, so live
     # product returns to zero while cumulative condensate and recycled mass
-    # retain the capture. b-1119's CaO/MgO liquid reference via d-144 fusion
-    # moves the Studio-3 total 0.0004975311735864234 -> 0.0004977157023971441
-    # kg (+1.84528810721e-7 kg, +3.70888942276e-4 relative).
+    # retain the capture. b-1119's CaO/MgO liquid-reference conversion changes
+    # the coupled melt path and the Studio-2 row-7 Na+K product to
+    # 0.0004975123352703119 kg, 2.03367126832e-7 kg below the old Studio-3
+    # candidate pin (a 0.04086% shift).
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004977157023971441, rel=1e-12, abs=1e-15
+        0.0004975123352703119, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
