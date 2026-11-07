@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 from yaml.nodes import MappingNode, SequenceNode, ScalarNode
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import PolymorphRejectionKind, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -33,6 +33,25 @@ APPENDIX_RENDER_PINS = {
     "rb86_scm84_appendix1_mgsio3_heat_of_fusion_wagner_based_value": "77.4",
     "rb86_scm84_appendix1_mgsio3_heat_of_fusion_high_pressure_curve": "81.2",
     "rb86_scm84_appendix1_mgsio3_heat_of_fusion_authors_solid_data": "66.0",
+}
+
+NEPHELINE_TABLE10_FOOTNOTE = (
+    'Table 10 footnote: “m” after Tf indicates a metastable, congruent melting point. '
+    "Tf for NaAlSiO4 is for nepheline, all others are for the stable polymorph at the liquidus."
+)
+
+NEPHELINE_TABLE10_FOOTNOTE_LOCATOR = {
+    "page": 13,
+    "published_page": 143,
+    "pdf_page_index": 12,
+    "table": "10",
+    "note": "Table 10 footnote below the table.",
+}
+
+UNRECOGNISED_NEPHELINE = {
+    "tag": "unknown",
+    "reason": "unrecognised polymorph 'nepheline' is not a closed Polymorph token",
+    "rejection_kind": "unrecognised",
 }
 
 TYPED_REFUSAL_COUNTS = {
@@ -282,6 +301,31 @@ def test_isolated_migration_has_only_typed_refusals_and_preserves_axes() -> None
     for observation_id in fusion_ids:
         assert raw[observation_id]["phase"] == "cr"
         assert migrated[observation_id].identity.species.phase.value.value == "cr"
+
+    naalsio4_table_context = next(
+        row
+        for row in document["extraction"]["table_context"][
+            "table_10_liquid_entropy_rows"
+        ]
+        if row["formula_as_printed"] == "NaAlSiO_4"
+    )
+    assert naalsio4_table_context["Tf_as_printed"] == "1750 m"
+
+    for observation_id in (
+        "rb86_scm84_table10_naalsio4_tf_entropy_of_fusion",
+        "rb86_scm84_table10_naalsio4_1600k_entropy_of_fusion",
+        "rb86_scm84_table10_naalsio4_tg_entropy_of_fusion",
+    ):
+        source_form = raw[observation_id]["condensed_form"]
+        assert source_form["state"] == "crystalline"
+        assert source_form["polymorph"] == UNRECOGNISED_NEPHELINE
+        assert source_form["note"] == NEPHELINE_TABLE10_FOOTNOTE
+        assert source_form["locator"] == NEPHELINE_TABLE10_FOOTNOTE_LOCATOR
+
+        migrated_polymorph = migrated[observation_id].identity.species.polymorph
+        assert migrated_polymorph.is_unknown
+        assert migrated_polymorph.reason == UNRECOGNISED_NEPHELINE["reason"]
+        assert migrated_polymorph.rejection_kind is PolymorphRejectionKind.UNRECOGNISED
 
     ternary_derived = {
         observation_id
