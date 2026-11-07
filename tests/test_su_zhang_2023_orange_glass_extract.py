@@ -5,10 +5,12 @@ from __future__ import annotations
 import csv
 from collections import Counter
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 import re
+from time import perf_counter
 
+from openpyxl import load_workbook
 import pytest
 import yaml
 
@@ -26,6 +28,7 @@ SID = "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SID}.yaml"
 AUDIT = ROOT / "data/literature/extracts/audits"
 TABLE_ASSET = f"tables:{SID}"
+SOURCE_XLSX = Path.home() / "Repos/regolith-corpus/raw" / SID / f"{SID}.xlsx"
 
 
 def _document() -> dict:
@@ -72,6 +75,42 @@ def _assert_cell_audit_matches(document: dict, cell_audit: list[dict]) -> None:
             )
 
 
+def _source_display_value(cell) -> str:
+    value = cell.value
+    assert isinstance(value, (int, float)) and not isinstance(value, bool)
+    significant_digits = format(value, ".15g")
+    number_format = cell.number_format or "General"
+    if number_format == "General":
+        return significant_digits
+    match = re.fullmatch(r"0(?:\.(0+))?", number_format)
+    assert match, (cell.parent.title, cell.coordinate, number_format)
+    places = len(match.group(1) or "")
+    rounded = Decimal(significant_digits).quantize(
+        Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP
+    )
+    return f"{rounded:.{places}f}"
+
+
+def _source_display_mismatches(document: dict, cell_audit: list[dict], workbook):
+    mismatches = []
+    target_checks = 0
+    for row in cell_audit:
+        source_value = _source_display_value(workbook[row["sheet"]][row["cell"]])
+        if row["displayed_value"] != source_value:
+            mismatches.append(
+                f"{row['sheet']}!{row['cell']} audit: {row['displayed_value']!r} != {source_value!r}"
+            )
+        for target in row["extract_target"].split(" | "):
+            target_checks += 1
+            extract_value = str(_resolve_audit_target(document, target))
+            if extract_value != source_value:
+                mismatches.append(
+                    f"{row['sheet']}!{row['cell']} target {target}: "
+                    f"{extract_value!r} != {source_value!r}"
+                )
+    return mismatches, target_checks
+
+
 def test_audit_target_resolver_supports_matrix_indices() -> None:
     document = {
         "species": {
@@ -109,6 +148,79 @@ def test_extract_validates_and_fidelity_mutation_is_detected() -> None:
         mutated, "SiO2", "su_zhang_2023_table_s2_empa_sio2_profile"
     )["values"]["series"][0]["SiO2_wt_pct"] = "38.7"
     assert check_all_fidelity_samples_match(mutated, label=f"mutated {SID}")
+
+
+def test_every_cell_audit_value_matches_independent_workbook_display() -> None:
+    if not SOURCE_XLSX.is_file():
+        pytest.skip(f"corpus workbook not available: {SOURCE_XLSX}")
+
+    started = perf_counter()
+    document = _document()
+    with (AUDIT / f"{SID}.cells.csv").open(encoding="utf-8", newline="") as stream:
+        cell_audit = list(csv.DictReader(stream))
+    workbook = load_workbook(SOURCE_XLSX, data_only=True, read_only=False)
+    assert len(cell_audit) == 7_777
+
+    mismatches, target_checks = _source_display_mismatches(
+        document, cell_audit, workbook
+    )
+    elapsed = perf_counter() - started
+    print(
+        f"FULL_CELL_SOURCE_GUARD cells={len(cell_audit)} target_checks={target_checks} "
+        f"mismatches={len(mismatches)} runtime_seconds={elapsed:.3f}"
+    )
+    assert target_checks == 14_679
+    assert not mismatches, "\n".join(mismatches[:20])
+
+    expected_pins = {
+        "D8": "5.72",
+        "K13": "0.062",
+        "C158": "8.81",
+        "K91": "0.063",
+        "G13": "0.267",
+    }
+    rows_by_cell = {
+        row["cell"]: row
+        for row in cell_audit
+        if row["sheet"] == "Table S2" and row["cell"] in expected_pins
+    }
+    assert set(rows_by_cell) == set(expected_pins)
+    for cell, expected in expected_pins.items():
+        audit_row = rows_by_cell[cell]
+        assert _source_display_value(workbook["Table S2"][cell]) == expected
+        assert audit_row["displayed_value"] == expected
+        assert all(
+            str(_resolve_audit_target(document, target)) == expected
+            for target in audit_row["extract_target"].split(" | ")
+        )
+
+    # Recreate the prior raw-XML rounding for D8 and keep YAML and CSV wrong together.
+    d8_audit_row = rows_by_cell["D8"]
+    legacy = Decimal(d8_audit_row["xml_stored_value"]).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    legacy_display = f"{legacy:.2f}"
+    assert legacy_display == "5.71"
+    mutated_document = deepcopy(document)
+    al2o3 = _observation(
+        mutated_document, "Al2O3", "su_zhang_2023_table_s2_empa_al2o3_profile"
+    )
+    d8_point = next(
+        point
+        for point in al2o3["values"]["series"]
+        if "D8 displayed" in point["locator"]["note"]
+    )
+    d8_point["Al2O3_wt_pct"] = legacy_display
+    wrong_audit_row = dict(d8_audit_row, displayed_value=legacy_display)
+    mutation_mismatches, _ = _source_display_mismatches(
+        mutated_document, [wrong_audit_row], workbook
+    )
+    assert any("audit:" in mismatch for mismatch in mutation_mismatches)
+    assert any("target " in mismatch for mismatch in mutation_mismatches)
+    print(
+        f"LEGACY_ROUNDING_MUTATION_RED Table S2!D8 old={legacy_display} "
+        f"source={_source_display_value(workbook['Table S2']['D8'])}"
+    )
 
 
 def test_all_printed_rows_cells_and_maps_are_accounted_for() -> None:
