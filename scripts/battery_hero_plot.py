@@ -25,10 +25,12 @@ shared-row count.
 from __future__ import annotations
 
 import argparse
+import base64
 import csv
 from contextlib import contextmanager
 import gzip
 import hashlib
+import html
 import json
 import math
 import os
@@ -57,7 +59,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.axes import Axes
-from matplotlib.colors import Normalize
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import (
@@ -129,6 +131,21 @@ HERO_TEMPERATURE_VIEWS = (
         f"T < {int(HERO_TEMPERATURE_FLOOR_K)} K",
     ),
 )
+COLLECTION_OBSERVABLES = (
+    (Rail.VAPOUR.value, "Vapour pressure"),
+    (Rail.MELT_ACTIVITY.value, "Melt activity"),
+    (Rail.REDOX.value, "Fe³⁺/Fe²⁺"),
+    (Rail.SIO_EVOLUTION.value, "SiO evolution"),
+    (Rail.RESIDUE_COMPOSITION.value, "Residue composition"),
+)
+COLLECTION_SCORE_RAILS = tuple(rail for rail, _label in COLLECTION_OBSERVABLES)
+FINGERPRINT_BANDS = (
+    ("good", "#1a9641"),
+    ("okay", "#f6c90e"),
+    ("needs work", "#d7191c"),
+)
+FINGERPRINT_COLOURS = dict(FINGERPRINT_BANDS)
+GOAL_COLOUR = "#0ca30c"
 
 
 @dataclass(frozen=True)
@@ -247,13 +264,14 @@ class ScorePlotData:
         tuple[str, str, str], tuple[Mapping[str, str], ...]
     ] = field(default_factory=dict)
     hero_source_disagreement_reasons: tuple[str, ...] = ()
+    hero_component_comparisons: tuple[Mapping[str, object], ...] = ()
 
 
 def _d139_exclusion_counts(
     data: ScorePlotData, *, rail: str | None = None
 ) -> tuple[tuple[str, int], ...]:
     counts: list[tuple[str, int]] = []
-    for engine in data.engines:
+    for engine in _ordered_hero_engines(data.engines):
         summary = data.summaries[engine]
         count = (
             summary.excluded_d139_rows
@@ -383,6 +401,26 @@ def _row_identity(row: Mapping[str, Any]) -> Mapping[str, Any]:
         if isinstance(identity, Mapping):
             return identity
     return {}
+
+
+def _is_d139_uncalibrated_kems_row(row: Mapping[str, Any]) -> bool:
+    numeric = row.get("numeric")
+    if not isinstance(numeric, Mapping) or numeric.get("decision_band") is not None:
+        return False
+    if _state_value(_row_identity(row).get("quantity")) != "p_partial":
+        return False
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    notice_sources = (row.get("notices"), candidate.get("notices"))
+    return any(
+        isinstance(notice, Mapping)
+        and notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
+        and isinstance(notice.get("reason"), str)
+        and notice["reason"].startswith("calibration_not_grounded:")
+        for source in notice_sources
+        if isinstance(source, Sequence) and not isinstance(source, (str, bytes))
+        for notice in source
+    )
 
 
 def _row_formula(row: Mapping[str, Any]) -> str:
@@ -1341,7 +1379,7 @@ def read_scores(
                     if selected_rail:
                         summary.non_dex_rows += 1
                     continue
-                if rail in HERO_RAILS:
+                if rail in HERO_AND_DECK_SOURCE_RAILS:
                     comparison_payloads.append(row)
                     if rail == Rail.VAPOUR.value:
                         source_disagreement_reasons.update(
@@ -1363,27 +1401,11 @@ def read_scores(
                     if selected_rail:
                         summary.missing_identity_rows += 1
                     continue
-                quantity = _state_value(identity.get("quantity"))
-                if numeric.get("decision_band") is None and quantity == "p_partial":
-                    notices = (
-                        row.get("notices"),
-                        candidate_observation.get("notices"),
-                    )
-                    has_calibration_notice = any(
-                        isinstance(notice, Mapping)
-                        and notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
-                        and isinstance(notice.get("reason"), str)
-                        and notice["reason"].startswith("calibration_not_grounded:")
-                        for source in notices
-                        if isinstance(source, Sequence)
-                        and not isinstance(source, (str, bytes))
-                        for notice in source
-                    )
-                    if has_calibration_notice:
-                        # Use the scorer's d-139 output marker; do not infer calibration here.
-                        summary.excluded_d139_rows += 1
-                        summary.excluded_d139_by_rail[rail] += 1
-                        continue
+                if _is_d139_uncalibrated_kems_row(row):
+                    # Use the scorer's d-139 output marker; do not infer calibration here.
+                    summary.excluded_d139_rows += 1
+                    summary.excluded_d139_by_rail[rail] += 1
+                    continue
                 formula = _species_formula(identity)
                 temperature_raw = _state_value(identity.get("temperature_K"))
                 temperature = _finite_float(temperature_raw)
@@ -1485,7 +1507,7 @@ def read_scores(
     hero_all_numeric_metrics = _hero_metric_records(
         comparison_payloads,
         engines=engines,
-        rails=HERO_RAILS,
+        rails=COLLECTION_SCORE_RAILS,
         exposure_policy=exposure_policy,
     )
     all_temperatures = [
@@ -1520,6 +1542,18 @@ def read_scores(
             primary_engines=("openimcc",),
             comparison_engines=("vaporock",),
             rails=(Rail.VAPOUR.value,),
+            exposure_policy=exposure_policy,
+            include_species=True,
+        )
+    )
+    hero_component_comparisons = tuple(
+        _hero_paired_engine_rail_comparisons(
+            comparison_payloads,
+            primary_engines=("openimcc",),
+            comparison_engines=tuple(
+                engine for engine in engines if engine != "openimcc"
+            ),
+            rails=(Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value),
             exposure_policy=exposure_policy,
             include_species=True,
         )
@@ -1599,6 +1633,7 @@ def read_scores(
         hero_source_disagreement_reasons=tuple(
             sorted(source_disagreement_reasons)
         ),
+        hero_component_comparisons=hero_component_comparisons,
     )
 
 
@@ -2457,26 +2492,40 @@ _HERO_OXYGEN_MODE_LABELS = {
     "solved": "solved cell oxygen balance",
 }
 _HERO_ENGINE_COLORS = {
-    "openimcc": "#0072b2",
-    "internal-analytical": "#d55e00",
-    "vaporock": "#8f7868",
-    "thermoengine": "#777777",
-    "alphamelts": "#8d7898",
-    "magemin": "#6f918d",
+    "openimcc": "#2a78d6",
+    "vaporock": "#eb6834",
+    "thermoengine": "#1baf7a",
+    "internal-analytical": "#eda100",
+    "magemin": "#e87ba4",
+    "alphamelts": "#6250d6",
 }
-_HERO_EXTRA_COLORS = ("#75879a", "#9b836d", "#8a8d68", "#927c8d", "#708f87")
+_HERO_ENGINE_ORDER = tuple(_HERO_ENGINE_COLORS)
 
 
 def _hero_engine_colors(engines: Sequence[str]) -> dict[str, str]:
-    colors = dict(_HERO_ENGINE_COLORS)
-    extras = sorted(set(engines) - colors.keys())
-    colors.update(
-        {
-            engine: _HERO_EXTRA_COLORS[index % len(_HERO_EXTRA_COLORS)]
-            for index, engine in enumerate(extras)
-        }
-    )
-    return {engine: colors[engine] for engine in sorted(set(engines))}
+    unknown = set(engines) - _HERO_ENGINE_COLORS.keys()
+    if unknown:
+        raise ValueError(f"no fixed hero colour for engine(s): {', '.join(sorted(unknown))}")
+    return {
+        engine: _HERO_ENGINE_COLORS[engine]
+        for engine in _HERO_ENGINE_ORDER
+        if engine in engines
+    }
+
+
+def _fingerprint_band(value: object) -> tuple[str, str]:
+    median_abs_dex = _hero_decimal(value)
+    if median_abs_dex is None:
+        raise ValueError("fingerprint median |error| must be finite")
+    if median_abs_dex <= Decimal("0.5"):
+        return "good", FINGERPRINT_COLOURS["good"]
+    if median_abs_dex <= Decimal("1.0"):
+        return "okay", FINGERPRINT_COLOURS["okay"]
+    return "needs work", FINGERPRINT_COLOURS["needs work"]
+
+
+def _ordered_hero_engines(engines: Sequence[str]) -> tuple[str, ...]:
+    return tuple(_hero_engine_colors(engines))
 
 
 def _compact_count(value: object) -> str:
@@ -2574,7 +2623,7 @@ def _hero_scorecard_cell_text(
 
 def _hero_scorecard_rows(data: ScorePlotData, rail: str) -> list[list[str]]:
     rows: list[list[str]] = []
-    for engine in data.engines:
+    for engine in _ordered_hero_engines(data.engines):
         metric = data.hero_all_numeric_metrics.get((rail, engine), {})
         views = metric.get("views", {})
         views = views if isinstance(views, Mapping) else {}
@@ -3115,12 +3164,16 @@ def _draw_hero_sweet_spot(
     engine: str,
     cells: Sequence[Mapping[str, object]],
     *,
-    colormap: Any,
-    normalization: Normalize,
     x_limits: tuple[float, float],
     temperature_limits: tuple[float, float],
 ) -> bool:
-    """Draw scorer-owned cell medians and sample counts for one engine."""
+    """Draw the scorer's temperature × SiO₂ cells as three status bands."""
+
+    axis.set_xlim(*x_limits)
+    axis.set_ylim(*temperature_limits)
+    axis.figure.canvas.draw()
+    x_gap = 2 * (x_limits[1] - x_limits[0]) / max(axis.bbox.width, 1)
+    y_gap = 2 * (temperature_limits[1] - temperature_limits[0]) / max(axis.bbox.height, 1)
 
     for cell in cells:
         x_low = _finite_float(cell.get("sio2_lower"))
@@ -3132,46 +3185,26 @@ def _draw_hero_sweet_spot(
         assert x_low is not None and x_high is not None
         assert y_low is not None and y_high is not None
         count = int(cell.get("n") or 0)
-        if count == 0:
+        if count < 3:
             continue
         value = _finite_float(cell.get("median_abs_dex"))
-        color_eligible = bool(cell.get("color_eligible")) and value is not None
-        sparse = not color_eligible
-        fill = (
-            colormap(normalization(value))
-            if color_eligible
-            else "#eeeeee" if sparse else "#ffffff"
-        )
-        hatch = "///" if sparse else None
+        if value is None:
+            continue
+        fill = str(cell.get("colour") or _fingerprint_band(value)[1])
         axis.add_patch(
             Rectangle(
-                (x_low, y_low),
-                x_high - x_low,
-                y_high - y_low,
+                (x_low + x_gap / 2, y_low + y_gap / 2),
+                max(0.0, x_high - x_low - x_gap),
+                max(0.0, y_high - y_low - y_gap),
                 facecolor=fill,
-                edgecolor="#aaaaaa",
-                linewidth=0.25,
-                hatch=hatch,
+                edgecolor="none",
+                linewidth=0,
             )
-        )
-        dark_contrast = _wcag_contrast_ratio(fill, "#222222")
-        light_contrast = _wcag_contrast_ratio(fill, "#f7f7f7")
-        label_color = "#222222" if dark_contrast >= light_contrast else "#f7f7f7"
-        axis.text(
-            (x_low + x_high) / 2,
-            (y_low + y_high) / 2,
-            _compact_count(count),
-            ha="center",
-            va="center",
-            color=label_color,
-            fontsize=5.0,
         )
 
     if not any(int(cell.get("n") or 0) for cell in cells):
         axis.set_axis_off()
         return False
-    axis.set_xlim(*x_limits)
-    axis.set_ylim(*temperature_limits)
     axis.set_xticks([index / 10 for index in range(11)])
     axis.set_xticklabels([f"{index / 10:.1f}" for index in range(11)], fontsize=5)
     _set_temperature_tick_locator(axis.yaxis, temperature_limits)
@@ -3180,33 +3213,11 @@ def _draw_hero_sweet_spot(
     axis.set_xlabel("SiO₂ mole fraction", fontsize=6)
     axis.set_ylabel("T (K)", fontsize=6)
     axis.set_title(
-        f"{engine}: median |dex|; n<3 hatched",
+        f"{engine}: temperature × SiO₂ fingerprint",
         loc="left",
         fontsize=6.5,
     )
     return True
-
-
-def _wcag_contrast_ratio(foreground: object, background: object) -> float:
-    """Return the WCAG contrast ratio for two opaque sRGB colors."""
-
-    def relative_luminance(color: object) -> float:
-        red, green, blue, _alpha = matplotlib.colors.to_rgba(color)
-        linear = tuple(
-            channel / 12.92
-            if channel <= 0.04045
-            else ((channel + 0.055) / 1.055) ** 2.4
-            for channel in (red, green, blue)
-        )
-        return sum(
-            channel * weight
-            for channel, weight in zip(linear, (0.2126, 0.7152, 0.0722), strict=True)
-        )
-
-    first = relative_luminance(foreground)
-    second = relative_luminance(background)
-    lighter, darker = sorted((first, second), reverse=True)
-    return (lighter + 0.05) / (darker + 0.05)
 
 
 def _draw_hero_history(
@@ -3499,6 +3510,1887 @@ def _hero_deck_summary_payload(data: ScorePlotData) -> dict[str, Any]:
     }
 
 
+def _collection_row_database(
+    source_path: Path,
+    database: sqlite3.Connection,
+    *,
+    bin_width_K: float,
+) -> None:
+    """Stream only scored rows used by the five hero observables to disk."""
+
+    database.execute(
+        """CREATE TABLE collection_rows (
+            rail TEXT NOT NULL,
+            engine TEXT NOT NULL,
+            experiment TEXT NOT NULL,
+            temperature_key TEXT NOT NULL,
+            composition_key TEXT NOT NULL,
+            observable TEXT NOT NULL,
+            source TEXT NOT NULL,
+            reference TEXT NOT NULL,
+            temperature_K REAL NOT NULL,
+            temperature_bin INTEGER NOT NULL,
+            sio2 REAL,
+            sio2_bin INTEGER,
+            composition TEXT NOT NULL,
+            species TEXT NOT NULL,
+            residual_dex REAL NOT NULL,
+            flagged INTEGER NOT NULL
+        )"""
+    )
+    pending: list[tuple[object, ...]] = []
+    with _open_residual_jsonl(source_path) as source:
+        for line_number, line in enumerate(source, start=1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"{source_path}:{line_number}: invalid JSON") from exc
+            if not isinstance(row, Mapping) or row.get("kind") == "battery_store_stamp":
+                continue
+            rail = str(row.get("rail") or "")
+            if rail not in COLLECTION_SCORE_RAILS:
+                continue
+            status = residual_status_token(row.get("status"))
+            numeric = row.get("numeric")
+            if status is ResidualStatus.REFUSED or not isinstance(numeric, Mapping):
+                continue
+            if numeric.get("operation") != "dex":
+                continue
+            if _is_d139_uncalibrated_kems_row(row):
+                continue
+            residual = _finite_float(numeric.get("value"))
+            identity = _row_identity(row)
+            temperature = _finite_float(_state_value(identity.get("temperature_K")))
+            if residual is None or temperature is None:
+                continue
+            temperature_key = _decimal_key(_state_value(identity.get("temperature_K")))
+            if temperature_key is None:
+                continue
+            engine = _engine_name(row)
+            if engine is None:
+                continue
+            composition_key, composition_label = _composition_fields(identity)
+            composition = _state_value(identity.get("composition"))
+            sio2_decimal = _battery_hero_sio2_mole_fraction(composition)
+            sio2 = None if sio2_decimal is None else float(sio2_decimal)
+            sio2_bin = (
+                None
+                if sio2 is None
+                else 19 if sio2 == 1 else math.floor(sio2 / 0.05)
+            )
+            candidate = row.get("candidate_observation")
+            candidate = candidate if isinstance(candidate, Mapping) else {}
+            source_name = str(
+                candidate.get("source_id")
+                or row.get("source_id")
+                or row.get("reference")
+                or row.get("key")
+                or "unknown source"
+            )
+            reference = str(row.get("reference") or row.get("key") or "")
+            request = row.get("candidate_request")
+            request = request if isinstance(request, Mapping) else {}
+            experiment = str(
+                candidate.get("experiment_id")
+                or request.get("experiment_id")
+                or reference
+                or f"line:{line_number}"
+            )
+            pending.append(
+                (
+                    rail,
+                    engine,
+                    experiment,
+                    temperature_key,
+                    composition_key,
+                    _row_observable(row),
+                    source_name,
+                    reference,
+                    temperature,
+                    math.floor(temperature / bin_width_K),
+                    sio2,
+                    sio2_bin,
+                    composition_label,
+                    _row_formula(row),
+                    residual,
+                    int(bool(_flagged_payload_strata(row))),
+                )
+            )
+            if len(pending) >= 5000:
+                database.executemany(
+                    "INSERT INTO collection_rows VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    pending,
+                )
+                pending.clear()
+    if pending:
+        database.executemany(
+            "INSERT INTO collection_rows VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            pending,
+        )
+    database.execute(
+        "CREATE INDEX collection_rows_rail_engine ON collection_rows(rail, engine)"
+    )
+    database.execute(
+        "CREATE INDEX collection_rows_temperature ON collection_rows(rail, engine, temperature_bin, residual_dex)"
+    )
+    database.execute(
+        "CREATE INDEX collection_rows_fingerprint ON collection_rows(rail, engine, temperature_bin, sio2_bin)"
+    )
+    database.execute(
+        """CREATE VIEW collection_unique_rows AS
+           SELECT rail, engine,
+                  MIN(experiment) AS experiment,
+                  MIN(temperature_key) AS temperature_key,
+                  composition_key, MIN(observable) AS observable,
+                  MIN(source) AS source, MIN(reference) AS reference,
+                  MIN(temperature_K) AS temperature_K,
+                  MIN(temperature_bin) AS temperature_bin,
+                  MIN(sio2) AS sio2, MIN(sio2_bin) AS sio2_bin,
+                  MIN(composition) AS composition, MIN(species) AS species,
+                  AVG(residual_dex) AS residual_dex,
+                  MAX(flagged) AS flagged
+             FROM collection_rows
+            GROUP BY engine, species, rail, composition_key, composition,
+                     observable, experiment, temperature_key"""
+    )
+    database.commit()
+
+
+def _collection_raw_tables(
+    database: sqlite3.Connection,
+    data: ScorePlotData,
+    *,
+    bin_width_K: float,
+) -> dict[str, list[dict[str, object]]]:
+    panel_counts: dict[tuple[str, str], dict[str, object]] = {}
+    for row in database.execute(
+        """SELECT rail, engine, COUNT(*), MIN(temperature_K), MAX(temperature_K),
+                  SUM(flagged), SUM(residual_dex < -3), SUM(residual_dex > 3)
+             FROM collection_unique_rows GROUP BY rail, engine"""
+    ):
+        rail, engine, count, t_min, t_max, flagged, below, above = row
+        panel_counts[(str(rail), str(engine))] = {
+            "plotted_n": int(count),
+            "temperature_min_K": t_min,
+            "temperature_max_K": t_max,
+            "flagged_n": int(flagged or 0),
+            "clipped_low_n": int(below or 0),
+            "clipped_high_n": int(above or 0),
+        }
+    panel_rows: list[dict[str, object]] = []
+    rail_limits: dict[str, tuple[float, float]] = {}
+    engines = _ordered_hero_engines(data.engines)
+    for rail, label in COLLECTION_OBSERVABLES:
+        rail_panels = [
+            panel_counts.get((rail, engine), {}) for engine in engines
+        ]
+        temperatures = [
+            float(value)
+            for panel in rail_panels
+            for key in ("temperature_min_K", "temperature_max_K")
+            if (value := panel.get(key)) is not None
+        ]
+        if temperatures:
+            low, high = min(temperatures), max(temperatures)
+            padding = max(25.0, (high - low) * 0.02)
+            rail_limits[rail] = (low - padding, high + padding)
+        else:
+            rail_limits[rail] = data.x_limits
+        for engine in engines:
+            panel = panel_counts.get((rail, engine), {})
+            metric = _collection_metric(data, rail, engine)
+            all_view = _view_metric(metric, "all")
+            panel_rows.append(
+                {
+                    "rail": rail,
+                    "observable": label,
+                    "engine": engine,
+                    "n": metric.get("n", 0),
+                    "plotted_n": panel.get("plotted_n", 0),
+                    "rms_dex": all_view.get("rms_dex", metric.get("rms_dex", "")),
+                    "flagged_n": panel.get("flagged_n", 0),
+                    "clipped_low_n": panel.get("clipped_low_n", 0),
+                    "clipped_high_n": panel.get("clipped_high_n", 0),
+                    "temperature_min_K": panel.get("temperature_min_K", ""),
+                    "temperature_max_K": panel.get("temperature_max_K", ""),
+                }
+            )
+
+    bins_by_key: dict[tuple[str, str, int], int] = {}
+    for rail, engine, temperature_bin, count in database.execute(
+        """SELECT rail, engine, temperature_bin, COUNT(*)
+             FROM collection_unique_rows
+            GROUP BY rail, engine, temperature_bin"""
+    ):
+        bins_by_key[(str(rail), str(engine), int(temperature_bin))] = int(count)
+    bin_values: dict[tuple[str, str, int], dict[int, float]] = {}
+    current_key: tuple[str, str, int] | None = None
+    current_index = 0
+    current_targets: set[int] = set()
+    current_values: dict[int, float] = {}
+
+    def save_quantiles(key: tuple[str, str, int], values: Mapping[int, float]) -> None:
+        count = bins_by_key[key]
+
+        def percentile(fraction: float) -> float:
+            position = (count - 1) * fraction
+            lower_index = math.floor(position)
+            upper_index = math.ceil(position)
+            lower_value = values[lower_index]
+            upper_value = values[upper_index]
+            return lower_value + (upper_value - lower_value) * (position - lower_index)
+
+        bin_values[key] = {
+            0: percentile(0.25),
+            1: percentile(0.5),
+            2: percentile(0.75),
+        }
+
+    for rail, engine, temperature_bin, residual in database.execute(
+        """SELECT rail, engine, temperature_bin, residual_dex
+             FROM collection_unique_rows
+            ORDER BY rail, engine, temperature_bin, residual_dex"""
+    ):
+        key = (str(rail), str(engine), int(temperature_bin))
+        if key != current_key:
+            if current_key is not None:
+                save_quantiles(current_key, current_values)
+            current_key = key
+            current_index = 0
+            count = bins_by_key[key]
+            current_targets = {
+                math.floor((count - 1) * fraction)
+                for fraction in (0.25, 0.5, 0.75)
+            } | {
+                math.ceil((count - 1) * fraction)
+                for fraction in (0.25, 0.5, 0.75)
+            }
+            current_values = {}
+        if current_index in current_targets:
+            current_values[current_index] = float(residual)
+        current_index += 1
+    if current_key is not None:
+        save_quantiles(current_key, current_values)
+
+    temperature_bins: list[dict[str, object]] = []
+    for key, quantiles in sorted(bin_values.items()):
+        rail, engine, temperature_bin = key
+        count = bins_by_key[key]
+        temperature_bins.append(
+            {
+                "rail": rail,
+                "engine": engine,
+                "temperature_bin": temperature_bin,
+                "temperature_center_K": (temperature_bin + 0.5) * bin_width_K,
+                "n": count,
+                "q1_dex": quantiles[0],
+                "median_dex": quantiles[1],
+                "q3_dex": quantiles[2],
+            }
+        )
+
+    density_counts: Counter[tuple[str, str, int, int, int, int]] = Counter()
+    density_x_bins = 48
+    density_y_bins = 36
+    for rail, engine, temperature, residual, flagged in database.execute(
+        """SELECT rail, engine, temperature_K, residual_dex, flagged
+             FROM collection_unique_rows"""
+    ):
+        x_low, x_high = rail_limits[str(rail)]
+        x_bin = min(
+            density_x_bins - 1,
+            max(0, int((float(temperature) - x_low) / (x_high - x_low) * density_x_bins)),
+        )
+        value = float(residual)
+        clipped = int(value < -3 or value > 3)
+        if value < -3:
+            y_bin = -1
+        elif value > 3:
+            y_bin = density_y_bins
+        else:
+            y_bin = min(
+                density_y_bins - 1,
+                max(0, int((value + 3) / 6 * density_y_bins)),
+            )
+        density_counts[
+            (str(rail), str(engine), x_bin, y_bin, int(flagged), clipped)
+        ] += 1
+    density_rows: list[dict[str, object]] = []
+    for (rail, engine, x_bin, y_bin, flagged, clipped), count in sorted(density_counts.items()):
+        x_low, x_high = rail_limits[rail]
+        residual_center = (
+            -3.0 if y_bin == -1
+            else 3.0 if y_bin == density_y_bins
+            else -3 + (y_bin + 0.5) * 6 / density_y_bins
+        )
+        density_rows.append(
+            {
+                "rail": rail,
+                "engine": engine,
+                "x_bin": x_bin,
+                "y_bin": y_bin,
+                "temperature_center_K": x_low + (x_bin + 0.5) * (x_high - x_low) / density_x_bins,
+                "residual_center_dex": residual_center,
+                "flagged": flagged,
+                "clipped": clipped,
+                "row_count": count,
+            }
+        )
+
+    points: list[dict[str, object]] = []
+    small_panels = {
+        (str(row["rail"]), str(row["engine"]))
+        for row in panel_rows
+        if int(row["plotted_n"]) <= 300
+    }
+    for rail, engine in sorted(small_panels):
+        for row in database.execute(
+            """SELECT source, reference, temperature_K, sio2, composition, species,
+                      residual_dex, flagged
+                 FROM collection_unique_rows WHERE rail = ? AND engine = ?
+                ORDER BY temperature_K, reference""",
+            (rail, engine),
+        ):
+            source, reference, temperature, sio2, composition, species, residual, flagged = row
+            points.append(
+                {
+                    "rail": rail,
+                    "engine": engine,
+                    "source": source,
+                    "reference": reference,
+                    "temperature_K": temperature,
+                    "sio2": sio2,
+                    "composition": composition,
+                    "species": species,
+                    "residual_dex": residual,
+                    "flagged": int(flagged),
+                    "clipped": float(residual) < -3 or float(residual) > 3,
+                }
+            )
+    return {
+        "panels": panel_rows,
+        "temperature_bins": temperature_bins,
+        "density": density_rows,
+        "points": points,
+    }
+
+
+_COLLECTION_TABLE_FIELDS = {
+    "scorecard": (
+        "rail", "observable", "primary_engine", "comparison_engine", "n_shared",
+        "primary_rms_dex", "comparison_rms_dex", "high_n_shared",
+        "high_primary_rms_dex", "high_comparison_rms_dex", "low_n_shared",
+        "low_primary_rms_dex", "low_comparison_rms_dex",
+    ),
+    "panels": (
+        "rail", "observable", "engine", "n", "plotted_n", "rms_dex",
+        "flagged_n", "clipped_low_n", "clipped_high_n", "temperature_min_K",
+        "temperature_max_K",
+    ),
+    "temperature_bins": (
+        "rail", "engine", "temperature_bin", "temperature_center_K", "n",
+        "q1_dex", "median_dex", "q3_dex",
+    ),
+    "temperature_density": (
+        "rail", "engine", "x_bin", "y_bin", "temperature_center_K",
+        "residual_center_dex", "flagged", "clipped", "row_count",
+    ),
+    "temperature_points": (
+        "rail", "engine", "source", "reference", "temperature_K", "sio2",
+        "composition", "species", "residual_dex", "flagged", "clipped",
+    ),
+    "components": ("rail", "component", "engine", "n_shared", "rms_dex"),
+    "fingerprints": (
+        "rail", "engine", "temperature_lower_K", "temperature_upper_K",
+        "sio2_lower", "sio2_upper", "n", "median_abs_dex", "band", "colour",
+    ),
+    "coverage": (
+        "rail", "observable", "engine", "scored_n", "input_missing_n",
+        "outside_domain_n", "not_output_n", "other_refused_n", "refused_n",
+        "scored_percent",
+    ),
+    "progress": (
+        "landing", "date", "rail", "engine", "rms_dex", "n", "exposed_n",
+        "held_out_n", "held_out_rms_dex", "shared_with", "basis", "annotation",
+    ),
+    "exposure": (
+        "rail", "engine", "exposed_n", "held_out_n", "held_out_rms_dex",
+    ),
+    "all_rows": (
+        "rail", "engine", "view", "n", "rms_dex", "sd_dex",
+        "median_abs_dex", "exposed_n", "held_out_n", "held_out_rms_dex",
+        "source_disagreement_n", "source_disagreement_rms_dex", "unflagged_n",
+        "unflagged_rms_dex",
+    ),
+}
+
+
+def _write_collection_csvs(
+    output_dir: Path,
+    tables: Mapping[str, Sequence[Mapping[str, object]]],
+) -> dict[str, Path]:
+    table_dir = output_dir / "tables"
+    table_dir.mkdir(parents=True, exist_ok=True)
+    files: dict[str, Path] = {}
+    for name, fields in _COLLECTION_TABLE_FIELDS.items():
+        path = table_dir / f"{name}.csv"
+        with path.open("w", encoding="utf-8", newline="") as output:
+            writer = csv.DictWriter(output, fieldnames=fields, extrasaction="ignore")
+            writer.writeheader()
+            writer.writerows(tables.get(name, ()))
+        files[f"table:{name}"] = path
+    return files
+
+
+def _read_collection_csv(path: Path) -> list[dict[str, str]]:
+    with path.open("r", encoding="utf-8", newline="") as source:
+        return list(csv.DictReader(source))
+
+
+def _read_annotations_file(path: Path | None) -> tuple[dict[str, str], tuple[str, ...]]:
+    if path is None:
+        return {}, ()
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError(f"{path}: annotations must be a JSON object")
+    raw_annotations = payload.get("annotations", {})
+    if not isinstance(raw_annotations, Mapping):
+        raise ValueError(f"{path}: annotations must map landing sha/date to label")
+    annotations = {
+        str(key): str(value)
+        for key, value in raw_annotations.items()
+        if str(key).strip() and str(value).strip()
+    }
+    raw_fixes = payload.get("fix_status", ())
+    if not isinstance(raw_fixes, Sequence) or isinstance(raw_fixes, (str, bytes)):
+        raise ValueError(f"{path}: fix_status must be a list of caller-supplied lines")
+    return annotations, tuple(str(line) for line in raw_fixes if str(line).strip())
+
+
+def _write_collection_methods(
+    data: ScorePlotData,
+    output_dir: Path,
+    *,
+    openimcc_commit: str,
+    fix_status_lines: Sequence[str],
+) -> Path:
+    path = output_dir / "methods.md"
+    revision = str(data.stamp.get("revision") or "not recorded")
+    default_pack = _openimcc_default_pack(data) or "not recorded in score metadata"
+    fix_lines = "\n".join(f"- {line}" for line in fix_status_lines)
+    if not fix_lines:
+        fix_lines = "- No fix-status lines were supplied by the caller."
+    path.write_text(
+        "\n".join(
+            (
+                "# Hero chart methods",
+                "",
+                f"- Scorer revision: `{revision}`",
+                f"- OpenIMCC score pin: `{openimcc_commit}`",
+                f"- OpenIMCC default pack at the scored pin: `{default_pack}`",
+                "- Error: `log10(predicted / measured)`, in dex; closer to zero is better.",
+                "- Same-row comparisons include only observations scored once by both engines.",
+                "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
+                "- Temperature views split at 1700 K; 1700 K belongs to the upper view.",
+                "- Exposed rows match the exposure census or exposed-source list. Held-out rows are absent from both and from the pre-cutoff observation IDs; held-out RMS is displayed only when n ≥ 5.",
+                f"- Source disagreement is identified by notice kind `{NoticeKind.SOURCE_DISAGREEMENT.value}` and shown separately from unflagged rows.",
+                "",
+                "## Caller-supplied fix status",
+                "",
+                fix_lines,
+                "",
+                "## Known caveats",
+                "",
+                "- Melt activity includes echo rows whose input is the analysed melt.",
+                "- The scorer's all-numeric RMS includes uncalibrated KEMS p_partial rows excluded from plotted points under d-139.",
+                "- Source-disagreement-flagged vapour rows are separated from unflagged rows in the all-rows table.",
+                "- Fingerprint cells with fewer than three scored rows are blank.",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
+def _save_collection_png(figure: Any, path: Path) -> None:
+    figure.savefig(
+        path,
+        dpi=150,
+        bbox_inches="tight",
+        metadata={"Software": "battery_hero_plot"},
+    )
+    plt.close(figure)
+
+
+def _draw_scorecard_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+    colors = _hero_engine_colors(
+        tuple({str(row["primary_engine"]) for row in rows} | {str(row["comparison_engine"]) for row in rows})
+    ) if rows else {}
+    max_rows = max(
+        (
+            sum(row["rail"] == rail for row in rows)
+            for rail, _label in COLLECTION_OBSERVABLES
+        ),
+        default=1,
+    )
+    figure, axes = plt.subplots(
+        1,
+        len(COLLECTION_OBSERVABLES),
+        figsize=(18, max(3.8, 0.48 * max_rows + 1.5)),
+        squeeze=False,
+        sharex=True,
+    )
+    plot_values = _scorecard_plot_values(rows)
+    all_values = [
+        float(value)
+        for values in plot_values.values()
+        for value in values
+        if value is not None
+    ]
+    right = max(0.6, max(all_values, default=0.5) * 1.18)
+    for axis, (rail, label) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+        selected = [row for row in rows if row["rail"] == rail]
+        partners = list(dict.fromkeys(str(row["comparison_engine"]) for row in selected))
+        primaries = list(dict.fromkeys(str(row["primary_engine"]) for row in selected))
+        comparisons = [(primary, partner) for primary in primaries for partner in partners]
+        comparisons = [
+            pair for pair in comparisons
+            if any(row["primary_engine"] == pair[0] and row["comparison_engine"] == pair[1] for row in selected)
+        ]
+        axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
+        axis.axvline(0, color="#263238", linewidth=1.1, zorder=1)
+        for index, (primary, partner) in enumerate(comparisons):
+            row = next(
+                item for item in selected
+                if item["primary_engine"] == primary and item["comparison_engine"] == partner
+            )
+            values = plot_values[(rail, primary, partner)]
+            for primary_value, partner_value, offset, alpha in (
+                (values[0], values[1], 0.13, 1.0),
+                (values[2], values[3], -0.13, 0.38),
+            ):
+                if primary_value is None or partner_value is None:
+                    continue
+                y = index + offset
+                axis.plot(
+                    [float(primary_value), float(partner_value)], [y, y],
+                    color="#64748b", linewidth=0.65, alpha=alpha, zorder=2,
+                )
+                axis.scatter(
+                    [float(primary_value)], [y], marker="o", s=21,
+                    color=colors[primary], alpha=alpha, zorder=3,
+                )
+                axis.scatter(
+                    [float(partner_value)], [y], marker="s", s=21,
+                    color=colors[partner], alpha=alpha, zorder=3,
+                )
+            counts = f"n={row['n_shared']}"
+            high_n = row.get("high_n_shared")
+            low_n = row.get("low_n_shared")
+            if high_n:
+                counts += f" · ≥1700 {high_n}"
+            if low_n:
+                counts += f" · <1700 {low_n}"
+            axis.text(right * 0.995, index, counts, ha="right", va="center", color="#64748b", fontsize=5.3)
+        axis.set_title(label, loc="left", fontsize=8)
+        axis.set_yticks(range(len(comparisons)))
+        axis.set_yticklabels(
+            [f"{primary} vs {partner}" for primary, partner in comparisons],
+            fontsize=5.5,
+        )
+        axis.invert_yaxis()
+        axis.set_xlim(0, right)
+        axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.5)
+        axis.tick_params(axis="x", labelsize=6)
+        axis.set_xlabel("Shared-row RMS error (dex)", fontsize=6.5)
+    engine_handles = [
+        Line2D([0], [0], marker="o", linestyle="", color=color, label=engine, markersize=4)
+        for engine, color in colors.items()
+    ]
+    temp_handles = [
+        Line2D([0], [0], marker="o", linestyle="", color="#334155", alpha=1, label="≥1700 K", markersize=4),
+        Line2D([0], [0], marker="o", linestyle="", color="#334155", alpha=0.38, label="<1700 K", markersize=4),
+    ]
+    figure.suptitle("Which engine is closest to measurement for each observable?", fontsize=11, y=0.99)
+    figure.text(0.5, 0.955, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=7)
+    if engine_handles:
+        figure.legend(handles=engine_handles + temp_handles, loc="upper center", bbox_to_anchor=(0.5, 0.925), ncol=min(8, len(engine_handles) + 2), frameon=False, fontsize=6)
+    figure.subplots_adjust(left=0.08, right=0.99, top=0.82, bottom=0.14, wspace=0.32)
+    _save_collection_png(figure, path)
+
+
+def _draw_temperature_png(
+    path: Path,
+    rail: str,
+    panel_rows: Sequence[Mapping[str, str]],
+    bin_rows: Sequence[Mapping[str, str]],
+    density_rows: Sequence[Mapping[str, str]],
+    point_rows: Sequence[Mapping[str, str]],
+) -> None:
+    colors = _hero_engine_colors(tuple(row["engine"] for row in panel_rows))
+    engines = tuple(engine for engine in colors if any(row["engine"] == engine for row in panel_rows))
+    panel_by_engine = {row["engine"]: row for row in panel_rows}
+    limits = [
+        _finite_float(panel_by_engine[engine].get(key))
+        for engine in engines
+        for key in ("temperature_min_K", "temperature_max_K")
+    ]
+    limits = [value for value in limits if value is not None]
+    low, high = (min(limits), max(limits)) if limits else (0.0, 1.0)
+    if low == high:
+        low -= 50
+        high += 50
+    figure, axes = plt.subplots(
+        max(1, len(engines)),
+        1,
+        figsize=(12.2, max(3.0, 2.0 * len(engines))),
+        squeeze=False,
+        sharex=True,
+        sharey=True,
+    )
+    axes_flat = list(axes.flat)
+    for axis, engine in zip(axes_flat, engines, strict=False):
+        panel = panel_by_engine[engine]
+        color = colors[engine]
+        n = int(panel.get("n") or 0)
+        plotted_n = int(panel.get("plotted_n") or 0)
+        rms = panel.get("rms_dex") or "unavailable"
+        flagged = int(panel.get("flagged_n") or 0)
+        clipped_low = int(panel.get("clipped_low_n") or 0)
+        clipped_high = int(panel.get("clipped_high_n") or 0)
+        count_label = f"{plotted_n} plotted of {n} scored"
+        axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
+        axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
+        axis.axvline(1700, color="#64748b", linestyle="--", linewidth=0.8, zorder=1)
+        selected_bins = [row for row in bin_rows if row["rail"] == rail and row["engine"] == engine]
+        if selected_bins:
+            x_values = [float(row["temperature_center_K"]) for row in selected_bins]
+            medians = [float(row["median_dex"]) for row in selected_bins]
+            q1 = [float(row["q1_dex"]) for row in selected_bins]
+            q3 = [float(row["q3_dex"]) for row in selected_bins]
+            axis.fill_between(x_values, q1, q3, color=color, alpha=0.2, linewidth=0)
+            axis.plot(x_values, medians, color=color, linewidth=1.2, zorder=3)
+        if plotted_n <= 300:
+            selected_points = [
+                row for row in point_rows
+                if row["rail"] == rail and row["engine"] == engine and row["clipped"].casefold() != "true"
+            ]
+            for is_flagged, alpha in ((False, 0.35), (True, 0.75)):
+                points = [row for row in selected_points if row["flagged"] == str(int(is_flagged))]
+                if points:
+                    axis.scatter(
+                        [float(row["temperature_K"]) for row in points],
+                        [max(-3, min(3, float(row["residual_dex"]))) for row in points],
+                        s=4,
+                        marker="o",
+                        color=_lighten_colour(color, 0.35) if is_flagged else color,
+                        alpha=alpha,
+                        linewidths=0,
+                        zorder=2,
+                    )
+        else:
+            selected_density = [row for row in density_rows if row["rail"] == rail and row["engine"] == engine]
+            for is_flagged in (False, True):
+                bins = [
+                    row for row in selected_density
+                    if row["flagged"] == str(int(is_flagged))
+                    and row["clipped"] != "1"
+                ]
+                if not bins:
+                    continue
+                base_colour = _lighten_colour(color, 0.35) if is_flagged else color
+                ramp = LinearSegmentedColormap.from_list(
+                    f"hero-{rail}-{engine}-{is_flagged}",
+                    [_lighten_colour(base_colour, 0.55), base_colour],
+                )
+                counts = [int(row["row_count"]) for row in bins]
+                axis.scatter(
+                    [float(row["temperature_center_K"]) for row in bins],
+                    [float(row["residual_center_dex"]) for row in bins],
+                    c=counts,
+                    s=36,
+                    marker="h",
+                    cmap=ramp,
+                    alpha=0.82 if is_flagged else 0.92,
+                    linewidths=0,
+                    zorder=2 if not is_flagged else 3,
+                )
+            for clipped_side, marker, y_bin in (("low", "v", "-1"), ("high", "^", "36")):
+                for is_flagged, alpha in ((False, 0.9), (True, 0.75)):
+                    bins = [
+                        row for row in selected_density
+                        if row["clipped"] == "1"
+                        and row["y_bin"] == y_bin
+                        and row["flagged"] == str(int(is_flagged))
+                    ]
+                    if bins:
+                        marker_colour = _lighten_colour(color, 0.35) if is_flagged else color
+                        axis.scatter(
+                            [float(row["temperature_center_K"]) for row in bins],
+                            [-3.0 if clipped_side == "low" else 3.0] * len(bins),
+                            s=6,
+                            marker=marker,
+                            color=marker_colour,
+                            alpha=alpha,
+                            linewidths=0,
+                            zorder=4,
+                        )
+        outliers = [
+            row for row in point_rows
+            if row["rail"] == rail and row["engine"] == engine and row["clipped"].casefold() == "true"
+        ]
+        for clipped_side, marker in (("low", "v"), ("high", "^")):
+            selected_outliers = [
+                row for row in outliers
+                if (float(row["residual_dex"]) < -3) == (clipped_side == "low")
+            ]
+            if selected_outliers:
+                axis.scatter(
+                    [float(row["temperature_K"]) for row in selected_outliers],
+                    [-3.0 if clipped_side == "low" else 3.0] * len(selected_outliers),
+                    s=16,
+                    marker=marker,
+                    color=color,
+                    linewidths=0,
+                    zorder=4,
+                )
+        axis.set_xlim(low, high)
+        axis.set_ylim(*Y_LIMITS)
+        axis.set_ylabel("Signed error (dex)", fontsize=7)
+        axis.grid(color="#94a3b8", alpha=0.17, linewidth=0.45)
+        axis.tick_params(labelsize=6)
+        axis.set_title(
+            f"{engine} · {count_label} · all-scored RMS {rms} dex · {flagged} extrapolated · {clipped_low + clipped_high} beyond ±3 dex",
+            loc="left",
+            fontsize=7.5,
+        )
+    axes_flat[-1].set_xlabel("Temperature (K)", fontsize=7)
+    if axes_flat:
+        axes_flat[0].text(0.995, 0.94, "association data floor", transform=axes_flat[0].transAxes, ha="right", va="top", fontsize=5.5, color="#64748b")
+    observable = dict(COLLECTION_OBSERVABLES)[rail]
+    figure.suptitle(f"How does {observable.lower()} error change with temperature?", fontsize=10, y=0.995)
+    figure.text(0.5, 0.978, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=6.5)
+    figure.subplots_adjust(left=0.09, right=0.985, top=0.94, bottom=0.08, hspace=0.55)
+    _save_collection_png(figure, path)
+
+
+def _lighten_colour(colour: str, fraction: float) -> tuple[float, float, float]:
+    red, green, blue = matplotlib.colors.to_rgb(colour)
+    return tuple(channel + (1 - channel) * fraction for channel in (red, green, blue))
+
+
+def _draw_component_png(
+    path: Path,
+    rail: str,
+    rows: Sequence[Mapping[str, str]],
+) -> None:
+    selected = [row for row in rows if row["rail"] == rail]
+    engines = tuple(
+        engine for engine in _HERO_ENGINE_ORDER
+        if any(row["engine"] == engine for row in selected)
+    )
+    colors = _hero_engine_colors(engines)
+    by_component: dict[str, list[Mapping[str, str]]] = defaultdict(list)
+    for row in selected:
+        by_component[row["component"]].append(row)
+    components = sorted(
+        by_component,
+        key=lambda component: (
+            -max(int(row.get("n_shared") or 0) for row in by_component[component]),
+            component,
+        ),
+    )
+    fig_height = max(3.2, 0.36 * len(components) + 1.4)
+    figure, axis = plt.subplots(figsize=(11.5, fig_height))
+    all_values = [
+        float(row["rms_dex"])
+        for row in selected
+        if row.get("rms_dex") not in (None, "")
+    ]
+    right = max(0.65, max(all_values, default=0.5) * 1.15)
+    axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
+    axis.axvline(0, color="#263238", linewidth=1.0, zorder=1)
+    for component_index, component in enumerate(components):
+        component_rows = by_component[component]
+        maximum_n = max((int(row["n_shared"] or 0) for row in component_rows), default=0)
+        for row in component_rows:
+            value = _finite_float(row.get("rms_dex"))
+            if value is None:
+                continue
+            engine = row["engine"]
+            engine_index = engines.index(engine)
+            offset = (engine_index - (len(engines) - 1) / 2) * 0.075
+            axis.scatter(
+                [value], [component_index + offset], marker="o", s=24,
+                color=colors[engine], alpha=0.9, linewidths=0, zorder=3,
+            )
+            axis.text(
+                value, component_index + offset + 0.055,
+                f"n={row['n_shared']}", ha="center", va="bottom",
+                fontsize=4.8, color="#475569",
+            )
+        axis.text(right * 0.995, component_index, f"n={maximum_n}", ha="right", va="center", color="#64748b", fontsize=5.5)
+    axis.set_yticks(range(len(components)))
+    axis.set_yticklabels(components, fontsize=6)
+    axis.invert_yaxis()
+    axis.set_xlim(0, right)
+    axis.set_xlabel("RMS error on rows shared with OpenIMCC (dex)", fontsize=7)
+    axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.5)
+    axis.tick_params(axis="x", labelsize=6)
+    title = "species" if rail == Rail.VAPOUR.value else "oxide"
+    observable = "vapour pressure" if rail == Rail.VAPOUR.value else "melt activity"
+    figure.suptitle(f"Which engine is closest by {title} for {observable}?", fontsize=10, y=0.99)
+    figure.text(0.5, 0.96, "Shared-row RMS error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=6.5)
+    handles = [
+        Line2D([0], [0], marker="o", linestyle="", color=color, label=engine, markersize=4)
+        for engine, color in colors.items()
+    ]
+    if handles:
+        figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.935), ncol=min(6, len(handles)), frameon=False, fontsize=6)
+    figure.subplots_adjust(left=0.11, right=0.99, top=0.88, bottom=0.12)
+    _save_collection_png(figure, path)
+
+
+def _draw_fingerprint_png(
+    path: Path,
+    rail: str,
+    rows: Sequence[Mapping[str, str]],
+    engines: Sequence[str],
+) -> None:
+    colors = _hero_engine_colors(engines)
+    figure, axes = plt.subplots(
+        1,
+        max(1, len(engines)),
+        figsize=(max(6.0, 3.2 * len(engines)), 4.2),
+        squeeze=False,
+        sharex=True,
+        sharey=True,
+    )
+    rail_rows = [row for row in rows if row["rail"] == rail]
+    temperatures = [
+        _finite_float(row.get(key))
+        for row in rail_rows
+        for key in ("temperature_lower_K", "temperature_upper_K")
+    ]
+    temperatures = [value for value in temperatures if value is not None]
+    limits = (min(temperatures), max(temperatures)) if temperatures else (0.0, 1.0)
+    x_limits = (0.0, 1.0)
+    handles = _fingerprint_legend_handles()
+    for axis, engine in zip(axes.flat, engines, strict=False):
+        cells = [
+            {
+                **row,
+                "temperature_lower_K": _finite_float(row.get("temperature_lower_K")),
+                "temperature_upper_K": _finite_float(row.get("temperature_upper_K")),
+                "sio2_lower": _finite_float(row.get("sio2_lower")),
+                "sio2_upper": _finite_float(row.get("sio2_upper")),
+                "n": int(row.get("n") or 0),
+            }
+            for row in rail_rows
+            if row["engine"] == engine
+        ]
+        _draw_hero_sweet_spot(
+            axis,
+            engine,
+            cells,
+            x_limits=x_limits,
+            temperature_limits=limits,
+        )
+        axis.set_title(engine, loc="left", fontsize=6.5)
+    observable = dict(COLLECTION_OBSERVABLES)[rail]
+    figure.suptitle(f"Where does {observable.lower()} meet the target?", fontsize=10, y=0.99)
+    figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.94), ncol=3, frameon=False, fontsize=6)
+    figure.subplots_adjust(left=0.07, right=0.99, top=0.87, bottom=0.14, wspace=0.18)
+    _save_collection_png(figure, path)
+
+
+def _fingerprint_legend_handles() -> list[matplotlib.patches.Patch]:
+    labels = {
+        "good": "within 0.5 dex — good",
+        "okay": "0.5–1 dex — okay",
+        "needs work": "over 1 dex — needs work",
+    }
+    return [
+        matplotlib.patches.Patch(
+            facecolor=colour,
+            edgecolor="none",
+            label=labels[name],
+        )
+        for name, colour in FINGERPRINT_BANDS
+    ]
+
+
+def _draw_coverage_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+    colors = {
+        "scored_n": "#405b74",
+        "input_missing_n": "#b9c2cc",
+        "outside_domain_n": "#8796a5",
+        "not_output_n": "#68798b",
+        "other_refused_n": "#d89b79",
+    }
+    labels = {
+        "scored_n": "scored",
+        "input_missing_n": "input missing",
+        "outside_domain_n": "outside domain",
+        "not_output_n": "not an output of this engine",
+        "other_refused_n": "other refused",
+    }
+    fig, axes = plt.subplots(
+        len(COLLECTION_OBSERVABLES), 1,
+        figsize=(11.5, 2.1 * len(COLLECTION_OBSERVABLES)),
+        squeeze=False,
+    )
+    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+        selected = [row for row in rows if row["rail"] == rail]
+        y_positions = list(range(len(selected)))
+        left = [0] * len(selected)
+        for field_name in colors:
+            values = [int(row.get(field_name) or 0) for row in selected]
+            axis.barh(y_positions, values, left=left, color=colors[field_name], height=0.68, label=labels[field_name])
+            left = [offset + value for offset, value in zip(left, values, strict=True)]
+        for index, row in enumerate(selected):
+            percent = row.get("scored_percent")
+            if percent:
+                axis.text(left[index] + max(left, default=0) * 0.01, index, f"{percent}% scored", va="center", fontsize=5.5, color="#334155")
+        axis.set_yticks(y_positions)
+        axis.set_yticklabels([row["engine"] for row in selected], fontsize=6)
+        axis.invert_yaxis()
+        axis.set_title(observable, loc="left", fontsize=7.5)
+        axis.set_xlabel("Rows", fontsize=6)
+        axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.45)
+        axis.tick_params(axis="x", labelsize=5.5)
+    handles, legend_labels = axes.flat[0].get_legend_handles_labels()
+    fig.suptitle("Can each engine predict the rows in this benchmark?", fontsize=10, y=0.995)
+    fig.legend(handles, legend_labels, loc="upper center", bbox_to_anchor=(0.5, 0.978), ncol=5, frameon=False, fontsize=5.5)
+    fig.subplots_adjust(left=0.14, right=0.99, top=0.95, bottom=0.06, hspace=0.58)
+    _save_collection_png(fig, path)
+
+
+def _draw_progress_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+    engine_names = tuple(
+        engine for engine in _HERO_ENGINE_ORDER
+        if any(row["engine"] == engine for row in rows)
+    )
+    colors = _hero_engine_colors(engine_names)
+    figure, axes = plt.subplots(
+        len(COLLECTION_OBSERVABLES), 1,
+        figsize=(12, 2.25 * len(COLLECTION_OBSERVABLES)),
+        squeeze=False,
+        sharey=True,
+    )
+    max_rms = max((_finite_float(row.get("rms_dex")) or 0 for row in rows), default=1.0)
+    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+        selected = [row for row in rows if row["rail"] == rail]
+        axis.axhspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
+        axis.axhline(0, color="#263238", linewidth=0.8)
+        for engine in engine_names:
+            engine_rows = [row for row in selected if row["engine"] == engine and row.get("rms_dex")]
+            engine_rows.sort(key=lambda row: row.get("date") or "")
+            dates: list[float] = []
+            values: list[float] = []
+            held_dates: list[float] = []
+            held_values: list[float] = []
+            for row in engine_rows:
+                date = _history_date({"commit_date": row.get("date")})
+                rms = _finite_float(row.get("rms_dex"))
+                if date is None or rms is None:
+                    continue
+                dates.append(date)
+                values.append(rms)
+                held_n = int(row.get("held_out_n") or 0)
+                held_rms = _finite_float(row.get("held_out_rms_dex"))
+                if held_n >= HERO_MINIMUM_REPORT_N and held_rms is not None:
+                    held_dates.append(date)
+                    held_values.append(held_rms)
+                if row.get("annotation"):
+                    axis.annotate(
+                        row["annotation"],
+                        (date, rms),
+                        textcoords="offset points",
+                        xytext=(3, 5),
+                        fontsize=5,
+                        color="#334155",
+                    )
+            if dates:
+                axis.plot(dates, values, color=colors[engine], marker="o", markersize=3, linewidth=1.0, label=engine)
+            if held_dates:
+                axis.scatter(held_dates, held_values, color=colors[engine], marker="D", s=20, zorder=4)
+        axis.set_title(observable, loc="left", fontsize=7.5)
+        axis.set_ylabel("Shared-row RMS (dex)", fontsize=6)
+        axis.set_ylim(0, max(0.6, max_rms * 1.08))
+        axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+        axis.tick_params(axis="x", rotation=22, labelsize=5.5)
+        axis.tick_params(axis="y", labelsize=5.5)
+        axis.grid(color="#94a3b8", alpha=0.2, linewidth=0.45)
+    axes.flat[-1].set_xlabel("Green landing date", fontsize=6)
+    handles = [
+        Line2D([0], [0], marker="o", linestyle="-", color=colors[engine], label=engine, markersize=3)
+        for engine in engine_names
+    ]
+    if handles:
+        handles.append(Line2D([0], [0], marker="D", linestyle="", color="#334155", label="held-out RMS (n ≥ 5)", markersize=4))
+        figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.985), ncol=min(7, len(handles)), frameon=False, fontsize=6)
+    figure.suptitle("Is RMS error improving across green landings?", fontsize=10, y=0.999)
+    figure.text(0.5, 0.987, "Lower shared-row RMS is better · green band = within 0.5 dex · diamonds show held-out RMS when n ≥ 5", ha="center", fontsize=6)
+    figure.subplots_adjust(left=0.11, right=0.99, top=0.95, bottom=0.06, hspace=0.62)
+    _save_collection_png(figure, path)
+
+
+def _draw_exposure_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+    exposure_rows = [row for row in rows if row.get("exposed_n") or row.get("held_out_n")]
+    figure, axes = plt.subplots(
+        len(COLLECTION_OBSERVABLES), 1,
+        figsize=(5.0, 7.0),
+        squeeze=False,
+        sharex=True,
+    )
+    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+        selected = [row for row in exposure_rows if row["rail"] == rail]
+        y = list(range(len(selected)))
+        exposed = [int(row.get("exposed_n") or 0) for row in selected]
+        held = [int(row.get("held_out_n") or 0) for row in selected]
+        axis.barh(y, exposed, color="#607d8b", height=0.35, label="exposed · in-sample")
+        axis.barh([value + 0.36 for value in y], held, color="#334155", height=0.35, label="held-out · out-of-sample")
+        for index, (exposed_n, held_n) in enumerate(zip(exposed, held, strict=True)):
+            axis.text(max(exposed_n, held_n) + 0.3, index + 0.18, f"{exposed_n} / {held_n}", va="center", fontsize=5.5)
+        axis.set_yticks([value + 0.18 for value in y])
+        axis.set_yticklabels([row["engine"] for row in selected], fontsize=7)
+        axis.invert_yaxis()
+        axis.set_title(observable, loc="left", fontsize=7.5)
+        axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.45)
+        axis.tick_params(axis="x", labelsize=6.5)
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    if not exposure_rows:
+        axes.flat[0].text(0.5, 0.5, "Exposure inputs were not supplied", transform=axes.flat[0].transAxes, ha="center", va="center", fontsize=8)
+    figure.suptitle("Are the scored rows exposed or held out?", fontsize=10, y=0.995)
+    if handles:
+        figure.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.976), ncol=2, frameon=False, fontsize=6.5)
+    figure.text(0.98, 0.015, "Exposed is in-sample · held-out is the out-of-sample check", ha="right", fontsize=6, color="#475569")
+    figure.subplots_adjust(left=0.25, right=0.98, top=0.93, bottom=0.07, hspace=0.62)
+    _save_collection_png(figure, path)
+
+
+def _html_table(rows: Sequence[Mapping[str, str]]) -> str:
+    if not rows:
+        return "<p>No rows.</p>"
+    columns = tuple(rows[0])
+    header = "".join(f"<th>{html.escape(column)}</th>" for column in columns)
+    body = "".join(
+        "<tr>" + "".join(f"<td>{html.escape(str(row.get(column, '')))}</td>" for column in columns) + "</tr>"
+        for row in rows
+    )
+    return f"<div class=table-wrap><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></div>"
+
+
+def _write_collection_html(
+    path: Path,
+    database: sqlite3.Connection,
+    *,
+    chart_files: Mapping[str, Path],
+    table_rows: Mapping[str, Sequence[Mapping[str, str]]],
+    engine_names: Sequence[str],
+) -> None:
+    def section(
+        chart_id: str,
+        title: str,
+        image_key: str,
+        tables: Sequence[tuple[str, Sequence[Mapping[str, str]]]],
+    ) -> str:
+        image_path = chart_files[image_key]
+        image = base64.b64encode(image_path.read_bytes()).decode("ascii")
+        table_markup = "".join(
+            f"<h4>{html.escape(label)}</h4>{_html_table(rows)}"
+            for label, rows in tables
+        )
+        return (
+            f'<section class="chart" id="{html.escape(chart_id)}">'
+            f"<h2>{html.escape(title)}</h2>"
+            f'<img src="data:image/png;base64,{image}" alt="{html.escape(title)}">'
+            f"<details><summary>Show chart data</summary>{table_markup}</details></section>"
+        )
+
+    with path.open("w", encoding="utf-8") as output:
+        output.write(
+            "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            "<title>Battery hero charts</title><style>"
+            ":root{--page:#fbfcfe;--surface:#fff;--ink:#18212b;--muted:#526171;--grid:#d8e0e8;--link:#1b5f9e}"
+            ":root[data-theme=dark]{--page:#111820;--surface:#19232d;--ink:#edf3f8;--muted:#aebbc8;--grid:#344351;--link:#8fc6ff}"
+            "*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}"
+            "main{max-width:1440px;margin:auto;padding:20px}h1{font-size:clamp(1.5rem,4vw,2.25rem);margin:.2rem 0}h2{font-size:1.2rem;margin:.3rem 0 .8rem}h3{font-size:1rem}"
+            ".chart,.interactive{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:16px;margin:16px 0;overflow:hidden}.collection-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:0 14px}.collection-grid>.chart{grid-column:1/-1}#chart-a{grid-column:1}#chart-g{grid-column:2;grid-row:1}"
+            ".chart img{display:block;width:100%;height:auto}.table-wrap{overflow:auto;max-height:55vh}table{border-collapse:collapse;width:100%;font-size:.78rem;white-space:nowrap}th,td{border-bottom:1px solid var(--grid);padding:5px 8px;text-align:left}th{position:sticky;top:0;background:var(--surface)}details{margin-top:12px}summary{cursor:pointer;color:var(--link);font-weight:600}"
+            ".controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end}.controls label{display:grid;gap:3px;color:var(--muted);font-size:.82rem}.controls input,.controls select,.controls button{min-height:38px;padding:6px 8px;border:1px solid var(--grid);border-radius:6px;background:var(--surface);color:var(--ink)}"
+            ".range{display:flex;gap:5px}.toggles{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0}.toggles label{display:flex;align-items:center;gap:5px;font-size:.84rem}.toggles input{min-height:0}canvas{display:block;width:100%;height:390px;border:1px solid var(--grid);border-radius:6px;margin:10px 0 20px;touch-action:pan-y}.tooltip{position:fixed;z-index:5;display:none;max-width:min(340px,90vw);padding:9px 11px;background:var(--ink);color:var(--page);border-radius:6px;font-size:.78rem;pointer-events:none;white-space:pre-wrap}"
+            "@media(max-width:700px){main{padding:10px}.chart,.interactive{padding:10px;border-radius:8px}.collection-grid{grid-template-columns:minmax(0,1fr)}#chart-a,#chart-g{grid-column:1;grid-row:auto}.chart{overflow-x:auto}#chart-a img,[id^=chart-d-] img{width:760px;max-width:none}.chart:not(#chart-a):not([id^=chart-d-]) img{width:100%;max-width:100%}.controls{align-items:stretch}.controls label{flex:1 1 130px}.controls input,.controls select{width:100%}canvas{height:320px}table{font-size:.7rem}}"
+            "</style></head><body><main><header><button id=\"theme-toggle\" type=\"button\">Toggle light/dark</button>"
+            "<h1>Battery benchmark: which engine fits your application?</h1>"
+            "<p>Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex</p></header>"
+        )
+        output.write('<div class="collection-grid">')
+        output.write(section("chart-a", "A · Which engine is closest to measurement?", "chart:A", [("Scorecard", table_rows["scorecard"])]))
+        for rail, label in COLLECTION_OBSERVABLES:
+            output.write(
+                section(
+                    f"chart-b-{rail}",
+                    f"B · How does {label.lower()} error change with temperature?",
+                    f"chart:B:{rail}",
+                    (
+                        ("Panel counts and clipping", [row for row in table_rows["panels"] if row["rail"] == rail]),
+                        ("Binned median and interquartile range", [row for row in table_rows["temperature_bins"] if row["rail"] == rail]),
+                        ("Density cells", [row for row in table_rows["temperature_density"] if row["rail"] == rail]),
+                        ("Scattered or clipped rows", [row for row in table_rows["temperature_points"] if row["rail"] == rail]),
+                    ),
+                )
+            )
+        for rail, title, label in (
+            (Rail.VAPOUR.value, "Species", "vapour pressure"),
+            (Rail.MELT_ACTIVITY.value, "Oxide", "melt activity"),
+        ):
+            output.write(
+                section(
+                    f"chart-c-{rail}",
+                    f"C · Which engine is closest by {title.lower()} for {label}?",
+                    f"chart:C:{rail}",
+                    (("Shared-row RMS", [row for row in table_rows["components"] if row["rail"] == rail]),),
+                )
+            )
+        for rail, label in COLLECTION_OBSERVABLES:
+            output.write(
+                section(
+                    f"chart-d-{rail}",
+                    f"D · Where does {label.lower()} meet the target?",
+                    f"chart:D:{rail}",
+                    (("Fingerprint cells", [row for row in table_rows["fingerprints"] if row["rail"] == rail]),),
+                )
+            )
+        output.write(section("chart-e", "E · Can each engine predict the benchmark rows?", "chart:E", [("Coverage", table_rows["coverage"])]))
+        output.write(section("chart-f", "F · Is shared-row RMS improving across green landings?", "chart:F", [("Progress", table_rows["progress"])]))
+        output.write(section("chart-g", "G · Are scored rows exposed or held out?", "chart:G", [("Exposure", table_rows["exposure"])]))
+        output.write("</div>")
+        output.write(
+            "<section class=\"interactive\" id=\"application-window\"><h2>Explore your application window</h2>"
+            "<p>Hover a point or fingerprint cell for row source, T, composition, and residual.</p><div class=\"controls\">"
+            "<label>Observable<select id=\"observable-select\"></select></label>"
+            "<label>Temperature range (K)<span class=\"range\"><input id=\"temperature-min\" type=\"number\" aria-label=\"Minimum temperature\"><input id=\"temperature-max\" type=\"number\" aria-label=\"Maximum temperature\"></span></label>"
+            "<label>SiO₂ range<span class=\"range\"><input id=\"sio2-min\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Minimum SiO2\"><input id=\"sio2-max\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Maximum SiO2\"></span></label>"
+            "<label>Fingerprint engine<select id=\"fingerprint-engine\"></select></label></div>"
+            "<div class=\"toggles\" id=\"engine-toggles\"></div><h3>Signed residual versus temperature</h3><canvas id=\"error-canvas\"></canvas>"
+            "<h3>Temperature × SiO₂ fingerprint</h3><canvas id=\"fingerprint-canvas\"></canvas></section>"
+        )
+        output.write(
+            "<section class=\"chart\"><h2>All rows by rail, engine, and temperature view</h2>"
+            "<details><summary>Show all-rows table</summary>"
+            + _html_table(table_rows["all_rows"])
+            + "</details></section><div id=\"tooltip\" class=\"tooltip\" role=\"tooltip\"></div>"
+        )
+        output.write('<script type="application/json" id="row-data">[')
+        first = True
+        for row in database.execute(
+            """SELECT rail, engine, source, reference, temperature_K, sio2,
+                      composition, species, residual_dex, flagged, temperature_bin, sio2_bin
+                 FROM collection_unique_rows ORDER BY rail, engine, temperature_K, reference"""
+        ):
+            rail, engine, source, reference, temperature, sio2, composition, species, residual, flagged, temperature_bin, sio2_bin = row
+            value = {
+                "rail": rail, "engine": engine, "source": source, "reference": reference,
+                "temperature_K": temperature, "sio2": sio2, "composition": composition,
+                "species": species, "residual_dex": residual, "flagged": int(flagged),
+                "temperature_bin": temperature_bin, "sio2_bin": sio2_bin,
+            }
+            if not first:
+                output.write(",")
+            output.write(json.dumps(value, separators=(",", ":")).replace("<", "\\u003c"))
+            first = False
+        output.write("]</script><script type=\"application/json\" id=\"cell-data\">")
+        output.write(json.dumps(table_rows["fingerprints"], separators=(",", ":")).replace("<", "\\u003c"))
+        output.write("</script><script>\n")
+        output.write("const rows=JSON.parse(document.getElementById('row-data').textContent);\n")
+        output.write("const cells=JSON.parse(document.getElementById('cell-data').textContent);\n")
+        output.write("const PALETTE=")
+        output.write(json.dumps(_hero_engine_colors(engine_names)))
+        output.write(";const BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'};\n")
+        output.write(_COLLECTION_INTERACTIVE_SCRIPT.replace("__RAILS__", json.dumps([rail for rail, _label in COLLECTION_OBSERVABLES])).replace("__LABELS__", json.dumps(dict(COLLECTION_OBSERVABLES))))
+        output.write("</script></main></body></html>")
+
+
+_COLLECTION_INTERACTIVE_SCRIPT = r"""
+const rails=__RAILS__,labels=__LABELS__;
+const railSelect=document.getElementById('observable-select'), engineSelect=document.getElementById('fingerprint-engine');
+const toggles=document.getElementById('engine-toggles'), tMin=document.getElementById('temperature-min'),tMax=document.getElementById('temperature-max');
+const sMin=document.getElementById('sio2-min'),sMax=document.getElementById('sio2-max');
+const errorCanvas=document.getElementById('error-canvas'),mapCanvas=document.getElementById('fingerprint-canvas'),tip=document.getElementById('tooltip');
+const engines=Object.keys(PALETTE);
+for(const rail of rails)railSelect.add(new Option(labels[rail],rail));
+for(const engine of engines){
+  engineSelect.add(new Option(engine,engine));
+  const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.checked=true;check.value=engine;check.dataset.engineToggle=engine;
+  const swatch=document.createElement('span');swatch.style.cssText='display:inline-block;width:12px;height:12px;background:'+PALETTE[engine]+';border-radius:50%';
+  label.append(check,swatch,document.createTextNode(engine));toggles.append(label);
+}
+let minTemp=Infinity,maxTemp=-Infinity;
+for(const row of rows){const temp=+row.temperature_K;if(Number.isFinite(temp)){minTemp=Math.min(minTemp,temp);maxTemp=Math.max(maxTemp,temp);}}
+tMin.value=Number.isFinite(minTemp)?Math.floor(minTemp):0;tMax.value=Number.isFinite(maxTemp)?Math.ceil(maxTemp):3000;sMin.value=0;sMax.value=1;
+function enabled(engine){return !!toggles.querySelector('[data-engine-toggle=\"'+CSS.escape(engine)+'\"]')?.checked;}
+function windowValues(){return [+tMin.value,+tMax.value,+sMin.value,+sMax.value];}
+function inWindow(row){const [lo,hi,slo,shi]=windowValues();if(+row.temperature_K<lo||+row.temperature_K>hi)return false;return row.sio2==null?(slo<=0&&shi>=1):(+row.sio2>=slo&&+row.sio2<=shi);}
+function size(canvas){const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height};}
+function lighten(hex,amount){const n=parseInt(hex.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return 'rgb('+Math.round(r+(255-r)*amount)+','+Math.round(g+(255-g)*amount)+','+Math.round(b+(255-b)*amount)+')';}
+function plotError(){
+  const {ctx,w,h}=size(errorCanvas),rail=railSelect.value,m={l:54,r:14,t:18,b:38},pw=w-m.l-m.r,ph=h-m.t-m.b,[lo,hi]=windowValues();
+  ctx.clearRect(0,0,w,h);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--page');ctx.fillRect(0,0,w,h);
+  const x=v=>m.l+(v-lo)/(hi-lo||1)*pw,y=v=>m.t+(3-Math.max(-3,Math.min(3,v)))/6*ph;
+  ctx.fillStyle='rgba(12,163,12,.12)';ctx.fillRect(m.l,y(.5),pw,y(-.5)-y(.5));ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--grid');
+  for(let i=0;i<=6;i++){const yy=m.t+i*ph/6;ctx.beginPath();ctx.moveTo(m.l,yy);ctx.lineTo(w-m.r,yy);ctx.stroke();}
+  ctx.strokeStyle='#263238';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m.l,y(0));ctx.lineTo(w-m.r,y(0));ctx.stroke();
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(1700),m.t);ctx.lineTo(x(1700),h-m.b);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('Temperature (K)',w/2-42,h-8);ctx.save();ctx.translate(14,h/2+38);ctx.rotate(-Math.PI/2);ctx.fillText('Signed error (dex)',0,0);ctx.restore();
+  for(const row of rows){if(row.rail!==rail||!enabled(row.engine)||!inWindow(row))continue;const px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=row.flagged?.72:.35;ctx.fillStyle=row.flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
+  ctx.globalAlpha=1;errorCanvas._plot={x,y,m,pw,ph,lo,hi,rail};
+}
+function plotMap(){
+  const {ctx,w,h}=size(mapCanvas),rail=railSelect.value,engine=engineSelect.value,m={l:54,r:14,t:18,b:36},pw=w-m.l-m.r,ph=h-m.t-m.b;
+  const railCells=cells.filter(c=>c.rail===rail&&c.engine===engine),[tlo,thi,slo,shi]=windowValues();let lo=Infinity,hi=-Infinity;
+  for(const cell of railCells){lo=Math.min(lo,+cell.temperature_lower_K);hi=Math.max(hi,+cell.temperature_upper_K);}if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=0;hi=1;}
+  ctx.clearRect(0,0,w,h);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--page');ctx.fillRect(0,0,w,h);const x=v=>m.l+(v-slo)/(shi-slo||1)*pw,y=v=>m.t+(hi-v)/(hi-lo||1)*ph;
+  for(const cell of railCells){if(!enabled(engine)||+cell.n<3||!cell.colour)continue;const xl=Math.max(slo,+cell.sio2_lower),xh=Math.min(shi,+cell.sio2_upper),yl=Math.max(tlo,+cell.temperature_lower_K),yh=Math.min(thi,+cell.temperature_upper_K);if(xh<=xl||yh<=yl)continue;ctx.fillStyle=cell.colour;ctx.fillRect(x(xl)+1,y(yh)+1,Math.max(0,x(xh)-x(xl)-2),Math.max(0,y(yl)-y(yh)-2));}
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.strokeRect(m.l,m.t,pw,ph);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('SiO₂ mole fraction',w/2-58,h-8);ctx.save();ctx.translate(14,h/2+30);ctx.rotate(-Math.PI/2);ctx.fillText('Temperature (K)',0,0);ctx.restore();mapCanvas._plot={x,y,m,pw,ph,lo,hi,rail,engine};
+}
+function showTip(event,kind){
+  const canvas=kind==='map'?mapCanvas:errorCanvas,p=canvas._plot;if(!p)return;const rect=canvas.getBoundingClientRect(),mx=event.clientX-rect.left,my=event.clientY-rect.top;let row=null,cell=null,best=Infinity;
+  if(kind==='map'){
+    const [tlo,thi,slo,shi]=windowValues(),sx=slo+(mx-p.m.l)/p.pw*(shi-slo),temp=p.hi-(my-p.m.t)/p.ph*(p.hi-p.lo);
+    if(!enabled(p.engine)){tip.style.display='none';return;}
+    cell=cells.find(c=>c.rail===p.rail&&c.engine===p.engine&&+c.n>=3&&sx>=+c.sio2_lower&&sx<+c.sio2_upper&&temp>=+c.temperature_lower_K&&temp<+c.temperature_upper_K&&+c.temperature_lower_K<thi&&+c.temperature_upper_K>tlo);
+    if(cell)row=rows.find(r=>r.rail===p.rail&&r.engine===p.engine&&r.sio2!=null&&+r.sio2>=+cell.sio2_lower&&+r.sio2<+cell.sio2_upper&&+r.temperature_K>=+cell.temperature_lower_K&&+r.temperature_K<+cell.temperature_upper_K&&inWindow(r));
+  }else{
+    for(const r of rows){if(r.rail!==p.rail||!enabled(r.engine)||!inWindow(r))continue;const dx=p.x(+r.temperature_K)-mx,dy=p.y(+r.residual_dex)-my,d=dx*dx+dy*dy;if(d<best){best=d;row=r;}}
+    if(best>110)row=null;
+  }
+  if(!row&&!cell){tip.style.display='none';return;}
+  const detail=row?'Row source: '+row.source+' ('+row.reference+')\nT: '+row.temperature_K+' K\nComposition: '+row.composition+'\nResidual: '+row.residual_dex+' dex':'No row in this cell';
+  tip.textContent=cell?'Median |error|: '+cell.median_abs_dex+' dex · n='+cell.n+'\n'+detail:detail;tip.style.display='block';tip.style.left=Math.min(event.clientX+12,innerWidth-350)+'px';tip.style.top=Math.min(event.clientY+12,innerHeight-120)+'px';
+}
+for(const control of [railSelect,engineSelect,tMin,tMax,sMin,sMax])control.addEventListener('input',()=>{plotError();plotMap();});
+toggles.addEventListener('change',()=>{plotError();plotMap();});errorCanvas.addEventListener('pointermove',e=>showTip(e,'error'));errorCanvas.addEventListener('pointerleave',()=>tip.style.display='none');mapCanvas.addEventListener('pointermove',e=>showTip(e,'map'));mapCanvas.addEventListener('pointerleave',()=>tip.style.display='none');
+document.getElementById('theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';plotError();plotMap();});
+window.addEventListener('resize',()=>{plotError();plotMap();});plotError();plotMap();
+""";
+
+
+def render_hero_collection(
+    data: ScorePlotData,
+    source_path: Path,
+    output_dir: Path,
+    *,
+    simulator_commit: str,
+    openimcc_commit: str,
+    render_date: str | None = None,
+    history_path: Path | None = None,
+    annotations: Mapping[str, str] | None = None,
+    fix_status_lines: Sequence[str] = (),
+) -> dict[str, Path]:
+    """Render the static A–G collection, sidecar tables, and embedded HTML."""
+
+    if not data.engines:
+        raise ValueError("no engines found in score JSONL")
+    render_date = render_date or datetime.now(timezone.utc).date().isoformat()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    scratch = os.environ.get("TMPDIR")
+    with tempfile.TemporaryDirectory(
+        prefix="battery-hero-collection-",
+        dir=scratch if scratch else None,
+    ) as scratch_path:
+        database = sqlite3.connect(Path(scratch_path) / "collection.sqlite3")
+        database.execute("PRAGMA journal_mode = OFF")
+        database.execute("PRAGMA synchronous = OFF")
+        database.execute("PRAGMA temp_store = FILE")
+        database.execute("PRAGMA cache_size = -32768")
+        _collection_row_database(
+            source_path,
+            database,
+            bin_width_K=data.bin_width_K,
+        )
+        raw_tables = _collection_raw_tables(
+            database,
+            data,
+            bin_width_K=data.bin_width_K,
+        )
+        history = read_history(history_path)
+        annotation_map = dict(annotations or {})
+        tables: dict[str, list[dict[str, object]]] = {
+            "scorecard": _scorecard_table_rows(data),
+            "panels": raw_tables["panels"],
+            "temperature_bins": raw_tables["temperature_bins"],
+            "temperature_density": raw_tables["density"],
+            "temperature_points": raw_tables["points"],
+            "components": _component_table_rows(data),
+            "fingerprints": _fingerprint_table_rows(data),
+            "coverage": _coverage_table_rows(data),
+            "progress": _history_collection_rows(
+                data,
+                history,
+                simulator_commit=simulator_commit,
+                render_date=render_date,
+                annotations=annotation_map,
+            ),
+            "exposure": [],
+            "all_rows": _all_rows_table_rows(data),
+        }
+        for rail, _label in COLLECTION_OBSERVABLES:
+            for engine in _ordered_hero_engines(data.engines):
+                view = _view_metric(_collection_metric(data, rail, engine), "all")
+                held = view.get("held_out", {})
+                held = held if isinstance(held, Mapping) else {}
+                tables["exposure"].append(
+                    {
+                        "rail": rail,
+                        "engine": engine,
+                        "exposed_n": view.get("exposed_n", ""),
+                        "held_out_n": held.get("n", ""),
+                        "held_out_rms_dex": held.get("rms_dex", ""),
+                    }
+                )
+        files = _write_collection_csvs(output_dir, tables)
+        csv_rows = {
+            name: _read_collection_csv(files[f"table:{name}"])
+            for name in _COLLECTION_TABLE_FIELDS
+        }
+        chart_files: dict[str, Path] = {}
+        path = output_dir / "battery-hero-A-scorecard.png"
+        _draw_scorecard_png(path, csv_rows["scorecard"])
+        chart_files["chart:A"] = path
+        files["chart:A"] = path
+        for rail, _label in COLLECTION_OBSERVABLES:
+            path = output_dir / f"battery-hero-B-{_revision_slug(rail)}.png"
+            _draw_temperature_png(
+                path,
+                rail,
+                [row for row in csv_rows["panels"] if row["rail"] == rail],
+                csv_rows["temperature_bins"],
+                csv_rows["temperature_density"],
+                csv_rows["temperature_points"],
+            )
+            key = f"chart:B:{rail}"
+            chart_files[key] = path
+            files[key] = path
+        for rail in (Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value):
+            path = output_dir / f"battery-hero-C-{_revision_slug(rail)}.png"
+            _draw_component_png(path, rail, csv_rows["components"])
+            key = f"chart:C:{rail}"
+            chart_files[key] = path
+            files[key] = path
+        for rail, _label in COLLECTION_OBSERVABLES:
+            path = output_dir / f"battery-hero-D-{_revision_slug(rail)}.png"
+            _draw_fingerprint_png(path, rail, csv_rows["fingerprints"], data.engines)
+            key = f"chart:D:{rail}"
+            chart_files[key] = path
+            files[key] = path
+        for chart_key, filename, draw, rows in (
+            ("chart:E", "battery-hero-E-coverage.png", _draw_coverage_png, csv_rows["coverage"]),
+            ("chart:F", "battery-hero-F-progress.png", _draw_progress_png, csv_rows["progress"]),
+            ("chart:G", "battery-hero-G-exposure.png", _draw_exposure_png, csv_rows["exposure"]),
+        ):
+            path = output_dir / filename
+            draw(path, rows)
+            chart_files[chart_key] = path
+            files[chart_key] = path
+        methods_path = _write_collection_methods(
+            data,
+            output_dir,
+            openimcc_commit=openimcc_commit,
+            fix_status_lines=fix_status_lines,
+        )
+        files["methods"] = methods_path
+        html_path = output_dir / "battery-hero.html"
+        _write_collection_html(
+            html_path,
+            database,
+            chart_files=chart_files,
+            table_rows=csv_rows,
+            engine_names=data.engines,
+        )
+        files["html"] = html_path
+        database.close()
+    return files
+
+
+def _collection_metric(
+    data: ScorePlotData, rail: str, engine: str
+) -> Mapping[str, object]:
+    return data.hero_all_numeric_metrics.get((rail, engine), {})
+
+
+def _collection_comparison(
+    data: ScorePlotData, rail: str, primary_engine: str
+) -> Mapping[str, object]:
+    chart = "sio_evolution" if rail == Rail.SIO_EVOLUTION.value else rail
+    if rail in HERO_RAILS:
+        return data.hero_comparisons.get((rail, primary_engine), {})
+    return data.hero_deck_comparisons.get((chart, primary_engine), {})
+
+
+def _collection_history_comparisons(
+    data: ScorePlotData,
+) -> dict[tuple[str, str], Mapping[str, object]]:
+    comparisons = dict(data.hero_comparisons)
+    for chart, rail in (
+        ("sio_evolution", Rail.SIO_EVOLUTION.value),
+        ("residue_composition", Rail.RESIDUE_COMPOSITION.value),
+    ):
+        for primary in HERO_PRIMARY_ENGINES:
+            record = data.hero_deck_comparisons.get((chart, primary))
+            if record is not None:
+                comparisons[(rail, primary)] = {**record, "rail": rail}
+    return comparisons
+
+
+def _view_metric(
+    metric: Mapping[str, object], view_name: str
+) -> Mapping[str, object]:
+    views = metric.get("views")
+    views = views if isinstance(views, Mapping) else {}
+    view = views.get(view_name)
+    return view if isinstance(view, Mapping) else {}
+
+
+def _scorecard_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for rail, label in COLLECTION_OBSERVABLES:
+        for primary in ("openimcc",):
+            comparison_record = _collection_comparison(data, rail, primary)
+            comparisons = comparison_record.get("comparisons")
+            if not isinstance(comparisons, Sequence) or isinstance(comparisons, (str, bytes)):
+                continue
+            for comparison in comparisons:
+                if not isinstance(comparison, Mapping):
+                    continue
+                views = comparison.get("views")
+                views = views if isinstance(views, Mapping) else {}
+                all_view = views.get("all", {})
+                all_view = all_view if isinstance(all_view, Mapping) else {}
+                high = views.get("temperature_ge_1700", {})
+                high = high if isinstance(high, Mapping) else {}
+                low = views.get("temperature_lt_1700", {})
+                low = low if isinstance(low, Mapping) else {}
+                rows.append(
+                    {
+                        "rail": rail,
+                        "observable": label,
+                        "primary_engine": primary,
+                        "comparison_engine": str(comparison.get("engine") or "unknown"),
+                        "n_shared": all_view.get("n_shared", comparison.get("n_shared", 0)),
+                        "primary_rms_dex": all_view.get("primary_rms_dex_on_shared", comparison.get("primary_rms_dex_on_shared")),
+                        "comparison_rms_dex": all_view.get("outside_rms_dex", comparison.get("outside_rms_dex")),
+                        "high_n_shared": high.get("n_shared", ""),
+                        "high_primary_rms_dex": high.get("primary_rms_dex_on_shared", ""),
+                        "high_comparison_rms_dex": high.get("outside_rms_dex", ""),
+                        "low_n_shared": low.get("n_shared", ""),
+                        "low_primary_rms_dex": low.get("primary_rms_dex_on_shared", ""),
+                        "low_comparison_rms_dex": low.get("outside_rms_dex", ""),
+                    }
+                )
+    return rows
+
+
+def _scorecard_plot_values(
+    rows: Sequence[Mapping[str, object]],
+) -> dict[
+    tuple[str, str, str],
+    tuple[Decimal | None, Decimal | None, Decimal | None, Decimal | None],
+]:
+    values: dict[
+        tuple[str, str, str],
+        tuple[Decimal | None, Decimal | None, Decimal | None, Decimal | None],
+    ] = {}
+    for row in rows:
+        key = (
+            str(row["rail"]),
+            str(row["primary_engine"]),
+            str(row["comparison_engine"]),
+        )
+        def decimal(field: str) -> Decimal | None:
+            value = row.get(field)
+            return None if value in (None, "") else Decimal(str(value))
+
+        values[key] = (
+            decimal("high_primary_rms_dex"),
+            decimal("high_comparison_rms_dex"),
+            decimal("low_primary_rms_dex"),
+            decimal("low_comparison_rms_dex"),
+        )
+    return values
+
+
+def _component_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    grouped: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
+    for record in data.hero_component_comparisons:
+        rail = str(record.get("rail") or "")
+        species = str(record.get("species") or "unknown")
+        if (
+            record.get("primary_engine") == "openimcc"
+            and rail in {Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value}
+        ):
+            grouped[(rail, species)].append(record)
+    rows: list[dict[str, object]] = []
+    for (rail, component), records in sorted(grouped.items()):
+        comparisons: dict[str, Mapping[str, object]] = {}
+        for record in records:
+            values = record.get("comparisons")
+            if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
+                continue
+            for comparison in values:
+                if not isinstance(comparison, Mapping):
+                    continue
+                engine = str(comparison.get("engine") or "unknown")
+                if int(comparison.get("n_shared") or 0) >= HERO_MINIMUM_REPORT_N:
+                    comparisons[engine] = comparison
+        if not comparisons:
+            continue
+        baseline = max(
+            comparisons.values(), key=lambda comparison: int(comparison.get("n_shared") or 0)
+        )
+        baseline_views = baseline.get("views")
+        baseline_views = baseline_views if isinstance(baseline_views, Mapping) else {}
+        baseline_all = baseline_views.get("all", {})
+        baseline_all = baseline_all if isinstance(baseline_all, Mapping) else {}
+        rows.append(
+            {
+                "rail": rail,
+                "component": component,
+                "engine": "openimcc",
+                "n_shared": baseline_all.get("n_shared", baseline.get("n_shared", 0)),
+                "rms_dex": baseline_all.get("primary_rms_dex_on_shared", baseline.get("primary_rms_dex_on_shared")),
+            }
+        )
+        for engine, comparison in comparisons.items():
+            views = comparison.get("views")
+            views = views if isinstance(views, Mapping) else {}
+            all_view = views.get("all", {})
+            all_view = all_view if isinstance(all_view, Mapping) else {}
+            rows.append(
+                {
+                    "rail": rail,
+                    "component": component,
+                    "engine": engine,
+                    "n_shared": all_view.get("n_shared", comparison.get("n_shared", 0)),
+                    "rms_dex": all_view.get("outside_rms_dex", comparison.get("outside_rms_dex")),
+                }
+            )
+    shared_count = Counter(
+        {
+            (str(row["rail"]), str(row["component"])): max(
+                (int(item["n_shared"]) for item in rows if item["rail"] == row["rail"] and item["component"] == row["component"]),
+                default=0,
+            )
+            for row in rows
+        }
+    )
+    rows.sort(
+        key=lambda row: (
+            str(row["rail"]),
+            -shared_count[(str(row["rail"]), str(row["component"]))],
+            str(row["component"]),
+            _HERO_ENGINE_ORDER.index(str(row["engine"])),
+        )
+    )
+    rows.sort(
+        key=lambda row: (
+            row["rail"],
+            -int(row["n_shared"] or 0),
+            row["component"],
+            row["engine"],
+        )
+    )
+    return rows
+
+
+def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for (rail, engine), cells in sorted(data.hero_sweet_spot_cells.items()):
+        if rail not in COLLECTION_SCORE_RAILS:
+            continue
+        for cell in cells:
+            count = int(cell.get("n") or 0)
+            value = cell.get("median_abs_dex")
+            band, colour = (
+                _fingerprint_band(value)
+                if count >= 3 and value is not None
+                else ("", "")
+            )
+            rows.append(
+                {
+                    "rail": rail,
+                    "engine": engine,
+                    "temperature_lower_K": cell.get("temperature_lower_K"),
+                    "temperature_upper_K": cell.get("temperature_upper_K"),
+                    "sio2_lower": cell.get("sio2_lower"),
+                    "sio2_upper": cell.get("sio2_upper"),
+                    "n": count,
+                    "median_abs_dex": value,
+                    "band": band,
+                    "colour": colour,
+                }
+            )
+    return rows
+
+
+def _coverage_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    reasons_by_key: dict[tuple[str, str], Counter[str]] = defaultdict(Counter)
+    for (rail, engine, reason), count in data.hero_refusal_totals.items():
+        if count <= 0:
+            continue
+        lowered = reason.casefold()
+        if "missing" in lowered or "input" in lowered or "identity" in lowered:
+            group = "input missing"
+        elif "not_observable" in lowered:
+            group = "not an output of this engine"
+        elif any(token in lowered for token in ("outside", "domain", "unsupported")):
+            group = "outside the engine's domain"
+        else:
+            group = "other"
+        reasons_by_key[(rail, engine)][group] += count
+    rows: list[dict[str, object]] = []
+    for rail, label in COLLECTION_OBSERVABLES:
+        for engine in _ordered_hero_engines(data.engines):
+            metric = _collection_metric(data, rail, engine)
+            scored = int(metric.get("n") or 0)
+            summary = data.summaries.get(engine, EngineSummary())
+            observable_absence = int(summary.not_observable_by_rail.get(rail, 0))
+            refused = int(summary.refused_by_rail.get(rail, 0))
+            groups = reasons_by_key[(rail, engine)]
+            missing = groups["input missing"]
+            outside = groups["outside the engine's domain"]
+            not_output = max(
+                groups["not an output of this engine"], observable_absence
+            )
+            other = max(0, refused - missing - outside - groups["not an output of this engine"])
+            total = scored + missing + outside + not_output + other
+            rows.append(
+                {
+                    "rail": rail,
+                    "observable": label,
+                    "engine": engine,
+                    "scored_n": scored,
+                    "input_missing_n": missing,
+                    "outside_domain_n": outside,
+                    "not_output_n": not_output,
+                    "other_refused_n": other,
+                    "refused_n": missing + outside + other,
+                    "scored_percent": "" if not total else f"{100 * scored / total:.17g}",
+                }
+            )
+    return rows
+
+
+def _history_collection_rows(
+    data: ScorePlotData,
+    history: Sequence[Mapping[str, Any]],
+    *,
+    simulator_commit: str,
+    render_date: str,
+    annotations: Mapping[str, str],
+) -> list[dict[str, object]]:
+    entries = list(history)
+    if not any(
+        str(entry.get("store_sha") or "") == simulator_commit
+        or str(entry.get("store_revision") or "") == str(data.stamp.get("revision") or "")
+        for entry in entries
+    ):
+        entries.append(
+            {
+                "store_sha": simulator_commit,
+                "store_revision": data.stamp.get("revision"),
+                "commit_date": render_date,
+                "metrics": list(
+                    {
+                        **data.hero_all_numeric_metrics,
+                        **data.hero_deck_metrics,
+                    }.values()
+                ),
+                "comparisons": list(_collection_history_comparisons(data).values()),
+            }
+        )
+    rows: list[dict[str, object]] = []
+    for entry in entries:
+        landing = str(entry.get("store_sha") or entry.get("store_revision") or "unknown")
+        date = str(entry.get("commit_date") or "")
+        annotation = annotations.get(landing) or annotations.get(date[:10]) or ""
+        comparisons = entry.get("comparisons")
+        shared_values: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
+        rails_with_comparisons: set[str] = set()
+        if isinstance(comparisons, Sequence) and not isinstance(
+            comparisons, (str, bytes)
+        ):
+            for record in comparisons:
+                if not isinstance(record, Mapping):
+                    continue
+                rail = str(record.get("rail") or "")
+                primary = str(record.get("primary_engine") or "")
+                if rail not in COLLECTION_SCORE_RAILS or not primary:
+                    continue
+                rails_with_comparisons.add(rail)
+                comparison_rows = record.get("comparisons")
+                if not isinstance(comparison_rows, Sequence) or isinstance(
+                    comparison_rows, (str, bytes)
+                ):
+                    continue
+                for comparison in comparison_rows:
+                    if not isinstance(comparison, Mapping):
+                        continue
+                    outside = str(comparison.get("engine") or "")
+                    if not outside:
+                        continue
+                    views = comparison.get("views")
+                    views = views if isinstance(views, Mapping) else {}
+                    all_view = views.get("all", {})
+                    all_view = all_view if isinstance(all_view, Mapping) else comparison
+                    n_shared = int(
+                        all_view.get("n_shared", comparison.get("n_shared")) or 0
+                    )
+                    if n_shared < 1:
+                        continue
+                    held = all_view.get("held_out", {})
+                    held = held if isinstance(held, Mapping) else {}
+                    exposed_n = all_view.get(
+                        "exposed_n", comparison.get("exposed_n", "")
+                    )
+                    held_out_n = held.get("n", "")
+                    for engine, rms_field, held_rms_field, shared_with in (
+                        (
+                            primary,
+                            "primary_rms_dex_on_shared",
+                            "primary_rms_dex_on_shared",
+                            outside,
+                        ),
+                        (
+                            outside,
+                            "outside_rms_dex",
+                            "outside_rms_dex",
+                            primary,
+                        ),
+                    ):
+                        rms = all_view.get(rms_field, comparison.get(rms_field))
+                        if rms in (None, ""):
+                            continue
+                        shared_values[(rail, engine)].append(
+                            {
+                                "rms_dex": rms,
+                                "n": n_shared,
+                                "exposed_n": exposed_n,
+                                "held_out_n": held_out_n,
+                                "held_out_rms_dex": held.get(held_rms_field, ""),
+                                "shared_with": shared_with,
+                                "basis": "shared_rows",
+                                "primary_engine": primary,
+                                "comparison_engine": outside,
+                            }
+                        )
+        selected_shared = {
+            key: min(
+                values,
+                key=lambda value: (
+                    str(value["primary_engine"]) != "openimcc",
+                    -int(value["n"]),
+                    str(value["primary_engine"]),
+                    str(value["comparison_engine"]),
+                ),
+            )
+            for key, values in shared_values.items()
+        }
+        metrics = entry.get("metrics")
+        if not isinstance(metrics, Sequence) or isinstance(metrics, (str, bytes)):
+            continue
+        for metric in metrics:
+            if not isinstance(metric, Mapping):
+                continue
+            rail = str(metric.get("rail") or "")
+            engine = str(metric.get("engine") or "")
+            if rail not in COLLECTION_SCORE_RAILS:
+                continue
+            views = metric.get("views")
+            views = views if isinstance(views, Mapping) else {}
+            all_view = views.get("all", {})
+            all_view = all_view if isinstance(all_view, Mapping) else {}
+            held = all_view.get("held_out", {})
+            held = held if isinstance(held, Mapping) else {}
+            shared = selected_shared.get((rail, engine))
+            if rail in rails_with_comparisons and shared is None:
+                continue
+            rows.append(
+                {
+                    "landing": landing,
+                    "date": date,
+                    "rail": rail,
+                    "engine": engine,
+                    "rms_dex": (
+                        shared["rms_dex"] if shared is not None else metric.get("rms_dex")
+                    ),
+                    "n": (
+                        shared["n"]
+                        if shared is not None
+                        else metric.get("n", metric.get("numeric_count", ""))
+                    ),
+                    "exposed_n": (
+                        shared["exposed_n"]
+                        if shared is not None
+                        else all_view.get("exposed_n", "")
+                    ),
+                    "held_out_n": (
+                        shared["held_out_n"] if shared is not None else held.get("n", "")
+                    ),
+                    "held_out_rms_dex": (
+                        shared["held_out_rms_dex"]
+                        if shared is not None
+                        else held.get("rms_dex", "")
+                    ),
+                    "shared_with": shared["shared_with"] if shared is not None else "",
+                    "basis": shared["basis"] if shared is not None else "legacy_all_rows",
+                    "annotation": annotation,
+                }
+            )
+    return rows
+
+
+def _all_rows_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for rail, _label in COLLECTION_OBSERVABLES:
+        for engine in _ordered_hero_engines(data.engines):
+            metric = _collection_metric(data, rail, engine)
+            if not metric:
+                continue
+            for view_name, _view_label in HERO_TEMPERATURE_VIEWS:
+                view = _view_metric(metric, view_name)
+                disagreement = view.get("source_disagreement_flagged", {})
+                disagreement = disagreement if isinstance(disagreement, Mapping) else {}
+                unflagged = view.get("unflagged", {})
+                unflagged = unflagged if isinstance(unflagged, Mapping) else {}
+                held = view.get("held_out", {})
+                held = held if isinstance(held, Mapping) else {}
+                rows.append(
+                    {
+                        "rail": rail,
+                        "engine": engine,
+                        "view": view_name,
+                        "n": view.get("n", ""),
+                        "rms_dex": view.get("rms_dex", ""),
+                        "sd_dex": view.get("sd_dex", ""),
+                        "median_abs_dex": view.get("median_abs_dex", ""),
+                        "exposed_n": view.get("exposed_n", ""),
+                        "held_out_n": held.get("n", ""),
+                        "held_out_rms_dex": held.get("rms_dex", ""),
+                        "source_disagreement_n": disagreement.get("n", ""),
+                        "source_disagreement_rms_dex": disagreement.get("rms_dex", ""),
+                        "unflagged_n": unflagged.get("n", ""),
+                        "unflagged_rms_dex": unflagged.get("rms_dex", ""),
+                    }
+                )
+    return rows
+
+
 def render_hero_charts(
     data: ScorePlotData,
     output_dir: Path,
@@ -3578,16 +5470,6 @@ def render_hero_charts(
             for engine in sweet_spot_engines
         }
         scorecard_rows = _hero_scorecard_rows(data, rail)
-        sweet_spot_values = [
-            value
-            for cells in sweet_spot_cells.values()
-            for cell in cells
-            if cell.get("color_eligible")
-            if (value := _finite_float(cell.get("median_abs_dex"))) is not None
-        ]
-        color_max = max(sweet_spot_values, default=1.0) or 1.0
-        normalization = Normalize(vmin=0.0, vmax=color_max)
-        sweet_spot_colormap = plt.get_cmap("viridis")
         row_specs: list[tuple[str, object, float]] = []
         facet_pairs = [
             tuple(numeric_facets[index : index + 2])
@@ -3660,7 +5542,6 @@ def render_hero_charts(
             hspace=0.3,
             wspace=0.2,
         )
-        sweet_spot_axes: list[Axes] = []
         scatter_axes: list[Axes] = []
         history_engine_names: set[str] = set()
         row_index = 0
@@ -3768,33 +5649,14 @@ def render_hero_charts(
                         else grid[row_index, column]
                     )
                     axis = figure.add_subplot(location)
-                    if _draw_hero_sweet_spot(
+                    _draw_hero_sweet_spot(
                         axis,
                         engine,
                         sweet_spot_cells[engine],
-                        colormap=sweet_spot_colormap,
-                        normalization=normalization,
                         x_limits=sweet_spot_x_limits,
                         temperature_limits=sweet_spot_temperature_limits,
-                    ):
-                        sweet_spot_axes.append(axis)
+                    )
             row_index += 1
-
-        if sweet_spot_axes and sweet_spot_values:
-            scalar = matplotlib.cm.ScalarMappable(
-                norm=normalization,
-                cmap=sweet_spot_colormap,
-            )
-            scalar.set_array([])
-            colorbar = figure.colorbar(
-                scalar,
-                ax=sweet_spot_axes,
-                fraction=0.018,
-                pad=0.012,
-            )
-            colorbar.set_label("median |dex| (n≥3)", fontsize=5.5)
-            colorbar.ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
-            colorbar.ax.tick_params(labelsize=5)
 
         status_lines: list[str] = []
         for engine in HERO_PRIMARY_ENGINES:
@@ -3984,6 +5846,8 @@ def render_hero_charts(
             engine_colors,
             flagged=flagged_points,
         )
+        if sweet_spot_pairs:
+            legend_handles.extend(_fingerprint_legend_handles())
         legend = None
         if legend_handles:
             legend = figure.legend(
@@ -4007,7 +5871,7 @@ def render_hero_charts(
         caption = (
             "Scatter marker face=engine colour; flagged/extrapolated=white face with engine-coloured edge. "
             "History: solid=RMS, dashed=median |dex|, dash-dot=SD/paired primary RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
-            "Sweet-spot fill=median |dex|; cell label=n; 1≤n<3 is grey and hatched; n=0 is blank. "
+            "Fingerprint fill uses median |dex| traffic-light bands; n<3 cells are blank. "
             f"Temperature split uses measured residual field {HERO_TEMPERATURE_FIELD}; "
             "1700 K is in the ≥ view and rows without T are all-only with a no T count."
         )
@@ -4309,18 +6173,6 @@ def render_hero_deck_charts(
             tuple(sweet_spot_engines[index : index + 2])
             for index in range(0, len(sweet_spot_engines), 2)
         ]
-        sweet_spot_values = [
-            value
-            for (rail, _engine), cells in data.hero_sweet_spot_cells.items()
-            if rail == source_rail
-            for cell in cells
-            if cell.get("color_eligible")
-            if (value := _finite_float(cell.get("median_abs_dex"))) is not None
-        ]
-        sweet_spot_colormap = plt.get_cmap("viridis")
-        sweet_spot_normalization = Normalize(
-            vmin=0.0, vmax=max(sweet_spot_values, default=1.0) or 1.0
-        )
         refusal_rails = (
             (source_rail, Rail.SIO_EVOLUTION.value)
             if chart == "redox_sensitivity"
@@ -4560,7 +6412,6 @@ def render_hero_deck_charts(
         )
         history_axis.set_xlabel("")
 
-        sweet_spot_axes: list[Axes] = []
         for pair_index, pair in enumerate(sweet_spot_pairs):
             row_index = current_row_count + 2 + pair_index
             for column, engine in enumerate(pair):
@@ -4568,16 +6419,13 @@ def render_hero_deck_charts(
                     grid[row_index, column * 3 : (column + 1) * 3]
                 )
                 cells = data.hero_sweet_spot_cells[(source_rail, engine)]
-                if _draw_hero_sweet_spot(
+                _draw_hero_sweet_spot(
                     axis,
                     engine,
                     cells,
-                    colormap=sweet_spot_colormap,
-                    normalization=sweet_spot_normalization,
                     x_limits=(0.0, 1.0),
                     temperature_limits=data.x_limits,
-                ):
-                    sweet_spot_axes.append(axis)
+                )
             if len(pair) == 1:
                 blank = figure.add_subplot(grid[row_index, 3:6])
                 blank.set_axis_off()
@@ -4620,6 +6468,8 @@ def render_hero_deck_charts(
             ),
             size_labels=size_labels,
         )
+        if sweet_spot_pairs:
+            handles.extend(_fingerprint_legend_handles())
         if handles:
             figure.legend(
                 handles=handles,
@@ -4630,34 +6480,10 @@ def render_hero_deck_charts(
                 fontsize=5.5,
             )
 
-        if sweet_spot_axes:
-            values = [
-                _finite_float(cell.get("median_abs_dex"))
-                for (rail, _engine), cells in data.hero_sweet_spot_cells.items()
-                if rail == source_rail
-                for cell in cells
-                if cell.get("color_eligible")
-            ]
-            numeric_values = [value for value in values if value is not None]
-            if numeric_values:
-                scalar = matplotlib.cm.ScalarMappable(
-                    norm=sweet_spot_normalization,
-                    cmap=sweet_spot_colormap,
-                )
-                scalar.set_array([])
-                colorbar = figure.colorbar(
-                    scalar,
-                    ax=sweet_spot_axes,
-                    fraction=0.018,
-                    pad=0.012,
-                )
-                colorbar.set_label("median |dex| (n≥3)", fontsize=5.5)
-                colorbar.ax.tick_params(labelsize=5)
-
         figure.text(
             0.5,
             0.025,
-            "Scored rows only; hollow markers are scorer-flagged. History is per source rail.",
+            "Scored rows only; fingerprint colours show median |dex| bands and cells with n<3 are blank.",
             ha="center",
             va="bottom",
             fontsize=5.4,
@@ -4720,9 +6546,24 @@ def render_plots(
     omit_empty_engines: bool | None = None,
     history_path: Path | None = None,
     openimcc_score_commit: str | None = None,
+    source_path: Path | None = None,
+    annotations: Mapping[str, str] | None = None,
+    fix_status_lines: Sequence[str] = (),
 ) -> dict[str, Path]:
     """Write shared-scale species/element tiles and one PNG per engine/view."""
 
+    if source_path is not None:
+        return render_hero_collection(
+            data,
+            source_path,
+            output_dir,
+            simulator_commit=simulator_commit,
+            openimcc_commit=openimcc_commit,
+            render_date=render_date,
+            history_path=history_path,
+            annotations=annotations,
+            fix_status_lines=fix_status_lines,
+        )
     if not data.engines:
         raise ValueError("no engines found in score JSONL")
     views = tuple(dict.fromkeys(group_by))
@@ -4983,6 +6824,11 @@ def _parser() -> argparse.ArgumentParser:
         help="append-only hero chart history JSONL (for example docs-private/.../hero-history.jsonl)",
     )
     parser.add_argument(
+        "--annotations",
+        type=Path,
+        help="JSON caller notes with annotations (landing sha/date to label) and fix_status lines",
+    )
+    parser.add_argument(
         "--append-history",
         action="store_true",
         help="append this archive's scorer summary as one history row",
@@ -5014,7 +6860,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         record = _history_record(
             summary,
             landing_sha=args.landing_sha,
-            comparisons=data.hero_comparisons,
+            comparisons=_collection_history_comparisons(data),
             diagnostics=data.hero_diagnostics,
             refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
             hero_metrics={
@@ -5026,6 +6872,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         append_history(args.history_path, record)
     abundance = load_element_abundance(args.abundance_feedstock)
+    annotations, fix_status_lines = _read_annotations_file(args.annotations)
     files = render_plots(
         data,
         args.output_dir,
@@ -5037,6 +6884,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         omit_empty_engines=args.omit_empty_engines,
         history_path=args.history_path,
         openimcc_score_commit=args.openimcc_commit,
+        source_path=args.input,
+        annotations=annotations,
+        fix_status_lines=fix_status_lines,
     )
     omitted_engines = (
         _empty_engine_names(data)
