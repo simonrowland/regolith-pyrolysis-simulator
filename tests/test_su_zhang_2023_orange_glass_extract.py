@@ -156,6 +156,26 @@ def test_all_printed_rows_cells_and_maps_are_accounted_for() -> None:
     assert s4_cu["sigma"] == "0.05"
     assert "Table S4!A11, D11, H11, C7" in s4_cu["locator"]["note"]
 
+    s2_k2o = _observation(
+        document, "K2O", "su_zhang_2023_table_s2_empa_k2o_profile"
+    )
+    k91 = next(
+        point for point in s2_k2o["values"]["series"]
+        if "K91 displayed" in point["locator"]["note"]
+    )
+    assert k91["K2O_wt_pct"] == "0.063"
+    assert "K91 displayed 0.063 (number format 0.000; stored value 6.25E-2)" in k91["locator"]["note"]
+
+    s2_mno = _observation(
+        document, "MnO", "su_zhang_2023_table_s2_empa_mno_profile"
+    )
+    g13 = next(
+        point for point in s2_mno["values"]["series"]
+        if "G13 displayed" in point["locator"]["note"]
+    )
+    assert g13["MnO_wt_pct"] == "0.267"
+    assert "G13 displayed 0.267 (number format 0.000; stored value 0.26650000000000001)" in g13["locator"]["note"]
+
     standards = next(
         row
         for row in document["species"]["unknown"]["context"]
