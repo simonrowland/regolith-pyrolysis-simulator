@@ -39,6 +39,56 @@ experiments:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, table: '1', note: 'Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.'}}
 species:
   Fe:
+    context:
+    - observation_id: jayasuriya_2004_low_fe_apparatus_and_protocol
+      type: apparatus
+      experiment: jayasuriya_2004_adeu_1pct
+      locator:
+        page: 2
+        published_page: 1598
+        section: Experimental Methods
+        table: '1'
+      units: as printed
+      values:
+        quantity: experimental apparatus and protocol
+        method_class: method_only
+        notes: >-
+          The ADeu samples with about 1 wt% Fe2O3 were equilibrated at 1682 K in a vertical tube furnace
+          with internal diameter 42 mm, equipped for gas mixing. The gas mixtures were O2, air, CO2-O2,
+          CO2, CO2-CO, and CO2-H2. Table 1 reports run time and wire loop per sample: FeV19, 8 h, Re;
+          FeV2, 45 h, Re; FeV20, 69 h, Re; FeV21, 21 h, Re; FeV5, 34 h, Re; FeV22, 22 h, Re/Pt;
+          FeV12, 43 h, Ir; FeV6, 34 h, Pt; FeV15, 38 h, Pt; FeV8, 47 h, Pt; FeV10, 42 h, Pt;
+          FeV11, 44 h, Pt; FeV13, 43 h, Pt; FeV14, 48 h, Pt; FeV1, 38 h, Pt; FeV9, 39 h, Pt;
+          D60, 4 h, sealed Pt capsule. For log fO2 = -7, Pt wire was wrapped around the Re wire above
+          the loop and the sample hung from the Pt. D60 was prepared at 11 kbar and 1673 K in a sealed
+          Pt capsule with 20 wt% PtO2 in a piston-cylinder apparatus; PtO2 breakdown produced an O2
+          partial pressure equal to the confining pressure. Sample mass and wire diameter: not stated.
+          Loop Fe presaturation: not stated. The authors state that they eschewed Fe-doped Pt alloys to
+          avoid contamination from isotopically normal Fe. Post-run bulk analysis, alkali analysis, and
+          Pt/Ir/Re pickup: not stated for this series.
+    - observation_id: jayasuriya_2004_high_fe_apparatus_and_protocol
+      type: apparatus
+      experiment: jayasuriya_2004_adeu_high_fe
+      locator:
+        page: 2
+        published_page: 1598
+        section: Experimental Methods
+        table: '1'
+      units: as printed
+      values:
+        quantity: experimental apparatus and protocol
+        method_class: method_only
+        notes: >-
+          Higher-Fe ADeu samples contained 2, 4, 7, 10, 20, or 30 wt% Fe2O3; mixtures of isotopically
+          enriched and natural Fe2O3 maintained a constant amount of 57Fe. Table 1 reports C27/11/01 at
+          log fO2 = -6.91 for 22 h on Re/Pt wire, C14/12/01 at -3.91 for 57 h on Pt wire, and D31/7/01
+          at -0.01 for 22 h on Pt wire. Samples were equilibrated at 1409 °C in a vertical tube furnace
+          with internal diameter 42 mm and gas mixing. For log fO2 = -7, Pt wire was wrapped around the
+          Re wire above the loop and the sample hung from the Pt. Sample mass and wire diameter: not
+          stated. Loop Fe presaturation: not stated. The authors state that they eschewed Fe-doped Pt
+          alloys to avoid contamination from isotopically normal Fe. FeOT in experiments above 1 wt%
+          was checked by electron-microprobe EDS; 95 analyses on 16 samples are reported. Alkali analysis
+          and Pt/Ir/Re pickup: not stated.
     observations:
     - observation_id: jayasuriya_2004_rt_1pct
       experiment: jayasuriya_2004_adeu_1pct
