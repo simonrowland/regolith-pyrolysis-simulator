@@ -238,6 +238,42 @@ def _assert_render_pins(document: dict) -> None:
         "section": "Discussion",
     }
 
+    reference_disagreements = {
+        "aegirine_table4_reaction_13_constituent_delta_fH": (
+            "Ko (22)",
+            "21",
+            "Al2(SO4)3·12H2O",
+            3,
+            "Table 4 prints reference 21; nearby prose attributes Al2(SO4)3·12H2O to Ko (22). Both source readings are retained.",
+        ),
+        "aegirine_table4_reaction_23_constituent_delta_fH": (
+            "Wagman (21)",
+            "22",
+            "H2SO4·7H2O",
+            13,
+            "Table 4 prints reference 22; nearby prose attributes H2SO4·7H2O to Wagman (20–21). Both source readings are retained.",
+        ),
+    }
+    for observation_id, expected in reference_disagreements.items():
+        values = observations[observation_id]["values"]
+        attribution, table_reference, substance, row_number, disagreement = expected
+        assert values["attribution"] == attribution
+        assert values["table_reference_number_as_printed"] == table_reference
+        assert values["table_reference_locator"] == {
+            "page": 13,
+            "published_page": 8,
+            "row": row_number,
+            "table": "4",
+            "column": 6,
+        }
+        assert values["attribution_locator"] == {
+            "page": 13,
+            "published_page": 8,
+            "section": "Standard Enthalpy of Formation",
+            "row": f"prose attribution for {substance}",
+        }
+        assert values["source_attribution_disagreement"] == disagreement
+
     expected_marked_temperatures = {
         "aegirine_table8_delta_fH": [
             ("1", "371.00"),
