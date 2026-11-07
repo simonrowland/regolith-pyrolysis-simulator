@@ -86,6 +86,21 @@ def _capture_engine(monkeypatch, row):
     return requests, {"openimcc": handle}
 
 
+def _capture_comparison_identities(monkeypatch):
+    from simulator.battery import score
+
+    compared = []
+    original = score._comparison_identity
+
+    def capture(identity, reference, prediction):
+        result = original(identity, reference, prediction)
+        compared.append(result)
+        return result
+
+    monkeypatch.setattr(score, "_comparison_identity", capture)
+    return compared
+
+
 def _fallback_notice(context, monkeypatch, row, rows):
     requests, handles = _capture_engine(monkeypatch, row)
     residual, _ = compile_residual(
@@ -110,6 +125,7 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     # G(1933)=126.02894 kJ/mol. 1994 Table 2 directly prints pO2=4.59e-11 atm.
     row = _row(source_context, source)
     requests, handles = _capture_engine(monkeypatch, row)
+    compared = _capture_comparison_identities(monkeypatch)
     residual, candidate = compile_residual(
         row, Engine.OPENIMCC, context=source_context, handles=handles,
         point_observations=tuple(r for r in source_context.observations.values() if r.experiment_id == row.experiment_id),
@@ -119,6 +135,13 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     assert requests[0].po2_bar == pytest.approx(expected_bar, rel=1e-10)
     assert residual.numeric is not None
     assert candidate is not None
+    assert len(compared) == 2
+    expected_pa = Decimal(str(requests[0].po2_bar)) * Decimal("1e5")
+    assert all(identity.fO2_Pa == State.of(expected_pa) for identity in compared)
+    selected = candidate.provenance["selected_oxygen_condition"]
+    assert Decimal(selected["value_Pa"]) == expected_pa
+    assert selected["rung"] == 2
+    assert selected["route"] == "source_linked_oxygen_condition"
     condition = candidate.provenance["source_oxygen_condition"]
     assert condition["derived_from"]
     assert condition["derivation"]["inputs"] == condition["derived_from"]
@@ -241,6 +264,35 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
         and notice.reason.startswith("measured condition: same-cell source-linked oxygen;")
         for notice in prediction.notices
     )
+
+    requests.clear()
+    compared = _capture_comparison_identities(monkeypatch)
+    scoring_context = replace(
+        source_context,
+        experiments={**source_context.experiments, experiment.experiment_id: experiment},
+        observations={**source_context.observations, row.observation_id: row},
+    )
+    point_observations = tuple(
+        observation for observation in source_context.observations.values()
+        if observation.experiment_id == row.experiment_id
+        and observation.observation_id != row.observation_id
+    ) + (row,)
+    residual, candidate = compile_residual(
+        row,
+        Engine.OPENIMCC,
+        context=scoring_context,
+        handles=handles,
+        point_observations=point_observations,
+    )
+    assert residual.numeric is not None
+    assert candidate is not None
+    assert len(compared) == 2
+    selected_pa = Decimal(str(requests[0].po2_bar)) * Decimal("1e5")
+    assert all(identity.fO2_Pa == State.of(selected_pa) for identity in compared)
+    selected = candidate.provenance["selected_oxygen_condition"]
+    assert Decimal(selected["value_Pa"]) == selected_pa
+    assert selected["rung"] == resolved.tier
+    assert selected["route"] == resolved.route
 
 
 def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_context):
