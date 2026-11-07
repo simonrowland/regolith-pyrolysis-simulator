@@ -655,21 +655,21 @@ def test_sr11_path_point_omission_names_temperature_and_oxide() -> None:
     )
 
 
-def test_sr12_default_notices_preserve_green_control_conversion() -> None:
+def test_sr12_notices_cover_present_repairs_but_not_absent_controls() -> None:
     from engines.alphamelts.parser import _control_float
 
-    notices: list[str] = []
-    assert _control_float({}, "pressure_bar", 1.0, repair_notices=notices) == 1.0
-    assert _control_float({"temperature_C": None}, "temperature_C", 0.0, repair_notices=notices) == 0.0
-    assert _control_float({"fO2_log": float("nan")}, "fO2_log", -9.0, repair_notices=notices) == -9.0
-    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=notices) == 0.0
-    assert _control_float({"temperature_C": b"1400"}, "temperature_C", 0.0, repair_notices=notices) == 0.0
+    warnings: list[str] = []
+    assert _control_float({}, "pressure_bar", 1.0, repair_notices=warnings) == 1.0
+    assert not any(warning.startswith("SR12:") for warning in warnings)
+    assert _control_float({"temperature_C": None}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
+    assert _control_float({"fO2_log": float("nan")}, "fO2_log", -9.0, repair_notices=warnings) == -9.0
+    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
+    assert _control_float({"temperature_C": b"1400"}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
 
-    assert len(notices) == 5
-    assert all(notice.startswith("SR12:") for notice in notices)
-    assert any("field=pressure_bar" in notice and "replacement=1.0" in notice for notice in notices)
-    assert any("field=temperature_C" in notice and "non_declared_control_defaulted" in notice and "replacement=0.0" in notice for notice in notices)
-    assert any("field=fO2_log" in notice and "nonfinite_control_defaulted" in notice for notice in notices)
+    assert len(warnings) == 4
+    assert all(warning.startswith("SR12:") for warning in warnings)
+    assert any("field=temperature_C" in warning and "non_declared_control_defaulted" in warning and "replacement=0.0" in warning for warning in warnings)
+    assert any("field=fO2_log" in warning and "nonfinite_control_defaulted" in warning for warning in warnings)
 
 
 def test_sr13_incomplete_first_activity_source_matches_green_selection() -> None:

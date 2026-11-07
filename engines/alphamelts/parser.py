@@ -529,14 +529,6 @@ def _control_float(
 ) -> float:
     value = controls.get(name, default)
     if name not in controls:
-        if repair_notices is not None:
-            repair_notices.append(_projection_repair_notice(
-                'SR12',
-                field=name,
-                item=name,
-                reason='absent_control_defaulted',
-                replacement=repr(float(default)),
-            ))
         return float(default)
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         if repair_notices is not None:

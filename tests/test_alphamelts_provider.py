@@ -1537,7 +1537,7 @@ def test_parser_sr12_default_values_keep_results_and_emit_notices():
     assert result.temperature_C == 1200.0
     assert result.pressure_bar == 1.0
     assert result.liquid_viscosity_Pa_s is None
-    assert len(result.warnings) == 5
+    assert len(result.warnings) == 3
     assert all(warning.startswith('SR12:') for warning in result.warnings)
     assert any(
         'field=executed_temperature_C' in warning
@@ -1547,6 +1547,11 @@ def test_parser_sr12_default_values_keep_results_and_emit_notices():
     assert any(
         'field=condensed_phase_reference_pressure_bar' in warning
         and 'replacement=1.0' in warning
+        for warning in result.warnings
+    )
+    assert not any(
+        'field=requested_temperature_C' in warning
+        or 'field=liquid_density_kg_m3' in warning
         for warning in result.warnings
     )
     assert result.status == 'ok'
