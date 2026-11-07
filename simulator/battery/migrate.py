@@ -1895,7 +1895,7 @@ def _composition_from_ideal_gas_volume(
         if ideal_gas_volume_scale(verbatim) == "percent"
     }
     if percent:
-        closure_error = _mole_percent_closure_error(percent)
+        closure_error = _percent_composition_closure_error(percent, "mole")
         if closure_error is not None:
             raise ValueError(closure_error)
     payload_basis = payload.get("basis")
@@ -6523,8 +6523,12 @@ def _named_material_mixture_binding(
             None,
         )
 
-    closure = _mole_percent_closure_error(
-        {f"component_{index}": amount for index, (_name, amount, _kind) in enumerate(parts)}
+    closure = _percent_composition_closure_error(
+        {
+            f"component_{index}": amount
+            for index, (_name, amount, _kind) in enumerate(parts)
+        },
+        "mole",
     )
     if closure is not None:
         return refused(_NAMED_MATERIAL_FRACTIONS_OPEN)
