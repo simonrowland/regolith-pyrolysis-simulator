@@ -9,11 +9,12 @@ The general ladder is the seeding order from d-160/d-163:
 4. the melt's intrinsic fO2, flagged borrowed.
 
 Knudsen vapour rows keep printed fO2 and explicit atmosphere/buffer routes
-first, then use congruent effusion before composition-only redox estimates.
-If its melt composition or temperature is missing, the row does not resolve.
+first, then use a measured same-cell oxygen condition, then congruent effusion
+before composition-only redox estimates. If its melt composition or
+temperature is missing, the row does not resolve.
 
-Tiers 1, 2 and 4 share one numeric fO2. For tier 3 effusion the shared
-input is the closure condition, not a number.
+Tiers 1, 2 and 4 share one numeric fO2. Tier 3 can be a numeric measured
+same-cell pressure, or an effusion closure whose shared input is not a number.
 
 Tiers 1 and the atmosphere part of tier 3 reuse ``oxygen_condition`` routes.
 The Kress inverse lives in ``simulator.fe_redox``. The effusion closure is
@@ -173,6 +174,7 @@ def resolve_row_fo2(
     composition_wt: Mapping[str, float] | None = None,
     temperature_K: float | None | object = _TEMPERATURE_UNSET,
     oxygen: WaypointResult | None = None,
+    source_oxygen_bar: float | None = None,
     quantity: Quantity | None = None,
 ) -> ResolvedFo2 | None:
     """Resolve one fO2 for this row. None when every tier fails.
@@ -218,6 +220,21 @@ def resolve_row_fo2(
     atmosphere = _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
         return atmosphere
+    if knudsen_vapour and source_oxygen_bar is not None:
+        try:
+            bar = float(source_oxygen_bar)
+        except (TypeError, ValueError, ArithmeticError):
+            bar = math.nan
+        if math.isfinite(bar) and bar > 0.0:
+            return ResolvedFo2(
+                math.log10(bar),
+                3,
+                "source_linked_oxygen_condition",
+                False,
+                po2_bar=bar,
+            )
+    if knudsen_vapour and (temperature is None or not weights):
+        return None
     closure = _effusion_closure(
         experiment,
         bench,

@@ -98,7 +98,7 @@ from simulator.battery.source_oxygen import (
     printed_source_pressure,
     resolve_source_oxygen,
     source_oxygen_closure_notice,
-    source_oxygen_substitution_notice,
+    source_oxygen_condition_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.physical_constants import GAS_CONSTANT
@@ -6287,13 +6287,16 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
     if quantity_token(observation.identity) not in _VAPOUR_EQUILIBRIUM:
         return None
-    pressure = linked_source_pressure(observation)
-    if pressure is None and _has_printed_fo2(observation, observation.identity):
-        pressure = printed_source_pressure(observation)
+    if _has_printed_fo2(observation, observation.identity):
         identity_pressure = observation.identity.fO2_Pa
-        if pressure is not None and identity_pressure is not None and identity_pressure.is_value:
-            pressure = identity_pressure.value
-    return pressure
+        if (
+            identity_pressure is not None
+            and identity_pressure.is_value
+            and identity_pressure.value is not None
+        ):
+            return identity_pressure.value
+        return printed_source_pressure(observation)
+    return linked_source_pressure(observation)
 
 
 _FE_REDOX_RATIO_UNDEFINED = object()
@@ -7515,6 +7518,7 @@ def _oxygen_input_request(
     bench: Bench | None = None,
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
+    source_oxygen_bar: float | None = None,
     force_ladder: bool = False,
 ) -> "Po2Request | EnginePrediction":
     """The scorer's one oxygen-input decision.
@@ -7608,8 +7612,15 @@ def _oxygen_input_request(
         composition=composition_value,
         composition_wt=composition_wt,
         temperature_K=temperature_K,
+        source_oxygen_bar=source_oxygen_bar,
         quantity=quantity,
     )
+    if (
+        resolved is not None
+        and resolved.route == "source_linked_oxygen_condition"
+        and observation is not None
+    ):
+        input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             input_notices.append(fo2_tier_notice(quantity, resolved))
@@ -9957,17 +9968,18 @@ def _predict_with_engine(
             input_notices.append(pressure_notice)
 
     knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
-    # d-216: a linked or printed source pressure is the row's fO2 before
-    # the ladder runs, so every engine is commanded the measured condition.
-    source_pressure = _source_oxygen_pressure_for_score(observation)
-    if knudsen_vapour and source_pressure is not None:
+    printed_fo2 = _has_printed_fo2(observation, identity)
+    source_pressure = (
+        _source_oxygen_pressure_for_score(observation)
+        if knudsen_vapour and printed_fo2
+        else None
+    )
+    if source_pressure is not None:
         identity = replace(identity, fO2_Pa=State.of(source_pressure))
-    # A found source pressure is commanded below. The shared ladder is only
-    # the unlinked Knudsen closure: no linked or printed pressure on the row.
-    shared_oxygen = (
-        knudsen_vapour
-        and source_pressure is None
-        and not _has_printed_fo2(observation, identity)
+    shared_oxygen = knudsen_vapour and not _has_printed_fo2(observation, identity)
+    linked_pressure = linked_source_pressure(observation) if shared_oxygen else None
+    source_oxygen_bar = (
+        None if linked_pressure is None else float(linked_pressure) / 1.0e5
     )
 
     def oxygen_decision(*, force_ladder: bool = False):
@@ -9985,6 +9997,7 @@ def _predict_with_engine(
             bench=bench,
             temperature_K=float(T),
             composition_wt=wt if isinstance(wt, dict) else None,
+            source_oxygen_bar=source_oxygen_bar,
             force_ladder=force_ladder,
         )
 
@@ -10017,40 +10030,18 @@ def _predict_with_engine(
                 return decision
             po2 = decision
         else:
-            # Inert or uniform W/Mo. The ladder returns the tier-3 effusion
-            # closure, the same condition for every engine. Engines that
-            # cannot solve it borrow the internal-analytical closure later.
+            # Inert or uniform W/Mo. The shared ladder can select a printed
+            # control, measured source condition, or congruent balance; an
+            # effusion request carries this same cell material to each engine.
             decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
-            if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
-                input_notices.append(
-                    source_oxygen_closure_notice(quantity, observation)
-                )
     else:
-        if (
-            knudsen_vapour
-            and source_pressure is not None
-            and not _has_printed_fo2(observation, identity)
-        ):
-            # Derived linked source pressure is the measured condition.
-            # Command it here. The ladder treats that fO2 as not printed
-            # and would replace it with the effusion closure. A printed
-            # fO2 stays on oxygen_decision so both cell branches attach
-            # the same tier-1 notice.
-            input_notices.append(
-                source_oxygen_substitution_notice(quantity, observation)
-            )
-            po2 = Po2Request(
-                mode=PO2_COMMANDED,
-                po2_bar=float(source_pressure) / 1.0e5,
-            )
-        else:
-            decision = oxygen_decision()
-            if isinstance(decision, EnginePrediction):
-                return decision
-            po2 = decision
+        decision = oxygen_decision()
+        if isinstance(decision, EnginePrediction):
+            return decision
+        po2 = decision
         # Printed, linked, or oxygen-not-required Knudsen path: still flag
         # an unmodelled reactive cell so the label travels with the prediction.
         if knudsen_vapour and bench is not None:
@@ -10065,6 +10056,9 @@ def _predict_with_engine(
                             quantity, bench.cell_materials
                         )
                     )
+
+    if shared_oxygen and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        input_notices.append(source_oxygen_closure_notice(quantity, observation))
 
     if composition_value is not None:
         wt = composition_wt_pct(composition_value)

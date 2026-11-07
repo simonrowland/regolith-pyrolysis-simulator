@@ -1827,8 +1827,13 @@ def _solve_cell_oxygen_balance(
     where M_i is molar mass and R is the gas constant. Balancing oxygen atoms
     over every effusing species, including cell oxides, leaves
     sum((nu_O,i - parent_demand_i) * p_i / sqrt(M_i)) = 0 because the common
-    sqrt(2*pi*R*T) cancels. For a pure MO evaporating congruently as M + O,
-    the solved p_O*sqrt(M_M)/(p_M*sqrt(M_O)) is 1.
+    sqrt(2*pi*R*T) cancels at the one cell temperature. Unit check:
+    p_i/sqrt(M_i*R*T) has Pa/sqrt((kg/mol)*(J/mol)) = mol/(m^2*s), using
+    J = Pa*m^3; the oxygen and parent-demand coefficients are dimensionless.
+    Sanity: SiO2(l) -> SiO(g) + 1/2 O2(g) requires 2*J_O2 = J_SiO, so
+    pO2/pSiO = 0.5*sqrt(M_O2/M_SiO) ~= 0.426 with the production molar masses.
+    For a pure MO evaporating congruently as M + O, the solved
+    p_O*sqrt(M_M)/(p_M*sqrt(M_O)) is 1.
     """
 
     if cell_material not in {None, *_CELL_OXIDE_GAS_TABLES}:

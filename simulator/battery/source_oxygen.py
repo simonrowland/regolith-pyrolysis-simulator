@@ -101,20 +101,20 @@ def source_oxygen_closure_notice(quantity: Quantity, row: Observation) -> Notice
         kind=NoticeKind.INPUT_OMITTED,
         affected_quantities=(quantity,),
         reason=(
-            "model assumption: vapour-only zero-storage closure; "
+            "predict-and-flag substitution: congruent vapour-only zero-storage closure; "
             f"source_oxygen_fallback={reason.value}"
         ),
         origin="source oxygen selection",
     )
 
 
-def source_oxygen_substitution_notice(quantity: Quantity, row: Observation) -> Notice:
-    """Flag a source-linked oxygen value and retain the derivation basis."""
+def source_oxygen_condition_notice(quantity: Quantity, row: Observation) -> Notice:
+    """Describe the measured same-cell oxygen condition and its lineage."""
 
     point = oxygen_pressure_point(row)
     inference = None if point is None else point.inference
     if inference is None or not inference.relation.startswith(SOURCE_OXYGEN_RELATION):
-        raise ValueError("source-linked oxygen substitution has no source derivation")
+        raise ValueError("source-linked oxygen condition has no source derivation")
     condition = (row.provenance or {}).get("source_oxygen_condition")
     condition_id = (
         condition.get("observation_id")
@@ -127,8 +127,9 @@ def source_oxygen_substitution_notice(quantity: Quantity, row: Observation) -> N
         kind=NoticeKind.INPUT_OMITTED,
         affected_quantities=(quantity,),
         reason=(
-            "model substitution: source-linked oxygen condition; "
-            f"target row has no printed fO2; basis={inference.relation}; "
+            "measured condition: same-cell source-linked oxygen; "
+            "rung=2:measured_same_cell_oxygen; target row has no printed fO2; "
+            f"basis={inference.relation}; "
             f"inputs={inputs}{selected}"
         ),
         origin="source oxygen selection",
