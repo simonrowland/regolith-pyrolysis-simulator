@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, ValueKind
+from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator, REPO_ROOT
 
@@ -31,6 +31,14 @@ RENDER_PINS = {
 TABLE1_RUNS = {
     "238", "241", "242", "198", "199", "202", "294", "205", "208",
     "223²", "226²", "210", "211", "213", "215", "218", "219", "221", "230",
+}
+
+REFUSAL_CENSUS = {
+    "sc1984_incongruent_fusion_1490k_1bar": (
+        "The printed reaction produces a multicomponent peritectic liquid plus metallic Fe. "
+        "The heat_of_fusion identity represents pure same-formula solid-to-liquid fusion and "
+        "would misidentify this reaction; no exact reaction-bearing identity is available."
+    ),
 }
 
 
@@ -95,7 +103,14 @@ def test_rendered_values_table_census_and_interior_mutation() -> None:
     )
     assert "reference only" in erratum["values"]["correction_as_printed"]
     assert "Chao (1978)" in erratum["values"]["correction_as_printed"]
+    assert "American Mineralogist 63, 424–425" in erratum["values"]["correction_as_printed"]
     assert erratum["values"]["data_or_formula_change"] == "none"
+    inherited_enthalpy = next(
+        row
+        for row in document["species"]["Fe2SiO4"]["context"]
+        if row["observation_id"] == "sc1984_inherited_solid_enthalpy_and_quench_mixture_correction"
+    )
+    assert "Robie, Finch, and Hemingway (1982)" in inherited_enthalpy["values"]["attribution"]
 
     changed = deepcopy(document)
     changed_row = _observations(changed)["sc1984_table1_c1_run294_enthalpy_increment"]
@@ -119,7 +134,7 @@ def test_isolated_migration_binds_printed_conditions_and_exact_refusals() -> Non
         for observation_id, observation in result.observations.items()
     }
     assert len(by_raw_id) == 45
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in by_raw_id.values()) == 41
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in by_raw_id.values()) == 42
 
     raw_observations = _observations(document)
     assert set(raw_observations) == set(by_raw_id)
@@ -147,7 +162,7 @@ def test_isolated_migration_binds_printed_conditions_and_exact_refusals() -> Non
     } | {
         "sc1984_table1_c1_liquid_fit_coefficients",
         "sc1984_equation6_liquid_enthalpy_fit",
-    } | enthalpy_ids
+    } | enthalpy_ids | set(REFUSAL_CENSUS)
     assert unknown_quantities == expected_unknown_quantities
     assert not [
         observation_id
@@ -201,15 +216,33 @@ def test_isolated_migration_binds_printed_conditions_and_exact_refusals() -> Non
         assert raw["point_conditions"]["fO2_Pa"]["state"]["tag"] == "unknown"
         assert raw["point_conditions"]["T_K"]["state"]["tag"] == "unknown"
 
+    c2_feo = raw_observations["sc1984_table2_c2_after_calorimetry_feo_bulk_analysis"]
+    assert c2_feo["values"]["value"] == "62.3"
+    assert "colorimetric" in c2_feo["values"]["method_as_printed"]
+    assert "titrimetric" in c2_feo["values"]["method_as_printed"]
+    assert c2_feo["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert "published C-2 post-calorimetry FeO composition" in c2_feo["values"]["derivation"]["raw_inputs"]["locator"]["note"]
+
+    c2_fe2o3 = raw_observations["sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis"]
+    expected_c2_ferric_inputs = {
+        "sc1984_table2_c2_after_calorimetry_feo_bulk_analysis",
+        "sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis",
+        "sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis",
+    }
+    assert c2_fe2o3["values"]["value"] == "6.5"
+    assert set(c2_fe2o3["values"]["derivation"]["inputs"]) == expected_c2_ferric_inputs
+    assert set(c2_fe2o3["derived_from"]) == expected_c2_ferric_inputs
+
     incongruent = by_raw_id["sc1984_incongruent_fusion_1490k_1bar"]
-    assert incongruent.identity.quantity.is_value
+    incongruent_refusal = REFUSAL_CENSUS["sc1984_incongruent_fusion_1490k_1bar"]
+    incongruent_raw = raw_observations["sc1984_incongruent_fusion_1490k_1bar"]
+    assert incongruent_raw["values"]["admission_status"] == "typed_refusal"
+    assert incongruent_raw["values"]["refusal_reason"] == incongruent_refusal
+    assert incongruent_raw["values"]["value"] == "88.4"
+    assert "0.0253Fe°(sol)" in incongruent_raw["values"]["reaction_as_printed"]
+    assert incongruent.identity.quantity.is_unknown
+    assert incongruent.value.kind is ValueKind.UNAVAILABLE
     assert incongruent.identity.species.phase.is_value
-    assert incongruent.identity.temperature_K.is_value
-    assert incongruent.identity.temperature_K.value == Decimal("1490")
-    fusion_profile = profile_for(incongruent.identity)
-    assert {"temperature_K", "subtype"} <= fusion_profile.required
-    assert "total_pressure_Pa" not in fusion_profile.required
-    assert incongruent.identity.total_pressure_Pa.is_not_applicable
     assert incongruent.identity.fO2_Pa is None or not incongruent.identity.fO2_Pa.is_value
     assert incongruent.identity.composition is None or not incongruent.identity.composition.is_value
     assert incongruent.point_conditions["total_pressure_Pa"].state.is_value
@@ -217,6 +250,15 @@ def test_isolated_migration_binds_printed_conditions_and_exact_refusals() -> Non
     assert incongruent.point_conditions["total_pressure_Pa"].locator.equation == "11"
 
     congruent = by_raw_id["sc1984_hypothetical_congruent_fusion"]
+    congruent_raw = raw_observations["sc1984_hypothetical_congruent_fusion"]
+    assert congruent.identity.quantity.is_value
+    assert congruent.identity.quantity.value is Quantity.ENTHALPY_OF_FUSION
+    assert congruent.value.kind is ValueKind.POINT
+    assert congruent.value.point == Decimal("89.3")
+    assert congruent_raw["values"]["reaction_as_printed"] == "Fe2SiO4(solid) = Fe2SiO4(liquid)"
+    fusion_profile = profile_for(congruent.identity)
+    assert {"temperature_K", "subtype"} <= fusion_profile.required
+    assert "total_pressure_Pa" not in fusion_profile.required
     assert congruent.identity.temperature_K is None or not congruent.identity.temperature_K.is_value
     assert congruent.identity.total_pressure_Pa is None or not congruent.identity.total_pressure_Pa.is_value
     assert raw_observations["sc1984_hypothetical_congruent_fusion"]["point_conditions"][
@@ -242,8 +284,6 @@ def test_isolated_migration_binds_printed_conditions_and_exact_refusals() -> Non
     for observation_id, expected_value in (
         ("sc1984_table2_c2_after_equilibrium_liquid_fe2o3", Decimal("2.1")),
         ("sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss", Decimal("3.7")),
-        ("sc1984_incongruent_fusion_1490k_1bar", Decimal("88.4")),
-        ("sc1984_hypothetical_congruent_fusion", Decimal("89.3")),
     ):
         assert by_raw_id[observation_id].value.kind is ValueKind.POINT
         assert by_raw_id[observation_id].value.point == expected_value

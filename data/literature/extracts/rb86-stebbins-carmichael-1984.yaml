@@ -3708,8 +3708,7 @@ species:
         analyte_as_printed: FeO
         sample_as_printed: C-2 after calorimetry
         method_class: measured_reduced
-        method_as_printed: Electron-microprobe analysis; FeO calculated by comparison with 100% total,
-          footnote 1.
+        method_as_printed: "Chemical ferrous-iron assays: colorimetric (Wilson, 1960) and titrimetric (Wilson, 1955) methods; both were calibrated for metallic Fe, and combination with total-iron analysis yields ferrous, ferric, and metallic contents (p. 293)."
         admission_status: typed_refusal
         value: '62.3'
         value_as_published: '62.3'
@@ -3724,8 +3723,9 @@ species:
         uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
           separately in the Table 2 analysis-method note.
         derivation:
-          relation: C-2 run-product FeO is a reduced electron-microprobe composition; the underlying probe
-            totals are not tabulated (Table 2 footnote 1).
+          relation: The published C-2 post-calorimetry FeO composition is reduced from the total-iron
+            assay and the colorimetric and titrimetric ferrous-iron assays, which were calibrated for
+            metallic Fe. The underlying chemical assay readings are not separately tabulated.
           raw_inputs:
             state:
               tag: value
@@ -3739,7 +3739,7 @@ species:
               table_row_number: 6
               table_column_number: 5
               column: C-2 after calorimetry
-              note: The electron-microprobe input totals used in this reduction are not separately printed.
+              note: The individual chemical assay readings are not separately printed; 62.3 wt.% is the published C-2 post-calorimetry FeO composition.
       point_conditions:
         fO2_Pa:
           state:
@@ -4154,10 +4154,14 @@ species:
         uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
           separately in the Table 2 analysis-method note.
         derivation:
-          relation: Fe2O3 is calculated from FeO and FeOtot (Table 2 footnote 5).
+          relation: Table 2 footnote 5 calculates Fe2O3 from FeO and FeOtot. The p. 293 chemical methods
+            distinguish metallic iron as well; the C-2 balance includes printed FeO 62.3 wt.%, FeOtot
+            70.1 wt.% as FeO, and Fe° 1.5 wt.%. The rounded inputs reproduce about 6.52 wt.% Fe2O3,
+            consistent with the printed 6.5 wt.% value.
           inputs:
           - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
           - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+          - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
       point_conditions:
         fO2_Pa:
           state:
@@ -4219,6 +4223,7 @@ species:
       derived_from:
       - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
       - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+      - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
     - observation_id: sc1984_equation6_liquid_enthalpy_fit
       experiment: sc1984_drop_calorimetry_c1
       type: heat_capacity_and_heat_content_series
@@ -4315,9 +4320,18 @@ species:
       standard_state: Incongruent melting reaction (4), fayalite solid to the equilibrium peritectic liquid
         plus Fe metal, at the stated 1 bar peritectic temperature.
       values:
-        quantity: heat_of_fusion
+        quantity: incongruent_fusion_enthalpy_to_peritectic_liquid_and_Fe_as_printed
         method_class: measured_reduced
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: The printed reaction produces a multicomponent peritectic liquid plus metallic Fe.
+          The heat_of_fusion identity represents pure same-formula solid-to-liquid fusion and would
+          misidentify this reaction; no exact reaction-bearing identity is available.
+        schema_gap: No exact quantity token represents the printed incongruent fusion reaction. Keep
+          88.4 kJ mol−1 as a typed refusal instead of assigning the pure-endmember heat_of_fusion token.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+        - simulator/battery/generators/janaf.py::janaf_fusion_enthalpy
+        - simulator/battery/compilation_tier.py::predict_thermo_attempt
         value: '88.4'
         value_as_published: '88.4'
         T_K: '1490'
@@ -4674,7 +4688,7 @@ species:
         section: Heat of fusion calculations
       units: J mol−1 and J g−1 as printed
       values:
-        attribution: Robie, Hemingway, and Fisher (1982), inherited high-temperature fayalite solid enthalpy
+        attribution: Robie, Finch, and Hemingway (1982), inherited high-temperature fayalite solid enthalpy
           equation based on Orr (1953) drop calorimetry and 5–383 K adiabatic heat capacity.
         equation8_as_printed: H_T − H_300 = 123.80T + 3.1167 × 10−2 T² − 36771 J mol−1
         accuracy_and_range_as_printed: Within 200 J mol−1 between 900 and 1900 K.
@@ -4698,7 +4712,7 @@ species:
       units: bibliographic correction
       values:
         correction_as_printed: Erratum at American Mineralogist 69:1198 corrects the laihunite reference
-          only, identifying G. Y. Chao (1978), Lunar and Planetary Science Conference Abstracts 9, 424–425.
+          only, identifying G. Y. Chao (1978), American Mineralogist 63, 424–425.
         data_or_formula_change: none
         verification: The erratum has no change to Table 1, Table 2, or any thermodynamic value or equation.
     - observation_id: sc1984_figure1_candidate_not_extracted
