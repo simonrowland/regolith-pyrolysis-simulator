@@ -753,6 +753,99 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert "live parity=confirmed" in window["detail"]
 
 
+def test_certification_requires_live_recipe_reachability_probe(smoke_payload):
+    owner = _owner_recipe_row(smoke_payload)
+    passing_assertions = {
+        validation_map.OWNER_CERTIFICATION_ASSERTION: {"passed": True},
+        validation_map.MAP_LIVE_PARITY_ASSERTION: {"passed": True},
+    }
+
+    assert validation_map._certification_pass(
+        passing_assertions,
+        live_owner_probe=None,
+        owner_row=owner,
+    ) is False
+    assert validation_map._certification_reachability_reason(
+        None,
+        owner,
+    ) is validation_map.CertificationReason.LIVE_RECIPE_REACHABILITY_PROBE_MISSING
+
+    assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+        live_owner_probe=None,
+    )
+    window = _assertion({"assertions": assertions}, "grind_ready_target_window")
+    assert window["passed"] is False
+    assert "live recipe reachability probe missing" in window["detail"]
+
+
+def test_certification_requires_reachable_live_recipe(smoke_payload):
+    probe = dict(smoke_payload["live_owner_probe"])
+    probe["recipe_reachable"] = False
+    passing_assertions = {
+        validation_map.OWNER_CERTIFICATION_ASSERTION: {"passed": True},
+        validation_map.MAP_LIVE_PARITY_ASSERTION: {"passed": True},
+    }
+    owner = _owner_recipe_row(smoke_payload)
+
+    assert validation_map._certification_pass(
+        passing_assertions,
+        live_owner_probe=probe,
+        owner_row=owner,
+    ) is False
+    assert validation_map._certification_reachability_reason(
+        probe,
+        owner,
+    ) is validation_map.CertificationReason.LIVE_RECIPE_UNREACHABLE
+
+
+@pytest.mark.parametrize(
+    ("field", "wrong_value"),
+    (
+        ("recipe_stage_name", "wrong_stage"),
+        ("recipe_gas_cover_mode", "hard_vacuum"),
+    ),
+)
+def test_certification_requires_live_recipe_identity_to_match_owner_row(
+    smoke_payload,
+    field,
+    wrong_value,
+):
+    probe = dict(smoke_payload["live_owner_probe"])
+    probe[field] = wrong_value
+    passing_assertions = {
+        validation_map.OWNER_CERTIFICATION_ASSERTION: {"passed": True},
+        validation_map.MAP_LIVE_PARITY_ASSERTION: {"passed": True},
+    }
+    owner = _owner_recipe_row(smoke_payload)
+
+    assert validation_map._certification_pass(
+        passing_assertions,
+        live_owner_probe=probe,
+        owner_row=owner,
+    ) is False
+    assert validation_map._certification_reachability_reason(
+        probe,
+        owner,
+    ) is validation_map.CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
+
+
+def test_certification_accepts_reachable_matching_live_recipe(smoke_payload):
+    passing_assertions = {
+        validation_map.OWNER_CERTIFICATION_ASSERTION: {"passed": True},
+        validation_map.MAP_LIVE_PARITY_ASSERTION: {"passed": True},
+    }
+
+    assert validation_map._certification_pass(
+        passing_assertions,
+        live_owner_probe=smoke_payload["live_owner_probe"],
+        owner_row=_owner_recipe_row(smoke_payload),
+    ) is True
+
+
 def test_certification_surfaces_require_owner_pass_and_live_parity(
     smoke_payload,
     tmp_path,

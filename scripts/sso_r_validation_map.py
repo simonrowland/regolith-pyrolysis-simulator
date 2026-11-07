@@ -11,6 +11,7 @@ import subprocess
 import sys
 import warnings
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -881,7 +882,104 @@ def _nondecreasing(values: list[float], *, tolerance: float = 1.0e-12) -> bool:
     return all(values[i + 1] + tolerance >= values[i] for i in range(len(values) - 1))
 
 
-def _certification_pass(assertions_by_name: Mapping[str, Mapping[str, Any]]) -> bool:
+class CertificationReason(str, Enum):
+    LIVE_RECIPE_REACHABILITY_PROBE_MISSING = (
+        "live recipe reachability probe missing"
+    )
+    LIVE_RECIPE_UNREACHABLE = "live recipe unreachable"
+    LIVE_RECIPE_IDENTITY_MISMATCH = "live recipe stage/gas identity mismatch"
+
+
+def _same_identity_number(actual: Any, expected: Any) -> bool:
+    try:
+        actual_number = float(actual)
+        expected_number = float(expected)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return (
+        math.isfinite(actual_number)
+        and math.isfinite(expected_number)
+        and actual_number == expected_number
+    )
+
+
+def _certification_reachability_reason(
+    live_owner_probe: Mapping[str, Any] | None,
+    owner_row: Mapping[str, Any] | None,
+) -> CertificationReason | None:
+    if live_owner_probe is None:
+        return CertificationReason.LIVE_RECIPE_REACHABILITY_PROBE_MISSING
+    if live_owner_probe.get("recipe_reachable") is not True:
+        return CertificationReason.LIVE_RECIPE_UNREACHABLE
+    if owner_row is None:
+        return CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
+
+    matches_owner_row = (
+        live_owner_probe.get("recipe_stage_name") == OWNER_RECIPE_STAGE_NAME
+        and live_owner_probe.get("recipe_gas_cover_mode")
+        == OWNER_RECIPE_GAS_COVER_MODE
+        and _same_identity_number(owner_row.get("temperature_C"), OWNER_RECIPE_T_C)
+        and _same_identity_number(
+            owner_row.get("requested_pO2_mbar"), OWNER_RECIPE_PO2_MBAR
+        )
+        and _same_identity_number(
+            owner_row.get("requested_pN2_mbar"), OWNER_RECIPE_PN2_MBAR
+        )
+        and _same_identity_number(
+            owner_row.get("dose_fraction_of_full_FeO_equiv"), 1.0
+        )
+        and _same_identity_number(
+            live_owner_probe.get("temperature_C"), owner_row.get("temperature_C")
+        )
+        and _same_identity_number(
+            live_owner_probe.get("recipe_pO2_mbar"),
+            owner_row.get("requested_pO2_mbar"),
+        )
+        and _same_identity_number(
+            live_owner_probe.get("recipe_pN2_mbar"),
+            owner_row.get("requested_pN2_mbar"),
+        )
+        and _same_identity_number(
+            live_owner_probe.get("recipe_p_total_mbar"),
+            owner_row.get("total_pressure_mbar"),
+        )
+        and _same_identity_number(
+            owner_row.get("total_pressure_mbar"), OWNER_RECIPE_TOTAL_PRESSURE_MBAR
+        )
+    )
+    if not matches_owner_row:
+        return CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
+    return None
+
+
+def _owner_certification_row(
+    rows: Iterable[Mapping[str, Any]],
+) -> Mapping[str, Any] | None:
+    return next(
+        (
+            row for row in rows
+            if float(row["temperature_C"]) == OWNER_RECIPE_T_C
+            and math.isclose(
+                float(row["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR
+            )
+            and math.isclose(
+                float(row["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR
+            )
+            and math.isclose(
+                float(row["dose_fraction_of_full_FeO_equiv"]), 1.0
+            )
+        ),
+        None,
+    )
+
+
+def _certification_pass(
+    assertions_by_name: Mapping[str, Mapping[str, Any]],
+    live_owner_probe: Mapping[str, Any] | None = None,
+    owner_row: Mapping[str, Any] | None = None,
+) -> bool:
+    if _certification_reachability_reason(live_owner_probe, owner_row) is not None:
+        return False
     owner = assertions_by_name.get(OWNER_CERTIFICATION_ASSERTION, {})
     parity = assertions_by_name.get(MAP_LIVE_PARITY_ASSERTION, {})
     return bool(owner.get("passed")) and bool(parity.get("passed"))
@@ -1132,17 +1230,11 @@ def evaluate_assertions(
         ),
     )
 
-    owner = [
-        r for r in rows
-        if float(r["temperature_C"]) == OWNER_RECIPE_T_C
-        and math.isclose(float(r["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR)
-        and math.isclose(float(r["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR)
-        and math.isclose(float(r["dose_fraction_of_full_FeO_equiv"]), 1.0)
-    ]
+    owner_row = _owner_certification_row(rows)
     map_live_semantics_parity_pass = False
     map_live_detail = "owner row missing"
-    if owner:
-        row = owner[0]
+    if owner_row is not None:
+        row = owner_row
         owner_pass = (
             row["native_fe_pool_mol"] > 0.0
             and row["native_fe_tap_mol"] > row["native_fe_vapor_mol"]
@@ -1185,6 +1277,15 @@ def evaluate_assertions(
         map_live_detail,
     )
     assertions_by_name = {a["name"]: a for a in assertions}
+    certification_reachability_reason = _certification_reachability_reason(
+        live_owner_probe,
+        owner_row,
+    )
+    certification_pass = _certification_pass(
+        assertions_by_name,
+        live_owner_probe,
+        owner_row,
+    )
 
     passing_target_rows = [
         r for r in rows
@@ -1197,10 +1298,15 @@ def evaluate_assertions(
     first_T = min((float(r["temperature_C"]) for r in passing_target_rows), default=None)
     add(
         "grind_ready_target_window",
-        first_T is not None and _certification_pass(assertions_by_name),
+        first_T is not None and certification_pass,
         (
             f"first_passing_T_C={first_T}; window under PN2 sweep transport "
             f"semantics; live parity={'confirmed' if map_live_semantics_parity_pass else 'missing'}"
+            + (
+                f"; certification_blocker={certification_reachability_reason.value}"
+                if certification_reachability_reason is not None
+                else ""
+            )
         ),
     )
     return assertions
@@ -1411,7 +1517,11 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
     )
     owner_classification = str(
         "certification_pass"
-        if _certification_pass(assertions_by_name)
+        if _certification_pass(
+            assertions_by_name,
+            payload.get("live_owner_probe"),
+            _owner_certification_row(rows),
+        )
         else "current_physics_blocker"
     )
     moved_pin_rows = [
@@ -1584,7 +1694,11 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         key=lambda row: row["requested_pN2_mbar"],
     )
     assertions_by_name = {a["name"]: a for a in payload["assertions"]}
-    certification_pass = _certification_pass(assertions_by_name)
+    certification_pass = _certification_pass(
+        assertions_by_name,
+        payload.get("live_owner_probe"),
+        owner,
+    )
     return {
         "schema_version": GOLDEN_SCHEMA_VERSION,
         "source_commit": payload["commit"],
