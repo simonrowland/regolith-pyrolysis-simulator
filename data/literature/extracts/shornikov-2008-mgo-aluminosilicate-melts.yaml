@@ -11,6 +11,21 @@ extraction:
   date: '2026-10-18'
   worker: trial-lmax-1018
 review_status: draft
+schema_gaps:
+  - observation_id: shornikov_2008_fig1_d_marker_1
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_fig1_d_marker_2
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_fig1_d_marker_3
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_fig1_d_marker_4
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_fig1_d_marker_5
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_fig1_d_marker_6
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2008_prose_cordierite_minimum_delta_fg
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 skipped_empty_or_dash:
   total: 18
   tables:
@@ -2858,6 +2873,31 @@ species:
             published_page: 148
             note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
               the numerical inputs.
+    context:
+    - observation_id: shornikov_2008_mgo_aluminosilicate_melts_kems_apparatus
+      type: apparatus
+      experiment: shornikov-archakov-2001-kems
+      locator:
+        page: 1
+        published_page: 147
+        pdf_page_index: 0
+        note: Paragraph comparing the present calculations with the cited experimental data.
+      units: as printed
+      values:
+        quantity: cited_mgo_aluminosilicate_kems_apparatus
+        method_class: method_only
+        apparatus: mass spectrometric Knudsen effusion method
+        method_as_published: >-
+          The obtained results are shown in the Figure below in comparison with the experimental data obtained by the mass spectrometric Knudsen effusion method in MgAl2O4 - SiO2 concentration range at 2050 K [1].
+        notes: |
+          Series stated in this paper: MgAl2O4 - SiO2 concentration range at 2050 K; data attributed to reference [1], Shornikov and Archakov (2001).
+          Sample holder or cell material: not stated in this article.
+          Cell inner dimensions and orifice size: not stated.
+          Sample mass: not stated.
+          Run duration at temperature: not stated.
+          Fe-presaturation of loops and how: not stated.
+          Post-run bulk analyses (total Fe, alkalis, or Mo/W/Pt/Ir/Re pickup): not stated.
+          Cell oxygen condition: not stated.
   Mg2SiO4:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r14_c02
@@ -4145,13 +4185,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 1
         x_SiO2_mol_pct_as_read: 0.71
-        value: '-23'
+        value_as_printed: '-23'
         read_uncertainty_kJ_mol: 0.005342
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4170,7 +4212,7 @@ species:
           - 44
           x_SiO2_mol_pct: 0.706822
           axis_minus_delta_fG_kJ_mol: 22.841879
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4223,13 +4265,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 2
         x_SiO2_mol_pct_as_read: 18
-        value: '-25'
+        value_as_printed: '-25'
         read_uncertainty_kJ_mol: 0.002670
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4248,7 +4292,7 @@ species:
           - 25
           x_SiO2_mol_pct: 18.171414
           axis_minus_delta_fG_kJ_mol: 25.235039
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4301,13 +4345,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 3
         x_SiO2_mol_pct_as_read: 52
-        value: '-27'
+        value_as_printed: '-27'
         read_uncertainty_kJ_mol: 0.002671
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4326,7 +4372,7 @@ species:
           - 59
           x_SiO2_mol_pct: 51.961603
           axis_minus_delta_fG_kJ_mol: 26.581191
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4379,13 +4425,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 4
         x_SiO2_mol_pct_as_read: 55
-        value: '-26'
+        value_as_printed: '-26'
         read_uncertainty_kJ_mol: 0.002672
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4404,7 +4452,7 @@ species:
           - 37
           x_SiO2_mol_pct: 55.378588
           axis_minus_delta_fG_kJ_mol: 25.929483
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4457,13 +4505,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 5
         x_SiO2_mol_pct_as_read: 65
-        value: '-23'
+        value_as_printed: '-23'
         read_uncertainty_kJ_mol: 0.005342
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4482,7 +4532,7 @@ species:
           - 32
           x_SiO2_mol_pct: 64.775298
           axis_minus_delta_fG_kJ_mol: 23.162392
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4535,13 +4585,15 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energies of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 6
         x_SiO2_mol_pct_as_read: 75
-        value: '-19'
+        value_as_printed: '-19'
         read_uncertainty_kJ_mol: 0.005341
         read_1:
           crop_id: figure-2-600dpi-r1
@@ -4560,7 +4612,7 @@ species:
           - 66
           x_SiO2_mol_pct: 74.646589
           axis_minus_delta_fG_kJ_mol: 18.771371
-        note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
+        note: The plotted ordinate is -ΔfG; the digitized Gibbs energy is retained as value_as_printed.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -4659,10 +4711,12 @@ species:
       units: kJ/mole
       phase: l
       values:
-        quantity: delta_fG
+        quantity_as_printed: Gibbs energy of melt formation from oxides
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: quoted_attributed
         T_K: '2050'
-        value: '-26.9'
+        value_as_printed: '-26.9'
         attribution: Present-study value quoted in the text; per-row calculation inputs are not printed.
       point_conditions:
         temperature_K:

@@ -1,45 +1,115 @@
+from __future__ import annotations
+
+from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
+from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
 
+
 ROOT = Path(__file__).resolve().parents[1]
-HIT_ROWS = {
-    "zaitsev-2006-magnesium-silicate-thermodynamics": {
-        "zaitsev_2006_table4_enstatite_experimental_delta_fG": (
-            "delta_fG",
-            "ΔfG(298 K)",
-            "formation from crystalline MgO and β-cristobalite",
-            "−32 143",
-        ),
-        "zaitsev_2006_table4_enstatite_calculated_delta_fG": (
-            "delta_fG",
-            "ΔfG(298 K)",
-            "formation from crystalline MgO and β-cristobalite",
-            "−32 150",
-        ),
-        "zaitsev_2006_table4_protoenstatite_experimental_delta_fG": (
-            "delta_fG",
-            "ΔfG(298 K)",
-            "formation from crystalline MgO and β-cristobalite",
-            "−23 914",
-        ),
-        "zaitsev_2006_table4_protoenstatite_calculated_delta_fG": (
-            "delta_fG",
-            "ΔfG(298 K)",
-            "formation from crystalline MgO and β-cristobalite",
-            "−23 882",
-        ),
-    }
-}
-FROM_OXIDES_SCHEMA_GAP = (
+SOURCE_ID = "shornikov-2008-mgo-aluminosilicate-melts"
+EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
+FRAME_REASON = (
     "No quantity token represents formation from simple oxides; "
     "delta_fG denotes formation from the elements."
 )
+ZAITSEV_HIT_ROWS = {
+    "zaitsev_2006_table4_enstatite_experimental_delta_fG": (
+        "ΔfG(298 K)",
+        "formation from crystalline MgO and β-cristobalite",
+        "−32 143",
+    ),
+    "zaitsev_2006_table4_enstatite_calculated_delta_fG": (
+        "ΔfG(298 K)",
+        "formation from crystalline MgO and β-cristobalite",
+        "−32 150",
+    ),
+    "zaitsev_2006_table4_protoenstatite_experimental_delta_fG": (
+        "ΔfG(298 K)",
+        "formation from crystalline MgO and β-cristobalite",
+        "−23 914",
+    ),
+    "zaitsev_2006_table4_protoenstatite_calculated_delta_fG": (
+        "ΔfG(298 K)",
+        "formation from crystalline MgO and β-cristobalite",
+        "−23 882",
+    ),
+}
+HIT_ROWS = {
+    "shornikov_2008_fig1_d_marker_1": (
+        "Gibbs energies of melt formation from oxides",
+        "-23",
+        2,
+        148,
+    ),
+    "shornikov_2008_fig1_d_marker_2": (
+        "Gibbs energies of melt formation from oxides",
+        "-25",
+        2,
+        148,
+    ),
+    "shornikov_2008_fig1_d_marker_3": (
+        "Gibbs energies of melt formation from oxides",
+        "-27",
+        2,
+        148,
+    ),
+    "shornikov_2008_fig1_d_marker_4": (
+        "Gibbs energies of melt formation from oxides",
+        "-26",
+        2,
+        148,
+    ),
+    "shornikov_2008_fig1_d_marker_5": (
+        "Gibbs energies of melt formation from oxides",
+        "-23",
+        2,
+        148,
+    ),
+    "shornikov_2008_fig1_d_marker_6": (
+        "Gibbs energies of melt formation from oxides",
+        "-19",
+        2,
+        148,
+    ),
+    "shornikov_2008_prose_cordierite_minimum_delta_fg": (
+        "Gibbs energy of melt formation from oxides",
+        "-26.9",
+        1,
+        147,
+    ),
+    "shornikov_2011_fig1_d_allibert_marker_01": (
+        "Gibbs energy of melt formation from oxides, as captioned.",
+        "-23.0",
+        2,
+        None,
+    ),
+    "shornikov_2011_fig1_d_allibert_marker_02": (
+        "Gibbs energy of melt formation from oxides, as captioned.",
+        "-24.25",
+        2,
+        None,
+    ),
+    "shornikov_2011_fig1_d_allibert_marker_03": (
+        "Gibbs energy of melt formation from oxides, as captioned.",
+        "-27.0",
+        2,
+        None,
+    ),
+    "shornikov_2011_fig1_d_allibert_marker_04": (
+        "Gibbs energy of melt formation from oxides, as captioned.",
+        "-30.0",
+        2,
+        None,
+    ),
+}
 
 
-def _records(document):
+def _records(document: dict) -> dict[str, dict]:
     result = {}
 
     def visit(node):
@@ -56,33 +126,89 @@ def _records(document):
     return result
 
 
-def test_zaitsev_table4_from_oxides_gibbs_rows_migrate_unavailable():
-    for source_id, expected in HIT_ROWS.items():
-        path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
-        document = yaml.safe_load(path.read_text(encoding="utf-8"))
-        rows = _records(document)
-        assert {gap["observation_id"] for gap in document["schema_gaps"]} == set(
-            expected
-        )
-        for observation_id, (
-            old_token,
-            printed,
-            reference,
-            printed_value,
-        ) in expected.items():
-            values = rows[observation_id]["values"]
-            assert old_token not in values
-            assert values["quantity_as_printed"] == printed
-            assert values["reference_state_as_printed"] == reference
-            assert values["schema_gap"] == FROM_OXIDES_SCHEMA_GAP
-            assert values["value_as_printed"] == printed_value
+def _assert_oxide_frame_rows(document: dict, hit_rows: dict) -> None:
+    rows = _records(document)
+    gaps = {
+        gap["observation_id"]: gap["reason"]
+        for gap in document["schema_gaps"]
+        if gap["observation_id"] in hit_rows
+    }
+    assert set(gaps) == set(hit_rows)
+    assert set(hit_rows).issubset(rows)
+    for observation_id, (quantity, printed_value, page, published_page) in hit_rows.items():
+        row = rows[observation_id]
+        values = row["values"]
+        assert "quantity" not in values
+        assert "value" not in values
+        assert values["quantity_as_printed"] == quantity
+        assert values["reference_state_as_printed"] == "formation from simple oxides"
+        assert values["schema_gap"] == FRAME_REASON
+        assert gaps[observation_id] == FRAME_REASON
+        assert values["value_as_printed"] == printed_value
+        assert row["locator"]["page"] == page
+        assert row["locator"].get("published_page") == published_page
+
+
+def test_oxide_frame_rows_are_unavailable_and_pinned() -> None:
+    extracts = {
+        SOURCE_ID: EXTRACT,
+        "shornikov-2011-cao-mgo-alumina-melts": ROOT
+        / "data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml",
+    }
+    for source_id, extract in extracts.items():
+        source_prefix = f"shornikov_{source_id.split('-')[1]}_"
+        hit_rows = {
+            observation_id: values
+            for observation_id, values in HIT_ROWS.items()
+            if observation_id.startswith(source_prefix)
+        }
+        assert hit_rows
+        document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+        _assert_oxide_frame_rows(document, hit_rows)
+
+        mutated = deepcopy(document)
+        rows = _records(mutated)
+        mutation_id = next(iter(hit_rows))
+        rows[mutation_id]["values"]["quantity"] = "delta_fG"
+        with pytest.raises(AssertionError):
+            _assert_oxide_frame_rows(mutated, hit_rows)
 
         migrator = Migrator(root=ROOT, index={}, aliases={})
-        migrator._migrate_extract(path)
+        migrator._migrate_extract(extract)
         migrator.finalize()
-        for observation_id in expected:
-            migrated = migrator.result.observations[
-                f"{source_id}::{observation_id}"
+        for observation_id in hit_rows:
+            migrated = [
+                row
+                for key, row in migrator.result.observations.items()
+                if key == f"{source_id}::{observation_id}"
+                or key.startswith(f"{source_id}::{observation_id}::")
             ]
-            assert not migrated.identity.quantity.is_value
-            assert migrated.value.kind.value == "unavailable"
+            assert len(migrated) == 1
+            assert not migrated[0].identity.quantity.is_value
+            assert migrated[0].value.kind is ValueKind.UNAVAILABLE
+            assert migrated[0].admission.status is AdmissionStatus.PENDING
+
+
+def test_zaitsev_table4_from_oxides_gibbs_rows_migrate_unavailable() -> None:
+    source_id = "zaitsev-2006-magnesium-silicate-thermodynamics"
+    path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rows = _records(document)
+    assert {gap["observation_id"] for gap in document["schema_gaps"]} == set(
+        ZAITSEV_HIT_ROWS
+    )
+    for observation_id, (printed, reference, printed_value) in ZAITSEV_HIT_ROWS.items():
+        values = rows[observation_id]["values"]
+        assert "delta_fG" not in values
+        assert values["quantity_as_printed"] == printed
+        assert values["reference_state_as_printed"] == reference
+        assert values["schema_gap"] == FRAME_REASON
+        assert values["value_as_printed"] == printed_value
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    for observation_id in ZAITSEV_HIT_ROWS:
+        migrated = migrator.result.observations[f"{source_id}::{observation_id}"]
+        assert not migrated.identity.quantity.is_value
+        assert migrated.value.kind is ValueKind.UNAVAILABLE

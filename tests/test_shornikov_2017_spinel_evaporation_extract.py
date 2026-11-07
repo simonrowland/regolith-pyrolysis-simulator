@@ -93,7 +93,16 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
     table_2 = [row for row in observations if "_table2_" in row["observation_id"]]
     table_3 = [row for row in observations if "_table3_" in row["observation_id"]]
 
-    assert len(document["species"]["MgAl2O4"]["context"]) == 8
+    context_rows = document["species"]["MgAl2O4"]["context"]
+    assert len(context_rows) == 9
+    apparatus = next(
+        row
+        for row in context_rows
+        if row["observation_id"]
+        == "shornikov_2017_spinel_evaporation_apparatus_record"
+    )
+    assert apparatus["type"] == "apparatus"
+    assert apparatus["experiment"] == "shornikov_2017_spinel_molybdenum_series"
     assert sum(len(row["values"].get("points", [])) for row in table_2) == 73
     assert sum(not row["values"].get("points") for row in table_2) == 11
     assert sum(len(row["values"].get("points", [])) for row in table_3) == 58
@@ -187,7 +196,15 @@ def test_isolated_migration_resolves_lineage_and_keeps_rows_unchanged() -> None:
     records = list(result.observations.values())
 
     assert len(records) == 144
-    assert sum(len(rows) for rows in result.context_by_work.values()) == 8
+    assert sum(len(rows) for rows in result.context_by_work.values()) == 9
+    apparatus_context_id = (
+        "shornikov-2017-spinel-evaporation::context::"
+        "shornikov_2017_spinel_evaporation_apparatus_record"
+    )
+    assert any(
+        experiment.equipment_context_id == apparatus_context_id
+        for experiment in result.experiments.values()
+    )
     assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 13
     assert result.validation is not None
     # The measured-reduced row records its located not-printed raw-input
