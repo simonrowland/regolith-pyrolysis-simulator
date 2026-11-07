@@ -6171,19 +6171,24 @@ def _comparison_identity(
     leaving it unknown on the identity. Their comparison uses that same
     printed composition. Oxygen-balance effusion predictions also supply
     their solved pO2 and scorer pressure assumption. Stored identities remain
-    unchanged.
+    unchanged. A shared-ladder prediction carries its selected fO2 on the
+    prediction identity and its route/tier notices; a measured source-link
+    notice records the physical selection rung. Comparison must use that
+    selection rather than resolving oxygen from the source again.
     """
 
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    selected_oxygen = _selected_shared_ladder_oxygen(prediction)
     shared_oxygen_condition = any(
         notice.fo2_mode is Fo2Mode.SHARED_LADDER
         for notice in prediction.notices
     )
     melt_identity = _melt_identity_for_valence(identity)
-    source_pressure = _source_oxygen_pressure_for_score(reference)
-    resolved_oxygen = solved_oxygen_balance or source_pressure is not None
+    resolved_oxygen = solved_oxygen_balance or (
+        selected_oxygen is not None and selected_oxygen[0] is not None
+    )
     pressure_independent = _pressure_independent_comparison(reference, prediction)
     redox = quantity_token(identity) in {
         Quantity.FE3_FE2_RATIO,
@@ -6223,18 +6228,6 @@ def _comparison_identity(
             used = getattr(prediction.identity, field_name)
             if (actual is None or not actual.is_value) and used is not None and used.is_value:
                 updates[field_name] = used
-    if (
-        shared_oxygen_condition
-        and "fO2_Pa" in profile_for(identity).required
-        and (identity.fO2_Pa is None or not identity.fO2_Pa.is_value)
-        and isinstance(prediction.identity, Identity)
-    ):
-        # The prediction identity carries the exact commanded bar value. Use
-        # it as the comparison condition on both sides, while leaving the
-        # stored reference identity untouched.
-        used_oxygen = prediction.identity.fO2_Pa
-        if used_oxygen is not None and used_oxygen.is_value:
-            updates["fO2_Pa"] = used_oxygen
     if fusion_polymorph_flag:
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
@@ -6250,8 +6243,12 @@ def _comparison_identity(
         point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
-    if source_pressure is not None:
-        updates["fO2_Pa"] = State.of(source_pressure)
+    if (
+        selected_oxygen is not None
+        and selected_oxygen[0] is not None
+        and "fO2_Pa" in profile_for(identity).required
+    ):
+        updates["fO2_Pa"] = State.of(selected_oxygen[0])
     elif solved_oxygen_balance and (
         identity.fO2_Pa is None or not identity.fO2_Pa.is_value
     ):
@@ -6269,6 +6266,53 @@ def _comparison_identity(
     if not updates:
         return identity
     return replace(identity, **updates)
+
+
+def _selected_shared_ladder_oxygen(
+    prediction: EnginePrediction,
+) -> tuple[Decimal | None, int, str] | None:
+    """Read the shared ladder's selected pressure, rung, and route once.
+
+    The prediction identity is the pressure passed to the engine. Ladder and
+    source-selection notices record its route and rung. Effusion balance has
+    no commanded pressure, so use its solver output when the engine reports
+    one.
+    """
+
+    for notice in prediction.notices:
+        if (
+            notice.origin != "fo2_ladder"
+            or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
+        ):
+            continue
+        match = re.fullmatch(r"fo2_tier=(\d+); route=(.+)", notice.reason)
+        if match is None:
+            continue
+        route = match.group(2)
+        borrowed_suffix = "; borrowed"
+        if route.endswith(borrowed_suffix):
+            route = route[:-len(borrowed_suffix)]
+        rung = int(match.group(1))
+        for condition_notice in prediction.notices:
+            if condition_notice.origin != "source oxygen selection":
+                continue
+            selected_rung = re.search(r"\brung=(\d+):", condition_notice.reason)
+            if selected_rung is not None:
+                rung = int(selected_rung.group(1))
+            break
+        value_pa: Decimal | None = None
+        if isinstance(prediction.identity, Identity):
+            state = prediction.identity.fO2_Pa
+            if state is not None and state.is_value and state.value is not None:
+                value_pa = state.value
+        if value_pa is None and has_own_engine_solved_oxygen_balance(
+            prediction.engine, prediction.notices
+        ):
+            po2_bar = _solved_effusion_po2_bar(prediction)
+            if po2_bar is not None:
+                value_pa = Decimal(str(po2_bar)) * Decimal("1e5")
+        return value_pa, rung, route
+    return None
 
 
 def _derived_fo2_condition(observation: Observation) -> bool:
@@ -10893,6 +10937,27 @@ def candidate_observation(
         )
     else:
         value = Value.point_of(prediction.value)
+    provenance = (
+        dict(prediction.refusal_detail)
+        if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and prediction.value is not None
+        else (
+            {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
+            if reference.provenance and "source_oxygen_condition" in reference.provenance
+            else None
+        )
+    )
+    selected_oxygen = _selected_shared_ladder_oxygen(prediction)
+    if selected_oxygen is not None:
+        if provenance is None:
+            provenance = {}
+        provenance["selected_oxygen_condition"] = {
+            "value_Pa": (
+                None if selected_oxygen[0] is None else str(selected_oxygen[0])
+            ),
+            "rung": selected_oxygen[1],
+            "route": selected_oxygen[2],
+        }
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",
         experiment_id=reference.experiment_id,
@@ -10921,16 +10986,7 @@ def candidate_observation(
         ),
         authority=prediction.authority,
         certified_band=prediction.certified_band,
-        provenance=(
-            dict(prediction.refusal_detail)
-            if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and prediction.value is not None
-            else (
-                {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
-                if reference.provenance and "source_oxygen_condition" in reference.provenance
-                else None
-            )
-        ),
+        provenance=provenance,
     )
 
 
