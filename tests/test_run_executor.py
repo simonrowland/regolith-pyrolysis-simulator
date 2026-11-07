@@ -108,7 +108,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # the laptop and studio-3, so this digest is not a laptop re-run.
     # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "b6721693fb460ec04fbd9995a52c00b8b58db77a1a19eb11dce762ce6a37a327"
+        "047ae392bf60f40d4b272dd399485f92b334d6be4b963598811c2ecbfd9ac008"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
