@@ -116,6 +116,39 @@ def _render_pins(document: dict) -> tuple[str, ...]:
             "E.4",
             None,
         ),
+        (
+            "HPO2",
+            "hastie_bonnell_1980_tableE2_hpo2_S_boron_analogy",
+            "entropy",
+            None,
+            "entropy",
+            "63.2",
+            197,
+            "E.2",
+            None,
+        ),
+        (
+            "NaPO2",
+            "hastie_bonnell_1980_tableE2_napo2_S_boron_analogy",
+            "entropy",
+            None,
+            "entropy",
+            "71.6",
+            197,
+            "E.2",
+            None,
+        ),
+        (
+            "LiPO2",
+            "hastie_bonnell_1980_tableE2_lipo2_S_boron_analogy",
+            "entropy",
+            None,
+            "entropy",
+            "68.0",
+            197,
+            "E.2",
+            None,
+        ),
     )
     observed: list[str] = []
     for species, observation_id, container, index, field, expected, page, table, column in pins:
@@ -341,6 +374,25 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     ]
     assert len(entropy_migrated) == 18
     assert all(row.value.kind is ValueKind.POINT for row in entropy_migrated)
+
+    boron_analogy_pins = (
+        ("hastie_bonnell_1980_tableE2_hpo2_S_boron_analogy", "264.4288"),
+        ("hastie_bonnell_1980_tableE2_napo2_S_boron_analogy", "299.5744"),
+        ("hastie_bonnell_1980_tableE2_lipo2_S_boron_analogy", "284.5120"),
+    )
+    for observation_id, expected in boron_analogy_pins:
+        source_row = _record(document, observation_id)
+        assert source_row["values"]["method_class"] == "model_derived"
+        derivation = source_row["values"]["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["method"]["locator"]["page"] == 196
+        assert "Jensen (1969)" in derivation["references"]
+        assert "JANAF (1971)" in derivation["references"]
+        row = migrated_source(observation_id)
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == Decimal(expected)
+        assert row.locator.page == 197
+        assert row.locator.table == "E.2"
 
     unknown_quantity_ids = {
         row.observation_id.split("::", 2)[1]

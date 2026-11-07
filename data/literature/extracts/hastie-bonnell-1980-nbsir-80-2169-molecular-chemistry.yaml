@@ -1515,12 +1515,37 @@ species:
       values:
         quantity: S
         units_as_printed: cal/(deg mol)
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: admitted
         entropy: '63.2'
         T_K: '298.15'
         comparison_basis_as_printed: boron analogy
         attribution: JANAF (1971)
+        derivation:
+          relation: Entropy predicted by analogy with the boron system using PO2 and BO2 as reference points.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              note: The numerical PO2 and BO2 reference data used for this entropy prediction are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Boron-system analogy for entropy, using PO2 and BO2 as reference points.
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              equation: D_O-PO/D_O-BO ≈ D_HO-PO/D_HO-BO ≈ D_Na-PO2/D_Na-BO2 ≈ D_Li-PO2/D_Li-BO2; the text says similar analogies apply to entropies.
+          references:
+          - JANAF (1971)
+          - Jensen (1969)
     - observation_id: hastie_bonnell_1980_tableE3_hpo2_S298
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_14
@@ -3595,12 +3620,37 @@ species:
       values:
         quantity: S
         units_as_printed: cal/(deg mol)
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: admitted
         entropy: '71.6'
         T_K: '298.15'
         comparison_basis_as_printed: boron analogy
         attribution: Jensen (1969)
+        derivation:
+          relation: Entropy predicted by analogy with the boron system using PO2 and BO2 as reference points.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              note: The numerical PO2 and BO2 reference data used for this entropy prediction are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Boron-system analogy for entropy, using PO2 and BO2 as reference points.
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              equation: D_O-PO/D_O-BO ≈ D_HO-PO/D_HO-BO ≈ D_Na-PO2/D_Na-BO2 ≈ D_Li-PO2/D_Li-BO2; the text says similar analogies apply to entropies.
+          references:
+          - Jensen (1969)
+          - JANAF (1971)
     - observation_id: hastie_bonnell_1980_tableE3_napo2_S298
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_14
@@ -3880,12 +3930,37 @@ species:
       values:
         quantity: S
         units_as_printed: cal/(deg mol)
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: admitted
         entropy: '68.0'
         T_K: '298.15'
         comparison_basis_as_printed: boron analogy
         attribution: Jensen (1969)
+        derivation:
+          relation: Entropy predicted by analogy with the boron system using PO2 and BO2 as reference points.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              note: The numerical PO2 and BO2 reference data used for this entropy prediction are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Boron-system analogy for entropy, using PO2 and BO2 as reference points.
+            locator:
+              page: 196
+              pdf_page_index: 195
+              published_page: E10
+              section: Appendix E
+              equation: D_O-PO/D_O-BO ≈ D_HO-PO/D_HO-BO ≈ D_Na-PO2/D_Na-BO2 ≈ D_Li-PO2/D_Li-BO2; the text says similar analogies apply to entropies.
+          references:
+          - Jensen (1969)
+          - JANAF (1971)
     - observation_id: hastie_bonnell_1980_tableE3_lipo2_S298
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_14
