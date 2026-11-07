@@ -1,0 +1,161 @@
+source_id: rb86-stebbins-etal-1984
+source: Stebbins, Carmichael & Moret 1984, “Heat capacities and entropies of silicate liquids and glasses”, doi 10.1007/BF00381840
+review_status: draft
+input_order: MinerU table drafts and markdown, then pdftotext-layout; PDF render used for flagged cells and table-layout checks.
+tables:
+  - page: 4
+    table: '1'
+    table_index: 1
+    printed_row_count: 23
+    columns:
+      1: glass/liquid sample label or printed formula
+      2: SiO2, mol %
+      3: TiO2, mol %
+      4: Al2O3, mol %
+      5: Fe2O3, mol %
+      6: FeO, mol %
+      7: MgO, mol %
+      8: CaO, mol %
+      9: Na2O, mol %
+      10: K2O, mol %
+    stored_as: source_context.table_1_compositions; composition for observations is attached by printed sample label.
+    condition_mapping: printed oxide mol % -> point_conditions.composition using the migrator's mole-percent path.
+    method_class: measured_direct analyses, with composition notes retained exactly as printed.
+    render_audit: Page 4 table layout checked in render; all numeric composition cells transcribed and row labels reconciled.
+  - page: 5
+    table: '2'
+    table_index: 2
+    printed_row_count: 29
+    columns:
+      1: glass sample label or Ab-An-Di coordinates
+      2: a in Cp = a + bT + cT^-2 + dT^-1/2
+      3: b x 10^2
+      4: c x 10^-5
+      5: d
+      6: Tg
+      7: sigma, percent
+      8: Tmax
+      9: r, percent
+    quantity: coefficient vector for a glass heat-capacity fit; kept typed-refused because the schema has no exact vector-valued Cp quantity.
+    unit: J K^-1 gfw^-1
+    phase: glass
+    evidence_class: measured_reduced
+    condition_mapping: Table 1 oxide mol % or closed Ab-An-Di coordinates; no point temperature, absolute fO2, or total pressure is printed.
+    render_audit: Page 5 table layout and all numeric cells checked in render; flagged decimal cells resolved there.
+  - page: 7
+    table: '3'
+    table_index: 3
+    printed_row_count: 136
+    composition_heading_rows: [1, 19, 32]
+    columns:
+      1-12: six adjacent temperature and relative-enthalpy pairs; odd columns are T in K, even columns are Delta H in J gfw^-1.
+    quantity: relative-enthalpy increment as printed, retained typed-refused because each value is relative to a 300 K glass/solid reference, not H(T)-H(298 K).
+    unit: J gfw^-1
+    phase: liquid or solid, according to the printed series label.
+    evidence_class: measured_direct
+    condition_mapping: Table 1 composition or printed closed Ab-An-Di coordinates; every T and Delta H cell uses its own row and column locator.
+    render_audit: Page 7 table layout and all numeric cells checked in render. The three composition headings at rows 1, 19, and 32 were assigned to their own panel; all 18 series headings and 136 point rows reconciled.
+  - page: 8
+    table: '4'
+    table_index: 4
+    printed_row_count: 17
+    columns:
+      1: sample/composition
+      2: a, J gfw^-1
+      3: b = Cp, J gfw^-1 K^-1
+      4: number of measurements n
+      5: sigma_H, J gfw^-1
+      6: sigma_Cp, J gfw^-1 K^-1
+      7: Tmin, K
+      8: Tmax, K
+    quantity: Cp=b from least-squares fit Delta H=bT-a.
+    unit: J gfw^-1 K^-1
+    phase: liquid, except printed solid rows.
+    evidence_class: measured_reduced
+    condition_mapping: fit temperature interval is retained verbatim; no midpoint is invented. Compositions follow Table 1 or Table 3 as printed.
+    lineage: each fit lists exactly the Table 3 enthalpy rows used by its printed n.
+    render_audit: Page 8 table layout and all numeric cells checked in render; digit disagreements in MinerU/pdftotext were settled against the page.
+  - page: 9
+    table: '5'
+    table_index: 5
+    printed_row_count: 9
+    columns:
+      1: glass oxide component
+      2: ai
+      3: bi x 10^2
+      4: ci x 10^-5
+      5: Cp,i at 700 K, per gram atom divided by 3R
+      6: crystalline solid oxide at 700 K, per gram atom divided by 3R
+    quantity: glass partial-molar Cp coefficient vector; kept typed-refused because no exact vector-valued Cp quantity exists.
+    phase: glass
+    evidence_class: measured_reduced
+    temperature_range: approximately 400-1000 K, exactly as printed in the caption.
+    render_audit: Page 9 table layout and all numeric cells checked in render; table 6 volume fits are excluded from this extract.
+  - page: 10
+    table: '7'
+    table_index: 7
+    printed_row_count: 12
+    columns:
+      1: liquid oxide component
+      2-4: printed partial-molar heat-capacity fit columns and statistics
+    quantity: liquid partial-molar Cp fit coefficients; stored for FeO, Fe2O3, Al2O3, and all other printed components.
+    phase: liquid
+    evidence_class: measured_reduced
+    temperature_range: about 1200-1850 K, exactly as printed in the caption.
+    render_audit: Page 10 table layout and all numeric cells checked in render; row labels verified against oxide component names.
+  - page: 12
+    table: '8'
+    table_index: 8
+    printed_row_count: 7
+    columns:
+      1: data set
+      2-6: printed RMSD and confidence-limit comparisons
+    stored_as: source_context.table_8_fit_comparison; no additional scored observation is created.
+    render_audit: Page 12 table layout and all numeric cells checked in render.
+  - page: 12
+    table: '9'
+    table_index: 9
+    printed_row_count: 18
+    columns:
+      1: pure liquid compound
+      2: Cv/3R per g-atom
+      3: sigma
+      4: source of Cp data
+    quantity: normalized constant-volume heat capacity Cv/3R; retained typed-refused because Quantity.CP is Cp and is not an exact match.
+    phase: liquid
+    method_class: measured_reduced for this report's own reductions; quoted_attributed for cited source rows.
+    render_audit: Page 12 table layout and all numeric cells checked in render; each source label reconciled to its row.
+  - page: 13
+    table: '10'
+    table_index: 10
+    printed_row_count: 17
+    columns:
+      1: silicate formula
+      2: Tf
+      3: Tg
+      4: Delta Sf,Tf
+      5: Delta Sf,1600 K
+      6: Delta Sf,Tg
+      7: Delta Sconfig at Tf/Ts=1.5
+      8: S0,liq at 1600 K
+      9: -Sx,liq at 1600 K
+    quantity: entropy_of_fusion for printed Delta Sf columns; remaining numerical columns are retained in source_context.table_10_liquid_entropy_rows.
+    unit: J g-atom^-1 K^-1
+    evidence_class: quoted_attributed for cited rows; measured_reduced for the authors' own reductions.
+    render_audit: Page 13 table layout and all numeric cells checked in render; plus-minus widths and footnote markers are retained as printed.
+  - page: 2
+    table: null
+    printed_material: Stout and Piwinskii 1980 temperature-dependent Cp equations quoted in the prose.
+    stored_as: typed-refused equation-valued Cp observations with attribution and printed coefficients.
+    evidence_class: quoted_attributed
+    render_audit: Prose locator and equations checked on the page 2 render.
+  - page: 15
+    table: null
+    printed_material: Appendix 1 fusion enthalpy discussion for Li2SiO3 and MgSiO3.
+    stored_as: MgSiO3 liquid relative enthalpy, the printed solution enthalpies, and three printed MgSiO3 fusion-enthalpy estimates.
+    render_audit: Appendix 1 prose and equations checked on the page 15 render.
+excluded:
+  - table: '6'
+    reason: liquid-volume fit parameters, outside the requested heat-capacity and enthalpy scope.
+  - figures: [1, 2, 3]
+    reason: figure-read values are outside this extraction; candidates are listed in the source context.
