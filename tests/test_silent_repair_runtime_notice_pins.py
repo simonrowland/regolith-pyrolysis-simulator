@@ -311,3 +311,512 @@ def test_sr24_repair_and_numerical_warning_keep_out_of_range_status(monkeypatch)
         "operator repair note",
         "operator repair note",
     ]
+
+
+def _petthermotools_activity_result(activity_sources: dict[str, object]):
+    backend = AlphaMELTSBackend()
+    results = {
+        "Conditions": {"mass": 100.0, "P_bar": 1.0},
+        "Liquid": {"mass": 100.0, "SiO2": 50.0},
+        "Liquid_prop": {"mass": 100.0, "SiO2_activity": 0.4},
+        **activity_sources,
+    }
+    return backend._parse_petthermotools_result(
+        results,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={"SiO2": 50.0},
+        total_input_kg=0.1,
+    )
+
+
+@pytest.mark.parametrize(
+    ("gamma", "reason"),
+    [
+        (float("nan"), "nonfinite_gamma"),
+        (0.0, "nonpositive_gamma"),
+    ],
+)
+def test_sr01_invalid_gamma_falls_through_to_later_activity_source(
+    gamma: float, reason: str
+) -> None:
+    result = _petthermotools_activity_result(
+        {"activity_coefficients": {"SiO2": gamma}}
+    )
+
+    assert result.activity_coefficients == {"SiO2": 0.4}
+    assert any(
+        warning.startswith("SR01:")
+        and "oxide='SiO2'" in warning
+        and f"reason={reason}" in warning
+        and "selected_source='phase_activity_fields'" in warning
+        for warning in result.warnings
+    )
+
+
+@pytest.mark.parametrize(
+    ("activity", "reason"),
+    [
+        (float("nan"), "nonfinite_direct_activity"),
+        (0.0, "nonpositive_direct_activity"),
+    ],
+)
+def test_sr02_invalid_direct_activity_uses_alternate_source(
+    activity: float, reason: str
+) -> None:
+    result = _petthermotools_activity_result(
+        {
+            "melt_oxide_activities": {"SiO2": activity},
+            "activities": {"Liquid": {"SiO2": 0.4}},
+        }
+    )
+
+    assert result.activity_coefficients == {"SiO2": 0.4}
+    assert any(
+        warning.startswith("SR02:")
+        and "oxide='SiO2'" in warning
+        and f"reason={reason}" in warning
+        and "alternate_source='activities'" in warning
+        for warning in result.warnings
+    )
+
+
+def test_sr04_invalid_endmember_activity_names_parent_oxide() -> None:
+    from engines.alphamelts.parser import project_equilibrium_to_diagnostics
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        SimpleNamespace(
+            status="ok",
+            liquid_fraction=1.0,
+            phase_masses_kg={"liquid": 1.0},
+            activity_coefficients={"SiO2_Liq": 0.0},
+        ),
+        mode="test",
+        engine_version="test",
+    )
+
+    assert diagnostics.activity_coefficients == {"SiO2_Liq": 0.0}
+    assert any(
+        notice.startswith("SR04:")
+        and "endmember='SiO2_Liq'" in notice
+        and "parent_oxide=SiO2" in notice
+        and "reason=nonpositive" in notice
+        for notice in diagnostics.backend_warnings
+    )
+
+
+def test_sr05_nonfinite_thermoengine_map_entries_are_dropped_with_notice() -> None:
+    from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    notices: list[str] = []
+    projected = transport._finite_mapping(
+        {"SiO2": 50.0, "MgO": float("inf")},
+        source="Liquid.oxide_wt",
+        repair_notices=notices,
+    )
+
+    assert projected == {"SiO2": 50.0}
+    assert len(notices) == 1
+    assert "SR05:" in notices[0]
+    assert "field=Liquid.oxide_wt" in notices[0]
+    assert "item='MgO'" in notices[0]
+
+
+def test_sr06_empty_thermoengine_liquid_composition_uses_bulk_with_notice() -> None:
+    from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+    class FakeMelts:
+        def __init__(self):
+            self.oxide_calls = 0
+
+        def get_oxide_names(self):
+            return ("SiO2", "MgO")
+
+        def set_bulk_composition(self, _bulk):
+            return None
+
+        def equilibrate_tp(self, *_args, **_kwargs):
+            return [("success", 1400.0, 0.1, object())]
+
+        def get_list_of_phases_in_assemblage(self, _root):
+            return ("Liquid",)
+
+        def get_mass_of_phase(self, _root, _phase):
+            return 1000.0
+
+        def get_composition_of_phase(self, _root, _phase, basis):
+            if basis == "component":
+                return {"SiO2": 0.5, "MgO": float("inf")}
+            self.oxide_calls += 1
+            return {"SiO2": 60.0, "MgO": 40.0} if self.oxide_calls == 1 else {}
+
+        def get_property_of_phase(self, _root, _phase, _name):
+            return 1.0
+
+        def get_dictionary_of_affinities(self, _root, **_kwargs):
+            return {}
+
+        def get_phase_names(self):
+            return ("Liquid",)
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    transport._equilibrate = object()
+    transport._liq_phase = object()
+    transport._operation_roots = []
+    transport._new_melts_model = lambda: FakeMelts()
+    transport._echo_log_fO2 = lambda *_args, **_kwargs: -10.0
+    transport._chemical_potentials_for_phase = (
+        lambda *_args: {"SiO2": 1.0, "MgO": 2.0}
+    )
+    component_moles: dict[str, float] = {}
+
+    def capture_activities(**kwargs):
+        component_moles.update(kwargs["component_mole_fraction"])
+        return {}
+
+    transport._activities_from_chemical_potentials = capture_activities
+    transport._fe_redox_split = lambda _liquid: {}
+
+    payload = transport._equilibrate_isolated(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        comp_wt={"SiO2": 60.0, "MgO": 40.0},
+        warnings=(),
+    )
+
+    assert payload.liquid_composition_wt_pct == {"SiO2": 60.0, "MgO": 40.0}
+    assert component_moles == {"SiO2": 0.5, "MgO": float("inf")}
+    assert any(
+        warning.startswith("SR06:")
+        and "field=liquid_composition_wt_pct" in warning
+        and "replacement=bulk_composition" in warning
+        for warning in payload.warnings
+    )
+    assert any("composition_of_phase returned an empty payload" in warning for warning in payload.warnings)
+
+
+def test_sr05_nonfinite_component_vector_keeps_typed_failure() -> None:
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineNonFiniteField,
+        ThermoEngineTransport,
+    )
+
+    class FakeLiquid:
+        endmember_names = ("SiO2", "MgO")
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    transport._liq_phase = FakeLiquid()
+
+    with pytest.raises(ThermoEngineNonFiniteField):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={"SiO2": 0.5, "MgO": float("inf")},
+            comp_wt={"SiO2": 60.0, "MgO": 40.0},
+        )
+
+
+def test_sr07_empty_component_vector_uses_wt_moles_without_changing_activity() -> None:
+    from engines.alphamelts.thermoengine import ThermoEngineTransport
+    from simulator.accounting.formulas import resolve_species_formula
+
+    class FakeLiquid:
+        endmember_names = ("SiO2", "MgO")
+
+        def chem_potential(self, _temperature, _pressure, *, mol):
+            self.normalized_moles = mol[0]
+            return (0.2, 0.3)
+
+        def gibbs_energy(self, _temperature, _pressure, *, mol):
+            return (0.0,)
+
+    liquid = FakeLiquid()
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    transport._liq_phase = liquid
+    transport._activity_converter = lambda mu, _mu0, _temperature: mu
+    notices: list[str] = []
+    activities = transport._activities_from_chemical_potentials(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        component_mole_fraction={},
+        comp_wt={"SiO2": 60.0, "MgO": 40.0},
+        repair_notices=notices,
+    )
+    si_moles = 60.0 / (resolve_species_formula("SiO2").molar_mass_kg_per_mol() * 1000.0)
+    mg_moles = 40.0 / (resolve_species_formula("MgO").molar_mass_kg_per_mol() * 1000.0)
+
+    assert liquid.normalized_moles == pytest.approx(
+        [si_moles / (si_moles + mg_moles), mg_moles / (si_moles + mg_moles)]
+    )
+    assert activities == {"SiO2": 0.2, "MgO": 0.3}
+    assert len(notices) == 1 and notices[0].startswith("SR07:")
+    assert "replacement=wt_derived_endmember_moles" in notices[0]
+
+
+def test_sr08_negative_wt_component_clamps_to_zero_with_notice() -> None:
+    from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    notices: list[str] = []
+    moles = transport._endmember_moles_from_wt(
+        {"SiO2": -1.0},
+        ("SiO2",),
+        repair_notices=notices,
+    )
+
+    assert moles == [0.0]
+    assert len(notices) == 1 and notices[0].startswith("SR08:")
+    assert "item='SiO2'" in notices[0]
+    assert "replacement=0.0" in notices[0]
+
+
+def test_sr09_missing_mu_empty_pure_state_and_nonpositive_activity_are_noticed() -> None:
+    from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+    class FakeLiquid:
+        endmember_names = ("SiO2", "MgO", "CaSiO3")
+
+        def chem_potential(self, _temperature, _pressure, *, mol):
+            return (1.0, 2.0)
+
+        def gibbs_energy(self, _temperature, _pressure, *, mol):
+            return () if mol[0][0] == 1.0 else (0.0,)
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    transport._liq_phase = FakeLiquid()
+    transport._activity_converter = lambda *_args: 0.0
+    notices: list[str] = []
+    activities = transport._activities_from_chemical_potentials(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        component_mole_fraction={"SiO2": 0.5, "MgO": 0.5},
+        comp_wt={},
+        repair_notices=notices,
+    )
+
+    assert activities == {}
+    assert any("item='SiO2'" in notice and "empty_pure_state_value" in notice for notice in notices)
+    assert any("item='MgO'" in notice and "nonpositive_computed_activity" in notice for notice in notices)
+    assert any("item='CaSiO3'" in notice and "missing_endmember_entry" in notice for notice in notices)
+
+
+def test_sr10_diagnostics_projection_filters_nonfinite_fields_and_bad_masses() -> None:
+    from engines.alphamelts.parser import project_equilibrium_to_diagnostics
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        SimpleNamespace(
+            status="ok",
+            phases_present=("liquid", "olivine"),
+            phase_masses_kg={"liquid": 1.0, "olivine": 0.0},
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={"SiO2": 60.0, "MgO": float("nan")},
+            activity_coefficients={"SiO2": 0.4, "MgO": float("inf")},
+        ),
+        mode="test",
+        engine_version="test",
+    )
+
+    assert diagnostics.phase_masses_kg == {"liquid": 1.0}
+    assert diagnostics.liquid_composition_wt_pct == {"SiO2": 60.0}
+    assert diagnostics.activity_coefficients == {"SiO2": 0.4}
+    assert sum(warning.startswith("SR10:") for warning in diagnostics.backend_warnings) == 3
+
+
+def test_sr11_path_point_omission_names_temperature_and_oxide() -> None:
+    from engines.alphamelts.parser import project_equilibrium_to_diagnostics
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        SimpleNamespace(
+            status="ok",
+            liquid_fraction=1.0,
+            phase_masses_kg={"liquid": 1.0},
+            liquid_fraction_path=({
+                "temperature_C": 1200.0,
+                "liquid_fraction": 0.5,
+                "liquid_composition_wt_pct": {
+                    "SiO2": 60.0,
+                    "MgO": float("nan"),
+                },
+            },),
+        ),
+        mode="test",
+        engine_version="test",
+    )
+
+    assert diagnostics.liquid_fraction_path[0]["liquid_composition_wt_pct"] == {
+        "SiO2": 60.0,
+    }
+    assert any(
+        warning.startswith("SR11:")
+        and "T=1200.0C MgO" in warning
+        for warning in diagnostics.backend_warnings
+    )
+
+
+def test_sr12_notices_cover_present_repairs_but_not_absent_controls() -> None:
+    from engines.alphamelts.parser import _control_float
+
+    warnings: list[str] = []
+    assert _control_float({}, "pressure_bar", 1.0, repair_notices=warnings) == 1.0
+    assert not any(warning.startswith("SR12:") for warning in warnings)
+    assert _control_float({"temperature_C": None}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
+    assert _control_float({"fO2_log": float("nan")}, "fO2_log", -9.0, repair_notices=warnings) == -9.0
+    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
+    assert _control_float({"temperature_C": b"1400"}, "temperature_C", 0.0, repair_notices=warnings) == 0.0
+
+    assert len(warnings) == 4
+    assert all(warning.startswith("SR12:") for warning in warnings)
+    assert any("field=temperature_C" in warning and "non_declared_control_defaulted" in warning and "replacement=0.0" in warning for warning in warnings)
+    assert any("field=fO2_log" in warning and "nonfinite_control_defaulted" in warning for warning in warnings)
+
+
+def test_sr13_incomplete_first_activity_source_matches_green_selection() -> None:
+    backend = AlphaMELTSBackend()
+    repairs: list[dict[str, str]] = []
+    values, diagnostics = backend._extract_activity_mapping(
+        {
+            "melt_oxide_activities": {"SiO2": 0.3},
+            "activities": {"Liquid": {"SiO2": 0.4, "MgO": 0.5}},
+        },
+        liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
+        repair_issues=repairs,
+    )
+
+    assert values == {"SiO2": 0.3}
+    assert diagnostics["diagnostic_activity_source"] == "melt_oxide_activities"
+    assert not any(item["site"] == "SR13" for item in repairs)
+
+
+def test_sr13_empty_activity_source_notice_keeps_green_fallback_value() -> None:
+    result = _petthermotools_activity_result(
+        {
+            "melt_oxide_activities": {},
+            "activities": {"Liquid": {"SiO2": 0.4, "MgO": 0.5}},
+        }
+    )
+
+    assert result.activity_coefficients == {"SiO2": 0.4, "MgO": 0.5}
+    assert any(
+        warning.startswith("SR13:")
+        and "source='melt_oxide_activities'" in warning
+        and "selected_source='activities'" in warning
+        and "empty_source_skipped" in warning
+        for warning in result.warnings
+    )
+
+
+def test_sr14_unparseable_phase_formula_uses_returned_oxide_composition() -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    backend = AlphaMELTSBackend()
+    notices: list[str] = []
+    species_mol, species_kg = backend._phase_species_from_instances(
+        [{
+            "instance_id": "olivine1",
+            "phase": "olivine",
+            "physical_mass_kg": 1.0,
+            "formula_or_endmember_token": "solver-token",
+            "composition_wt_pct": {"SiO2": 50.0},
+        }],
+        repair_notices=notices,
+    )
+
+    assert species_kg == {"olivine1": {"SiO2": 0.5}}
+    assert species_mol == {
+        "olivine1": {
+            "SiO2": 0.5 / resolve_species_formula(
+                "SiO2"
+            ).molar_mass_kg_per_mol(),
+        }
+    }
+    assert len(notices) == 1 and notices[0].startswith("SR14:")
+    assert "token='solver-token'" in notices[0]
+    assert "selected_source=returned_oxide_composition" in notices[0]
+
+
+def test_sr16_magemin_phase_composition_filters_invalid_values_with_notices() -> None:
+    backend = MAGEMinBackend()
+    notices: list[str] = []
+    payload = backend._phase_assemblage_payload(
+        {
+            "phases": {
+                "liq": {
+                    "mass_kg": 1.0,
+                    "composition": {
+                        "SiO2": 60.0,
+                        "MgO": 0.0,
+                        "FeO": -1.0,
+                        "CaO": float("inf"),
+                        "MnO": float("nan"),
+                    },
+                },
+                "olivine": {"mass_kg": 1.0, "composition": {"MgO": 50.0}},
+            },
+        },
+        repair_notices=notices,
+    )
+
+    assert payload[2] == {
+        "liq": {"SiO2": 60.0, "CaO": float("inf")},
+        "olivine": {"MgO": 50.0},
+    }
+    assert payload[3] == 0.5
+    assert len(notices) == 3
+    assert all(notice.startswith("SR16:") and "phase='liq'" in notice for notice in notices)
+
+
+def test_sr15_composition_mapping_drops_invalid_values_with_notice() -> None:
+    backend = AlphaMELTSBackend()
+    notices: list[str] = []
+    diagnostics = backend._out_of_domain_diagnostics(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        composition_wt_pct={
+            "SiO2": 50.0,
+            "MgO": 0.0,
+            "CaO": float("inf"),
+        },
+        repair_notices=notices,
+    )
+
+    assert diagnostics["out_of_domain_crash_point"]["composition_wt_pct"] == {
+        "SiO2": 50.0,
+    }
+    assert len(notices) == 2
+    assert any(
+        "field=composition_wt_pct" in notice
+        and "species='MgO'" in notice
+        and "reason=nonpositive" in notice
+        for notice in notices
+    )
+    assert any(
+        "field=composition_wt_pct" in notice
+        and "species='CaO'" in notice
+        and "reason=nonfinite" in notice
+        for notice in notices
+    )
+
+
+def test_sr15_runtime_refusal_surfaces_nested_composition_repair_notice() -> None:
+    backend = AlphaMELTSBackend()
+    result = backend.equilibrate(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        composition_mol_by_account={
+            'process.cleaned_melt': {'CaO': 0.0},
+            'unsupported.account': {'MgO': 1.0},
+        },
+    )
+
+    assert result.status == 'out_of_domain'
+    assert any(
+        'SR15:' in notice
+        and 'field=composition_mol_by_account[process.cleaned_melt]' in notice
+        and "species='CaO'" in notice
+        and 'reason=nonpositive' in notice
+        for notice in result.warnings
+    )
