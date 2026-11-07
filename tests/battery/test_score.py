@@ -17305,7 +17305,10 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
         for notice in residual.notices
     )
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in residual.notices
     )
 

@@ -624,7 +624,10 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         ) == ("identity_incomplete", "missing_fO2", None)
         assert general_outcome[2] == "oxygen_balance_effusion"
         assert any(
-            notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+            notice.reason == (
+                "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+                "route=effusion_oxygen_balance"
+            )
             for notice in general.notices
         )
         return

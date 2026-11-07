@@ -96,7 +96,10 @@ def test_costa_and_stolyarova_effusion_numbers_match_shared_closure(
         assert prediction.value == value
         assert _solved_effusion_po2_bar(prediction) == bar
         assert any(
-            notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+            notice.reason == (
+                "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+                "route=effusion_oxygen_balance"
+            )
             for notice in prediction.notices
         )
 

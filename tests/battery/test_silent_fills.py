@@ -408,7 +408,10 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     assert seen["po2_bar"] is None
     assert seen["cell_material"] is None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
 
@@ -593,7 +596,10 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
     assert seen["po2_bar"] is None
     assert seen["cell_material"] == cell_material
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
 
@@ -738,7 +744,10 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
 
@@ -919,7 +928,10 @@ def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
 
     assert prediction.value is not None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
     solved_notice = next(

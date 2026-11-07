@@ -965,7 +965,8 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
             if "effusion closure borrowed from internal-analytical" in notice.reason
         )
         assert borrowed_notice.reason.startswith(
-            "fo2_tier=3; route=effusion_oxygen_balance;"
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance;"
         )
         assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         assert borrowed_notice.authority is Authority.BRIDGE
