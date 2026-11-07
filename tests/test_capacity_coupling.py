@@ -765,6 +765,13 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         "K": 0.469,
         "Al": 1.4e-8,
     }
+    flux_seam_probe_pa = {
+        **verifier_probe_pa,
+        # The pre-RG flux source still uses the unconverted liquid activity.
+        # Studio-2 reports 0.09397692153837496 Pa here; the catalog's
+        # crystalline-standard conversion is pinned separately above.
+        "Mg": 0.09397692153837496,
+    }
     pure_component_probe_pa = {
         "Ca": 8.35e5,
         "Mg": 6.87e5,
@@ -806,7 +813,9 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         baseline_catalog_pa[species_id] = catalog_pa
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
-        assert within_probe_band(species_id, float(seam_pa), probe_pa)
+        assert within_probe_band(
+            species_id, float(seam_pa), flux_seam_probe_pa[species_id]
+        )
         if species_id == "K":
             # K fit domain ends at 1600 K; this probe is at 1873.15 K → OOR.
             # t-538: OOR value is the physical 1/T-tangent continuation of the
@@ -830,7 +839,10 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
-            assert within_probe_band(species_id, catalog_pa, float(seam_pa))
+            if species_id != "Mg":
+                assert within_probe_band(
+                    species_id, catalog_pa, float(seam_pa)
+                )
         activity = answer.source_reaction_activity
         assert activity is not None
         assert activity.provider == "BuiltinVaporPressureProvider"

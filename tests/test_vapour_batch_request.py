@@ -1749,19 +1749,30 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
     elif failure == "missing_temperature":
         state = replace(state, temperature_K=None)
 
-    # Activity-contract failures matter when the channel is claimed. Missing
-    # process state is checked before closure, including with no claims.
-    activation_context = (
-        _pre_rg_activation_context()
-        if failure in {"missing_pO2", "missing_temperature"}
-        else _pre_rg_activation_context("K")
-    )
-    with pytest.raises(VapourRequestConstructionError):
-        catalog.resolve_batch(
+    # Temperature is run-wide input. Intrinsic melt fO2 is only required by
+    # the channels whose evaluator consumes it, so its absence stays local.
+    if failure == "missing_pO2":
+        batch = catalog.resolve_batch(
             ledger,
             state,
-            flux_activation_context=activation_context,
+            flux_activation_context=_pre_rg_activation_context("K"),
         )
+        answer = batch.channel("K")
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
+    else:
+        activation_context = (
+            _pre_rg_activation_context()
+            if failure == "missing_temperature"
+            else _pre_rg_activation_context("K")
+        )
+        with pytest.raises(VapourRequestConstructionError):
+            catalog.resolve_batch(
+                ledger,
+                state,
+                flux_activation_context=activation_context,
+            )
 
 
 @pytest.mark.parametrize("missing_field", ("temperature_K", "intrinsic_pO2"))
@@ -1778,11 +1789,7 @@ def test_pre_rg_run_state_is_validated_before_channel_answers(
         state = replace(state, temperature_K=None)
     else:
         state = replace(state, source_reaction_fO2_bar=None)
-    ledger = (
-        {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
-        if channel_refuses
-        else {}
-    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
 
     def refuse_activity(declaration, **kwargs):
         return SourceReactionActivity(
@@ -1801,16 +1808,28 @@ def test_pre_rg_run_state_is_validated_before_channel_answers(
             detail="activity evidence row is absent for this species",
         )
 
-    expected_input = (
-        "temperature_K"
-        if missing_field == "temperature_K"
-        else "intrinsic_melt oxygen fugacity"
-    )
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match=expected_input,
-    ):
-        catalog.resolve_batch(
+    activation_context = _pre_rg_activation_context("K")
+    if missing_field == "temperature_K":
+        with pytest.raises(
+            VapourRequestConstructionError,
+            match="temperature_K",
+        ):
+            catalog.resolve_batch(
+                ledger if channel_refuses else {},
+                state,
+                activity_provider=(
+                    SimpleNamespace(resolve_source_reaction_activity=refuse_activity)
+                    if channel_refuses
+                    else None
+                ),
+                flux_activation_context=(
+                    activation_context
+                    if channel_refuses
+                    else _pre_rg_activation_context()
+                ),
+            )
+    else:
+        batch = catalog.resolve_batch(
             ledger,
             state,
             activity_provider=(
@@ -1818,12 +1837,18 @@ def test_pre_rg_run_state_is_validated_before_channel_answers(
                 if channel_refuses
                 else None
             ),
-            flux_activation_context=(
-                _pre_rg_activation_context("K")
-                if channel_refuses
-                else _pre_rg_activation_context()
-            ),
+            flux_activation_context=activation_context,
         )
+        answer = batch.channel("K")
+        assert isinstance(answer.pressure, PressureRefusal)
+        if channel_refuses:
+            assert answer.source_reaction_activity is not None
+            assert answer.source_reaction_activity.refusal_code is (
+                ActivityRefusalCode.MISSING_EVIDENCE
+            )
+        else:
+            assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+            assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
 
 
 @pytest.mark.parametrize("total_pressure_Pa", (0.0, -1.0, math.nan))
