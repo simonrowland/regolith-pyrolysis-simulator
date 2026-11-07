@@ -13,6 +13,17 @@ from tools import validate_literature_extracts as vle
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
+TABLE_2A_FO2_BY_RUN = {
+    "43": "-8.50",
+    "38": "-8.50",
+    "41": "-9.50",
+    "35": "-9.50",
+    "36": "-9.50",
+    "37": "-9.50",
+    "49": "-10.00",
+    "47": "-10.00",
+    "48": "-10.00",
+}
 
 
 def _document() -> dict:
@@ -34,6 +45,18 @@ def test_full_table_render_pins_and_run_reconciliation() -> None:
         for table in ("2a", "2b", "2c")
     }
     assert [len(by_table[table]) for table in ("2a", "2b", "2c")] == [9, 9, 9]
+    # Page 7, Table 2a's printed vertical rules delimit these three fO2 groups.
+    table_2a_fO2 = {
+        row["values"]["tabulated_values_as_published"]["run_id"]:
+        row["point_conditions"]["fO2_log"]["state"]["value"]
+        for row in by_table["2a"]
+    }
+    assert table_2a_fO2 == TABLE_2A_FO2_BY_RUN
+    assert all(
+        row["point_conditions"]["fO2_log"]["locator"]["page"] == 7
+        and row["point_conditions"]["fO2_log"]["locator"]["table"] == "2a"
+        for row in by_table["2a"]
+    )
     assert len(
         {
             row["values"]["tabulated_values_as_published"]["run_id"]
@@ -124,6 +147,12 @@ def test_isolated_migration_maps_each_printed_condition() -> None:
         assert row.point_conditions["total_pressure_Pa"].locator.page == 1
         assert row.point_conditions["quench_state"].state.value == "not_stated"
         assert row.point_conditions["quench_state"].locator.page == 4
+
+    run41 = result.observations[f"{SOURCE_ID}::bn79_t2a_run41_db3_glass_s"]
+    assert run41.point_conditions["fO2_log"].state.value == Decimal("-9.50")
+    assert run41.point_conditions["fO2_log"].locator.page == 7
+    assert run41.point_conditions["fO2_log"].locator.table == "2a"
+    assert run41.identity.fO2_Pa.value == Decimal("0.00003204177839165610358147878883")
 
     sulfur = result.observations[f"{SOURCE_ID}::bn79_t2a_run43_db3_glass_s"]
     assert sulfur.value.point == Decimal("0.027")

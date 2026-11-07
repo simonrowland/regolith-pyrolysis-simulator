@@ -5,10 +5,11 @@ audit_method: MinerU is machine read 1; pdftotext-layout is machine read 2; ever
 mineru_qa_prescreen: The QA pre-screen flagged all four tables for low digit agreement (pages 2, 7, 8,
   9; numeric agreements 0.667, 0.741, 0.653, 0.653). Each table was fully checked from its page render;
   cell-level OCR disagreements are noted in the audit CSV.
-render_layout_check: Rendered table layout was checked once per table. Table 2a run columns map to fO2
-  isobars -8.50 (43, 38, 41), -9.50 (35, 36, 37), and -10.00 (49, 47, 48); the MinerU merged-header candidate
-  shifts run 41 to -9.50, corrected from the render. Tables 2b and 2c carry -10.50 and -11.50 respectively.
-  Table 2b has 7 DB/3 and 2 PAL-685 glass analyses; Table 2c has 5 DB/3 and 4 secondary glass analyses.
+render_layout_check: 'Rendered table layout was checked once per table. Table 2a''s printed vertical rules
+  group runs 43, 38 at log fO2 -8.50; runs 41, 35, 36, 37 at -9.50; and runs 49, 47, 48 at -10.00. Tables
+  2b and 2c each have one log fO2 header spanning the full run grid: -10.50 across runs 81, 69, 31, 42,
+  33, 71, 34 in Table 2b, and -11.50 across runs 44, 40, 45, 70, 46 in Table 2c. Table 2b has 7 DB/3 and
+  2 PAL-685 glass analyses; Table 2c has 5 DB/3 and 4 secondary glass analyses.'
 reconciled_counts:
   unique_runs: 21
   glass_analyses: 27
@@ -106,5 +107,5 @@ cell_mappings:
 audit_file: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.audit.csv
 compare_file: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.compare.csv
 draft_compare_result: 27 sulfur averages matched their table, page, row, and column in the MinerU draft;
-  no numeric mismatch, no-match, or locator error. The grouped-header assignment for Table 2a run 41 was
-  corrected from the render and is noted in the full-cell audit.
+  no numeric mismatch, no-match, or locator error. Table 2a's fO2 groups were assigned from the rendered
+  vertical rules and are noted in the full-cell audit.
