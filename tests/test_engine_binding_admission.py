@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import gc
 import hashlib
 import json
 import os
+import weakref
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -764,6 +766,9 @@ def test_direct_live_constructor_does_not_admit_mismatched_backend(
     error = facade._binding_admission_errors[SYNTHETIC_IDENTITY.producer_transport]
     assert isinstance(error, EngineBindingAdmissionError)
     assert "live backend identity mismatch" in error.reason
+    assert error.__traceback__ is None
+    assert error.__cause__ is None
+    assert error.__context__ is None
 
 
 def _run_fake_alpha_python_api_probe(
@@ -995,6 +1000,47 @@ def test_direct_replay_only_constructor_uses_receipt_authorizer(
 
     assert calls == [(SYNTHETIC_IDENTITY, {"binding_provenance_verifiable": True})]
     assert SYNTHETIC_IDENTITY.producer_transport in facade._admitted_bindings
+
+
+def test_cached_replay_error_is_raised_from_a_fresh_copy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_cached_real",
+        lambda _config: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
+        "cached_real_provenance",
+        lambda _config, _backend: {"binding_provenance_verifiable": True},
+    )
+
+    def refuse(identity, _provenance):
+        raise EngineBindingAdmissionError(identity, "receipt missing")
+
+    monkeypatch.setattr(admission, "authorize_binding", refuse)
+    facade = CachedRealBackend(
+        config=SimpleNamespace(
+            miss_policy="fail-loud",
+            authorized_backend_family=SimpleNamespace(name="ALPHAMELTS"),
+        ),
+        live_backend=None,
+    )
+
+    with pytest.raises(
+        EngineBindingAdmissionError,
+        match="receipt missing",
+    ) as excinfo:
+        facade.initialize()
+
+    stored = facade._binding_admission_errors[
+        SYNTHETIC_IDENTITY.producer_transport
+    ]
+    assert stored is not excinfo.value
+    assert stored.__traceback__ is None
+    assert stored.__cause__ is None
+    assert stored.__context__ is None
 
 
 def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
@@ -1664,3 +1710,43 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
             sim,
             artifact="equilibrium_post_record",
         )
+
+
+def test_live_admission_error_does_not_keep_provider_finalizer_alive(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    closed: list[bool] = []
+
+    class FakeMAGEMinBackend:
+        name = "magemin"
+
+        def get_engine_version(self) -> str:
+            return "fixture"
+
+        def close(self) -> None:
+            closed.append(True)
+
+    class FakeProvider:
+        def __init__(self) -> None:
+            self.backend = FakeMAGEMinBackend()
+            weakref.finalize(self, self.backend.close)
+
+    def publish_unadmitted_backend() -> weakref.ReferenceType[FakeProvider]:
+        provider = FakeProvider()
+
+        def reject(identity, _provenance):
+            provider_from_frame = provider
+            assert provider_from_frame is provider
+            raise EngineBindingAdmissionError(identity, "receipt missing")
+
+        provider_ref = weakref.ref(provider)
+        with monkeypatch.context() as patch:
+            patch.setattr(admission, "authorize_binding", reject)
+            admission.publish_live_backend_admission(provider.backend)
+        return provider_ref
+
+    provider_ref = publish_unadmitted_backend()
+    gc.collect()
+
+    assert provider_ref() is None
+    assert closed == [True]

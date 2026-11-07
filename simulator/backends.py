@@ -325,7 +325,12 @@ class CachedRealBackend(RealBackendAuthority):
             self._validate_replay_admission()
             error = next(iter(self._binding_admission_errors.values()), None)
             if error is not None:
-                raise error
+                from simulator.engine_binding_admission import (
+                    _detached_exception_copy,
+                )
+
+                # Raising the cached instance would attach a traceback to it.
+                raise _detached_exception_copy(error)
             return True
         initializer = getattr(self._live_backend, "initialize", None)
         if not callable(initializer):
@@ -345,6 +350,7 @@ class CachedRealBackend(RealBackendAuthority):
             binding_identity_for_backend,
             binding_identity_for_cached_real,
             cached_real_provenance,
+            _detached_exception_copy,
         )
 
         identity = binding_identity_for_cached_real(self.config)
@@ -364,7 +370,7 @@ class CachedRealBackend(RealBackendAuthority):
             )
             authorize_binding(identity, provenance)
         except Exception as exc:  # noqa: BLE001 - cache eligibility fails closed
-            self._binding_admission_errors[key] = exc
+            self._binding_admission_errors[key] = _detached_exception_copy(exc)
             return
         self._binding_admission_errors.pop(key, None)
         if publish:
