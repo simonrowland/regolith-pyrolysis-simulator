@@ -7930,9 +7930,22 @@ species:
       derived_from:
       - bennington_1982_table2_reaction_1_mean
       derivation:
-        relation: The Table 1 reaction heat is the reported mean from Table 2.
+        relation: Table 1 reaction (1) heat equals 2 × the Table 2 per-mole mean,
+          using the 2 SiO2 stoichiometric coefficient in the located Table 1 equation.
         inputs:
         - bennington_1982_table2_reaction_1_mean
+        method:
+          state:
+            tag: value
+            value: '2SiO2(c) + 12HF(sol) = 2H2SiF6(sol) + 4H2O(sol)'
+          locator:
+            page: 10
+            published_page: 4
+            pdf_page_index: 9
+            table: '1'
+            table_row_number: 2
+            note: Table 1 reaction (1) equation; coefficient 2 SiO2 gives the
+              Table 2 per-mole scaling.
     - observation_id: bennington_1982_table2_reaction_1_previous_values
       type: gibbs_table
       locator:
@@ -8631,9 +8644,22 @@ species:
       derived_from:
       - bennington_1982_table2_reaction_2_mean
       derivation:
-        relation: The Table 1 reaction heat is the reported mean from Table 2.
+        relation: Table 1 reaction (2) heat equals 1/2 × the Table 2 per-mole mean,
+          using the 1/2 Fe2O3 stoichiometric coefficient in the located Table 1 equation.
         inputs:
         - bennington_1982_table2_reaction_2_mean
+        method:
+          state:
+            tag: value
+            value: '1/2Fe2O3(c) + 3H+(sol) = Fe3+(sol) + 3/2H2O(sol)'
+          locator:
+            page: 10
+            published_page: 4
+            pdf_page_index: 9
+            table: '1'
+            table_row_number: 3
+            note: Table 1 reaction (2) equation; coefficient 1/2 Fe2O3 gives the
+              Table 2 per-mole scaling.
     - observation_id: bennington_1982_table2_reaction_2_individual_values
       type: gibbs_table
       locator:
@@ -9229,9 +9255,22 @@ species:
       derived_from:
       - bennington_1982_table2_reaction_3_mean
       derivation:
-        relation: The Table 1 reaction heat is the reported mean from Table 2.
+        relation: Table 1 reaction (3) heat equals 1/2 × the Table 2 per-mole mean,
+          using the 1/2 Na2SO4 stoichiometric coefficient in the located Table 1 equation.
         inputs:
         - bennington_1982_table2_reaction_3_mean
+        method:
+          state:
+            tag: value
+            value: '1/2Na2SO4 III(c) = Na+(sol) + 1/2SO4^2−(sol)'
+          locator:
+            page: 10
+            published_page: 4
+            pdf_page_index: 9
+            table: '1'
+            table_row_number: 4
+            note: Table 1 reaction (3) equation; coefficient 1/2 Na2SO4 gives the
+              Table 2 per-mole scaling.
     - observation_id: bennington_1982_table2_reaction_3_individual_values
       type: gibbs_table
       locator:
@@ -9737,9 +9776,22 @@ species:
       derived_from:
       - bennington_1982_table2_reaction_4_mean
       derivation:
-        relation: The Table 1 reaction heat is the reported mean from Table 2.
+        relation: Table 1 reaction (4) heat equals 4 × the Table 2 per-mole mean,
+          using the 4 H2O stoichiometric coefficient in the located Table 1 equation.
         inputs:
         - bennington_1982_table2_reaction_4_mean
+        method:
+          state:
+            tag: value
+            value: '4H2O(l) = 4H2O(sol)'
+          locator:
+            page: 10
+            published_page: 4
+            pdf_page_index: 9
+            table: '1'
+            table_row_number: 5
+            note: Table 1 reaction (4) equation; coefficient 4 H2O gives the
+              Table 2 per-mole scaling.
     - observation_id: bennington_1982_table2_reaction_4_individual_values
       type: gibbs_table
       locator:

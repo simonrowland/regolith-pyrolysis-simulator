@@ -6,6 +6,7 @@ from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from tests.battery.test_migrate import _migrate_real_extract
@@ -58,6 +59,48 @@ TABLE6_LOG_KF_RENDER = (
     "23.773", "23.630", "17.774", "14.242", "11.868", "10.156", "8.856", "8.343",
     "8.342", "7.819", "7.292", "7.292", "6.973", "6.276", "5.693", "5.371",
 )
+TABLE1_REACTION_HEAT_SCALING = (
+    (
+        "bennington_1982_table1_reaction_1_heat_of_solution",
+        "bennington_1982_table2_reaction_1_mean",
+        "2",
+        "2 SiO2",
+        "-32.904",
+        "-65.808",
+        "2SiO2(c) + 12HF(sol) = 2H2SiF6(sol) + 4H2O(sol)",
+        2,
+    ),
+    (
+        "bennington_1982_table1_reaction_2_heat_of_solution",
+        "bennington_1982_table2_reaction_2_mean",
+        "1/2",
+        "1/2 Fe2O3",
+        "-42.026",
+        "-21.013",
+        "1/2Fe2O3(c) + 3H+(sol) = Fe3+(sol) + 3/2H2O(sol)",
+        3,
+    ),
+    (
+        "bennington_1982_table1_reaction_3_heat_of_solution",
+        "bennington_1982_table2_reaction_3_mean",
+        "1/2",
+        "1/2 Na2SO4",
+        "+1.056",
+        "+0.528",
+        "1/2Na2SO4 III(c) = Na+(sol) + 1/2SO4^2−(sol)",
+        4,
+    ),
+    (
+        "bennington_1982_table1_reaction_4_heat_of_solution",
+        "bennington_1982_table2_reaction_4_mean",
+        "4",
+        "4 H2O",
+        "+0.820",
+        "+3.280",
+        "4H2O(l) = 4H2O(sol)",
+        5,
+    ),
+)
 
 
 def _document() -> dict:
@@ -79,6 +122,28 @@ def _context(document: dict, observation_id: str) -> dict:
         for row in block.get("context", [])
         if row["observation_id"] == observation_id
     )
+
+
+def _assert_table1_reaction_heat_scaling(document: dict) -> None:
+    observations = _observations(document)
+    for observation_id, parent_id, factor, coefficient, mean, output, equation, row_number in (
+        TABLE1_REACTION_HEAT_SCALING
+    ):
+        observation = observations[observation_id][1]
+        derivation = observation["derivation"]
+        assert observation["values"]["value"] == output
+        assert observations[parent_id][1]["values"]["value"] == mean
+        assert derivation["inputs"] == [parent_id]
+        assert derivation["relation"] == (
+            f"Table 1 reaction ({row_number - 1}) heat equals {factor} × the Table 2 "
+            f"per-mole mean, using the {coefficient} stoichiometric coefficient in "
+            "the located Table 1 equation."
+        )
+        assert derivation["method"]["state"]["value"] == equation
+        locator = derivation["method"]["locator"]
+        assert locator["page"] == 10
+        assert locator["table"] == "1"
+        assert locator["table_row_number"] == row_number
 
 
 def _assert_render_pins(document: dict) -> None:
@@ -222,6 +287,21 @@ def test_table6_log_kf_is_preserved_as_an_oxide_frame_schema_gap() -> None:
     assert all("value" not in point for point in points)
     assert all(point["locator"]["page"] == 15 for point in points)
     assert all(point["locator"]["table"] == "6" for point in points)
+
+
+def test_table1_reaction_heats_apply_the_printed_stoichiometric_factors() -> None:
+    document = _document()
+    _assert_table1_reaction_heat_scaling(document)
+
+    mutated = deepcopy(document)
+    first_reaction = _observations(mutated)[
+        "bennington_1982_table1_reaction_1_heat_of_solution"
+    ][1]
+    first_reaction["derivation"]["relation"] = (
+        "The Table 1 reaction heat is the unscaled Table 2 per-mole mean."
+    )
+    with pytest.raises(AssertionError):
+        _assert_table1_reaction_heat_scaling(mutated)
 
 
 def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditions(
