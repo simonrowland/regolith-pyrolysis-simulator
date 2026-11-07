@@ -127,6 +127,24 @@ def _assert_render_pins(document: dict) -> None:
     assert oxide["locator"]["row"] == 3
     assert oxide["locator"]["column"] == 6
 
+    table9_log_k = observations["aegirine_table9_log10_Kf"]
+    assert table9_log_k["values"]["quantity"] == "log10_K_from_oxides"
+    assert table9_log_k["values"]["quantity_as_printed"] == "log Kf"
+    assert table9_log_k["values"]["reference_state_as_printed"] == "formation from oxides"
+    assert table9_log_k["values"]["schema_gap"]
+    assert table9_log_k["values"]["points"][0]["value"] == "26.818"
+    assert table9_log_k["values"]["points"][0]["locator"] == {
+        "page": 18,
+        "published_page": 13,
+        "row": 3,
+        "table": "9",
+        "column": 8,
+    }
+    assert table9_log_k["values"]["reaction_as_printed"] == (
+        "1.9738SiO2(c) + 0.0705Al2O3(c) + 0.3681Fe2O3(c) + 0.16FeO(c) + "
+        "0.03MnO(c) + 0.1121CaO(c) + 0.4345Na2O(c) -> adjusted aegirine(c)"
+    )
+
     for observation_id, parent in (
         ("aegirine_table8_delta_fH", "aegirine_table4_reaction_24_formation_from_elements"),
         ("aegirine_table9_delta_fH_from_oxides", "aegirine_table4_reaction_25_formation_from_oxides"),
@@ -447,8 +465,9 @@ def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() ->
     migrated = list(result.observations.values())
     assert result.validation.hard_issues == ()
     assert len(migrated) == 616
-    assert sum(row.value.kind.value == "unavailable" for row in migrated) == 259
-    assert sum(not row.identity.quantity.is_value for row in migrated) == 259
+    assert sum(row.value.kind.value == "point" for row in migrated) == 342
+    assert sum(row.value.kind.value == "unavailable" for row in migrated) == 274
+    assert sum(not row.identity.quantity.is_value for row in migrated) == 274
     assert sum(not row.identity.species.phase.is_value for row in migrated) == 0
 
     unknown_quantities = Counter(
@@ -465,6 +484,7 @@ def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() ->
             "aegirine_table9_negative_gibbs_function_over_T_from_H298": 15,
             "aegirine_table9_delta_fH_from_oxides": 15,
             "aegirine_table9_delta_fG_from_oxides": 15,
+            "aegirine_table9_log10_Kf": 15,
             "aegirine_solution_measurements": 6,
             "aegirine_solution_correction_terms": 5,
             "aegirine_table4_reaction_25_formation_from_oxides": 1,

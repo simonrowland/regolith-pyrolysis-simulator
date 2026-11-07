@@ -85,9 +85,12 @@ scope_assessment:
     reactions 24–25; Tables 8–9 calculations; pure NaFeSi2O6 discussion value.
   quoted_attributed_observations: Table 3 reactions 1–9 and Table 4 reactions 12–23.
   schema_gap_observations: Table 3 reaction enthalpies; Table 6 S(T)-S(0), −[G(T)−H(0)]/T, H(T)-H(0); Table 8 −[G(T)−H(298.15)]/T;
-    Table 9 thermal Gibbs function and oxide-frame ΔHf/ΔGf; solution calorimetry and its correction terms.
+    Table 9 thermal Gibbs function, oxide-frame ΔHf/ΔGf, and oxide-reaction log Kf; solution calorimetry and its correction terms.
   note: No glass or fusion quantity is reported. Liquid states occur in Table 3 solution reactions, Table 4 reactions
     20 and 23, the Table 8 element reference states, and the Table 9 caption’s Al2O3(α,l).
+schema_gaps:
+- observation_id: aegirine_table9_log10_Kf
+  reason: No exact quantity token represents log Kf for the printed oxide-formation reaction; simulator/battery/enums.py::Quantity.LOG10_KF is the elements-frame formation constant, and simulator/battery/enums.py::Quantity.LOG10_K_REACTION does not preserve this formation frame.
 species:
   Aegirine natural sample:
     observations:
@@ -26780,7 +26783,10 @@ species:
         frame.
       standard_state: Formation oxides frame as stated in the table caption; source does not state a numerical pressure.
       values:
-        quantity: log10_Kf
+        quantity: log10_K_from_oxides
+        quantity_as_printed: log Kf
+        reference_state_as_printed: formation from oxides
+        schema_gap: No exact quantity token represents log Kf for the printed oxide-formation reaction; simulator/battery/enums.py::Quantity.LOG10_KF is the elements-frame formation constant, and simulator/battery/enums.py::Quantity.LOG10_K_REACTION does not preserve this formation frame.
         method_class: measured_reduced
         points:
         - T_K: '298.15'
