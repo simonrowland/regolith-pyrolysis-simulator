@@ -17275,12 +17275,8 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     ident = replace(
-        F.activity_identity(
-            formula="K",
-            composition=composition,
-            component_basis="K2O",
-        ),
-        quantity=Quantity.P_PARTIAL,
+        _partial_identity(),
+        composition=State.of(composition),
         species=Species("K", Phase.G),
         fO2_Pa=State.unknown("no fO2 printed"),
     )

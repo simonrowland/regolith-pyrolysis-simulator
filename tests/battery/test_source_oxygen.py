@@ -11,23 +11,27 @@ from simulator.battery.enums import (
     CellMaterial,
     Engine,
     EvidenceClass,
+    FO2Channel,
     NoticeKind,
     Phase,
     Quantity,
 )
 from simulator.battery.records import (
-    Bench, BenchIdentity, Located, Reaction, ReactionTerm, Species, State,
+    Bench, BenchIdentity, Derivation, FO2Control, Located, Reaction,
+    ReactionTerm, Species, State, Value,
 )
 from simulator.battery.score import (
     ScoreContext,
     _bench_for_score,
     compile_residual,
     load_score_context,
+    predict_with_engine,
 )
 from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
     SourceOxygenFallback,
     SourceOxygenFallbackReason as FallbackReason,
+    linked_source_pressure,
     resolve_source_oxygen,
 )
 from simulator.diagnostic_helpers import binary_pot_battery as battery
@@ -92,7 +96,7 @@ def _fallback_notice(context, monkeypatch, row, rows):
     assert requests[0].mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
     return next(
         notice for notice in residual.notices
-        if notice.reason.startswith("model assumption: vapour-only zero-storage closure;")
+        if notice.reason.startswith("predict-and-flag substitution: congruent vapour-only zero-storage closure;")
     )
 
 
@@ -123,13 +127,102 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
         notice for notice in residual.notices
         if notice.kind is NoticeKind.INPUT_OMITTED
         and notice.origin == "source oxygen selection"
-        and notice.reason.startswith("model substitution: source-linked oxygen condition;")
+        and notice.reason.startswith("measured condition: same-cell source-linked oxygen;")
     )
     assert condition["observation_id"] in substitution.reason
     assert "target row has no printed fO2" in substitution.reason
+    assert "rung=2:measured_same_cell_oxygen" in substitution.reason
     assert "basis=source_oxygen_condition;" in substitution.reason
     assert "inputs=" in substitution.reason
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
+
+
+@pytest.mark.parametrize("printed_control", ("fO2", "IW_buffer"))
+def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
+    source_context, monkeypatch, printed_control
+):
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    original = _row(source_context, "shornikov-1994-mullite-kems")
+    temperature = Decimal("1200")
+    identity = replace(
+        original.identity,
+        temperature_K=State.of(temperature),
+        fO2_Pa=(
+            State.of(Decimal("1e-8"))
+            if printed_control == "fO2"
+            else State.unknown("no target fO2 printed")
+        ),
+    )
+    linked = Located(
+        State.of(Value.point_of("1e-5")),
+        locator=original.locator,
+        inference=Derivation(
+            "source_oxygen_condition; same-cell measured O/O2",
+            inputs=("same-cell-O2-observation",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    row = replace(
+        original,
+        identity=identity,
+        point_conditions={**(original.point_conditions or {}), "fO2_Pa": linked},
+        provenance={"source_oxygen_condition": {"observation_id": "same-cell-O2-observation"}},
+    )
+    experiment = source_context.experiments[row.experiment_id]
+    experiment = replace(
+        experiment,
+        conditions={
+            **experiment.conditions,
+            "temperature_K": Located(State.of(temperature), locator=row.locator),
+        },
+    )
+    if printed_control == "IW_buffer":
+        experiment = replace(
+            experiment,
+            fO2_control=FO2Control(
+                channel=State.of(FO2Channel.BUFFER),
+                buffer=Located(State.of("IW"), locator=row.locator),
+            ),
+        )
+    bench = _bench_for_score(experiment, source_context.benches)
+    assert bench is not None
+    linked_pa = linked_source_pressure(row)
+    assert linked_pa is not None
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        row,
+        composition=row.identity.composition.value,
+        temperature_K=float(temperature),
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=float(linked_pa) / 1.0e5,
+    )
+    assert resolved is not None and not resolved.closure
+
+    requests, handles = _capture_engine(monkeypatch, row)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        row,
+        handles=handles,
+        isolated=False,
+        experiment=experiment,
+        bench=bench,
+    )
+    expected_bar = resolved.po2_bar or 10.0 ** resolved.log10_fO2_bar
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(expected_bar)
+    assert any(
+        notice.reason == f"fo2_tier={resolved.tier}; route={resolved.route}"
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.origin == "source oxygen selection"
+        and notice.reason.startswith("measured condition: same-cell source-linked oxygen;")
+        for notice in prediction.notices
+    )
 
 
 def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_context):
