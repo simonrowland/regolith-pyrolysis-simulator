@@ -704,7 +704,7 @@ def test_g2_plante_pressure_rows_lift_page_271_calibration(tmp_path):
     )
 
 
-def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
+def test_g1_jacobson_keeps_category_and_scored_quantity(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-139-jacobson-2024.yaml")
     result = migrate(root, write=False)
@@ -714,30 +714,25 @@ def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
         if oid.startswith(parent_id + "::")
     ]
     assert len(points) == 21
-    printed_species = [
-        "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
-        "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
-    ]
-    assert [obs.identity.species.formula for obs in points] == printed_species
-    assert all(
-        obs.identity.quantity.is_unknown
-        and "predicted_partial_pressure" in obs.identity.quantity.reason
-        and obs.value.kind is ValueKind.UNAVAILABLE
-        and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        and obs.derivation is not None
-        and obs.derivation.references == ("Bale et al. [115]", "Snyder et al. [117]")
-        and (obs.point_conditions or {}).get("temperature_K") is not None
-        and obs.point_conditions["temperature_K"].state.value == Decimal("2500.0")
-        and obs.point_conditions["temperature_K"].locator is not None
-        and obs.point_conditions["temperature_K"].locator.table == "1"
-        and rail_for_quantity(
+    for obs in points:
+        assert quantity_token(obs.identity) is Quantity.P_PARTIAL
+        assert obs.value.kind is ValueKind.POINT
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert obs.derivation is not None
+        assert obs.derivation.references == ("Bale et al. [115]", "Snyder et al. [117]")
+        assert obs.derivation.method is not None
+        assert obs.derivation.method.locator is not None
+        assert obs.derivation.method.locator.page == 19
+        assert (obs.point_conditions or {}).get("temperature_K") is not None
+        assert obs.point_conditions["temperature_K"].state.value == Decimal("2500.0")
+        assert obs.point_conditions["temperature_K"].locator is not None
+        assert obs.point_conditions["temperature_K"].locator.table == "1"
+        assert rail_for_quantity(
             quantity_token(obs.identity),
             species_formula=obs.identity.species.formula,
-        ) is None
-        for obs in points
-    )
-    assert any(
+        ) is not None
+    assert not any(
         entry.observation_id in {obs.observation_id for obs in points}
         and "unsupported quantity 'predicted_partial_pressure'" in entry.why
         for entry in result.queue
