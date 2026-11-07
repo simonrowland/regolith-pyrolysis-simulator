@@ -137,7 +137,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         ),
         (
             "shornikov_2008_fig1_d_marker_3",
-            "value",
+            "value_as_printed",
             "-27",
             52,
             0.002671,
@@ -164,7 +164,9 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         assert values[value_key] == value
         assert values["x_SiO2_mol_pct_as_read"] == x_siO2_mol_pct
         uncertainty_key = (
-            "read_uncertainty_kJ_mol" if value_key == "value" else "read_uncertainty_dex"
+            "read_uncertainty_kJ_mol"
+            if value_key in {"value", "value_as_printed"}
+            else "read_uncertainty_dex"
         )
         assert values[uncertainty_key] == uncertainty
         assert values[uncertainty_key] > 0
@@ -204,7 +206,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         row for _, row in observations
         if row["observation_id"] == "shornikov_2008_prose_cordierite_minimum_delta_fg"
     )
-    assert prose_row["values"]["value"] == "-26.9"
+    assert prose_row["values"]["value_as_printed"] == "-26.9"
     assert prose_row["locator"]["page"] == 1
     assert prose_row["locator"]["pdf_page_index"] == 0
     assert prose_row["locator"]["published_page"] == 147
@@ -222,10 +224,11 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == document["source_id"]]
     assert len(migrated) == 70
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 24
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 46
-    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 24
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 17
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 53
+    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 17
     assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 46
+    assert sum(row.admission.status is AdmissionStatus.PENDING for row in migrated) == 7
     assert not result.registry_issues
     assert result.validation is not None
     assert not result.validation.hard_issues
