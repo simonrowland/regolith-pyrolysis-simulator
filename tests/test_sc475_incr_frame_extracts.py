@@ -5,7 +5,11 @@ import yaml
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
-HIT_ROWS = {'beyer-1980-potassium-metasilicate-disilicate-ri8410': {'bey80_k2si2o5_reference_glass_S_table6': ('S',
+HIT_ROWS = {'bennington-brown-beyer-1984-aegirine-ri8912': {'aegirine_table9_log10_Kf': ('log10_Kf',
+                                                                                     'log Kf',
+                                                                                     'formation from oxides',
+                                                                                     None)},
+ 'beyer-1980-potassium-metasilicate-disilicate-ri8410': {'bey80_k2si2o5_reference_glass_S_table6': ('S',
                                                                                                     'S°(T)−S°(298.15 '
                                                                                                     'K)',
                                                                                                     'entropy '
