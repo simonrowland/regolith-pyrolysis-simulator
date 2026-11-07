@@ -25,6 +25,7 @@ One file per table in `tables/{El}-{NNN}.yaml`:
 
 - 8-column rows as published: T, Cp, S, −[G−H(Tr)]/T, H−H(Tr), ΔfH, ΔfG, log Kf.
 - Every number is stored as `as_published` plus a parsed `value`. `INFINITE` and blank cells are `value: null`, never guessed.
+- Optional table-level `delta_fH_298_uncertainty` stores a printed monograph header uncertainty for ΔfH°(298.15 K), with its unit and locator. Reference-state tables store exact zero with reason `reference state by definition`. An absent field means the header supplied no uncertainty; it is not zero.
 - Short rows (phase transitions, λ maxima, fugacity notes) stay under `parse_ambiguities` with the raw line.
 - No unit conversion, no smoothing, no merging of phases.
 
