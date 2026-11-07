@@ -4089,9 +4089,9 @@ species:
       type: quoted_attributed_context
       units: wt%
       locator:
-        page: 8
-        pdf_page_index: 7
-        published_page: 490
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
         section: Sulfur solubility as a function of fugacity and melt composition
         paragraph: Coexisting sulfide description
       values:
@@ -4101,12 +4101,32 @@ species:
         scope_note: Generic attributed statement in prose, not a run-specific sulfide analysis; Tables
           2a–2c provide no coexisting sulfide composition.
 refusals:
-- what: Figure-only numerical reads in Figures 1–4, including the Figure 4 FeO–sulfur trend/fit
-  why: No figure-only values or fit coefficients are extracted in this table wave. Figure 4 is described
-    qualitatively as a reasonable fit and contains external Haughton et al. data; no fitted numerical
-    equation is printed.
+- what: Figure 1 figure-only numerical readings
+  why: Figure-only readings are not extracted in this table wave.
   locator:
-    page: 7
-    pdf_page_index: 6
-    published_page: 489
+    page: 5
+    pdf_page_index: 4
+    published_page: 487
     figure: '1'
+- what: Figure 2 figure-only sulfur-profile readings
+  why: Figure-only readings are not extracted in this table wave.
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 488
+    figure: '2'
+- what: Figure 3 figure-only sulfur-solubility readings
+  why: Figure-only readings are not extracted in this table wave.
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 492
+    figure: '3'
+- what: Figure 4 figure-only FeO–sulfur trend and fit readings
+  why: Figure-only readings are not extracted; the paper describes a reasonable fit and includes Haughton
+    et al. data, but prints no fitted numerical equation.
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 493
+    figure: '4'

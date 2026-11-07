@@ -157,3 +157,40 @@ def test_isolated_migration_maps_each_printed_condition() -> None:
     sulfur = result.observations[f"{SOURCE_ID}::bn79_t2a_run43_db3_glass_s"]
     assert sulfur.value.point == Decimal("0.027")
     assert sulfur.identity.subtype.value == "wt_percent"
+
+
+def test_context_and_figure_refusal_locators() -> None:
+    document = _document()
+    # The quoted Naldrett statement is on printed p. 489; each figure has its
+    # own locator at its printed caption page.
+    context = document["species"]["S"]["context"]
+    naldrett = next(
+        row
+        for row in context
+        if row["observation_id"] == "bn79_naldrett_1969_sulfide_fe_context"
+    )
+    assert {
+        key: naldrett["locator"][key]
+        for key in ("page", "pdf_page_index", "published_page")
+    } == {"page": 7, "pdf_page_index": 6, "published_page": 489}
+
+    expected_pages = {
+        "1": (5, 4, 487),
+        "2": (6, 5, 488),
+        "3": (10, 9, 492),
+        "4": (11, 10, 493),
+    }
+    refusals = document["refusals"]
+    by_figure = {row["locator"]["figure"]: row for row in refusals}
+    assert set(by_figure) == set(expected_pages)
+    for figure, (page, page_index, published_page) in expected_pages.items():
+        row = by_figure[figure]
+        assert figure in row["what"]
+        assert {
+            key: row["locator"][key]
+            for key in ("page", "pdf_page_index", "published_page")
+        } == {
+            "page": page,
+            "pdf_page_index": page_index,
+            "published_page": published_page,
+        }
