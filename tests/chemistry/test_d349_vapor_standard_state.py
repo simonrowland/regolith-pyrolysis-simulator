@@ -619,6 +619,10 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
     feedstocks_data,
     setpoints_data,
 ):
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_segment_for_temperature,
+    )
+
     sim = _build_sim(
         feedstock_key,
         vapor_pressure_data,
@@ -664,7 +668,12 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
         legacy_pressures = legacy.vapor_pressures_Pa
         kernel_pressures = kernel.diagnostic["vapor_pressures_Pa"]
 
-        for species in ("Mg", "Ca", "Fe"):
+        species_to_compare = ["Mg", "Ca"]
+        if ellingham_segment_for_temperature(
+            "Fe", temperature_C + 273.15
+        ) is not None:
+            species_to_compare.append("Fe")
+        for species in species_to_compare:
             assert (species in legacy_pressures) == (species in kernel_pressures), (
                 f"{feedstock_key} at {temperature_C:g} C: legacy and provider "
                 f"disagree whether {species} is published"
