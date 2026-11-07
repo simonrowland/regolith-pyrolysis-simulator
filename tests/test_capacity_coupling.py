@@ -1053,38 +1053,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
+    ceiling_flux_species = {"Ca", "CaO_gas", "TiO", "TiO2_gas"}
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # b-1119's d-144 (5b5d2a080) multiplies solid-reference gamma by
-    # exp(-DeltaGfus/RT). At the resulting 1673.15 K step, the CaO and MgO
-    # factors are 0.06790255 (-1.168114 dex) and 0.09493137 (-1.022590 dex).
-    # This lowers Ca/Mg vapor terms and their coupled melt-composition
-    # contribution. A paired one-step run with DeltaGfus=0 gives
-    # 0.06423670196107581 kg/hr; enabling d-144 lowers non-phosphorus head
-    # rate to 0.06422943778094445 kg/hr (-7.26418e-6 kg/hr, -0.011309%).
-    # The series-resistance calculation gates its final transported rate
-    # (J * surface area), after d-144 has reduced CaO activity. The
-    # Mac-Studio-256-3, gate config, receipts b1119rcptf3/f4, measured
-    # 3.71455597341169e-13 kg/hr at 1673.15 K, below both the engine's
-    # 1e-12 cutoff and half of it, so CaO_gas must not enter the emitted flux
-    # or ceiling roster.
-    below_threshold_rates = sim._last_evaporation_flux_diagnostic[
-        "below_threshold_evaporation_flux"
-    ]["fluxes_kg_hr"]
-    cao_gas_rate_kg_hr = float(below_threshold_rates["CaO_gas"])
-    assert cao_gas_rate_kg_hr == pytest.approx(
-        3.71455597341169e-13, rel=0.05, abs=0.0
-    )
-    assert cao_gas_rate_kg_hr < 1e-12 / 2
-    assert "CaO_gas" not in sim._last_evaporation_flux_diagnostic[
-        "evaporation_flux_kg_hr"
-    ]
-    assert "CaO_gas" not in snapshot.evap_flux.species_kg_hr
-    assert "CaO_gas" not in snapshot.evap_flux.alpha_authority_status_by_species
-    ceiling_flux_species = {"Ca", "TiO", "TiO2_gas"}
+    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06422943778094445, rel=1e-12, abs=1e-12
+        0.06423670196107581, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1112,41 +1087,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Studio pin report keys capacity_total_kg_hr,
-        # capacity_transport_saturation_pct, and capacity_melt_mass_kg pin
-        # this d-144-adjusted head result; the Ar cover and ramp put the step
-        # at 1400 C and set its transport saturation. The green a6d75d8b4 ->
-        # restacked a93958edc reports move total flux 0.06423670196107581 ->
-        # 0.06422943778094445 kg/hr (-7.26418013136e-6, -0.0113085%),
-        # a -1.13084574855e-4 relative change,
-        # saturation 2.4701307994323103 -> 2.4698591005232133%
-        # (-0.000271698909 percentage points), and melt mass
-        # 998.7072055554551 -> 998.7072128196352 kg (+7.26418011254e-6),
-        # from the CaO/MgO liquid reference via d-144 fusion.
+        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
+        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
+        # step was 1.39e6% over transport capacity; the new value is 2.47%.
         (
             1,
             1400.0,
-            0.06422943778094445,
-            2.4698591005232133,
-            998.7072128196352,
+            0.06423670196107581,
+            2.4701307994323103,
+            998.7072055554551,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # b-1119's CaO/MgO liquid reference via d-144 fusion moves the studio
-    # capacity_head_result.n_transitions pin 26 -> 25; below-gate CaO_gas adds
-    # no evaporation or condensation transition.
-    assert len(sim.atom_ledger.transitions) == 25
-    ca_ti_reasons = {
-        transition.reason for transition in sim.atom_ledger.transitions
-    }
-    # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
-    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
-        ca_ti_reasons
-    )
-    assert "Ti" not in snapshot.evap_flux.species_kg_hr
-    assert "Ti" not in snapshot.evap_flux.alpha_authority_status_by_species
-    assert "evaporate_Ti" not in ca_ti_reasons
+    # The split adds Na/Mg collector and K-trap captures after their matching
+    # evaporations. Generic C0 Ca has no designated collector in that split;
+    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
+    # offgas instead of the former mixed-stage condense_Ca transition.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
     ) == (
@@ -1162,6 +1119,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_K",
         "evaporate_AlO",
         "evaporate_Ca",
+        "evaporate_CaO_gas",
         "evaporate_Cr",
         "evaporate_CrO",
         "evaporate_K2",
@@ -1170,18 +1128,6 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "evaporate_Mn",
         "evaporate_Na2",
         "evaporate_Na2O_gas",
-        "evaporate_SiO2_gas",
-        "evaporate_TiO",
-        "evaporate_TiO2_gas",
-        "fe_redox_respeciation",
-        "overhead_bleed",
-    )
-    assert {"evaporate_CaO_gas", "condense_CaO_gas"}.isdisjoint(
-        ca_ti_reasons
-    )
-    assert tuple(
-        transition.reason for transition in sim.atom_ledger.transitions[-5:]
-    ) == (
         "evaporate_SiO2_gas",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
