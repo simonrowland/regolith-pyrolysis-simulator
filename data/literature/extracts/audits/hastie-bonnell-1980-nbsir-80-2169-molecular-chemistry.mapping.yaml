@@ -191,5 +191,8 @@ figure_only_candidates:
   - Figure 6: HPO2/PO temperature curve is figure-only and was not digitized.
 comparison:
   file: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.compare.csv
-  result: Two locator errors; zero numeric mismatches and zero unverifiable rows were emitted by the comparer.
+  numeric_projection: 0
+  numeric_projection_reason: tools/mineru_table_draft.py::_numeric_points does not select this extract's p_atm, entropy, or delta_fH values.
+  result: Two locator diagnostics; the comparer supplied no numeric comparison, so its zero-mismatch and zero-unverifiable counts are vacuous.
   locator_notes: PDF pages 114 and 122 use report page numbers 1122 and 1130. Both page footers and table captions were checked on the render; the comparer applies the ordinary PDF-page offset and flags these appended Appendix B folios.
+  numeric_audit: The committed cells CSV provides the independent numeric comparison: for each extracted record, printed row, and column, compare cell_as_printed (machine-read cell) with rendered_cell (300 dpi page transcription). All 512 listed cell instances were checked this way; use table_mappings.extract_records and the CSV locator columns to project each cell to its extract record. The comparison artifact above is retained only for locator diagnostics.
