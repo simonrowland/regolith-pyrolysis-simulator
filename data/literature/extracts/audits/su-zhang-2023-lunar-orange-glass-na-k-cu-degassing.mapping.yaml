@@ -1,0 +1,57 @@
+source_file: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+supplementary_docx: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+method: Workbook cells are mapped by printed sheet, source row, column heading and exact cell reference. Numeric cells are
+  compared openpyxl-to-OOXML; no PDF OCR or figure digitization is used.
+tables:
+- table: S1
+  role: EMPA standards and analytical setup context
+  data_rows: 10
+  numeric_cells: 30
+- table: S2
+  role: EMPA oxide profiles
+  data_rows: 263
+  numeric_cells: 5676
+  fields:
+  - SiO2
+  - TiO2
+  - Al2O3
+  - Cr2O3
+  - FeO
+  - MnO
+  - MgO
+  - CaO
+  - Na2O
+  - K2O
+  - Total (typed refusal)
+- table: S3
+  role: SIMS Na2O profiles
+  data_rows: 61
+  numeric_cells: 187
+- table: S4
+  role: author-reduced LA-ICP-MS Na2O, K2O, Cu profiles
+  data_rows: 268
+  numeric_cells: 1884
+- table: S5
+  role: raw 2-D signal-map context; not recomputed
+  data_rows: 1396
+  numeric_cells: 63996
+  maps: 32
+  metadata_records: 32
+  per_cell_values: 0
+docx_methods:
+- locator: S1 P32
+  finding: Ambient fNa and fO2 depend on bead flight path and are not known a priori.
+- locator: S2 P38
+  finding: Melt droplets cooled to form glass beads; no claim that volatile concentrations are preserved on quench.
+- locator: S2 P51
+  finding: 1640 K is model initial T0, not measured profile temperature.
+- locator: S3 P69-P88
+  finding: Map2Profile conversion, standards/calibration, layer averaging, and uncertainties; no re-computation performed.
+- locator: S4 P92
+  finding: Tables S2-S5 hold analytical data and Table S1 EMPA conditions.
+audit_policy: All 71,773 numeric source cells across Tables S1-S5 were cross-read from openpyxl and direct XLSX OOXML <v>.
+  The 7,777 numeric cells stored per-cell in S1-S4 have one canonical record in cells.csv with displayed value, number format,
+  stored XML value, and every extract target resolved against the extract. The 63,996 S5 values are represented by 32 non-overlapping
+  located ranges and row/column shapes, without per-cell values. compare.csv is a compact per-table counts/exceptions summary.
+  Table layout is read from workbook sheet headers/groups. DOCX prose paragraph numbers were checked from OOXML after textutil
+  export.
