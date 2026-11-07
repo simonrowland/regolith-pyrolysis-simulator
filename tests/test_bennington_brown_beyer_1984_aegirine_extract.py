@@ -138,18 +138,49 @@ def _assert_render_pins(document: dict) -> None:
             "Pankratz, L. B. (1982), Thermodynamic Properties of Elements and Oxides, BuMines B 672, reference 19."
         ]
         assert derived["derivation"]["method"]["locator"] == {
-            "page": 16,
-            "published_page": 11,
+            "page": 15,
+            "published_page": 10,
             "section": "Enthalpies and Gibbs Energies of Formation and Reaction",
         }
         assert "raw_inputs" not in derived["derivation"]
+
+    method_rows = [
+        row
+        for observation_id, row in observations.items()
+        if observation_id.startswith(("aegirine_table8_", "aegirine_table9_"))
+    ]
+    assert len(method_rows) == 14
+    assert all(
+        row["derivation"]["method"]["locator"]["page"] == 15
+        and row["derivation"]["method"]["locator"]["published_page"] == 10
+        for row in method_rows
+    )
 
     abstract_s = observations["aegirine_abstract_standard_entropy"]
     assert abstract_s["values"]["points"][0]["value"] == "38.03"
     assert abstract_s["uncertainty"]["value"] == ".14"
     assert abstract_s["uncertainty"]["verbatim"] == "±.14 cal/mol/K"
-    assert abstract_s["locator"]["page"] == 11
+    assert abstract_s["locator"]["page"] == 6
+    assert abstract_s["locator"]["published_page"] == 1
     assert "table" not in abstract_s["locator"]
+    assert abstract_s["values"]["points"][0]["locator"]["page"] == 6
+    assert abstract_s["derivation"]["raw_inputs"]["locator"]["page"] == 15
+    assert abstract_s["derivation"]["raw_inputs"]["locator"]["published_page"] == 10
+
+    abstract_rows = [
+        row for observation_id, row in observations.items()
+        if observation_id.startswith("aegirine_abstract_")
+    ]
+    assert len(abstract_rows) == 4
+    assert all(row["locator"]["page"] == 6 and row["locator"]["published_page"] == 1 for row in abstract_rows)
+    assert all(point["locator"]["page"] == 6 for row in abstract_rows for point in row["values"]["points"])
+
+    table6_fidelity = next(
+        sample for sample in document["fidelity_samples"]
+        if "aegirine_table6_smoothed_cp" in sample["path"]
+    )
+    assert table6_fidelity["value"] == "40.499"
+    assert table6_fidelity["locator"]["row"] == 34
 
     expected_marked_temperatures = {
         "aegirine_table8_delta_fH": [
