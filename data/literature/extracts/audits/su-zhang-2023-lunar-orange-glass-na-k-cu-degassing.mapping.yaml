@@ -36,6 +36,8 @@ tables:
   data_rows: 1396
   numeric_cells: 63996
   maps: 32
+  metadata_records: 32
+  per_cell_values: 0
 docx_methods:
 - locator: S1 P32
   finding: Ambient fNa and fO2 depend on bead flight path and are not known a priori.
@@ -47,7 +49,9 @@ docx_methods:
   finding: Map2Profile conversion, standards/calibration, layer averaging, and uncertainties; no re-computation performed.
 - locator: S4 P92
   finding: Tables S2-S5 hold analytical data and Table S1 EMPA conditions.
-audit_policy: Every numeric cell across Tables S1–S5 has a source cell, displayed value, Excel number format, stored XML value,
-  extract target, and an agreement result. The source is an XLSX, so the two reads are openpyxl and direct OOXML <v>; each
-  target path is also resolved against the extract and compared to the displayed value. Table layout is read from workbook
-  sheet headers/groups. DOCX prose paragraph numbers were checked from OOXML after textutil export.
+audit_policy: All 71,773 numeric source cells across Tables S1-S5 were cross-read from openpyxl and direct XLSX OOXML <v>.
+  The 7,777 numeric cells stored per-cell in S1-S4 have one canonical record in cells.csv with displayed value, number format,
+  stored XML value, and every extract target resolved against the extract. The 63,996 S5 values are represented by 32 non-overlapping
+  located ranges and row/column shapes, without per-cell values. compare.csv is a compact per-table counts/exceptions summary.
+  Table layout is read from workbook sheet headers/groups. DOCX prose paragraph numbers were checked from OOXML after textutil
+  export.

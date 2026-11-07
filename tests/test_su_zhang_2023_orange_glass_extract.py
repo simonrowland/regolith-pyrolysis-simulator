@@ -72,6 +72,28 @@ def _assert_cell_audit_matches(document: dict, cell_audit: list[dict]) -> None:
             )
 
 
+def test_audit_target_resolver_supports_matrix_indices() -> None:
+    document = {
+        "species": {
+            "unknown": {
+                "context": [
+                    {
+                        "observation_id": "map",
+                        "values": {"matrix_as_printed": [["a", "b"], ["c", "d"]]},
+                    }
+                ]
+            }
+        }
+    }
+    assert (
+        _resolve_audit_target(
+            document,
+            "species.unknown.context[map].values.matrix_as_printed[1][0]",
+        )
+        == "c"
+    )
+
+
 def test_extract_validates_and_fidelity_mutation_is_detected() -> None:
     document = _document()
     assert validate_extract_document(
@@ -224,26 +246,72 @@ def test_all_printed_rows_cells_and_maps_are_accounted_for() -> None:
         "Cu63_cps",
     }
     assert sum(
-        len(line)
+        row["values"]["shape"]["rows"] * row["values"]["shape"]["columns"]
         for row in maps
-        for line in row["values"]["matrix_as_printed"]
     ) == 63_996
     assert all(row["values"]["typed_refused_schema_gap"] for row in maps)
+    assert all(
+        row["values"]["source_sha256"]
+        == "e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3"
+        for row in maps
+    )
+    assert all(row["values"]["sheet_name"] == "Table S5" for row in maps)
+    assert all(row["values"]["units"] == "counts per second" for row in maps)
+    assert all(
+        re.fullmatch(r"A\d+:[A-Z]+\d+", row["values"]["cell_range"])
+        and row["values"]["cell_range"] in row["locator"]["note"]
+        for row in maps
+    )
+    assert all(row["values"]["caption_locator"] == "Table S5!A1" for row in maps)
+    assert all(
+        row["values"]["caption_as_printed"]
+        == "Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads."
+        for row in maps
+    )
+    assert all("Map2Profile.py" in row["values"]["method_as_printed"] for row in maps)
+    assert all(
+        row["values"]["method_locator"]["paragraphs"] == "P69-P88"
+        and row["values"]["method_locator"]["section"] == "S3"
+        for row in maps
+    )
+    assert all("matrix_as_printed" not in row["values"] for row in maps)
+    assert all(
+        "tools/validate_literature_extracts.py::OBSERVATION_TYPES" in row["values"]["schema_gap"]
+        and "simulator/battery/migrate.py::QUANTITY_ALIASES" in row["values"]["schema_gap"]
+        and "simulator/battery/enums.py::PHASE_BASIS_TOKENS" in row["values"]["schema_gap"]
+        and "drowart-1960-al2o3-kems.yaml" in row["values"]["schema_gap"]
+        for row in maps
+    )
+    context_counts = Counter(
+        row["locator"]["table"]
+        for row in document["species"]["unknown"]["context"]
+    )
+    assert context_counts == {"Table S1": 1, "Table S5": 32}
 
     with (AUDIT / f"{SID}.cells.csv").open(encoding="utf-8", newline="") as stream:
         cell_audit = list(csv.DictReader(stream))
-    assert len(cell_audit) == 71_773
+    assert len(cell_audit) == 7_777
     assert Counter(row["sheet"] for row in cell_audit) == {
         "Table S1": 30,
         "Table S2": 5_676,
         "Table S3": 187,
         "Table S4": 1_884,
-        "Table S5": 63_996,
     }
     _assert_cell_audit_matches(document, cell_audit)
     with (AUDIT / f"{SID}.compare.csv").open(encoding="utf-8", newline="") as stream:
         compare_audit = list(csv.DictReader(stream))
-    assert len(compare_audit) == 71_773
+    assert len(compare_audit) == 6
+    assert {row["sheet"] for row in compare_audit} == {
+        "Table S1", "Table S2", "Table S3", "Table S4", "Table S5", "TOTAL"
+    }
+    summary_by_sheet = {row["sheet"]: row for row in compare_audit}
+    assert summary_by_sheet["Table S5"]["source_numeric_cells"] == "63996"
+    assert summary_by_sheet["Table S5"]["per_cell_audit_records"] == "0"
+    assert summary_by_sheet["Table S5"]["extract_target_checks"] == "0"
+    assert summary_by_sheet["TOTAL"]["source_numeric_cells"] == "71773"
+    assert summary_by_sheet["TOTAL"]["per_cell_audit_records"] == "7777"
+    assert all(row["mismatches"] == "0" for row in compare_audit)
+    assert all("result" not in row and "extract_target" not in row for row in compare_audit)
 
 
 def test_cell_audit_detects_unpinned_profile_mutation() -> None:
