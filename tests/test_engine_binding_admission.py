@@ -1733,16 +1733,24 @@ def test_live_admission_error_does_not_keep_provider_finalizer_alive(
 
     def publish_unadmitted_backend() -> weakref.ReferenceType[FakeProvider]:
         provider = FakeProvider()
+        authorizer_calls: list[bool] = []
 
         def reject(identity, _provenance):
+            authorizer_calls.append(True)
             provider_from_frame = provider
             assert provider_from_frame is provider
             raise EngineBindingAdmissionError(identity, "receipt missing")
 
         provider_ref = weakref.ref(provider)
         with monkeypatch.context() as patch:
+            patch.setattr(
+                admission,
+                "current_backend_provenance",
+                lambda _identity, _backend: {"runtime_version": "fixture"},
+            )
             patch.setattr(admission, "authorize_binding", reject)
             admission.publish_live_backend_admission(provider.backend)
+        assert authorizer_calls == [True]
         return provider_ref
 
     provider_ref = publish_unadmitted_backend()
@@ -1816,6 +1824,63 @@ def test_thermoengine_failed_initialization_does_not_keep_provider_alive(
         "synthetic ThermoEngine init failure",
     )
     assert backend.transport is None
+    gc.collect()
+    assert provider_ref() is None
+    assert closed == [True]
+
+
+def test_alphamelts_failed_initialization_does_not_keep_provider_alive(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    closed: list[bool] = []
+
+    class FakeBackend(AlphaMELTSBackend):
+        def close(self) -> None:
+            closed.append(True)
+            super().close()
+
+    class FakeProvider:
+        def __init__(self) -> None:
+            self.backend = FakeBackend()
+            weakref.finalize(self, self.backend.close)
+
+    def fail_initialization_with_provider() -> tuple[
+        AlphaMELTSBackend, weakref.ReferenceType[FakeProvider]
+    ]:
+        provider = FakeProvider()
+        backend = provider.backend
+        provider_ref = weakref.ref(provider)
+        provider_holder = [provider]
+        provider = None
+
+        def fail_import() -> None:
+            provider_from_frame = provider_holder.pop()
+            assert provider_from_frame is not None
+            raise ImportError("synthetic AlphaMELTS import failure")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(backend, "_import_petthermotools", fail_import)
+            try:
+                backend._initialize_petthermotools(
+                    require_petthermotools=True
+                )
+            except ImportError as error:
+                assert type(error) is ImportError
+                assert str(error) == (
+                    "PetThermoTools Python path unavailable: "
+                    "petthermotools and meltsdynamic must both import"
+                )
+        return backend, provider_ref
+
+    backend, provider_ref = fail_initialization_with_provider()
+
+    assert backend._pet_import_error == (
+        "ImportError",
+        "PetThermoTools Python path unavailable: "
+        "petthermotools and meltsdynamic must both import",
+    )
     gc.collect()
     assert provider_ref() is None
     assert closed == [True]
