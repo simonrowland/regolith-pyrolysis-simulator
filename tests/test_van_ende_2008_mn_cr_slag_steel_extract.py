@@ -13,6 +13,9 @@ from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/van-ende-2008-mn-cr-slag-steel.yaml"
+EXTRACT_V2 = (
+    ROOT / "data/literature/extracts-v2/van-ende-2008-mn-cr-slag-steel.yaml"
+)
 
 # Section headings transcribed from the source's pdftotext-layout text.
 PRINTED_SECTION_HEADINGS = {
@@ -60,11 +63,14 @@ def _section_strings(value: object):
 
 
 def test_every_locator_section_is_a_printed_source_heading() -> None:
-    sections = set(_section_strings(_document()))
+    for extract in (EXTRACT, EXTRACT_V2):
+        document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+        sections = set(_section_strings(document))
 
-    assert sections
-    assert sections <= PRINTED_SECTION_HEADINGS
-    assert sections == {"3. Experimental"}
+        assert sections
+        assert "2.3 Experimental Procedure" not in sections
+        assert sections <= PRINTED_SECTION_HEADINGS
+        assert sections == {"3. Experimental"}
 
 
 def _assert_table4_pins(document: dict) -> None:

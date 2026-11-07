@@ -24,7 +24,21 @@ EXPECTED_QUANTITY_UNKNOWN = {
     "zaitsev_2006_eq9_mg2sio4_gibbs_fit",
     "zaitsev_2006_eq16_mg2sio4_model_function",
     "zaitsev_2006_eq17_mgsio3_model_function",
+    "zaitsev_2006_table4_enstatite_experimental_delta_fG",
+    "zaitsev_2006_table4_enstatite_calculated_delta_fG",
+    "zaitsev_2006_table4_protoenstatite_experimental_delta_fG",
+    "zaitsev_2006_table4_protoenstatite_calculated_delta_fG",
 }
+TABLE4_FROM_OXIDES = {
+    "zaitsev_2006_table4_enstatite_experimental_delta_fG": "−32 143",
+    "zaitsev_2006_table4_enstatite_calculated_delta_fG": "−32 150",
+    "zaitsev_2006_table4_protoenstatite_experimental_delta_fG": "−23 914",
+    "zaitsev_2006_table4_protoenstatite_calculated_delta_fG": "−23 882",
+}
+FROM_OXIDES_SCHEMA_GAP = (
+    "No quantity token represents formation from simple oxides; "
+    "delta_fG denotes formation from the elements."
+)
 
 
 def _source_observation(document: dict, observation_id: str) -> dict:
@@ -34,6 +48,27 @@ def _source_observation(document: dict, observation_id: str) -> dict:
         for observation in species.get("observations", [])
         if observation["observation_id"] == observation_id
     )
+
+
+def _assert_table4_from_oxides_frame(document: dict) -> None:
+    schema_gaps = {
+        gap["observation_id"]: gap["reason"] for gap in document["schema_gaps"]
+    }
+    assert schema_gaps == {
+        observation_id: FROM_OXIDES_SCHEMA_GAP
+        for observation_id in TABLE4_FROM_OXIDES
+    }
+    for observation_id, printed_value in TABLE4_FROM_OXIDES.items():
+        values = _source_observation(document, observation_id)["values"]
+        assert "quantity" not in values
+        assert values["quantity_as_printed"] == "ΔfG(298 K)"
+        assert values["reference_state_as_printed"] == (
+            "formation from crystalline MgO and β-cristobalite"
+        )
+        assert values["schema_gap"] == FROM_OXIDES_SCHEMA_GAP
+        assert values["value_as_printed"] == printed_value
+        assert "delta_fG" not in values
+        assert "delta_fG_as_printed" not in values
 
 
 def _fidelity_pins(document: dict) -> tuple[tuple[str, int, str], ...]:
@@ -48,7 +83,7 @@ def _fidelity_pins(document: dict) -> tuple[tuple[str, int, str], ...]:
         ),
         (
             "zaitsev_2006_table4_enstatite_calculated_delta_fG",
-            "delta_fG",
+            "value_as_printed",
         ),
         (
             "zaitsev_2006_eq8_mgsio3_gibbs_fit",
@@ -91,9 +126,13 @@ def test_zaitsev_2006_printed_rows_render_pins_and_isolated_migration():
             for row in table2
         }
     ) == 6
-    assert {
-        row["values"]["quantity"] for row in table4
-    } == {"delta_fG"}
+    _assert_table4_from_oxides_frame(document)
+    mutated = deepcopy(document)
+    _source_observation(
+        mutated, "zaitsev_2006_table4_enstatite_calculated_delta_fG"
+    )["values"]["quantity"] = "delta_fG"
+    with pytest.raises(AssertionError):
+        _assert_table4_from_oxides_frame(mutated)
 
     partial_gibbs_parents = {
         "zaitsev_2006_eq6_mgo_partial_gibbs_fit": (
@@ -155,7 +194,7 @@ def test_zaitsev_2006_printed_rows_render_pins_and_isolated_migration():
     expected_pins = (
         ("0.181", 4, "2"),
         ("1.0", 4, "2"),
-        ("-32150", 7, "4"),
+        ("−32 150", 7, "4"),
         ("ΔfG(MgSiO3) = −(30842 ± 413) + (0.14 ± 0.29)T", 3, "8"),
     )
     assert _fidelity_pins(document) == expected_pins
@@ -196,7 +235,7 @@ def test_zaitsev_2006_printed_rows_render_pins_and_isolated_migration():
     assert sum(
         observation.value.kind is ValueKind.UNAVAILABLE
         for observation in result.observations.values()
-    ) == 9
+    ) == 13
 
     prefix = f"{SOURCE_ID}::"
     migrated = {
@@ -257,11 +296,12 @@ def test_zaitsev_2006_printed_rows_render_pins_and_isolated_migration():
     enstatite_calculated = migrated[
         "zaitsev_2006_table4_enstatite_calculated_delta_fG"
     ]
-    assert enstatite_calculated.value.point == Decimal("-32.15")
-    assert enstatite_calculated.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-    assert migrated[
-        "zaitsev_2006_table4_enstatite_experimental_delta_fG"
-    ].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert enstatite_calculated.value.kind is ValueKind.UNAVAILABLE
+    for observation_id in TABLE4_FROM_OXIDES:
+        observation = migrated[observation_id]
+        assert not observation.identity.quantity.is_value
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.identity.species.phase.is_value
     assert migrated[
         "zaitsev_2006_eq8_mgsio3_gibbs_fit"
     ].evidence.class_.value is EvidenceClass.MEASURED_REDUCED

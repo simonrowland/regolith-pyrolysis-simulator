@@ -19,6 +19,15 @@ extraction:
     figure-read KEMS series and are not digitized in this extraction. The 10^-4 Pa statement is for sample
     preparation only and is not transferred to the KEMS measurements.
 review_status: draft
+schema_gaps:
+  - observation_id: zaitsev_2006_table4_enstatite_experimental_delta_fG
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: zaitsev_2006_table4_enstatite_calculated_delta_fG
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 fidelity_samples:
   - path: species.MgO.observations[zaitsev_2006_table2_mgo_x_sio2_0p486].values.activity
     value: '0.181'
@@ -38,15 +47,15 @@ fidelity_samples:
       table: '2'
       row: 'x(SiO2) = 0.563'
       note: Table 2, a(SiO2); render confirms 1.0.
-  - path: species.MgSiO3.observations[zaitsev_2006_table4_enstatite_calculated_delta_fG].values.delta_fG
-    value: '-32150'
+  - path: species.MgSiO3.observations[zaitsev_2006_table4_enstatite_calculated_delta_fG].values.value_as_printed
+    value: '−32 150'
     locator:
       page: 7
       published_page: 341
       pdf_page_index: 6
       table: '4'
       row: 'Enstatite MgSiO3; ΔfG(298 K); Calculated'
-      note: Render confirms −32 150 J/mol.
+      note: Render confirms −32 150 J/mol; formation is from crystalline MgO and β-cristobalite.
   - path: species.MgSiO3.observations[zaitsev_2006_eq8_mgsio3_gibbs_fit].values.equation_as_published
     value: 'ΔfG(MgSiO3) = −(30842 ± 413) + (0.14 ± 0.29)T'
     locator:
@@ -2065,14 +2074,15 @@ species:
         values:
           formation_basis_as_published: >-
             Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity_as_printed: "ΔfG(298 K)"
+          reference_state_as_printed: formation from crystalline MgO and β-cristobalite
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
           column_as_printed: Experimental
-          quantity: delta_fG
           method_class: quoted_attributed
           admission_status: admitted
           attribution: '[31]'
           T_K: '298'
-          delta_fG: '-32143'
-          delta_fG_as_printed: '−32 143'
+          value_as_printed: '−32 143'
           phase_as_printed: Enstatite
       - observation_id: zaitsev_2006_table4_enstatite_calculated_delta_fG
         type: gibbs_table
@@ -2139,13 +2149,14 @@ species:
         values:
           formation_basis_as_published: >-
             Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity_as_printed: "ΔfG(298 K)"
+          reference_state_as_printed: formation from crystalline MgO and β-cristobalite
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
           column_as_printed: Calculated
-          quantity: delta_fG
           method_class: model_derived
           admission_status: admitted
           T_K: '298'
-          delta_fG: '-32150'
-          delta_fG_as_printed: '−32 150'
+          value_as_printed: '−32 150'
           phase_as_printed: Enstatite
       - observation_id: zaitsev_2006_table4_protoenstatite_experimental_delta_fG
         type: gibbs_table
@@ -2206,14 +2217,15 @@ species:
         values:
           formation_basis_as_published: >-
             Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity_as_printed: "ΔfG(298 K)"
+          reference_state_as_printed: formation from crystalline MgO and β-cristobalite
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
           column_as_printed: Experimental
-          quantity: delta_fG
           method_class: quoted_attributed
           admission_status: admitted
           attribution: '[31]'
           T_K: '298'
-          delta_fG: '-23914'
-          delta_fG_as_printed: '−23 914'
+          value_as_printed: '−23 914'
           phase_as_printed: Protoenstatite
       - observation_id: zaitsev_2006_table4_protoenstatite_calculated_delta_fG
         type: gibbs_table
@@ -2280,13 +2292,14 @@ species:
         values:
           formation_basis_as_published: >-
             Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity_as_printed: "ΔfG(298 K)"
+          reference_state_as_printed: formation from crystalline MgO and β-cristobalite
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
           column_as_printed: Calculated
-          quantity: delta_fG
           method_class: model_derived
           admission_status: admitted
           T_K: '298'
-          delta_fG: '-23882'
-          delta_fG_as_printed: '−23 882'
+          value_as_printed: '−23 882'
           phase_as_printed: Protoenstatite
       - observation_id: zaitsev_2006_eq17_mgsio3_model_function
         type: gibbs_table
