@@ -3699,6 +3699,10 @@ class EvaporationMixin:
                     for species_id in effective_pressure_species_ids
                     if species_id not in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
                 )
+            domain_at = getattr(self, "liquid_feo_domain_at", None)
+            liquid_feo_domain = (
+                domain_at(float(temperature_K)) if callable(domain_at) else None
+            )
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3758,6 +3762,7 @@ class EvaporationMixin:
                 melt_activity_engine_inputs=getattr(
                     self, "_melt_activity_engine_inputs", {}
                 ),
+                liquid_feo_domain=liquid_feo_domain,
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

@@ -7,9 +7,23 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.equilibrium as equilibrium_module
+from simulator.core import (
+    PyrolysisSimulator,
+    _MeltRedoxLiquidusFloorFallback,
+    _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+)
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.equilibrium import (
     EquilibriumMixin,
     _internal_analytical_control_refusal,
+)
+from simulator.evaporation import (
+    _KRESS91_FLOOR_OPEN_SIDE_C,
+    _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+)
+from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    LiquidFeODomain,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.silent_zero import (
@@ -392,3 +406,492 @@ def test_internal_analytical_source_certified_range_refusal_is_typed(
         for warning in result.warnings
     )
     assert result.diagnostics["silent_zero_notes"] == sim._silent_zero_notes
+
+
+_FEO_MELT_WT = {
+    "SiO2": 50.0,
+    "Al2O3": 15.0,
+    "FeO": 12.0,
+    "MgO": 10.0,
+    "CaO": 13.0,
+}
+
+
+def _feo_equilibrium_sim(*, temperature_C, domain=None, with_domain_method=True):
+    melt = SimpleNamespace(
+        temperature_C=temperature_C,
+        p_total_mbar=1.0,
+        oxygen_reservoir=None,
+        melt_fO2_log=-12.0,
+        fO2_log=-12.0,
+        composition_wt_pct=lambda: dict(_FEO_MELT_WT),
+    )
+    sim = SimpleNamespace(
+        melt=melt,
+        vapor_pressures={"metals": {}, "oxide_vapors": {}},
+        _ELLINGHAM_THERMO=(),
+        _headspace_transport_pO2_bar=lambda: 1e-12,
+        _oxygen_numerical_floor_bar=lambda: 1e-12,
+        atom_ledger=None,
+    )
+    if with_domain_method:
+        sim.liquid_feo_domain_at = lambda _T_K: domain
+    return sim
+
+
+def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_activity():
+    domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=225.0 + 273.15,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    plain = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_equilibrium_sim(temperature_C=225.0, with_domain_method=False)
+    )
+    flagged = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_equilibrium_sim(temperature_C=225.0, domain=domain)
+    )
+    plain_diag = plain.diagnostics["a_FeO_calphad"]
+    flagged_diag = flagged.diagnostics["a_FeO_calphad"]
+
+    assert flagged.status == "ok"
+    assert flagged_diag["notices"] == [
+        {
+            "type": "typed_notice",
+            "kind": "liquid_model_below_liquidus",
+            "temperature_K": domain.temperature_K,
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+            "source": "gate_liquid_fraction",
+            "authority": "extrapolated",
+        }
+    ]
+    assert {
+        key: value for key, value in flagged_diag.items() if key != "notices"
+    } == plain_diag
+    assert flagged_diag["a_FeO_authoritative"] == plain_diag["a_FeO_authoritative"]
+    assert flagged_diag["a_FeO_authoritative"] > 0.0
+    assert "gamma_FeO" in flagged_diag
+
+
+def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
+    domain = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=1600.0 + 273.15,
+        liquidus_T_C=1200.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    plain = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_equilibrium_sim(temperature_C=1600.0, with_domain_method=False)
+    )
+    liquid = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_equilibrium_sim(temperature_C=1600.0, domain=domain)
+    )
+
+    assert liquid.diagnostics == plain.diagnostics
+    assert liquid.vapor_pressures_Pa == plain.vapor_pressures_Pa
+    assert "notices" not in liquid.diagnostics["a_FeO_calphad"]
+
+
+def _gate_host(curve, *, pinned=True):
+    def _resolve(gate_authority=_RESOLVE_MELT_REDOX_GATE_AUTHORITY, **_kwargs):
+        if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
+            raise AssertionError("FeO domain started a liquidus solve")
+        return curve
+
+    host = SimpleNamespace(
+        melt=SimpleNamespace(hour=1),
+        _resolved_melt_redox_gate_authority=_resolve,
+    )
+    if pinned:
+        host._melt_redox_gate_authority_tick_hour = 1
+        host._melt_redox_gate_authority_this_tick = (
+            curve
+            if not isinstance(curve, dict)
+            else {"disposition": "live", "curve": curve}
+        )
+    else:
+        host._melt_redox_gate_authority_tick_hour = None
+        host._melt_redox_gate_authority_this_tick = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        )
+    return host
+
+
+def test_liquid_feo_domain_uses_silicate_liquidus_not_the_kress_floor():
+    curve = {
+        "liquidus_T_C": 1700.0,
+        "solidus_T_C": 1050.0,
+        "source": "gate_liquid_fraction",
+    }
+    host = _gate_host(curve)
+    cold = PyrolysisSimulator.liquid_feo_domain_at(host, 225.0 + 273.15)
+    assert cold.below_liquidus is True
+    assert cold.liquidus_T_C == 1700.0
+    assert cold.solidus_T_C == 1050.0
+    assert cold.source == "gate_liquid_fraction"
+    assert cold.temperature_K == pytest.approx(225.0 + 273.15)
+
+    hot = PyrolysisSimulator.liquid_feo_domain_at(host, 1750.0 + 273.15)
+    assert hot.below_liquidus is False
+
+    at_liquidus_K = 1700.0 + 273.15
+    at_curve = {
+        "liquidus_T_C": at_liquidus_K - 273.15,
+        "solidus_T_C": 1050.0,
+        "source": "gate_liquid_fraction",
+    }
+    at = PyrolysisSimulator.liquid_feo_domain_at(_gate_host(at_curve), at_liquidus_K)
+    assert at.below_liquidus is False
+
+    # A fully molten melt between a sub-1200 liquidus and the Kress floor
+    # is liquid for this model. The floor is a redox-capacity gate.
+    low_liquidus = {
+        "liquidus_T_C": 1100.0,
+        "solidus_T_C": 900.0,
+        "source": "gate_liquid_fraction",
+    }
+    between = PyrolysisSimulator.liquid_feo_domain_at(
+        _gate_host(low_liquidus),
+        1150.0 + 273.15,
+    )
+    assert between.below_liquidus is False
+
+
+def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
+    fallback = _MeltRedoxLiquidusFloorFallback(
+        source="none:liquidus_unavailable",
+        reason="test",
+        liquidus_status="invalid",
+    )
+    host = _gate_host(fallback)
+    floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+    at_floor = PyrolysisSimulator.liquid_feo_domain_at(host, floor_C + 273.15)
+    assert at_floor.below_liquidus is True
+    assert at_floor.liquidus_T_C == floor_C
+    assert at_floor.solidus_T_C == floor_C
+    assert at_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert fallback.source == "none:liquidus_unavailable"
+    above = PyrolysisSimulator.liquid_feo_domain_at(host, floor_C + 273.15 + 0.1)
+    assert above.below_liquidus is False
+
+    missing = PyrolysisSimulator.liquid_feo_domain_at(
+        _gate_host(None),
+        1700.0 + 273.15,
+    )
+    assert missing.below_liquidus is True
+    assert missing.liquidus_T_C is None
+    assert missing.solidus_T_C is None
+    assert missing.source == "none:liquidus_gate_in_progress"
+
+    unresolved = PyrolysisSimulator.liquid_feo_domain_at(
+        _gate_host({"source": "broken"}),
+        1700.0 + 273.15,
+    )
+    assert unresolved.below_liquidus is True
+    assert unresolved.source == "none:liquidus_unresolved"
+
+    not_established = PyrolysisSimulator.liquid_feo_domain_at(
+        _gate_host(
+            {
+                "liquidus_T_C": 1700.0,
+                "solidus_T_C": 1050.0,
+                "source": "gate_liquid_fraction",
+            },
+            pinned=False,
+        ),
+        1750.0 + 273.15,
+    )
+    assert not_established is None
+
+
+def _established_record_host(record):
+    """Real establish, resolver, and curve unwrap. Only the record is supplied."""
+
+    host = SimpleNamespace(
+        melt=SimpleNamespace(hour=1),
+        _melt_redox_liquidus_gate_record=lambda **_kwargs: record,
+    )
+    host._melt_redox_liquidus_gate_curve = (
+        PyrolysisSimulator._melt_redox_liquidus_gate_curve.__get__(host)
+    )
+    host._melt_redox_gate_record_is_admitted = (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted.__get__(host)
+    )
+    return host
+
+
+def test_replay_and_originless_live_curves_feed_the_liquid_feo_domain():
+    """A resolved curve admission will not pin still has a liquidus.
+
+    The redox resolver collapses both records to None. That None is not the
+    FeO domain: 225 C is below the curve, and a temperature above the curve
+    is not.
+    """
+
+    replay = {
+        "disposition": "replay",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+        },
+    }
+    replay_host = _established_record_host(replay)
+    established = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            replay_host
+        )
+    )
+    assert established["liquidus_T_C"] == 1700.0
+    assert (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted(
+            replay_host, replay
+        )
+        is False
+    )
+    resolved = PyrolysisSimulator._resolved_melt_redox_gate_authority(
+        replay_host
+    )
+    assert resolved["liquidus_T_C"] == 1700.0
+    assert (
+        PyrolysisSimulator._resolved_melt_redox_gate_authority(
+            replay_host, replay
+        )
+        is None
+    )
+    assert getattr(
+        replay_host, "_melt_redox_gate_authority_tick_hour", None
+    ) is None
+    cold = PyrolysisSimulator.liquid_feo_domain_at(
+        replay_host, 225.0 + 273.15
+    )
+    assert cold.below_liquidus is True
+    assert cold.liquidus_T_C == 1700.0
+    assert cold.solidus_T_C == 1050.0
+    assert cold.source == "gate_liquid_fraction"
+    hot = PyrolysisSimulator.liquid_feo_domain_at(
+        replay_host, 1750.0 + 273.15
+    )
+    assert hot.below_liquidus is False
+    assert hot.liquidus_T_C == 1700.0
+    assert hot.source == "gate_liquid_fraction"
+
+    floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+    liquidus_T_C = floor_C + float(_KRESS91_FLOOR_OPEN_SIDE_C)
+    live = {
+        "disposition": "live",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+            "liquidus_T_C": liquidus_T_C,
+            "solidus_T_C": floor_C,
+        },
+    }
+    live_host = _established_record_host(live)
+    live_curve = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            live_host
+        )
+    )
+    assert live_curve["liquidus_T_C"] == pytest.approx(liquidus_T_C)
+    assert (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted(live_host, live)
+        is False
+    )
+    live_resolved = PyrolysisSimulator._resolved_melt_redox_gate_authority(
+        live_host
+    )
+    assert live_resolved["source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert (
+        PyrolysisSimulator._resolved_melt_redox_gate_authority(live_host, live)
+        is None
+    )
+    below_floor = PyrolysisSimulator.liquid_feo_domain_at(
+        live_host, 225.0 + 273.15
+    )
+    assert below_floor.below_liquidus is True
+    assert below_floor.liquidus_T_C == pytest.approx(liquidus_T_C)
+    assert below_floor.solidus_T_C == pytest.approx(floor_C)
+    assert below_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    above_floor = PyrolysisSimulator.liquid_feo_domain_at(
+        live_host, 1750.0 + 273.15
+    )
+    assert above_floor.below_liquidus is False
+    assert above_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+
+
+def _oxide_batch_sim() -> PyrolysisSimulator:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"SiO2": 60.0, "FeO": 40.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+
+
+def _replay_record(*, liquidus_T_C: float) -> dict:
+    return {
+        "disposition": "replay",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": liquidus_T_C,
+            "solidus_T_C": 1050.0,
+        },
+    }
+
+
+def test_load_batch_drops_a_retained_liquid_feo_curve():
+    """A second batch must not keep the previous batch's liquidus.
+
+    load_batch sets melt.hour back to 0. The retained curve is cleared
+    with the redox pin, so the new establish is what the domain reads.
+    """
+
+    sim = _oxide_batch_sim()
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: _replay_record(
+        liquidus_T_C=1700.0
+    )
+    sim.load_batch("oxide")
+    first = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert first["liquidus_T_C"] == 1700.0
+    assert sim._liquid_feo_resolved_curve_hour == sim.melt.hour
+
+    sim.load_batch("oxide")
+    assert sim.melt.hour == 0
+    assert sim._liquid_feo_resolved_curve_hour is None
+    assert sim._liquid_feo_resolved_curve is not None
+    fallback = _MeltRedoxLiquidusFloorFallback(
+        source="none:liquidus_unavailable",
+        reason="test",
+        liquidus_status="invalid",
+    )
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: fallback
+    second = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert isinstance(second, _MeltRedoxLiquidusFloorFallback)
+    at_1300 = PyrolysisSimulator.liquid_feo_domain_at(sim, 1300.0 + 273.15)
+    assert at_1300.below_liquidus is False
+    assert at_1300.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert at_1300.liquidus_T_C == float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: _replay_record(
+        liquidus_T_C=1700.0
+    )
+    sim.load_batch("oxide")
+    replay = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert replay["liquidus_T_C"] == 1700.0
+    pinned = {
+        "disposition": "live",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+        },
+    }
+    sim.load_batch("oxide")
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: pinned
+    sim._melt_redox_gate_record_is_admitted = lambda _value, **_kwargs: True
+    pinned_curve = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert pinned_curve["liquidus_T_C"] == 1700.0
+    assert sim._melt_redox_gate_authority_tick_hour == sim.melt.hour
+    assert sim._liquid_feo_resolved_curve_hour is None
+    at_1500 = PyrolysisSimulator.liquid_feo_domain_at(sim, 1500.0 + 273.15)
+    assert at_1500.below_liquidus is True
+    assert at_1500.liquidus_T_C == 1700.0
+    assert at_1500.source == "gate_liquid_fraction"
+
+
+def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
+    comp = dict(_FEO_MELT_WT)
+    cold_K = 225.0 + 273.15
+    below = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=cold_K,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    above = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=1600.0 + 273.15,
+        liquidus_T_C=1200.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+
+    def _host(domain):
+        return SimpleNamespace(
+            _feot_equivalent_wt_pct=PyrolysisSimulator._feot_equivalent_wt_pct,
+            liquid_feo_domain_at=(None if domain is None else (lambda _T: domain)),
+        )
+
+    def _state(domain, *, T_K, fO2_log):
+        host = _host(domain)
+        if domain is None:
+            del host.liquid_feo_domain_at
+        return PyrolysisSimulator._native_fe_saturation_state(
+            host,
+            comp,
+            fe3_over_sigma_fe=0.1,
+            T_K=T_K,
+            pressure_bar=1e-6,
+            fO2_log=fO2_log,
+        )
+
+    cold_fO2 = -14.0
+    flagged = _state(below, T_K=cold_K, fO2_log=cold_fO2)
+    plain = _state(None, T_K=cold_K, fO2_log=cold_fO2)
+    assert flagged["notices"][0]["kind"] == "liquid_model_below_liquidus"
+    assert flagged["notices"][0]["authority"] == "extrapolated"
+    assert flagged["native_fe_activity"] == plain["native_fe_activity"]
+    assert {
+        key: value for key, value in flagged.items() if key != "notices"
+    } == plain
+    assert "notices" not in plain
+
+    hot_K = 1600.0 + 273.15
+    hot_plain = _state(None, T_K=hot_K, fO2_log=-10.0)
+    hot_liquid = _state(above, T_K=hot_K, fO2_log=-10.0)
+    assert hot_liquid == hot_plain
+    assert "notices" not in hot_liquid
+
+    zero = _state(below, T_K=cold_K, fO2_log=1000.0)
+    zero_plain = _state(None, T_K=cold_K, fO2_log=1000.0)
+    assert zero["native_fe_activity_source"] == "unavailable:no_positive_a_FeO"
+    assert zero["notices"][0]["kind"] == "liquid_model_below_liquidus"
+    assert {
+        key: value for key, value in zero.items() if key != "notices"
+    } == zero_plain

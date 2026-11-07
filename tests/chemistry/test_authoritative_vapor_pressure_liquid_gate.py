@@ -95,6 +95,7 @@ def _sim_with_vapor_dispatch(
 
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=1600.0),
+        liquid_feo_domain_at=lambda _T_K: None,
         _allow_fallback_vapor=False,
         _commanded_pO2_bar=lambda: 1e-9,
         # #94 LIVE-PO2-SWEEP: kernel refresh now reads the shared vapor
