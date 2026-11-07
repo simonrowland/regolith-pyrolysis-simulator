@@ -103,7 +103,7 @@ species:
         points:
         - value: '-105.263'
           reaction_number: 10
-          reaction_as_printed: ^{2} (10)  [(Na_{0.869}Fe^{3+} Fe^{2+} Mn_{0.03}Ca_{0.1121})(Al_{0.141}Si_{1.9738})(O_{6})](c)
+          reaction_as_printed: ^{2} (10)  [(Na_{0.869}Fe^{3+}_{0.7362}Fe^{2+}_{0.16}Mn_{0.03}Ca_{0.1121})(Al_{0.141}Si_{1.9738})(O_{6})](c)
             + 12.067HF(sol) + 3.8806H^{+}(sol) \rightarrow 1.9738H_{2}SiF_{6}(sol) + 0.141Al^{3+}(sol) + 0.869Na^{+}(sol)
             + 0.8962Fe^{3+}(sol) + 0.03Mn^{2+}(sol) + 0.1121CaF_{2}(p) + 6H_{2}O(sol)
           locator: &id001
@@ -148,7 +148,7 @@ species:
           reactions as written; retained as typed-refused data.
         schema_gap: The battery has no exact reaction-enthalpy quantity token for calorimetric heats of these reactions
           as written; retained as typed-refused data.
-        reaction_as_printed: ^{2} (10)  [(Na_{0.869}Fe^{3+} Fe^{2+} Mn_{0.03}Ca_{0.1121})(Al_{0.141}Si_{1.9738})(O_{6})](c)
+        reaction_as_printed: ^{2} (10)  [(Na_{0.869}Fe^{3+}_{0.7362}Fe^{2+}_{0.16}Mn_{0.03}Ca_{0.1121})(Al_{0.141}Si_{1.9738})(O_{6})](c)
           + 12.067HF(sol) + 3.8806H^{+}(sol) \rightarrow 1.9738H_{2}SiF_{6}(sol) + 0.141Al^{3+}(sol) + 0.869Na^{+}(sol)
           + 0.8962Fe^{3+}(sol) + 0.03Mn^{2+}(sol) + 0.1121CaF_{2}(p) + 6H_{2}O(sol)
       derivation:
@@ -180,7 +180,7 @@ species:
         - value: '+11.890'
           reaction_number: 11
           reaction_as_printed: 1.9738SiO2(c) + 0.0705Al2(SO4)3·12H2O(c) + 0.3681Fe2O3(c) + 0.160FeSO4·7H2O(c) + 0.030MnO(c)
-            + 0.1121CaO(c) + 0.4345Na2SO4(c) + 4.482H2O(l) + 0.806H2SO4·7H2O(l) -> adjusted aegirine(c)
+            + 0.1121CaO(c) + 0.4345Na2SO4(c) + 4.482H2O(l) -> adjusted aegirine(c) + 0.806H2SO4·7H2O(l)
           locator: &id002
             page: 11
             published_page: 6
@@ -220,7 +220,7 @@ species:
         schema_gap: The battery has no exact reaction-enthalpy quantity token for the overall calorimetric reaction;
           retained as typed-refused data.
         reaction_as_printed: 1.9738SiO2(c) + 0.0705Al2(SO4)3·12H2O(c) + 0.3681Fe2O3(c) + 0.160FeSO4·7H2O(c) + 0.030MnO(c)
-          + 0.1121CaO(c) + 0.4345Na2SO4(c) + 4.482H2O(l) + 0.806H2SO4·7H2O(l) -> adjusted aegirine(c)
+          + 0.1121CaO(c) + 0.4345Na2SO4(c) + 4.482H2O(l) -> adjusted aegirine(c) + 0.806H2SO4·7H2O(l)
       derivation:
         relation: The source combines reaction enthalpies 1 through 10 using the printed cycle equation.
         inputs:

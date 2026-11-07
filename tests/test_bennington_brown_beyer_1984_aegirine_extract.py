@@ -95,6 +95,22 @@ def _assert_render_pins(document: dict) -> None:
     assert table3["locator"]["table"] == "3"
     assert table3["locator"]["row"] == 11
     assert table3["locator"]["column"] == 3
+    reaction10 = observations["aegirine_table3_reaction_10"]
+    for equation in (
+        table3["reaction_as_printed"],
+        reaction10["values"]["reaction_as_printed"],
+    ):
+        assert "Fe^{3+}_{0.7362}Fe^{2+}_{0.16}" in equation
+
+    reaction11 = observations["aegirine_table3_overall_reaction_11"]
+    reaction11_point = reaction11["values"]["points"][0]
+    for equation in (
+        reaction11_point["reaction_as_printed"],
+        reaction11["values"]["reaction_as_printed"],
+    ):
+        product_side = equation.split("->", maxsplit=1)[1]
+        assert "0.806H2SO4·7H2O(l)" in product_side
+        assert "0.806H2SO4·7H2O(l)" not in equation.split("->", maxsplit=1)[0]
 
     elemental = observations["aegirine_table8_delta_fH"]["values"]["points"][0]
     assert elemental["T_K"] == "298.15"
