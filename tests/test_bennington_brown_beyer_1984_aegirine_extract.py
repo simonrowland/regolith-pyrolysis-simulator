@@ -189,10 +189,12 @@ def _assert_render_pins(document: dict) -> None:
     assert adjusted_solution_point["uncertainty"]["verbatim"] == "±0.200 kcal/mol"
     assert adjusted_solution_point["locator"]["page"] == 18
     assert adjusted_solution_point["locator"]["published_page"] == 13
-    assert adjusted_solution["derivation"]["inputs"] == [
+    expected_adjusted_solution_lineage = [
         "aegirine_table3_reaction_10",
-        "aegirine_table1_sample_characterization",
+        "bennington-brown-beyer-1984-aegirine-ri8912::context::aegirine_table1_sample_characterization",
     ]
+    assert adjusted_solution["derivation"]["inputs"] == expected_adjusted_solution_lineage
+    assert adjusted_solution["derived_from"] == expected_adjusted_solution_lineage
 
     adjusted_reaction = observations["aegirine_pure_endmember_overall_calorimetric_reaction"]
     adjusted_reaction_point = adjusted_reaction["values"]["points"][0]
@@ -303,7 +305,7 @@ def _assert_render_pins(document: dict) -> None:
         "cp",
         "S",
         "negative_gibbs_function_over_T_from_H298",
-        "enthalpy_increment_from_H298",
+        "H_minus_H298",
         "delta_fH_from_oxides",
         "delta_fG_from_oxides",
         "log10_Kf",

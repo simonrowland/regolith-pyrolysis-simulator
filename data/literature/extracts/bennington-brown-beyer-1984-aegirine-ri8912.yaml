@@ -29413,7 +29413,7 @@ species:
         relation: Authors calculate the pure-endmember heat of solution after thermal substitution adjustments and formula-weight correction.
         inputs:
         - aegirine_table3_reaction_10
-        - aegirine_table1_sample_characterization
+        - bennington-brown-beyer-1984-aegirine-ri8912::context::aegirine_table1_sample_characterization
         method:
           state:
             tag: value
@@ -29425,7 +29425,7 @@ species:
         output_unit: kcal/mol
       derived_from:
       - aegirine_table3_reaction_10
-      - aegirine_table1_sample_characterization
+      - bennington-brown-beyer-1984-aegirine-ri8912::context::aegirine_table1_sample_characterization
       uncertainty:
         kind: printed
         value: '0.200'
@@ -29567,8 +29567,8 @@ species:
         - aegirine_table4_reaction_15_constituent_delta_fH
         - aegirine_table4_reaction_23_constituent_delta_fH
         references:
-        - Pankratz (19): reactions 12 (SiO2), 15 (Fe2O3), 20 (H2O(l)), and 21 (Na2SO4-III).
-        - Wagman (21): reaction 23 (H2SO4·7H2O(l)).
+        - "Pankratz (19): reactions 12 (SiO2), 15 (Fe2O3), 20 (H2O(l)), and 21 (Na2SO4-III)."
+        - "Wagman (21): reaction 23 (H2SO4·7H2O(l))."
         method:
           state:
             tag: value
