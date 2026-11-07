@@ -7685,6 +7685,9 @@ def _oxygen_input_request(
     ):
         input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
+        if not oxygen_required:
+            input_notices.append(_omission_notice(quantity, oxygen_why))
+            return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             input_notices.append(fo2_tier_notice(quantity, resolved))
         return Po2Request(
