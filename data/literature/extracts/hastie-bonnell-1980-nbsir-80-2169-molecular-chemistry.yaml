@@ -1,0 +1,5842 @@
+schema_version: literature_extract.v1
+source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+source:
+  citation: Hastie, J. W. and Bonnell, D. W. (1980), Molecular Chemistry of Inhibited Combustion Systems, National
+    Bureau of Standards, NBSIR 80-2169, final report, December 1980.
+  year: 1980
+extraction:
+  method: Table content transcribed from MinerU machine text and checked against pdftotext-layout. Every cell in
+    the included tables was checked against its rendered PDF page; the render resolved layout and digit conflicts.
+    The source is born-digital.
+  date: '2026-11-07'
+  worker: w1107hb-hb80
+  provenance_path: raw/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.pdf
+review_status: draft
+corrections: []
+scope_assessment:
+  requested_data: High-temperature gas partial pressures and thermochemistry for P-, Na-, and Li-bearing vapor species,
+    plus the authors' printed reaction-model data.
+  included_printed_tables:
+    main_table_2_rows: 10
+    main_table_3_rows: 15
+    main_table_4_rows: 10
+    appendix_B_table_2_rows: 6
+    appendix_D_table_D_1_rows: 3
+    appendix_D_table_D_2_rows: 7
+    appendix_E_table_E_1_rows: 4
+    appendix_E_unnumbered_PO_comparison_rows: 3
+    appendix_E_table_E_2_rows: 6
+    appendix_E_table_E_3_rows: 4
+    appendix_E_table_E_4_rows: 8
+  excluded_printed_tables:
+  - locator:
+      page: 21
+      published_page: 15
+      table: '1'
+    reason: Qualitative flame and smoke outcomes; no vapour or thermochemical values.
+  - locator:
+      page: 114
+      published_page: '1122'
+      table: '1'
+    reason: Burner and measurement-technique inventory; not vapour or thermochemical results.
+  - locator:
+      page: 143
+      published_page: B17
+      table: '1'
+    reason: Flame-property comparison table; not vapour or thermochemical results.
+  - locator:
+      page: 169
+    reason: Duplicate scan of Table D.2 on printed page D7; stored once at PDF page 167.
+  - locator:
+      page: 203
+    reason: NBS report cover form, not a data table.
+  - locator:
+      page: 205
+    reason: Date-due page, not a data table.
+  figure_only_candidates:
+  - Figures D.3-D.9: Underlying Na and Li emission intensities and experimental error bounds are figure-only; no
+      point values were read from them.
+  - Figure 6: HPO2/PO temperature curve; no figure-only values were read.
+  note: Table 2 reports ion-intensity-normalized pressure values, not raw ion intensities. The printed TMP column
+    is retained as printed and is not mapped to total flame pressure because the report does not define it as the
+    flame's total pressure. No unprinted pressure, gas mixture, or temperature is added. Rows in Tables 3, 4, D.1
+    and D.2 that lack exact quantity tokens are typed-refused and retained in full below. Printed numbers in parentheses
+    in main Table 2 are predicted equilibrium partial pressures, not measurement errors. Main Table 2 upper-limit
+    pressure cells are retained verbatim in its full-table record; the existing pressure selection path does not
+    migrate partial-pressure bounds.
+schema_gaps:
+- quantity: flame_reaction_kinetic_parameters
+  symbols:
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  - simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+  - simulator/battery/enums.py::Quantity.MASS_LOSS_RATE
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  reason: The closed quantities contain log10_K_reaction but no linear reaction equilibrium constant, reaction enthalpy,
+    rate constant, or reaction rate. MASS_LOSS_RATE is not a chemical reaction rate; LOG10_K_REACTION is log-only.
+    Tables 3 and 4 remain typed-refused.
+- quantity: relative_gas_pressure_ratio
+  symbols:
+  - simulator/battery/enums.py::Quantity.VALENCE_RATIO
+  - simulator/battery/enums.py::Quantity.ION_INTENSITY_RATIO
+  - simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO
+  reason: The HPO2/PO and H/H2O pressure ratios and NaPO2/Na and LiPO2/Li ratios are not valence ratios, ion-intensity
+    ratios, or a phase-distribution ratio. They remain typed-refused in Tables D.1 and D.2.
+- quantity: bond_dissociation_energy_and_thermochemical_fit_coefficients
+  symbols:
+  - simulator/battery/enums.py::Quantity.DELTA_FH
+  - simulator/battery/enums.py::Quantity.CP
+  - simulator/battery/enums.py::Quantity.S
+  reason: The Table E.2 D(X-PO) bond-dissociation energies are not formation enthalpies. Table E.1 coefficients
+    are a seven-coefficient thermodynamic-function representation, not CP or S values. Both remain typed-refused;
+    the exact S and elemental-frame formation enthalpies are separately admitted from Tables E.2-E.4.
+species:
+  PO:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_po_measured_pressures
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator: &id017
+        page: 22
+        pdf_page_index: 21
+        published_page: 16
+        table: '2'
+        row: PO
+      phase: gas
+      regime: high-pressure sampling mass spectrometry
+      standard_state: Partial pressure of PO in the sampled phosphorus-containing flame.
+      units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        admission_status: admitted
+        ion_pressure_basis_as_printed: Partial Pressure × 10^-4 atm
+        printed_scale: 10^-4 atm
+        normalization_as_printed: The authors estimated ionization cross sections and normalized the data assuming
+          mass balance between P added and P produced.
+        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
+        derivation:
+          relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
+            and mass-balance normalization.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+              note: Raw ion intensities and cross sections are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Table 2 footnote d mass-balance normalization
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+        points:
+        - flame_as_printed: 3.1/1/4
+          p_as_published: '20.0'
+          p_atm: '0.002'
+          T_K: '2100'
+          temperature_uncertainty_K_as_printed: ±100
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 9.7/1/3.3
+          p_as_published: '12.0'
+          p_atm: '0.0012'
+          T_K: '1460'
+          temperature_uncertainty_K_as_printed: ±100
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 6.5/1/4.2
+          p_as_published: '24.0'
+          p_atm: '0.0024'
+          T_K: '1600'
+          temperature_uncertainty_K_as_printed: ±100
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 6.5/1/4.2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=6.5/1/4.2; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 6.5/1/4.2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 11.4/1/4
+          p_as_published: '27.6'
+          p_atm: '0.00276'
+          T_K: '1350'
+          temperature_uncertainty_K_as_printed: ±100
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 11.4/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=11.4/1/4; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 11.4/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 3.1/1/2.7
+          p_as_published: '28.5'
+          p_atm: '0.00285'
+          T_K: '2340'
+          temperature_uncertainty_K_as_printed: ±100
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2340'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 3.1/1/2.7
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/2.7; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/2.7
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+    - observation_id: hastie_bonnell_1980_table2_po_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: PO
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of PO in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '20.0'
+          p_atm: '0.002'
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PO
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '0.7'
+          p_atm: 7e-05
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PO
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: PO
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableD2_po_calculated_partial_pressures
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_07
+      locator: &id016
+        page: 167
+        pdf_page_index: 166
+        published_page: D7
+        table: D.2
+        row: PO
+      phase: gas
+      standard_state: Calculated partial pressure of PO in the printed flame mixtures.
+      units: atm as printed in Table D.2 computer notation.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table D.2 gives gas ratios and calculated partial pressures but no total flame pressure.
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: pressure
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        points:
+        - row_as_printed: '1'
+          flame_as_printed: 5/1/4.1
+          p_as_published: 1.83(-3)
+          p_atm: '0.00183'
+          T_K: '1850'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1850'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 5/1/4.1
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=5/1/4.1
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 5/1/4.1
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '1'
+        - row_as_printed: '2'
+          flame_as_printed: 1.8/1/4.3
+          p_as_published: 3.31(-5)
+          p_atm: '3.31e-05'
+          T_K: '2050'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2050'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 1.8/1/4.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=1.8/1/4.3
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 1.8/1/4.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '2'
+        - row_as_printed: '3'
+          flame_as_printed: 3.7/1/3
+          p_as_published: 4.0(-3)
+          p_atm: '0.004'
+          T_K: '2200'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2200'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 3.7/1/3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.7/1/3
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 3.7/1/3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '3'
+        - row_as_printed: '4'
+          flame_as_printed: 2/1/2
+          p_as_published: 1.88(-4)
+          p_atm: '0.000188'
+          T_K: '2370'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2370'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '4'
+        - row_as_printed: '5'
+          flame_as_printed: 2/1/2
+          p_as_published: 2.63(-4)
+          p_atm: '0.000263'
+          T_K: '2450'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2450'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '5'
+        - row_as_printed: '6'
+          flame_as_printed: 2/1/2
+          p_as_published: 2.6(-3)
+          p_atm: '0.0026'
+          T_K: '2450'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2450'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '6'
+        - row_as_printed: '7'
+          flame_as_printed: 0.53/1/0.8
+          p_as_published: 1.98(-3)
+          p_atm: '0.00198'
+          T_K: '2650'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2650'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 0.53/1/0.8
+            gas_mix:
+              state:
+                tag: value
+                value: CH4/O2/N2=0.53/1/0.8
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 0.53/1/0.8
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '7'
+        derivation:
+          relation: Table D.2 reports calculated PO partial pressures used in the third-law analysis.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: calculated pressure inputs
+              figure: D.3-D.9
+          method:
+            state:
+              tag: value
+              value: Authors calculated PO and O2 partial pressures for the Table D.2 flame mixtures; the third-law
+                analysis uses the printed pressure ratios.
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: PO
+              equation: calculated partial pressures in Table D.2
+          references:
+          - JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_po_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator: &id024
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: PO
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: PO
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '69.0'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_po_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: PO
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: PO
+      values:
+        quantity: delta_fH
+        method_class: model_derived
+        admission_status: admitted
+        delta_fH: '-26.8'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        derivation:
+          relation: 2000 K formation enthalpy from the printed 298.15 K formation value and thermodynamic functions.
+          method:
+            state:
+              tag: value
+              value: Thermodynamic-function evaluation using the report data base and JANAF (1971) functions.
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: PO
+              equation: 2000 K formation enthalpy from 298.15 K data and thermal functions
+          references:
+          - JANAF (1971)
+          - Drowart et al. (1972)
+          - Smoes and Drowart (1974)
+          inputs: &id001
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+      derived_from: *id001
+    - observation_id: hastie_bonnell_1980_appendixE_po_delta_fH298_drowart
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_11
+      locator: &id020
+        page: 193
+        pdf_page_index: 192
+        published_page: E7
+        row: Drowart et al. (1972)
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            row: ΔHf,298
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference datum; no experimental pressure stated.
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '-2.3'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as printed.
+        attribution: Drowart et al. (1972)
+      uncertainty:
+        reported_status: printed
+        value: '2'
+        units: kcal/mol
+        confidence_level: not_stated
+    - observation_id: hastie_bonnell_1980_appendixE_po_delta_fH298_janaf
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_11
+      locator:
+        page: 193
+        pdf_page_index: 192
+        published_page: E7
+        row: JANAF (1971), Interim Table
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            row: ΔHf,298
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference datum; no experimental pressure stated.
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '-1.5'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as printed.
+        attribution: JANAF (1971), Interim Table
+      uncertainty:
+        reported_status: printed
+        value: '2'
+        units: kcal/mol
+        confidence_level: not_stated
+    - observation_id: hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_11
+      locator:
+        page: 193
+        pdf_page_index: 192
+        published_page: E7
+        row: Present study
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            row: ΔHf,298
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference datum; no experimental pressure is stated.
+          locator:
+            page: 193
+            pdf_page_index: 192
+            published_page: E7
+            row: pressure
+            section: Appendix E, section 3
+            note: Unnumbered PO formation-enthalpy comparison
+      values:
+        quantity: delta_fH
+        method_class: measured_reduced
+        admission_status: admitted
+        delta_fH: '-5.5'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as printed.
+        attribution: Present study; lower value selected for internal thermodynamic consistency.
+        derivation:
+          relation: Best fit to numerous experimental data sets involving PO, HPO2, NaPO2 and LiPO2; lower PO formation
+            enthalpy selected for internal thermodynamic consistency.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 193
+              pdf_page_index: 192
+              published_page: E7
+              row: fit inputs
+              section: Appendix E, section 3
+              note: Unnumbered PO formation-enthalpy comparison
+      uncertainty:
+        reported_status: printed
+        value: '2'
+        units: kcal/mol
+        confidence_level: not_stated
+  HPO2:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_hpo2_measured_pressures
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: 16
+        table: '2'
+        row: HPO2
+      phase: gas
+      regime: high-pressure sampling mass spectrometry
+      standard_state: Partial pressure of HPO2 in the sampled phosphorus-containing flame.
+      units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        admission_status: admitted
+        ion_pressure_basis_as_printed: Partial Pressure × 10^-4 atm
+        printed_scale: 10^-4 atm
+        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
+        derivation:
+          relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
+            and mass-balance normalization.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+              note: Raw ion intensities and cross sections are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Table 2 footnote d mass-balance normalization
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+        points:
+        - flame_as_printed: 3.1/1/4
+          p_as_published: '0.4'
+          p_atm: 4e-05
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 9.7/1/3.3
+          p_as_published: '3.1'
+          p_atm: '0.00031'
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 6.5/1/4.2
+          p_as_published: '2.4'
+          p_atm: '0.00024'
+          T_K: '1600'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 6.5/1/4.2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=6.5/1/4.2; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 6.5/1/4.2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 11.4/1/4
+          p_as_published: '2.4'
+          p_atm: '0.00024'
+          T_K: '1350'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 11.4/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=11.4/1/4; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 11.4/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 3.1/1/2.7
+          p_as_published: '1.5'
+          p_atm: '0.00015'
+          T_K: '2340'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2340'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 3.1/1/2.7
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/2.7; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/2.7
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+    - observation_id: hastie_bonnell_1980_table2_hpo2_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: HPO2
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of HPO2 in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '1.3'
+          p_atm: '0.00013'
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: HPO2
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '0.4'
+          p_atm: 4e-05
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: HPO2
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: HPO2
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE2_hpo2_S_present_study
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator: &id025
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_HPO2 present_study
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: HPO2
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '63.2'
+        T_K: '298.15'
+        comparison_basis_as_printed: present study
+        derivation:
+          relation: Present-study entropies calculated statistically from Table E.3 structural and spectroscopic
+            parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Statistical-mechanical entropy calculation; harmonic oscillator approximation.
+            locator:
+              page: 197
+              pdf_page_index: 196
+              published_page: E11
+              table: E.2
+              row: HPO2
+          references:
+          - JANAF (1971)
+      uncertainty:
+        reported_status: printed
+        value: '2.0'
+        units: cal/(deg mol)
+        confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE2_hpo2_S_boron_analogy
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_HPO2 boron_analogy
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: HPO2
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '63.2'
+        T_K: '298.15'
+        comparison_basis_as_printed: boron analogy
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE3_hpo2_S298
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_14
+      locator: &id023
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: HOPO
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: S298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table E.3 gives thermodynamic functions, not an experimental gas-pressure condition.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: HOPO
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '63.2'
+        T_K: '298.15'
+        derivation:
+          relation: Statistical-mechanical entropy from Table E.3 structure and vibrational parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Harmonic oscillator approximation; estimated molecular structure and vibrational frequencies.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: HOPO
+          references:
+          - JANAF (1971)
+          - Hastie (1975), p. 291
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_hpo2_delta_fH_relative_PO_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_15
+      locator: &id002
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: HOPO
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: ΔHf,298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference value; no total gas pressure is stated.
+          locator: *id002
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        formation_enthalpy_as_printed: '-96.0'
+        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
+        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
+          relative to PO.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        derivation:
+          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE4_hpo2_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: HPO2
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: HPO2
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '90.0'
+        T_K: '2000'
+        attribution: Table E.3 statistical-mechanical functions
+        derivation:
+          relation: Table E.4 uses the authors' statistical-mechanical P-species functions summarized in Table E.3.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Table E.3 statistical-mechanical functions
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: HPO2
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_appendixD_hpo2_kems_logK
+      type: gibbs_table
+      experiment: hastie_bonnell_1980_experiment_20
+      locator: &id003
+        page: 162
+        pdf_page_index: 161
+        published_page: D2
+        section: Appendix D
+        paragraph b: null
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless log10 Kp; no pressure unit or standard state stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1300'
+          locator:
+            page: 162
+            pdf_page_index: 161
+            published_page: D2
+            section: Appendix D
+            paragraph b: null
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
+              value.
+          locator: *id003
+      values:
+        quantity: log10_K_reaction
+        method_class: measured_reduced
+        admission_status: admitted
+        log10_K_reaction: '-4.5'
+        Kp_as_printed: 10^(-4.5 ± 1)
+        reaction_as_printed: 1/2 P2 + 2 HPO2 = H2O + 3 PO
+        standard_state_as_printed: Not stated.
+        pressure_unit_as_printed: Not stated.
+        derived_formation_enthalpy_as_printed: -96.7 ± 6 kcal/mol relative to ΔHf,298 PO = -5.5 ± 3 kcal/mol
+        derivation:
+          relation: Authors' equilibrium-constant reduction from mass-spectrometric observations, followed by third-law
+            thermochemistry.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 162
+              published_page: D2
+              section: Appendix D
+              paragraph b: null
+              note: Mass-spectrometric details are stated to appear elsewhere.
+          method:
+            state:
+              tag: value
+              value: Knudsen-effusion mass spectrometry; third-law method using Appendix E entropy functions
+            locator:
+              page: 162
+              published_page: D2
+              section: Appendix D
+              paragraph b: null
+      uncertainty:
+        reported_status: printed
+        value: '1'
+        units: log10 Kp
+        confidence_level: not_stated
+  PN:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_pn_measured_pressures
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: 16
+        table: '2'
+        row: PN
+      phase: gas
+      regime: high-pressure sampling mass spectrometry
+      standard_state: Partial pressure of PN in the sampled phosphorus-containing flame.
+      units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        admission_status: admitted
+        ion_pressure_basis_as_printed: Partial Pressure × 10^-4 atm
+        printed_scale: 10^-4 atm
+        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
+        derivation:
+          relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
+            and mass-balance normalization.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+              note: Raw ion intensities and cross sections are not tabulated.
+          method:
+            state:
+              tag: value
+              value: Table 2 footnote d mass-balance normalization
+            locator:
+              page: 22
+              published_page: 16
+              table: '2'
+        points:
+        - flame_as_printed: 3.1/1/4
+          p_as_published: '1.5'
+          p_atm: '0.00015'
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 9.7/1/3.3
+          p_as_published: '1.6'
+          p_atm: '0.00016'
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+        - flame_as_printed: 6.5/1/4.2
+          p_as_published: '2.4'
+          p_atm: '0.00024'
+          T_K: '1600'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: Temp.
+                column: 6.5/1/4.2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=6.5/1/4.2; NTP burner-input mole ratio
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: H2/O2/N2
+                column: 6.5/1/4.2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Table 2 does not identify TMP as total flame pressure.
+              locator:
+                page: 22
+                published_page: 16
+                table: '2'
+                row: TMP
+    - observation_id: hastie_bonnell_1980_table2_pn_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: PN
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of PN in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '5.6'
+          p_atm: '0.00056'
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PN
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '19.0'
+          p_atm: '0.0019'
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PN
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: PN
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+  unknown:
+    observations:
+    - observation_id: hastie_bonnell_1980_table3_reaction_parameters_typed_refusal
+      type: rate_series
+      experiment: hastie_bonnell_1980_experiment_02
+      locator: &id012
+        page: 32
+        pdf_page_index: 31
+        published_page: 26
+        table: '3'
+      phase: gas
+      units: 'mixed printed columns: dimensionless equilibrium factors and molecule^-1 cm^3 s^-1 rate coefficients.'
+      values:
+        quantity: reaction_equilibrium_and_rate_parameters_as_printed
+        method_class: model_derived
+        admission_status: typed_refusal
+        schema_gap: Table 3 combines exp(ΔS/R), -ΔH/R, forward Arrhenius A and E/R with no exact closed quantity
+          for reaction enthalpy, linear equilibrium factor, or reaction-rate coefficient. TYPE_QUANTITY infers a
+          mass-loss rate from rate_series only when quantity is absent; the descriptive quantity deliberately prevents
+          that inference. The source's model parameters are retained.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+        - simulator/battery/enums.py::Quantity.MASS_LOSS_RATE
+        method_as_printed: Candidate reactions and temperature-independent ΔS, ΔH, A and E values for 1800–2600
+          K. The forward rate constants are model parameters; reverse rates use kr=kf/K. Exothermic reactions were
+          assigned 300 K using Jensen and Jones (1974, 1976).
+        references_as_printed:
+        - JANAF (1971)
+        - Baulch et al. (1972)
+        - Jensen and Jones (1974)
+        - Jensen and Jones (1976)
+        rows_as_printed:
+        - - '1'
+          - PO + H + X -> HPO + X
+          - 6.5(-7)
+          - '18900'
+          - 1.1(-29)
+          - '300'
+        - - '2'
+          - HPO + H -> PO + H2
+          - '0.86'
+          - '35600'
+          - 1.1(-9)
+          - '300'
+        - - '3'
+          - HPO2 + H -> PO + H2O
+          - '15.1'
+          - '21740'
+          - 1.5(-10)
+          - '300'
+        - - '4'
+          - HPO2 + H -> PO2 + H2
+          - '3.3'
+          - '19200'
+          - 2.1(-10)
+          - '300'
+        - - '5'
+          - PO2 + H -> PO + OH
+          - '19.5'
+          - '-4930'
+          - 1.5(-10)
+          - '5230'
+        - - '6'
+          - PO2 + H + X -> HPO2 + X
+          - '0.21'
+          - '35300'
+          - 1.5(-28)
+          - '300'
+        - - '7'
+          - PO + OH + X -> HPO2 + X
+          - 8.6(-9)
+          - '40300'
+          - 1.5(-28)
+          - '300'
+        - - '8'
+          - HPO2 + OH -> PO2 + H2O
+          - '0.8'
+          - '26700'
+          - 1.5(-10)
+          - '300'
+        - - '9'
+          - HPO2 + H2 -> HPO + H2O
+          - '18.1'
+          - '13900'
+          - 1.7(-10)
+          - '300'
+        - - '10'
+          - PO + H2O -> PO2 + H2
+          - '0.22'
+          - '-2500'
+          - 1.0(-11)
+          - '2800'
+        - - '11'
+          - H + O2 -> OH + O
+          - ''
+          - ''
+          - ''
+          - ''
+        - - '12'
+          - H + H2O -> H2 + OH
+          - ''
+          - ''
+          - ''
+          - ''
+        - - '13'
+          - H + OH + X -> H2O + X
+          - see JANAF (1971)
+          - ''
+          - see Baulch et al. (1972)
+          - ''
+        - - '14'
+          - H + H + X -> H2 + X
+          - ''
+          - ''
+          - (1972)
+          - ''
+        - - '15'
+          - O + H2 -> OH + H
+          - ''
+          - ''
+          - ''
+          - ''
+        column_headers_as_printed:
+        - Reaction
+        - exp(ΔS/R)
+        - -ΔH/R (K)
+        - A_f
+        - E/R (K)
+        footnotes_as_printed:
+        - X is a third body major flame constituent, e.g. H2O or N2.
+        - ΔS and ΔH are reaction entropy and enthalpy terms; ΔS, ΔH, A and E are treated temperature-independent
+          from 1800 to 2600 K.
+        - Reverse rate constants use kr=kf/K; Af/Ar=exp(ΔS/R) and Ef/Er=ΔH.
+        - All exothermic processes assigned 300 K following Jensen and Jones (1974, 1976).
+        - Rate-constant units are molecule^-1 cm^3 s^-1.
+        T_range_K:
+        - '1800'
+        - '2600'
+        derivation:
+          relation: Kinetic parameters are compiled and assigned for the reported reaction mechanism; reverse rates
+            use kr = kf/K.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 32
+              pdf_page_index: 31
+              published_page: '26'
+              table: '3'
+              row: kinetic input data
+          method:
+            state:
+              tag: value
+              value: Reaction-mechanism parameter selection; reverse rates are calculated with kr = kf/K.
+            locator:
+              page: 32
+              pdf_page_index: 31
+              published_page: '26'
+              table: '3'
+              row: reaction parameters
+              equation: kr = kf/K
+          references:
+          - JANAF (1971)
+          - Baulch et al. (1972)
+          - Jensen and Jones (1974)
+          - Jensen and Jones (1976)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 parameters are stated temperature-independent over 1800-2600 K.
+          locator:
+            page: 32
+            pdf_page_index: 31
+            published_page: '26'
+            table: '3'
+            row: range
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No flame total pressure is printed for the reaction parameter table.
+          locator:
+            page: 32
+            pdf_page_index: 31
+            published_page: '26'
+            table: '3'
+            row: pressure
+    - observation_id: hastie_bonnell_1980_table4_typical_reaction_rates_typed_refusal
+      type: rate_series
+      experiment: hastie_bonnell_1980_experiment_03
+      locator: &id013
+        page: 39
+        pdf_page_index: 38
+        published_page: 33
+        table: '4'
+      phase: gas
+      units: molecule^-1 cm^3 s^-1 for k; molecule cm^-3 s^-1 for reaction rate.
+      values:
+        quantity: model_reaction_rates_as_printed
+        method_class: model_derived
+        admission_status: typed_refusal
+        schema_gap: The printed columns are forward/reverse rate constants and reaction rates; the closed quantity
+          set has no exact chemical reaction-rate or rate-constant token. MASS_LOSS_RATE is unrelated, and no unit
+          conversion can create the missing quantity.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.MASS_LOSS_RATE
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        derivation:
+          relation: Typical modeled reaction-rate values use the Table 3 mechanism parameters and the printed flame
+            scenarios.
+          inputs:
+          - hastie_bonnell_1980_table3_reaction_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Authors’ flame inhibition and promotion reaction model.
+            locator:
+              page: 39
+              pdf_page_index: 38
+              published_page: '33'
+              table: '4'
+              row: model outputs
+              equation: reaction-rate model
+          references:
+          - JANAF (1971)
+          - Baulch et al. (1972)
+          - Jensen and Jones (1974)
+          - Jensen and Jones (1976)
+        references_as_printed:
+        - Table 3
+        - JANAF (1971)
+        - Jensen and Jones (1974)
+        - Jensen and Jones (1976)
+        rows_as_printed:
+        - - '1'
+          - PO + H + X -> HPO + X
+          - 1.1(-29)
+          - 1.2(22)
+          - --
+          - --
+          - 1.1(-29)
+          - 1.0(23)
+          - --
+          - --
+        - - '2'
+          - HPO + H -> PO + H2
+          - 1.1(-9)
+          - 5.2(20)
+          - 3.3(-18)
+          - 3.0(16)
+          - 1.1(-9)
+          - 3.0(21)
+          - 8.5(-16)
+          - 1.0(18)
+        - - '3'
+          - HPO2 + H -> PO + H2O
+          - 1.5(-10)
+          - 4.1(21)
+          - 5.8(-18)
+          - 3.3(16)
+          - 1.5(-10)
+          - 2.1(22)
+          - 1.7(-15)
+          - 3.1(19)
+        - - '4'
+          - HPO2 + H -> PO2 + H2
+          - 1.8(-10)
+          - 4.9(21)
+          - 1.3(-15)
+          - 3.9(19)
+          - 1.8(-10)
+          - 2.6(22)
+          - 2.5(-14)
+          - 2.3(19)
+        - - '5'
+          - PO2 + H -> PO + OH
+          - 8.2(-12)
+          - 7.2(17)
+          - 1.2(-10)
+          - 1.3(21)
+          - 1.9(-11)
+          - 3.5(22)
+          - 5.6(-11)
+          - 5.5(23)
+        - - '6'
+          - PO2 + H + X -> HPO2 + X
+          - 1.5(-28)
+          - 5.2(21)
+          - --
+          - --
+          - 1.5(-28)
+          - 1.0(24)
+          - --
+          - --
+        - - '7'
+          - PO + OH + X -> HPO2 + X
+          - 1.5(-28)
+          - 6.4(19)
+          - --
+          - --
+          - 1.5(-28)
+          - 5.8(24)
+          - --
+          - --
+        - - '8'
+          - HPO2 + OH -> PO2 + H2O
+          - 1.3(-10)
+          - 1.4(20)
+          - 5.8(-17)
+          - 1.1(16)
+          - 1.3(-10)
+          - 7.6(22)
+          - 3.9(-15)
+          - 5.3(22)
+        - - '9'
+          - HPO2 + H2 -> HPO + H2O
+          - 1.5(-10)
+          - 1.4(23)
+          - 3.7(-15)
+          - 3.7(16)
+          - 1.5(-10)
+          - 1.1(22)
+          - 3.4(-14)
+          - 1.1(19)
+        - - '10'
+          - PO + H2O -> PO2 + H2
+          - 2.0(-12)
+          - 1.2(22)
+          - 3.6(-11)
+          - 1.1(22)
+          - 3.3(-12)
+          - 6.1(22)
+          - 4.0(-11)
+          - 3.6(22)
+        column_headers_as_printed:
+        - Reaction
+        - Inhibition 1800 K: forward kf, rate Rf, reverse kr, rate Rr
+        - Promotion 2500 K: forward kf, rate Rf, reverse kr, rate Rr
+        conditions_as_printed:
+          inhibition_gas_mix: H2/O2/N2=5/1/4.1
+          inhibition_temperature_K: '1800'
+          promotion_gas_mix: H2/O2/N2=2/1/2
+          promotion_temperature_K: '2500'
+          inhibition_partial_pressure_equivalence: 1 atm, explicitly stated by footnote a for mole fractions in
+            those modeled flame conditions.
+        footnotes_as_printed:
+        - Inhibition model composition from equilibrium calculations except H and OH; units are mole fraction equivalent
+          to partial pressure at 1 atm.
+        - Promotion model composition is printed as mole fraction.
+        - X is the combined major flame species, approximately 3.9 × 10^18 molecule/cm^3.
+        - Computer notation 1.1(-29) means 1.1 × 10^-29.
+        - Rate units are cm^3 molecule^-1 s^-1.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 4 includes separate 1800 K inhibition and 2500 K promotion model conditions.
+          locator:
+            page: 39
+            pdf_page_index: 38
+            published_page: '33'
+            table: '4'
+            row: condition columns
+        gas_mix:
+          state:
+            tag: unknown
+            reason: Table 4 includes two different printed flame mixtures.
+          locator:
+            page: 39
+            pdf_page_index: 38
+            published_page: '33'
+            table: '4'
+            row: condition columns
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Only inhibition footnote a explicitly equates mole fraction with partial pressure at 1 atm;
+              no shared total pressure is assigned.
+          locator:
+            page: 39
+            pdf_page_index: 38
+            published_page: '33'
+            table: '4'
+            row: pressure
+      derived_from:
+      - hastie_bonnell_1980_table3_reaction_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+      type: gibbs_table
+      experiment: hastie_bonnell_1980_experiment_05
+      locator: &id015
+        page: 163
+        pdf_page_index: 162
+        published_page: D3
+        table: D.1
+      phase: gas
+      units: 'Mixed as printed: gas pressure ratios, Kp and kcal/mol reaction enthalpy.'
+      values:
+        quantity: hpo2_reaction_pressure_ratios_Kp_and_third_law_enthalpy
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: The row mixes HPO2/PO pressure ratios, calculated H/H2O pressure ratios, linear Kp and reaction
+          enthalpy. No exact quantity token represents the full row. LOG10_K_REACTION is logarithmic only; H_MINUS_H298
+          is not reaction enthalpy; gas pressure ratios have no exact token. Each printed cell is retained verbatim.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/enums.py::Quantity.VALENCE_RATIO
+        rows_as_printed:
+        - - 6.5/1/4.2
+          - '1600'
+          - '0.1'
+          - 1.87(-4)
+          - 1.87(-5)
+          - '23.7'
+        - - 3.1/1/4
+          - '2120'
+          - 2.0(-2)
+          - 5.3(-3)
+          - 1.06(-4)
+          - '23.7'
+        - - 3.1/1/2.7
+          - '2340'
+          - 5.26(-2)
+          - 1.64(-2)
+          - 8.62(-4)
+          - '17.3'
+        column_headers_as_printed:
+        - H2/O2/N2
+        - T (K)
+        - HPO2/PO
+        - H/H2O
+        - Kp
+        - ΔH298
+        column_evidence:
+          HPO2_over_PO: measured_reduced from mass-spectrometric flame data in Table 2
+          H_over_H2O: model_derived multicomponent equilibrium using upgraded JANAF (1971); optical measurements
+            on similar flames agreed
+          Kp_and_reaction_enthalpy: measured_reduced from the pressure ratios and thermodynamic functions in Appendix
+            E
+        reaction_as_printed: PO + H2O = HPO2 + H
+        standard_state_as_printed: Kp standard state and pressure unit are not stated.
+        references_as_printed:
+        - JANAF (1971)
+        derivation:
+          relation: Pressure ratios, equilibrium constants and third-law enthalpies are reduced from flame mass-spectrometric
+            data and thermodynamic functions.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 163
+              pdf_page_index: 162
+              published_page: D3
+              table: D.1
+              row: raw mass-spectrometric signals
+          method:
+            state:
+              tag: value
+              value: Flame mass-spectrometric equilibrium analysis; third-law reaction thermochemistry.
+            locator:
+              page: 163
+              pdf_page_index: 162
+              published_page: D3
+              table: D.1
+              row: third-law analysis
+          references:
+          - JANAF (1971)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table D.1 contains three different printed flame temperatures.
+          locator:
+            page: 163
+            pdf_page_index: 162
+            published_page: D3
+            table: D.1
+            row: T column
+        gas_mix:
+          state:
+            tag: unknown
+            reason: Table D.1 contains three different printed flame gas ratios.
+          locator:
+            page: 163
+            pdf_page_index: 162
+            published_page: D3
+            table: D.1
+            row: gas-ratio column
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table D.1 does not print total flame pressure.
+          locator:
+            page: 163
+            pdf_page_index: 162
+            published_page: D3
+            table: D.1
+            row: pressure
+    - observation_id: hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      type: gibbs_table
+      experiment: hastie_bonnell_1980_experiment_18
+      locator: &id026
+        page: 167
+        pdf_page_index: 166
+        published_page: D7
+        table: D.2
+      phase: gas
+      units: 'Mixed as printed: atm, pressure ratios, K and kcal/mol.'
+      values:
+        quantity: NaPO2_LiPO2_pressure_ratios_equilibrium_constants_and_reaction_enthalpies
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: The table combines pressure ratios, linear K values and second-law reaction enthalpies. There
+          is no exact gas-pressure-ratio, linear equilibrium-constant or reaction-enthalpy quantity. The listed
+          formation-enthalpy results are stored separately with their printed element formation symbol and the PO
+          reference noted in Appendix E.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        - simulator/battery/enums.py::Quantity.VALENCE_RATIO
+        rows_as_printed:
+        - - 5/1/4.1
+          - '1850'
+          - 1.83(-3)
+          - 2.8(-9)
+          - '2.1'
+          - 2.1(7)
+          - '137.3'
+          - '3.0'
+          - 3.0(7)
+          - '146.3'
+        - - 1.8/1/4.3
+          - '2050'
+          - 3.31(-5)
+          - 1.26(-2)
+          - '10.0'
+          - 2.7(6)
+          - '143.8'
+          - '5.2'
+          - 1.4(6)
+          - '149.7'
+        - - 3.7/1/3
+          - '2200'
+          - 4.0(-3)
+          - 1.46(-6)
+          - '0.9'
+          - 1.9(5)
+          - '142.9'
+          - '1.0'
+          - 2.1(5)
+          - '152.5'
+        - - 2/1/2
+          - '2370'
+          - 1.88(-4)
+          - 5.0(-3)
+          - '0.45'
+          - 3.4(4)
+          - '146.3'
+          - '---'
+          - '---'
+          - '---'
+        - - 2/1/2
+          - '2450'
+          - 2.63(-4)
+          - 6.74(-3)
+          - '0.14'
+          - 6.5(3)
+          - '140.1'
+          - '---'
+          - '---'
+          - '---'
+        - - 2/1/2
+          - '2450'
+          - 2.6(-3)
+          - 2.46(-3)
+          - '1.1'
+          - 8.5(3)
+          - '141.4'
+          - '0.06'
+          - 5.0(2)
+          - '138.9'
+        - - 0.53/1/0.8
+          - '2650'
+          - 1.98(-3)
+          - 1.48(-2)
+          - '1.1'
+          - 4.5(3)
+          - '154.5'
+          - ~0.1
+          - ~4.0(2)
+          - '153.0'
+        column_headers_as_printed:
+        - Flame H2/O2/N2
+        - T (K)
+        - PO (atm)
+        - O2 (atm)
+        - RNa
+        - KNa
+        - -ΔHNa,298 (kcal/mol)
+        - RLi
+        - KLi
+        - -ΔHLi,298 (kcal/mol)
+        column_evidence:
+          PO_and_O2_partial_pressures: model_derived; the source states both pressure columns were calculated.
+          RNa_and_RLi: measured_reduced from Na and Li emission-intensity changes; underlying intensity values are
+            figure-only in Figures D.3-D.8.
+          KNa_KLi_and_reaction_enthalpies: measured_reduced from pressure ratios and calculated pressures.
+        reaction_as_printed: Na + PO + 1/2 O2 = NaPO2; similarly for Li.
+        computer_notation_as_printed: 1.83(-3) means 1.83 × 10^-3.
+        reaction_hf_results_as_printed:
+        - NaPO2: -123.5 ± 5.5 kcal/mol
+        - LiPO2: -115.2 ± 5.8 kcal/mol
+        footnotes_as_printed:
+        - Row 7 is a CH4/O2/N2 flame.
+        - Experimental error bounds are in Figure D.9.
+        - Table D.2 is duplicated on PDF page 169; the duplicate is identical to the render of PDF page 167.
+        derivation:
+          relation: NaPO2/Na and LiPO2/Li pressure ratios and third-law reaction enthalpies are reduced from flame
+            mass-spectrometric data.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: emission-intensity series
+              figure: D.3-D.9
+          method:
+            state:
+              tag: value
+              value: Third-law thermochemical analysis using calculated PO and O2 partial pressures and printed
+                alkali-phosphate ratios.
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: third-law analysis
+          references:
+          - JANAF (1971)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table D.2 contains seven different printed flame temperatures.
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: T column
+        gas_mix:
+          state:
+            tag: unknown
+            reason: Table D.2 contains seven different printed flame gas ratios.
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: flame column
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table D.2 does not print total flame pressure.
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: pressure
+    - observation_id: hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_04
+      locator: &id014
+        page: 192
+        pdf_page_index: 191
+        published_page: E6
+        table: E.1
+      phase: gas
+      units: Coefficients A1-A7 as printed; valid 298.15-5000 K.
+      values:
+        quantity: thermodynamic_function_fit_coefficients_as_printed
+        method_class: model_derived
+        admission_status: typed_refusal
+        schema_gap: A1-A7 form the report's seven-parameter thermodynamic-function representation. CP is a heat-capacity
+          quantity and S is entropy; neither is an exact token for this coefficient vector. Coefficients are kept
+          as printed without evaluating or expanding them.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity.CP
+        - simulator/battery/enums.py::Quantity.S
+        method_as_printed: Statistical-mechanical ideal-gas functions calculated with JANAF (1971) equations; BASIC
+          code on CDC Cybernet at 14-digit precision. Equilibrium calculations used CEC-76 supplied by B. McBride
+          of NASA Lewis from a tape created December 11, 1979.
+        references_as_printed:
+        - JANAF (1971)
+        - CEC-76, supplied by B. McBride, NASA Lewis
+        temperature_range_K_as_printed:
+        - '298.15'
+        - '5000'
+        rows_as_printed:
+        - - HPO
+          - '2.87129590E+00'
+          - '5.74074470E-03'
+          - '-3.44113690E-06'
+          - '9.71911380E-10'
+          - '-1.05193950E-13'
+          - '-5.86337172E+03'
+          - '1.04228407E+01'
+        - - HPO2
+          - '2.52212083E+00'
+          - '8.91362860E-03'
+          - '-4.66432070E-06'
+          - '1.15362175E-09'
+          - '-1.08937615E-13'
+          - '-4.94190805E+04'
+          - '1.49576310E+01'
+        - - NaPO2
+          - '5.71069827E+00'
+          - '7.66608854E-03'
+          - '-5.06885111E-06'
+          - '1.42209111E-09'
+          - '-1.42316725E-13'
+          - '-6.42003450E+04'
+          - '2.3386362E+00'
+        - - LiPO2
+          - '4.87775884E+00'
+          - '8.97034507E-03'
+          - '-5.85790189E-06'
+          - '1.63025247E-09'
+          - '-1.62250410E-13'
+          - '-5.96756424E+04'
+          - '3.14581376E+00'
+        footnote_as_printed: Coefficient exponent computer notation E-03 equals 10^-3.
+        T_range_K:
+        - '298.15'
+        - '5000'
+        derivation:
+          relation: The seven thermodynamic-function coefficients are calculated from the printed molecular and
+            vibrational parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Statistical-mechanical ideal-gas functions in the JANAF equation basis; CEC-76 equilibrium
+                code.
+            locator:
+              page: 192
+              pdf_page_index: 191
+              published_page: E6
+              table: E.1
+              row: coefficient representation
+              equation: seven-coefficient thermodynamic-function representation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The printed coefficients are valid over a temperature range, not at one point.
+          locator:
+            page: 192
+            pdf_page_index: 191
+            published_page: E6
+            table: E.1
+            row: range
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermodynamic function coefficients are not an experimental gas-pressure condition.
+          locator:
+            page: 192
+            pdf_page_index: 191
+            published_page: E6
+            table: E.1
+            row: pressure
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
+      type: gibbs_table
+      experiment: hastie_bonnell_1980_experiment_10
+      locator: &id019
+        page: 193
+        pdf_page_index: 192
+        published_page: E7
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_reduced
+        admission_status: admitted
+        delta_fH: '-5.5'
+        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as designated by the printed formation
+          symbol.
+        T_K: '298.15'
+        comparison_rows_as_printed:
+        - - -5.5 ± 2
+          - Present study
+        - - -2.3 ± 2
+          - Drowart et al. (1972)
+        - - -1.5 ± 2
+          - JANAF (1971), Interim Table
+        method_as_printed: Present-study value selected for consistency with the report's experimental data base.
+        derivation:
+          relation: PO formation enthalpy selected from the authors' thermochemical reduction.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 193
+              published_page: E7
+              section: 3
+              note: Supporting experimental inputs are not printed here.
+          method:
+            state:
+              tag: value
+              value: Authors' present-study value; mass-spectrometric thermochemical analysis
+            locator:
+              page: 193
+              published_page: E7
+      uncertainty:
+        reported_status: printed
+        value: '2'
+        units: kcal/mol
+        confidence_level: not_stated
+    - observation_id: hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_06
+      locator: &id004
+        page: 163
+        pdf_page_index: 162
+        published_page: D3
+        section: Appendix D
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: The report explicitly states that HPO2 formation enthalpies are measured relative to PO. The
+          closed delta_fH token is for elemental formation enthalpy and cannot represent a relative-to-PO datum.
+          The printed values and their reference frame are retained.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        values_as_printed:
+        - value: -96.7 ± 6
+          locator:
+            page: 162
+            published_page: D2
+            section: Appendix D
+            paragraph b: null
+        - value: -94 ± 4
+          locator:
+            page: 163
+            published_page: D3
+            section: Appendix D
+            paragraph c: null
+        - value: -96 ± 4
+          locator:
+            page: 163
+            published_page: D3
+            section: Appendix D
+            paragraph c: null
+        reference_frame_as_printed: Relative to ΔHf,298 PO.
+        method_as_printed: Knudsen-effusion mass-spectrometric third law; flame mass-spectrometric third law.
+        references_as_printed:
+        - JANAF (1971)
+        - Drowart et al. (1972)
+        derivation:
+          relation: Third-law HPO2 formation enthalpy from the measured Kp and Appendix E entropy functions, relative
+            to PO.
+          inputs:
+          - hastie_bonnell_1980_appendixD_hpo2_kems_logK
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 163
+            pdf_page_index: 162
+            published_page: D3
+            section: Appendix D
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
+              value.
+          locator: *id004
+      derived_from:
+      - hastie_bonnell_1980_appendixD_hpo2_kems_logK
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_appendixE_tableE2_bond_energies_typed_refusal
+      type: gibbs_table
+      experiment: hastie_bonnell_1980_experiment_09
+      locator: &id018
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+      phase: gas
+      units: kcal/mol for D; cal/(deg mol) for S.
+      values:
+        quantity: bond_dissociation_and_boron_analogy_comparison_as_printed
+        admission_status: typed_refusal
+        schema_gap: D(X-PO) is a bond-dissociation energy, not delta_fH; no exact token represents the printed reaction
+          D value. The comparison percentages are author-calculated and also have no exact quantity token. Entropy
+          rows are extracted separately as S.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        - simulator/battery/enums.py::Quantity.S
+        rows_as_printed:
+        - - D_HO-PO
+          - 99.9 ± 4
+          - '103.1'
+          - '-3.6'
+        - - D_Na-PO2
+          - 88.3 ± 5.5
+          - 82.9 ± 3.0 or 85.0 ± 5.0
+          - 6.5 or 3.3
+        - - D_Li-PO2
+          - 92.4 ± 5.8
+          - '92.7'
+          - '-0.3'
+        references_as_printed:
+        - Jensen (1969)
+        - JANAF (1971)
+        - Gingerich and Miller (1975)
+        - Smoes and Drowart (1974)
+        column_evidence:
+          present_study_bond_dissociation_energies: model_derived from the present-study thermochemical fit; no
+            exact bond-energy quantity token.
+          boron_analogy_and_literature_values: quoted_attributed to the row-specific printed references.
+          comparison_percentages: author-calculated from the displayed bond energies.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: pressure
+    - observation_id: hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_13
+      locator: &id022
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+      phase: gas
+      units: 'Mixed as printed: degrees, angstroms, atomic mass units, cm^3, cm^-1, cal/(deg mol), kcal/mol.'
+      values:
+        quantity: structural_spectroscopic_and_relative_formation_data_as_printed
+        admission_status: typed_refusal
+        schema_gap: The table's structural and vibrational-parameter vectors have no exact quantity token. HPO2,
+          NaPO2 and LiPO2 formation enthalpies are explicitly relative to PO in Appendix E, so they cannot use the
+          elemental delta_fH token. Values remain typed-refused.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        - simulator/battery/enums.py::Quantity.CP
+        - simulator/battery/enums.py::Quantity.S
+        rows_as_printed:
+        - - POH
+          - HOP=118.0 degrees
+          - rHO=1.0 A
+          - rPO=1.6 A
+          - '0.0284'
+          - 2400(v3);950(v1);500(v2)
+          - '56.3'
+          - -9.5 ± 5
+        - - HOPO
+          - HOP=118.0 degrees; OPO=116.0 degrees
+          - rPO=1.40 A
+          - rOH=1.00 A
+          - '1.516'
+          - 3680(v1);2030(v2);1420(v3);1195(v4);530(v5);1400(v6)
+          - '63.2'
+          - '-96.0'
+        - - Li-OPO
+          - Li-OP=100.0 degrees; OPO=116.0 degrees
+          - rOP=1.6 A
+          - rLi-O=1.62 A
+          - '6.7'
+          - 850(v2);1250(v1);550(v4);925(v3);250(v6);325(v5)
+          - '66.3'
+          - '-115.0'
+        - - Na-OPO
+          - Na-OP=100.0 degrees; OPO=116.0 degrees
+          - rOP=1.60 A
+          - rO-Na=2.00 A
+          - '30.50'
+          - 800(v1);1200(v2);500(v3);200(v4);100(v5);150(v6)
+          - '73.4'
+          - '-123.5'
+        parameter_method_as_printed: Harmonic oscillator approximation with sigma=1, epsilon=0, g=1; estimated structures
+          and vibrational parameters. Na/Li structures assumed analogous to HOPO; alternative M-O-P-O ring structures
+          could affect entropy by several cal/mol.
+        enthalpy_reference_frame_as_printed: HPO2, NaPO2 and LiPO2 relative to PO; POH formation estimated with
+          the M-OH versus M-F bond-energy correlation.
+        references_as_printed:
+        - Hastie (1975), p. 291
+        - Jensen (1969)
+        - JANAF (1971)
+        column_evidence:
+          structure_and_vibrational_parameters: model_derived from estimated structures and harmonic-oscillator
+            parameters.
+          entropy_values: model_derived statistical-mechanical calculations; separately admitted as S observations.
+          HPO2_NaPO2_LiPO2_formation_enthalpies: measured_reduced and explicitly relative to PO; separately typed-refused
+            for the elemental-frame quantity gap.
+          POH_formation_enthalpy: model_derived using the M-OH versus M-F bond-energy correlation.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table E.3 gives thermochemical reference values and molecular parameters, not a gas pressure.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: pressure
+    - observation_id: hastie_bonnell_1980_appendixE_tableE4_hpo2_hf_relative_po_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator: &id005
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: HPO2
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: model_derived
+        admission_status: typed_refusal
+        schema_gap: Table E.4 repeats the selected HPO2 formation enthalpy. Appendix E states the HPO2 formation
+          enthalpy is measured relative to PO; the exact elemental delta_fH token therefore does not represent this
+          row.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        delta_fH_2000_as_printed: '-97.9'
+        reference_frame_as_printed: Relative to ΔHf,298 PO; 2000 K thermodynamic function used in the flame model.
+        derivation:
+          relation: 2000 K HPO2 formation enthalpy relative to PO from the selected third-law result and thermodynamic
+            functions.
+          inputs:
+          - hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: HPO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
+              value.
+          locator: *id005
+      derived_from:
+      - hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    context:
+    - observation_id: hastie_bonnell_1980_main_table2_full_rendered_table
+      type: printed_table_context
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: 16
+        table: '2'
+      phase: gas
+      units: Pressure coefficients ×10^-4 atm; TMP ×10^-3 atm; temperature K; time ×10^-3 s.
+      values:
+        admission_status: typed_refusal_for_limits_and_mixed_measured_model_cells
+        table_columns_as_printed:
+        - H2/O2/N2 flame mole ratio
+        - TMP (10^-3 atm)
+        - Temperature (K)
+        - Time (10^-3 s)
+        - PO
+        - HPO2
+        - PN
+        - P2
+        - PO2
+        - HPO
+        flame_columns_as_printed:
+        - 3.1/1/4
+        - 9.7/1/3.3
+        - 6.5/1/4.2
+        - 11.4/1/4
+        - 3.1/1/2.7
+        rows_as_printed:
+        - - TMP (10^-3 atm)
+          - '3.0'
+          - '2.0'
+          - '3.0'
+          - '3.0'
+          - '3.0'
+        - - Temp. (K)
+          - '2100'
+          - '1460'
+          - '1600'
+          - '1350'
+          - '2340'
+        - - Time (10^-3 s)
+          - '2.0'
+          - '3.0'
+          - '1.3'
+          - ~2.0
+          - ~2.0
+        - - P-Species
+          - ''
+          - ''
+          - ''
+          - ''
+          - ''
+        - - PO
+          - 20.0 (20.0)
+          - 12.0 (0.7)
+          - '24.0'
+          - '27.6'
+          - '28.5'
+        - - HPO2
+          - 0.4 (1.3)
+          - 3.1 (0.4)
+          - '2.4'
+          - '2.4'
+          - '1.5'
+        - - PN
+          - 1.5 (5.6)
+          - 1.6 (19.0)
+          - '2.4'
+          - —
+          - —
+        - - P2
+          - <0.05 (0.005)
+          - 1.2 (0.4)*
+          - <0.2
+          - —
+          - —
+        - - PO2
+          - <0.05 (2.1)
+          - <0.4 (0.006)
+          - <0.4
+          - —
+          - —
+        - - HPO
+          - <0.05 (0.02)
+          - <0.6 (0.002)
+          - <0.2
+          - —
+          - —
+        footnotes_as_printed:
+        - H2/O2/N2 values are NTP mole ratios of burner input.
+        - Temperature uncertainty is ±100 K; Na D-line reversal or adiabatic thermodynamic calculation with empirical
+          burner heat-loss correction.
+        - Flow time is referenced to reaction zone; typically 2 ms is approximately 1 cm.
+        - Relative pressure uncertainties ±10%, absolute ±30%; upper limits are mass-spectrometer detection limits.
+        - Parenthesized values are predicted equilibrium partial pressures.
+    - observation_id: hastie_bonnell_1980_appendixB_table2_full_rendered_table
+      type: printed_table_context
+      locator:
+        page: 122
+        pdf_page_index: 121
+        published_page: 1130
+        table: '2'
+      phase: gas
+      units: K
+      values:
+        quantity: flame_temperature_comparison_as_printed
+        method_class: mixed_by_column_and_typed_refusal
+        admission_status: typed_refusal
+        schema_gap: The exact flame-temperature comparison is not a transition temperature and the report's closed
+          Quantity set has no flame-temperature token. The calculated adiabatic cells are authors' model results;
+          measured cells and literature values are kept with their own column labels.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.TRANSITION_TEMPERATURE
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        column_evidence:
+          Na-D line reversal: measured_direct, authors and W. Miller [47] comparison values are identified by footnotes
+            c and d.
+          OH absorption: measured_direct.
+          Vibrational Raman: measured_direct.
+          Rotational Raman: measured_direct or stated as a cross-technique comparison in footnote g.
+          Calculated adiabatic: model_derived; method is adiabatic thermodynamic calculation, source says accuracy
+            within 1 K.
+        references_as_printed:
+        - W. Miller [47]
+        - references [2], [16], and [47] cited in the surrounding comparison section
+        rows_as_printed:
+        - - 4.0/1.0/4.0
+          - 'no'
+          - 2100 ± 20
+          - ''
+          - 2146 ± 40
+          - ''
+          - ''
+        - - 4.0/1.0/4.0
+          - 'yes'
+          - 2060 ± 20
+          - 2160 ± 40
+          - 1980 ± 40
+          - g
+          - '2019'
+        - - 4.0/1.0/4.0
+          - --
+          - 1990 ± 20 (underlined)
+          - ''
+          - 2010 ± 40 (underlined)
+          - ''
+          - ''
+        - - 4.0/1.0/4.0
+          - --
+          - 2020 (W. Miller [47])
+          - ''
+          - ''
+          - ''
+          - ''
+        - - 3.4/1.0/2.0
+          - 'yes'
+          - 2470 ± 20
+          - 2425 ± 60
+          - 2500 ± 150
+          - f
+          - '2545'
+        - - 3.4/1.0/2.0
+          - --
+          - 2475 (W. Miller [47])
+          - ''
+          - ''
+          - ''
+          - ''
+        footnotes_as_printed:
+        - Temperature in K at 30 mm (cylindrical burner) or 15 mm (rectangular burner) above burner face; rotational
+          Raman uncertainty is two standard deviations.
+        - Value with superscript b was measured at z=30 mm, y=0 mm; similar at z=15 mm (Fig. 11).
+        - Underlined data are for cylindrical burner; other data refer to rectangular burner.
+        - Miller [47] values were obtained with an almost identical burner and gas flow condition.
+        - Calculated adiabatic data should be accurate within a degree.
+        - See Figure 12 for data at z=30 mm, y=0 mm.
+        - Cross-technique Raman comparison at z=30 mm, y=2 mm: rotational 2113 ± 22 K and vibrational 2096 ± 40
+            K.
+    - observation_id: hastie_bonnell_1980_appendixE_tableE2_full_comparison_table
+      type: printed_table_context
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+      phase: gas
+      units: 'D: kcal/mol; S: cal/(deg mol); reference temperature 298.15 K.'
+      values:
+        admission_status: D bond energies and difference column typed-refused; S values separately extracted.
+        rows_as_printed:
+        - - D_HO-PO
+          - 99.9 ± 4
+          - '103.1'
+          - '-3.6'
+        - - D_Na-PO2
+          - 88.3 ± 5.5
+          - 82.9 ± 3.0 or 85.0 ± 5.0
+          - 6.5 or 3.3
+        - - D_Li-PO2
+          - 92.4 ± 5.8
+          - '92.7'
+          - '-0.3'
+        - - S_HPO2
+          - 63.2 ± 2.0
+          - '63.2'
+          - '0'
+        - - S_NaPO2
+          - 73.4 ± 2.0
+          - '71.6'
+          - '2.5'
+        - - S_LiPO2
+          - 66.3 ± 2.0
+          - '68.0'
+          - '-2.5'
+        references_as_printed:
+        - Jensen (1969)
+        - JANAF (1971)
+        - Gingerich and Miller (1975)
+        - Smoes and Drowart (1974)
+        footnotes_as_printed:
+        - D values are kcal/mol; S values are cal/(deg mol), at 298.15 K.
+        - Jensen (1969) supplies LiBO2/NaBO2 analogy data.
+        - JANAF data are based on a single indirect measurement.
+        - Bond values are consistent with second-law data for Na + PO + 1/2 O2 = NaPO2 and similarly for Li.
+        - Two disparate literature values are 82.3 and 72.9 kcal/mol from Gingerich and Miller (1975) and Smoes
+          and Drowart (1974).
+    - observation_id: hastie_bonnell_1980_appendixE_tableE3_full_rendered_table
+      type: printed_table_context
+      locator:
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+      phase: gas
+      units: Mixed as printed.
+      values:
+        rows_as_printed:
+        - - POH
+          - HOP=118.0°
+          - rHO=1.0 Å
+          - rPO=1.6 Å
+          - '0.0284'
+          - 2400(v3);950(v1);500(v2)
+          - '56.3'
+          - '-9.5'
+        - - HOPO
+          - HOP=118.0°
+          - OPO=116.0°
+          - rPO=1.40 Å
+          - rOH=1.00 Å
+          - '1.516'
+          - 3680(v1);2030(v2);1420(v3);1195(v4);530(v5);1400(v6)
+          - '63.2'
+          - '-96.0'
+        - - Li-OPO
+          - Li-OP=100.0°
+          - OPO=116.0°
+          - rOP=1.6 Å
+          - rLi-O=1.62 Å
+          - '6.7'
+          - 850(v2);1250(v1);550(v4);925(v3);250(v6);325(v5)
+          - '66.3'
+          - '-115.0'
+        - - Na-OPO
+          - Na-OP=100.0°
+          - OPO=116.0°
+          - rOP=1.60 Å
+          - rO-Na=2.00 Å
+          - '30.50'
+          - 800(v1);1200(v2);500(v3);200(v4);100(v5);150(v6)
+          - '73.4'
+          - '-123.5'
+        footnotes_as_printed:
+        - Harmonic oscillator approximation sigma=1, epsilon=0, g=1.
+        - HPO entropy is isomer-dependent; the listed POH isomer is used.
+        - Angles and bond distances were estimated.
+        - Na/Li structures were assumed analogous to HOPO; a ring alternative could alter entropy by several cal/(deg
+          mol).
+    - observation_id: hastie_bonnell_1980_appendixE_tableE4_full_rendered_table
+      type: printed_table_context
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+      phase: gas
+      units: ΔHf,2000 kcal/mol; S2000 cal/(deg mol).
+      values:
+        admission_status: HPO2 formation value typed-refused due relative-to-PO reference frame; all S and other
+          Hf cells separately extracted.
+        rows_as_printed:
+        - - PO
+          - '-26.8'
+          - '69.0'
+        - - PO2
+          - '-81.9'
+          - '84.2'
+        - - HPO
+          - '-10.2'
+          - '77.5'
+        - - HPO2
+          - '-97.9'
+          - '90.0'
+        - - H
+          - '54.2'
+          - '36.8'
+        - - OH
+          - '8.9'
+          - '57.9'
+        - - H2
+          - '0.'
+          - '45.0'
+        - - H2O
+          - '-60.1'
+          - '63.2'
+        reference_frame_as_printed: ΔHf,2000 is the elemental standard formation quantity in JANAF (1971) convention
+          where the report uses JANAF data; Appendix E explicitly says P-containing derived enthalpies are relative
+          to PO.
+        source_as_printed: JANAF (1971), unless indicated otherwise in the main text.
+  NaPO2:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE2_napo2_S_present_study
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_NaPO2 present_study
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: NaPO2
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '73.4'
+        T_K: '298.15'
+        comparison_basis_as_printed: present study
+        derivation:
+          relation: Present-study entropies calculated statistically from Table E.3 structural and spectroscopic
+            parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Statistical-mechanical entropy calculation; harmonic oscillator approximation.
+            locator:
+              page: 197
+              pdf_page_index: 196
+              published_page: E11
+              table: E.2
+              row: NaPO2
+          references:
+          - JANAF (1971)
+      uncertainty:
+        reported_status: printed
+        value: '2.0'
+        units: cal/(deg mol)
+        confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE2_napo2_S_boron_analogy
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_NaPO2 boron_analogy
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: NaPO2
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '71.6'
+        T_K: '298.15'
+        comparison_basis_as_printed: boron analogy
+        attribution: Jensen (1969)
+    - observation_id: hastie_bonnell_1980_tableE3_napo2_S298
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_14
+      locator:
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: Na-OPO
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: S298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table E.3 gives thermodynamic functions, not an experimental gas-pressure condition.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: Na-OPO
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '73.4'
+        T_K: '298.15'
+        derivation:
+          relation: Statistical-mechanical entropy from Table E.3 structure and vibrational parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Harmonic oscillator approximation; estimated molecular structure and vibrational frequencies.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: Na-OPO
+          references:
+          - JANAF (1971)
+          - Hastie (1975), p. 291
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_napo2_delta_fH_relative_PO_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_15
+      locator: &id006
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: Na-OPO
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: ΔHf,298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference value; no total gas pressure is stated.
+          locator: *id006
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        formation_enthalpy_as_printed: '-123.5'
+        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
+        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
+          relative to PO.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        derivation:
+          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableD2_napo2_formation_enthalpy_relative_PO_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_19
+      locator: &id007
+        page: 167
+        pdf_page_index: 166
+        published_page: D7
+        table: D.2
+        row: ΔHf,298 NaPO2
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: ΔHf,298
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Standard formation datum; not the total pressure in the flame.
+          locator: *id007
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        formation_enthalpy_as_printed: -123.5 ± 5.5
+        reference_frame_as_printed: Derived from Na + PO + 1/2 O2 = NaPO2, or the analogous Li reaction; Appendix
+          E states P-species formation enthalpies are relative to PO.
+        schema_gap: No exact quantity token represents formation enthalpy referenced to PO rather than elemental
+          formation enthalpy.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        method_as_printed: Third-law analysis of pressure ratios, calculated partial pressures, and emission-intensity
+          changes.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 167
+            published_page: D7
+            table: D.2
+            figure: D.3-D.9
+        derivation:
+          relation: Third-law reaction enthalpy from the printed flame ratios and calculated PO/O2 partial pressures;
+            elemental formation enthalpy remains relative to PO.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: emission-intensity series
+              figure: D.3-D.9
+          method:
+            state:
+              tag: value
+              value: Third-law analysis of NaPO2/Na or LiPO2/Li pressure ratios.
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: NaPO2
+              equation: third-law reaction analysis
+          references:
+          - JANAF (1971)
+      uncertainty:
+        reported_status: printed
+        value: '5.5'
+        units: kcal/mol
+        confidence_level: not_stated
+  LiPO2:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE2_lipo2_S_present_study
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_LiPO2 present_study
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: LiPO2
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '66.3'
+        T_K: '298.15'
+        comparison_basis_as_printed: present study
+        derivation:
+          relation: Present-study entropies calculated statistically from Table E.3 structural and spectroscopic
+            parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Statistical-mechanical entropy calculation; harmonic oscillator approximation.
+            locator:
+              page: 197
+              pdf_page_index: 196
+              published_page: E11
+              table: E.2
+              row: LiPO2
+          references:
+          - JANAF (1971)
+      uncertainty:
+        reported_status: printed
+        value: '2.0'
+        units: cal/(deg mol)
+        confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE2_lipo2_S_boron_analogy
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_17
+      locator:
+        page: 197
+        pdf_page_index: 196
+        published_page: E11
+        table: E.2
+        row: S_LiPO2 boron_analogy
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: reference temperature
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 197
+            pdf_page_index: 196
+            published_page: E11
+            table: E.2
+            row: LiPO2
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '68.0'
+        T_K: '298.15'
+        comparison_basis_as_printed: boron analogy
+        attribution: Jensen (1969)
+    - observation_id: hastie_bonnell_1980_tableE3_lipo2_S298
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_14
+      locator:
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: Li-OPO
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: S298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table E.3 gives thermodynamic functions, not an experimental gas-pressure condition.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: Li-OPO
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '66.3'
+        T_K: '298.15'
+        derivation:
+          relation: Statistical-mechanical entropy from Table E.3 structure and vibrational parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Harmonic oscillator approximation; estimated molecular structure and vibrational frequencies.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: Li-OPO
+          references:
+          - JANAF (1971)
+          - Hastie (1975), p. 291
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_lipo2_delta_fH_relative_PO_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_15
+      locator: &id008
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: Li-OPO
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: ΔHf,298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference value; no total gas pressure is stated.
+          locator: *id008
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        formation_enthalpy_as_printed: '-115.0'
+        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
+        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
+          relative to PO.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        derivation:
+          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableD2_lipo2_formation_enthalpy_relative_PO_typed_refusal
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_19
+      locator: &id009
+        page: 167
+        pdf_page_index: 166
+        published_page: D7
+        table: D.2
+        row: ΔHf,298 LiPO2
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: ΔHf,298
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Standard formation datum; not the total pressure in the flame.
+          locator: *id009
+      values:
+        quantity: formation_enthalpy_relative_to_PO_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        formation_enthalpy_as_printed: -115.2 ± 5.8
+        reference_frame_as_printed: Derived from Na + PO + 1/2 O2 = NaPO2, or the analogous Li reaction; Appendix
+          E states P-species formation enthalpies are relative to PO.
+        schema_gap: No exact quantity token represents formation enthalpy referenced to PO rather than elemental
+          formation enthalpy.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DELTA_FH
+        method_as_printed: Third-law analysis of pressure ratios, calculated partial pressures, and emission-intensity
+          changes.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 167
+            published_page: D7
+            table: D.2
+            figure: D.3-D.9
+        derivation:
+          relation: Third-law reaction enthalpy from the printed flame ratios and calculated PO/O2 partial pressures;
+            elemental formation enthalpy remains relative to PO.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: emission-intensity series
+              figure: D.3-D.9
+          method:
+            state:
+              tag: value
+              value: Third-law analysis of NaPO2/Na or LiPO2/Li pressure ratios.
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: LiPO2
+              equation: third-law reaction analysis
+          references:
+          - JANAF (1971)
+      uncertainty:
+        reported_status: printed
+        value: '5.8'
+        units: kcal/mol
+        confidence_level: not_stated
+  P2:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_p2_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: P2
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of P2 in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '0.005'
+          p_atm: 5e-07
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: P2
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '0.4'
+          p_atm: 4e-05
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: P2
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: P2
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    - observation_id: hastie_bonnell_1980_table2_p2_measured_pressure
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: P2
+      phase: gas
+      regime: high-pressure sampling mass spectrometry
+      standard_state: Partial pressure of P2 in the sampled phosphorus-containing flame.
+      units: atm; printed coefficient is multiplied by 10^-4 atm.
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        p_as_published: '1.2'
+        p_atm: '0.00012'
+        flame_as_printed: 9.7/1/3.3
+        derivation:
+          relation: Mass-spectrometric ion signal reduced to partial pressure using estimated cross sections and
+            mass-balance normalization.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: P2
+          method:
+            state:
+              tag: value
+              value: Table 2 footnote d mass-balance normalization
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: P2
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1460'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: Temp.
+            column: 9.7/1/3.3
+        gas_mix:
+          state:
+            tag: value
+            value: H2/O2/N2=9.7/1/3.3
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: H2/O2/N2
+            column: 9.7/1/3.3
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+  PO2:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_po2_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: PO2
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of PO2 in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '2.1'
+          p_atm: '0.00021'
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PO2
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '0.006'
+          p_atm: 6e-07
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: PO2
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: PO2
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE4_po2_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: PO2
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: PO2
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '84.2'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_po2_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: PO2
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: PO2
+      values:
+        quantity: delta_fH
+        method_class: model_derived
+        admission_status: admitted
+        delta_fH: '-81.9'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        derivation:
+          relation: 2000 K formation enthalpy from the printed 298.15 K formation value and thermodynamic functions.
+          method:
+            state:
+              tag: value
+              value: Thermodynamic-function evaluation using the report data base and JANAF (1971) functions.
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: PO2
+              equation: 2000 K formation enthalpy from 298.15 K data and thermal functions
+          references:
+          - JANAF (1971)
+          - Drowart et al. (1972)
+          - Smoes and Drowart (1974)
+          inputs: &id010
+          - hastie_bonnell_1980_appendixE_po2_delta_fH298_quoted_kems
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+      derived_from: *id010
+    - observation_id: hastie_bonnell_1980_appendixE_po2_delta_fH298_quoted_kems
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_01
+      locator: &id011
+        page: 194
+        pdf_page_index: 193
+        published_page: E8
+        section: '4'
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 194
+            pdf_page_index: 193
+            published_page: E8
+            row: ΔHf,298
+            section: '4'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Thermochemical reference datum; no experimental pressure stated here.
+          locator:
+            page: 194
+            pdf_page_index: 193
+            published_page: E8
+            section: '4'
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '-61.0'
+        T_K: '298.15'
+        uncertainty_as_printed: ±2.6
+        reference_frame_as_printed: ΔHf,298 PO2; elemental formation enthalpy in the cited thermochemical determinations.
+        attribution: Drowart et al. (1972) and Smoes and Drowart (1974), Knudsen-effusion mass spectrometry.
+      uncertainty:
+        reported_status: printed
+        value: '2.6'
+        units: kcal/mol
+        confidence_level: not_stated
+  HPO:
+    observations:
+    - observation_id: hastie_bonnell_1980_table2_hpo_equilibrium_predictions
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_08
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: '16'
+        table: '2'
+        row: HPO
+      phase: gas
+      standard_state: Predicted equilibrium partial pressure of HPO in the flame mixture.
+      units: atm; printed coefficients are multiplied by 10^-4 atm.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental flame pressure.
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: TMP
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        printed_scale: 10^-4 atm
+        points:
+        - flame_as_printed: 3.1/1/4
+          predicted_pressure_as_published: '0.02'
+          p_atm: 2e-06
+          T_K: '2100'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2100'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 3.1/1/4
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.1/1/4
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 3.1/1/4
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: HPO
+        - flame_as_printed: 9.7/1/3.3
+          predicted_pressure_as_published: '0.002'
+          p_atm: 2e-07
+          T_K: '1460'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1460'
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: Temp.
+                column: 9.7/1/3.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=9.7/1/3.3
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: H2/O2/N2
+                column: 9.7/1/3.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 22
+                pdf_page_index: 21
+                published_page: '16'
+                table: '2'
+                row: TMP
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: '16'
+            table: '2'
+            row: HPO
+        derivation:
+          relation: Authors calculated the predicted equilibrium partial pressure listed in parentheses in Table
+            2.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Multicomponent equilibrium calculation with the upgraded JANAF (1971) data base using CEC-76.
+            locator:
+              page: 22
+              pdf_page_index: 21
+              published_page: '16'
+              table: '2'
+              row: HPO
+              equation: multicomponent equilibrium calculation
+          references:
+          - JANAF (1971)
+          - CEC-76 supplied by B. McBride, NASA Lewis
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_poh_S298
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_14
+      locator:
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: POH
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: S298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table E.3 gives thermodynamic functions, not an experimental gas-pressure condition.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: POH
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '56.3'
+        T_K: '298.15'
+        derivation:
+          relation: Statistical-mechanical entropy from Table E.3 structure and vibrational parameters.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Harmonic oscillator approximation; estimated molecular structure and vibrational frequencies.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: POH
+          references:
+          - JANAF (1971)
+          - Hastie (1975), p. 291
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE4_hpo_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: HPO
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: HPO
+      values:
+        quantity: S
+        method_class: model_derived
+        admission_status: admitted
+        entropy: '77.5'
+        T_K: '2000'
+        attribution: Table E.3 statistical-mechanical functions
+        derivation:
+          relation: Table E.4 uses the authors' statistical-mechanical P-species functions summarized in Table E.3.
+          inputs:
+          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Table E.3 statistical-mechanical functions
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: HPO
+      derived_from:
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE4_hpo_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: HPO
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: HPO
+      values:
+        quantity: delta_fH
+        method_class: model_derived
+        admission_status: admitted
+        delta_fH: '-10.2'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        derivation:
+          relation: 2000 K HPO formation enthalpy from the Table E.3 POH estimate and thermodynamic functions.
+          inputs:
+          - hastie_bonnell_1980_tableE3_poh_delta_fH298
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          method:
+            state:
+              tag: value
+              value: Thermodynamic-function evaluation using the report data base and JANAF (1971) functions.
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: HPO
+              equation: 2000 K formation enthalpy from 298.15 K data and thermal functions
+          references:
+          - JANAF (1971)
+          - Hastie (1975), p. 291
+      derived_from:
+      - hastie_bonnell_1980_tableE3_poh_delta_fH298
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+  O2:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures
+      type: partial_pressure
+      experiment: hastie_bonnell_1980_experiment_07
+      locator:
+        page: 167
+        pdf_page_index: 166
+        published_page: D7
+        table: D.2
+        row: O2
+      phase: gas
+      standard_state: Calculated partial pressure of O2 in the printed flame mixtures.
+      units: atm as printed in Table D.2 computer notation.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table D.2 gives gas ratios and calculated partial pressures but no total flame pressure.
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: pressure
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: admitted
+        points:
+        - row_as_printed: '1'
+          flame_as_printed: 5/1/4.1
+          p_as_published: 2.8(-9)
+          p_atm: '2.8e-09'
+          T_K: '1850'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1850'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 5/1/4.1
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=5/1/4.1
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 5/1/4.1
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '1'
+        - row_as_printed: '2'
+          flame_as_printed: 1.8/1/4.3
+          p_as_published: 1.26(-2)
+          p_atm: '0.0126'
+          T_K: '2050'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2050'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 1.8/1/4.3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=1.8/1/4.3
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 1.8/1/4.3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '2'
+        - row_as_printed: '3'
+          flame_as_printed: 3.7/1/3
+          p_as_published: 1.46(-6)
+          p_atm: '1.46e-06'
+          T_K: '2200'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2200'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 3.7/1/3
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=3.7/1/3
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 3.7/1/3
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '3'
+        - row_as_printed: '4'
+          flame_as_printed: 2/1/2
+          p_as_published: 5.0(-3)
+          p_atm: '0.005'
+          T_K: '2370'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2370'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '4'
+        - row_as_printed: '5'
+          flame_as_printed: 2/1/2
+          p_as_published: 6.74(-3)
+          p_atm: '0.00674'
+          T_K: '2450'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2450'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '5'
+        - row_as_printed: '6'
+          flame_as_printed: 2/1/2
+          p_as_published: 2.46(-3)
+          p_atm: '0.00246'
+          T_K: '2450'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2450'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 2/1/2
+            gas_mix:
+              state:
+                tag: value
+                value: H2/O2/N2=2/1/2
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 2/1/2
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '6'
+        - row_as_printed: '7'
+          flame_as_printed: 0.53/1/0.8
+          p_as_published: 1.48(-2)
+          p_atm: '0.0148'
+          T_K: '2650'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2650'
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: T
+                column: 0.53/1/0.8
+            gas_mix:
+              state:
+                tag: value
+                value: CH4/O2/N2=0.53/1/0.8
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: Flame
+                column: 0.53/1/0.8
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The source does not state total experimental flame pressure.
+              locator:
+                page: 167
+                pdf_page_index: 166
+                published_page: D7
+                table: D.2
+                row: pressure
+          locator:
+            page: 167
+            pdf_page_index: 166
+            published_page: D7
+            table: D.2
+            row: '7'
+        derivation:
+          relation: Table D.2 reports calculated O2 partial pressures used in the third-law analysis.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: calculated pressure inputs
+              figure: D.3-D.9
+          method:
+            state:
+              tag: value
+              value: Authors calculated PO and O2 partial pressures for the Table D.2 flame mixtures; the third-law
+                analysis uses the printed pressure ratios.
+            locator:
+              page: 167
+              pdf_page_index: 166
+              published_page: D7
+              table: D.2
+              row: O2
+              equation: calculated partial pressures in Table D.2
+          references:
+          - JANAF (1971)
+  POH:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE3_poh_delta_fH298
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_12
+      locator: &id021
+        page: 199
+        pdf_page_index: 198
+        published_page: E13
+        table: E.3
+        row: POH
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: ΔHf,298.15
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 199
+            pdf_page_index: 198
+            published_page: E13
+            table: E.3
+            row: POH
+      values:
+        quantity: delta_fH
+        method_class: model_derived
+        admission_status: admitted
+        delta_fH: '-9.5'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298.15; elemental formation enthalpy is the printed formation quantity.
+        method_as_printed: M-OH versus M-F bond-energy correlation; Hastie (1975), p. 291.
+        derivation:
+          relation: M-OH versus M-F bond-energy correlation for POH formation enthalpy.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: bond-correlation input values
+          method:
+            state:
+              tag: value
+              value: M-OH versus M-F bond-energy correlation; D(P-OH) = 0.83 D(P-F).
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: POH
+              equation: D(P-OH) = 0.83 D(P-F)
+          references:
+          - Hastie (1975), p. 291
+      uncertainty:
+        reported_status: printed
+        value: '5'
+        units: kcal/mol
+        confidence_level: not_stated
+  H:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE4_h_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '36.8'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_h_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '54.2'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        method_or_attribution_as_printed: JANAF (1971).
+        attribution: JANAF (1971).
+  OH:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE4_oh_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: OH
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: OH
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '57.9'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_oh_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: OH
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: OH
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '8.9'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        method_or_attribution_as_printed: JANAF (1971).
+        attribution: JANAF (1971).
+  H2:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE4_h2_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H2
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H2
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '45.0'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_h2_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H2
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '0.'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        method_or_attribution_as_printed: JANAF (1971).
+        attribution: JANAF (1971).
+  H2O:
+    observations:
+    - observation_id: hastie_bonnell_1980_tableE4_h2o_S2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H2O
+      phase: gas
+      units: cal/(deg mol)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: S2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H2O
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        admission_status: admitted
+        entropy: '63.2'
+        T_K: '2000'
+        attribution: JANAF (1971)
+    - observation_id: hastie_bonnell_1980_tableE4_h2o_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator:
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: H2O
+      phase: gas
+      units: kcal/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: ΔHf,2000
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The thermodynamic table gives no gas-pressure condition.
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: H2O
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_fH: '-60.1'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000; elemental formation reference in JANAF (1971) convention unless the
+          main text specifies another basis.
+        method_or_attribution_as_printed: JANAF (1971).
+        attribution: JANAF (1971).
+fidelity_samples:
+- path: species.PO.observations[hastie_bonnell_1980_table2_po_measured_pressures].values.points[1].p_as_published
+  value: '12.0'
+  locator:
+    page: 22
+    published_page: '16'
+    table: '2'
+    row: PO
+    column: 9.7/1/3.3
+- path: species.HPO2.observations[hastie_bonnell_1980_table2_hpo2_measured_pressures].values.points[2].p_as_published
+  value: '2.4'
+  locator:
+    page: 22
+    published_page: '16'
+    table: '2'
+    row: HPO2
+    column: 6.5/1/4.2
+- path: species.PO.observations[hastie_bonnell_1980_tableD2_po_calculated_partial_pressures].values.points[4].p_as_published
+  value: 2.63(-4)
+  locator:
+    page: 167
+    published_page: D7
+    table: D.2
+    row: '4'
+- path: species.O2.observations[hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures].values.points[4].p_as_published
+  value: 6.74(-3)
+  locator:
+    page: 167
+    published_page: D7
+    table: D.2
+    row: '5'
+- path: species.PO.observations[hastie_bonnell_1980_tableE4_po_delta_fH2000].values.delta_fH
+  value: '-26.8'
+  locator:
+    page: 201
+    published_page: E14
+    table: E.4
+    row: PO
+experiments:
+- experiment_id: hastie_bonnell_1980_experiment_01
+  label_as_printed: Adopted PO2 formation enthalpy for the report data base
+  locator: *id011
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id011
+- experiment_id: hastie_bonnell_1980_experiment_02
+  label_as_printed: Authors' P-containing flame inhibition kinetic scheme
+  locator: *id012
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id012
+- experiment_id: hastie_bonnell_1980_experiment_03
+  label_as_printed: Authors' modeled reaction rates in representative flame systems
+  locator: *id013
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id013
+- experiment_id: hastie_bonnell_1980_experiment_04
+  label_as_printed: CEC-76 thermodynamic function representation
+  locator: *id014
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id014
+- experiment_id: hastie_bonnell_1980_experiment_05
+  label_as_printed: Flame mass-spectrometric HPO2 reaction thermochemistry
+  locator: *id015
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id015
+- experiment_id: hastie_bonnell_1980_experiment_06
+  label_as_printed: HPO2 formation enthalpy from Knudsen-effusion and flame data
+  locator: *id004
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id004
+- experiment_id: hastie_bonnell_1980_experiment_07
+  label_as_printed: Hastie and Bonnell P-containing flames for NaPO2/LiPO2 analysis
+  locator: *id016
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id016
+- experiment_id: hastie_bonnell_1980_experiment_08
+  label_as_printed: Hastie and Bonnell phosphorus-containing flames
+  locator: *id017
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id017
+- experiment_id: hastie_bonnell_1980_experiment_09
+  label_as_printed: P-O bond dissociation comparison with boron analogies
+  locator: *id018
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id018
+- experiment_id: hastie_bonnell_1980_experiment_10
+  label_as_printed: PO formation enthalpy comparison
+  locator: *id019
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id019
+- experiment_id: hastie_bonnell_1980_experiment_11
+  label_as_printed: PO formation-enthalpy comparison
+  locator: *id020
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id020
+- experiment_id: hastie_bonnell_1980_experiment_12
+  label_as_printed: POH formation enthalpy estimate
+  locator: *id021
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id021
+- experiment_id: hastie_bonnell_1980_experiment_13
+  label_as_printed: Statistical-mechanical data for new P-containing gas species
+  locator: *id022
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id022
+- experiment_id: hastie_bonnell_1980_experiment_14
+  label_as_printed: Statistical-mechanical thermodynamic functions for P-containing gas species
+  locator: *id023
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id023
+- experiment_id: hastie_bonnell_1980_experiment_15
+  label_as_printed: Thermochemical data referenced to PO
+  locator: *id002
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id002
+- experiment_id: hastie_bonnell_1980_experiment_16
+  label_as_printed: Thermodynamic functions used in kinetic analysis
+  locator: *id024
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id024
+- experiment_id: hastie_bonnell_1980_experiment_17
+  label_as_printed: Thermodynamic-data comparison at the printed reference temperature
+  locator: *id025
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id025
+- experiment_id: hastie_bonnell_1980_experiment_18
+  label_as_printed: Third-law analysis of NaPO2 and LiPO2 reaction enthalpy
+  locator: *id026
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id026
+- experiment_id: hastie_bonnell_1980_experiment_19
+  label_as_printed: Third-law reaction thermochemistry from flame data
+  locator: *id007
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id007
+- experiment_id: hastie_bonnell_1980_experiment_20
+  label_as_printed: V3P source Knudsen-effusion mass-spectrometric reaction
+  locator: *id003
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level
+          temperatures are attached to observations.
+      locator: *id003

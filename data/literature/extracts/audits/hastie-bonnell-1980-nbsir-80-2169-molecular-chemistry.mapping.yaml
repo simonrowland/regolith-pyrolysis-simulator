@@ -1,0 +1,193 @@
+schema_version: literature_extract_audit_mapping.v1
+source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+machine_read_order:
+  - MinerU content-list HTML table blocks and Markdown were the first machine read.
+  - pdftotext-layout was the second machine read and its row/column placement was checked against page renders.
+  - The PDF render was used only as the printed-cell audit and for conflicting or flagged cells.
+  - tools/mineru_table_draft.py convert produced the table index and cell drafts used for comparison.
+  - tools/mineru_table_qa.py ranked 18 table blocks; nine blocks were flagged and 63 invented details blocks were ignored.
+cell_audit:
+  file: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.cells.csv
+  audited_nonblank_cell_instances: 509
+  method: Every listed cell was checked against its rendered PDF page; the printed row and column assignment was checked for each table.
+  duplicate_record_cells: The count includes repeated printed cells where a complete table context and a typed-refusal or typed observation record both retain that table material.
+  source_pages_are_absolute_pdf_pages: true
+table_mappings:
+  - printed_table: '2'
+    pdf_page: 22
+    printed_page: 16
+    draft_table: p022-t02
+    printed_body_rows: 10
+    extract_records:
+      - hastie_bonnell_1980_main_table2_full_rendered_table
+      - hastie_bonnell_1980_table2_po_measured_pressures
+      - hastie_bonnell_1980_table2_hpo2_measured_pressures
+      - hastie_bonnell_1980_table2_pn_measured_pressures
+      - hastie_bonnell_1980_table2_p2_measured_pressure
+      - hastie_bonnell_1980_table2_po_equilibrium_predictions
+      - hastie_bonnell_1980_table2_hpo2_equilibrium_predictions
+      - hastie_bonnell_1980_table2_pn_equilibrium_predictions
+      - hastie_bonnell_1980_table2_p2_equilibrium_predictions
+      - hastie_bonnell_1980_table2_po2_equilibrium_predictions
+      - hastie_bonnell_1980_table2_hpo_equilibrium_predictions
+    columns: Flame input gas ratio, TMP, temperature, flow time, measured partial-pressure coefficients, and parenthesized equilibrium predictions.
+    evidence: Measured pressures are measured_reduced using the mass-spectrometric reduction and mass-balance normalization. Parenthesized predictions are model_derived using the CEC-76 equilibrium calculation and JANAF (1971) data.
+    unresolved_cells: Eight upper-limit pressure cells remain verbatim in the complete table record; current pressure selection does not migrate partial-pressure bounds. See the blocker in the companion audit.
+  - printed_table: '3'
+    pdf_page: 32
+    printed_page: 26
+    draft_table: p032-t03
+    printed_body_rows: 15
+    extract_records:
+      - hastie_bonnell_1980_table3_reaction_parameters_typed_refusal
+    columns: Reaction, forward rate parameter, activation energy, reverse rate parameter, and printed references.
+    evidence: Authors' flame-model reaction parameters; typed-refused because no exact quantity tokens cover the combined rate and equilibrium-parameter forms.
+  - printed_table: '4'
+    pdf_page: 39
+    printed_page: 33
+    draft_table: p039-t04
+    printed_body_rows: 10
+    extract_records:
+      - hastie_bonnell_1980_table4_typical_reaction_rates_typed_refusal
+    columns: Reaction and typical reaction rates across the flame cases.
+    evidence: Authors' modeled rates; retained with the printed methods and references but typed-refused because no exact reaction-rate quantity token exists.
+  - printed_table: '2'
+    appendix: B
+    pdf_page: 122
+    printed_page: 1130
+    draft_table: p122-t06
+    printed_body_rows: 6
+    extract_records:
+      - hastie_bonnell_1980_appendixB_table2_full_rendered_table
+    columns: Flame ratios, burner selection, measured flame temperatures by technique, literature comparison, and calculated adiabatic temperatures.
+    evidence: Measured, quoted, and model-derived columns are labeled separately. The values are retained but typed-refused because flame-temperature comparison has no exact quantity token.
+  - printed_table: D.1
+    pdf_page: 163
+    printed_page: D3
+    draft_table: p163-t08
+    printed_body_rows: 3
+    extract_records:
+      - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+    columns: HPO2/PO and H/H2O pressure ratios, Kp, and third-law reaction enthalpy.
+    evidence: Typed-refused because the printed pressure ratios, linear Kp, and reaction enthalpy do not have exact quantity tokens.
+  - printed_table: D.2
+    pdf_page: 167
+    printed_page: D7
+    draft_table: p167-t09
+    printed_body_rows: 7
+    extract_records:
+      - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      - hastie_bonnell_1980_tableD2_po_calculated_partial_pressures
+      - hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures
+      - hastie_bonnell_1980_tableD2_napo2_formation_enthalpy_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableD2_lipo2_formation_enthalpy_relative_PO_typed_refusal
+    columns: Temperature, flame gas ratio, calculated PO and O2 pressures, alkali-phosphate pressure ratios, Kp, and formation enthalpies relative to PO.
+    evidence: Calculated PO and O2 pressures are model_derived. The pressure ratios, linear Kp, and relative-to-PO formation values are typed-refused.
+  - printed_table: E.1
+    appendix: E
+    pdf_page: 192
+    printed_page: E6
+    draft_table: p192-t12
+    printed_body_rows: 4
+    extract_records:
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+    columns: Seven thermal-function coefficients for PO, PO2, HPO, and HPO2.
+    evidence: Typed-refused because the fitted coefficient vector is not itself a tabulated heat capacity or entropy quantity. Its method and sources are retained.
+  - printed_table: None
+    appendix: E
+    pdf_page: 193
+    printed_page: E7
+    printed_body_rows: 3
+    extract_records:
+      - hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_drowart
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_janaf
+    columns: Three PO formation enthalpy values, with the present-study estimate and attributed prior values separated.
+    evidence: Present-study estimate is measured_reduced from the authors' own data; Drowart et al. and JANAF values are quoted_attributed.
+  - printed_table: E.2
+    appendix: E
+    pdf_page: 197
+    printed_page: E11
+    draft_table: p197-t14
+    printed_body_rows: 6
+    extract_records:
+      - hastie_bonnell_1980_appendixE_tableE2_full_comparison_table
+      - hastie_bonnell_1980_appendixE_tableE2_bond_energies_typed_refusal
+      - hastie_bonnell_1980_tableE2_hpo2_S_present_study
+      - hastie_bonnell_1980_tableE2_hpo2_S_boron_analogy
+      - hastie_bonnell_1980_tableE2_napo2_S_present_study
+      - hastie_bonnell_1980_tableE2_napo2_S_boron_analogy
+      - hastie_bonnell_1980_tableE2_lipo2_S_present_study
+      - hastie_bonnell_1980_tableE2_lipo2_S_boron_analogy
+    columns: D(X-PO) bond energies and entropy comparison values.
+    evidence: Bond energies and comparison forms are typed-refused; entropy values are stored separately with their printed source.
+  - printed_table: E.3
+    appendix: E
+    pdf_page: 199
+    printed_page: E13
+    draft_table: p199-t15
+    printed_body_rows: 4
+    extract_records:
+      - hastie_bonnell_1980_appendixE_tableE3_full_rendered_table
+      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
+      - hastie_bonnell_1980_tableE3_poh_S298
+      - hastie_bonnell_1980_tableE3_poh_delta_fH298
+      - hastie_bonnell_1980_tableE3_hpo2_S298
+      - hastie_bonnell_1980_tableE3_hpo2_delta_fH_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableE3_napo2_S298
+      - hastie_bonnell_1980_tableE3_napo2_delta_fH_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableE3_lipo2_S298
+      - hastie_bonnell_1980_tableE3_lipo2_delta_fH_relative_PO_typed_refusal
+    columns: Species structures, vibrational data, S298, and formation enthalpy estimates.
+    evidence: S298 and the POH estimate are stored with their printed frames; alkali-phosphate and HPO2 formation values relative to PO are typed-refused.
+  - printed_table: E.4
+    appendix: E
+    pdf_page: 201
+    printed_page: E14
+    draft_table: p201-t16
+    printed_body_rows: 8
+    extract_records:
+      - hastie_bonnell_1980_appendixE_tableE4_full_rendered_table
+      - hastie_bonnell_1980_appendixE_tableE4_hpo2_hf_relative_po_typed_refusal
+    columns: Species, S2000, and ΔHf,2000.
+    evidence: Entropy and elemental-reference formation enthalpies are stored as printed; HPO2's relative-to-PO value is typed-refused.
+excluded_tables:
+  - printed_table: '1'
+    pdf_page: 21
+    printed_page: 15
+    reason: Qualitative flame and smoke outcomes without vapor or thermochemical values.
+  - printed_table: '1'
+    pdf_page: 114
+    printed_page: 1122
+    reason: Burner and measurement-technique inventory, outside the extraction target.
+  - printed_table: '1'
+    pdf_page: 143
+    printed_page: B17
+    reason: Flame-property comparison, outside the extraction target.
+  - printed_table: D.2 duplicate
+    pdf_page: 169
+    reason: Duplicate scan of the table on PDF page 167.
+  - printed_table: None
+    pdf_page: 203
+    reason: Cover form.
+  - printed_table: None
+    pdf_page: 205
+    reason: Date-due page.
+prose_records:
+  - pdf_page: 162
+    published_page: D2
+    topic: HPO2/PO KEMS log equilibrium constant and relative formation enthalpy.
+  - pdf_page: 163
+    published_page: D3
+    topic: Third-law HPO2 formation enthalpy relative to PO.
+  - pdf_page: 194
+    published_page: E8
+    topic: PO2 formation enthalpy quoted from the cited KEMS studies.
+figure_only_candidates:
+  - Figures D.3-D.9: Na and Li emission-intensity traces and error limits are figure-only and were not digitized.
+  - Figure 6: HPO2/PO temperature curve is figure-only and was not digitized.
+comparison:
+  file: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.compare.csv
+  result: Two locator errors; zero numeric mismatches and zero unverifiable rows were emitted by the comparer.
+  locator_notes: PDF pages 114 and 122 use report page numbers 1122 and 1130. Both page footers and table captions were checked on the render; the comparer applies the ordinary PDF-page offset and flags these appended Appendix B folios.
