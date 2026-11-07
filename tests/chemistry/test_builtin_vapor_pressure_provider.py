@@ -2311,7 +2311,10 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
         vapor_pressure_data,
         melt=_CaOnlyMelt(),
     )._internal_analytical_equilibrium()
-    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.a2f3f64f221b0p-15"
+    # d-349 changes this legacy pin by the d-144 Ca-028(l) -> Ca-029(s)
+    # activity factor at 1713 K: new/old = 12.9314524612614, matching
+    # exp(DeltaG_fus/RT) from the owner's reported log10 offset 1.1116473.
+    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.529aba65ce211p-11"
     ca_reference = result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Ca"]["P_reference_Antoine_Pa"]
@@ -2594,12 +2597,15 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         ] is False
         assert "gas_standard_fugacity" in result.vapor_pressures_source["Mg"]
 
+    # d-349 moves the legacy pin by the d-144 Mg-009(l) -> Mg-010(s)
+    # activity factor at 1360.999 K: new/old = 32.6588218818284, matching
+    # exp(DeltaG_fus/RT) from the owner's reported log10 offset 1.5140005.
     # Just below the reconstructed segment remains pure-comp without bridge flag.
     result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1360.999),
     )._internal_analytical_equilibrium()
-    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.10315b6351d19p-26"
+    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.15cbf835b9725p-21"
     assert result.diagnostics["vapor_pressure_authority"][
         VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
     ] is False

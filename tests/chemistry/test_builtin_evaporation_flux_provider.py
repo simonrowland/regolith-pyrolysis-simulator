@@ -66,6 +66,20 @@ _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
 
 
+def _provider_backed_fe_pressure_fixture(sim):
+    """Keep the test's Fe-only pressure claim on the real activity contract."""
+
+    equilibrium = sim._internal_analytical_equilibrium()
+    sim._refresh_vapor_pressures_from_kernel(equilibrium)
+    pressure = equilibrium.vapor_pressures_Pa["Fe"]
+    source = equilibrium.vapor_pressures_source.get("Fe")
+    equilibrium.vapor_pressures_Pa = {"Fe": pressure}
+    equilibrium.vapor_pressures_source = (
+        {"Fe": source} if source is not None else {}
+    )
+    return equilibrium
+
+
 def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
@@ -313,6 +327,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
         setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    equilibrium = _provider_backed_fe_pressure_fixture(sim)
     sim.melt.p_total_mbar = None
     captured_request_pressures = []
     build_vapour_batch = sim.build_vapour_batch
@@ -332,14 +347,6 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     # t-383: Na standard_reaction_term refuses pre-RG eligibility without
     # NaO0.5 activity evidence. This counter test only needs a flux-eligible
     # seam claim so the mocked EVAPORATION_FLUX path can record alpha fallbacks.
-    equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-        liquid_fraction=1.0,
-    )
-
     sim._calculate_evaporation(equilibrium)
 
     assert captured_request_pressures == [None]
@@ -1589,6 +1596,7 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
         "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    equilibrium = _provider_backed_fe_pressure_fixture(sim)
     original_dispatch = sim._dispatch_only
 
     def dispatch(intent, *args, **kwargs):
@@ -1597,13 +1605,6 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
-    equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-        liquid_fraction=1.0,
-    )
     sim._calculate_evaporation(equilibrium)
     for key in ("missing_alpha", "species_refusals"):
         assert sim._last_evaporation_flux_diagnostic[key] == result.diagnostic[key]
@@ -1795,6 +1796,7 @@ def test_missing_transport_channel_is_unavailable_downstream(
         "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    equilibrium = _provider_backed_fe_pressure_fixture(sim)
     original_dispatch = sim._dispatch_only
 
     def dispatch(intent, *args, **kwargs):
@@ -1804,13 +1806,6 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
-    equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-        liquid_fraction=1.0,
-    )
     flux = sim._calculate_evaporation(equilibrium)
     assert "Si" not in flux.species_kg_hr
     assert flux.species_kg_hr["Na"] > 0.0
@@ -1834,6 +1829,7 @@ def test_missing_transport_channel_is_unavailable_downstream(
         "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
     )
     single_sim.melt.temperature_C = 1500.0
+    single_equilibrium = _provider_backed_fe_pressure_fixture(single_sim)
     original_single_dispatch = single_sim._dispatch_only
 
     def dispatch_single(intent, *args, **kwargs):
@@ -1843,7 +1839,7 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     monkeypatch.setattr(single_sim, "_dispatch_only", dispatch_single)
     monkeypatch.setattr(single_sim, "_freeze_gate_enabled", lambda: False)
-    single_flux = single_sim._calculate_evaporation(equilibrium)
+    single_flux = single_sim._calculate_evaporation(single_equilibrium)
     assert single_flux.species_kg_hr == {}
     assert single_flux.carrier_authority_by_species["Si"]["is_refused"] is True
 

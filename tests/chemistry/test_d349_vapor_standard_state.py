@@ -637,7 +637,15 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
         species_formula_registry=sim.species_formula_registry,
     )
 
-    for temperature_C in (225.0, 425.0, 625.0, 825.0, 1500.0, 1650.0):
+    for temperature_C in (
+        225.0,
+        425.0,
+        625.0,
+        825.0,
+        1070.0,
+        1500.0,
+        1650.0,
+    ):
         sim.melt.temperature_C = temperature_C
         legacy = sim._internal_analytical_equilibrium()
         request = IntentRequest(
@@ -656,7 +664,7 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
         legacy_pressures = legacy.vapor_pressures_Pa
         kernel_pressures = kernel.diagnostic["vapor_pressures_Pa"]
 
-        for species in ("Mg", "Ca"):
+        for species in ("Mg", "Ca", "Fe"):
             assert (species in legacy_pressures) == (species in kernel_pressures), (
                 f"{feedstock_key} at {temperature_C:g} C: legacy and provider "
                 f"disagree whether {species} is published"
