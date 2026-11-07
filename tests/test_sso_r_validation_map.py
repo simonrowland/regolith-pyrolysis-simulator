@@ -147,6 +147,9 @@ def test_owner_recipe_surface_constants_are_shared():
     assert validation_map.OWNER_RECIPE_TOTAL_PRESSURE_MBAR == pytest.approx(
         sso_r_owner_surface.OWNER_RECIPE_TOTAL_PRESSURE_MBAR
     )
+    assert validation_map.OWNER_RECIPE_DOSE_FRACTION == (
+        sso_r_owner_surface.OWNER_RECIPE_DOSE_FRACTION
+    )
 
 
 def _assertion(payload, name):
@@ -163,17 +166,8 @@ def _calibrated_inputs():
     return setpoints, feedstocks, vapor_pressures, calibration
 
 
-def _is_owner_recipe_row(row):
-    return (
-        row["temperature_C"] == pytest.approx(validation_map.OWNER_RECIPE_T_C)
-        and row["requested_pO2_mbar"] == pytest.approx(validation_map.OWNER_RECIPE_PO2_MBAR)
-        and row["requested_pN2_mbar"] == pytest.approx(validation_map.OWNER_RECIPE_PN2_MBAR)
-        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
-    )
-
-
 def _owner_recipe_row(payload):
-    return next(row for row in payload["rows"] if _is_owner_recipe_row(row))
+    return sso_r_owner_surface.owner_certification_row(payload["rows"])
 
 
 def test_manual_fO2_anchors_match_native_fe_design_window():
@@ -345,9 +339,13 @@ def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
 def test_sio_vapor_pressure_responds_to_requested_po2(smoke_payload):
     rows = [
         row for row in smoke_payload["rows"]
-        if row["temperature_C"] == pytest.approx(1650.0)
-        and row["requested_pN2_mbar"] == pytest.approx(10.0)
-        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
+        if row["temperature_C"] == pytest.approx(sso_r_owner_surface.OWNER_RECIPE_T_C)
+        and row["requested_pN2_mbar"] == pytest.approx(
+            sso_r_owner_surface.OWNER_RECIPE_PN2_MBAR
+        )
+        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(
+            sso_r_owner_surface.OWNER_RECIPE_DOSE_FRACTION
+        )
     ]
     by_pO2 = {float(row["requested_pO2_mbar"]): row for row in rows}
     low = by_pO2[1.0e-6]
@@ -587,13 +585,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(
     smoke_payload,
     configured_freeze_gate_liquidus_path_consumed,
 ):
-    owner = [
-        row for row in smoke_payload["rows"]
-        if row["temperature_C"] == 1650.0
-        and row["requested_pO2_mbar"] == pytest.approx(1.0e-6)
-        and row["requested_pN2_mbar"] == pytest.approx(10.0)
-        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
-    ][0]
+    owner = sso_r_owner_surface.owner_certification_row(smoke_payload["rows"])
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
     if configured_freeze_gate_liquidus_path_consumed:
         expected_owner = CONFIGURED_OWNER_PN2_ANCHORS
@@ -765,10 +757,10 @@ def test_certification_requires_live_recipe_reachability_probe(smoke_payload):
         live_owner_probe=None,
         owner_row=owner,
     ) is False
-    assert validation_map._certification_reachability_reason(
+    assert sso_r_owner_surface.certification_reachability_reason(
         None,
         owner,
-    ) is validation_map.CertificationReason.LIVE_RECIPE_REACHABILITY_PROBE_MISSING
+    ) is sso_r_owner_surface.CertificationReason.LIVE_RECIPE_REACHABILITY_PROBE_MISSING
 
     assertions = validation_map.evaluate_assertions(
         smoke_payload["rows"],
@@ -796,10 +788,10 @@ def test_certification_requires_reachable_live_recipe(smoke_payload):
         live_owner_probe=probe,
         owner_row=owner,
     ) is False
-    assert validation_map._certification_reachability_reason(
+    assert sso_r_owner_surface.certification_reachability_reason(
         probe,
         owner,
-    ) is validation_map.CertificationReason.LIVE_RECIPE_UNREACHABLE
+    ) is sso_r_owner_surface.CertificationReason.LIVE_RECIPE_UNREACHABLE
 
 
 @pytest.mark.parametrize(
@@ -827,10 +819,10 @@ def test_certification_requires_live_recipe_identity_to_match_owner_row(
         live_owner_probe=probe,
         owner_row=owner,
     ) is False
-    assert validation_map._certification_reachability_reason(
+    assert sso_r_owner_surface.certification_reachability_reason(
         probe,
         owner,
-    ) is validation_map.CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
+    ) is sso_r_owner_surface.CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
 
 
 def test_certification_accepts_reachable_matching_live_recipe(smoke_payload):
@@ -850,10 +842,11 @@ def test_certification_surfaces_require_owner_pass_and_live_parity(
     smoke_payload,
     tmp_path,
 ):
+    owner = _owner_recipe_row(smoke_payload)
     rows = []
     for row in smoke_payload["rows"]:
         updated = dict(row)
-        if _is_owner_recipe_row(updated):
+        if row is owner:
             updated["ferric_divergence_material"] = True
             updated["row_passes_base_integrity"] = False
         rows.append(updated)
