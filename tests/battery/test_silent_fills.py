@@ -842,7 +842,14 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     obs = F.observation("no-p", "exp", ident, Decimal("0.2"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
     assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
-    assert seen["mode"] == PO2_COMMANDED
+    assert seen["mode"] == PO2_NOT_AN_INPUT
+    assert seen["po2_bar"] is None
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "melt has no multivalent element" in notice.reason
+        and "oxygen is not an input and was omitted" in notice.reason
+        for notice in prediction.notices
+    )
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "does not carry total_pressure_Pa" in notice.reason
