@@ -1,0 +1,210 @@
+source_id: bennington-brown-1982-synthetic-acmite-ri8621
+source_read_order:
+- MinerU table HTML and markdown
+- pdftotext-layout machine text
+- Rendered PDF pages 7 and 9–15 only to verify flagged values and table row/column layout
+tables:
+- table_key: p010-t01
+  printed_locator:
+    page: 10
+    published_page: 4
+    table: '1'
+  printed_rows: 7
+  mapping: Columns 1–2 identify the reaction, column 3 is ΔH in kcal, and column 4 is its uncertainty. Reactions
+    (1)–(6) are assigned to the compounds named by the reaction headings; reaction (7) is the overall acmite calorimetric
+    reaction. The Table 1 reaction-7 heat is retained with the Table 2 prose repeat.
+  cell_audit: The six reaction means and reaction (7) value/uncertainty are audited in the companion cells CSV.
+    The printed reaction (7) equation/value is embedded in a merged MinerU cell and was checked against the rendered
+    page and pdftotext.
+  render_verified:
+  - row: 5
+    column: 3
+    text: '+3.280'
+    reason: Comparison rejects the valid phase token l; render confirms the Table 1 liquid-water reaction value.
+  - row: 6
+    column: 3
+    text: '+3.119'
+    reason: Comparison rejects the valid phase token l; render confirms the Table 1 liquid hydrate reaction value.
+  - row: 10
+    column: 3
+    text: 13.005 ±0.044
+    reason: Reaction (7) value is in a merged equation cell; render checked.
+- table_key: p011-t02
+  printed_locator:
+    page: 11
+    published_page: 5
+    table: '2'
+  printed_rows: 12
+  mapping: Columns 1–6 are the individual solution heat results, mean, and mean uncertainty for reactions (1)–(6).
+    41 individual results, six means, and six uncertainties are retained. Reaction (1) first six values are previously
+    published; its last three are confirmatory measurements; reaction (5) is attributed to reference (3).
+  cell_audit: All printed numeric values and row/column assignments are in the companion cells CSV; empty table
+    cells are not counted as data. The comparator rejects phase token l for Table 2 columns 4–5; all 12 individual-value
+    mismatches and both means are render-verified. The row-12 reaction-1 mean is printed as Mean -32.904 and is
+    absent from the numeric draft cell set; render-verified.
+  render_verified:
+  - row: 2
+    column: 4
+    text: '+0.822'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 3
+    column: 4
+    text: '.821'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 4
+    column: 4
+    text: '.821'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 5
+    column: 4
+    text: '.820'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 6
+    column: 4
+    text: '.819'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 7
+    column: 4
+    text: '.821'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 12
+    column: 4
+    text: '+0.820'
+    reason: Comparator's phase helper rejects token l; render confirms the liquid-water mean.
+  - row: 2
+    column: 5
+    text: '6.230'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 3
+    column: 5
+    text: '6.242'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 4
+    column: 5
+    text: '6.239'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 5
+    column: 5
+    text: '6.228'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 6
+    column: 5
+    text: '6.243'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 7
+    column: 5
+    text: '6.249'
+    reason: Comparator's phase helper rejects token l; the value and table position are confirmed on the page-5
+      render.
+  - row: 12
+    column: 5
+    text: '+6.239'
+    reason: Comparator's phase helper rejects token l; render confirms the liquid-hydrate mean.
+  - row: 12
+    column: 1
+    text: '-32.904'
+    reason: MinerU draft keeps the mean label in the numeric cell; comparator does not parse it. Render confirms
+      the mean.
+- table_key: p012-t03
+  printed_locator:
+    page: 12
+    published_page: 6
+    table: '3'
+  printed_rows: 6
+  mapping: Rows (8)–(13) are literature formation enthalpies from elements with printed uncertainties and references.
+    Reactions (14) and (15), their exact and rounded results, and their prose repeats are transcribed separately;
+    the oxide-frame result remains typed-refused.
+  cell_audit: The six tabular literature formation values and uncertainties are in the MinerU grid. The comparator
+    rejects valid phase token l for reactions (11) and (12); both cells are render-verified. The reaction (14)/(15)
+    equations and calculated values are embedded outside the parsed table grid; render checked and recorded in the
+    companion cells CSV.
+  render_verified:
+  - row: 5
+    column: 3
+    text: '-68.315'
+    reason: Comparator's phase helper rejects token l; render confirms reaction (11) water(l).
+  - row: 6
+    column: 3
+    text: '-687.663'
+    reason: Comparator's phase helper rejects token l; render confirms reaction (12) hydrate(l).
+  - row: 8
+    column: 3
+    text: '-615.866'
+    reason: Calculated reaction (14) is printed outside the MinerU table grid; render confirms the value.
+  - row: 9
+    column: 3
+    text: '-32.076'
+    reason: Calculated reaction (15) is printed outside the MinerU table grid; render confirms the value.
+- table_key: p013-t04
+  printed_locator:
+    page: 13
+    published_page: 7
+    table: '4'
+  printed_rows: 19
+  mapping: Reference and function listing only; no numeric thermodynamic data are stored from this table.
+- table_key: p014-t05
+  printed_locator:
+    page: 14
+    published_page: 8
+    table: '5'
+  printed_rows: 19
+  mapping: Columns 1–8 are T/K, Cp°, S°, −(G°−H°298)/T, H°−H°298, ΔHf° from elements, ΔGf° from elements, and log
+    Kf. Cp, entropy, Gibbs function, and relative enthalpy are attributed to Ko et al. (15); the formation and log
+    K columns are the authors' calculations with stored parents and the named elemental data references in Table
+    4.
+- table_key: p015-t07
+  printed_locator:
+    page: 15
+    published_page: 9
+    table: '6'
+  printed_rows: 16
+  mapping: Columns 1–8 are T/K and the same seven property columns as Table 5, with formation data from oxides.
+    The source's 847 K SiO2 and 960 K Fe2O3 transition rows are retained separately. The authors' calculations link
+    stored parents and the named oxide-data references in Table 4. Oxide-frame ΔHf°, ΔGf°, and Log Kf values are
+    typed-refused because no exact oxide-frame schema tokens exist.
+context_audit:
+  page_7: Abstract formation values, 298.15 K reference, and 298–1263 K range are retained. Render checked.
+  page_9: Sample composition, theoretical composition, impurities, HF solution mass/concentration, dichromate mass,
+    silica stoichiometry, and the 25°C/73.7°C solution-calorimetry process are transcribed. Analysis and methods
+    layout checked against render.
+  page_10: The Table 1 footnote states reactants at 25°C and products at 73.7°C for reactions (1)–(6); these are
+    preserved as two process temperatures rather than collapsed to a single T condition.
+  page_11: The prose repeats the overall reaction heat as 13.009 ±0.044 kcal, while Table 1 gives 13.005 ±0.044
+    kcal. Both prose values are render-verified and retained; compare reports the prose value outside table cells.
+  page_13: Table 4 lists functions, sources, and printed citation numbers for auxiliary Fe, Fe2O3, Na, Na2O, O2,
+    Si, and SiO2 data; numerical auxiliary values are not reproduced, so source citations are retained as named
+    derivation references.
+  page_14: Table 5 footnotes identify 371 K as sodium melting, 1043 and 1185 K as iron transitions, and 1177 K as
+    sodium boiling; these are reference-element events.
+  page_15: Table 6 footnotes identify 847 K as the SiO2 transition and 960 K as the Fe2O3 transition. Discussion
+    identifies 1263 K as reported acmite melting point; no fusion enthalpy or liquid acmite values are printed.
+lineage_and_schema:
+- Table 1 reactions (1)–(4) scale the Table 2 per-mole means by the printed stoichiometric coefficients 2, 1/2, 1/2,
+  and 4, respectively; each relation is located at its Table 1 equation. Reaction (7) links to reactions (1)–(6).
+- Table 3 element-frame reaction (14) links to reaction (7) and literature reactions (8)–(12). The formation-from-oxides
+  reaction (15) links to reaction (7) and reactions (10)–(13).
+- Tables 5–6 Cp, S, −(G−H298)/T, and H−H298 are quoted from Ko et al. (1977). The authors' calculated formation
+  and log K rows link to the stored formation/thermal inputs and carry the named auxiliary data references assigned
+  by Table 4, with each reference mapped to its printed constituent quantity.
+- 'Reaction heats and oxide-frame formation values are typed-refused: simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES
+  and ::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES have no exact reaction-heat
+  type/token; Quantity.DELTA_FH/DELTA_FG are elements-frame only.'
+figure_reads: No figure-only values extracted; none identified as a data candidate.
+table_compare:
+  output: bennington-brown-1982-synthetic-acmite-ri8621.compare.csv
+  result: 'compare reports 283 matched and 23 mismatches. All mismatches were resolved against the rendered pages:
+    18 are liquid-phase rows where tools/mineru_table_draft.py::_phase_matches_column does not accept the required
+    PHASE_MAP token l; the remaining five are four merged/prose reaction values and the Table 2 mean whose ''Mean''
+    prefix prevents numeric parsing. No digit, sign, exponent, row, or column disagreement remains after render
+    review.'
