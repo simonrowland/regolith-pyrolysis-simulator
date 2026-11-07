@@ -15,6 +15,11 @@ from simulator.battery.enums import ValueKind
 
 SID = "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
 EXTRACT = REPO_ROOT / f"data/literature/extracts/{SID}.yaml"
+AUDIT_MAPPING = (
+    REPO_ROOT
+    / "data/literature/extracts/audits"
+    / f"{SID}.mapping.yaml"
+)
 FIT_IDS = {
     "richter_2011_text_alpha_k_vacuum_fit",
     "richter_2011_text_beta_k_vacuum_fit",
@@ -116,7 +121,28 @@ def _assert_render_pins(document: dict) -> None:
     }
     assert starts["IIAB5-start"]["sample"]["oxide_wt_pct_as_printed"]["K2O"] == "5"
     assert starts["IIAB5-start"]["sample"]["analysis_method_as_printed"]
+    iiab5_start = starts["IIAB5-start"]["sample"]
+    assert iiab5_start["delta41K_as_printed"] == "0.00"
+    assert iiab5_start["delta41K_locator"] == {
+        "page": 39,
+        "pdf_page_index": 38,
+        "published_page": 38,
+        "table": "1",
+        "row": "IIAB5-start",
+        "column": "delta41K",
+    }
+    assert iiab5_start["reference_standard_as_printed"] == "source-material K2CO3 solution"
     assert starts["50Di50Le-0"]["sample"]["delta41K_as_printed"] == "0.00"
+
+    alpha_k_fit = observations["richter_2011_text_alpha_k_vacuum_fit"][1]
+    assert alpha_k_fit["values"]["value_as_printed"] == "0.9790"
+    assert alpha_k_fit["values"]["uncertainty"] == {
+        "kind": "printed",
+        "value": "0.0015",
+        "verbatim": "±0.0015 at 95% confidence",
+        "confidence_level": "95%",
+        "basis": "Printed uncertainty width at 95% confidence.",
+    }
 
 
 def test_table_values_are_render_pinned_and_mutations_fail(tmp_path: Path) -> None:
@@ -132,6 +158,17 @@ def test_table_values_are_render_pinned_and_mutations_fail(tmp_path: Path) -> No
     changed_observation["values"]["series"][0]["SiO2_wt_pct"] = "62.22"
     mutation_path = tmp_path / EXTRACT.name
     mutation_path.write_text(yaml.safe_dump(changed, sort_keys=False), encoding="utf-8")
+    with pytest.raises(AssertionError):
+        _assert_render_pins(_document(mutation_path))
+
+    changed_baseline = deepcopy(document)
+    iiab5_start = next(
+        row["sample"]
+        for row in changed_baseline["experiments"]
+        if row.get("sample", {}).get("sample_id") == "IIAB5-start"
+    )
+    iiab5_start["delta41K_as_printed"] = "123.45"
+    mutation_path.write_text(yaml.safe_dump(changed_baseline, sort_keys=False), encoding="utf-8")
     with pytest.raises(AssertionError):
         _assert_render_pins(_document(mutation_path))
 
@@ -197,6 +234,23 @@ def test_later_iiab2_starting_composition_is_unknown_and_zero_time_assays_remain
             "FeO": "12.62",
         },
     }
+
+
+def test_render_audit_has_one_entry_per_nonempty_cell() -> None:
+    mapping = yaml.safe_load(AUDIT_MAPPING.read_text(encoding="utf-8"))
+    tables = {table["table"]: table for table in mapping["tables"]}
+    assert {
+        table_number: len(table["render_verified"])
+        for table_number, table in tables.items()
+    } == {"1": 640, "2": 98}
+    separator_cells = [
+        cell
+        for cell in tables["1"]["render_verified"]
+        if cell["row"] == 27 and cell["text"] == "gas flow rate"
+    ]
+    assert separator_cells == [
+        {"row": 27, "column": 5, "text": "gas flow rate"}
+    ]
 
 
 def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:

@@ -4765,6 +4765,16 @@ experiments:
       Na2O: '5'
       K2O: '5'
       FeO: '15'
+    delta41K_as_printed: '0.00'
+    delta41K_2sigma_as_printed: ''
+    delta41K_locator:
+      page: 39
+      pdf_page_index: 38
+      published_page: 38
+      table: '1'
+      row: IIAB5-start
+      column: delta41K
+    reference_standard_as_printed: source-material K2CO3 solution
 - experiment_id: richter-2011-50di50le-0
   kind: zero_time_baseline
   method: Table 1 sample row; no run temperature is printed
@@ -76014,10 +76024,10 @@ species:
         uncertainty_as_printed: ±0.0015 at 95% confidence
         uncertainty:
           kind: printed
-          value: 0.0015 at 95% confidence
+          value: '0.0015'
           verbatim: ±0.0015 at 95% confidence
-          confidence_level: not_stated
-          basis: Printed uncertainty width; confidence level not stated.
+          confidence_level: 95%
+          basis: Printed uncertainty width at 95% confidence.
     - observation_id: richter_2011_text_beta_k_vacuum_fit
       type: alpha
       phase: l
@@ -80406,7 +80416,8 @@ notes:
   cells; the pdftotext layer has only 0.002 numeric agreement, so all stored numeric cells were render-checked.'
 - Table 1 contributes 325 printed residue oxide cells across 49 run samples and 21 temperature-bearing rows with
   numeric δ41K values. Two additional printed 0.00 δ41K values occur on the IIAB5-start and 50Di50Le-0 baseline
-  rows; both are retained in their starting/baseline metadata without an uncertainty. Table 2 contains 17 body rows
+  rows; both are retained in their starting/baseline metadata with their Table 1 row locators and source-material
+  K2CO3 reference, and neither has a printed uncertainty. Table 2 contains 17 body rows
   and 34 printed γK/γNa cells; the per-row sample, temperature, pressure, coefficient, and source columns were checked
   against the 600 dpi page-40 render. The Table 2 draft has 81 numeric cells and 1.000 agreement with pdftotext.
 - The Table 1 residue oxide values are post-evaporation compositions, never starting bulk. IIAB1 Na2O, K2O, Al2O3,
@@ -80416,8 +80427,8 @@ notes:
   uncertainty is printed apart from the IIAB1 ICP-MS precision statement.
 - No sample mass or total sample mass loss/fraction evaporated is reported; no mass-loss fraction is calculated
   from oxide depletion. The Table 1 surface-area pairs and 24/70 cm/min gas-flow rates are retained as printed.
-  The two zero δ41K baseline cells are retained in their source-row metadata; numerical isotope uncertainties are
-  blank for those rows.
+  The two zero δ41K baseline cells are retained in their source-row metadata at Table 1 rows IIAB5-start and
+  50Di50Le-0, referenced to the source-material K2CO3 solution; numerical isotope uncertainties are blank for those rows.
 - The 2.5 mm iridium wire-loop support is assigned only to the vacuum experiments, which Section 4.2 states were
   suspended from the loops. Section 4.3 does not identify a crucible or sample support for the flowing-gas runs,
   so those apparatus fields remain unknown.
