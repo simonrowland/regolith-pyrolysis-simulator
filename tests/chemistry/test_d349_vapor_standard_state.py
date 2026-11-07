@@ -669,9 +669,9 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
         kernel_pressures = kernel.diagnostic["vapor_pressures_Pa"]
 
         species_to_compare = ["Mg", "Ca"]
-        if ellingham_segment_for_temperature(
-            "Fe", temperature_C + 273.15
-        ) is not None:
+        temperature_K = temperature_C + 273.15
+        fe_segment = ellingham_segment_for_temperature("Fe", temperature_K)
+        if fe_segment.range_K[0] <= temperature_K < fe_segment.range_K[1]:
             species_to_compare.append("Fe")
         for species in species_to_compare:
             assert (species in legacy_pressures) == (species in kernel_pressures), (
