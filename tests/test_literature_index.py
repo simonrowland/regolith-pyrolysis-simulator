@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -405,6 +406,16 @@ def test_nasa_cea_private_locator_backlog():
 # ---------------------------------------------------------------------------
 
 COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
+
+
+def test_committed_source_status_counts_match_rows():
+    status = builder.load_yaml(COMMITTED_STATUS)
+    rows = status["sources"]
+    row_counts = Counter(row["stage"] for row in rows)
+    by_stage = dict(row_counts)
+
+    assert status["counts"]["sources"] == len(rows)
+    assert status["counts"]["by_stage"] == by_stage
 
 
 def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:
