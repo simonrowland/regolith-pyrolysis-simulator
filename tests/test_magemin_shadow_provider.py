@@ -624,8 +624,9 @@ def test_projected_liquid_nonpositive_values_match_green_and_nonfinite_is_filter
         for warning in repair_warnings
     )
     assert any(
-        "phase 'olivine'" in warning and 'nonpositive' in warning
-        for warning in diagnostic.backend_warnings
+        "phase='olivine'" in warning
+        and 'reason=nonpositive' in warning
+        for warning in repair_warnings
     )
     assert equilibrium.warnings == []
     cached_after = canonical_json_bytes(equilibrium_payload(sim, equilibrium))

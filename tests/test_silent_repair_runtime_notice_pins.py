@@ -313,6 +313,24 @@ def test_sr24_repair_and_numerical_warning_keep_out_of_range_status(monkeypatch)
     ]
 
 
+def _petthermotools_activity_result(activity_sources: dict[str, object]):
+    backend = AlphaMELTSBackend()
+    results = {
+        "Conditions": {"mass": 100.0, "P_bar": 1.0},
+        "Liquid": {"mass": 100.0, "SiO2": 50.0},
+        "Liquid_prop": {"mass": 100.0, "SiO2_activity": 0.4},
+        **activity_sources,
+    }
+    return backend._parse_petthermotools_result(
+        results,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={"SiO2": 50.0},
+        total_input_kg=0.1,
+    )
+
+
 @pytest.mark.parametrize(
     ("gamma", "reason"),
     [
@@ -323,26 +341,17 @@ def test_sr24_repair_and_numerical_warning_keep_out_of_range_status(monkeypatch)
 def test_sr01_invalid_gamma_falls_through_to_later_activity_source(
     gamma: float, reason: str
 ) -> None:
-    backend = AlphaMELTSBackend()
-    repairs: list[dict[str, str]] = []
-    values, diagnostics = backend._extract_activity_mapping(
-        {
-            "activity_coefficients": {"SiO2": gamma},
-            "Liquid_prop": {"SiO2_activity": 0.4},
-        },
-        liquid_composition_wt_pct={"SiO2": 50.0},
-        repair_issues=repairs,
+    result = _petthermotools_activity_result(
+        {"activity_coefficients": {"SiO2": gamma}}
     )
-    selected = diagnostics["diagnostic_activity_source"]
-    notices = [backend._activity_repair_notice(item, selected) for item in repairs]
 
-    assert values == {"SiO2": 0.4}
+    assert result.activity_coefficients == {"SiO2": 0.4}
     assert any(
-        notice.startswith("SR01:")
-        and "oxide='SiO2'" in notice
-        and f"reason={reason}" in notice
-        and "selected_source='phase_activity_fields'" in notice
-        for notice in notices
+        warning.startswith("SR01:")
+        and "oxide='SiO2'" in warning
+        and f"reason={reason}" in warning
+        and "selected_source='phase_activity_fields'" in warning
+        for warning in result.warnings
     )
 
 
@@ -356,26 +365,20 @@ def test_sr01_invalid_gamma_falls_through_to_later_activity_source(
 def test_sr02_invalid_direct_activity_uses_alternate_source(
     activity: float, reason: str
 ) -> None:
-    backend = AlphaMELTSBackend()
-    repairs: list[dict[str, str]] = []
-    values, diagnostics = backend._extract_activity_mapping(
+    result = _petthermotools_activity_result(
         {
             "melt_oxide_activities": {"SiO2": activity},
             "activities": {"Liquid": {"SiO2": 0.4}},
-        },
-        liquid_composition_wt_pct={"SiO2": 50.0},
-        repair_issues=repairs,
+        }
     )
-    selected = diagnostics["diagnostic_activity_source"]
-    notices = [backend._activity_repair_notice(item, selected) for item in repairs]
 
-    assert values == {"SiO2": 0.4}
+    assert result.activity_coefficients == {"SiO2": 0.4}
     assert any(
-        notice.startswith("SR02:")
-        and "oxide='SiO2'" in notice
-        and f"reason={reason}" in notice
-        and "alternate_source='activities'" in notice
-        for notice in notices
+        warning.startswith("SR02:")
+        and "oxide='SiO2'" in warning
+        and f"reason={reason}" in warning
+        and "alternate_source='activities'" in warning
+        for warning in result.warnings
     )
 
 
@@ -659,12 +662,14 @@ def test_sr12_default_notices_preserve_green_control_conversion() -> None:
     assert _control_float({}, "pressure_bar", 1.0, repair_notices=notices) == 1.0
     assert _control_float({"temperature_C": None}, "temperature_C", 0.0, repair_notices=notices) == 0.0
     assert _control_float({"fO2_log": float("nan")}, "fO2_log", -9.0, repair_notices=notices) == -9.0
-    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=notices) == 1.0
+    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=notices) == 0.0
+    assert _control_float({"temperature_C": b"1400"}, "temperature_C", 0.0, repair_notices=notices) == 0.0
 
-    assert len(notices) == 2
+    assert len(notices) == 5
     assert all(notice.startswith("SR12:") for notice in notices)
     assert any("field=pressure_bar" in notice and "replacement=1.0" in notice for notice in notices)
-    assert any("field=fO2_log" in notice and "nonfinite_control" in notice for notice in notices)
+    assert any("field=temperature_C" in notice and "non_declared_control_defaulted" in notice and "replacement=0.0" in notice for notice in notices)
+    assert any("field=fO2_log" in notice and "nonfinite_control_defaulted" in notice for notice in notices)
 
 
 def test_sr13_incomplete_first_activity_source_matches_green_selection() -> None:
@@ -685,29 +690,20 @@ def test_sr13_incomplete_first_activity_source_matches_green_selection() -> None
 
 
 def test_sr13_empty_activity_source_notice_keeps_green_fallback_value() -> None:
-    backend = AlphaMELTSBackend()
-    repairs: list[dict[str, str]] = []
-    values, diagnostics = backend._extract_activity_mapping(
+    result = _petthermotools_activity_result(
         {
             "melt_oxide_activities": {},
             "activities": {"Liquid": {"SiO2": 0.4, "MgO": 0.5}},
-        },
-        liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
-        repair_issues=repairs,
+        }
     )
-    notices = [
-        backend._activity_repair_notice(item, diagnostics["diagnostic_activity_source"])
-        for item in repairs
-    ]
 
-    assert values == {"SiO2": 0.4, "MgO": 0.5}
-    assert diagnostics["diagnostic_activity_source"] == "activities"
+    assert result.activity_coefficients == {"SiO2": 0.4, "MgO": 0.5}
     assert any(
-        notice.startswith("SR13:")
-        and "source='melt_oxide_activities'" in notice
-        and "selected_source='activities'" in notice
-        and "empty_source_skipped" in notice
-        for notice in notices
+        warning.startswith("SR13:")
+        and "source='melt_oxide_activities'" in warning
+        and "selected_source='activities'" in warning
+        and "empty_source_skipped" in warning
+        for warning in result.warnings
     )
 
 

@@ -28,7 +28,7 @@ from engines.alphamelts.domain import (
     _endmember_activity_repair_notices,
 )
 from engines.alphamelts.result import LiquidusDiagnostics
-from simulator.scalar_boundary import is_finite
+from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
 
 class ParserError(RuntimeError):
@@ -145,12 +145,10 @@ def project_equilibrium_to_diagnostics(
         getattr(equilibrium_result, 'liquid_composition_wt_pct', {}) or {}
     ).items():
         try:
-            value = float(raw_value)
+            finite_value = float(raw_value)
         except (TypeError, ValueError):
             continue
-        if not is_finite(raw_value):
-            if math.isfinite(value):
-                continue
+        if not math.isfinite(finite_value):
             warnings.append(_projection_repair_notice(
                 'SR10',
                 field='liquid_composition_wt_pct',
@@ -158,16 +156,14 @@ def project_equilibrium_to_diagnostics(
                 reason='nonfinite_value_dropped',
             ))
             continue
-        liquid_comp[str(key)] = value
+        liquid_comp[str(key)] = float(raw_value)
     activities = {}
     for key, raw_value in raw_activities.items():
         try:
-            value = float(raw_value)
+            finite_value = float(raw_value)
         except (TypeError, ValueError):
             continue
-        if not is_finite(raw_value):
-            if math.isfinite(value):
-                continue
+        if not math.isfinite(finite_value):
             warnings.append(_projection_repair_notice(
                 'SR10',
                 field='activity_coefficients',
@@ -175,7 +171,7 @@ def project_equilibrium_to_diagnostics(
                 reason='nonfinite_value_dropped',
             ))
             continue
-        activities[str(key)] = value
+        activities[str(key)] = float(raw_value)
 
     return LiquidusDiagnostics(
         liquidus_T_C=liquidus_T_C,
@@ -438,10 +434,10 @@ def _phase_masses_kg(
         getattr(equilibrium_result, 'phase_masses_kg', {}) or {}
     ).items():
         try:
-            mass = float(raw_mass)
+            finite_mass = float(raw_mass)
         except (TypeError, ValueError):
             continue
-        if not math.isfinite(mass) or mass <= 0.0:
+        if not math.isfinite(finite_mass) or not float(raw_mass) > 0.0:
             if warnings is not None:
                 warnings.append(_projection_repair_notice(
                     'SR10',
@@ -449,12 +445,12 @@ def _phase_masses_kg(
                     item=str(phase),
                     reason=(
                         'nonfinite_value_dropped'
-                        if not math.isfinite(mass)
+                        if not math.isfinite(finite_mass)
                         else 'nonpositive_value_dropped'
                     ),
                 ))
             continue
-        masses[str(phase)] = mass
+        masses[str(phase)] = float(raw_mass)
     return masses
 
 
@@ -501,10 +497,10 @@ def _liquid_fraction_path(
             clean_composition = {}
             for oxide, raw_value in dict(composition or {}).items():
                 try:
-                    value = float(raw_value)
+                    finite_value = float(raw_value)
                 except (TypeError, ValueError):
                     continue
-                if not math.isfinite(value):
+                if not math.isfinite(finite_value):
                     if repair_notices is not None:
                         repair_notices.append(_projection_repair_notice(
                             'SR11',
@@ -513,7 +509,7 @@ def _liquid_fraction_path(
                             reason='nonfinite_path_value_dropped',
                         ))
                     continue
-                clean_composition[str(oxide)] = value
+                clean_composition[str(oxide)] = float(raw_value)
             path.append({
                 'temperature_C': point_temperature_C,
                 'liquid_fraction': point_fraction,
@@ -539,6 +535,16 @@ def _control_float(
                 field=name,
                 item=name,
                 reason='absent_control_defaulted',
+                replacement=repr(float(default)),
+            ))
+        return float(default)
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        if repair_notices is not None:
+            repair_notices.append(_projection_repair_notice(
+                'SR12',
+                field=name,
+                item=name,
+                reason='non_declared_control_defaulted',
                 replacement=repr(float(default)),
             ))
         return float(default)
