@@ -223,4 +223,3 @@ def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditio
 
     unavailable = sum(row.value.kind.value == "unavailable" for row in migrated.values())
     assert unavailable == len(expected_quantity_unknown)
-
