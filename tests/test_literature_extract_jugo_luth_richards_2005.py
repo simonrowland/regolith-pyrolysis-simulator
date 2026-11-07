@@ -43,12 +43,50 @@ def _source_observations(document: dict) -> dict[str, dict]:
     }
 
 
+def _assert_paper_method_locators(document: dict) -> None:
+    observations = _source_observations(document)
+    expected_method_locator = {
+        "page": 5,
+        "pdf_page_index": 4,
+        "published_page": 787,
+        "section": "Analytical techniques",
+    }
+    assert len(observations) == 198
+    assert all(
+        row["values"]["method_locator"] == expected_method_locator
+        for row in observations.values()
+    )
+
+    context = document["species"]["S"]["context"]
+    mineral_method_rows = [
+        row for row in context if "method_locator" in row.get("values", {})
+    ]
+    assert len(mineral_method_rows) == 4
+    assert all(
+        row["values"]["method_locator"] == expected_method_locator
+        for row in mineral_method_rows
+    )
+
+    sulfide = next(
+        row for row in context
+        if row["observation_id"].endswith("_sulfide_pooled_composition_context")
+    )
+    assert sulfide["locator"] == {
+        "page": 6,
+        "pdf_page_index": 5,
+        "published_page": 788,
+        "section": "Sulfides",
+        "note": "Pooled composition, n=12; no run assignment for individual analyses.",
+    }
+
+
 def _assert_render_pins(document: dict) -> None:
     observations = _source_observations(document)
     context = document["species"]["S"]["context"]
     assert len(observations) == 198
     assert len(document["experiments"]) == 22
     assert len(context) == 10
+    _assert_paper_method_locators(document)
 
     for observation_id, (species, value, printed, run_id, column) in RENDER_PINS.items():
         row = observations[observation_id]
@@ -106,6 +144,20 @@ def test_mutating_a_rendered_table_cell_breaks_the_pin() -> None:
     _source_observations(mutated)[
         "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation_table4_run_2_s"
     ]["values"]["value"] = "0.15"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated)
+
+
+def test_mutating_paper_method_pages_breaks_the_pin() -> None:
+    mutated = deepcopy(_document())
+    for row in _source_observations(mutated).values():
+        row["values"]["method_locator"]["page"] = 999
+    context = mutated["species"]["S"]["context"]
+    for row in context:
+        if "method_locator" in row.get("values", {}):
+            row["values"]["method_locator"]["page"] = 999
+        if row["observation_id"].endswith("_sulfide_pooled_composition_context"):
+            row["locator"]["page"] = 999
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
 
