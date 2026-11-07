@@ -1201,11 +1201,10 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             )
             - 1
         ) < Decimal("1e-24")
-    # The unavailable-value exemption removes two missing-derivation issues;
-    # the separate derived_from lineage issues remain required.
-    assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
-        {"conditional_field": 2}
-    )
+    assert result.validation is not None
+    # d-351 accepts this source's supplied lineage as recorded; unlike the old
+    # unconditional conditional-field expectation, this extraction is clean.
+    assert result.validation.hard_issues == ()
 
     expected = {
         "::T=1677:row=ad-10:": {
@@ -9142,10 +9141,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # relative entropy increments remain typed refusals; it prints no Cp or
     # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
     # A fresh migration adds Fredrickson & Chasanov's 74 H_minus_H298 and 12 cp
-    # points: H_minus_H298 377->451 and cp 1752->1764. The Beyer schema-gap
-    # rows stop exposing 93 unsupported glass-S and oxide-formation cells as
-    # numeric, so n_numeric is 8818 + 86 - 93 = 8811. The full fresh store has
-    # 949 unavailable cells.
+    # points: H_minus_H298 377->451 and cp 1752->1764. The old 8818 total also
+    # counted 93 Beyer cells from the Table 6 glass-S and Tables 8/10/12
+    # simple-oxide-formation schema-gap rows. SC-475 keeps those rows typed
+    # unavailable; their printed cells remain unchanged and are pinned by
+    # test_sc475_incr_frame_extracts. Ozawa's 86 flat Table 1 rows are not
+    # series-census entries, so the current total is 8904 - 86 - 93 = 8725.
+    # The fresh store has 949 unavailable cells.
     assert census.get("cp") == 1764
     assert census.get("H_minus_H298") == 451
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
@@ -9194,8 +9196,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
     # Ozawa 2012 Table 1's 86 rows are flat after e0f1d52a7, so
-    # _series_census excludes them from the numeric total: 8904 - 86 = 8818.
-    assert n_numeric == 8818, (n_numeric, census, n_unavailable)
+    # _series_census excludes them from the numeric total.
+    assert n_numeric == 8725, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -16474,10 +16476,22 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
     tokens = {quantity_token(o.identity) for o in robinot}
     assert Quantity.YIELD_FRACTION in tokens
     assert Quantity.O2_YIELD in tokens
+    model_yield = [
+        o
+        for o in robinot
+        if o.observation_id.startswith(
+            "kems-044-robinot-2026::robinot_2026_o2_hsc_expected_1p37_model"
+        )
+    ]
+    assert len(model_yield) == 1
+    assert model_yield[0].identity.temperature_K.is_value
+    assert model_yield[0].identity.temperature_K.value == Decimal("2073.15")
+    experimental_yields = [o for o in robinot if o is not model_yield[0]]
+    assert experimental_yields
     assert all(
         o.identity.temperature_K.is_unknown
         and "no midpoint invented" in (o.identity.temperature_K.reason or "")
-        for o in robinot
+        for o in experimental_yields
     )
     sauerborn = [
         o

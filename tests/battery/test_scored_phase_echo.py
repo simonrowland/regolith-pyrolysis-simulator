@@ -734,10 +734,12 @@ def test_taniguchi_metal_fe_reaches_the_basis_gate(
         "taniguchi_1997_table1_sample_101_metal_fe_composition",
     )
     composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value.input_provenance is None
+    assert composition is not None and composition.is_unknown
+    assert "printed oxide wt% map has no positive mass" in composition.reason
     prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["input"] == "composition"
+    assert prediction.execution.state.value == "not_probed"
 
 
 def test_kunisada_final_slag_refuses_before_the_basis_gate(
@@ -749,11 +751,13 @@ def test_kunisada_final_slag_refuses_before_the_basis_gate(
         "kunisada_1986_t1ii_e_equilibrium_SiO2_in_slag",
     )
     composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value.input_provenance == "scored_phase_analysis"
+    assert composition is not None and composition.is_unknown
+    assert "sum=102.15 wt% is above 102 wt%" in composition.reason
+    assert "d-343" in composition.reason
     prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
-    assert prediction.refusal_reason is not RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["input"] == "composition"
+    assert prediction.execution.state.value == "not_probed"
 
 
 def test_kim_2014_measured_v_row_is_not_stamped_analysed_glass(
@@ -767,10 +771,12 @@ def test_kim_2014_measured_v_row_is_not_stamped_analysed_glass(
         "kim_2014_carbon_fe_v_mo_ni_p003_t01_r02_c02",
     )
     composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value.input_provenance is None
+    assert composition is not None and composition.is_unknown
+    assert "printed oxide wt% map has no positive mass" in composition.reason
     prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["input"] == "composition"
+    assert prediction.execution.state.value == "not_probed"
 
 
 def test_gorojovsky_starting_bulk_passes_the_guard() -> None:
