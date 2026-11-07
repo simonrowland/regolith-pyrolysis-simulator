@@ -3376,4 +3376,4 @@ def test_hero_summary_source_disagreement_descriptor_matches_notice_kind(
     assert descriptor["rule"] == "notice.kind == source_disagreement"
     assert descriptor["enum"] == "SOURCE_DISAGREEMENT"
     assert "reason_prefix" not in descriptor
-    assert descriptor["reasons"] == sorted(set(reasons))
+    assert descriptor["reason_strings"] == sorted(set(reasons))

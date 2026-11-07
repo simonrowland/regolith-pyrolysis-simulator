@@ -246,6 +246,7 @@ class ScorePlotData:
     hero_deck_axis_refusal_details: Mapping[
         tuple[str, str, str], tuple[Mapping[str, str], ...]
     ] = field(default_factory=dict)
+    hero_source_disagreement_reasons: tuple[str, ...] = ()
 
 
 def _d139_exclusion_counts(
@@ -585,14 +586,36 @@ def _hero_metric_temperature(row: Mapping[str, object]) -> Decimal | None:
     return _hero_decimal(temperature)
 
 
-def _hero_source_disagreement_flagged(row: Mapping[str, object]) -> bool:
+def _hero_source_disagreement_notices(
+    row: Mapping[str, object],
+) -> tuple[Mapping[str, object], ...]:
     notices = row.get("notices")
     if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
-        return False
-    return any(
-        isinstance(notice, Mapping)
-        and notice.get("kind") == NoticeKind.SOURCE_DISAGREEMENT.value
+        return ()
+    return tuple(
+        notice
         for notice in notices
+        if isinstance(notice, Mapping)
+        and notice.get("kind") == NoticeKind.SOURCE_DISAGREEMENT.value
+    )
+
+
+def _hero_source_disagreement_flagged(row: Mapping[str, object]) -> bool:
+    return bool(_hero_source_disagreement_notices(row))
+
+
+def _hero_source_disagreement_reasons(
+    row: Mapping[str, object],
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {
+                reason
+                for notice in _hero_source_disagreement_notices(row)
+                if isinstance((reason := notice.get("reason")), str)
+                and reason.strip()
+            }
+        )
     )
 
 
@@ -1195,6 +1218,7 @@ def read_scores(
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
     comparison_payloads: list[Mapping[str, object]] = []
+    source_disagreement_reasons: set[str] = set()
     deck_score_rows: list[Mapping[str, object]] = []
     sweet_spot_samples: list[tuple[str, str, object, object, object]] = []
     hero_composition_sio2: dict[str, float] = {}
@@ -1319,6 +1343,10 @@ def read_scores(
                     continue
                 if rail in HERO_RAILS:
                     comparison_payloads.append(row)
+                    if rail == Rail.VAPOUR.value:
+                        source_disagreement_reasons.update(
+                            _hero_source_disagreement_reasons(row)
+                        )
                 if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
                     deck_payload = _battery_hero_deck_payload(row)
                     deck_candidate = deck_payload.get("candidate_observation")
@@ -1568,6 +1596,9 @@ def read_scores(
         ],
         hero_deck_axis_refusals=deck_records["axis_refusals"],
         hero_deck_axis_refusal_details=deck_records["axis_refusal_details"],
+        hero_source_disagreement_reasons=tuple(
+            sorted(source_disagreement_reasons)
+        ),
     )
 
 
@@ -3381,7 +3412,12 @@ def _hero_summary_payload(
                 {
                     "field": "Residual.notices",
                     "notice_kind": NoticeKind.SOURCE_DISAGREEMENT.value,
-                    "reason_prefix": "source_internally_inconsistent:",
+                    "rule": (
+                        "notice.kind == "
+                        f"{NoticeKind.SOURCE_DISAGREEMENT.value}"
+                    ),
+                    "enum": NoticeKind.SOURCE_DISAGREEMENT.name,
+                    "reason_strings": list(data.hero_source_disagreement_reasons),
                     "groups": ["source_disagreement_flagged", "unflagged"],
                 }
                 if rail == Rail.VAPOUR.value
