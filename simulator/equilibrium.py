@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Any
 
 from engines.antoine import (
@@ -26,9 +27,13 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import (
+    MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
+    _activity_for_crystalline_vapor_k,
+    _vapor_activity_source_standard_state,
     melt_oxide_activity,
     single_cation_mole_fractions,
 )
+from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     kress91_furnace_activity_pressure_bar,
@@ -1183,6 +1188,9 @@ class EquilibriumMixin:
                 continue
 
             # --- Oxide activity ---                              [ELLI-5]
+            activity_for_k = None
+            activity_provenance_for_species = None
+            activity_conversion = None
             if parent_oxide == 'FeO':
                 a_oxide = max(
                     0.0,
@@ -1207,15 +1215,58 @@ class EquilibriumMixin:
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                a_oxide = oxide_activity.equivalent_parent_activity(
-                    n_ox / n_M
-                )
+                activity_for_k = oxide_activity.activity
+                activity_provenance_for_species = oxide_activity.provenance()
+                if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+                    standard_pair = d144_vapor_standard_state_pair(parent_oxide)
+                    if standard_pair is None:
+                        raise RuntimeError(
+                            f'{parent_oxide}: missing d-144 vapor standard pair'
+                        )
+                    source_standard_state_id, source_standard_state_phase = (
+                        _vapor_activity_source_standard_state(
+                            parent_oxide,
+                            activity_provenance_for_species.get(
+                                'melt_oxide_activity_reference_state'
+                            ),
+                            {},
+                        )
+                    )
+                    target_standard_state_id, target_standard_state_phase = (
+                        standard_pair[1]
+                    )
+                    (
+                        activity_for_k,
+                        activity_conversion,
+                        conversion_warning,
+                    ) = _activity_for_crystalline_vapor_k(
+                        parent_oxide,
+                        activity_for_k,
+                        T_K,
+                        source_standard_state_id=source_standard_state_id,
+                        target_standard_state_id=target_standard_state_id,
+                        source_standard_state_phase=source_standard_state_phase,
+                        target_standard_state_phase=target_standard_state_phase,
+                    )
+                    if conversion_warning:
+                        warnings.append(conversion_warning)
+                    activity_provenance_for_species.update(
+                        {
+                            'activity_standard_state_conversion': activity_conversion,
+                            'vapor_activity_used_for_K': activity_for_k,
+                            'vapor_k_standard_state_id': target_standard_state_id,
+                            'vapor_k_standard_state_phase': target_standard_state_phase,
+                        }
+                    )
+                a_oxide = replace(
+                    oxide_activity, activity=activity_for_k
+                ).equivalent_parent_activity(n_ox / n_M)
             if (
                 oxide_activity is None
                 and a_oxide <= 1e-10
             ) or (
                 oxide_activity is not None
-                and oxide_activity.activity <= 1e-10
+                and activity_for_k <= 1e-10
             ):
                 if oxide_activity is None:
                     # FeO path: oxide_activity stays None by construction
@@ -1240,7 +1291,20 @@ class EquilibriumMixin:
                         category=CATEGORY_PROVEN_ZERO,
                     )
                 else:
-                    _sz_activity_skip(species, oxide_activity)
+                    if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+                        _sz_omit(
+                            species,
+                            ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                            field='vapor_activity_used_for_K',
+                            detail=(
+                                'vapor activity on the selected K basis is '
+                                f'{activity_for_k!r} <= 1e-10; species omitted '
+                                'by the activity threshold'
+                            ),
+                            category=CATEGORY_PROVEN_ZERO,
+                        )
+                    else:
+                        _sz_activity_skip(species, oxide_activity)
                 continue
 
             ellingham_extrapolation = ellingham_authority_limit(
@@ -1262,7 +1326,7 @@ class EquilibriumMixin:
                 a_oxide if oxide_activity is None else oxide_activity.activity
             )
             if oxide_activity is not None:
-                activity_provenance[species] = oxide_activity.provenance()
+                activity_provenance[species] = activity_provenance_for_species
             else:
                 feo_sources = feo_activity_diagnostic.get('sources')
                 activity_provenance[species] = {
@@ -1339,7 +1403,15 @@ class EquilibriumMixin:
                 field="P_effective_Pa",
             )
 
-            if P_effective_Pa > 1e-15:
+            retain_converted_positive_pressure = bool(
+                activity_conversion
+                and activity_conversion.get('conversion_performed')
+                and P_effective_Pa > 0.0
+            )
+            # Match the kernel's positive sub-threshold retention for a
+            # converted carrier; the legacy 1e-15 Pa cutoff caused the shadow
+            # path to drop Mg/Ca keys that the converted route still reports.
+            if P_effective_Pa > 1e-15 or retain_converted_positive_pressure:
                 vapor_pressures[species] = P_effective_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
                 fit_extrapolated = (
