@@ -304,6 +304,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    monkeypatch,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -312,6 +313,15 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
         setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = None
+    captured_request_pressures = []
+    build_vapour_batch = sim.build_vapour_batch
+
+    def capture_request_pressure(**kwargs):
+        captured_request_pressures.append(kwargs["total_pressure_Pa"])
+        return build_vapour_batch(**kwargs)
+
+    monkeypatch.setattr(sim, "build_vapour_batch", capture_request_pressure)
     sim._dispatch_only = lambda intent, *, control_inputs, redox_state=None: SimpleNamespace(
         status="ok",
         diagnostic={
@@ -332,6 +342,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
 
     sim._calculate_evaporation(equilibrium)
 
+    assert captured_request_pressures == [None]
     summary = sim._degraded_path_engagement_summary()
     assert summary["unmeasured_alpha_evaporation_fallback"]["total_count"] == 2
 
