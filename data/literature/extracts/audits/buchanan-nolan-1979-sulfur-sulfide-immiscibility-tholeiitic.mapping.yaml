@@ -1,0 +1,110 @@
+source_id: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+audit_method: MinerU is machine read 1; pdftotext-layout is machine read 2; every numeric table cell and
+  the row/column assignments were checked from page renders (method b). No OCR redo was needed because
+  all four tables remained readable when rendered.
+mineru_qa_prescreen: The QA pre-screen flagged all four tables for low digit agreement (pages 2, 7, 8,
+  9; numeric agreements 0.667, 0.741, 0.653, 0.653). Each table was fully checked from its page render;
+  cell-level OCR disagreements are noted in the audit CSV.
+render_layout_check: Rendered table layout was checked once per table. Table 2a run columns map to fO2
+  isobars -8.50 (43, 38, 41), -9.50 (35, 36, 37), and -10.00 (49, 47, 48); the MinerU merged-header candidate
+  shifts run 41 to -9.50, corrected from the render. Tables 2b and 2c carry -10.50 and -11.50 respectively.
+  Table 2b has 7 DB/3 and 2 PAL-685 glass analyses; Table 2c has 5 DB/3 and 4 secondary glass analyses.
+reconciled_counts:
+  unique_runs: 21
+  glass_analyses: 27
+  table_1_starting_composition_rows: 3
+  table_cell_audit_records: 452
+tables:
+- printed_table: '1'
+  draft_key: p002-t01
+  pdf_page: 2
+  published_page: 484
+  printed_data_rows: 3
+  row_labels:
+  - DB/3
+  - DB/8
+  - PAL-685
+  columns:
+  - SiO2
+  - Al2O3
+  - CaO
+  - MgO
+  - Fe2O3
+  - FeO
+  - Total
+  purpose: starting-material compositions; analyst P. Watkins; analytical technique not stated
+- printed_table: 2a
+  draft_key: p007-t02
+  pdf_page: 7
+  published_page: 489
+  primary_run_columns: 9
+  primary_glass_assays: 9
+  starting_composition: DB/3
+  row_data:
+  - fO2
+  - fS2
+  - run id
+  - SO2/CO2/CO/total flow
+  - duration
+  - phases
+  - Mol. % Fa
+  - analysis count
+  - SiO2/Al2O3/CaO/MgO/FeO/total
+  - sulfur average
+  - sulfur range
+- printed_table: 2b
+  draft_key: p008-t03
+  pdf_page: 8
+  published_page: 490
+  primary_run_columns: 7
+  primary_glass_assays: 7
+  secondary_glass_assays: 2
+  secondary_material: PAL-685
+  row_data:
+  - fO2
+  - fS2
+  - run id
+  - SO2/CO2/CO/total flow
+  - duration
+  - phases
+  - Mol. % Fa
+  - analysis count
+  - SiO2/Al2O3/CaO/MgO/FeO/total
+  - sulfur average
+  - sulfur range
+- printed_table: 2c
+  draft_key: p009-t04
+  pdf_page: 9
+  published_page: 491
+  primary_run_columns: 5
+  primary_glass_assays: 5
+  secondary_glass_assays: 4
+  secondary_materials:
+  - DB/8
+  - PAL-685
+  row_data:
+  - fO2
+  - fS2
+  - run id
+  - SO2/CO2/CO/total flow
+  - duration
+  - phases
+  - Mol. % Fa
+  - analysis count
+  - SiO2/Al2O3/CaO/MgO/FeO/total
+  - sulfur average
+  - sulfur range
+cell_mappings:
+  table2_sulfur_average: values.value; units wt%; typed as equilibrium_phase_composition of S in glass
+  table2_sulfur_range: uncertainty.range_as_published; never stored as the central value
+  table2_glass_oxide_composition: values.tabulated_values_as_published.glass_oxide_composition_wt_percent
+  table2_conditions: point_conditions T_C, fO2_log, total_pressure_Pa (unit-converted from printed 1 atm),
+    and initial composition; each value has state and locator
+  table2_fS2_flows_duration_phases_fa_n: values.tabulated_values_as_published
+  sulfide_composition: no run-specific values in Tables 2a–2c; phase presence preserved; prose quote about
+    60 wt.% Fe is attributed to Naldrett (1969)
+audit_file: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.audit.csv
+compare_file: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.compare.csv
+draft_compare_result: 27 sulfur averages matched their table, page, row, and column in the MinerU draft;
+  no numeric mismatch, no-match, or locator error. The grouped-header assignment for Table 2a run 41 was
+  corrected from the render and is noted in the full-cell audit.

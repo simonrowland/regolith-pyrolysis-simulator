@@ -1,0 +1,4112 @@
+schema_version: literature_extract.v1
+source_id: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+source:
+  citation: D. L. Buchanan and J. Nolan, ‘Solubility of sulfur and sulfide immiscibility in synthetic
+    tholeiitic melts and their relevance to Bushveld-Complex rocks,’ The Canadian Mineralogist 17 (1979),
+    483–494.
+  year: 1979
+  corpus_source_id: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+extraction:
+  method: Transcribed from the MinerU table drafts and markdown, cross-checked against pdftotext-layout,
+    then full-cell audited against rendered page images. Every numeric Table 1 and Table 2 cell was read
+    from its page render; flagged readings and OCR disagreements are itemized in the committed audit CSV.
+  date: '2026-11-07'
+  worker: w1107bn-bn79
+  note: Table 1 names analyst P. Watkins but states no technique for the starting-material analyses. The
+    paper describes the modified GeoScan microprobe, synthetic ZnS standard, and PET crystal for run-product
+    analyses on published p. 486. Quenched glass is stored as glass; the paper does not state sulfur preservation
+    on quench.
+review_status: draft
+page_offset: 482
+fidelity_samples:
+- species: S
+  observation_id: bn79_t2a_run43_db3_glass_s
+  field: value
+  value: '0.027'
+  note: Table 2a, run 43, average weight-percent sulfur; full cell checked against the page render.
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 489
+    table: 2a
+    row: run 43; DB/3 glass
+    column: weight percent sulfur / average
+- species: S
+  observation_id: bn79_t2b_run69_db3_glass_s
+  field: value
+  value: '0.136'
+  note: Table 2b, run 69, average weight-percent sulfur; full cell checked against the page render.
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 490
+    table: 2b
+    row: run 69; DB/3 glass
+    column: weight percent sulfur / average
+- species: S
+  observation_id: bn79_t2b_run69_pal685_glass_s
+  field: value
+  value: '0.103'
+  note: Table 2b, run 69, average weight-percent sulfur; full cell checked against the page render.
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 490
+    table: 2b
+    row: run 69; PAL-685 glass
+    column: weight percent sulfur / average
+- species: S
+  observation_id: bn79_t2c_run45_db3_glass_s
+  field: value
+  value: '0.145'
+  note: Table 2c, run 45, average weight-percent sulfur; full cell checked against the page render.
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 491
+    table: 2c
+    row: run 45; DB/3 glass
+    column: weight percent sulfur / average
+- species: S
+  observation_id: bn79_t2c_run45_db8_glass_s
+  field: value
+  value: '0.317'
+  note: Table 2c, run 45, average weight-percent sulfur; full cell checked against the page render.
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 491
+    table: 2c
+    row: run 45; DB/8 glass
+    column: weight percent sulfur / average
+experiments:
+- experiment_id: bn79_synthetic_tholeiitic_glass_quench_runs
+  method: Controlled CO2–CO–SO2 gas-mixing furnace runs at 1200°C; 4 mm starting-material disks/beads
+    were suspended by the bead technique, initially fused onto a platinum loop. At run completion samples
+    were quickly withdrawn into air and quenched in water.
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 486
+    section: Experimental Techniques
+    paragraph: General Procedure and Analysis of run products
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 483
+        section: Abstract
+        note: The abstract states one atmosphere total pressure for the experiments; converted to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 483
+        section: Abstract
+        note: The abstract reports total pressure and fugacity ranges, but does not identify a separate
+          sweep gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  S:
+    observations:
+    - observation_id: bn79_t2a_run43_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 43; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 2
+        note: Table 2a, run 43; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-8.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 43
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.027'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: &id001
+          SiO2: '47.58'
+          Al2O3: '14.84'
+          CaO: '8.10'
+          MgO: '11.10'
+          Fe2O3: '12.27'
+          FeO: '6.71'
+          Total: '100.60'
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '43'
+          log_fS2: '-1.40'
+          gas_flow_cc_per_min:
+            SO2: '98.76'
+            CO2: '4.85'
+            CO: '16.40'
+            total: '120.01'
+          duration_hours: '77'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.50'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.26'
+            Al2O3: '15.92'
+            CaO: '8.76'
+            MgO: '8.82'
+            FeO: '17.05'
+            Total: '98.81'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.021-0.034
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 43; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run38_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 38; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 3
+        note: Table 2a, run 38; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-8.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 38
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.009'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '38'
+          log_fS2: '-2.00'
+          gas_flow_cc_per_min:
+            SO2: '62.88'
+            CO2: '86.20'
+            CO: '10.91'
+            total: '159.99'
+          duration_hours: '99'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.10'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.32'
+            Al2O3: '16.02'
+            CaO: '8.88'
+            MgO: '9.09'
+            FeO: '16.65'
+            Total: '98.96'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.005-0.015
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 38; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run41_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 41; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 4
+        note: Table 2a, run 41; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-8.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 41
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.059'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '41'
+          log_fS2: '-1.00'
+          gas_flow_cc_per_min:
+            SO2: '45.77'
+            CO2: '32.54'
+            CO: '61.69'
+            total: '140.00'
+          duration_hours: '101'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.42'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.12'
+            Al2O3: '16.18'
+            CaO: '8.99'
+            MgO: '8.86'
+            FeO: '16.37'
+            Total: '99.52'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.054-0.062
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 41; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run35_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 35; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 5
+        note: Table 2a, run 35; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 35
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.027'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '35'
+          log_fS2: '-2.00'
+          gas_flow_cc_per_min:
+            SO2: '9.71'
+            CO2: '120.26'
+            CO: '30.03'
+            total: '160.00'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.79'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.15'
+            Al2O3: '15.59'
+            CaO: '8.68'
+            MgO: '8.61'
+            FeO: '16.97'
+            Total: '99.00'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.018-0.036
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 35; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run36_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 36; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 6
+        note: Table 2a, run 36; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 36
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.015'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '36'
+          log_fS2: '-3.00'
+          gas_flow_cc_per_min:
+            SO2: '2.98'
+            CO2: '164.62'
+            CO: '32.40'
+            total: '200.00'
+          duration_hours: '96'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.09'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.66'
+            Al2O3: '16.14'
+            CaO: '8.92'
+            MgO: '8.97'
+            FeO: '16.19'
+            Total: '98.88'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.010-0.22
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 36; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run37_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 37; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 7
+        note: Table 2a, run 37; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.50'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 37
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.011'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '37'
+          log_fS2: '-4.00'
+          gas_flow_cc_per_min:
+            SO2: '0.69'
+            CO2: '133.82'
+            CO: '25.49'
+            total: '160.00'
+          duration_hours: '112'
+          duration_status: printed
+          phases_present: gl+ol
+          olivine_fayalite_mol_percent: '25.65'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.28'
+            Al2O3: '15.91'
+            CaO: '8.82'
+            MgO: '8.91'
+            FeO: '16.66'
+            Total: '99.58'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.006-0.016
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 37; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run49_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 49; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 8
+        note: Table 2a, run 49; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.00'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 49
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.070'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '49'
+          log_fS2: '-1.50'
+          gas_flow_cc_per_min:
+            SO2: '14.91'
+            CO2: '89.32'
+            CO: '55.77'
+            total: '160.00'
+          duration_hours: '90'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.22'
+            Al2O3: '15.00'
+            CaO: '8.15'
+            MgO: '9.16'
+            FeO: '17.13'
+            Total: '98.66'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.062 0.074
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 49; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run47_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 47; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 9
+        note: Table 2a, run 47; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.00'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 47
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.062'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '47'
+          log_fS2: '-2.00'
+          gas_flow_cc_per_min:
+            SO2: '5.92'
+            CO2: '108.47'
+            CO: '45.61'
+            total: '160.00'
+          duration_hours: '99'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '24.84'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.33'
+            Al2O3: '15.76'
+            CaO: '8.88'
+            MgO: '9.07'
+            FeO: '16.60'
+            Total: '98.64'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.057-0.067
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 47; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2a_run48_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 489
+        table: 2a
+        row: run 48; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 19
+        table_column_number: 10
+        note: Table 2a, run 48; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.00'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 489
+            table: 2a
+            row: run 48
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.025'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '48'
+          log_fS2: '-3.00'
+          gas_flow_cc_per_min:
+            SO2: '1.19'
+            CO2: '117.81'
+            CO: '41.01'
+            total: '160.01'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.68'
+            Al2O3: '14.96'
+            CaO: '8.42'
+            MgO: '9.15'
+            FeO: '16.77'
+            Total: '98.98'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.021-0.028
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 489
+          table: 2a
+          row: run 48; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run81_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 81; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 2
+        note: Table 2b, run 81; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 81
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.114'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '81'
+          log_fS2: '-1.25'
+          gas_flow_cc_per_min:
+            SO2: '22.11'
+            CO2: '50.60'
+            CO: '87.29'
+            total: '160.00'
+          duration_hours: null
+          duration_status: blank/not reported
+          phases_present: ol,gl(sp)
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: null
+          glass_oxide_composition_wt_percent:
+            SiO2: '-'
+            Al2O3: '-'
+            CaO: '-'
+            MgO: '-'
+            FeO: '-'
+            Total: null
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.106-0.125
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 81; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run69_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 69; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 3
+        note: Table 2b, run 69; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 69
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.136'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '69'
+          log_fS2: '-1.75'
+          gas_flow_cc_per_min:
+            SO2: '8.08'
+            CO2: '82.32'
+            CO: '69.60'
+            total: '160.00'
+          duration_hours: '94'
+          duration_status: printed
+          phases_present: ol,gl(sp)
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '3'
+          glass_oxide_composition_wt_percent:
+            SiO2: '50.01'
+            Al2O3: '15.87'
+            CaO: '8.75'
+            MgO: '8.78'
+            FeO: '16.53'
+            Total: '99.94'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.122-0.150
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 69; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run69_pal685_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 69; PAL-685 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 3
+        note: Table 2b, run 69; starting material PAL-685; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 69
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '58.58'
+              - - Al2O3
+                - '13.00'
+              - - CaO
+                - '7.93'
+              - - MgO
+                - '4.12'
+              - - Fe2O3
+                - '10.91'
+              - - FeO
+                - '5.83'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: PAL-685
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.103'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: PAL-685
+        starting_composition_wt_pct_as_published: &id002
+          SiO2: '58.58'
+          Al2O3: '13.00'
+          CaO: '7.93'
+          MgO: '4.12'
+          Fe2O3: '10.91'
+          FeO: '5.83'
+          Total: '100.37'
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.37'
+        tabulated_values_as_published:
+          run_id: '69'
+          log_fS2: '-1.75'
+          gas_flow_cc_per_min:
+            SO2: '8.08'
+            CO2: '82.32'
+            CO: '69.60'
+            total: '160.00'
+          duration_hours: '94'
+          duration_status: printed
+          phases_present: gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '3'
+          glass_oxide_composition_wt_percent:
+            SiO2: '56.32'
+            Al2O3: '13.94'
+            CaO: '9.59'
+            MgO: '4.77'
+            FeO: '15.04'
+            Total: '99.66'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.092-0.113
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 69; PAL-685 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run31_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 31; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 4
+        note: Table 2b, run 31; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 31
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.123'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '31'
+          log_fS2: '-2.00'
+          gas_flow_cc_per_min:
+            SO2: '5.01'
+            CO2: '89.20'
+            CO: '65.79'
+            total: '160.00'
+          duration_hours: '96'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '25.94'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.97'
+            Al2O3: '15.39'
+            CaO: '8.64'
+            MgO: '8.61'
+            FeO: '17.27'
+            Total: '99.88'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.115-0.130
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 31; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run42_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 42; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 5
+        note: Table 2b, run 42; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 42
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.081'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '42'
+          log_fS2: '-2.50'
+          gas_flow_cc_per_min:
+            SO2: '2.04'
+            CO2: '95.79'
+            CO: '62.18'
+            total: '160.01'
+          duration_hours: '97'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '26.58'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.85'
+            Al2O3: '15.72'
+            CaO: '8.71'
+            MgO: '8.81'
+            FeO: '17.10'
+            Total: '99.19'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.078-0.090
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 42; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run33_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 33; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 6
+        note: Table 2b, run 33; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 33
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.039'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '33'
+          log_fS2: '-3.00'
+          gas_flow_cc_per_min:
+            SO2: '0.90'
+            CO2: '98.26'
+            CO: '60.84'
+            total: '160.00'
+          duration_hours: '91'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '27.79'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.79'
+            Al2O3: '14.47'
+            CaO: '8.55'
+            MgO: '8.39'
+            FeO: '17.02'
+            Total: '99.22'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.035-0.048
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 33; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run71_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 71; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 7
+        note: Table 2b, run 71; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 71
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.068'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '71'
+          log_fS2: '-3.50'
+          gas_flow_cc_per_min:
+            SO2: '0.43'
+            CO2: '99.26'
+            CO: '60.31'
+            total: '160.00'
+          duration_hours: '94'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '4'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.79'
+            Al2O3: '15.42'
+            CaO: '8.74'
+            MgO: '8.70'
+            FeO: '16.67'
+            Total: '99.32'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.063-0.072
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 71; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run71_pal685_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 71; PAL-685 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 7
+        note: Table 2b, run 71; starting material PAL-685; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 71
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '58.58'
+              - - Al2O3
+                - '13.00'
+              - - CaO
+                - '7.93'
+              - - MgO
+                - '4.12'
+              - - Fe2O3
+                - '10.91'
+              - - FeO
+                - '5.83'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: PAL-685
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.054'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: PAL-685
+        starting_composition_wt_pct_as_published: *id002
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.37'
+        tabulated_values_as_published:
+          run_id: '71'
+          log_fS2: '-3.50'
+          gas_flow_cc_per_min:
+            SO2: '0.43'
+            CO2: '99.26'
+            CO: '60.31'
+            total: '160.00'
+          duration_hours: '94'
+          duration_status: printed
+          phases_present: gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '3'
+          glass_oxide_composition_wt_percent:
+            SiO2: '55.87'
+            Al2O3: '14.34'
+            CaO: '9.56'
+            MgO: '4.71'
+            FeO: '15.13'
+            Total: '99.61'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.047-0.059
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 71; PAL-685 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2b_run34_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        table: 2b
+        row: run 34; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 8
+        note: Table 2b, run 34; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.50'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 490
+            table: 2b
+            row: run 34
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.020'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '34'
+          log_fS2: '-4.00'
+          gas_flow_cc_per_min:
+            SO2: '0.30'
+            CO2: '139.51'
+            CO: '84.07'
+            total: '223.88'
+          duration_hours: '119'
+          duration_status: printed
+          phases_present: ol/gl
+          olivine_fayalite_mol_percent: '25.54'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '50.19'
+            Al2O3: '15.62'
+            CaO: '8.66'
+            MgO: '8.64'
+            FeO: '16.46'
+            Total: '99.57'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.014-0.026
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 490
+          table: 2b
+          row: run 34; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run44_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 44; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 2
+        note: Table 2c, run 44; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 44
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.159'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '44'
+          log_fS2: '-1.20'
+          gas_flow_cc_per_min:
+            SO2: '25.17'
+            CO2: '0.12'
+            CO: '134.71'
+            total: '160.00'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: ol,gl+sp
+          olivine_fayalite_mol_percent: '22.70'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '48.62'
+            Al2O3: '16.04'
+            CaO: '8.81'
+            MgO: '9.47'
+            FeO: '15.54'
+            Total: '98.48'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.155-0.163
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 44; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run44_db8_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 44; DB/8 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 2
+        note: Table 2c, run 44; starting material DB/8; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 44
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '48.88'
+              - - Al2O3
+                - '5.43'
+              - - CaO
+                - '9.31'
+              - - MgO
+                - '11.88'
+              - - Fe2O3
+                - '17.89'
+              - - FeO
+                - '6.65'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/8
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.281'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/8
+        starting_composition_wt_pct_as_published: &id003
+          SiO2: '48.88'
+          Al2O3: '5.43'
+          CaO: '9.31'
+          MgO: '11.88'
+          Fe2O3: '17.89'
+          FeO: '6.65'
+          Total: '100.04'
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.04'
+        tabulated_values_as_published:
+          run_id: '44'
+          log_fS2: '-1.20'
+          gas_flow_cc_per_min:
+            SO2: '25.17'
+            CO2: '0.12'
+            CO: '134.71'
+            total: '160.00'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: px,gl(sp)
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '2'
+          glass_oxide_composition_wt_percent:
+            SiO2: '52.74'
+            Al2O3: '8.39'
+            CaO: '12.10'
+            MgO: '7.54'
+            FeO: '18.73'
+            Total: '99.50'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.278-0.284
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 44; DB/8 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run40_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 40; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 3
+        note: Table 2c, run 40; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 40
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.140'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '40'
+          log_fS2: '-2.00'
+          gas_flow_cc_per_min:
+            SO2: '5.76'
+            CO2: '47.00'
+            CO: '120.02'
+            total: '172.78'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: ol,gl(sp)
+          olivine_fayalite_mol_percent: '25.28'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.43'
+            Al2O3: '15.97'
+            CaO: '8.94'
+            MgO: '8.77'
+            FeO: '16.04'
+            Total: '99.15'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.130-0.152
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 40; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run45_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 45; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 4
+        note: Table 2c, run 45; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 45
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.145'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '45'
+          log_fS2: '-3.00'
+          gas_flow_cc_per_min:
+            SO2: '1.01'
+            CO2: '53.09'
+            CO: '105.91'
+            total: '160.01'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: ol,gl+sp
+          olivine_fayalite_mol_percent: 22.49-25.66
+          number_of_analyses_in_average: '4'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.24'
+            Al2O3: '16.43'
+            CaO: '8.97'
+            MgO: '9.82'
+            FeO: '14.45'
+            Total: '98.91'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.138-0.157
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 45; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run45_db8_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 45; DB/8 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 4
+        note: Table 2c, run 45; starting material DB/8; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 45
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '48.88'
+              - - Al2O3
+                - '5.43'
+              - - CaO
+                - '9.31'
+              - - MgO
+                - '11.88'
+              - - Fe2O3
+                - '17.89'
+              - - FeO
+                - '6.65'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/8
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.317'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/8
+        starting_composition_wt_pct_as_published: *id003
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.04'
+        tabulated_values_as_published:
+          run_id: '45'
+          log_fS2: '-3.00'
+          gas_flow_cc_per_min:
+            SO2: '1.01'
+            CO2: '53.09'
+            CO: '105.91'
+            total: '160.01'
+          duration_hours: '95'
+          duration_status: printed
+          phases_present: px,gl+sp
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '3'
+          glass_oxide_composition_wt_percent:
+            SiO2: '51.41'
+            Al2O3: '7.81'
+            CaO: '11.77'
+            MgO: '7.98'
+            FeO: '19.50'
+            Total: '98.47'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.314-0.322
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 45; DB/8 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run70_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 70; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 5
+        note: Table 2c, run 70; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 70
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.156'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '70'
+          log_fS2: '-3.50'
+          gas_flow_cc_per_min:
+            SO2: '0.49'
+            CO2: '54.25'
+            CO: '105.27'
+            total: '160.01'
+          duration_hours: '96'
+          duration_status: printed
+          phases_present: ol,gl+sp
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '50.68'
+            Al2O3: '16.63'
+            CaO: '9.06'
+            MgO: '8.74'
+            FeO: '14.82'
+            Total: '99.93'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.148-0.170
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 70; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run70_pal685_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 70; PAL-685 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 5
+        note: Table 2c, run 70; starting material PAL-685; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 70
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '58.58'
+              - - Al2O3
+                - '13.00'
+              - - CaO
+                - '7.93'
+              - - MgO
+                - '4.12'
+              - - Fe2O3
+                - '10.91'
+              - - FeO
+                - '5.83'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: PAL-685
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.107'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: PAL-685
+        starting_composition_wt_pct_as_published: *id002
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.37'
+        tabulated_values_as_published:
+          run_id: '70'
+          log_fS2: '-3.50'
+          gas_flow_cc_per_min:
+            SO2: '0.49'
+            CO2: '54.25'
+            CO: '105.27'
+            total: '160.01'
+          duration_hours: '96'
+          duration_status: printed
+          phases_present: gl+sp
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '2'
+          glass_oxide_composition_wt_percent:
+            SiO2: '57.27'
+            Al2O3: '15.05'
+            CaO: '10.39'
+            MgO: '5.28'
+            FeO: '11.64'
+            Total: '99.63'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: not reported for this run; Table 2 reports phase presence
+            and silicate-glass analyses only
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.097-0.117
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 70; PAL-685 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run46_db3_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 46; DB/3 glass
+        column: weight percent sulfur / average
+        table_row_number: 20
+        table_column_number: 6
+        note: Table 2c, run 46; starting material DB/3; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 46
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '47.58'
+              - - Al2O3
+                - '14.84'
+              - - CaO
+                - '8.10'
+              - - MgO
+                - '11.10'
+              - - Fe2O3
+                - '12.27'
+              - - FeO
+                - '6.71'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/3
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.049'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/3
+        starting_composition_wt_pct_as_published: *id001
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.60'
+        tabulated_values_as_published:
+          run_id: '46'
+          log_fS2: '-4.00'
+          gas_flow_cc_per_min:
+            SO2: '0.40'
+            CO2: '87.65'
+            CO: '167.95'
+            total: '256.00'
+          duration_hours: '122'
+          duration_status: printed
+          phases_present: ol+gl
+          olivine_fayalite_mol_percent: '24.07'
+          number_of_analyses_in_average: '5'
+          glass_oxide_composition_wt_percent:
+            SiO2: '49.14'
+            Al2O3: '15.59'
+            CaO: '8.89'
+            MgO: '9.40'
+            FeO: '15.67'
+            Total: '98.69'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.041-0.059
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 46; DB/3 glass
+          column: weight percent sulfur / range
+    - observation_id: bn79_t2c_run46_db8_glass_s
+      type: sulfur_solubility_and_sulfate_capacity_series
+      units: wt%
+      experiment: bn79_synthetic_tholeiitic_glass_quench_runs
+      regime: quench_equilibration
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 491
+        table: 2c
+        row: run 46; DB/8 glass
+        column: weight percent sulfur / average
+        table_row_number: 32
+        table_column_number: 6
+        note: Table 2c, run 46; starting material DB/8; average sulfur in the quenched silicate glass.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1200'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: table caption
+            column: temperature
+          units: °C
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 9
+            pdf_page_index: 8
+            published_page: 491
+            table: 2c
+            row: run 46
+            column: log fO2
+          units: log10(atm)
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 483
+            section: Abstract
+            note: The abstract states one atmosphere total pressure for the experiments.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '48.88'
+              - - Al2O3
+                - '5.43'
+              - - CaO
+                - '9.31'
+              - - MgO
+                - '11.88'
+              - - Fe2O3
+                - '17.89'
+              - - FeO
+                - '6.65'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 484
+            table: '1'
+            row: DB/8
+            column: starting oxide composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 486
+            section: General Procedure
+            note: The beads are said to have been withdrawn into air and quenched in water; sulfur preservation
+              or alteration is not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: S
+        phase: glass
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1200'
+        value: '0.115'
+        units: wt%
+        method_class: measured_direct
+        admission_status: admitted
+        method: Electron-microprobe analysis on a modified Cambridge Scientific Instruments GeoScan; sulfur
+          used synthetic ZnS as the standard and a PET spectrometer crystal (published p. 486).
+        sample_state_note: Run products were withdrawn into air and quenched in water; the measured phase
+          is the quenched silicate glass.
+        starting_composition_as_published: DB/8
+        starting_composition_wt_pct_as_published: *id003
+        starting_composition_method_as_published: not stated for Table 1; analyst P. Watkins is named
+        starting_composition_analyst_as_published: P. Watkins
+        starting_composition_total_wt_pct_as_published: '100.04'
+        tabulated_values_as_published:
+          run_id: '46'
+          log_fS2: '-4.00'
+          gas_flow_cc_per_min:
+            SO2: '0.40'
+            CO2: '87.65'
+            CO: '167.95'
+            total: '256.00'
+          duration_hours: '122'
+          duration_status: printed
+          phases_present: px+gl
+          olivine_fayalite_mol_percent: null
+          number_of_analyses_in_average: '4'
+          glass_oxide_composition_wt_percent:
+            SiO2: '51.10'
+            Al2O3: '7.53'
+            CaO: '11.80'
+            MgO: '7.78'
+            FeO: '21.21'
+            Total: '99.42'
+          container_or_sample_holder: sample disk/bead suspended from a platinum loop inside the reaction
+            tube
+          coexisting_sulfide_composition_status: 'not applicable: no sulfide phase is indicated by the
+            Table 2 phase entry'
+      uncertainty:
+        confidence_level: not_stated
+        range_as_published: 0.110-0.121
+        units: wt%
+        note: Table reports a within-bead range, not a stated confidence interval; confidence level not
+          stated.
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 491
+          table: 2c
+          row: run 46; DB/8 glass
+          column: weight percent sulfur / range
+    context:
+    - observation_id: bn79_naldrett_1969_sulfide_fe_context
+      type: quoted_attributed_context
+      units: wt%
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 490
+        section: Sulfur solubility as a function of fugacity and melt composition
+        paragraph: Coexisting sulfide description
+      values:
+        statement_as_published: The immiscible sulfide melt formed consists of about 60 wt.% iron (Naldrett
+          1969).
+        attribution: Naldrett (1969)
+        scope_note: Generic attributed statement in prose, not a run-specific sulfide analysis; Tables
+          2a–2c provide no coexisting sulfide composition.
+refusals:
+- what: Figure-only numerical reads in Figures 1–4, including the Figure 4 FeO–sulfur trend/fit
+  why: No figure-only values or fit coefficients are extracted in this table wave. Figure 4 is described
+    qualitatively as a reasonable fit and contains external Haughton et al. data; no fitted numerical
+    equation is printed.
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 489
+    figure: '1'
