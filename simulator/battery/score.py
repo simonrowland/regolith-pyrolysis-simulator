@@ -2710,13 +2710,6 @@ _CONDENSED_ELEMENT_REFERENCE_TABLES: Mapping[str, frozenset[str]] = {
     "shornikov-2019-mgo-titania-melts": frozenset({"table:2"}),
     "shornikov-2020-mgo-feo-melts": frozenset({"table:2"}),
 }
-# The 2.0 kJ/mol cut admits the reported 2019 Mg/Ti/O residuals
-# (0.399/0.316/0.122 kJ/mol), the 2020 Fe(g) check (1.324 kJ/mol), and the
-# 2008/2011 diagnostic checks with rounding headroom. The 2011 Ca(g) residual
-# (2.073 kJ/mol) is deliberately outside; its Mg(g) row independently passes.
-_CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL = Decimal("2.0")
-
-
 def _condensed_element_reference_table_key(
     reference: Observation,
 ) -> tuple[str, str] | None:
@@ -2746,6 +2739,7 @@ def _condensed_element_reference_table_diagnostics(
 
     from simulator.battery.generators.janaf import (
         janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+        janaf_condensed_element_gas_diagnostic_uncertainty_terms,
         janaf_liquid_element_reference_at_temperature,
     )
 
@@ -2799,6 +2793,74 @@ def _condensed_element_reference_table_diagnostics(
             )
             continue
         residual = observation.value.point - predicted
+        # Decimal exponent preserves the source cell's printed precision;
+        # half its last-place quantum is the rounding half-width in kJ/mol.
+        printed_quantum = Decimal(1).scaleb(
+            observation.value.point.as_tuple().exponent
+        )
+        tolerance_terms: dict[str, Decimal | None] = {
+            "printed_rounding_kJ_per_mol": abs(printed_quantum) / Decimal(2),
+        }
+        janaf_terms = janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+            formula, temperature_K
+        )
+        gas_delta_fH = janaf_terms["gas_delta_fH_kJ_per_mol"]
+        fusion_transition = janaf_terms["fusion_transition_kJ_per_mol"]
+        tolerance_terms["JANAF_delta_fH_plus_fusion_kJ_per_mol"] = (
+            gas_delta_fH + fusion_transition
+            if isinstance(gas_delta_fH, Decimal)
+            and isinstance(fusion_transition, Decimal)
+            else None
+        )
+        tolerance_terms["gas_delta_fH_component_kJ_per_mol"] = (
+            gas_delta_fH if isinstance(gas_delta_fH, Decimal) else None
+        )
+        tolerance_terms["fusion_transition_component_kJ_per_mol"] = (
+            fusion_transition if isinstance(fusion_transition, Decimal) else None
+        )
+        for term_name in (
+            "gas_interpolation_kJ_per_mol",
+            "liquid_interpolation_kJ_per_mol",
+            "liquid_extrapolation_kJ_per_mol",
+        ):
+            term_value = janaf_terms[term_name]
+            tolerance_terms[term_name] = (
+                term_value if isinstance(term_value, Decimal) else None
+            )
+        unavailable_reasons = (
+            [str(janaf_terms["unavailable_reason"])]
+            if janaf_terms["unavailable_reason"]
+            else []
+        )
+        unavailable_reasons.extend(
+            f"{name} is unavailable"
+            for name, value in tolerance_terms.items()
+            if value is None and "_component_" not in name
+        )
+        # JANAF ΔfH and transition inputs both contribute to the same
+        # correction bound; combine that conservative bound linearly, then
+        # combine it with rounding/interpolation/extrapolation components in
+        # the ruled root-sum-square tolerance.
+        sigma_terms = (
+            tolerance_terms["printed_rounding_kJ_per_mol"],
+            tolerance_terms["JANAF_delta_fH_plus_fusion_kJ_per_mol"],
+            tolerance_terms["gas_interpolation_kJ_per_mol"],
+            tolerance_terms["liquid_interpolation_kJ_per_mol"],
+            tolerance_terms["liquid_extrapolation_kJ_per_mol"],
+        )
+        tolerance = (
+            Decimal(2)
+            * sum(
+                (value**2 for value in sigma_terms if value is not None),
+                Decimal(0),
+            ).sqrt()
+            if not unavailable_reasons
+            else None
+        )
+        tolerance_unavailable_reason = "; ".join(
+            reason for reason in unavailable_reasons if reason
+        ) or None
+        extrapolated = bool(janaf_terms["extrapolated"])
         rows_by_table[table_key].append(
             {
                 "observation": observation,
@@ -2808,11 +2870,16 @@ def _condensed_element_reference_table_diagnostics(
                 "predicted_kJ_per_mol": predicted,
                 "residual_kJ_per_mol": residual,
                 "frame_offset_kJ_per_mol": frame_offset,
+                "tolerance_terms_kJ_per_mol": tolerance_terms,
+                "tolerance_kJ_per_mol": tolerance,
+                "tolerance_unavailable_reason": tolerance_unavailable_reason,
+                "extrapolated": extrapolated,
+                "gas_table_id": janaf_terms["gas_table_id"],
+                "liquid_table_id": janaf_terms["liquid_table_id"],
                 # A row cannot choose between frames when their JANAF offset
                 # is within the same error allowance used for reproduction.
                 "frame_discriminating": (
-                    abs(frame_offset)
-                    > _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+                    tolerance is not None and abs(frame_offset) > tolerance
                 ),
             }
         )
@@ -2825,19 +2892,19 @@ def _condensed_element_reference_table_diagnostics(
             for row in comparable
             if row.get("frame_discriminating")
             and abs(row["residual_kJ_per_mol"])
-            <= _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+            <= row["tolerance_kJ_per_mol"]
         ]
         contradicting = [
             row
             for row in comparable
             if row.get("frame_discriminating")
             and abs(row["residual_kJ_per_mol"])
-            > _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+            > row["tolerance_kJ_per_mol"]
         ]
         diagnostics[key] = {
             "accepted": bool(passing) and not contradicting,
-            "tolerance_kJ_per_mol": (
-                _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+            "tolerance_rule": (
+                "2 * sqrt(sum of squared available row uncertainty terms)"
             ),
             "diagnostic_rows": tuple(rows),
             "contradicting_rows": tuple(contradicting),

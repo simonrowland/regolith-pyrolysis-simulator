@@ -78,6 +78,8 @@ from simulator.reference_data.janaf import (
     _is_nist_typed_absent_enthalpy_cell,
     load_manifest,
     load_table_document,
+    table_delta_fh_298_uncertainty_for_table_id,
+    table_fusion_transition_for_table_id,
     table_printed_temperatures,
 )
 from tools.harvest_janaf_compilation import parse_table
@@ -3556,6 +3558,191 @@ def janaf_condensed_element_gas_delta_fG_kJ_per_mol(
         ).delta_fG_kJ_per_mol
     )
     return gas_g - liquid_reference
+
+
+def _janaf_second_difference_interpolation_bound(
+    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+) -> Decimal | None:
+    """Bound chord interpolation from neighboring JANAF second differences."""
+
+    if any(temperature == temperature_K for temperature, _ in points):
+        return Decimal(0)
+    bracket_index = next(
+        (
+            index
+            for index, (left, right) in enumerate(zip(points, points[1:]))
+            if left[0] < temperature_K < right[0]
+        ),
+        None,
+    )
+    if bracket_index is None:
+        return None
+    left, right = points[bracket_index : bracket_index + 2]
+    bounds: list[Decimal] = []
+    for start in (bracket_index - 1, bracket_index):
+        triple = points[start : start + 3]
+        if len(triple) != 3:
+            continue
+        (x0, y0), (x1, y1), (x2, y2) = triple
+        # The local quadratic correction to the bracket chord is the second
+        # divided difference times (T−x_left)(T−x_right). Take the larger
+        # estimate from the adjacent triples that contain the bracket.
+        divided_second = (
+            (y2 - y1) / (x2 - x1) - (y1 - y0) / (x1 - x0)
+        ) / (x2 - x0)
+        bounds.append(
+            abs(divided_second * (temperature_K - left[0]) * (temperature_K - right[0]))
+        )
+    return max(bounds) if bounds else None
+
+
+def janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+    element: str, temperature_K: Decimal
+) -> dict[str, Decimal | str | bool | None]:
+    """Return JANAF uncertainty components for a gas-atom frame diagnostic.
+
+    Every returned numeric term is in kJ/mol. Missing printed uncertainties
+    and unavailable interpolation bounds stay ``None`` so callers cannot
+    mistake unavailable evidence for a zero-width bound.
+    """
+
+    temperature_K = Decimal(temperature_K)
+    terms: dict[str, Decimal | str | bool | None] = {
+        "gas_delta_fH_kJ_per_mol": None,
+        "fusion_transition_kJ_per_mol": None,
+        "gas_interpolation_kJ_per_mol": None,
+        "liquid_interpolation_kJ_per_mol": None,
+        "liquid_extrapolation_kJ_per_mol": None,
+        "gas_table_id": None,
+        "liquid_table_id": None,
+        "extrapolated": False,
+        "unavailable_reason": None,
+    }
+    reasons: list[str] = []
+
+    gas_table_ids = _janaf_gas_table_ids().get(element, ())
+    if len(gas_table_ids) != 1:
+        reasons.append(
+            f"expected one JANAF gas table for {element}, found {len(gas_table_ids)}"
+        )
+        terms["unavailable_reason"] = "; ".join(reasons)
+        return terms
+    gas_table_id = gas_table_ids[0]
+    terms["gas_table_id"] = gas_table_id
+    gas_delta_fH = table_delta_fh_298_uncertainty_for_table_id(gas_table_id)
+    if gas_delta_fH is None:
+        reasons.append(f"{gas_table_id} has no printed ΔfH°(298.15 K) uncertainty")
+    else:
+        terms["gas_delta_fH_kJ_per_mol"] = gas_delta_fH
+
+    gas_points, _digest, gas_missing = _fusion_property_points(
+        gas_table_id, "formation_gibbs_energy"
+    )
+    if _missing_node_for_interpolation(gas_points, gas_missing, temperature_K):
+        reasons.append(f"{gas_table_id} interpolation spans a missing JANAF node")
+    else:
+        terms["gas_interpolation_kJ_per_mol"] = (
+            _janaf_second_difference_interpolation_bound(gas_points, temperature_K)
+        )
+        if terms["gas_interpolation_kJ_per_mol"] is None:
+            reasons.append(f"{gas_table_id} interpolation bound is unavailable")
+
+    if element == "O":
+        terms["fusion_transition_kJ_per_mol"] = Decimal(0)
+        terms["liquid_interpolation_kJ_per_mol"] = Decimal(0)
+        terms["liquid_extrapolation_kJ_per_mol"] = Decimal(0)
+    else:
+        liquid_table_ids = _janaf_liquid_element_table_ids().get(element, ())
+        if len(liquid_table_ids) != 1:
+            reasons.append(
+                f"expected one JANAF liquid table for {element}, "
+                f"found {len(liquid_table_ids)}"
+            )
+        else:
+            liquid_table_id = liquid_table_ids[0]
+            terms["liquid_table_id"] = liquid_table_id
+            liquid_points, _digest, liquid_missing = _fusion_property_points(
+                liquid_table_id, "formation_gibbs_energy"
+            )
+            liquid_upper_K = liquid_points[-1][0]
+            liquid_reference = janaf_liquid_element_reference_at_temperature(
+                element, temperature_K
+            )
+            if liquid_reference.extrapolation_interval_K is not None:
+                terms["extrapolated"] = True
+                terms["liquid_interpolation_kJ_per_mol"] = Decimal(0)
+                # Assume an unmodelled constant Cp(l) error of 10% at the last
+                # liquid node Te. Then dH=dCp(T−Te) and dS=dCp ln(T/Te), so
+                # |dG|=dCp[T ln(T/Te)−(T−Te)]. Cp is J mol^-1 K^-1 and T is K,
+                # giving J/mol; divide by 1000 for kJ/mol. At 2973 K the
+                # bound is about 0.14 kJ/mol for Ca from 2500 K and 0.7 kJ/mol
+                # for Mg from 2000 K, matching the d-351 sanity checks.
+                cp_liquid = _exact_janaf_property_value(
+                    liquid_table_id, "heat_capacity", liquid_upper_K
+                )
+                delta_t = temperature_K - liquid_upper_K
+                d_cp = cp_liquid * Decimal("0.10")
+                extrapolation_J = d_cp * (
+                    temperature_K * (temperature_K / liquid_upper_K).ln()
+                    - delta_t
+                )
+                terms["liquid_extrapolation_kJ_per_mol"] = (
+                    abs(extrapolation_J) / Decimal(1000)
+                )
+            else:
+                terms["liquid_extrapolation_kJ_per_mol"] = Decimal(0)
+                if _missing_node_for_interpolation(
+                    liquid_points, liquid_missing, temperature_K
+                ):
+                    reasons.append(
+                        f"{liquid_table_id} interpolation spans a missing JANAF node"
+                    )
+                else:
+                    terms["liquid_interpolation_kJ_per_mol"] = (
+                        _janaf_second_difference_interpolation_bound(
+                            liquid_points, temperature_K
+                        )
+                    )
+                    if terms["liquid_interpolation_kJ_per_mol"] is None:
+                        reasons.append(
+                            f"{liquid_table_id} interpolation bound is unavailable"
+                        )
+
+            reference_state = _element_reference_state(element, temperature_K)[0]
+            if not reference_state.is_value:
+                terms["fusion_transition_kJ_per_mol"] = None
+                reasons.append(
+                    f"{element} JANAF reference state is unavailable at "
+                    f"{temperature_K} K"
+                )
+            elif phase_token(reference_state.value) in {Phase.CR, Phase.G}:
+                transition = table_fusion_transition_for_table_id(liquid_table_id)
+                if transition is None:
+                    terms["fusion_transition_kJ_per_mol"] = None
+                    reasons.append(
+                        f"{liquid_table_id} has no printed fusion transition "
+                        "uncertainty"
+                    )
+                else:
+                    tfus = transition["temperature_K"]
+                    dtfus = transition["temperature_uncertainty_K"]
+                    dfus_h = transition["enthalpy_kJ_per_mol"]
+                    ddfus_h = transition["enthalpy_uncertainty_kJ_per_mol"]
+                    # First-order propagation of ΔfusG=ΔfusH(1−T/Tfus):
+                    # dG = |1−T/Tfus| dH + |ΔfusH*T/Tfus²| dTfus, with
+                    # both terms in kJ/mol. For a gas reference, the gas
+                    # table's printed ΔfH uncertainty above is also required
+                    # because G(l)−G(g) includes vaporisation.
+                    terms["fusion_transition_kJ_per_mol"] = (
+                        abs((Decimal(1) - temperature_K / tfus) * ddfus_h)
+                        + abs(dfus_h * temperature_K / (tfus**2) * dtfus)
+                    )
+            else:
+                terms["fusion_transition_kJ_per_mol"] = Decimal(0)
+
+    if reasons:
+        terms["unavailable_reason"] = "; ".join(reasons)
+    return terms
 
 
 @lru_cache(maxsize=None)

@@ -47,7 +47,9 @@ from simulator.battery.score import (
 )
 from simulator.battery.generators.janaf import (
     janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+    janaf_condensed_element_gas_diagnostic_uncertainty_terms,
 )
+from simulator.reference_data.janaf import table_fusion_transition_for_table_id
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -576,8 +578,36 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
             "1e-6"
         )
         assert diagnostic_row["frame_discriminating"] is frame_discriminating
+        tolerance = diagnostic_row["tolerance_kJ_per_mol"]
+        if tolerance is not None:
+            terms = diagnostic_row["tolerance_terms_kJ_per_mol"]
+            assert terms["JANAF_delta_fH_plus_fusion_kJ_per_mol"] == (
+                terms["gas_delta_fH_component_kJ_per_mol"]
+                + terms["fusion_transition_component_kJ_per_mol"]
+            )
+            sigma_terms = (
+                terms["printed_rounding_kJ_per_mol"],
+                terms["JANAF_delta_fH_plus_fusion_kJ_per_mol"],
+                terms["gas_interpolation_kJ_per_mol"],
+                terms["liquid_interpolation_kJ_per_mol"],
+                terms["liquid_extrapolation_kJ_per_mol"],
+            )
+            assert tolerance == Decimal(2) * sum(
+                (term**2 for term in sigma_terms), Decimal(0)
+            ).sqrt()
+            assert diagnostic_row["frame_discriminating"] is (
+                abs(diagnostic_row["frame_offset_kJ_per_mol"]) > tolerance
+            )
         if table_key == rejected_2011_key:
             assert diagnostics[table_key]["accepted_row"] is None
+            if formula == "Ca":
+                # The derived budget leaves the −2.0726 kJ/mol Ca residual
+                # outside tolerance, so it contradicts and refuses Table 1.
+                assert not (
+                    abs(diagnostic_row["residual_kJ_per_mol"]) <= tolerance
+                )
+        if formula == "Mg" and table_key == (SOURCE_ID, "table:2"):
+            assert terms["printed_rounding_kJ_per_mol"] == Decimal("0.0005")
     accepted_row_formulas = {
         table_key: diagnostics[table_key]["accepted_row"]["formula"]
         for table_key in accepted_keys
@@ -588,6 +618,7 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
         (SOURCE_ID, "table:2"): "Mg",
         ("shornikov-2020-mgo-feo-melts", "table:2"): "Mg",
     }
+
 
     # The 2019 paper's three independent checks are recomputed from the JANAF
     # owner, rather than copied into the conversion path as expected values.
@@ -853,6 +884,99 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
     assert unresolved.identity.reaction.is_unknown
     assert unresolved.identity.formation_elements.is_unknown
     assert not (unresolved.provenance or {}).get("derived_by")
+
+
+def test_janaf_diagnostic_uncertainty_terms_come_from_tables(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    transitions = {
+        table_id: table_fusion_transition_for_table_id(table_id)
+        for table_id in ("Ca-004", "Mg-003", "Fe-006", "Ti-004")
+    }
+    assert transitions["Ca-004"]["temperature_K"] == Decimal("1115")
+    assert transitions["Ca-004"]["temperature_uncertainty_K"] == Decimal("2")
+    assert transitions["Ca-004"]["enthalpy_kJ_per_mol"] == Decimal("8.540")
+    assert transitions["Ca-004"]["enthalpy_uncertainty_kJ_per_mol"] == Decimal("0.10")
+    assert "p. 706" in transitions["Ca-004"]["enthalpy_locator"]
+    assert transitions["Mg-003"]["temperature_K"] == Decimal("923")
+    assert transitions["Mg-003"]["temperature_uncertainty_K"] == Decimal("1")
+    assert transitions["Mg-003"]["enthalpy_kJ_per_mol"] == Decimal("8.477")
+    assert transitions["Mg-003"]["enthalpy_uncertainty_kJ_per_mol"] == Decimal("0.418")
+    assert "p. 1531" in transitions["Mg-003"]["enthalpy_locator"]
+    assert transitions["Fe-006"]["temperature_K"] == Decimal("1809")
+    assert transitions["Fe-006"]["temperature_uncertainty_K"] == Decimal("5")
+    assert transitions["Fe-006"]["enthalpy_kJ_per_mol"] == Decimal("13.807")
+    assert transitions["Fe-006"]["enthalpy_uncertainty_kJ_per_mol"] == Decimal("0.4")
+    assert "p. 1224" in transitions["Fe-006"]["enthalpy_locator"]
+    assert transitions["Ti-004"]["temperature_K"] == Decimal("1936")
+    assert transitions["Ti-004"]["temperature_uncertainty_K"] == Decimal("10")
+    assert transitions["Ti-004"]["enthalpy_kJ_per_mol"] == Decimal("14.146")
+    assert transitions["Ti-004"]["enthalpy_uncertainty_kJ_per_mol"] == Decimal("5.0")
+    assert "p. 1910" in transitions["Ti-004"]["enthalpy_locator"]
+
+    mg_at_boiling = janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+        "Mg", Decimal("2173")
+    )
+    assert mg_at_boiling["gas_delta_fH_kJ_per_mol"] == Decimal("0.80")
+    mg_transition = transitions["Mg-003"]
+    temperature_K = Decimal("2173")
+    assert mg_at_boiling["fusion_transition_kJ_per_mol"] == (
+        abs(
+            (Decimal(1) - temperature_K / mg_transition["temperature_K"])
+            * mg_transition["enthalpy_uncertainty_kJ_per_mol"]
+        )
+        + abs(
+            mg_transition["enthalpy_kJ_per_mol"]
+            * temperature_K
+            / mg_transition["temperature_K"] ** 2
+            * mg_transition["temperature_uncertainty_K"]
+        )
+    )
+    assert isinstance(mg_at_boiling["gas_interpolation_kJ_per_mol"], Decimal)
+    assert mg_at_boiling["extrapolated"] is True
+    assert mg_at_boiling["liquid_extrapolation_kJ_per_mol"] > 0
+
+    mg_interpolated_in_liquid_table = (
+        janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+            "Mg", Decimal("1965")
+        )
+    )
+    assert mg_interpolated_in_liquid_table["extrapolated"] is False
+    assert mg_interpolated_in_liquid_table["liquid_interpolation_kJ_per_mol"] > 0
+
+    mg_extrapolation_sanity = janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+        "Mg", Decimal("2973")
+    )
+    ca_extrapolation_sanity = janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+        "Ca", Decimal("2973")
+    )
+    assert Decimal("0.6") < mg_extrapolation_sanity[
+        "liquid_extrapolation_kJ_per_mol"
+    ] < Decimal("0.8")
+    assert Decimal("0.1") < ca_extrapolation_sanity[
+        "liquid_extrapolation_kJ_per_mol"
+    ] < Decimal("0.2")
+
+    oxygen = janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+        "O", Decimal("2173")
+    )
+    assert oxygen["gas_delta_fH_kJ_per_mol"] == Decimal("0.1")
+    assert oxygen["unavailable_reason"] is None
+
+    from simulator.battery.generators import janaf as janaf_owner
+
+    monkeypatch.setattr(
+        janaf_owner, "table_fusion_transition_for_table_id", lambda _table_id: None
+    )
+    missing_transition = (
+        janaf_owner.janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+            "Mg", Decimal("2173")
+        )
+    )
+    assert missing_transition["fusion_transition_kJ_per_mol"] is None
+    assert "no printed fusion transition uncertainty" in missing_transition[
+        "unavailable_reason"
+    ]
 
 
 def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
