@@ -12,6 +12,7 @@ import yaml
 from simulator.battery.enums import (
     AdmissionStatus,
     NoticeKind,
+    Quantity,
     UncertaintyKind,
     ValueKind,
 )
@@ -21,6 +22,9 @@ from simulator.battery.identity import (
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.migrate import Migrator
+from simulator.battery.score import (
+    _printed_uncertainty_band,
+)
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -241,7 +245,7 @@ def _migrated_observation(result, observation_id: str):
 
 
 @pytest.mark.parametrize("temperature_K", ("2173", "2973"))
-def test_unprinted_standard_pressure_derives_gas_band_at_row_temperature(
+def test_unprinted_standard_pressure_widens_printed_gas_band_at_row_temperature(
     tmp_path: Path, temperature_K: str
 ) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -249,6 +253,7 @@ def test_unprinted_standard_pressure_derives_gas_band_at_row_temperature(
     row = _source_observation(document, observation_id)
     row["standard_pressure"] = "not_printed"
     row["values"]["T_K"] = temperature_K
+    row["uncertainty"] = "±0.2 kJ/mol"
 
     result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
     observation = _migrated_observation(result, observation_id)
@@ -264,6 +269,17 @@ def test_unprinted_standard_pressure_derives_gas_band_at_row_temperature(
     assert observation.uncertainty.kind is UncertaintyKind.DERIVED
     assert observation.uncertainty.value == expected
     assert observation.uncertainty.basis == "kJ/mol"
+    assert observation.uncertainty.verbatim == "±0.2 kJ/mol"
+    scored = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+    )
+    assert scored.refusal is None
+    assert scored.band is not None
+    assert scored.band.value == Decimal("0.2") + expected
+    assert scored.band.band_basis == "printed_plus_derived_bound"
     if temperature_K == "2973":
         assert abs(expected - Decimal("0.33")) < Decimal("0.005")
     notice = next(
@@ -271,6 +287,37 @@ def test_unprinted_standard_pressure_derives_gas_band_at_row_temperature(
         if notice.kind is NoticeKind.INPUT_OMITTED
     )
     assert notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"
+
+
+def test_unprinted_standard_pressure_is_the_derived_only_gas_band(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    row = _source_observation(document, observation_id)
+    row["standard_pressure"] = "not_printed"
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    observation = _migrated_observation(result, observation_id)
+
+    expected = abs(
+        standard_pressure_delta_g_kJ_per_mol(
+            Decimal("1"),
+            Decimal("2173"),
+            PA_PER_BAR_DEC,
+            PA_PER_ATM_DEC,
+        )
+    )
+    scored = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+    )
+    assert scored.refusal is None
+    assert scored.band is not None
+    assert scored.band.value == expected
+    assert scored.band.band_basis == "derived_bound"
+    assert "only band source" in scored.band.rule
 
 
 def test_unprinted_standard_pressure_condensed_row_gets_notice_only(
@@ -285,6 +332,13 @@ def test_unprinted_standard_pressure_condensed_row_gets_notice_only(
     observation = _migrated_observation(result, observation_id)
 
     assert observation.uncertainty.kind is UncertaintyKind.NONE
+    scored = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+    )
+    assert scored.band is None
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
         and notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"

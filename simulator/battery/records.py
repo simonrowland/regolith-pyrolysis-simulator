@@ -1520,6 +1520,8 @@ class DecisionBand:
         if self.band_basis not in {
             "row_printed",
             "source_method",
+            "printed_plus_derived_bound",
+            "derived_bound",
             "fusion_combined_row_printed",
             "fusion_combined_source_method",
             "derived_scatter",

@@ -167,6 +167,7 @@ from simulator.battery.identity import (
     identity_equal,
     profile_for,
     quantity_token,
+    _STANDARD_PRESSURE_AMBIGUITY_RELATION,
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.stable_ids import (
@@ -23883,14 +23884,18 @@ class Migrator:
                         PA_PER_ATM_DEC,
                     )
                 )
+                printed_uncertainty = (
+                    uncertainty.verbatim
+                    if uncertainty.kind is UncertaintyKind.PRINTED
+                    else None
+                )
                 uncertainty = Uncertainty(
                     kind=UncertaintyKind.DERIVED,
+                    verbatim=printed_uncertainty,
                     value=pressure_width,
                     basis="kJ/mol",
                     derivation=Derivation(
-                        relation=(
-                            "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
-                        ),
+                        relation=_STANDARD_PRESSURE_AMBIGUITY_RELATION,
                         inputs=(),
                         parameters=(),
                         output_unit="kJ/mol",

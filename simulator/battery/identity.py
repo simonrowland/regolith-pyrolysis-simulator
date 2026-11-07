@@ -277,6 +277,11 @@ def ideal_gas_entropy_pressure_shift_J_per_mol_K(
     return -R_J_PER_MOL_K * _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
 
 
+_STANDARD_PRESSURE_AMBIGUITY_RELATION = (
+    "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+)
+
+
 def standard_pressure_delta_g_kJ_per_mol(
     delta_n_gas: object,
     T_K: object,

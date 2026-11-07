@@ -93,6 +93,7 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
+    _STANDARD_PRESSURE_AMBIGUITY_RELATION,
 )
 from simulator.battery.source_oxygen import (
     CO_MEASURED_CONSISTENCY_ORIGIN,
@@ -5500,6 +5501,17 @@ def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
     return isinstance(raw, str) and _UNCERTAINTY_NOT_PRINTED_RE.search(raw) is not None
 
 
+def _is_standard_pressure_ambiguity_uncertainty(
+    uncertainty: Uncertainty | None,
+) -> bool:
+    return (
+        uncertainty is not None
+        and uncertainty.kind is UncertaintyKind.DERIVED
+        and uncertainty.derivation is not None
+        and uncertainty.derivation.relation == _STANDARD_PRESSURE_AMBIGUITY_RELATION
+    )
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -5509,7 +5521,96 @@ def _printed_uncertainty_band(
     method: MethodToken | None = None,
     band_basis: str = "row_printed",
 ) -> _PrintedBandResolution:
-    if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
+    if uncertainty is None:
+        return _PrintedBandResolution()
+    if _is_standard_pressure_ambiguity_uncertainty(uncertainty):
+        width = uncertainty.value
+        if (
+            quantity is not Quantity.DELTA_FG
+            or not isinstance(width, Decimal)
+            or not width.is_finite()
+            or width < 0
+            or not uncertainty.basis
+        ):
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "derived_standard_pressure_uncertainty_unmapped",
+                    "quantity": quantity.value,
+                    "value": None if width is None else str(width),
+                    "basis": uncertainty.basis,
+                }
+            )
+        operation = _residual_metric_operation(quantity, source_observation)
+        if operation is not MetricOperation.ABSOLUTE:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "derived_standard_pressure_metric_unmapped",
+                    "operation": None if operation is None else operation.value,
+                }
+            )
+        converted, converted_unit = _convert_uncertainty_width(
+            quantity, width, uncertainty.basis
+        )
+        if converted is None or converted_unit is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "derived_standard_pressure_unit_unmapped",
+                    "basis": uncertainty.basis,
+                }
+            )
+        pressure_ticket = _metric_uncertainty_width(
+            operation, quantity, reference, converted, converted_unit
+        )
+        if pressure_ticket is None or pressure_ticket < 0 or not pressure_ticket.is_finite():
+            return _PrintedBandResolution(
+                refusal={"reason": "derived_standard_pressure_width_invalid"}
+            )
+
+        printed = _PrintedBandResolution()
+        if uncertainty.verbatim is not None:
+            printed = _printed_uncertainty_band(
+                quantity,
+                Uncertainty(
+                    kind=UncertaintyKind.PRINTED,
+                    verbatim=uncertainty.verbatim,
+                ),
+                reference,
+                source_observation=source_observation,
+                method=method,
+                band_basis="row_printed",
+            )
+            if printed.refusal is not None:
+                return printed
+
+        printed_ticket = (
+            Decimal(0) if printed.band is None else printed.band.value
+        )
+        # The pressure difference is a bounded systematic ambiguity, so its
+        # kJ/mol half-width adds linearly to a printed kJ/mol band, rather than
+        # combining in quadrature. If there is no printed band, it is the sole
+        # band source.
+        total_ticket = printed_ticket + pressure_ticket
+        band_basis = (
+            "printed_plus_derived_bound"
+            if printed.band is not None
+            else "derived_bound"
+        )
+        rule = (
+            "printed_plus_derived_bound: printed and standard-pressure kJ/mol "
+            "bounds summed linearly"
+            if printed.band is not None
+            else "derived_bound: standard-pressure kJ/mol ambiguity is the only band source"
+        )
+        return _PrintedBandResolution(
+            DecisionBand(
+                total_ticket,
+                QUANTITY_UNITS[quantity],
+                rule,
+                band_basis=band_basis,
+            ),
+            notice=printed.notice,
+        )
+    if uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
     if _verbatim_denies_printed_uncertainty(uncertainty):
         return _PrintedBandResolution()
@@ -15022,7 +15123,13 @@ def compile_residual(
         row_operation = _residual_metric_operation(quantity, reference)
         band_uncertainty = source_reference.uncertainty
         band_basis = None
-        if band_uncertainty.kind is UncertaintyKind.PRINTED:
+        if _is_standard_pressure_ambiguity_uncertainty(band_uncertainty):
+            band_basis = (
+                "printed_plus_derived_bound"
+                if band_uncertainty.verbatim is not None
+                else "derived_bound"
+            )
+        elif band_uncertainty.kind is UncertaintyKind.PRINTED:
             band_basis = "row_printed"
         elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
             work = context.works.get(experiment.work_id or "")
@@ -15230,8 +15337,13 @@ def compile_residual(
                 ),
             )
         printed_applies = (
-            band_uncertainty.kind is UncertaintyKind.PRINTED
-            and _uncertainty_scope_covers_cell(band_uncertainty, source_reference)
+            (
+                band_uncertainty.kind is UncertaintyKind.PRINTED
+                and _uncertainty_scope_covers_cell(
+                    band_uncertainty, source_reference
+                )
+            )
+            or _is_standard_pressure_ambiguity_uncertainty(band_uncertainty)
         )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
