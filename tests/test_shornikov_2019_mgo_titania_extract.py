@@ -753,7 +753,7 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
             execution=Execution(state=ExecutionState.PRODUCED),
             value=diagnostic_row["predicted_kJ_per_mol"],
             unit=QUANTITY_UNITS[Quantity.DELTA_FG],
-            coefficient_sources=("ellingham",),
+            coefficient_sources=("janaf-condensed-element-reference",),
             lineage_complete=True,
             identity=resolved.identity,
         )
