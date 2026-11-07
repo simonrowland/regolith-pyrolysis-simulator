@@ -1,0 +1,591 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  citation: Michael Möller (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation und des Temperns
+    von Siliziumoxid, Diplomarbeit, Ruprecht-Karls-Universität Heidelberg, Kirchhoff-Institut für Physik, HD-KIP 07-37.
+  source_ids:
+  - moeller-2007-silicon-oxide-evaporation-condensation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:moeller-2007-silicon-oxide-evaporation-condensation
+      role: pdf
+      path: raw/moeller-2007-silicon-oxide-evaporation-condensation/moeller-2007-silicon-oxide-evaporation-condensation.pdf
+      sha256:
+        tag: value
+        value: fcb1940aba122cb6f4c2a93130266e41f0fbc6fd8d5ba8883dac264b713ccbbe
+    - asset_id: pdftotext:moeller-2007-silicon-oxide-evaporation-condensation
+      role: pdftotext
+      path: text/moeller-2007-silicon-oxide-evaporation-condensation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:moeller-2007-silicon-oxide-evaporation-condensation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: moeller2007_ta_deposition_thickness
+  type: table_context
+  locator:
+    page: 81
+    pdf_page_index: 80
+    published_page: 76
+    table: '4.4'
+  units: nm
+  values:
+    quantity: SiO_deposition_thickness_on_tantalum
+    method_class: measured_reduced
+    schema_gap: Film thickness is geometric length and no exact film-thickness quantity token is available; retained as typed-refused
+      context.
+    printed_values:
+      fitted_film_thickness: 19 nm
+      previously_calculated_film_thickness: 78 nm
+    printed_value_locators:
+      fitted_film_thickness:
+        page: 81
+        pdf_page_index: 80
+        published_page: 76
+        table: '4.4'
+      previously_calculated_film_thickness:
+        page: 78
+        pdf_page_index: 77
+        published_page: 73
+        section: 4.3.3
+    author_explanation:
+      aperture: The selected aperture was 2 mm.
+      sample_rotation: The sample was rotated by 72.1°.
+      incident_beam_diameter: At that rotation, the incident beam diameter in the plane of incidence at the sample exceeded
+        10 mm.
+      deposited_film_diameter: The deposited circular film had an approximate diameter of 11 mm.
+      film_center_offset: The film center was about 4 mm from the sample center.
+      bare_substrate_reflection: The beam also reflected from bare substrate.
+      possible_anisotropy_or_inhomogeneity: The discrepancy may also indicate anisotropy or inhomogeneity in the deposited
+        film.
+    explanation_locator:
+      page: 80
+      pdf_page_index: 79
+      published_page: 75
+      section: 4.3.3
+    disposition: The fitted and previously calculated Ta thicknesses are both retained as printed; reflectance spectra are
+      not digitized.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_ta_deposition_thickness
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_table22_to_band_positions
+  type: table_record
+  locator:
+    page: 43
+    pdf_page_index: 42
+    published_page: 38
+    table: '2.2'
+  units: cm-1
+  values:
+    quantity: SiO2_transversal_optical_band_wavenumber
+    quantity_as_printed: Literaturwerte für die drei transversal optischen charakteristischen Schwingungsbanden von SiO2 im
+      IR. Dabei steht exp für experimentell und theo für theoretisch bestimmte Frequenzen.
+    quantity_gloss_en: Literature values for the three characteristic transverse optical vibration bands of SiO2 in IR; exp
+      denotes experimentally determined and theo theoretically determined frequencies.
+    disposition: quoted_attributed
+    method_class: quoted_attributed
+    schema_gap: IR band wavenumber lacks an exact quantity token and table_record is outside the closed observation type set;
+      retained as typed-refused context.
+    rows:
+    - rocking_mode_cm_1: '450'
+      bending_mode_cm_1: '800'
+      stretching_mode_cm_1: 1060-1080
+      literature_as_printed: '[35] exp'
+    - rocking_mode_cm_1: '457'
+      bending_mode_cm_1: '810'
+      stretching_mode_cm_1: 1065-1076
+      literature_as_printed: '[36] exp, theo'
+    - rocking_mode_cm_1: '450'
+      bending_mode_cm_1: '810'
+      stretching_mode_cm_1: null
+      literature_as_printed: '[34] exp'
+    - rocking_mode_cm_1: '447'
+      bending_mode_cm_1: '813'
+      stretching_mode_cm_1: '1062'
+      literature_as_printed: '[37] exp'
+    - rocking_mode_cm_1: null
+      bending_mode_cm_1: null
+      stretching_mode_cm_1: '1082'
+      literature_as_printed: '[17] theo'
+    - rocking_mode_cm_1: null
+      bending_mode_cm_1: null
+      stretching_mode_cm_1: '1072'
+      literature_as_printed: '[38] exp'
+    printed_row_count: 6
+    label_glossary:
+      rocking mode: Schaukelschwingung
+      bending mode: Biegeschwingung
+      stretching mode: Streckschwingung
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_table22_to_band_positions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO2
+- observation_id: moeller2007_table23_lo_band_positions
+  type: table_record
+  locator:
+    page: 43
+    pdf_page_index: 42
+    published_page: 38
+    table: '2.3'
+  units: cm-1
+  values:
+    quantity: SiO2_longitudinal_optical_band_wavenumber
+    quantity_as_printed: Literaturwerte für die drei longitudinal optischen charakteristischen Schwingungsbanden von SiO2
+      im IR.
+    quantity_gloss_en: Literature values for the three characteristic longitudinal optical vibration bands of SiO2 in IR.
+    disposition: quoted_attributed
+    method_class: quoted_attributed
+    schema_gap: IR band wavenumber lacks an exact quantity token and table_record is outside the closed observation type set;
+      retained as typed-refused context.
+    rows:
+    - rocking_mode_cm_1: '507'
+      bending_mode_cm_1: '820'
+      stretching_mode_cm_1: '1160'
+      literature_as_printed: '[36]'
+    - rocking_mode_cm_1: null
+      bending_mode_cm_1: null
+      stretching_mode_cm_1: '1162'
+      literature_as_printed: '[39] exp'
+    - rocking_mode_cm_1: null
+      bending_mode_cm_1: null
+      stretching_mode_cm_1: 1170; 1159,9
+      literature_as_printed: '[38] exp theo'
+    printed_row_count: 3
+    label_glossary:
+      rocking mode: Schaukelschwingung
+      bending mode: Biegeschwingung
+      stretching mode: Streckschwingung
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_table23_lo_band_positions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO2
+- observation_id: moeller2007_table42_fitted_band_positions_and_thickness
+  type: table_record
+  locator:
+    page: 73
+    pdf_page_index: 72
+    published_page: 68
+    table: '4.2'
+  units: resonance frequency cm-1; fitted thickness nm
+  values:
+    quantity: SiO_fitted_transversal_optical_band_wavenumbers_and_film_thickness
+    quantity_as_printed: Variablen mit Werten der Fitparametern für die Modellierung von SiO.
+    quantity_gloss_en: Variables with fit-parameter values for modelling SiO.
+    method_class: measured_reduced
+    schema_gap: IR band wavenumber and fitted film thickness in this table are retained as typed-refused context because table_record
+      is outside the closed observation type set; no exact wavenumber quantity token exists.
+    rows:
+    - resonance_frequency_cm_1: '996'
+      oscillator_strength_cm_1: '833'
+      damping_cm_1: 0,02
+      gaussian_width_cm_1: '73'
+      mode_label_de: Streck-
+      mode_gloss_en: stretching vibration
+    - resonance_frequency_cm_1: '697'
+      oscillator_strength_cm_1: '303'
+      damping_cm_1: 0,07
+      gaussian_width_cm_1: '68'
+      mode_label_de: Biege-
+      mode_gloss_en: bending vibration
+    - resonance_frequency_cm_1: '442'
+      oscillator_strength_cm_1: '336'
+      damping_cm_1: 0,02
+      gaussian_width_cm_1: '65'
+      mode_label_de: Schaukelschwingung
+      mode_gloss_en: rocking vibration
+    dielectric_background:
+      real_part: 4,02
+      imaginary_part: '0'
+    fitted_film_thickness_nm: '166'
+    film_thickness_from_deposition_rates_nm: 104,8
+    printed_row_count: 3 oscillators plus dielectric-background and thickness records
+    mode_assignment_locator:
+      page: 72
+      pdf_page_index: 71
+      published_page: 67
+      section: 4.3.1
+      note: Paragraph states Streck-, Biege- und Schaukelschwingung in this oscillator order; assignments correspond to the
+        three table rows.
+    label_glossary:
+      rocking mode: Schaukelschwingung
+      bending mode: Biegeschwingung
+      stretching mode: Streckschwingung
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_table42_fitted_band_positions_and_thickness
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_table45_to_band_positions
+  type: table_record
+  locator:
+    page: 82
+    pdf_page_index: 81
+    published_page: 77
+    table: '4.5'
+  units: cm-1
+  values:
+    quantity: SiO_transversal_optical_resonance_wavenumber
+    quantity_as_printed: Resonanzfrequenzen nu_TO der verschiedenen Messungen von SiO
+    method_class: measured_reduced
+    derivation: Resonance frequencies fitted from each relative transmission spectrum; the table reports the authors' fits.
+    schema_gap: IR band wavenumber lacks an exact quantity token and table_record is outside the closed observation type set;
+      retained as typed-refused context.
+    rows:
+    - substrate_as_printed: Si
+      nu_TO_cm_1: '996'
+    - substrate_as_printed: Si
+      nu_TO_cm_1: '1000'
+    - substrate_as_printed: Si
+      nu_TO_cm_1: '1002'
+    - substrate_as_printed: Ge
+      nu_TO_cm_1: '994'
+    printed_row_count: 4
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_table45_to_band_positions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_table46_anneal_series
+  type: table_record
+  locator:
+    page: 86
+    pdf_page_index: 85
+    published_page: 81
+    table: '4.6'
+  units: temperature °C; resonance frequency cm-1; oscillator strength cm-1; damping cm-1; Gaussian distribution width cm-1;
+    dielectric background dimensionless
+  values:
+    quantity: SiO_annealing_temperature_and_fitted_band_parameters
+    quantity_as_printed: Fitparameter des Brendeloszillators der Resonanzfrequenz nu_TO und des dielektrischen Hintergrunds
+      epsilon_inf nach Tempern der Probe auf Temperatur T
+    method_class: measured_reduced
+    schema_gap: IR band wavenumber and fitted oscillator parameters lack exact quantity tokens; table_record is outside the
+      closed observation type set. Retained as typed-refused context.
+    annealing_duration_as_printed: 10 min per pulse
+    rows:
+    - anneal_temperature_as_printed: RT
+      nu_TO_cm_1: '996'
+      oscillator_strength_cm_1: '833'
+      damping_cm_1: 0,021
+      gaussian_width_cm_1: '73'
+      epsilon_inf: 4,02
+    - anneal_temperature_C: '200'
+      nu_TO_cm_1: '1004'
+      oscillator_strength_cm_1: '831'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: '68'
+      epsilon_inf: 3,48
+    - anneal_temperature_C: '300'
+      nu_TO_cm_1: '1013'
+      oscillator_strength_cm_1: '831'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: '66'
+      epsilon_inf: 3,49
+    - anneal_temperature_C: '400'
+      nu_TO_cm_1: '1026'
+      oscillator_strength_cm_1: '839'
+      damping_cm_1: 0,002
+      gaussian_width_cm_1: '65'
+      epsilon_inf: 3,53
+    - anneal_temperature_C: '500'
+      nu_TO_cm_1: '1037'
+      oscillator_strength_cm_1: '844'
+      damping_cm_1: 0,002
+      gaussian_width_cm_1: '64'
+      epsilon_inf: 3,60
+    - anneal_temperature_C: '600'
+      nu_TO_cm_1: '1051'
+      oscillator_strength_cm_1: '854'
+      damping_cm_1: 0,002
+      gaussian_width_cm_1: '62'
+      epsilon_inf: 3,69
+    - anneal_temperature_C: '700'
+      nu_TO_cm_1: '1062'
+      oscillator_strength_cm_1: '861'
+      damping_cm_1: 0,002
+      gaussian_width_cm_1: '60'
+      epsilon_inf: 3,45
+    - anneal_temperature_C: '800'
+      nu_TO_cm_1: '1076'
+      oscillator_strength_cm_1: '1162'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: '65'
+      epsilon_inf: 0,01
+    printed_row_count: 8
+    quench_statement: 'Probe was returned to room temperature before the post-pulse spectrum; source does not claim preserved
+      high-temperature state. Locator: page 84, section 4.4.'
+    duration_condition_locator:
+      page: 84
+      pdf_page_index: 83
+      published_page: 79
+      section: '4.4'
+      note: Si and Ta heated 10 minutes per pulse; Ge heated 1 minute per pulse. Table 4.6 is the Si series.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_table46_anneal_series
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_tableA2_anneal_rocking_bending
+  type: table_record
+  locator:
+    page: 100
+    pdf_page_index: 99
+    published_page: 95
+    table: A.2
+  units: temperature °C; resonance frequency cm-1; oscillator strength cm-1; damping cm-1; Gaussian distribution width cm-1
+  values:
+    quantity: SiO_annealing_rocking_and_bending_band_parameters
+    quantity_as_printed: Fitparameter der Brendeloszillatoren der Resonanzfrequenz für die Schaukel- und Biegeschwingung nach
+      Tempern der Probe auf Temperatur T
+    method_class: measured_reduced
+    schema_gap: IR band wavenumber and fitted oscillator parameters lack exact quantity tokens; table_record is outside the
+      closed observation type set. Retained as typed-refused context.
+    annealing_duration_as_printed: 10 min per Si pulse (section 4.4, page 84)
+    rows:
+    - mode_as_printed: rocking
+      anneal_temperature_as_printed: RT
+      resonance_frequency_cm_1: '447'
+      oscillator_strength_cm_1: '336'
+      damping_cm_1: 0,024
+      gaussian_width_cm_1: '65'
+    - mode_as_printed: rocking
+      anneal_temperature_C: '200'
+      resonance_frequency_cm_1: '422'
+      oscillator_strength_cm_1: '1118'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: 0,6
+    - mode_as_printed: rocking
+      anneal_temperature_C: '300'
+      resonance_frequency_cm_1: '429'
+      oscillator_strength_cm_1: '1054'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: 0,7
+    - mode_as_printed: rocking
+      anneal_temperature_C: '400'
+      resonance_frequency_cm_1: '438'
+      oscillator_strength_cm_1: '1009'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: 0,7
+    - mode_as_printed: rocking
+      anneal_temperature_C: '500'
+      resonance_frequency_cm_1: '436'
+      oscillator_strength_cm_1: '1049'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: 0,7
+    - mode_as_printed: rocking
+      anneal_temperature_C: '600'
+      resonance_frequency_cm_1: '443'
+      oscillator_strength_cm_1: '997'
+      damping_cm_1: 0,001
+      gaussian_width_cm_1: 0,8
+    - mode_as_printed: rocking
+      anneal_temperature_C: '700'
+      resonance_frequency_cm_1: '407'
+      oscillator_strength_cm_1: '1356'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: 0,7
+    - mode_as_printed: rocking
+      anneal_temperature_C: '800'
+      resonance_frequency_cm_1: '440'
+      oscillator_strength_cm_1: '2075'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '0'
+    - mode_as_printed: bending
+      anneal_temperature_as_printed: RT
+      resonance_frequency_cm_1: '697'
+      oscillator_strength_cm_1: '303'
+      damping_cm_1: 0,066
+      gaussian_width_cm_1: '68'
+    - mode_as_printed: bending
+      anneal_temperature_C: '200'
+      resonance_frequency_cm_1: '704'
+      oscillator_strength_cm_1: '268'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '67'
+    - mode_as_printed: bending
+      anneal_temperature_C: '300'
+      resonance_frequency_cm_1: '715'
+      oscillator_strength_cm_1: '227'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '60'
+    - mode_as_printed: bending
+      anneal_temperature_C: '400'
+      resonance_frequency_cm_1: '717'
+      oscillator_strength_cm_1: '232'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '65'
+    - mode_as_printed: bending
+      anneal_temperature_C: '500'
+      resonance_frequency_cm_1: '727'
+      oscillator_strength_cm_1: '227'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '64'
+    - mode_as_printed: bending
+      anneal_temperature_C: '600'
+      resonance_frequency_cm_1: '755'
+      oscillator_strength_cm_1: '189'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '50'
+    - mode_as_printed: bending
+      anneal_temperature_C: '700'
+      resonance_frequency_cm_1: '777'
+      oscillator_strength_cm_1: '197'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '44'
+    - mode_as_printed: bending
+      anneal_temperature_C: '800'
+      resonance_frequency_cm_1: '802'
+      oscillator_strength_cm_1: '368'
+      damping_cm_1: '0'
+      gaussian_width_cm_1: '62'
+    printed_row_count: 16, split into two mode blocks of 8 rows each
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_tableA2_anneal_rocking_bending
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_text_annealing_conditions
+  type: table_context
+  locator:
+    page: 85
+    pdf_page_index: 84
+    published_page: 80
+    section: '4.4'
+  units: as printed
+  values:
+    quantity: SiO_annealing_duration_and_chamber_pressure
+    method_class: method_only
+    printed_conditions:
+      annealing_chamber_pressure: up to 1 · 10−7 mbar
+      duration: 10 min (Si, Ta); 1 min (Ge)
+      silicon_temperature_series: 200 °C first pulse; then 100 °C steps through 900 °C
+    disposition: Conditions and durations are stated in section 4.4; no unprinted condition is added.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_text_annealing_conditions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_text_condensation_conditions
+  type: table_context
+  locator:
+    page: 71
+    pdf_page_index: 70
+    published_page: 66
+    section: '4.3'
+  units: as printed
+  values:
+    quantity: SiO_condensation_and_substrate_conditions
+    method_class: method_only
+    printed_conditions:
+      pressure: below 3 · 10−10 mbar
+      substrate_temperature_during_measurement: room temperature
+      typical_deposition_rate: around 1 nm/min
+      substrate_pretreatment: '300–400 °C for several hours; then up to 1000 °C (Ge: 800 °C) for several minutes'
+    disposition: Conditions are verbatim prose values; no unprinted pressure or temperature is filled in.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_text_condensation_conditions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_text_deposition_conditions
+  type: table_context
+  locator:
+    page: 69
+    pdf_page_index: 68
+    published_page: 64
+    section: 4.2.2
+  units: as printed
+  values:
+    quantity: silicon_monoxide_deposition_and_annealing_conditions
+    method_class: method_only
+    printed_conditions:
+      source_material: quartz (SiO2); principal reported vapor species SiO and O2
+      source_temperature: not tabulated in the scope-relevant printed tables; numeric series appears only in Figure 4.3 and
+        is therefore excluded
+      source_atmosphere: UHV chamber; pressure '<5 · 10−10 mbar'
+      source_pressure: <5 · 10−10 mbar
+    disposition: Evaporation condition recorded as printed; source temperature appears only in Figure 4.3 and is excluded.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_text_deposition_conditions
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_text_deposition_thickness_and_rates
+  type: table_context
+  locator:
+    page: 72
+    pdf_page_index: 71
+    published_page: 67
+    section: 4.3.1
+  units: nm; nm/min; mbar
+  values:
+    quantity: SiO_deposition_thickness_and_rate_text_values
+    schema_gap: Film thickness is geometric length and the printed film growth rate is length/time; mass_loss_areal_density
+      and evaporation_rate do not express those quantities. See simulator/battery/enums.py::Quantity.MASS_LOSS_AREAL_DENSITY
+      and Quantity.EVAPORATION_RATE.
+    method_class: measured_reduced
+    printed_values:
+      maximum_deposition_series_thickness_from_rate: 104,8 nm
+      scout_fitted_thickness: 166 nm
+      difference_between_thickness_estimates: about 60 nm
+      typical_deposition_rate: around 1 nm/min
+      chamber_pressure_during_condensation: below 3 · 10−10 mbar
+      chamber_pressure_change_during_measurement: ΔpUHV = 0,2 · 10−10 mbar decrease
+    printed_value_locators:
+      maximum_deposition_series_thickness_from_rate:
+        page: 72
+        pdf_page_index: 71
+        published_page: 67
+        section: 4.3.1
+      scout_fitted_thickness:
+        page: 73
+        pdf_page_index: 72
+        published_page: 68
+        table: '4.2'
+      difference_between_thickness_estimates:
+        page: 74
+        pdf_page_index: 73
+        published_page: 69
+        section: 4.3.1
+      chamber_pressure_change_during_measurement:
+        page: 74
+        pdf_page_index: 73
+        published_page: 69
+        section: 4.3.1
+    disposition: The 104.8 nm value is derived from pre/post deposition rates; 166 nm is the authors' spectral fit. The approximate
+      60 nm difference is the authors' comparison, not an independent measurement.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_text_deposition_thickness_and_rates
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
+- observation_id: moeller2007_text_evaporation_pressure_bounds
+  type: table_context
+  locator:
+    page: 70
+    pdf_page_index: 69
+    published_page: 65
+    section: 4.2.2
+  units: mbar; °C
+  values:
+    quantity: SiO_evaporation_vapor_pressure_text_bounds
+    method_class: measured_direct
+    printed_results:
+      measured_vapor_pressures: Die gemessenen Dampfdrücke lagen fast alle über 1 mbar.
+      difference_between_two_series_as_printed: Die Messungen weisen einen Unterschied von etwa einer Größenordnung auf.
+      difference_between_two_series_gloss_en: The measurements differ by about one order of magnitude.
+      temperature_oscillations: gelegentlich zu stärkeren Temperaturoszillationen (∆T = ±50 °C)
+      equation_2_20_as_printed: Die gemessenen Dampfdrücke lagen fast alle über 1 mbar, so dass die Gleichung (2.20) nicht
+        mehr verwendet werden kann.
+      equation_2_20_gloss_en: Almost all measured vapor pressures were above 1 mbar, so equation (2.20) can no longer be used.
+      reproducibility_as_printed: Man kann erkennen, dass die gemessenen Dampfdrücke nicht reproduziert werden konnten.
+      reproducibility_gloss_en: One can see that the measured vapor pressures could not be reproduced.
+    disposition: Prose bounds and methodological caveats only; the Figure 4.3 pressure series is not transcribed or mapped
+      to p_sat.
+  context_id: moeller-2007-silicon-oxide-evaporation-condensation::context::moeller2007_text_evaporation_pressure_bounds
+  work_id: 7c2e2ca59aafc50d2c95b2e662cd77330404349e34e1a930ac8592b2c917efb7
+  source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  species: SiO
