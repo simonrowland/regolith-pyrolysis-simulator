@@ -106,8 +106,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
+    # Re-pinned 2026-11-07 on rpp-ctrl with the gate engine set at eeadc6585
+    # (openimcc 66ec4a3); payload changed and ledger digest reproduced.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "8e53b0f97a3dc81209cf91835192fe1723caf5111c0e1360fbbec0b6a9d2fecb"
+        "dd69684d2afa08d3a6e9a47a774bb74076465d149feda3f351e1db745e5a1149"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
