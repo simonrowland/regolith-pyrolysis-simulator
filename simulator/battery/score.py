@@ -6285,17 +6285,25 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 
 
 def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
+    """Return point-associated oxygen pressure, not identity-only fO2.
+
+    Comparison uses a returned pressure to align prediction conditions. An
+    identity fO2 alone must not make an unknown total-pressure axis known.
+    """
+
     if quantity_token(observation.identity) not in _VAPOUR_EQUILIBRIUM:
         return None
     if _has_printed_fo2(observation, observation.identity):
+        pressure = printed_source_pressure(observation)
         identity_pressure = observation.identity.fO2_Pa
         if (
-            identity_pressure is not None
+            pressure is not None
+            and identity_pressure is not None
             and identity_pressure.is_value
             and identity_pressure.value is not None
         ):
             return identity_pressure.value
-        return printed_source_pressure(observation)
+        return pressure
     return linked_source_pressure(observation)
 
 
