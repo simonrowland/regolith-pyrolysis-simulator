@@ -4535,26 +4535,37 @@ def test_intrinsic_fo2_affects_pressure_and_state_fingerprint() -> None:
 
 
 @pytest.mark.parametrize("intrinsic_fO2", [None, "bogus", -1.0, math.nan])
-def test_intrinsic_fo2_missing_or_malformed_fails_run_state_validation(
+def test_intrinsic_fo2_missing_is_local_but_malformed_fails_validation(
     intrinsic_fO2: Any,
 ) -> None:
     payload = _minimal_family("K")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
 
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match="intrinsic_melt oxygen fugacity",
-    ):
-        catalog.resolve_batch(
+    state = _state_with_k_activity(
+        temperature_K=1500.0,
+        fO2_bar=1.0e-8,
+        source_reaction_fO2_bar=intrinsic_fO2,
+    )
+    if intrinsic_fO2 is None:
+        answer = catalog.resolve_batch(
             ledger,
-            _state_with_k_activity(
-                temperature_K=1500.0,
-                fO2_bar=1.0e-8,
-                source_reaction_fO2_bar=intrinsic_fO2,
-            ),
+            state,
             flux_activation_context=_rg_activation_context(),
-        )
+        ).channel("K")
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
+    else:
+        with pytest.raises(
+            VapourRequestConstructionError,
+            match="intrinsic_melt oxygen fugacity",
+        ):
+            catalog.resolve_batch(
+                ledger,
+                state,
+                flux_activation_context=_rg_activation_context(),
+            )
 
 
 def test_validation_anchors_propagate_to_rule_and_answer() -> None:

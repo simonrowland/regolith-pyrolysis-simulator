@@ -128,6 +128,7 @@ REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_ABSENT_SOURCE_ATOM,
+    REFUSAL_MISSING_OUTCOME_STATE,
     ActivityRefusalCode.MISSING_EVIDENCE.value,
     ActivityRefusalCode.UNMAPPED_PHASE.value,
     ActivityRefusalCode.UNMAPPED_ENDMEMBER.value,
@@ -2908,12 +2909,6 @@ def _validate_run_state_inputs(
     needs_temperature = any(
         rule.has_pressure_evaluator for rule in relevant_rules
     ) or any(evaluator is not None for evaluator in evaluators)
-    needs_intrinsic_fo2 = any(
-        getattr(evaluator, "oxygen_fugacity_channel", None) == "intrinsic_melt"
-        for evaluator in evaluators
-        if evaluator is not None
-    )
-
     def require_positive(value: Any, label: str, *, required: bool) -> None:
         if value is None:
             if required:
@@ -2954,8 +2949,11 @@ def _validate_run_state_inputs(
     require_positive(
         state.source_reaction_fO2_bar,
         "intrinsic_melt oxygen fugacity",
-        required=needs_intrinsic_fo2,
+        required=False,
     )
+    # Intrinsic fO2 is an evaluator input for selected channels, not a
+    # run-wide transport requirement. _make_live returns a typed refusal for
+    # each affected channel so a missing solve diagnostic cannot abort peers.
 
 
 def resolve_vapour_batch(
@@ -3054,8 +3052,8 @@ def resolve_vapour_batch(
     # supplied by the typed effective-pressure seam, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
     # Typed non-debiting answers and species-local refusals demote only that
-    # species' seam claim. Contract refusals fail on claimed channels, while
-    # missing outcome-determining process state fails even with no claims.
+    # species' seam claim. Run-wide temperature is validated before closure;
+    # an evaluator-specific outcome gap remains a typed channel refusal.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
@@ -3068,10 +3066,7 @@ def resolve_vapour_batch(
             species_id: answer.refusal_code or "unknown_refusal"
             for species_id, answer in answers.items()
             if answer.is_refused
-            and (
-                species_id in claimed
-                or answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
-            )
+            and species_id in claimed
             and not _is_species_local_refusal(answer)
         }
         if fail_closed_refusals:
