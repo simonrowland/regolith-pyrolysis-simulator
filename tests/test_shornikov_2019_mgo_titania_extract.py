@@ -11,19 +11,27 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    Engine,
     NoticeKind,
+    Phase,
     Quantity,
+    RefusalReason,
     UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import (
+    IdentityEqualKind,
     PA_PER_ATM_DEC,
     PA_PER_BAR_DEC,
+    identity_equal,
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import (
+    ScoreContext,
     _printed_uncertainty_band,
+    _resolve_shornikov_2019_table2_identity_axes,
+    compile_residual,
 )
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -381,3 +389,161 @@ def test_standard_pressure_declaration_is_closed_and_requires_gas_temperature() 
         in error
         for error in validate_extract_document(document, expected_source_id=SOURCE_ID)
     )
+
+
+def test_table2_identity_axes_resolve_at_score_time_without_extract_edits(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    table2_rows = [
+        row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+        if row["locator"].get("table") == "2"
+    ]
+    assert len(table2_rows) == 20
+    assert len(
+        {
+            formula
+            for formula, block in document["species"].items()
+            if any(
+                row["locator"].get("table") == "2"
+                for row in block.get("observations", [])
+            )
+        }
+    ) == 15
+    assert all("identity" not in row for row in table2_rows)
+
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    by_id = {
+        row["observation_id"]: _resolve_shornikov_2019_table2_identity_axes(
+            _migrated_observation(result, row["observation_id"])
+        )
+        for row in table2_rows
+    }
+    unresolved_solids = []
+    for row in table2_rows:
+        observation = by_id[row["observation_id"]]
+        assert observation.identity.standard_pressure_Pa.value == Decimal("100000")
+        assert observation.identity.reaction.is_value
+        assert observation.identity.formation_elements.is_value
+        derived_by = observation.provenance["derived_by"]
+        assert derived_by["standard_pressure_Pa"] == "d351_nominal_p0"
+        assert derived_by["reaction"] == "d338_reference_state_owner"
+        assert derived_by["formation_elements"] == "d338_reference_state_owner"
+        if observation.identity.species.phase.value is Phase.CR:
+            polymorph = observation.identity.species.polymorph
+            if polymorph is None or not polymorph.is_value:
+                refusal = next(
+                    notice
+                    for notice in observation.notices
+                    if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+                )
+                unresolved_solids.append(
+                    (row["observation_id"], refusal.reason)
+                )
+            else:
+                assert derived_by["species.polymorph"] == (
+                    "d338_reference_state_owner"
+                )
+    assert dict(unresolved_solids) == {
+        "shornikov_2019_mgo_titania_melts_p003_t02_r04_c02": (
+            "fusion conversion missing input for Mg2TiO4: incomplete JANAF "
+            "stability candidate set: JANAF crystal table has no canonical "
+            "polymorph for Mg2TiO4"
+        ),
+        "shornikov_2019_mgo_titania_melts_p003_t02_r05_c02": (
+            "fusion conversion missing input for MgTiO3: incomplete JANAF "
+            "stability candidate set: JANAF crystal table has no canonical "
+            "polymorph for MgTiO3"
+        ),
+        "shornikov_2019_mgo_titania_melts_p003_t02_r06_c02": (
+            "fusion conversion missing input for MgTi2O5: incomplete JANAF "
+            "stability candidate set: JANAF crystal table has no canonical "
+            "polymorph for MgTi2O5"
+        ),
+        "shornikov_2019_mgo_titania_melts_p003_t02_r07_c02": (
+            "fusion conversion missing input for TiO2: no JANAF fusion table "
+            "pair for TiO2"
+        ),
+    }
+    for observation_id, _reason in unresolved_solids:
+        assert (
+            identity_equal(
+                by_id[observation_id].identity,
+                by_id[observation_id].identity,
+            ).kind
+            is IdentityEqualKind.IDENTITY_UNKNOWN
+        )
+
+    oxygen = by_id[
+        "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    ]
+    assert oxygen.identity.standard_pressure_Pa.value == Decimal("100000")
+    assert oxygen.identity.reaction.is_value
+    assert oxygen.identity.formation_elements.is_value
+    oxygen_reference = dict(oxygen.identity.formation_elements.value)["O"]
+    assert oxygen_reference.formula == "O2"
+    assert oxygen_reference.phase.is_value
+    assert oxygen_reference.phase.value is Phase.G
+    assert identity_equal(oxygen.identity, oxygen.identity).kind is IdentityEqualKind.EQUAL
+    assert oxygen.provenance["derived_by"] == {
+        "standard_pressure_Pa": "d351_nominal_p0",
+        "reaction": "d338_reference_state_owner",
+        "formation_elements": "d338_reference_state_owner",
+    }
+    assert oxygen.uncertainty.kind is UncertaintyKind.DERIVED
+
+    periclase = by_id[
+        "shornikov_2019_mgo_titania_melts_p003_t02_r03_c02"
+    ]
+    assert periclase.identity.species.polymorph.is_value
+    assert str(periclase.identity.species.polymorph.value) == "periclase"
+    assert periclase.provenance["derived_by"]["species.polymorph"] == (
+        "d338_reference_state_owner"
+    )
+    assert identity_equal(
+        periclase.identity, periclase.identity
+    ).kind is IdentityEqualKind.EQUAL
+
+    liquid = by_id[
+        "shornikov_2019_mgo_titania_melts_p003_t02_r03_c04"
+    ]
+    assert liquid.identity.species.phase.value is Phase.L
+    assert liquid.identity.standard_pressure_Pa.value == Decimal("100000")
+    assert identity_equal(liquid.identity, liquid.identity).kind is IdentityEqualKind.EQUAL
+
+    unsupported_solid = by_id[
+        "shornikov_2019_mgo_titania_melts_p003_t02_r05_c02"
+    ]
+    refusal = next(
+        notice
+        for notice in unsupported_solid.notices
+        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    assert "fusion conversion missing input for MgTiO3:" in refusal.reason
+    assert "incomplete JANAF stability candidate set" in refusal.reason
+    assert "no canonical polymorph for MgTiO3" in refusal.reason
+    assert identity_equal(
+        unsupported_solid.identity, unsupported_solid.identity
+    ).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    score_context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        extract_review={SOURCE_ID: "reviewed"},
+    )
+    refused_residual, _ = compile_residual(
+        _migrated_observation(
+            result, "shornikov_2019_mgo_titania_melts_p003_t02_r05_c02"
+        ),
+        Engine.INTERNAL_ANALYTICAL,
+        context=score_context,
+    )
+    assert refused_residual.refusal is not None
+    assert refused_residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refused_residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
+    assert refused_residual.refusal.detail["notice"] == refusal.reason
+    assert all("identity" not in row for row in table2_rows)

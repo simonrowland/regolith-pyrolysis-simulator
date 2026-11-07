@@ -2364,12 +2364,13 @@ def _reference_polymorph_notice(
     kind: NoticeKind,
     reason: str,
     band: str,
+    quantity: Quantity = Quantity.ACTIVITY,
     authority: Authority | None = None,
     certification: str | None = None,
 ) -> Notice:
     return Notice(
         kind=kind,
-        affected_quantities=(Quantity.ACTIVITY,),
+        affected_quantities=(quantity,),
         reason=reason,
         origin=reference.observation_id,
         band=band,
@@ -2450,17 +2451,21 @@ def _feo1_5_hematite_field_refusal(
 def _decide_omitted_reference_polymorph(
     reference: Observation,
     identity: Identity,
-    standard_state: StandardState,
+    standard_state: StandardState | None,
     formula: str,
     temperature_K: Decimal,
+    *,
+    identity_axis: Literal["reference_state", "species"] = "reference_state",
+    quantity: Quantity = Quantity.ACTIVITY,
 ) -> tuple[Observation | None, Notice | None]:
     """Infer the stable JANAF crystal for a printed, unnamed pure solid.
 
     Returns ``(updated reference, None)`` when the row may convert, or
     ``(None, refusal)`` when inference is refused. The stored record is not
     written; ``updated`` is the working observation whose polymorph is the
-    inferred crystal so the named fusion path can run. A refusal is typed
-    and carries no converted value.
+    inferred crystal so the named comparison path can run. A refusal is typed
+    and carries no converted value. d-338 owns both reference-state and product
+    species polymorph inference; the source extract remains unchanged.
     """
 
     from simulator.battery.generators.janaf import (
@@ -2471,8 +2476,20 @@ def _decide_omitted_reference_polymorph(
         janaf_solid_stability_transitions,
     )
 
-    polymorph_state = standard_state.endmember.polymorph
-    assert polymorph_state is not None
+    if identity_axis == "species":
+        endmember = identity.species
+        assert endmember is not None
+        polymorph_state = endmember.polymorph
+        if polymorph_state is None:
+            polymorph_state = State.unknown(
+                "source does not state polymorph",
+                rejection_kind=PolymorphRejectionKind.OMITTED,
+            )
+    else:
+        assert standard_state is not None
+        endmember = standard_state.endmember
+        polymorph_state = endmember.polymorph
+        assert polymorph_state is not None
     reason_text = polymorph_state.reason or ""
     if _polymorph_reason_states_quench_or_metastable(reason_text):
         return None, _reference_polymorph_notice(
@@ -2480,6 +2497,7 @@ def _decide_omitted_reference_polymorph(
             kind=NoticeKind.INPUT_OMITTED,
             reason=REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
             band="source states a quench or a metastable reference phase",
+            quantity=quantity,
         )
 
     # Premise: a printed one-cation solid references the dimer's crystal,
@@ -2489,7 +2507,11 @@ def _decide_omitted_reference_polymorph(
     # FeO1.5 is hematite only inside the Fe-030/Fe-032 fO2 field; otherwise
     # the printed point is kept and the refusal names that field.
     mapped_from: str | None = None
-    dimer = _ONE_CATION_OXIDE_DIMER.get(formula)
+    dimer = (
+        _ONE_CATION_OXIDE_DIMER.get(formula)
+        if identity_axis == "reference_state"
+        else None
+    )
     if dimer is not None:
         if formula == "FeO1.5":
             field_refusal = _feo1_5_hematite_field_refusal(
@@ -2500,7 +2522,8 @@ def _decide_omitted_reference_polymorph(
         mapped_from = formula
         formula = dimer
         assert reference.value.point is not None
-        endmember = replace(standard_state.endmember, formula=formula)
+        endmember = replace(endmember, formula=formula)
+        assert standard_state is not None
         standard_state = replace(
             standard_state, endmember=endmember, component_basis=formula
         )
@@ -2517,6 +2540,7 @@ def _decide_omitted_reference_polymorph(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             reason=f"fusion conversion missing input for {formula}: {detail}",
             band=f"JANAF fusion data for {formula}: {detail}",
+            quantity=quantity,
         )
 
     try:
@@ -2549,6 +2573,7 @@ def _decide_omitted_reference_polymorph(
                 f"{fusion.melting_temperature_K} K; "
                 f"tables={fusion.crystal_table}/{fusion.liquid_table}"
             ),
+            quantity=quantity,
         )
 
     try:
@@ -2576,6 +2601,7 @@ def _decide_omitted_reference_polymorph(
                 f"({nearest.stable_below.polymorph.value}"
                 f"/{nearest.stable_above.polymorph.value})"
             ),
+            quantity=quantity,
         )
 
     selected = stability.selected
@@ -2637,6 +2663,7 @@ def _decide_omitted_reference_polymorph(
                 f"JANAF stable polymorph {selected.polymorph.value} "
                 f"table {selected.table_id}"
             ),
+            quantity=quantity,
             authority=Authority.CERTIFIED,
             certification=(
                 "NIST-JANAF solid formation Gibbs energies compared at T"
@@ -2650,6 +2677,7 @@ def _decide_omitted_reference_polymorph(
                 kind=NoticeKind.DERIVATION_USES_COMPILATION,
                 reason=REFERENCE_SOLID_INFERRED_REASON,
                 band="solid reference is inferred secondary evidence",
+                quantity=quantity,
                 authority=Authority.CERTIFIED,
                 certification=(
                     "source omission reason states the solid itself was inferred"
@@ -2657,17 +2685,126 @@ def _decide_omitted_reference_polymorph(
             )
         )
     endmember = replace(
-        standard_state.endmember, polymorph=State.of(selected.polymorph)
+        endmember,
+        formula=formula,
+        polymorph=State.of(selected.polymorph),
+    )
+    updated_identity = (
+        replace(identity, species=endmember)
+        if identity_axis == "species"
+        else replace(
+            identity,
+            reference_state=State.of(
+                replace(standard_state, endmember=endmember)
+            ),
+        )
     )
     updated = replace(
         reference,
-        identity=replace(
-            identity,
-            reference_state=State.of(replace(standard_state, endmember=endmember)),
-        ),
+        identity=updated_identity,
         notices=union_notices(reference.notices, tuple(notices)),
     )
     return updated, None
+
+
+_SHORNIKOV_2019_TABLE2_SOURCE_ID = "shornikov-2019-mgo-titania-melts"
+_STANDARD_PRESSURE_UNPRINTED_REASON = (
+    "standard pressure unprinted (1 bar vs 1 atm)"
+)
+
+
+def _resolve_shornikov_2019_table2_identity_axes(
+    reference: Observation,
+) -> Observation:
+    """Resolve the d-351 Table 2 identity at score time, leaving the extract raw."""
+
+    identity = reference.identity
+    if (
+        reference.source_id != _SHORNIKOV_2019_TABLE2_SOURCE_ID
+        or reference.locator is None
+        or reference.locator.table != "2"
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.DELTA_FG
+        or not any(
+            notice.reason == _STANDARD_PRESSURE_UNPRINTED_REASON
+            for notice in reference.notices
+        )
+    ):
+        return reference
+
+    temperature_K = temperature_of(identity)
+    species = identity.species
+    phase = None if species is None else phase_token(species)
+    if temperature_K is None or species is None or phase not in {
+        Phase.CR,
+        Phase.L,
+        Phase.G,
+    }:
+        return reference
+
+    derived_by = dict((reference.provenance or {}).get("derived_by") or {})
+    standard_pressure = identity.standard_pressure_Pa
+    if standard_pressure is None or standard_pressure.is_unknown:
+        identity = replace(
+            identity,
+            standard_pressure_Pa=State.of(Decimal("100000")),
+        )
+        derived_by["standard_pressure_Pa"] = "d351_nominal_p0"
+
+    if phase is Phase.CR and _source_polymorph_is_unspecified(species.polymorph):
+        updated, refusal = _decide_omitted_reference_polymorph(
+            reference,
+            identity,
+            None,
+            species.formula,
+            temperature_K,
+            identity_axis="species",
+            quantity=Quantity.DELTA_FG,
+        )
+        if refusal is not None:
+            reference = replace(
+                reference,
+                notices=union_notices(reference.notices, (refusal,)),
+            )
+        else:
+            assert updated is not None
+            reference = updated
+            identity = updated.identity
+            assert isinstance(identity, Identity)
+            species = identity.species
+            assert species is not None
+            derived_by["species.polymorph"] = "d338_reference_state_owner"
+
+    # The JANAF (ref) schedules supply each element's standard reference state
+    # at this row's T. The same owner derives the formation reaction from that
+    # basis; no identity axis is written back into the literature extract.
+    from simulator.battery.generators.janaf import _formation_basis_at_temperature
+
+    basis = _formation_basis_at_temperature(species.formula, species, temperature_K)
+    if identity.reaction is None or identity.reaction.is_unknown:
+        identity = replace(identity, reaction=basis.reaction)
+        derived_by["reaction"] = "d338_reference_state_owner"
+    if identity.formation_elements is None or identity.formation_elements.is_unknown:
+        identity = replace(identity, formation_elements=basis.formation_elements)
+        derived_by["formation_elements"] = "d338_reference_state_owner"
+
+    basis_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason="formation reaction and elements derived_by:d338_reference_state_owner",
+        origin=reference.observation_id,
+        band=basis.locator_note,
+        authority=Authority.CERTIFIED,
+        certification="JANAF (ref) elemental reference-state schedules at row T",
+    )
+    provenance = dict(reference.provenance or {})
+    provenance["derived_by"] = derived_by
+    return replace(
+        reference,
+        identity=identity,
+        notices=union_notices(reference.notices, (basis_notice,)),
+        provenance=provenance,
+    )
 
 
 def _fusion_energy_when_polymorph_absent(
@@ -14063,6 +14200,7 @@ def compile_residual(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
+    reference = _resolve_shornikov_2019_table2_identity_axes(reference)
     source_reference = reference
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(reference.identity)
