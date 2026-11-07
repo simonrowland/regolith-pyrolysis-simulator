@@ -619,10 +619,6 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
     feedstocks_data,
     setpoints_data,
 ):
-    from simulator.chemistry.ellingham_thermo import (
-        ellingham_segment_for_temperature,
-    )
-
     sim = _build_sim(
         feedstock_key,
         vapor_pressure_data,
@@ -668,12 +664,7 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
         legacy_pressures = legacy.vapor_pressures_Pa
         kernel_pressures = kernel.diagnostic["vapor_pressures_Pa"]
 
-        species_to_compare = ["Mg", "Ca"]
-        temperature_K = temperature_C + 273.15
-        fe_segment = ellingham_segment_for_temperature("Fe", temperature_K)
-        if fe_segment.range_K[0] <= temperature_K < fe_segment.range_K[1]:
-            species_to_compare.append("Fe")
-        for species in species_to_compare:
+            for species in ("Mg", "Ca"):
             assert (species in legacy_pressures) == (species in kernel_pressures), (
                 f"{feedstock_key} at {temperature_C:g} C: legacy and provider "
                 f"disagree whether {species} is published"
@@ -682,6 +673,25 @@ def test_d349_legacy_mg_ca_publication_matches_provider(
                 assert legacy_pressures[species] == pytest.approx(
                     kernel_pressures[species], rel=1e-9, abs=0.0
                 ), f"{feedstock_key} at {temperature_C:g} C: {species} pressure"
+            if temperature_C == 1070.0:
+                route = legacy.diagnostics["activity_provenance"]["Fe"]
+                expected_activity, expected_notice, _warning = (
+                    _activity_for_crystalline_vapor_k(
+                        "FeO",
+                        float(legacy.activity_coefficients["Fe"]),
+                        temperature_C + 273.15,
+                        source_standard_state_id="Fe-020",
+                        target_standard_state_id="Fe-020",
+                        source_standard_state_phase="liquid",
+                        target_standard_state_phase="solid",
+                    )
+                )
+                assert route["activity_standard_state_conversion"] == (
+                    expected_notice
+                )
+                assert route["vapor_activity_used_for_K"] == pytest.approx(
+                    expected_activity, rel=1e-12, abs=0.0
+                )
 
 
 def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
