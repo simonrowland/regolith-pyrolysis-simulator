@@ -6169,12 +6169,11 @@ def _comparison_identity(
 
     KEMS activity series can store printed composition on the point while
     leaving it unknown on the identity. Their comparison uses that same
-    printed composition. Oxygen-balance effusion predictions also supply
-    their solved pO2 and scorer pressure assumption. Stored identities remain
-    unchanged. A shared-ladder prediction carries its selected fO2 on the
-    prediction identity and its route/tier notices; a measured source-link
-    notice records the physical selection rung. Comparison must use that
-    selection rather than resolving oxygen from the source again.
+    printed composition. A shared-ladder prediction carries its selected
+    fO2 on the prediction identity and its route/tier notices; a measured
+    source-link notice records the physical selection rung. Comparison uses
+    that selection rather than resolving oxygen from the source again.
+    Oxygen selection never supplies total pressure.
     """
 
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
@@ -6255,7 +6254,7 @@ def _comparison_identity(
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if (resolved_oxygen or pressure_independent) and (
+    if pressure_independent and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
         quantity = quantity_token(identity)
@@ -6297,16 +6296,16 @@ def _selected_shared_ladder_oxygen(
             route = route[:-len(borrowed_suffix)]
         physics_rung = None if match.group(2) is None else int(match.group(2))
         value_pa: Decimal | None = None
-        if isinstance(prediction.identity, Identity):
-            state = prediction.identity.fO2_Pa
-            if state is not None and state.is_value and state.value is not None:
-                value_pa = state.value
-        if value_pa is None and has_own_engine_solved_oxygen_balance(
+        if has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
         ):
             po2_bar = _solved_effusion_po2_bar(prediction)
             if po2_bar is not None:
                 value_pa = Decimal(str(po2_bar)) * Decimal("1e5")
+        if value_pa is None and isinstance(prediction.identity, Identity):
+            state = prediction.identity.fO2_Pa
+            if state is not None and state.is_value and state.value is not None:
+                value_pa = state.value
         return value_pa, int(match.group(1)), physics_rung, route
     return None
 
@@ -7545,14 +7544,21 @@ def _payload_fo2_bar(payload: Mapping) -> float | None:
 
 
 def _prediction_identity_with_fo2(
-    identity: Identity, po2_bar: float | None
+    identity: Identity,
+    po2_bar: float | None,
+    *,
+    preserve_existing: bool,
 ) -> Identity:
     if (
         po2_bar is None
         or not math.isfinite(po2_bar)
         or po2_bar <= 0.0
         or "fO2_Pa" not in profile_for(identity).required
-        or (identity.fO2_Pa is not None and identity.fO2_Pa.is_value)
+        or (
+            preserve_existing
+            and identity.fO2_Pa is not None
+            and identity.fO2_Pa.is_value
+        )
     ):
         return identity
     return replace(
@@ -7577,7 +7583,6 @@ def _oxygen_input_request(
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
     source_oxygen_bar: float | None = None,
-    force_ladder: bool = False,
 ) -> "Po2Request | EnginePrediction":
     """The scorer's one oxygen-input decision.
 
@@ -7587,11 +7592,8 @@ def _oxygen_input_request(
     a commanded number; engines that cannot solve it are rewritten by the
     comparison path onto the internal-analytical closure. A row the ladder
     cannot resolve refuses ``missing_fO2`` for every engine when oxygen is
-    required. ``force_ladder`` still asks the ladder for a quantity that
-    does not require oxygen; it does not override a closure, and it does
-    not fill a Knudsen cell that cannot close. Any other quantity that
-    does not take oxygen records the omission and runs with oxygen not an
-    input.
+    required. A quantity that does not take oxygen records the omission
+    before any ladder rung can command a condition.
 
     Callers that predate the ladder pass no observation. They keep the
     identity-only decision: command an identity fO2, refuse ``missing_fO2``
@@ -7609,6 +7611,9 @@ def _oxygen_input_request(
     oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
         identity, composition_value
     )
+    if not oxygen_required:
+        input_notices.append(_omission_notice(quantity, oxygen_why))
+        return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     if observation is None:
         fo2_state = identity.fO2_Pa
         if (
@@ -7620,24 +7625,21 @@ def _oxygen_input_request(
                 mode=PO2_COMMANDED,
                 po2_bar=float(fo2_state.value) / 1.0e5,
             )
-        if oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=tuple(input_notices),
-            )
-        input_notices.append(_omission_notice(quantity, oxygen_why))
-        return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+                "multivalent": list(redox),
+            },
+            notices=tuple(input_notices),
+        )
 
     from simulator.battery.fo2_ladder import (
         ResolvedFo2,
@@ -7685,9 +7687,6 @@ def _oxygen_input_request(
     ):
         input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
-        if not oxygen_required:
-            input_notices.append(_omission_notice(quantity, oxygen_why))
-            return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             input_notices.append(fo2_tier_notice(quantity, resolved))
         return Po2Request(
@@ -7695,36 +7694,32 @@ def _oxygen_input_request(
             po2_bar=None,
             cell_material=resolved.cell_material,
         )
-    if oxygen_required or force_ladder:
-        if resolved is not None and not resolved.closure:
-            input_notices.append(fo2_tier_notice(quantity, resolved))
-            bar = (
-                resolved.po2_bar
-                if resolved.po2_bar is not None
-                else 10.0 ** resolved.log10_fO2_bar
-            )
-            return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
-        if oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=(
-                    *input_notices,
-                    *_knudsen_oxygen_refusal_notices(quantity, experiment),
-                ),
-            )
-    input_notices.append(_omission_notice(quantity, oxygen_why))
-    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    if resolved is not None and not resolved.closure:
+        input_notices.append(fo2_tier_notice(quantity, resolved))
+        bar = (
+            resolved.po2_bar
+            if resolved.po2_bar is not None
+            else 10.0 ** resolved.log10_fO2_bar
+        )
+        return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+    return _input_refusal(
+        engine=engine,
+        channel=channel,
+        sources=sources,
+        identity=identity,
+        requested=requested,
+        reason=RefusalReason.IDENTITY_INCOMPLETE,
+        detail={
+            "reason": "missing_fO2",
+            "quantity": quantity.value,
+            "why": oxygen_why,
+            "multivalent": list(redox),
+        },
+        notices=(
+            *input_notices,
+            *_knudsen_oxygen_refusal_notices(quantity, experiment),
+        ),
+    )
 
 
 def _borrow_internal_analytical_effusion(
@@ -9936,7 +9931,11 @@ def _predict_with_engine(
                 coefficient_sources=activity_sources,
                 lineage_complete=activity_lineage_complete,
                 certified_band=certified_band,
-                identity=_prediction_identity_with_fo2(identity, activity_fo2_bar),
+                identity=_prediction_identity_with_fo2(
+                    identity,
+                    activity_fo2_bar,
+                    preserve_existing=_has_printed_fo2(observation, identity),
+                ),
                 requested_composition=requested,
                 version=activity.activity_model,
             )
@@ -10054,7 +10053,7 @@ def _predict_with_engine(
         None if linked_pressure is None else float(linked_pressure) / 1.0e5
     )
 
-    def oxygen_decision(*, force_ladder: bool = False):
+    def oxygen_decision():
         return _oxygen_input_request(
             engine=engine,
             channel=channel,
@@ -10070,7 +10069,6 @@ def _predict_with_engine(
             temperature_K=float(T),
             composition_wt=wt if isinstance(wt, dict) else None,
             source_oxygen_bar=source_oxygen_bar,
-            force_ladder=force_ladder,
         )
 
     if activity_payload is not None:
@@ -10922,6 +10920,18 @@ def _predict_with_engine(
             ),
         )
     expanded = expand_coefficient_sources(sources)
+    prediction_fo2_bar = (
+        po2.po2_bar if po2.mode == PO2_COMMANDED else None
+    )
+    if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        solved_oxygen = _solved_effusion_oxygen_payload(engine, notices)
+        solved_bar = None if solved_oxygen is None else solved_oxygen.get("pO2_bar")
+        if (
+            isinstance(solved_bar, (int, float))
+            and math.isfinite(float(solved_bar))
+            and float(solved_bar) > 0.0
+        ):
+            prediction_fo2_bar = float(solved_bar)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -10936,7 +10946,8 @@ def _predict_with_engine(
         coefficient_basis=coefficient_basis,
         identity=_prediction_identity_with_fo2(
             identity,
-            po2.po2_bar if po2.mode == PO2_COMMANDED else None,
+            prediction_fo2_bar,
+            preserve_existing=printed_fo2,
         ),
         requested_composition=requested,
         version=engine_version,
