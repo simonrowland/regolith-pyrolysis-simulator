@@ -24,7 +24,7 @@ All 71,773 numeric source cells are cross-read between openpyxl and XLSX OOXML n
 
 ## Method and interpretation
 
-- EMPA is stated in Table S2; its standards and conditions are in Table S1. SIMS is stated in Table S3. LA-ICP-MS and its Na/K/Cu calibrations are stated in Table S4 and DOCX S3 paragraphs 69–88. Cu's external reference is Ni et al. (2019) as printed in DOCX S3 paragraph 76.
+- EMPA is stated in Table S2; its standards and conditions are in Table S1. SIMS is stated in Table S3. LA-ICP-MS and its Na/K/Cu calibrations are stated in Table S4 and DOCX S3 paragraphs 69–88. Cu's external reference is Ni et al. (2019) as printed in DOCX S3 paragraph 82.
 - DOCX S2 paragraph 38 says melt droplets cooled to form glass beads. Preservation or alteration of volatile concentrations during quench is not stated, so profile phase is `glass` and quench status is `not_stated`.
 - No profile row prints analysis temperature, fO2, total pressure, or a starting bulk composition for the sampled beads. These identity axes remain unknown. Table S2's oxide values are the measured radial-profile outputs, not initial-composition conditions. The 1640 K in DOCX S2 paragraph 51 is the fitted model's initial temperature, not a measured condition. Ambient fNa/fO2 are explicitly unknown a priori in DOCX S1 paragraph 32.
 - S2 major oxide values, S3 SIMS Na2O, and S4 Na2O/K2O/Cu values are preserved with printed 1-sigma uncertainties. Table S2 and S3 report standard deviations; DOCX S3 paragraph 84 states Cu uncertainties are standard errors. S4 is `measured_reduced` because the authors convert/calibrate their own S5 signal maps; each S4 observation names its bead's analyte map and Fe boundary map as parents.
