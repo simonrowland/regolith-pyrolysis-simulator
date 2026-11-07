@@ -57,6 +57,12 @@ def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() ->
         and observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.EVOLVED_GAS_YIELD
     ]
+    assert len(rows) == 104
+    expected_species = {"H2", "N2", "CH4", "CO", "CO2", "H2S", "COS", "H2O"}
+    assert {
+        species: sum(row.identity.species.formula == species for row in rows)
+        for species in expected_species
+    } == {species: 13 for species in expected_species}
     assert all(row.value.kind is ValueKind.POINT for row in rows)
 
     point = next(
@@ -78,6 +84,38 @@ def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() ->
     assert parameters["factor"].state.value == Decimal(
         "0.0004960317460317460317460317460"
     )
+
+    quoted = {
+        observation_id.split("::")[1]: observation
+        for observation_id, observation in migrator.result.observations.items()
+        if observation_id.startswith("murchison-degassing-2023-springer::")
+        and observation.identity.quantity.is_unknown
+        and "specific_gas_yield conversion has no verified input basis"
+        in (observation.identity.quantity.reason or "")
+    }
+    expected_quoted_species = {
+        "voropaev_2023_table4_chelyabinsk_quoted_h2": "H2",
+        "voropaev_2023_table4_chelyabinsk_quoted_n2": "N2",
+        "voropaev_2023_table4_chelyabinsk_quoted_ch4": "CH4",
+        "voropaev_2023_table4_chelyabinsk_quoted_co": "CO",
+        "voropaev_2023_table4_chelyabinsk_quoted_co2": "CO2",
+        "voropaev_2023_table4_chelyabinsk_quoted_h2s": "H2S",
+        "voropaev_2023_table4_chelyabinsk_quoted_cos": "COS",
+        "voropaev_2023_table4_chelyabinsk_quoted_h2o": "H2O",
+    }
+    assert set(quoted) == set(expected_quoted_species)
+    for observation_id, species in expected_quoted_species.items():
+        observation = quoted[observation_id]
+        assert observation.identity.species.formula == species
+        assert observation.identity.quantity.reason == (
+            "specific_gas_yield conversion has no verified input basis for "
+            "quoted_from_other_workers rows"
+        )
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.locator is not None
+        assert observation.locator.table == "4"
+        assert observation.locator.published_page == 580
+        assert observation.locator.pdf_page_index == 10
 
 
 def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
