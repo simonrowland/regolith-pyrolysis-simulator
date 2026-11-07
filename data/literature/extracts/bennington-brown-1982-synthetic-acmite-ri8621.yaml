@@ -18,6 +18,9 @@ extraction:
     Table 3 reaction (14) and its prose repeat print different uncertainty roundings; Table 1 and the following
     prose also print different reaction-7 central values. Both are retained as printed.
 review_status: draft
+schema_gaps:
+- observation_id: bennington_1982_table6_log10_Kf
+  reason: No quantity token represents formation from simple oxides; log10_Kf denotes formation from the elements.
 fidelity_samples:
 - path: species.NaFeSi2O6.observations[bennington_1982_table5_cp].values.points[0].value
   value: '40.607'
@@ -7382,15 +7385,21 @@ species:
       phase: cr
       units: dimensionless
       values:
-        quantity: log10_Kf
+        quantity: log10_formation_from_oxides_as_printed
+        quantity_as_printed: Log Kf
+        reference_state_as_printed: formation from simple oxides
         method_class: measured_reduced
+        schema_gap: 'No quantity token represents formation from simple oxides; log10_Kf denotes formation from the elements. simulator/battery/enums.py::FORMATION_QUANTITIES includes Quantity.LOG10_KF; simulator/battery/identity.py::profile_for assigns formation quantities to elements-frame identities.'
+        admission_status: typed_refusal
+        refusal_reason: No exact oxide-frame log10_Kf quantity token exists.
         derivation_note: Table 4 assigns Fe2O3 ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin,
           King, and Bonnickson [6]; Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10],
           JANAF NSRDS-NBS 37 [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3
           [20], Anderson [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
         reaction_as_printed: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)
+        standard_state_as_printed: Formation from the oxides.
         points:
-        - value: '23.773'
+        - value_as_printed: '23.773'
           table_row_number: 3
           table_column_number: 8
           locator:
@@ -7416,7 +7425,7 @@ species:
                 table_row_number: 3
                 table_column_number: 1
                 note: Table 6 row 298.15, Log Kf column; temperature column
-        - value: '23.630'
+        - value_as_printed: '23.630'
           table_row_number: 4
           table_column_number: 8
           locator:
@@ -7442,7 +7451,7 @@ species:
                 table_row_number: 4
                 table_column_number: 1
                 note: Table 6 row 300, Log Kf column; temperature column
-        - value: '17.774'
+        - value_as_printed: '17.774'
           table_row_number: 5
           table_column_number: 8
           locator:
@@ -7468,7 +7477,7 @@ species:
                 table_row_number: 5
                 table_column_number: 1
                 note: Table 6 row 400, Log Kf column; temperature column
-        - value: '14.242'
+        - value_as_printed: '14.242'
           table_row_number: 6
           table_column_number: 8
           locator:
@@ -7494,7 +7503,7 @@ species:
                 table_row_number: 6
                 table_column_number: 1
                 note: Table 6 row 500, Log Kf column; temperature column
-        - value: '11.868'
+        - value_as_printed: '11.868'
           table_row_number: 7
           table_column_number: 8
           locator:
@@ -7520,7 +7529,7 @@ species:
                 table_row_number: 7
                 table_column_number: 1
                 note: Table 6 row 600, Log Kf column; temperature column
-        - value: '10.156'
+        - value_as_printed: '10.156'
           table_row_number: 8
           table_column_number: 8
           locator:
@@ -7546,7 +7555,7 @@ species:
                 table_row_number: 8
                 table_column_number: 1
                 note: Table 6 row 700, Log Kf column; temperature column
-        - value: '8.856'
+        - value_as_printed: '8.856'
           table_row_number: 9
           table_column_number: 8
           locator:
@@ -7572,7 +7581,7 @@ species:
                 table_row_number: 9
                 table_column_number: 1
                 note: Table 6 row 800, Log Kf column; temperature column
-        - value: '8.343'
+        - value_as_printed: '8.343'
           table_row_number: 10
           table_column_number: 8
           locator:
@@ -7599,7 +7608,7 @@ species:
                 table_column_number: 1
                 note: Table 6 row 847, Log Kf column; temperature column
           temperature_footnote_as_printed: '1'
-        - value: '8.342'
+        - value_as_printed: '8.342'
           table_row_number: 11
           table_column_number: 8
           locator:
@@ -7625,7 +7634,7 @@ species:
                 table_row_number: 11
                 table_column_number: 1
                 note: Table 6 row 847, Log Kf column; temperature column
-        - value: '7.819'
+        - value_as_printed: '7.819'
           table_row_number: 12
           table_column_number: 8
           locator:
@@ -7651,7 +7660,7 @@ species:
                 table_row_number: 12
                 table_column_number: 1
                 note: Table 6 row 900, Log Kf column; temperature column
-        - value: '7.292'
+        - value_as_printed: '7.292'
           table_row_number: 13
           table_column_number: 8
           locator:
@@ -7678,7 +7687,7 @@ species:
                 table_column_number: 1
                 note: Table 6 row 960, Log Kf column; temperature column
           temperature_footnote_as_printed: '2'
-        - value: '7.292'
+        - value_as_printed: '7.292'
           table_row_number: 14
           table_column_number: 8
           locator:
@@ -7704,7 +7713,7 @@ species:
                 table_row_number: 14
                 table_column_number: 1
                 note: Table 6 row 960, Log Kf column; temperature column
-        - value: '6.973'
+        - value_as_printed: '6.973'
           table_row_number: 15
           table_column_number: 8
           locator:
@@ -7730,7 +7739,7 @@ species:
                 table_row_number: 15
                 table_column_number: 1
                 note: Table 6 row 1000, Log Kf column; temperature column
-        - value: '6.276'
+        - value_as_printed: '6.276'
           table_row_number: 16
           table_column_number: 8
           locator:
@@ -7756,7 +7765,7 @@ species:
                 table_row_number: 16
                 table_column_number: 1
                 note: Table 6 row 1100, Log Kf column; temperature column
-        - value: '5.693'
+        - value_as_printed: '5.693'
           table_row_number: 17
           table_column_number: 8
           locator:
@@ -7782,7 +7791,7 @@ species:
                 table_row_number: 17
                 table_column_number: 1
                 note: Table 6 row 1200, Log Kf column; temperature column
-        - value: '5.371'
+        - value_as_printed: '5.371'
           table_row_number: 18
           table_column_number: 8
           locator:

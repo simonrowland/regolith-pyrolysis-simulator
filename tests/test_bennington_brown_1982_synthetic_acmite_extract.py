@@ -30,6 +30,7 @@ QUANTITY_UNKNOWN_SOURCE_IDS = {
     "bennington_1982_table6_negative_gibbs_function",
     "bennington_1982_table6_delta_fH",
     "bennington_1982_table6_delta_fG",
+    "bennington_1982_table6_log10_Kf",
 }
 
 TABLE5_AUXILIARY_REFERENCES = (
@@ -52,6 +53,10 @@ TABLE6_AUXILIARY_REFERENCES = (
     "Roth and Bertram [18] (Table 4: SiO2, high-temperature data).",
     "White [24] (Table 4: SiO2, high-temperature data).",
     "Wietzel [25] (Table 4: SiO2, high-temperature data).",
+)
+TABLE6_LOG_KF_RENDER = (
+    "23.773", "23.630", "17.774", "14.242", "11.868", "10.156", "8.856", "8.343",
+    "8.342", "7.819", "7.292", "7.292", "6.973", "6.276", "5.693", "5.371",
 )
 
 
@@ -198,6 +203,27 @@ def test_render_cells_row_counts_and_fidelity_mutation() -> None:
     assert check_all_fidelity_samples_match(mutated, label=EXTRACT.stem)
 
 
+def test_table6_log_kf_is_preserved_as_an_oxide_frame_schema_gap() -> None:
+    document = _document()
+    row = _observations(document)["bennington_1982_table6_log10_Kf"][1]
+    values = row["values"]
+
+    assert values["quantity"] == "log10_formation_from_oxides_as_printed"
+    assert values["quantity_as_printed"] == "Log Kf"
+    assert values["reference_state_as_printed"] == "formation from simple oxides"
+    assert values["reaction_as_printed"] == (
+        "2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)"
+    )
+    assert "log10_Kf denotes formation from the elements" in values["schema_gap"]
+    assert "simulator/battery/enums.py::FORMATION_QUANTITIES" in values["schema_gap"]
+    points = values["points"]
+    assert len(points) == 16
+    assert tuple(point["value_as_printed"] for point in points) == TABLE6_LOG_KF_RENDER
+    assert all("value" not in point for point in points)
+    assert all(point["locator"]["page"] == 15 for point in points)
+    assert all(point["locator"]["table"] == "6" for point in points)
+
+
 def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditions(
     tmp_path: Path,
 ) -> None:
@@ -256,7 +282,9 @@ def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditio
         if row.identity.quantity.is_unknown
     }
     assert quantity_unknown == expected_quantity_unknown
-    assert len(quantity_unknown) == 123
+    assert len(quantity_unknown) == 139
+    assert sum(row.value.kind.value == "point" for row in migrated.values()) == 169
+    assert sum(row.value.kind.value == "unavailable" for row in migrated.values()) == 139
     phase_unknown = {
         observation_id
         for observation_id, row in migrated.items()

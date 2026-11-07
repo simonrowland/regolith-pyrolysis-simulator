@@ -2558,6 +2558,15 @@ HIT_ROWS = {'beyer-1980-potassium-metasilicate-disilicate-ri8410': {'bey80_k2si2
                                                                                                               '7.73 '
                                                                                                               '± '
                                                                                                               '1.76')}}
+HIT_ROWS["bennington-brown-1982-synthetic-acmite-ri8621"] = {
+    "bennington_1982_table6_log10_Kf": (
+        "log10_Kf",
+        "Log Kf",
+        "formation from simple oxides",
+        None,
+    ),
+}
+
 P1_REFERENCES = {'barin-1995': ('barin95_nafeo2_solb_heat_content', 'barin95_nafeo2_liq_heat_content'),
  'beyer-1980-potassium-metasilicate-disilicate-ri8410': ('bey80_k2si2o5_heat_content_crystal_table3',
                                                          'bey80_k2si2o5_crystal_pretransition_503',
