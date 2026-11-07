@@ -28924,31 +28924,19 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
-        parent_composition = (parent_point_conditions or {}).get("composition")
-        raw_row_conditions = (
-            raw_item.get("point_conditions")
-            if isinstance(raw_item, Mapping)
-            else None
-        )
         row_composition = (point_conditions or {}).get("composition")
-        row_has_printed_composition = (
-            isinstance(raw_row_conditions, Mapping)
-            and "composition" in raw_row_conditions
-            and row_composition is not None
-            and row_composition.state.is_value
-            and row_composition.locator is not None
-        )
         if (
             identity.quantity.is_value
             and identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             and identity.species.phase.is_value
             and identity.species.phase.value is Phase.L
-            and (parent_composition is None or parent_composition.state.is_unknown)
-            and not row_has_printed_composition
+            and row_composition is not None
+            and row_composition.state.is_unknown
         ):
             # A liquid equilibrium-composition child reports composition as
-            # its measured quantity. Drop an absent/unknown inherited condition,
-            # but keep an explicitly located printed row condition.
+            # its measured quantity. Suppress only an unknown circular
+            # condition; located conditions must survive regardless of which
+            # source field supplied them.
             point_conditions = dict(point_conditions or {})
             point_conditions.pop("composition", None)
         if (
