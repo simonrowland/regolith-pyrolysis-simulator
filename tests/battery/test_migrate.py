@@ -5658,17 +5658,22 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     assert not obs.derived_from
 
 
-def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
+def _model_derived_density_without_derivation() -> dict:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
     row["type"] = "density"
     row["units"] = "kg/m3"
-    values = row["values"]
-    values.clear()
-    values["quantity"] = "density"
-    values["method_class"] = "model_derived"
-    values["density_kg_m3"] = 1.0
-    values["admission_status"] = "typed_refusal"
+    row["values"] = {
+        "quantity": "density",
+        "method_class": "model_derived",
+        "density_kg_m3": 1.0,
+        "admission_status": "typed_refusal",
+    }
+    return extract
+
+
+def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
+    extract = _model_derived_density_without_derivation()
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
@@ -5681,15 +5686,18 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
         result.works, result.experiments, result.observations, residuals=None
     )
     paths = [i.path for i in report.hard_issues]
-    assert any(p.endswith(".derived_from") for p in paths), report.hard_issues
-    assert any(p.endswith(".derivation") for p in paths), report.hard_issues
-    assert all(
-        i.reason.value == "conditional_field"
+    assert set(paths) == {
+        f"observation[{obs.observation_id}].derivation.method",
+        f"observation[{obs.observation_id}].derivation.references",
+    }, report.hard_issues
+    assert len(report.hard_issues) == 2
+    assert all(i.reason.value == "conditional_field" for i in report.hard_issues)
+    assert any(
+        i.detail == "model_derived requires named references"
         for i in report.hard_issues
-        if i.path.endswith(".derived_from") or i.path.endswith(".derivation")
     )
     assert any(
-        "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
+        "derivation" in (e.axes or ())
         for e in result.queue
     )
 
@@ -5780,12 +5788,10 @@ def test_b879_caption_only_figure_model_lineage_requirement(
 
 
 def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) -> None:
+    from simulator.battery.validate import observation_issue_location
     from tools.dump_hard_issues import dump_hard_issues
 
-    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    values = extract["species"]["Na"]["observations"][0]["values"]
-    values["method_class"] = "model_derived"
-    values.pop("series", None)
+    extract = _model_derived_density_without_derivation()
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
@@ -5800,12 +5806,32 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
         rows = list(csv.DictReader(stream, delimiter="\t"))
 
     assert written == len(rows) == len(result.validation.hard_issues)
-    assert any(
-        row["source_id"] == "fixture-source"
-        and row["field"] == "derived_from"
-        and row["issue_code"] == "conditional_field"
+    expected_rows = {
+        (
+            "fixture-source",
+            observation_id,
+            field,
+            issue.reason.value,
+            issue.detail,
+        )
+        for issue in result.validation.hard_issues
+        if (location := observation_issue_location(issue.path)) is not None
+        for observation_id, field in (location,)
+    }
+    actual_rows = {
+        (
+            row["source_id"],
+            row["observation_id"],
+            row["field"],
+            row["issue_code"],
+            row["message"],
+        )
         for row in rows
-    )
+    }
+    assert actual_rows == expected_rows
+    assert {
+        row["field"] for row in rows if row["source_id"] == "fixture-source"
+    } == {"derivation.method", "derivation.references"}
 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
