@@ -1938,10 +1938,9 @@ class EngineWorkerPool:
                     future.set_result(result)
                     del result
             finally:
-                if item is not None:
-                    # A future's exception traceback can reach its caller and
-                    # provider; release the request cycle before the next get.
-                    del item, future, request, timeout_s
+                # A future's exception traceback can reach its caller and
+                # provider; release the request cycle before the next get.
+                item = future = request = timeout_s = None
                 self._queue.task_done()
 
     def _request_cancel_pending(self) -> None:
