@@ -399,6 +399,8 @@ def test_sio_wall_sweep_refuses_nonfinite_po2_and_po2_above_total() -> None:
 # b-1119's CaO/MgO liquid reference via d-144 fusion moves the Mars evolved
 # SiO report pin 1.05354760695e-05 -> 1.05354763902e-05 kg
 # (+3.207e-13 kg, +3.04400102e-6%); the lunar evolved pin is unchanged.
+# re-pinned 2026-11-07 at fd54f096e (rpp-ctrl, s3 gate engine set); was 1.04099076417e-05, relative change +7.70419899735e-09.
+# re-pinned 2026-11-07 at fd54f096e (rpp-ctrl, s3 gate engine set); was 1.05354763902e-05, relative change -8.67677897206e-07.
 from tests.studio_pin_support import sio_evolved_baseline
 
 BASELINE_SIO_EVOLVED_KG = {
@@ -535,8 +537,9 @@ BASELINE_STAGE4_SIO2_KG = {
 # +9.84889904286e-6 relative). The pin report's sio_stage3_silica_kg is the
 # lunar-only CLI pin; there is no independent Mars Stage-3 report value, so the
 # Mars baseline intentionally follows the Studio-3 golden.
+# re-pinned 2026-11-07 at fd54f096e (rpp-ctrl, s3 gate engine set); was 6.95332797045e-06, relative change +6.34150297342e-06.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.95332797045e-06,
+    "lunar_mare_low_ti": 6.953372065e-06,
     "mars_basalt": 1.10775807581e-06,
 }
 

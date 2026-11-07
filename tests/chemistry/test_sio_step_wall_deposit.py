@@ -243,6 +243,7 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # via d-144 fusion moves the studio pin from green 8.42832285937e-06
         # to restacked 8.42832285779e-06 kg (-1.58e-15 kg,
         # -1.87463079e-8%).
+        # re-pinned 2026-11-07 at fd54f096e (rpp-ctrl, s3 gate engine set); was 8.42832285779e-06, relative change +4.22266692742e-09.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
             8.42832289338e-06, rel=1e-9
         )
