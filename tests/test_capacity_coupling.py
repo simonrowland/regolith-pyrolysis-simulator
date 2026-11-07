@@ -795,12 +795,15 @@ def test_catalog_probe_and_flux_seam_share_the_crystalline_activity_basis():
 
     temperature_K = equilibrium.temperature_C + 273.15
     original_equilibrium_activities = dict(equilibrium.activity_coefficients)
-    original_activities = dict(sim._last_vapor_pressure_diagnostic["activities"])
-    original_diagnostic_activities = dict(original_activities)
+    original_diagnostic = dict(sim._last_vapor_pressure_diagnostic)
+    original_activities = dict(original_diagnostic["activities"])
     assert original_equilibrium_activities == sim._last_high_t_melt_activity["selected_parent_activities"]
     assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
     activity_exponents: dict[str, float] = {}
+    request_rules = {
+        rule.species_id: rule for rule in sim.vapour_rail_catalog.request_rules
+    }
     for species_id, probe_pa in verifier_probe_pa.items():
         answer = batch.channel(species_id)
         assert isinstance(answer.pressure, PressureValue)
@@ -878,10 +881,49 @@ def test_catalog_probe_and_flux_seam_share_the_crystalline_activity_basis():
             # every activity=1 reversion independently leaves its own band.
             mutated_activities = dict(original_activities)
             mutated_activities[species_id] = 1.0
-            equilibrium.activity_coefficients = dict(mutated_activities)
-            sim._last_vapor_pressure_diagnostic["activities"] = dict(
-                mutated_activities
+            original_route = original_diagnostic[
+                "vapor_pressure_numerator_provenance"
+            ][species_id]
+            request_rule = request_rules[species_id]
+            assert request_rule.parent_oxide is not None
+            k_basis_activity, conversion, _warning = (
+                melt_activity._activity_for_crystalline_vapor_k(
+                    request_rule.parent_oxide,
+                    mutated_activities[species_id],
+                    temperature_K,
+                    source_standard_state_id=original_route[
+                        "melt_oxide_activity_reference_state"
+                    ],
+                    target_standard_state_id=original_route[
+                        "vapor_k_standard_state_id"
+                    ],
+                    source_standard_state_phase=original_route[
+                        "melt_oxide_activity_reference_state_phase"
+                    ],
+                    target_standard_state_phase=original_route[
+                        "vapor_k_standard_state_phase"
+                    ],
+                )
             )
+            mutated_provenance = {
+                route: dict(route_provenance)
+                for route, route_provenance in original_diagnostic[
+                    "vapor_pressure_numerator_provenance"
+                ].items()
+            }
+            mutated_route = mutated_provenance[species_id]
+            mutated_route["activity_standard_state_conversion"] = conversion
+            mutated_route["vapor_activity_used_for_K"] = k_basis_activity
+            if "vapor_activity_for_crystalline_K" in mutated_route:
+                mutated_route["vapor_activity_for_crystalline_K"] = (
+                    k_basis_activity
+                )
+            mutated_diagnostic = dict(original_diagnostic)
+            mutated_diagnostic["activities"] = dict(mutated_activities)
+            mutated_diagnostic[
+                "vapor_pressure_numerator_provenance"
+            ] = mutated_provenance
+            sim._last_vapor_pressure_diagnostic = mutated_diagnostic
             a1_reversion_batch = sim._resolve_evaporation_vapour_batch(
                 equilibrium,
                 temperature_K=temperature_K,
@@ -907,10 +949,7 @@ def test_catalog_probe_and_flux_seam_share_the_crystalline_activity_basis():
                 float(seam_pa),
             )
     finally:
-        equilibrium.activity_coefficients = original_equilibrium_activities
-        sim._last_vapor_pressure_diagnostic["activities"] = (
-            original_diagnostic_activities
-        )
+        sim._last_vapor_pressure_diagnostic = original_diagnostic
 
     # Source-reaction oxygen fugacity is intrinsic melt fO2, not transport
     # headspace pO2. Varying only transport pO2 must leave catalog P_eff fixed.
