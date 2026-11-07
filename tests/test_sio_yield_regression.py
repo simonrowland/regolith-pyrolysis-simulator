@@ -473,9 +473,11 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 # Mars 1.26683344649e-06 -> 1.26683074311e-06 kg
 # (-2.70338e-12 kg, -2.13396639266e-6 relative). Both values are Studio-3
 # obtained pins, not laptop regenerations.
+# re-pinned 2026-11-07 at fd54f096e, rpp-ctrl gate set; was 1.1039431106e-09, relative change -0.0399117963751.
+# re-pinned 2026-11-07 at fd54f096e, rpp-ctrl gate set; was 1.26683074311e-06, relative change +0.00010368119081.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 1.1039431106e-09,
-    "mars_basalt": 1.26683074311e-06,
+    "lunar_mare_low_ti": 1.05988275796e-09,
+    "mars_basalt": 1.26696208963e-06,
 }
 
 # 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
@@ -538,9 +540,10 @@ BASELINE_STAGE4_SIO2_KG = {
 # lunar-only CLI pin; there is no independent Mars Stage-3 report value, so the
 # Mars baseline intentionally follows the Studio-3 golden.
 # re-pinned 2026-11-07 at fd54f096e (rpp-ctrl, s3 gate engine set); was 6.95332797045e-06, relative change +6.34150297342e-06.
+# re-pinned 2026-11-07 at fd54f096e, rpp-ctrl gate set; was 1.10775807581e-06, relative change -0.000170854904273.
 BASELINE_STAGE3_SIO2_KG = {
     "lunar_mare_low_ti": 6.953372065e-06,
-    "mars_basalt": 1.10775807581e-06,
+    "mars_basalt": 1.10756880991e-06,
 }
 
 
