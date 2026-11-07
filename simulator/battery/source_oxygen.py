@@ -128,6 +128,7 @@ def source_oxygen_condition_notice(quantity: Quantity, row: Observation) -> Noti
         affected_quantities=(quantity,),
         reason=(
             "measured condition: same-cell source-linked oxygen; "
+            "rung=2:measured_same_cell_oxygen; "
             "condition=measured_same_cell_oxygen; target row has no printed fO2; "
             f"basis={inference.relation}; "
             f"inputs={inputs}{selected}"
