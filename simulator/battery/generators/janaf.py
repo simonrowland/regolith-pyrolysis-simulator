@@ -59,6 +59,7 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    phase_token,
 )
 from simulator.reference_data.janaf import (
     COMPILATION_ROLE,
@@ -335,6 +336,27 @@ class _FormationBasis:
             else:
                 parts.append(f"{table_id}-{lower_line}-{upper_line}")
         return "formation-ref-" + "-".join(parts)
+
+
+@dataclass(frozen=True)
+class JANAFLiquidElementReference:
+    """JANAF liquid-element ΔfG relative to its reference state at one T."""
+
+    species: Species
+    delta_fG_kJ_per_mol: Decimal
+    table_id: str
+    table_upper_K: Decimal
+    extrapolation_interval_K: tuple[Decimal, Decimal] | None = None
+
+
+@dataclass(frozen=True)
+class _CondensedElementFormationBasis:
+    reaction: State[Reaction]
+    formation_elements: State[tuple[tuple[str, Species], ...]]
+    locator_note: str
+    extrapolated_elements: tuple[
+        tuple[str, str, Decimal, Decimal], ...
+    ] = ()
 
 
 def _published_decimal(token: object) -> Decimal | None:
@@ -3298,6 +3320,242 @@ def _janaf_gas_table_ids() -> dict[str, tuple[str, ...]]:
             continue
         grouped.setdefault(formula, []).append(table_id)
     return {formula: tuple(table_ids) for formula, table_ids in grouped.items()}
+
+
+@lru_cache(maxsize=1)
+def _janaf_liquid_element_table_ids() -> dict[str, tuple[str, ...]]:
+    """Neutral elemental liquid table ids keyed by element symbol."""
+
+    grouped: dict[str, list[str]] = {}
+    for entry in load_manifest().get("entries") or ():
+        if not isinstance(entry, Mapping) or entry.get("charge") not in (0, "0"):
+            continue
+        formula = str(entry.get("formula_normalised") or "")
+        table_id = str(entry.get("table_id") or "")
+        if (
+            formula
+            and table_id
+            and entry.get("phase") == "l"
+            and formula in ELEMENT_SYMBOLS
+        ):
+            grouped.setdefault(formula, []).append(table_id)
+    return {element: tuple(table_ids) for element, table_ids in grouped.items()}
+
+
+def _exact_janaf_property_value(
+    table_id: str, property_name: str, temperature_K: Decimal
+) -> Decimal:
+    points, _digest, missing = _fusion_property_points(table_id, property_name)
+    for temperature, value in points:
+        if temperature == temperature_K:
+            return value
+    if temperature_K in missing:
+        raise ValueError(
+            f"{table_id}: JANAF {property_name} is missing at {temperature_K} K"
+        )
+    raise ValueError(
+        f"{table_id}: JANAF {property_name} has no printed node at "
+        f"{temperature_K} K"
+    )
+
+
+@lru_cache(maxsize=None)
+def janaf_liquid_element_reference_at_temperature(
+    element: str, temperature_K: Decimal
+) -> JANAFLiquidElementReference:
+    """Return ``G(element,l) - G(element, JANAF ref)`` in kJ/mol.
+
+    Within the liquid table this is its printed formation-Gibbs series. If
+    the requested T is above that series, the reference schedule must be gas
+    at both the last liquid node and the requested T. The tail then integrates
+    the linear Cp(l)-Cp(g) slope measured over the last 100 K.
+    """
+
+    temperature_K = Decimal(temperature_K)
+    if temperature_K <= 0 or not temperature_K.is_finite():
+        raise ValueError("JANAF liquid-element reference requires positive finite T")
+    table_ids = _janaf_liquid_element_table_ids().get(element, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF liquid-element table for {element}")
+    if len(table_ids) != 1:
+        raise ValueError(
+            f"ambiguous JANAF liquid-element tables for {element}: "
+            f"{', '.join(table_ids)}"
+        )
+    table_id = table_ids[0]
+    gibbs_points, _digest, gibbs_missing = _fusion_property_points(
+        table_id, "formation_gibbs_energy"
+    )
+    lower_K, upper_K = gibbs_points[0][0], gibbs_points[-1][0]
+    liquid_species = make_species(element, State.of(Phase.L))
+    if lower_K <= temperature_K <= upper_K:
+        delta_g = _interpolate_formation_gibbs(
+            gibbs_points, temperature_K, gibbs_missing
+        )
+        return JANAFLiquidElementReference(
+            species=liquid_species,
+            delta_fG_kJ_per_mol=delta_g,
+            table_id=table_id,
+            table_upper_K=upper_K,
+        )
+
+    if temperature_K < lower_K:
+        raise ValueError(
+            f"{temperature_K} K is below {table_id} liquid range "
+            f"{lower_K}–{upper_K} K"
+        )
+
+    reference_at_tail = _element_reference_state(element, upper_K)[0]
+    reference_at_temperature = _element_reference_state(element, temperature_K)[0]
+    if (
+        not reference_at_tail.is_value
+        or phase_token(reference_at_tail.value) is not Phase.G
+        or not reference_at_temperature.is_value
+        or phase_token(reference_at_temperature.value) is not Phase.G
+    ):
+        raise ValueError(
+            f"{element} JANAF reference is not a located gas at the liquid-table "
+            f"end {upper_K} K and requested {temperature_K} K"
+        )
+    gas_ids = _janaf_gas_table_ids().get(element, ())
+    if len(gas_ids) != 1:
+        raise ValueError(
+            f"expected one JANAF gas table for {element}, found {gas_ids}"
+        )
+    gas_table_id = gas_ids[0]
+    tail_start_K = upper_K - Decimal(100)
+    if tail_start_K < lower_K:
+        raise ValueError(
+            f"{table_id} has no complete final 100 K liquid Cp interval"
+        )
+
+    liquid_g0 = _interpolate_formation_gibbs(
+        gibbs_points, upper_K, gibbs_missing
+    )
+    gas_g_points, _digest, gas_g_missing = _fusion_property_points(
+        gas_table_id, "formation_gibbs_energy"
+    )
+    gas_g0 = _interpolate_formation_gibbs(
+        gas_g_points, upper_K, gas_g_missing
+    )
+    liquid_s0 = _exact_janaf_property_value(table_id, "entropy", upper_K)
+    gas_s0 = _exact_janaf_property_value(gas_table_id, "entropy", upper_K)
+    liquid_cp0 = _exact_janaf_property_value(table_id, "heat_capacity", upper_K)
+    gas_cp0 = _exact_janaf_property_value(gas_table_id, "heat_capacity", upper_K)
+    liquid_cp_start = _exact_janaf_property_value(
+        table_id, "heat_capacity", tail_start_K
+    )
+    gas_cp_start = _exact_janaf_property_value(
+        gas_table_id, "heat_capacity", tail_start_K
+    )
+
+    # Premise: after the liquid table ends, extrapolate only its Cp difference
+    # from the JANAF gas reference over the final printed 100 K. Algebra:
+    # ΔCp(T)=c0+m(T−T0), ΔH=∫ΔCp dT, ΔS=∫ΔCp/T dT, and
+    # ΔG(T)=ΔG0−ΔS0(T−T0)+ΔH−TΔS. Units: ΔG0[kJ/mol]×1000,
+    # Cp[J/(mol·K)], T[K], so the result is J/mol before ÷1000. Mg at
+    # 2173 K yields G(Mg,l)−G(Mg,g) ≈ 72.80 kJ/mol from Mg-003/Mg-005.
+    delta_t = temperature_K - upper_K
+    delta_cp0 = liquid_cp0 - gas_cp0
+    delta_cp_start = liquid_cp_start - gas_cp_start
+    cp_slope = (delta_cp0 - delta_cp_start) / Decimal(100)
+    delta_h = delta_cp0 * delta_t + cp_slope * delta_t**2 / Decimal(2)
+    log_t_ratio = (temperature_K / upper_K).ln()
+    delta_s = (
+        delta_cp0 * log_t_ratio
+        + cp_slope * (delta_t - upper_K * log_t_ratio)
+    )
+    delta_g0_j_per_mol = (liquid_g0 - gas_g0) * Decimal(1000)
+    delta_s0 = liquid_s0 - gas_s0
+    delta_g_j_per_mol = (
+        delta_g0_j_per_mol
+        - delta_s0 * delta_t
+        + delta_h
+        - temperature_K * delta_s
+    )
+    return JANAFLiquidElementReference(
+        species=liquid_species,
+        delta_fG_kJ_per_mol=delta_g_j_per_mol / Decimal(1000),
+        table_id=table_id,
+        table_upper_K=upper_K,
+        extrapolation_interval_K=(tail_start_K, upper_K),
+    )
+
+
+def _formation_basis_with_condensed_elements(
+    formula: str, product: Species, temperature_K: Decimal
+) -> _CondensedElementFormationBasis:
+    composition = formula_composition(formula)
+    if composition is None:
+        raise ValueError(f"JANAF formula {formula!r} has no parsed composition")
+    terms = [ReactionTerm(product, Fraction(1))]
+    formation_elements: list[tuple[str, Species]] = []
+    notes: list[str] = []
+    extrapolated: list[tuple[str, str, Decimal, Decimal]] = []
+    for element, amount in composition:
+        if element == "O":
+            state, atom_count, locator_key, locator_note, _convention = (
+                _element_reference_state(element, temperature_K)
+            )
+            if not state.is_value or atom_count is None:
+                raise ValueError(state.reason or locator_note)
+            reference_species = state.value
+            table_id = locator_key[1]
+            notes.append(f"{element}: {locator_note}")
+        else:
+            reference = janaf_liquid_element_reference_at_temperature(
+                element, temperature_K
+            )
+            reference_species = reference.species
+            atom_count = Fraction(1)
+            notes.append(
+                f"{element}: {reference.table_id} liquid ΔfG="
+                f"{reference.delta_fG_kJ_per_mol} kJ/mol"
+            )
+            if reference.extrapolation_interval_K is not None:
+                low_K, high_K = reference.extrapolation_interval_K
+                extrapolated.append((element, reference.table_id, low_K, high_K))
+                notes[-1] += (
+                    f"; Cp(l)-Cp(g) extrapolated from {low_K}–{high_K} K"
+                )
+        formation_elements.append((element, reference_species))
+        terms.append(
+            ReactionTerm(
+                reference_species,
+                -Fraction(str(amount)) / atom_count,
+            )
+        )
+    return _CondensedElementFormationBasis(
+        reaction=State.of(Reaction(tuple(terms))),
+        formation_elements=State.of(tuple(formation_elements)),
+        locator_note="JANAF condensed-element references: " + "; ".join(notes),
+        extrapolated_elements=tuple(extrapolated),
+    )
+
+
+def janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+    element: str, temperature_K: Decimal
+) -> Decimal:
+    """JANAF gas-atom ΔfG on a liquid-element frame, in kJ/mol."""
+
+    composition = formula_composition(element)
+    if (
+        composition is None
+        or len(composition) != 1
+        or composition[0][0] != element
+        or composition[0][1] != 1
+        or element == "O2"
+    ):
+        raise ValueError(f"{element!r} is not a diagnostic gas-element formula")
+    gas_g = _janaf_gas_formation_gibbs_J_per_mol(element, temperature_K) / Decimal(1000)
+    liquid_reference = (
+        Decimal(0)
+        if element == "O"
+        else janaf_liquid_element_reference_at_temperature(
+            element, temperature_K
+        ).delta_fG_kJ_per_mol
+    )
+    return gas_g - liquid_reference
 
 
 @lru_cache(maxsize=None)

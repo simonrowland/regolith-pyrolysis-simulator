@@ -363,12 +363,13 @@ class NoticeKind(StrEnum):
 
 
 class ReferenceStateConvention(StrEnum):
-    """Catalog activity_input.standard_state.convention, extended per v2.1."""
+    """Reference-frame conventions used by activity and formation records."""
 
     RAOULTIAN_PURE_ENDMEMBER = "raoultian_pure_endmember"
     HENRIAN_SOLID = "henrian_solid"
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
+    CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
 
 
 class Phase(StrEnum):
