@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
@@ -104,6 +105,17 @@ def _render_pins(document: dict) -> tuple[str, ...]:
             "E.4",
             None,
         ),
+        (
+            "PO",
+            "hastie_bonnell_1980_tableE4_po_S2000",
+            "entropy",
+            None,
+            "entropy",
+            "69.0",
+            201,
+            "E.4",
+            None,
+        ),
     )
     observed: list[str] = []
     for species, observation_id, container, index, field, expected, page, table, column in pins:
@@ -189,7 +201,35 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     assert len(observations) == 86
     assert len(result.experiments) == 20
     assert len(result.validation.hard_issues) == 0
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 33
+    unavailable = [
+        row for row in observations if row.value.kind is ValueKind.UNAVAILABLE
+    ]
+    unavailable_by_reason = Counter()
+    for row in unavailable:
+        reason = row.value.unavailable_reason or ""
+        if "unsupported printed unit for entropy" in reason:
+            unavailable_by_reason["unsupported_entropy_unit"] += 1
+        elif "do not establish log10 K" in reason:
+            unavailable_by_reason["reaction_log_k_standard_state"] += 1
+        else:
+            unavailable_by_reason["quantity_unknown_schema_gap"] += 1
+    assert dict(unavailable_by_reason) == {
+        "quantity_unknown_schema_gap": 14,
+        "reaction_log_k_standard_state": 1,
+    }
+
+    entropy_source_rows = [
+        row
+        for item in document["species"].values()
+        for row in item.get("observations", [])
+        if row.get("values", {}).get("quantity") == "S"
+    ]
+    assert len(entropy_source_rows) == 18
+    assert all(row["units"] == "cal/mol/K" for row in entropy_source_rows)
+    assert all(
+        row["values"]["units_as_printed"] == "cal/(deg mol)"
+        for row in entropy_source_rows
+    )
 
     def migrated(observation_id: str, temperature: str):
         return next(
@@ -228,6 +268,25 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     assert e4_po.value.point == Decimal("-112.1312")
     assert (e4_po.locator.page, e4_po.locator.table) == (201, "E.4")
     assert e4_po.identity.temperature_K.value == Decimal("2000")
+
+    e4_po_entropy = next(
+        row
+        for row in observations
+        if "::hastie_bonnell_1980_tableE4_po_S2000" in row.observation_id
+    )
+    assert e4_po_entropy.value.kind is ValueKind.POINT
+    assert e4_po_entropy.value.point == Decimal("288.6960")
+    assert (e4_po_entropy.locator.page, e4_po_entropy.locator.table) == (201, "E.4")
+    assert e4_po_entropy.identity.temperature_K.value == Decimal("2000")
+
+    entropy_ids = {row["observation_id"] for row in entropy_source_rows}
+    entropy_migrated = [
+        row
+        for row in observations
+        if any(f"::{observation_id}" in row.observation_id for observation_id in entropy_ids)
+    ]
+    assert len(entropy_migrated) == 18
+    assert all(row.value.kind is ValueKind.POINT for row in entropy_migrated)
 
     unknown_quantity_ids = {
         row.observation_id.split("::", 2)[1]

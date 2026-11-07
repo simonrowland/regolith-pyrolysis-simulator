@@ -820,7 +820,7 @@ species:
         table: E.4
         row: PO
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -844,6 +844,7 @@ species:
             row: PO
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '69.0'
@@ -1425,7 +1426,7 @@ species:
         table: E.2
         row: S_HPO2 present_study
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -1449,6 +1450,7 @@ species:
             row: HPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '63.2'
@@ -1488,7 +1490,7 @@ species:
         table: E.2
         row: S_HPO2 boron_analogy
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -1512,6 +1514,7 @@ species:
             row: HPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '63.2'
@@ -1528,7 +1531,7 @@ species:
         table: E.3
         row: HOPO
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -1552,6 +1555,7 @@ species:
             row: HOPO
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '63.2'
@@ -1628,7 +1632,7 @@ species:
         table: E.4
         row: HPO2
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -1652,6 +1656,7 @@ species:
             row: HPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '90.0'
@@ -3463,7 +3468,7 @@ species:
         table: E.2
         row: S_NaPO2 present_study
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3487,6 +3492,7 @@ species:
             row: NaPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '73.4'
@@ -3526,7 +3532,7 @@ species:
         table: E.2
         row: S_NaPO2 boron_analogy
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3550,6 +3556,7 @@ species:
             row: NaPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '71.6'
@@ -3566,7 +3573,7 @@ species:
         table: E.3
         row: Na-OPO
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3590,6 +3597,7 @@ species:
             row: Na-OPO
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '73.4'
@@ -3749,7 +3757,7 @@ species:
         table: E.2
         row: S_LiPO2 present_study
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3773,6 +3781,7 @@ species:
             row: LiPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '66.3'
@@ -3812,7 +3821,7 @@ species:
         table: E.2
         row: S_LiPO2 boron_analogy
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3836,6 +3845,7 @@ species:
             row: LiPO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '68.0'
@@ -3852,7 +3862,7 @@ species:
         table: E.3
         row: Li-OPO
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -3876,6 +3886,7 @@ species:
             row: Li-OPO
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '66.3'
@@ -4386,7 +4397,7 @@ species:
         table: E.4
         row: PO2
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -4410,6 +4421,7 @@ species:
             row: PO2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '84.2'
@@ -4668,7 +4680,7 @@ species:
         table: E.3
         row: POH
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -4692,6 +4704,7 @@ species:
             row: POH
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '56.3'
@@ -4725,7 +4738,7 @@ species:
         table: E.4
         row: HPO
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -4749,6 +4762,7 @@ species:
             row: HPO
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: model_derived
         admission_status: admitted
         entropy: '77.5'
@@ -5281,7 +5295,7 @@ species:
         table: E.4
         row: H
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -5305,6 +5319,7 @@ species:
             row: H
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '36.8'
@@ -5364,7 +5379,7 @@ species:
         table: E.4
         row: OH
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -5388,6 +5403,7 @@ species:
             row: OH
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '57.9'
@@ -5447,7 +5463,7 @@ species:
         table: E.4
         row: H2
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -5471,6 +5487,7 @@ species:
             row: H2
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '45.0'
@@ -5530,7 +5547,7 @@ species:
         table: E.4
         row: H2O
       phase: gas
-      units: cal/(deg mol)
+      units: cal/mol/K
       point_conditions:
         temperature_K:
           state:
@@ -5554,6 +5571,7 @@ species:
             row: H2O
       values:
         quantity: S
+        units_as_printed: cal/(deg mol)
         method_class: quoted_attributed
         admission_status: admitted
         entropy: '63.2'
