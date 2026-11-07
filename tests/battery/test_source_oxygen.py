@@ -137,7 +137,7 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
 
 
-@pytest.mark.parametrize("printed_control", ("fO2", "IW_buffer"))
+@pytest.mark.parametrize("printed_control", ("oxygen_pressure", "IW_buffer"))
 def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     source_context, monkeypatch, printed_control
 ):
@@ -148,14 +148,10 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     identity = replace(
         original.identity,
         temperature_K=State.of(temperature),
-        fO2_Pa=(
-            State.of(Decimal("1e-8"))
-            if printed_control == "fO2"
-            else State.unknown("no target fO2 printed")
-        ),
+        fO2_Pa=State.unknown("no target fO2 printed"),
     )
     linked = Located(
-        State.of(Value.point_of("1e-5")),
+        State.of(Value.point_of("1e-4")),
         locator=original.locator,
         inference=Derivation(
             "source_oxygen_condition; same-cell measured O/O2",
@@ -167,7 +163,13 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     row = replace(
         original,
         identity=identity,
-        point_conditions={**(original.point_conditions or {}), "fO2_Pa": linked},
+        point_conditions={
+            **(original.point_conditions or {}),
+            "fO2_Pa": linked,
+            "total_pressure_Pa": Located(
+                State.of(Value.point_of("100000")), locator=original.locator
+            ),
+        },
         provenance={"source_oxygen_condition": {"observation_id": "same-cell-O2-observation"}},
     )
     experiment = source_context.experiments[row.experiment_id]
@@ -178,7 +180,17 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
             "temperature_K": Located(State.of(temperature), locator=row.locator),
         },
     )
-    if printed_control == "IW_buffer":
+    if printed_control == "oxygen_pressure":
+        experiment = replace(
+            experiment,
+            fO2_control=FO2Control(
+                channel=State.unknown("channel not printed"),
+                oxygen_partial_pressure_Pa=Located(
+                    State.of(Value.point_of("1e-8")), locator=row.locator
+                ),
+            ),
+        )
+    else:
         experiment = replace(
             experiment,
             fO2_control=FO2Control(
@@ -200,6 +212,11 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
         source_oxygen_bar=float(linked_pa) / 1.0e5,
     )
     assert resolved is not None and not resolved.closure
+    assert resolved.route == (
+        "oxygen_partial_pressure_to_log_fO2"
+        if printed_control == "oxygen_pressure"
+        else "buffer_relation"
+    )
 
     requests, handles = _capture_engine(monkeypatch, row)
     prediction = predict_with_engine(

@@ -719,6 +719,10 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
             observation.identity,
             temperature_K=State.of(Decimal("1200")),
         ),
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "total_pressure_Pa": F.located(Value.point_of("100000")),
+        },
     )
     bench = _cell_material_bench((CellMaterial.PT,))
     composition = observation.identity.composition.value
