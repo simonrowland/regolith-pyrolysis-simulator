@@ -1,8 +1,9 @@
 schema_version: literature_extract_audit_mapping.v1
 source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
 machine_read_order:
+  - The report is scanned; the pdftotext-layout file is an OCR text layer.
   - MinerU content-list HTML table blocks and Markdown were the first machine read.
-  - pdftotext-layout was the second machine read and its row/column placement was checked against page renders.
+  - The OCR text layer in pdftotext-layout was the second machine read and its row/column placement was checked against page renders.
   - The PDF render was used only as the printed-cell audit and for conflicting or flagged cells.
   - tools/mineru_table_draft.py convert produced the table index and cell drafts used for comparison.
   - tools/mineru_table_qa.py ranked 18 table blocks; nine blocks were flagged and 63 invented details blocks were ignored.
