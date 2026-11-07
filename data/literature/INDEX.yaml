@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 777
-  extracts: 775
+  sources: 779
+  extracts: 777
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 79
+  extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 775
+  extracts_without_pdf: 777
   alias_groups_needing_resolution: 83
 gaps:
   pdfs_without_extract: []
@@ -536,6 +536,7 @@ gaps:
   - richet-bottinga-1986-silicate-thermochemistry
   - richter-2008-cai-like-liquids-lpsc-abstract
   - richter-et-al-2007
+  - richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
   - roeder-1974-iron-activity-olivine-basaltic-liquids
@@ -694,6 +695,7 @@ gaps:
   - street-2010-thermal-properties-simulants
   - stuve-pankratz-richardson-1971-ri7535-sodium-ferrite
   - su-2024-lunar-volatiles-thesis
+  - su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
   - sublimation-kinetics-2023-minerals
   - sugawara-2011-sodium-silicate-fusion-mixing
   - sugawara-2013-soda-lime-melt-na2o-activity
@@ -867,6 +869,7 @@ gaps:
   - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - smales-1971-lpsc-12022
   - stebbins-carmichael-weill-1983
+  - su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
   - ta-badro-2021
   - ta-flemetakis-2024
   - thomas-2022-chlorine-bonding-silicate-melts
@@ -31682,6 +31685,65 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+  aliases: []
+  citation: Richter, F. M., Mendybaev, R. A., Christensen, J. N., Ebel, D. S., Gaffney, A. M., and others
+    (2011), Laboratory experiments bearing on the origin and evolution of olivine-rich chondrules, Meteoritics
+    & Planetary Science.
+  doi: 10.1111/j.1945-5100.2011.01220.x
+  report_number: null
+  identifier: 10.1111/j.1945-5100.2011.01220.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation.yaml
+    review_status: draft
+    rows: 388
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation.pdf
+      present: true
+      sha256: f6c51536305f01d66e20bfad5acfda082d9a51768801f0b3e70f552eddbe05ce
+      matches_simulator: null
+    sidecar:
+      path: raw/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      exists: true
+      file_count: 54
+    tables:
+      path: tables/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 75e3b98190a442a2afc77502a9d21cae21701992
 - source_id: robie-hemingway-wilson-1980-usgs-of-80-908
   aliases: []
   citation: Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals
@@ -40919,6 +40981,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  aliases: []
+  citation: Su, X., Zhang, Y., Liu, Y. & Holder, R. M. (2023). Outgassing and In-gassing of Na, K and
+    Cu in Lunar 74220 Orange Glass Beads. Earth and Planetary Science Letters.
+  doi: 10.1016/j.epsl.2022.117924
+  report_number: null
+  identifier: 10.1016/j.epsl.2022.117924
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml
+    review_status: draft
+    rows: 277
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/sidecar.yaml
+      present: true
+    text:
+      path: text/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 75e3b98190a442a2afc77502a9d21cae21701992
 - source_id: sublimation-kinetics-2023-minerals
   aliases: []
   citation: 'Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. & Pownceby, M.
