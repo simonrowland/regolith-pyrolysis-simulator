@@ -68,8 +68,9 @@ table_mappings:
     printed_body_rows: 3
     extract_records:
       - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
-    columns: HPO2/PO and H/H2O pressure ratios, Kp, and third-law reaction enthalpy.
-    evidence: Typed-refused because the printed pressure ratios, linear Kp, and reaction enthalpy do not have exact quantity tokens.
+      - hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law
+    columns: HPO2/PO and H/H2O pressure ratios, Kp, third-law reaction enthalpy, and a derived HPO2 formation enthalpy.
+    evidence: Reaction pressure ratios, linear Kp, and reaction enthalpy remain typed-refused; the separately derived elemental ΔHf value is measured_reduced.
   - printed_table: D.2
     pdf_page: 167
     printed_page: D7
@@ -79,10 +80,10 @@ table_mappings:
       - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
       - hastie_bonnell_1980_tableD2_po_calculated_partial_pressures
       - hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures
-      - hastie_bonnell_1980_tableD2_napo2_formation_enthalpy_relative_PO_typed_refusal
-      - hastie_bonnell_1980_tableD2_lipo2_formation_enthalpy_relative_PO_typed_refusal
-    columns: Temperature, flame gas ratio, calculated PO and O2 pressures, alkali-phosphate pressure ratios, Kp, and formation enthalpies relative to PO.
-    evidence: Calculated PO and O2 pressures are model_derived. The pressure ratios, linear Kp, and relative-to-PO formation values are typed-refused.
+      - hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law
+      - hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law
+    columns: Temperature, flame gas ratio, calculated PO and O2 pressures, alkali-phosphate pressure ratios, Kp, reaction enthalpies, and final formation enthalpies.
+    evidence: Calculated PO and O2 pressures are model_derived. The pressure ratios, linear Kp, and reaction enthalpies remain typed-refused; final elemental ΔHf values are measured_reduced.
   - printed_table: E.1
     appendix: E
     pdf_page: 192
@@ -134,13 +135,13 @@ table_mappings:
       - hastie_bonnell_1980_tableE3_poh_S298
       - hastie_bonnell_1980_tableE3_poh_delta_fH298
       - hastie_bonnell_1980_tableE3_hpo2_S298
-      - hastie_bonnell_1980_tableE3_hpo2_delta_fH_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableE3_hpo2_delta_fH
       - hastie_bonnell_1980_tableE3_napo2_S298
-      - hastie_bonnell_1980_tableE3_napo2_delta_fH_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableE3_napo2_delta_fH
       - hastie_bonnell_1980_tableE3_lipo2_S298
-      - hastie_bonnell_1980_tableE3_lipo2_delta_fH_relative_PO_typed_refusal
+      - hastie_bonnell_1980_tableE3_lipo2_delta_fH
     columns: Species structures, vibrational data, S298, and formation enthalpy estimates.
-    evidence: S298 and the POH estimate are stored with their printed frames; alkali-phosphate and HPO2 formation values relative to PO are typed-refused.
+    evidence: S298 and the POH estimate are stored with their printed frames; the three HPO2/alkali-phosphate ΔHf values are admitted as elemental formation values using PO as the experimental reference.
   - printed_table: E.4
     appendix: E
     pdf_page: 201
@@ -149,9 +150,9 @@ table_mappings:
     printed_body_rows: 8
     extract_records:
       - hastie_bonnell_1980_appendixE_tableE4_full_rendered_table
-      - hastie_bonnell_1980_appendixE_tableE4_hpo2_hf_relative_po_typed_refusal
+      - hastie_bonnell_1980_appendixE_tableE4_hpo2_delta_fH2000
     columns: Species, S2000, and ΔHf,2000.
-    evidence: Entropy and elemental-reference formation enthalpies are stored as printed; HPO2's relative-to-PO value is typed-refused.
+    evidence: Entropy and elemental-reference formation enthalpies are stored as printed; HPO2's 2000 K formation enthalpy is model_derived from the selected 298 K value and thermodynamic functions.
 excluded_tables:
   - printed_table: '1'
     pdf_page: 21
@@ -180,7 +181,7 @@ prose_records:
     topic: HPO2/PO KEMS log equilibrium constant and relative formation enthalpy.
   - pdf_page: 163
     published_page: D3
-    topic: Third-law HPO2 formation enthalpy relative to PO.
+    topic: Third-law HPO2 formation enthalpy derived using PO as the reference compound.
   - pdf_page: 194
     published_page: E8
     topic: PO2 formation enthalpy quoted from the cited KEMS studies.

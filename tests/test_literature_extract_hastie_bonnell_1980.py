@@ -186,6 +186,27 @@ def test_rendered_values_table_rows_and_mutation_are_pinned() -> None:
     assert rows["PO2"][:3] == ["<0.05 (2.1)", "<0.4 (0.006)", "<0.4"]
     assert rows["HPO"][:3] == ["<0.05 (0.02)", "<0.6 (0.002)", "<0.2"]
 
+    formation_pins = (
+        ("HPO2", "hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law", "-94", 162, None),
+        ("NaPO2", "hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law", "-123.5", 167, "D.2"),
+        ("LiPO2", "hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law", "-115.2", 167, "D.2"),
+        ("HPO2", "hastie_bonnell_1980_tableE3_hpo2_delta_fH", "-96.0", 199, "E.3"),
+        ("NaPO2", "hastie_bonnell_1980_tableE3_napo2_delta_fH", "-123.5", 199, "E.3"),
+        ("LiPO2", "hastie_bonnell_1980_tableE3_lipo2_delta_fH", "-115.0", 199, "E.3"),
+        ("HPO2", "hastie_bonnell_1980_appendixE_tableE4_hpo2_delta_fH2000", "-97.9", 201, "E.4"),
+    )
+    for species, observation_id, expected, page, table in formation_pins:
+        actual_species, row = _record_with_species(document, observation_id)
+        assert actual_species == species
+        assert row["values"]["quantity"] == "delta_fH"
+        assert row["values"]["admission_status"] == "admitted"
+        assert row["values"]["delta_fH"] == expected
+        assert row["locator"]["page"] == page
+        assert row["locator"].get("table") == table
+        assert "hastie_bonnell_1980_appendixE_po_delta_fH298_present_study" in row[
+            "values"
+        ]["derivation"]["inputs"]
+
     changed = copy.deepcopy(document)
     _record(
         changed, "hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures"
@@ -214,7 +235,7 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
         else:
             unavailable_by_reason["quantity_unknown_schema_gap"] += 1
     assert dict(unavailable_by_reason) == {
-        "quantity_unknown_schema_gap": 14,
+        "quantity_unknown_schema_gap": 7,
         "reaction_log_k_standard_state": 1,
     }
 
@@ -236,6 +257,11 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
             row
             for row in observations
             if f"::{observation_id}::T={temperature}" in row.observation_id
+        )
+
+    def migrated_source(observation_id: str):
+        return next(
+            row for row in observations if f"::{observation_id}" in row.observation_id
         )
 
     table2_po = migrated("hastie_bonnell_1980_table2_po_measured_pressures", "2100")
@@ -279,6 +305,34 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     assert (e4_po_entropy.locator.page, e4_po_entropy.locator.table) == (201, "E.4")
     assert e4_po_entropy.identity.temperature_K.value == Decimal("2000")
 
+    formation_migration_pins = (
+        ("hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law", "-393.2960", 162, None, "4"),
+        ("hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law", "-516.7240", 167, "D.2", "5.5"),
+        ("hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law", "-481.9968", 167, "D.2", "5.8"),
+        ("hastie_bonnell_1980_tableE3_hpo2_delta_fH", "-401.6640", 199, "E.3", None),
+        ("hastie_bonnell_1980_tableE3_napo2_delta_fH", "-516.7240", 199, "E.3", None),
+        ("hastie_bonnell_1980_tableE3_lipo2_delta_fH", "-481.1600", 199, "E.3", None),
+        ("hastie_bonnell_1980_appendixE_tableE4_hpo2_delta_fH2000", "-409.6136", 201, "E.4", None),
+    )
+    for observation_id, expected, page, table, uncertainty in formation_migration_pins:
+        row = migrated_source(observation_id)
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == Decimal(expected)
+        assert row.identity.quantity.value.value == "delta_fH"
+        assert row.locator.page == page
+        assert row.locator.table == table
+        if uncertainty is None:
+            assert row.uncertainty.kind.value == "none"
+        else:
+            assert row.uncertainty.kind.value == "printed"
+            assert row.uncertainty.verbatim["value"] == uncertainty
+    assert migrated_source(
+        "hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law"
+    ).identity.temperature_K.value == Decimal("298.15")
+    assert migrated_source(
+        "hastie_bonnell_1980_appendixE_tableE4_hpo2_delta_fH2000"
+    ).identity.temperature_K.value == Decimal("2000")
+
     entropy_ids = {row["observation_id"] for row in entropy_source_rows}
     entropy_migrated = [
         row
@@ -294,21 +348,15 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
         if row.identity.quantity.tag.value == "unknown"
     }
     assert unknown_quantity_ids == {
-        "hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal",
         "hastie_bonnell_1980_appendixD_tableD1_typed_refusal",
         "hastie_bonnell_1980_appendixD_tableD2_typed_refusal",
         "hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal",
         "hastie_bonnell_1980_appendixE_tableE2_bond_energies_typed_refusal",
         "hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal",
-        "hastie_bonnell_1980_appendixE_tableE4_hpo2_hf_relative_po_typed_refusal",
         "hastie_bonnell_1980_table3_reaction_parameters_typed_refusal",
         "hastie_bonnell_1980_table4_typical_reaction_rates_typed_refusal",
-        "hastie_bonnell_1980_tableD2_lipo2_formation_enthalpy_relative_PO_typed_refusal",
-        "hastie_bonnell_1980_tableD2_napo2_formation_enthalpy_relative_PO_typed_refusal",
-        "hastie_bonnell_1980_tableE3_hpo2_delta_fH_relative_PO_typed_refusal",
-        "hastie_bonnell_1980_tableE3_lipo2_delta_fH_relative_PO_typed_refusal",
-        "hastie_bonnell_1980_tableE3_napo2_delta_fH_relative_PO_typed_refusal",
     }
+    assert len(unknown_quantity_ids) == 7
     assert all(
         row.identity.species is None
         or row.identity.species.phase.tag.value != "unknown"

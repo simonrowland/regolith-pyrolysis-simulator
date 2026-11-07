@@ -1579,7 +1579,7 @@ species:
           - Hastie (1975), p. 291
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
-    - observation_id: hastie_bonnell_1980_tableE3_hpo2_delta_fH_relative_PO_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_hpo2_delta_fH
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id002
@@ -1607,21 +1607,34 @@ species:
             reason: Thermochemical reference value; no total gas pressure is stated.
           locator: *id002
       values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
+        quantity: delta_fH
         method_class: measured_reduced
-        admission_status: typed_refusal
-        formation_enthalpy_as_printed: '-96.0'
-        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
-        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
-          relative to PO.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
+        admission_status: admitted
+        delta_fH: '-96.0'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298.15 (kcal/mol), Table E.3 (PDF p. 199); the experimental reduction uses
+          the selected elemental ΔHf,298 PO value as described in Appendix E, section 3 (PDF p. 193).
         derivation:
-          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          relation: Table E.3 reports the final HPO2 formation enthalpy after the third-law reaction thermochemistry
+            is reduced using the selected PO formation enthalpy.
           inputs:
           - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          method:
+            state:
+              tag: value
+              value: Third-law flame mass-spectrometric thermochemistry referenced to PO, with elemental formation value reported.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: HOPO
+          references:
+          - JANAF (1971)
       derived_from:
       - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
     - observation_id: hastie_bonnell_1980_tableE4_hpo2_S2000
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_16
@@ -1744,6 +1757,148 @@ species:
         value: '1'
         units: log10 Kp
         confidence_level: not_stated
+    - observation_id: hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_06
+      locator: &id004
+        page: 162
+        pdf_page_index: 161
+        published_page: D2
+        section: Appendix D
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_reduced
+        admission_status: admitted
+        delta_fH: '-94'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 HPO2; the report calls this the HPO2 heat of formation (PDF p. 162).
+          Its third-law reaction result is reduced using the selected elemental ΔHf,298 PO value (PDF p. 193).
+        method_as_printed: Flame mass-spectrometric third-law reaction enthalpy; HPO2 formation enthalpy derived from it.
+        values_as_printed:
+        - value: -96.7 ± 6
+          locator:
+            page: 162
+            published_page: D2
+            section: Appendix D
+            note: KEMS third-law determination
+        - value: -94 ± 4
+          locator:
+            page: 162
+            published_page: D2
+            section: Appendix D
+            note: flame third-law determination retained as the admitted scalar
+        - value: -96 ± 4
+          locator:
+            page: 163
+            published_page: D3
+            section: Appendix D
+            note: selected value for the thermodynamic data bank
+        references_as_printed:
+        - JANAF (1971)
+        - Drowart et al. (1972)
+        derivation:
+          relation: PO + H2O = HPO2 + H; the Table D.1 third-law reaction enthalpy and the selected PO formation
+            enthalpy yield the elemental HPO2 formation enthalpy printed on PDF p. 162.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          method:
+            state:
+              tag: value
+              value: Flame mass-spectrometric third-law analysis and formation-enthalpy reduction.
+            locator:
+              page: 162
+              pdf_page_index: 161
+              published_page: D2
+              section: Appendix D
+              row: PO + H2O = HPO2 + H
+          references:
+          - JANAF (1971)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298.15'
+          locator:
+            page: 162
+            pdf_page_index: 161
+            published_page: D2
+            section: Appendix D
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
+              value.
+          locator: *id004
+      uncertainty:
+        reported_status: printed
+        value: '4'
+        units: kcal/mol
+        confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+    - observation_id: hastie_bonnell_1980_appendixE_tableE4_hpo2_delta_fH2000
+      type: heat_capacity_and_heat_content_series
+      experiment: hastie_bonnell_1980_experiment_16
+      locator: &id005
+        page: 201
+        pdf_page_index: 200
+        published_page: E14
+        table: E.4
+        row: HPO2
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: model_derived
+        admission_status: admitted
+        delta_fH: '-97.9'
+        T_K: '2000'
+        reference_frame_as_printed: ΔHf,2000 (kcal/mol), Table E.4 (PDF p. 201); elemental formation enthalpy
+          computed from the selected 298.15 K HPO2 formation value and thermodynamic functions.
+        derivation:
+          relation: Table E.4 gives the 2000 K HPO2 elemental formation enthalpy from the selected 298.15 K formation
+            result and the tabulated thermodynamic functions.
+          inputs:
+          - hastie_bonnell_1980_tableE3_hpo2_delta_fH
+          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          method:
+            state:
+              tag: value
+              value: Thermodynamic-function calculation for the kinetic-analysis data table.
+            locator:
+              page: 201
+              pdf_page_index: 200
+              published_page: E14
+              table: E.4
+              row: HPO2
+          references:
+          - JANAF (1971)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 201
+            pdf_page_index: 200
+            published_page: E14
+            table: E.4
+            row: HPO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
+              value.
+          locator: *id005
+      derived_from:
+      - hastie_bonnell_1980_tableE3_hpo2_delta_fH
+      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
   PN:
     observations:
     - observation_id: hastie_bonnell_1980_table2_pn_measured_pressures
@@ -2865,74 +3020,6 @@ species:
         value: '2'
         units: kcal/mol
         confidence_level: not_stated
-    - observation_id: hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
-      type: heat_capacity_and_heat_content_series
-      experiment: hastie_bonnell_1980_experiment_06
-      locator: &id004
-        page: 163
-        pdf_page_index: 162
-        published_page: D3
-        section: Appendix D
-      phase: gas
-      units: kcal/mol
-      values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
-        method_class: measured_reduced
-        admission_status: typed_refusal
-        schema_gap: The report explicitly states that HPO2 formation enthalpies are measured relative to PO. The
-          closed delta_fH token is for elemental formation enthalpy and cannot represent a relative-to-PO datum.
-          The printed values and their reference frame are retained.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
-        values_as_printed:
-        - value: -96.7 ± 6
-          locator:
-            page: 162
-            published_page: D2
-            section: Appendix D
-            paragraph b: null
-        - value: -94 ± 4
-          locator:
-            page: 163
-            published_page: D3
-            section: Appendix D
-            paragraph c: null
-        - value: -96 ± 4
-          locator:
-            page: 163
-            published_page: D3
-            section: Appendix D
-            paragraph c: null
-        reference_frame_as_printed: Relative to ΔHf,298 PO.
-        method_as_printed: Knudsen-effusion mass-spectrometric third law; flame mass-spectrometric third law.
-        references_as_printed:
-        - JANAF (1971)
-        - Drowart et al. (1972)
-        derivation:
-          relation: Third-law HPO2 formation enthalpy from the measured Kp and Appendix E entropy functions, relative
-            to PO.
-          inputs:
-          - hastie_bonnell_1980_appendixD_hpo2_kems_logK
-          - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '298.15'
-          locator:
-            page: 163
-            pdf_page_index: 162
-            published_page: D3
-            section: Appendix D
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
-              value.
-          locator: *id004
-      derived_from:
-      - hastie_bonnell_1980_appendixD_hpo2_kems_logK
-      - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
     - observation_id: hastie_bonnell_1980_appendixE_tableE2_bond_energies_typed_refusal
       type: gibbs_table
       experiment: hastie_bonnell_1980_experiment_09
@@ -3009,9 +3096,8 @@ species:
       values:
         quantity: structural_spectroscopic_and_relative_formation_data_as_printed
         admission_status: typed_refusal
-        schema_gap: The table's structural and vibrational-parameter vectors have no exact quantity token. HPO2,
-          NaPO2 and LiPO2 formation enthalpies are explicitly relative to PO in Appendix E, so they cannot use the
-          elemental delta_fH token. Values remain typed-refused.
+        schema_gap: The table's structural and vibrational-parameter vectors have no exact quantity token. Its
+          HPO2, NaPO2, and LiPO2 formation values are admitted separately using the elemental delta_fH token.
         schema_gap_symbols:
         - tools/validate_literature_extracts.py::OBSERVATION_TYPES
         - simulator/battery/enums.py::Quantity.DELTA_FH
@@ -3053,8 +3139,8 @@ species:
         parameter_method_as_printed: Harmonic oscillator approximation with sigma=1, epsilon=0, g=1; estimated structures
           and vibrational parameters. Na/Li structures assumed analogous to HOPO; alternative M-O-P-O ring structures
           could affect entropy by several cal/mol.
-        enthalpy_reference_frame_as_printed: HPO2, NaPO2 and LiPO2 relative to PO; POH formation estimated with
-          the M-OH versus M-F bond-energy correlation.
+        enthalpy_reference_frame_as_printed: HPO2, NaPO2, and LiPO2 values are ΔHf entries; Appendix E describes
+          their experimental reduction relative to PO. POH formation is estimated with the M-OH versus M-F bond-energy correlation.
         references_as_printed:
         - Hastie (1975), p. 291
         - Jensen (1969)
@@ -3063,8 +3149,8 @@ species:
           structure_and_vibrational_parameters: model_derived from estimated structures and harmonic-oscillator
             parameters.
           entropy_values: model_derived statistical-mechanical calculations; separately admitted as S observations.
-          HPO2_NaPO2_LiPO2_formation_enthalpies: measured_reduced and explicitly relative to PO; separately typed-refused
-            for the elemental-frame quantity gap.
+          HPO2_NaPO2_LiPO2_formation_enthalpies: measured_reduced to the final elemental ΔHf values using PO as
+            the experimental reference compound; separately admitted as delta_fH observations.
           POH_formation_enthalpy: model_derived using the M-OH versus M-F bond-energy correlation.
       point_conditions:
         temperature_K:
@@ -3087,54 +3173,6 @@ species:
             published_page: E13
             table: E.3
             row: pressure
-    - observation_id: hastie_bonnell_1980_appendixE_tableE4_hpo2_hf_relative_po_typed_refusal
-      type: heat_capacity_and_heat_content_series
-      experiment: hastie_bonnell_1980_experiment_16
-      locator: &id005
-        page: 201
-        pdf_page_index: 200
-        published_page: E14
-        table: E.4
-        row: HPO2
-      phase: gas
-      units: kcal/mol
-      values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
-        method_class: model_derived
-        admission_status: typed_refusal
-        schema_gap: Table E.4 repeats the selected HPO2 formation enthalpy. Appendix E states the HPO2 formation
-          enthalpy is measured relative to PO; the exact elemental delta_fH token therefore does not represent this
-          row.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
-        delta_fH_2000_as_printed: '-97.9'
-        reference_frame_as_printed: Relative to ΔHf,298 PO; 2000 K thermodynamic function used in the flame model.
-        derivation:
-          relation: 2000 K HPO2 formation enthalpy relative to PO from the selected third-law result and thermodynamic
-            functions.
-          inputs:
-          - hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
-          - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2000'
-          locator:
-            page: 201
-            pdf_page_index: 200
-            published_page: E14
-            table: E.4
-            row: HPO2
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: The report does not state the total experimental flame or effusion pressure for this thermochemical
-              value.
-          locator: *id005
-      derived_from:
-      - hastie_bonnell_1980_appendixD_hpo2_hf_relative_to_po_typed_refusal
-      - hastie_bonnell_1980_appendixE_tableE1_coefficients_typed_refusal
     context:
     - observation_id: hastie_bonnell_1980_main_table2_full_rendered_table
       type: printed_table_context
@@ -3425,8 +3463,8 @@ species:
       phase: gas
       units: ΔHf,2000 kcal/mol; S2000 cal/(deg mol).
       values:
-        admission_status: HPO2 formation value typed-refused due relative-to-PO reference frame; all S and other
-          Hf cells separately extracted.
+        admission_status: HPO2 formation value separately extracted as an admitted model-derived elemental ΔHf; all S
+          and other Hf cells are separately extracted.
         rows_as_printed:
         - - PO
           - '-26.8'
@@ -3621,7 +3659,7 @@ species:
           - Hastie (1975), p. 291
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
-    - observation_id: hastie_bonnell_1980_tableE3_napo2_delta_fH_relative_PO_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_napo2_delta_fH
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id006
@@ -3649,22 +3687,35 @@ species:
             reason: Thermochemical reference value; no total gas pressure is stated.
           locator: *id006
       values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
+        quantity: delta_fH
         method_class: measured_reduced
-        admission_status: typed_refusal
-        formation_enthalpy_as_printed: '-123.5'
-        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
-        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
-          relative to PO.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
+        admission_status: admitted
+        delta_fH: '-123.5'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298.15 (kcal/mol), Table E.3 (PDF p. 199); Appendix E describes the experimental
+          reduction relative to PO (PDF p. 193), with the final table value in the elemental formation frame.
         derivation:
-          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          relation: Table E.3 reports the final NaPO2 formation enthalpy after the third-law reaction thermochemistry
+            is reduced using the selected PO formation enthalpy.
           inputs:
           - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          method:
+            state:
+              tag: value
+              value: Third-law flame mass-spectrometric thermochemistry referenced to PO, with elemental formation value reported.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: Na-OPO
+          references:
+          - JANAF (1971)
       derived_from:
       - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
-    - observation_id: hastie_bonnell_1980_tableD2_napo2_formation_enthalpy_relative_PO_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+    - observation_id: hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_19
       locator: &id007
@@ -3692,51 +3743,31 @@ species:
             reason: Standard formation datum; not the total pressure in the flame.
           locator: *id007
       values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
+        quantity: delta_fH
         method_class: measured_reduced
-        admission_status: typed_refusal
-        formation_enthalpy_as_printed: -123.5 ± 5.5
-        reference_frame_as_printed: Derived from Na + PO + 1/2 O2 = NaPO2, or the analogous Li reaction; Appendix
-          E states P-species formation enthalpies are relative to PO.
-        schema_gap: No exact quantity token represents formation enthalpy referenced to PO rather than elemental
-          formation enthalpy.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
+        admission_status: admitted
+        delta_fH: '-123.5'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 NaPO2, stated separately in the Table D.2 footer (PDF p. 167); the
+          third-law measurement uses PO as the experimental reference and reports the elemental formation value.
         method_as_printed: Third-law analysis of pressure ratios, calculated partial pressures, and emission-intensity
           changes.
-        raw_inputs:
-          state:
-            tag: value
-            value: not_printed
-          locator:
-            page: 167
-            published_page: D7
-            table: D.2
-            figure: D.3-D.9
         derivation:
-          relation: Third-law reaction enthalpy from the printed flame ratios and calculated PO/O2 partial pressures;
-            elemental formation enthalpy remains relative to PO.
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 167
-              pdf_page_index: 166
-              published_page: D7
-              table: D.2
-              row: emission-intensity series
-              figure: D.3-D.9
+          relation: Na + PO + 1/2 O2 = NaPO2; the third-law reaction result is reduced using the selected elemental
+            PO formation enthalpy to obtain the Table D.2 footer value.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
           method:
             state:
               tag: value
-              value: Third-law analysis of NaPO2/Na or LiPO2/Li pressure ratios.
+              value: Third-law analysis of NaPO2/Na flame pressure ratios.
             locator:
               page: 167
               pdf_page_index: 166
               published_page: D7
               table: D.2
-              row: NaPO2
+              row: NaPO2/Na
               equation: third-law reaction analysis
           references:
           - JANAF (1971)
@@ -3745,6 +3776,9 @@ species:
         value: '5.5'
         units: kcal/mol
         confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
   LiPO2:
     observations:
     - observation_id: hastie_bonnell_1980_tableE2_lipo2_S_present_study
@@ -3910,7 +3944,7 @@ species:
           - Hastie (1975), p. 291
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
-    - observation_id: hastie_bonnell_1980_tableE3_lipo2_delta_fH_relative_PO_typed_refusal
+    - observation_id: hastie_bonnell_1980_tableE3_lipo2_delta_fH
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id008
@@ -3938,22 +3972,35 @@ species:
             reason: Thermochemical reference value; no total gas pressure is stated.
           locator: *id008
       values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
+        quantity: delta_fH
         method_class: measured_reduced
-        admission_status: typed_refusal
-        formation_enthalpy_as_printed: '-115.0'
-        reference_frame_as_printed: Measured relative to PO, as stated in Appendix E, section 3 (PDF p. 193).
-        schema_gap: The exact delta_fH token denotes elemental formation enthalpy; this report measures these species
-          relative to PO.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
+        admission_status: admitted
+        delta_fH: '-115.0'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298.15 (kcal/mol), Table E.3 (PDF p. 199); Appendix E describes the experimental
+          reduction relative to PO (PDF p. 193), with the final table value in the elemental formation frame.
         derivation:
-          relation: Selected formation enthalpy is reduced from the printed third-law reaction thermochemistry.
+          relation: Table E.3 reports the final LiPO2 formation enthalpy after the third-law reaction thermochemistry
+            is reduced using the selected PO formation enthalpy.
           inputs:
           - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+          method:
+            state:
+              tag: value
+              value: Third-law flame mass-spectrometric thermochemistry referenced to PO, with elemental formation value reported.
+            locator:
+              page: 199
+              pdf_page_index: 198
+              published_page: E13
+              table: E.3
+              row: Li-OPO
+          references:
+          - JANAF (1971)
       derived_from:
       - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
-    - observation_id: hastie_bonnell_1980_tableD2_lipo2_formation_enthalpy_relative_PO_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+    - observation_id: hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_19
       locator: &id009
@@ -3981,51 +4028,31 @@ species:
             reason: Standard formation datum; not the total pressure in the flame.
           locator: *id009
       values:
-        quantity: formation_enthalpy_relative_to_PO_as_printed
+        quantity: delta_fH
         method_class: measured_reduced
-        admission_status: typed_refusal
-        formation_enthalpy_as_printed: -115.2 ± 5.8
-        reference_frame_as_printed: Derived from Na + PO + 1/2 O2 = NaPO2, or the analogous Li reaction; Appendix
-          E states P-species formation enthalpies are relative to PO.
-        schema_gap: No exact quantity token represents formation enthalpy referenced to PO rather than elemental
-          formation enthalpy.
-        schema_gap_symbols:
-        - simulator/battery/enums.py::Quantity.DELTA_FH
+        admission_status: admitted
+        delta_fH: '-115.2'
+        T_K: '298.15'
+        reference_frame_as_printed: ΔHf,298 LiPO2, stated separately in the Table D.2 footer (PDF p. 167); the
+          third-law measurement uses PO as the experimental reference and reports the elemental formation value.
         method_as_printed: Third-law analysis of pressure ratios, calculated partial pressures, and emission-intensity
           changes.
-        raw_inputs:
-          state:
-            tag: value
-            value: not_printed
-          locator:
-            page: 167
-            published_page: D7
-            table: D.2
-            figure: D.3-D.9
         derivation:
-          relation: Third-law reaction enthalpy from the printed flame ratios and calculated PO/O2 partial pressures;
-            elemental formation enthalpy remains relative to PO.
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 167
-              pdf_page_index: 166
-              published_page: D7
-              table: D.2
-              row: emission-intensity series
-              figure: D.3-D.9
+          relation: Li + PO + 1/2 O2 = LiPO2; the third-law reaction result is reduced using the selected elemental
+            PO formation enthalpy to obtain the Table D.2 footer value.
+          inputs:
+          - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+          - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
           method:
             state:
               tag: value
-              value: Third-law analysis of NaPO2/Na or LiPO2/Li pressure ratios.
+              value: Third-law analysis of LiPO2/Li flame pressure ratios.
             locator:
               page: 167
               pdf_page_index: 166
               published_page: D7
               table: D.2
-              row: LiPO2
+              row: LiPO2/Li
               equation: third-law reaction analysis
           references:
           - JANAF (1971)
@@ -4034,6 +4061,9 @@ species:
         value: '5.8'
         units: kcal/mol
         confidence_level: not_stated
+      derived_from:
+      - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
+      - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
   P2:
     observations:
     - observation_id: hastie_bonnell_1980_table2_p2_equilibrium_predictions
