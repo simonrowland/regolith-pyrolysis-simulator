@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 779
-  extracts: 777
+  sources: 782
+  extracts: 780
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 777
-  alias_groups_needing_resolution: 83
+  extracts_without_pdf: 780
+  alias_groups_needing_resolution: 84
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -195,6 +195,7 @@ gaps:
   - hanson-jones-1998-am-cr-partitioning-olivine-liquid
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
   - haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  - hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
   - hayashi-2025-ca-fe-silicate-redox-activities
   - he-2017-karrooite-ordering-heat-capacity
   - henao-2001-ni-cr-mn-co-cu-slag-distribution
@@ -238,6 +239,7 @@ gaps:
   - jsc-a16-special-samples
   - jsc-lunar-catalog-12023
   - jugo-2010-sulfur-xanes
+  - jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation
   - kale-srikanth-2000-sodium-ferrite-gibbs
   - kambayashi-kato-1984-mgo-sio2-1973k
   - kang-2007-sio2-activity-cas-low-silica
@@ -417,6 +419,7 @@ gaps:
   - matsuzaki-1997-feo-tio2-sio2-activities
   - matzen-2017-ni-olivine-composition
   - matzen-2022-martian-basalt-redox
+  - mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
   - mccready-1948-sodium-silicate
   - mcgill-na-fe-o-critical-assessment
   - mendybaev-2013-fun-cai-evaporation
@@ -1528,6 +1531,12 @@ gaps:
     source_ids:
     - kems-006-zhang-2021
     - zhang-2021-acsesc-si
+    resolution: owner/controller
+  - type: source_id_alias
+    key: hastie-1980
+    source_ids:
+    - hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+    - kems-214-hastie-1980-nbsir-80-2178
     resolution: owner/controller
 sources:
 - source_id: 1997jonesthermo
@@ -11754,6 +11763,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  aliases: []
+  citation: Hastie, J. W. and Bonnell, D. W. (1980), Molecular Chemistry of Inhibited Combustion Systems,
+    National Bureau of Standards, NBSIR 80-2169, final report, December 1980.
+  doi: null
+  report_number: NBSIR 80-2169
+  identifier: NBSIR 80-2169
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.yaml
+    review_status: draft
+    rows: 57
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.pdf
+      present: true
+      sha256: c3b410d8b5ca157836cc04dbd1762672dea6f8bd982e7859a1a8b4077dd43873
+      matches_simulator: null
+    sidecar:
+      path: raw/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry/sidecar.yaml
+      present: true
+    text:
+      path: text/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      exists: true
+      file_count: 340
+    tables:
+      path: tables/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2e5c4bcdf7b91bfd0c1bb897b48c054e4ebf50bc
 - source_id: hayashi-2025-ca-fe-silicate-redox-activities
   aliases: []
   citation: Hayashi, M., Takatsuji, S., Kubuki, S., Watanabe, T., Endo, R., and Susa, M. (2025). Effect
@@ -14276,6 +14343,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation
+  aliases: []
+  citation: Jugo, P. J., Luth, R. W. & Richards, J. P. (2005), ‘An Experimental Study of the Sulfur Content
+    in Basaltic Melts Saturated with Immiscible Sulfide or Sulfate Liquids at 1300°C and 1.0 GPa’, Journal
+    of Petrology 46(4), 783–798.
+  doi: 10.1093/petrology/egh097
+  report_number: null
+  identifier: 10.1093/petrology/egh097
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation.yaml
+    review_status: draft
+    rows: 198
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation.pdf
+      present: true
+      sha256: bdfcafc1278cf9535a6b6e81cad775e3fad07e827d73b6968dc111453d45b46a
+      matches_simulator: null
+    sidecar:
+      path: raw/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation/sidecar.yaml
+      present: true
+    text:
+      path: text/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation
+      exists: true
+      file_count: 29
+    tables:
+      path: tables/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2e5c4bcdf7b91bfd0c1bb897b48c054e4ebf50bc
 - source_id: kale-srikanth-2000-sodium-ferrite-gibbs
   aliases: []
   citation: Kale, G. M. and Srikanth, S. (1999). Electrochemical Determination of the Gibbs Energy of
@@ -24657,6 +24783,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
+  aliases: []
+  citation: Mavrogenes, J. A. and O’Neill, H. St.C. (1999), ‘The relative effects of pressure, temperature
+    and oxygen fugacity on the solubility of sulfide in mafic magmas’, Geochimica et Cosmochimica Acta
+    63(7/8), 1173–1180.
+  doi: 10.1016/S0016-7037(98)00289-0
+  report_number: null
+  identifier: 10.1016/S0016-7037(98)00289-0
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml
+    review_status: draft
+    rows: 28
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.pdf
+      present: true
+      sha256: 10f739657160642c4a76280d307ad17ee8b119dc46a5ad1a74f217d60080ab80
+      matches_simulator: null
+    sidecar:
+      path: raw/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas/sidecar.yaml
+      present: true
+    text:
+      path: text/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
+      exists: true
+      file_count: 34
+    tables:
+      path: tables/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2e5c4bcdf7b91bfd0c1bb897b48c054e4ebf50bc
 - source_id: mccready-1948-sodium-silicate
   aliases: []
   citation: McCready N.W. (1948), The Thermodynamic Properties of Sodium Silicate, Journal of Physical
