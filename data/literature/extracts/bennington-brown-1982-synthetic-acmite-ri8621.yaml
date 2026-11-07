@@ -162,8 +162,9 @@ species:
       values:
         table_content_as_printed: Table 4 lists thermodynamic data sources and functions for reaction constituents;
           it contains no numerical thermodynamic values.
-        numerical_auxiliary_inputs_status: The numerical auxiliary constituent data used for Tables 5 and 6 are
-          not reproduced here.
+        numerical_auxiliary_inputs_status: Table 4 names the cited sources for auxiliary constituent data; their
+          numerical values are not tabulated in this report. Those citations are carried as named derivation references
+          for Tables 5 and 6.
     - observation_id: bennington_1982_melting_point_context
       type: sample_and_method_context
       locator:
@@ -2974,8 +2975,9 @@ species:
       values:
         quantity: delta_fH
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe(c,l) all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data
+          and Si low-temperature data to JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        reaction_as_printed: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)
         points:
         - value: '-615.870'
           table_row_number: 3
@@ -3482,23 +3484,30 @@ species:
       - bennington_1982_table5_entropy
       - bennington_1982_table5_enthalpy_increment
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 5, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table3_reaction_14_delta_fH_from_elements
         - bennington_1982_table5_cp
         - bennington_1982_table5_entropy
         - bennington_1982_table5_enthalpy_increment
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 5 calculated formation reaction: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 14
+            published_page: 8
+            pdf_page_index: 13
+            table: '5'
+            note: Table 5 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe(c,l)
+              all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data and Si low-temperature data to
+              JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        references:
+        - 'Hultgren [11] (Table 4: Fe(c,l), all data; Si(c,l), all data).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na(c,l,g), all data; Si(c,l), low-temperature data).'
+        - 'JANAF [8] (Table 4: O2(g), all data).'
+        output_unit: kcal/mol
       T_range_K:
       - '298.15'
       - '1263'
@@ -3520,8 +3529,9 @@ species:
       values:
         quantity: delta_fG
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe(c,l) all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data
+          and Si low-temperature data to JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        reaction_as_printed: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)
         points:
         - value: '-575.855'
           table_row_number: 3
@@ -4028,23 +4038,30 @@ species:
       - bennington_1982_table5_entropy
       - bennington_1982_table5_enthalpy_increment
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 5, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table3_reaction_14_delta_fH_from_elements
         - bennington_1982_table5_cp
         - bennington_1982_table5_entropy
         - bennington_1982_table5_enthalpy_increment
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 5 calculated formation reaction: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 14
+            published_page: 8
+            pdf_page_index: 13
+            table: '5'
+            note: Table 5 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe(c,l)
+              all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data and Si low-temperature data to
+              JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        references:
+        - 'Hultgren [11] (Table 4: Fe(c,l), all data; Si(c,l), all data).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na(c,l,g), all data; Si(c,l), low-temperature data).'
+        - 'JANAF [8] (Table 4: O2(g), all data).'
+        output_unit: kcal/mol
       T_range_K:
       - '298.15'
       - '1263'
@@ -4066,8 +4083,9 @@ species:
       values:
         quantity: log10_Kf
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe(c,l) all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data
+          and Si low-temperature data to JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        reaction_as_printed: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)
         points:
         - value: '422.108'
           table_row_number: 3
@@ -4571,20 +4589,27 @@ species:
       derived_from:
       - bennington_1982_table5_delta_fG
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 5, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table5_delta_fG
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 5 calculated formation reaction: 2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 14
+            published_page: 8
+            pdf_page_index: 13
+            table: '5'
+            note: Table 5 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe(c,l)
+              all data and Si(c,l) all data to Hultgren [11]; Na(c,l,g) all data and Si low-temperature data to
+              JANAF NSRDS-NBS 37 [7]; and O2(g) all data to JANAF [8].
+        references:
+        - 'Hultgren [11] (Table 4: Fe(c,l), all data; Si(c,l), all data).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na(c,l,g), all data; Si(c,l), low-temperature data).'
+        - 'JANAF [8] (Table 4: O2(g), all data).'
+        output_unit: dimensionless
       T_range_K:
       - '298.15'
       - '1263'
@@ -6371,8 +6396,11 @@ species:
       values:
         quantity: formation_from_oxides_as_printed
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe2O3 ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin,
+          King, and Bonnickson [6]; Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10],
+          JANAF NSRDS-NBS 37 [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3
+          [20], Anderson [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        reaction_as_printed: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)
         schema_gap: 'The quantity is formation from oxides. No exact elements-frame token is valid: simulator/battery/enums.py::Quantity.DELTA_FH
           and ::DELTA_FG represent elements-frame formation quantities, and simulator/battery/migrate.py::QUANTITY_ALIASES
           and ::TYPE_QUANTITY define no oxide-frame quantity.'
@@ -6804,23 +6832,43 @@ species:
       - bennington_1982_table6_entropy
       - bennington_1982_table6_enthalpy_increment
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 6, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table3_reaction_15_heat_of_formation_from_oxides
         - bennington_1982_table6_cp
         - bennington_1982_table6_entropy
         - bennington_1982_table6_enthalpy_increment
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 6 calculated formation reaction: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 15
+            published_page: 9
+            pdf_page_index: 14
+            table: '6'
+            note: Table 6 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe2O3
+              ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin, King, and Bonnickson [6];
+              Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10], JANAF NSRDS-NBS 37
+              [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3 [20], Anderson
+              [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        references:
+        - 'NBS 270-4 [21] (Table 4: Fe2O3, ΔHf298).'
+        - 'Westrum and Grovold [23] (Table 4: Fe2O3, low-temperature data).'
+        - 'Coughlin, King, and Bonnickson [6] (Table 4: Fe2O3, high-temperature data).'
+        - 'O''Hare and Wagman [17,22] (Table 4: Na2O, ΔHf298).'
+        - 'Grimley and Margrave [10] (Table 4: Na2O, S°).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na2O, Cp°).'
+        - 'Fredrickson and Chasanov [9] (Table 4: Na2O, high-temperature data).'
+        - 'Wise [26] (Table 4: SiO2, ΔHf298).'
+        - 'NBS-270-3 [20] (Table 4: SiO2, S°).'
+        - 'Anderson [1] (Table 4: SiO2, low-temperature data).'
+        - 'Moser [16] (Table 4: SiO2, high-temperature data).'
+        - 'Roth and Bertram [18] (Table 4: SiO2, high-temperature data).'
+        - 'White [24] (Table 4: SiO2, high-temperature data).'
+        - 'Wietzel [25] (Table 4: SiO2, high-temperature data).'
+        output_unit: kcal/mol
       T_range_K:
       - '298.15'
       - '1263'
@@ -6842,8 +6890,11 @@ species:
       values:
         quantity: formation_from_oxides_as_printed
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe2O3 ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin,
+          King, and Bonnickson [6]; Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10],
+          JANAF NSRDS-NBS 37 [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3
+          [20], Anderson [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        reaction_as_printed: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)
         schema_gap: 'The quantity is formation from oxides. No exact elements-frame token is valid: simulator/battery/enums.py::Quantity.DELTA_FH
           and ::DELTA_FG represent elements-frame formation quantities, and simulator/battery/migrate.py::QUANTITY_ALIASES
           and ::TYPE_QUANTITY define no oxide-frame quantity.'
@@ -7275,23 +7326,43 @@ species:
       - bennington_1982_table6_entropy
       - bennington_1982_table6_enthalpy_increment
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 6, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table3_reaction_15_heat_of_formation_from_oxides
         - bennington_1982_table6_cp
         - bennington_1982_table6_entropy
         - bennington_1982_table6_enthalpy_increment
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 6 calculated formation reaction: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 15
+            published_page: 9
+            pdf_page_index: 14
+            table: '6'
+            note: Table 6 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe2O3
+              ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin, King, and Bonnickson [6];
+              Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10], JANAF NSRDS-NBS 37
+              [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3 [20], Anderson
+              [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        references:
+        - 'NBS 270-4 [21] (Table 4: Fe2O3, ΔHf298).'
+        - 'Westrum and Grovold [23] (Table 4: Fe2O3, low-temperature data).'
+        - 'Coughlin, King, and Bonnickson [6] (Table 4: Fe2O3, high-temperature data).'
+        - 'O''Hare and Wagman [17,22] (Table 4: Na2O, ΔHf298).'
+        - 'Grimley and Margrave [10] (Table 4: Na2O, S°).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na2O, Cp°).'
+        - 'Fredrickson and Chasanov [9] (Table 4: Na2O, high-temperature data).'
+        - 'Wise [26] (Table 4: SiO2, ΔHf298).'
+        - 'NBS-270-3 [20] (Table 4: SiO2, S°).'
+        - 'Anderson [1] (Table 4: SiO2, low-temperature data).'
+        - 'Moser [16] (Table 4: SiO2, high-temperature data).'
+        - 'Roth and Bertram [18] (Table 4: SiO2, high-temperature data).'
+        - 'White [24] (Table 4: SiO2, high-temperature data).'
+        - 'Wietzel [25] (Table 4: SiO2, high-temperature data).'
+        output_unit: kcal/mol
       T_range_K:
       - '298.15'
       - '1263'
@@ -7313,8 +7384,11 @@ species:
       values:
         quantity: log10_Kf
         method_class: measured_reduced
-        derivation_note: Calculated by Bennington and Brown from their calorimetric results, Ko et al. (1977) properties,
-          and auxiliary constituent data.
+        derivation_note: Table 4 assigns Fe2O3 ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin,
+          King, and Bonnickson [6]; Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10],
+          JANAF NSRDS-NBS 37 [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3
+          [20], Anderson [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        reaction_as_printed: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)
         points:
         - value: '23.773'
           table_row_number: 3
@@ -7738,20 +7812,40 @@ species:
       derived_from:
       - bennington_1982_table6_delta_fG
       derivation:
-        relation: Authors' tabulated thermodynamic calculation; numerical auxiliary constituent inputs are not reproduced
-          in Table 4.
+        relation: Authors' calculation for the formation reaction printed in Table 6, using the stored parent rows
+          and named auxiliary sources listed in Table 4.
         inputs:
         - bennington_1982_table6_delta_fG
-        raw_inputs:
+        method:
           state:
             tag: value
-            value: not_printed
+            value: 'Table 6 calculated formation reaction: 2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)'
           locator:
-            page: 13
-            published_page: 7
-            pdf_page_index: 12
-            table: '4'
-            note: Table 4 lists auxiliary data sources but not their numerical values.
+            page: 15
+            published_page: 9
+            pdf_page_index: 14
+            table: '6'
+            note: Table 6 caption gives the reaction and calculated thermodynamic columns; Table 4 assigns Fe2O3
+              ΔHf298/LT/HT to NBS 270-4 [21], Westrum and Grovold [23], and Coughlin, King, and Bonnickson [6];
+              Na2O ΔHf298/S°/Cp°/HT to O'Hare and Wagman [17,22], Grimley and Margrave [10], JANAF NSRDS-NBS 37
+              [7], and Fredrickson and Chasanov [9]; and SiO2 ΔHf298/S°/LT/HT to Wise [26], NBS-270-3 [20], Anderson
+              [1], Moser [16], Roth and Bertram [18], White [24], and Wietzel [25].
+        references:
+        - 'NBS 270-4 [21] (Table 4: Fe2O3, ΔHf298).'
+        - 'Westrum and Grovold [23] (Table 4: Fe2O3, low-temperature data).'
+        - 'Coughlin, King, and Bonnickson [6] (Table 4: Fe2O3, high-temperature data).'
+        - 'O''Hare and Wagman [17,22] (Table 4: Na2O, ΔHf298).'
+        - 'Grimley and Margrave [10] (Table 4: Na2O, S°).'
+        - 'JANAF NSRDS-NBS 37 [7] (Table 4: Na2O, Cp°).'
+        - 'Fredrickson and Chasanov [9] (Table 4: Na2O, high-temperature data).'
+        - 'Wise [26] (Table 4: SiO2, ΔHf298).'
+        - 'NBS-270-3 [20] (Table 4: SiO2, S°).'
+        - 'Anderson [1] (Table 4: SiO2, low-temperature data).'
+        - 'Moser [16] (Table 4: SiO2, high-temperature data).'
+        - 'Roth and Bertram [18] (Table 4: SiO2, high-temperature data).'
+        - 'White [24] (Table 4: SiO2, high-temperature data).'
+        - 'Wietzel [25] (Table 4: SiO2, high-temperature data).'
+        output_unit: dimensionless
       T_range_K:
       - '298.15'
       - '1263'

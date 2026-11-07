@@ -32,6 +32,28 @@ QUANTITY_UNKNOWN_SOURCE_IDS = {
     "bennington_1982_table6_delta_fG",
 }
 
+TABLE5_AUXILIARY_REFERENCES = (
+    "Hultgren [11] (Table 4: Fe(c,l), all data; Si(c,l), all data).",
+    "JANAF NSRDS-NBS 37 [7] (Table 4: Na(c,l,g), all data; Si(c,l), low-temperature data).",
+    "JANAF [8] (Table 4: O2(g), all data).",
+)
+TABLE6_AUXILIARY_REFERENCES = (
+    "NBS 270-4 [21] (Table 4: Fe2O3, ΔHf298).",
+    "Westrum and Grovold [23] (Table 4: Fe2O3, low-temperature data).",
+    "Coughlin, King, and Bonnickson [6] (Table 4: Fe2O3, high-temperature data).",
+    "O'Hare and Wagman [17,22] (Table 4: Na2O, ΔHf298).",
+    "Grimley and Margrave [10] (Table 4: Na2O, S°).",
+    "JANAF NSRDS-NBS 37 [7] (Table 4: Na2O, Cp°).",
+    "Fredrickson and Chasanov [9] (Table 4: Na2O, high-temperature data).",
+    "Wise [26] (Table 4: SiO2, ΔHf298).",
+    "NBS-270-3 [20] (Table 4: SiO2, S°).",
+    "Anderson [1] (Table 4: SiO2, low-temperature data).",
+    "Moser [16] (Table 4: SiO2, high-temperature data).",
+    "Roth and Bertram [18] (Table 4: SiO2, high-temperature data).",
+    "White [24] (Table 4: SiO2, high-temperature data).",
+    "Wietzel [25] (Table 4: SiO2, high-temperature data).",
+)
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -105,6 +127,35 @@ def _assert_render_pins(document: dict) -> None:
         )
     ) == 16 * 7
 
+    for table, page, reaction, references in (
+        (
+            "5", 14,
+            "2Si(s,l) + Fe(c,l) + Na(c,l,g) + 3O2(g) = NaFe3+Si2O6(c)",
+            TABLE5_AUXILIARY_REFERENCES,
+        ),
+        (
+            "6", 15,
+            "2SiO2(c) + 0.5Fe2O3(c) + 0.5Na2O(c) = NaFe3+Si2O6(c)",
+            TABLE6_AUXILIARY_REFERENCES,
+        ),
+    ):
+        for property_name in ("delta_fH", "delta_fG", "log10_Kf"):
+            row = observations[f"bennington_1982_table{table}_{property_name}"][1]
+            derivation = row["derivation"]
+            assert derivation["inputs"] == row["derived_from"]
+            assert "raw_inputs" not in derivation
+            assert tuple(derivation["references"]) == references
+            assert derivation["method"]["state"]["value"].endswith(reaction)
+            assert derivation["method"]["locator"]["page"] == page
+            assert derivation["method"]["locator"]["table"] == table
+            assert "Table 4 assigns" in derivation["method"]["locator"]["note"]
+            assert row["values"]["reaction_as_printed"] == reaction
+    assert sum(
+        len(observations[f"bennington_1982_table{table}_{property_name}"][1]["values"]["points"])
+        for table in ("5", "6")
+        for property_name in ("delta_fH", "delta_fG", "log10_Kf")
+    ) == 105
+
     # The source assigns the first six silica runs to earlier work and the last
     # three to this report's confirmatory measurements.
     assert observations["bennington_1982_table2_reaction_1_previous_values"][1][
@@ -165,15 +216,37 @@ def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditio
         for observation_id, row in result.observations.items()
         if row.source_id == SID
     }
+    assert len(migrated) == 308
     source_rows = _observations(document)
+    for table, references in (
+        ("5", TABLE5_AUXILIARY_REFERENCES),
+        ("6", TABLE6_AUXILIARY_REFERENCES),
+    ):
+        for property_name in ("delta_fH", "delta_fG", "log10_Kf"):
+            source_id = f"bennington_1982_table{table}_{property_name}"
+            point_count = len(source_rows[source_id][1]["values"]["points"])
+            point_rows = [
+                row
+                for observation_id, row in migrated.items()
+                if observation_id.startswith(f"{SID}::{source_id}::")
+            ]
+            assert len(point_rows) == point_count
+            for row in point_rows:
+                assert row.derivation is not None
+                assert row.derivation.references == references
+                assert row.derivation.raw_inputs is None
     expected_quantity_unknown = set()
     for source_id in QUANTITY_UNKNOWN_SOURCE_IDS:
         assert source_id in source_rows
         points = source_rows[source_id][1]["values"].get("points")
         if points:
-            expected_quantity_unknown.update(
-                f"{SID}::{source_id}::point:{index}" for index in range(len(points))
-            )
+            point_ids = {
+                observation_id
+                for observation_id in migrated
+                if observation_id.startswith(f"{SID}::{source_id}::")
+            }
+            assert len(point_ids) == len(points)
+            expected_quantity_unknown.update(point_ids)
         else:
             expected_quantity_unknown.add(f"{SID}::{source_id}")
 
@@ -191,26 +264,32 @@ def test_isolated_migration_has_only_declared_quantity_gaps_and_printed_conditio
     }
     assert phase_unknown == set()
 
-    for observation_id, temperature in (
-        (f"{SID}::bennington_1982_table5_cp::point:0", "298.15"),
-        (f"{SID}::bennington_1982_table5_delta_fH::point:0", "298.15"),
-        (f"{SID}::bennington_1982_table6_cp::point:15", "1263"),
+    for source_id, temperature in (
+        ("bennington_1982_table5_cp", "298.15"),
+        ("bennington_1982_table5_delta_fH", "298.15"),
+        ("bennington_1982_table6_cp", "1263"),
     ):
-        row = migrated[observation_id]
+        row = next(
+            row
+            for observation_id, row in migrated.items()
+            if observation_id.startswith(f"{SID}::{source_id}::")
+            and row.identity.temperature_K.is_value
+            and row.identity.temperature_K.value == Decimal(temperature)
+        )
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == Decimal(temperature)
         assert row.identity.species.phase.is_value
         assert row.identity.composition is None or not row.identity.composition.is_value
-        assert row.identity.total_pressure_Pa is None or row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
+        assert row.identity.total_pressure_Pa is None or not row.identity.total_pressure_Pa.is_value
+        assert row.identity.fO2_Pa is None or not row.identity.fO2_Pa.is_value
 
     # The HF reactions have two printed participant temperatures, not a single
     # experiment T. Preserve both and keep the migrator's single T axis unknown.
     reaction1 = migrated[f"{SID}::bennington_1982_table1_reaction_1_heat_of_solution"]
     assert reaction1.identity.temperature_K is None or reaction1.identity.temperature_K.is_unknown
     assert reaction1.point_conditions["temperature_C"].state.is_unknown
-    assert reaction1.point_conditions["reactant_temperature_C"].state.value == "25"
-    assert reaction1.point_conditions["product_temperature_C"].state.value == "73.7"
+    assert reaction1.point_conditions["reactant_temperature_C"].state.value == Decimal("25")
+    assert reaction1.point_conditions["product_temperature_C"].state.value == Decimal("73.7")
 
     # No total pressure, oxygen fugacity, or melt composition is printed for the
     # experiments. They must not appear as numeric source conditions.

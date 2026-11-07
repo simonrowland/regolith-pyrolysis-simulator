@@ -161,7 +161,8 @@ tables:
   printed_rows: 19
   mapping: Columns 1–8 are T/K, Cp°, S°, −(G°−H°298)/T, H°−H°298, ΔHf° from elements, ΔGf° from elements, and log
     Kf. Cp, entropy, Gibbs function, and relative enthalpy are attributed to Ko et al. (15); the formation and log
-    K columns are the authors' calculations.
+    K columns are the authors' calculations with stored parents and the named elemental data references in Table
+    4.
 - table_key: p015-t07
   printed_locator:
     page: 15
@@ -169,8 +170,9 @@ tables:
     table: '6'
   printed_rows: 16
   mapping: Columns 1–8 are T/K and the same seven property columns as Table 5, with formation data from oxides.
-    The source's 847 K SiO2 and 960 K Fe2O3 transition rows are retained separately. Oxide-frame ΔHf° and ΔGf° values
-    are typed-refused because no exact oxide-frame schema tokens exist.
+    The source's 847 K SiO2 and 960 K Fe2O3 transition rows are retained separately. The authors' calculations link
+    stored parents and the named oxide-data references in Table 4. Oxide-frame ΔHf° and ΔGf° values are typed-refused
+    because no exact oxide-frame schema tokens exist.
 context_audit:
   page_7: Abstract formation values, 298.15 K reference, and 298–1263 K range are retained. Render checked.
   page_9: Sample composition, theoretical composition, impurities, HF solution mass/concentration, dichromate mass,
@@ -180,8 +182,9 @@ context_audit:
     preserved as two process temperatures rather than collapsed to a single T condition.
   page_11: The prose repeats the overall reaction heat as 13.009 ±0.044 kcal, while Table 1 gives 13.005 ±0.044
     kcal. Both prose values are render-verified and retained; compare reports the prose value outside table cells.
-  page_13: Table 4 lists auxiliary data sources but no numerical values; input numbers used in Tables 5 and 6 are
-    not reproduced.
+  page_13: Table 4 lists functions, sources, and printed citation numbers for auxiliary Fe, Fe2O3, Na, Na2O, O2,
+    Si, and SiO2 data; numerical auxiliary values are not reproduced, so source citations are retained as named
+    derivation references.
   page_15: Discussion identifies 1263 K as reported acmite melting point; no fusion enthalpy or liquid acmite values
     are printed.
 lineage_and_schema:
@@ -189,8 +192,8 @@ lineage_and_schema:
 - Table 3 element-frame reaction (14) links to reaction (7) and literature reactions (8)–(12). The formation-from-oxides
   reaction (15) links to reaction (7) and reactions (10)–(13).
 - Tables 5–6 Cp, S, −(G−H298)/T, and H−H298 are quoted from Ko et al. (1977). The authors' calculated formation
-  and log K rows link to the stored formation/thermal inputs and declare the additional numerical Table 4 inputs
-  not printed.
+  and log K rows link to the stored formation/thermal inputs and carry the named auxiliary data references assigned
+  by Table 4, with each reference mapped to its printed constituent quantity.
 - 'Reaction heats and oxide-frame formation values are typed-refused: simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES
   and ::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES have no exact reaction-heat
   type/token; Quantity.DELTA_FH/DELTA_FG are elements-frame only.'
