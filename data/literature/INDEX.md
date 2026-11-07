@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 775
-- Extracts (`literature_extract.v1`): 773
+- Sources: 777
+- Extracts (`literature_extract.v1`): 775
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 773
+- Extracts with no PDF: 775
 - Alias groups needing owner/controller resolution: 83
 - Extracts with private/non-public row locators: 79
 
@@ -72,6 +72,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `beerkens-2003-sulfate-decomposition-na2o-activity` | Beerkens, R. G. C. (2003). "Sulfate Decomposition and Sodium Oxide Activity in Soda–Lime–Silica Glass Melts," Journal of the American Ceramic Society 86(11), 1893–1899. | 10.1111/j.1151-2916.2003.tb03578.x | ABSENT, `` | `raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf` (present, 70b94b47); `text/beerkens-2003-sulfate-decomposition-na2o-activity/` (46 files, exists); `tables/beerkens-2003-sulfate-decomposition-na2o-activity/` (0 files, ABSENT) | `data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml` (1 rows, draft, private_path) | `ledger/beerkens-2003-sulfate-decomposition-na2o-activity.yaml`: — (—) |
 | `behrens-rosenblatt-1972` | Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190 |  | ABSENT, `` | `raw/behrens-rosenblatt-1972/behrens-rosenblatt-1972.pdf` (ABSENT, ); `text/behrens-rosenblatt-1972/` (0 files, ABSENT); `tables/behrens-rosenblatt-1972/` (0 files, ABSENT) | `data/literature/extracts/behrens-rosenblatt-1972.yaml` (1 rows, draft) | `ledger/behrens-rosenblatt-1972.yaml`: extracted (2026-09-06) |
 | `bencze-yazhenskikh-2016` | Bencze, L., Rys-Matejczuk, M., Yazhenskikh, E., Ziegner, M. & Muller, M. (2016), Investigation of Vaporization of Alkali Metals from Solidified Gasifier Slags by Knudsen Effusion Mass Spectrometry, Energy & Fuels, DOI 10.1021/acs.energyfuels.5b01620 | 10.1021/acs.energyfuels.5b01620 | ABSENT, `` | `raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf` (present, c91031c4); `text/bencze-yazhenskikh-2016/` (15 files, exists); `tables/bencze-yazhenskikh-2016/` (0 files, ABSENT) | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` (4 rows, draft, private_path) | `ledger/bencze-yazhenskikh-2016.yaml`: decoded (2026-09-06) |
+| `bennington-brown-1982-synthetic-acmite-ri8621` | Bennington, K. O. & Brown, R. R. (1982), Thermodynamic Properties of Synthetic Acmite (NaFe3+Si2O6), U.S. Bureau of Mines Report of Investigations 8621. |  | ABSENT, `` | `raw/bennington-brown-1982-synthetic-acmite-ri8621/bennington-brown-1982-synthetic-acmite-ri8621.pdf` (present, f8112cdb); `text/bennington-brown-1982-synthetic-acmite-ri8621/` (31 files, exists); `tables/bennington-brown-1982-synthetic-acmite-ri8621/` (0 files, ABSENT) | `data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml` (43 rows, draft) | `ledger/bennington-brown-1982-synthetic-acmite-ri8621.yaml`: — (—) |
+| `bennington-brown-beyer-1984-aegirine-ri8912` | Bennington, K. O.; Brown, R. R.; Beyer, R. P. (1984). Thermodynamic Properties of Aegirine. U.S. Bureau of Mines Report of Investigations 8912. |  | ABSENT, `` | `raw/bennington-brown-beyer-1984-aegirine-ri8912/bennington-brown-beyer-1984-aegirine-ri8912.pdf` (present, 4bad0cc8); `text/bennington-brown-beyer-1984-aegirine-ri8912/` (47 files, exists); `tables/bennington-brown-beyer-1984-aegirine-ri8912/` (0 files, ABSENT) | `data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml` (54 rows, draft) | `ledger/bennington-brown-beyer-1984-aegirine-ri8912.yaml`: — (—) |
 | `bennour-1996-ternary-cs-na-silicate` | Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination of the Excess Thermodynamic Functions in Ternary Cs2O–SiO2–Na2O Melts by Knudsen Effusion Mass Spectrometry. Physics and Chemistry of Liquids33(4):229–248. | 10.1080/00319109608039824 | ABSENT, `` | `raw/bennour-1996-ternary-cs-na-silicate/bennour-1996-ternary-cs-na-silicate.pdf` (present, dc927ff7); `text/bennour-1996-ternary-cs-na-silicate/` (131 files, exists); `tables/bennour-1996-ternary-cs-na-silicate/` (0 files, ABSENT) | `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` (8 rows, draft) | `ledger/bennour-1996-ternary-cs-na-silicate.yaml`: — (—) |
 | `berkowitz-chupka-inghram-1957` | Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90 |  | ABSENT, `` | `raw/berkowitz-chupka-inghram-1957/berkowitz-chupka-inghram-1957.pdf` (ABSENT, ); `text/berkowitz-chupka-inghram-1957/` (0 files, ABSENT); `tables/berkowitz-chupka-inghram-1957/` (0 files, ABSENT) | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` (1 rows, draft) | `ledger/berkowitz-chupka-inghram-1957.yaml`: extracted (2026-09-06) |
 | `berman-1988-internally-consistent-mineral-thermodynamic-data` | Berman, R. G. (1988), Thermodynamic data for minerals, Journal of Petrology, 29(2), 445-522. | 10.1093/petrology/29.2.445 | ABSENT, `` | `raw/berman-1988-internally-consistent-mineral-thermodynamic-data/berman-1988-internally-consistent-mineral-thermodynamic-data.pdf` (present, 0cb68ff7); `text/berman-1988-internally-consistent-mineral-thermodynamic-data/` (178 files, exists); `tables/berman-1988-internally-consistent-mineral-thermodynamic-data/` (3 files, exists) | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` (219 rows, draft) | `ledger/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml`: — (—) |
@@ -854,6 +856,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `beerkens-2003-sulfate-decomposition-na2o-activity`
 - `behrens-rosenblatt-1972`
 - `bencze-yazhenskikh-2016`
+- `bennington-brown-1982-synthetic-acmite-ri8621`
+- `bennington-brown-beyer-1984-aegirine-ri8912`
 - `bennour-1996-ternary-cs-na-silicate`
 - `berkowitz-chupka-inghram-1957`
 - `berman-1988-internally-consistent-mineral-thermodynamic-data`
