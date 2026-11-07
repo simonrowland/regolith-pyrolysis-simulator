@@ -13,6 +13,15 @@ extraction:
   worker: trial-lxh-1018
   dispatch_id: trial-lxh-1018
 review_status: draft
+schema_gaps:
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_01
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_02
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_03
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2011_fig1_d_allibert_marker_04
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 fidelity_samples:
 - species: Al2O3
   observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02
@@ -3459,11 +3468,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Gibbs energy of melt formation from oxides, as captioned."
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
-        value: -23.0
+        admission_status: pending
+        value_as_printed: '-23.0'
         composition_Al2O3_mole_pct_as_plotted: 24.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
         series: '1'
@@ -3540,11 +3551,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Gibbs energy of melt formation from oxides, as captioned."
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
-        value: '-24.25'
+        admission_status: pending
+        value_as_printed: '-24.25'
         composition_Al2O3_mole_pct_as_plotted: 28.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
         series: '1'
@@ -3623,11 +3636,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Gibbs energy of melt formation from oxides, as captioned."
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
-        value: -27.0
+        admission_status: pending
+        value_as_printed: '-27.0'
         composition_Al2O3_mole_pct_as_plotted: 32.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
         series: '1'
@@ -3704,11 +3719,13 @@ species:
       experiment: shornikov_2011_figure1_series1_allibert_1979
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
-        quantity: delta_fG
+        quantity_as_printed: "Gibbs energy of melt formation from oxides, as captioned."
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
-        value: -30.0
+        admission_status: pending
+        value_as_printed: '-30.0'
         composition_Al2O3_mole_pct_as_plotted: 36.0
         attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
         series: '1'

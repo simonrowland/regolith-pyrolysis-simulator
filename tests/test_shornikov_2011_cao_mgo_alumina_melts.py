@@ -59,7 +59,7 @@ _FRESH_READS = (
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", ("3130.5", "3463.5"), ("3130.81", "3464.55"), "activity", "0.189", "read_uncertainty_dex", "0.001506", "0.723187"),
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", ("3290.5", "3388.0"), ("3290.91", "3388.72"), "activity", "0.277", "read_uncertainty_dex", "0.001383", "0.556929"),
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", ("3482.5", "3332.5"), ("3483.02", "3332.84"), "activity", "0.368", "read_uncertainty_dex", "0.000783", "0.434562"),
-    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2722.56", "5064.95"), "value", "-24.25", "read_uncertainty_kJ_mol", "0.00291", "24.250232"),
+    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2722.56", "5064.95"), "value_as_printed", "-24.25", "read_uncertainty_kJ_mol", "0.00291", "24.250232"),
 )
 
 _UNCHANGED_MARKERS = (
@@ -70,6 +70,13 @@ _UNCHANGED_MARKERS = (
     "shornikov_2011_fig1_d_allibert_marker_03",
     "shornikov_2011_fig1_d_allibert_marker_04",
 )
+
+_OXIDE_FRAME_MARKERS = {
+    "shornikov_2011_fig1_d_allibert_marker_01": "-23.0",
+    "shornikov_2011_fig1_d_allibert_marker_02": "-24.25",
+    "shornikov_2011_fig1_d_allibert_marker_03": "-27.0",
+    "shornikov_2011_fig1_d_allibert_marker_04": "-30.0",
+}
 
 
 def _migrated() -> list:
@@ -211,6 +218,20 @@ def test_tables_and_figure_markers_match_the_render_pins() -> None:
     assert len(markers) == 19
     assert len(observations) == 60
     assert len(unavailable) == 8
+    oxide_frame_rows = {
+        row["observation_id"]: row
+        for row in markers
+        if row["observation_id"] in _OXIDE_FRAME_MARKERS
+    }
+    assert set(oxide_frame_rows) == set(_OXIDE_FRAME_MARKERS)
+    for observation_id, printed_value in _OXIDE_FRAME_MARKERS.items():
+        values = oxide_frame_rows[observation_id]["values"]
+        assert "quantity" not in values
+        assert "value" not in values
+        assert values["quantity_as_printed"] == "Gibbs energy of melt formation from oxides, as captioned."
+        assert values["reference_state_as_printed"] == "formation from simple oxides"
+        assert values["value_as_printed"] == printed_value
+        assert values["admission_status"] == "pending"
     fresh_ids = {spec[1] for spec in _FRESH_READS}
     assert fresh_ids.isdisjoint(_UNCHANGED_MARKERS)
     for row in markers:
@@ -284,6 +305,10 @@ def test_fresh_reads_lie_inside_the_printed_uncertainty_band() -> None:
             assert f"({second[0]}, {second[1]})" in row["locator"]["note"]
             assert ordinate in row["locator"]["note"]
             assert str(row["uncertainty"][key]) == width
+            if observation_id in _OXIDE_FRAME_MARKERS:
+                assert migrated[observation_id].value.kind is ValueKind.UNAVAILABLE
+                assert migrated[observation_id].admission.status.value == "pending"
+                continue
             _assert_printed_band_contains_both_reads(
                 migrated[observation_id],
                 panel,
@@ -322,8 +347,9 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     observations = list(result.observations.values())
 
     assert len(observations) == 60
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 19
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 41
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 15
+    assert sum(row.admission.status.value == "pending" for row in observations) == 4
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 45
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
