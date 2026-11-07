@@ -946,28 +946,43 @@ species:
           note: FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these as calculated activities, not measured activity points.
         phase: l
         standard_state: vapour pressure of pure K2O
+        standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+        basis: >-
+          K2O activity is the partial pressure over the mixture divided by the vapour pressure of pure K2O;
+          the pure-oxide reference phase is not specified.
+        basis_locator:
+          page: 9
+          pdf_page_index: 8
+          section: Procedure
+          note: The paper prints the unnumbered definition ai = pi / pi0 for activity.
         units: dimensionless activity
         values:
           quantity: activity
           label: Calculated K2O activity model curves
           method_as_published: >-
-            FACT 2.1 thermodynamic modelling with the modified quasi-chemical
-            model and the ChemSage delta-G minimiser.
+            For the results presented here, the data base system FACT 2.1 by Bale et al. (1996), the
+            modified quasi-chemical model for non-ideal solutions and the ΔG-minimiser ChemSage were used.
           method_class: model_derived
-          derivation:
-            relation: The authors calculated K2O activity with the FACT 2.1 database system, modified quasi-chemical model, and ChemSage ΔG-minimiser.
-            raw_inputs:
-              state: {tag: value, value: not_printed}
-              locator: {page: 10, section: Phase equilibrium modelling}
-            method:
-              state: {tag: value, value: FACT 2.1 database system with the modified quasi-chemical model and ChemSage ΔG-minimiser.}
-              locator: {page: 10, section: Phase equilibrium modelling}
-            references:
-              - 'Bale et al. (1996), F*A*C*T 2.1 User Manual.'
-              - 'Pelton and Blander (1984, 1986), modified quasi-chemical model.'
-          status: typed_refusal
-          reason: Figure-only model values are outside this extraction wave; no measured K2O activity data are tabulated.
-          admission_status: rejected_no_figure_reading
+          method_locator:
+            page: 10
+            pdf_page_index: 9
+            section: Phase equilibrium modelling
+          references_as_published:
+            - >-
+              Bale, C. W., Pelton, A. D., Thompson, W. T., 1996: "F*A*C*T 2.1 − User Manual", Ecole
+              Polytechnique de Montreal/Royal Military College, Canada, July 1996.
+            - >-
+              Pelton, A. D., Blander, M., 1984: "Computer-assisted analysis of the thermodynamic
+              properties and phase diagrams of slags", Proceedings, 2nd Int'l. Symp. on Metall. Slags
+              and Fluxes, TMS-AIME, Warrendale, PA, Eds. H. A. Fine and D. R. Gaskell, pp. 281-294.
+            - >-
+              Pelton, A. D., Blander, M., 1986: "Thermodynamic analysis of ordered liquid solutions by a
+              modified quasichemical approach − Application to silicate slags", Metall. Trans. B,
+              Vol. 17B, pp. 805-815.
+          reason: >-
+            Figure 6 gives calculated K2O activity as curves without a numeric activity table; curve values
+            were not digitised and remain unavailable.
+          admission_status: figure_only
           value_cells_printed: false
         point_conditions:
           temperature_K:
