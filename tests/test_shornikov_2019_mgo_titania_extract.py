@@ -54,6 +54,17 @@ from tools.validate_literature_extracts import validate_extract_document
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-2019-mgo-titania-melts.yaml"
 SOURCE_ID = "shornikov-2019-mgo-titania-melts"
+_CONDENSED_REFERENCE_SOURCE_PATHS = {
+    "shornikov-2008-mgo-aluminosilicate-melts": ROOT
+    / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml",
+    "shornikov-2011-cao-mgo-alumina-melts": ROOT
+    / "data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml",
+    "shornikov-2019-ca-feo-vapor": ROOT
+    / "data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml",
+    SOURCE_ID: EXTRACT,
+    "shornikov-2020-mgo-feo-melts": ROOT
+    / "data/literature/extracts/shornikov-2020-mgo-feo-melts.yaml",
+}
 
 
 def _assert_sc456_model_class(row: dict) -> None:
@@ -248,6 +259,18 @@ def _migrate_extract_document(document: dict, path: Path):
     migrator._migrate_extract(path)
     migrator.finalize()
     return migrator.result
+
+
+def _migrate_condensed_reference_sources(tmp_path: Path):
+    results = {}
+    observations = []
+    for source_id, path in _CONDENSED_REFERENCE_SOURCE_PATHS.items():
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        result = _migrate_extract_document(document, tmp_path / path.name)
+        results[source_id] = result
+        observations.extend(result.observations.values())
+    diagnostics = _condensed_element_reference_table_diagnostics(observations)
+    return results, observations, diagnostics
 
 
 def _source_observation(document: dict, observation_id: str) -> dict:
@@ -445,26 +468,7 @@ def test_table2_values_remain_a_typed_frame_gap_pending_physics(
 def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
     tmp_path: Path,
 ) -> None:
-    source_paths = {
-        "shornikov-2008-mgo-aluminosilicate-melts": ROOT
-        / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml",
-        "shornikov-2011-cao-mgo-alumina-melts": ROOT
-        / "data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml",
-        "shornikov-2019-ca-feo-vapor": ROOT
-        / "data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml",
-        SOURCE_ID: EXTRACT,
-        "shornikov-2020-mgo-feo-melts": ROOT
-        / "data/literature/extracts/shornikov-2020-mgo-feo-melts.yaml",
-    }
-    results = {}
-    observations = []
-    for source_id, path in source_paths.items():
-        document = yaml.safe_load(path.read_text(encoding="utf-8"))
-        result = _migrate_extract_document(document, tmp_path / path.name)
-        results[source_id] = result
-        observations.extend(result.observations.values())
-
-    diagnostics = _condensed_element_reference_table_diagnostics(observations)
+    results, observations, diagnostics = _migrate_condensed_reference_sources(tmp_path)
     expected_keys = {
         ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"),
         ("shornikov-2011-cao-mgo-alumina-melts", "table:1"),
@@ -674,9 +678,8 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
         == "d338_reference_state_owner"
     )
 
-    # Each accepted source has a real numeric residual on a model-derived
-    # gas-element row. Feed that independent JANAF value through the ordinary
-    # residual compiler to prove the restored literature-modelled tier can score.
+    # Compiler-only proof: feed independent JANAF predictions through the
+    # ordinary residual compiler. Production prediction is tested separately.
     for table_key in sorted(accepted_keys):
         diagnostic_row = diagnostics[table_key]["accepted_row"]
         assert diagnostic_row is not None
@@ -850,6 +853,133 @@ def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
     assert unresolved.identity.reaction.is_unknown
     assert unresolved.identity.formation_elements.is_unknown
     assert not (unresolved.provenance or {}).get("derived_by")
+
+
+def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
+    tmp_path: Path,
+) -> None:
+    results, _observations, diagnostics = _migrate_condensed_reference_sources(
+        tmp_path
+    )
+    table_keys = {
+        "shornikov-2008-mgo-aluminosilicate-melts": (
+            "shornikov-2008-mgo-aluminosilicate-melts",
+            "unnumbered:2:1",
+        ),
+        "shornikov-2011-cao-mgo-alumina-melts": (
+            "shornikov-2011-cao-mgo-alumina-melts",
+            "table:1",
+        ),
+        "shornikov-2019-ca-feo-vapor": (
+            "shornikov-2019-ca-feo-vapor",
+            "table:1",
+        ),
+        SOURCE_ID: (SOURCE_ID, "table:2"),
+        "shornikov-2020-mgo-feo-melts": (
+            "shornikov-2020-mgo-feo-melts",
+            "table:2",
+        ),
+    }
+    expected = {
+        "shornikov-2008-mgo-aluminosilicate-melts": (
+            42,
+            {"shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r15_c04"},
+            {
+                ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 6,
+                ("unsupported", "engine-thermo-does-not-emit"): 23,
+                ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 10,
+                ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
+                ("method_unknown", "method_unknown"): 1,
+            },
+        ),
+        "shornikov-2011-cao-mgo-alumina-melts": (
+            32,
+            set(),
+            {
+                ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 7,
+                ("unsupported", "engine-thermo-does-not-emit"): 23,
+                ("identity_unknown", None): 2,
+            },
+        ),
+        "shornikov-2019-ca-feo-vapor": (
+            16,
+            {"shornikov_2019_ca_feo_vapor_p003_t01_r05_c04"},
+            {
+                ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
+                ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 3,
+                ("unsupported", "engine-thermo-does-not-emit"): 9,
+                ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 2,
+            },
+        ),
+        SOURCE_ID: (
+            20,
+            {"shornikov_2019_mgo_titania_melts_p003_t02_r07_c04"},
+            {
+                ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 4,
+                ("unsupported", "engine-thermo-does-not-emit"): 11,
+                ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
+                ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 3,
+            },
+        ),
+        "shornikov-2020-mgo-feo-melts": (
+            17,
+            {"shornikov_2020_mgo_feo_melts_p002_t03_r06_c04"},
+            {
+                ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
+                ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 3,
+                ("unsupported", "engine-thermo-does-not-emit"): 9,
+                ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 3,
+            },
+        ),
+    }
+
+    for source_id, table_key in table_keys.items():
+        result = results[source_id]
+        context = ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+            root=ROOT,
+        )
+        row_count = 0
+        numeric_ids = set()
+        refusals = {}
+        for row in result.observations.values():
+            if (
+                _condensed_element_reference_table_key(row) != table_key
+                or not isinstance(row.identity, Identity)
+                or quantity_token(row.identity) is not Quantity.DELTA_FG
+                or row.value.kind is not ValueKind.POINT
+            ):
+                continue
+            row_count += 1
+            residual, _candidate = compile_residual(
+                row,
+                Engine.INTERNAL_ANALYTICAL,
+                context=context,
+                condensed_frame_diagnostics=diagnostics,
+            )
+            if residual.numeric is not None:
+                numeric_ids.add(row.observation_id.split("::")[-1])
+                assert residual.numeric.value.is_finite()
+                assert row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+                assert any(
+                    notice.kind is NoticeKind.FIGURE_ONLY
+                    and notice.reason == "evidence_class:model_derived"
+                    for notice in residual.notices
+                )
+                continue
+            assert residual.refusal is not None, row.observation_id
+            key = (
+                residual.refusal.reason.value,
+                residual.refusal.detail.get("reason"),
+            )
+            refusals[key] = refusals.get(key, 0) + 1
+
+        expected_rows, expected_numeric_ids, expected_refusals = expected[source_id]
+        assert row_count == expected_rows, source_id
+        assert numeric_ids == expected_numeric_ids, source_id
+        assert refusals == expected_refusals, source_id
 
 
 def test_condensed_element_frame_requires_discriminating_reproduction(
