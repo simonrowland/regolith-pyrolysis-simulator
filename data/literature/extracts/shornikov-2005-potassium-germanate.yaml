@@ -3532,11 +3532,10 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         value_as_printed: '7.04'
+        value: "7.04"
+        standard_state: "Fusion entropy for the crystalline-to-liquid transition at the printed melting temperature, as denoted by ΔmS in Table 2."
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1249'
@@ -3555,6 +3554,35 @@ species:
               kind: point
               point: '1249'
           locator: *id025
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        output_unit: "J/mol K"
+        method:
+          state:
+            tag: value
+            value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: "Conclusions"
+        references:
+        - "Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]"
+        - "Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]"
+        - "Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]"
+        - "Richet et al. (1994), Premelting effects in minerals [52]"
+        - "Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify
+              exact raw input rows for each fusion entropy.
     - observation_id: ge_2005_t2_K2O_SiO2_melt_dfH
       type: gibbs_table
       locator: &id026
@@ -3761,11 +3789,10 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         value_as_printed: '8.10'
+        value: "8.10"
+        standard_state: "Fusion entropy for the crystalline-to-liquid transition at the printed melting temperature, as denoted by ΔmS in Table 2."
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1318'
@@ -3784,6 +3811,35 @@ species:
               kind: point
               point: '1318'
           locator: *id030
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        output_unit: "J/mol K"
+        method:
+          state:
+            tag: value
+            value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: "Conclusions"
+        references:
+        - "Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]"
+        - "Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]"
+        - "Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]"
+        - "Richet et al. (1994), Premelting effects in minerals [52]"
+        - "Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify
+              exact raw input rows for each fusion entropy.
     - observation_id: ge_2005_t2_K2O_2SiO2_melt_dfH
       type: gibbs_table
       locator: &id031
@@ -4075,11 +4131,10 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         value_as_printed: '19.09'
+        value: "19.09"
+        standard_state: "Fusion entropy for the crystalline-to-liquid transition at the printed melting temperature, as denoted by ΔmS in Table 2."
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1362'
@@ -4098,6 +4153,35 @@ species:
               kind: point
               point: '1362'
           locator: *id037
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        output_unit: "J/mol K"
+        method:
+          state:
+            tag: value
+            value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: "Conclusions"
+        references:
+        - "Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]"
+        - "Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]"
+        - "Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]"
+        - "Richet et al. (1994), Premelting effects in minerals [52]"
+        - "Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify
+              exact raw input rows for each fusion entropy.
     - observation_id: ge_2005_t2_Na2O_SiO2_melt_dfH
       type: gibbs_table
       locator: &id038
@@ -4284,11 +4368,10 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         value_as_printed: '10.96'
+        value: "10.96"
+        standard_state: "Fusion entropy for the crystalline-to-liquid transition at the printed melting temperature, as denoted by ΔmS in Table 2."
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1147'
@@ -4307,6 +4390,35 @@ species:
               kind: point
               point: '1147'
           locator: *id042
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        output_unit: "J/mol K"
+        method:
+          state:
+            tag: value
+            value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: "Conclusions"
+        references:
+        - "Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]"
+        - "Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]"
+        - "Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]"
+        - "Richet et al. (1994), Premelting effects in minerals [52]"
+        - "Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify
+              exact raw input rows for each fusion entropy.
     - observation_id: ge_2005_t2_Na2O_2SiO2_melt_dfH
       type: gibbs_table
       locator: &id043
@@ -4494,11 +4606,10 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         value_as_printed: '7.35'
+        value: "7.35"
+        standard_state: "Fusion entropy for the crystalline-to-liquid transition at the printed melting temperature, as denoted by ΔmS in Table 2."
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1081'
@@ -4517,6 +4628,35 @@ species:
               kind: point
               point: '1081'
           locator: *id047
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        output_unit: "J/mol K"
+        method:
+          state:
+            tag: value
+            value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: "Conclusions"
+        references:
+        - "Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]"
+        - "Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]"
+        - "Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]"
+        - "Richet et al. (1994), Premelting effects in minerals [52]"
+        - "Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify
+              exact raw input rows for each fusion entropy.
     - observation_id: ge_2005_t2_3Na2O_8SiO2_melt_dfH
       type: gibbs_table
       locator: &id048

@@ -327,17 +327,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-1300.488'
+        value: "-1300.488"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: cr
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -352,6 +352,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   MgTiO3:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r08_c04
@@ -691,17 +718,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-932.105'
+        value: "-932.105"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: cr
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -716,6 +743,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_prose_mgtio3_delta_fh298_estimate
       type: gibbs_table
       locator:
@@ -1088,17 +1142,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-1496.736'
+        value: "-1496.736"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: cr
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1113,6 +1167,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r06_c04
       type: gibbs_table
       locator:
@@ -1127,17 +1208,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-1511.848'
+        value: "-1511.848"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: l
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1146,6 +1227,33 @@ species:
               kind: point
               point: '2173'
           locator: *id001
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_prose_mgti2o5_heat_of_fusion_bale_2016
       type: heat_capacity_and_heat_content_series
       locator:
@@ -1413,17 +1521,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-355.987'
+        value: "-355.987"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: cr
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1438,6 +1546,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r03_c04
       type: gibbs_table
       locator:
@@ -1452,17 +1587,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-329.234'
+        value: "-329.234"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: l
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1471,6 +1606,33 @@ species:
               kind: point
               point: '2173'
           locator: *id002
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r05_c06
       type: gibbs_table
       locator:
@@ -1485,17 +1647,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-120.207'
+        value: "-120.207"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1504,6 +1666,33 @@ species:
               kind: point
               point: '2173'
           locator: *id003
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_prose_mgo_relative_vapour_amount_limit
       type: gas_speciation
       locator:
@@ -1561,17 +1750,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-72.400'
+        value: "-72.400"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1580,6 +1769,33 @@ species:
               kind: point
               point: '2173'
           locator: *id002
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   Mg2:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r04_c06
@@ -1596,17 +1812,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '20.659'
+        value: "20.659"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1615,6 +1831,33 @@ species:
               kind: point
               point: '2173'
           locator: *id004
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   Ti:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r06_c06
@@ -1631,17 +1874,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '170.472'
+        value: "170.472"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1650,6 +1893,33 @@ species:
               kind: point
               point: '2173'
           locator: *id001
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   TiO2:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_a_curve_2
@@ -1886,17 +2156,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-551.661'
+        value: "-551.661"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: cr
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1911,6 +2181,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r07_c04
       type: gibbs_table
       locator:
@@ -1925,17 +2222,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-551.278'
+        value: "-551.278"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: l
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1944,6 +2241,33 @@ species:
               kind: point
               point: '2173'
           locator: *id005
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r08_c06
       type: gibbs_table
       locator:
@@ -1958,17 +2282,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-334.779'
+        value: "-334.779"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -1983,6 +2307,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   TiO:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r07_c06
@@ -1999,17 +2350,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-136.688'
+        value: "-136.688"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2018,6 +2369,33 @@ species:
               kind: point
               point: '2173'
           locator: *id005
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   Ti2O3:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r09_c06
@@ -2034,17 +2412,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-641.289'
+        value: "-641.289"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2059,6 +2437,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   Ti2O4:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r10_c06
@@ -2075,17 +2480,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '-794.803'
+        value: "-794.803"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2100,6 +2505,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   O:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r11_c06
@@ -2116,17 +2548,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '110.091'
+        value: "110.091"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2141,6 +2573,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   O2:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r12_c06
@@ -2157,17 +2616,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '0.000'
+        value: "0.000"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2182,6 +2641,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   O3:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r13_c06
@@ -2198,17 +2684,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '283.608'
+        value: "283.608"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2223,6 +2709,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   O4:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r14_c06
@@ -2239,17 +2752,17 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2173'
         value_as_printed: '209.765'
+        value: "209.765"
+        standard_state: "Gibbs energy of formation from elements for the Table 2 condensed and vapor phases at 2173 K; the paper does not print the standard pressure."
         method_as_printed: 'Calculated in the developed semi-empirical model using the theory of ideal associated solutions.'
         method_description: 'Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K.'
       phase: g
       per: mol_species
       experiment: shornikov-2019-present-study-model
+      standard_pressure: not_printed
       point_conditions:
         temperature_K:
           state:
@@ -2264,6 +2777,33 @@ species:
             table: '2'
             column_header: ΔG°2173, kJ/mol
             note: The table caption gives the calculation temperature as 2173 K.
+      derivation:
+        relation: "Standard Gibbs energies calculated for the reported condensed phases and vapor species at 2173 K."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Calculated in the developed semi-empirical model using the theory of ideal associated solutions."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: "Thermodynamic properties of the MgO–TiO2 melts"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            note: The source names thermodynamic data sources but does not enumerate every
+              numerical model input.
   MgO-TiO2:
     observations:
     - observation_id: shornikov_2019_mgo_titania_melts_fig3_curve_1

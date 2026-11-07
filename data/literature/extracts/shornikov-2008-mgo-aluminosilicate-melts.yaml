@@ -32,14 +32,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1017.742'
+        value: "-1017.742"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -58,6 +57,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r03_c04
       type: gibbs_table
       locator:
@@ -70,14 +96,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1004.796'
+        value: "-1004.796"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -91,6 +116,33 @@ species:
               point: '2050'
           locator: *id001
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r09_c06
       type: gibbs_table
       locator:
@@ -103,14 +155,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-399.375'
+        value: "-399.375"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -129,6 +180,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_fig1_b_marker_1
       type: activity_coefficient
       experiment: shornikov-archakov-2001-kems
@@ -660,14 +738,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '79.835'
+        value: "79.835"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -681,6 +758,33 @@ species:
               point: '2050'
           locator: *id001
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al2SiO5:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r04_c02
@@ -695,14 +799,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1572.345'
+        value: "-1572.345"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -721,6 +824,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   AlO:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r04_c06
@@ -735,14 +865,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-77.597'
+        value: "-77.597"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -756,6 +885,33 @@ species:
               point: '2050'
           locator: *id002
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al2Si2O7:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r05_c02
@@ -770,14 +926,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-2043.949'
+        value: "-2043.949"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -796,6 +951,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   AlO2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r05_c06
@@ -810,14 +992,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-98.856'
+        value: "-98.856"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -831,6 +1012,33 @@ species:
               point: '2050'
           locator: *id003
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al6Si2O13:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r06_c02
@@ -845,14 +1053,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-4189.139'
+        value: "-4189.139"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -871,6 +1078,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r06_c04
       type: gibbs_table
       locator:
@@ -883,14 +1117,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-4166.824'
+        value: "-4166.824"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -904,6 +1137,33 @@ species:
               point: '2050'
           locator: *id004
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r06_c06
@@ -918,14 +1178,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '185.080'
+        value: "185.080"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -939,6 +1198,33 @@ species:
               point: '2050'
           locator: *id004
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   MgAl2O4:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r07_c02
@@ -953,14 +1239,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1432.815'
+        value: "-1432.815"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -979,6 +1264,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r07_c04
       type: gibbs_table
       locator:
@@ -991,14 +1303,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1402.992'
+        value: "-1402.992"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -1012,6 +1323,33 @@ species:
               point: '2050'
           locator: *id005
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al2O:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r07_c06
@@ -1026,14 +1364,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-284.309'
+        value: "-284.309"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -1047,6 +1384,33 @@ species:
               point: '2050'
           locator: *id005
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   MgAl2SiO6:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r08_c02
@@ -1061,14 +1425,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1951.349'
+        value: "-1951.349"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -1087,6 +1450,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Al2O2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r08_c06
@@ -1101,14 +1491,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-384.001'
+        value: "-384.001"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -1122,6 +1511,33 @@ species:
               point: '2050'
           locator: *id006
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Mg2Al4SiO10:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r09_c02
@@ -1136,14 +1552,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-3397.978'
+        value: "-3397.978"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -1157,6 +1572,33 @@ species:
               point: '2050'
           locator: *id007
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Mg2Al4Si5O18:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r10_c02
@@ -1171,14 +1613,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-5687.842'
+        value: "-5687.842"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -1197,6 +1638,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r10_c04
       type: gibbs_table
       locator:
@@ -1209,14 +1677,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-5714.275'
+        value: "-5714.275"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -1230,6 +1697,33 @@ species:
               point: '2050'
           locator: *id008
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   AlSi:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r10_c06
@@ -1244,14 +1738,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '1151.705'
+        value: "1151.705"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -1265,6 +1758,33 @@ species:
               point: '2050'
           locator: *id008
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Mg3Al2Si3O12:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r11_c02
@@ -1279,14 +1799,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-3796.483'
+        value: "-3796.483"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -1305,6 +1824,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r11_c04
       type: gibbs_table
       locator:
@@ -1317,14 +1863,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-3811.640'
+        value: "-3811.640"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -1338,6 +1883,33 @@ species:
               point: '2050'
           locator: *id009
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   AlSiO:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r11_c06
@@ -1352,14 +1924,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-217.442'
+        value: "-217.442"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -1373,6 +1944,33 @@ species:
               point: '2050'
           locator: *id009
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   MgO:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r12_c02
@@ -1387,14 +1985,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-370.531'
+        value: "-370.531"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -1413,6 +2010,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r12_c04
       type: gibbs_table
       locator:
@@ -1425,14 +2049,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-350.509'
+        value: "-350.509"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -1446,6 +2069,33 @@ species:
               point: '2050'
           locator: *id010
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r13_c06
       type: gibbs_table
       locator:
@@ -1458,14 +2108,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-112.070'
+        value: "-112.070"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -1484,6 +2133,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_fig1_a_marker_1
       type: activity_coefficient
       experiment: shornikov-archakov-2001-kems
@@ -2015,14 +2691,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-61.659'
+        value: "-61.659"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2036,6 +2711,33 @@ species:
               point: '2050'
           locator: *id010
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   MgSiO3:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r13_c02
@@ -2050,14 +2752,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-937.039'
+        value: "-937.039"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -2071,6 +2772,33 @@ species:
               point: '2050'
           locator: *id011
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r13_c04
       type: gibbs_table
       locator:
@@ -2083,14 +2811,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-937.226'
+        value: "-937.226"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -2104,6 +2831,33 @@ species:
               point: '2050'
           locator: *id011
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Mg2SiO4:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r14_c02
@@ -2118,14 +2872,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1341.906'
+        value: "-1341.906"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -2144,6 +2897,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r14_c04
       type: gibbs_table
       locator:
@@ -2156,14 +2936,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-1335.552'
+        value: "-1335.552"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -2177,6 +2956,33 @@ species:
               point: '2050'
           locator: *id012
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Si:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r14_c06
@@ -2191,14 +2997,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '161.631'
+        value: "161.631"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2212,6 +3017,33 @@ species:
               point: '2050'
           locator: *id012
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   SiO2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r15_c02
@@ -2226,14 +3058,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-540.626'
+        value: "-540.626"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: cr
@@ -2252,6 +3083,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r15_c04
       type: gibbs_table
       locator:
@@ -2264,14 +3122,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-541.222'
+        value: "-541.222"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: l
@@ -2285,6 +3142,33 @@ species:
               point: '2050'
           locator: *id013
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r16_c06
       type: gibbs_table
       locator:
@@ -2297,14 +3181,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-313.278'
+        value: "-313.278"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2323,6 +3206,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
     - observation_id: shornikov_2008_fig1_c_marker_1
       type: activity_coefficient
       experiment: shornikov-archakov-2001-kems
@@ -2776,14 +3686,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-257.183'
+        value: "-257.183"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2797,6 +3706,33 @@ species:
               point: '2050'
           locator: *id013
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Si2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r17_c06
@@ -2811,14 +3747,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '210.531'
+        value: "210.531"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2837,6 +3772,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Si2O2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r18_c06
@@ -2851,14 +3813,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '-552.779'
+        value: "-552.779"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2877,6 +3838,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   Si3:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r19_c06
@@ -2891,14 +3879,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '261.005'
+        value: "261.005"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2917,6 +3904,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   O:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r20_c06
@@ -2931,14 +3945,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '118.320'
+        value: "118.320"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2957,6 +3970,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   O2:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r21_c06
@@ -2971,14 +4011,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '0.000'
+        value: "0.000"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -2997,6 +4036,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   O3:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r22_c06
@@ -3011,14 +4077,13 @@ species:
       units: kJ/mole
       mineru_flags: []
       values:
-        attribution: 'Cited model input references: Shornikov and Archakov [1]; Zaitsev et al. [3]; Shornikov and Archakov [4]; Robie and Hemingway [5]'
+        attribution: "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; Robie and Hemingway [4]; Chase [5]"
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '2050'
         value_as_printed: '276.725'
+        value: "276.725"
+        standard_state: "Gibbs energy of formation from elements for condensed and vapor species at 2050 K, as stated in the unnumbered Table caption."
         method_as_printed: 'Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters.'
         method_description: 'Gibbs formation energies calculated for the reported phases and vapor species at 2050 K.'
       phase: g
@@ -3037,6 +4102,33 @@ species:
             column_header: ΔfG°2050, kJ/mole
             note: The printed caption is the unnumbered Table; calculation temperature is stated as 2050 K.
       experiment: shornikov-2008-table-calculations
+      derivation:
+        relation: "Gibbs formation energies calculated for the reported phases and vapor species at 2050 K."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "Calculation within the ideal associated solutions theory using a simplified lattice model and semi-phenomenological energy parameters."
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 147
+            section: "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+        references:
+        - "Shornikov and Archakov (2001) [1]"
+        - "Glushko et al. (1978–1982) [3]"
+        - "Robie and Hemingway (1995) [4]"
+        - "Chase (1998) [5]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 148
+            note: The unnumbered Table caption cites data [1, 3–5] but does not enumerate
+              the numerical inputs.
   MgAl2O4–SiO2 melt:
     observations:
     - observation_id: shornikov_2008_fig1_d_marker_1

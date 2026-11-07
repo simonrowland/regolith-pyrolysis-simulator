@@ -130,15 +130,14 @@ def _render_pins(document: dict) -> None:
         "Al2O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
     )
-    assert model_result["values"]["method_class"] == "typed_refusal"
-    assert model_result["values"]["method_class_as_printed"] == "model_derived"
-    assert model_result["values"]["admission_status"] == "typed_refusal"
-    assert "equation" in model_result["values"]["reason"]
+    assert model_result["values"]["method_class"] == "model_derived"
+    assert model_result["values"]["value"] == model_result["values"]["value_as_printed"]
     assert model_result["values"]["method_as_printed"] == (
         "ideal associated solutions theory with Gibbs energy minimization"
     )
     assert "Table 1 Gibbs energies" in model_result["values"]["method_description"]
-    assert "derivation" not in model_result
+    assert model_result["derivation"]["method"]["locator"]["paragraph"]
+    assert model_result["derivation"]["references"]
 
     marker_pins = (
         ("CaO", "a", "0.497", "(1401.5, 3435.5)", "(1401.76, 3436.61)", "0.303870", "0.000961"),
@@ -171,7 +170,7 @@ def _render_pins(document: dict) -> None:
     assert minimum["values"]["method_class"] == "typed_refusal"
     assert minimum["values"]["method_class_as_printed"] == "model_derived"
     assert minimum["values"]["admission_status"] == "typed_refusal"
-    assert "equation" in minimum["values"]["reason"]
+    assert "composition is incomplete" in minimum["values"]["reason"]
     assert minimum["values"]["method_as_printed"] == (
         "ideal associated solutions theory with Gibbs energy minimization"
     )
@@ -322,8 +321,8 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     observations = list(result.observations.values())
 
     assert len(observations) == 60
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 19
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 41
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 51
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 9
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []

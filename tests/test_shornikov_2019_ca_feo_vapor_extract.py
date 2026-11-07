@@ -22,10 +22,8 @@ def _assert_table1_model_evidence(document: dict) -> None:
         for row in block.get("observations", [])
     }
     row = rows["shornikov_2019_ca_feo_vapor_p003_t01_r03_c02"]
-    assert row["values"]["method_class"] == "typed_refusal"
-    assert row["values"]["method_class_as_printed"] == "model_derived"
-    assert row["values"]["admission_status"] == "typed_refusal"
-    assert "equation" in row["values"]["reason"]
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["values"]["value"] == row["values"]["value_as_printed"]
     assert row["values"]["method_as_printed"] == (
         "Theory of ideal associated solutions; semi-empirical model"
     )
@@ -33,7 +31,8 @@ def _assert_table1_model_evidence(document: dict) -> None:
     assert row["values"]["attribution"] == (
         "Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)"
     )
-    assert "derivation" not in row
+    assert row["derivation"]["method"]["locator"]["paragraph"]
+    assert row["derivation"]["references"]
     external = rows["shornikov_2019_c2f2o5_decomposition_allen_snow_1955"]
     assert external["values"]["method_class"] == "quoted_attributed"
 
@@ -48,7 +47,7 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         if row["locator"].get("table") == "1"
     ]
     assert len(table_rows) == 16
-    assert all(row["values"]["method_class"] == "typed_refusal" for _, row in table_rows)
+    assert all(row["values"]["method_class"] == "model_derived" for _, row in table_rows)
 
     figure_series = [
         row
@@ -173,13 +172,13 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         if row.source_id == document["source_id"]
     ]
     assert len(migrated) == 68
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 40
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 28
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 56
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 12
     assert sum(
         row.admission.status is AdmissionStatus.ADMITTED
         and row.value.kind is ValueKind.POINT
         for row in migrated
-    ) == 4
+    ) == 20
     assert not result.registry_issues
     assert result.validation is not None
     assert not result.validation.hard_issues

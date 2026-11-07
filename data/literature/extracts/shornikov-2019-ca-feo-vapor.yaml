@@ -99,12 +99,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-435.296'
+        value: "-435.296"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
@@ -123,6 +122,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c04
       type: gibbs_table
       locator:
@@ -137,12 +162,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-422.317'
+        value: "-422.317"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: l
@@ -155,6 +179,32 @@ species:
               kind: point
               point: '1873'
           locator: *id001
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c06
       type: gibbs_table
       locator:
@@ -169,12 +219,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-68.953'
+        value: "-68.953"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -193,6 +242,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_fig2_cao_panel_a_curve_4
       type: activity_coefficient
       experiment: shornikov-2019-model-curves
@@ -383,12 +458,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-9.985'
+        value: "-9.985"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -401,6 +475,32 @@ species:
               kind: point
               point: '1873'
           locator: *id001
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   CaFeO2:
     context:
     - observation_id: shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin
@@ -430,12 +530,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-599.816'
+        value: "-599.816"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
@@ -454,6 +553,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_cafeo2_delta_fh298_shugurov_2005
       experiment: shugurov-2005
       type: gibbs_table
@@ -494,12 +619,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '90.363'
+        value: "90.363"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -512,6 +636,32 @@ species:
               kind: point
               point: '1873'
           locator: *id002
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   FeO:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c02
@@ -528,12 +678,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-153.762'
+        value: "-153.762"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: cr
@@ -546,6 +695,32 @@ species:
               kind: point
               point: '1873'
           locator: *id003
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c04
       type: gibbs_table
       locator:
@@ -560,12 +735,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '-157.951'
+        value: "-157.951"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: l
@@ -578,6 +752,32 @@ species:
               kind: point
               point: '1873'
           locator: *id003
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r08_c06
       type: gibbs_table
       locator:
@@ -592,12 +792,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '76.891'
+        value: "76.891"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -616,6 +815,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
     - observation_id: shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
       experiment: ban-ya-1980-fig2a
       type: activity_coefficient
@@ -1417,12 +1642,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '145.501'
+        value: "145.501"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1441,6 +1665,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   Fe2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r07_c06
@@ -1457,12 +1707,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '399.724'
+        value: "399.724"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1481,6 +1730,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   FeO2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r09_c06
@@ -1497,12 +1772,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '34.624'
+        value: "34.624"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1521,6 +1795,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   O:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r10_c06
@@ -1537,12 +1837,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '130.138'
+        value: "130.138"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1561,6 +1860,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   O2:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r11_c06
@@ -1577,12 +1902,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '0.000'
+        value: "0.000"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1601,6 +1925,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   O3:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r12_c06
@@ -1617,12 +1967,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '266.369'
+        value: "266.369"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1641,6 +1990,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   O4:
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r13_c06
@@ -1657,12 +2032,11 @@ species:
       values:
         attribution: 'Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)'
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1873'
         value_as_printed: '181.230'
+        value: "181.230"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and vapor phases at 1873 K."
         method_as_printed: 'Theory of ideal associated solutions; semi-empirical model'
         method_description: 'The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data.'
       phase: g
@@ -1681,7 +2055,32 @@ species:
             table: '1'
             column_header: ΔG°1873, kJ/mol
             note: The 1873 K temperature is printed in the Gibbs-energy column heading.
-
+      derivation:
+        relation: "The Table 1 Gibbs energies were calculated in this study within the theory of ideal associated solutions, using model parameters from cited thermodynamic data."
+        output_unit: "kJ/mol"
+        method:
+          state:
+            tag: value
+            value: "Theory of ideal associated solutions; semi-empirical model"
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 83
+            paragraph: "Right-column ideal associated-solutions model and initial-data paragraphs"
+        references:
+        - "Shornikov (2016)"
+        - "Glushko et al. (1978–1982)"
+        - "Bale et al. (2016)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 2
+            published_page: 83
+            pdf_page_index: 1
+            section: thermodynamic model paragraph (no subsection heading printed)
+            note: Per-row thermodynamic input data are not printed.
   Ca2Fe2O5:
     observations:
     - observation_id: shornikov_2019_c2f2o5_decomposition_oelsen_maetz_1941

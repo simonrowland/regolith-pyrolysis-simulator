@@ -29,15 +29,16 @@ def test_table2_fusion_entropies_are_author_calculations_and_temperatures_are_at
     )
     for observation_id in calculated_ids:
         row = observations[observation_id]
-        assert row["values"]["method_class"] == "typed_refusal"
-        assert row["values"]["method_class_as_printed"] == "model_derived"
-        assert row["values"]["admission_status"] == "typed_refusal"
+        assert row["values"]["method_class"] == "model_derived"
+        assert row["values"]["value"] == row["values"]["value_as_printed"]
         assert row["values"]["method_as_printed"].startswith(
             "Calculation results in Table 2"
         )
         assert "Table 2" in row["values"]["method_description"]
-        assert "equation" in row["values"]["reason"]
-        assert "derivation" not in row
+        assert row["derivation"]["method"]["locator"]["section"] == "Conclusions"
+        assert row["derivation"]["references"]
+        assert all("none_printed" not in ref for ref in row["derivation"]["references"])
+        assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
 
     external_temperature_ids = (
         "ge_2005_t2_K2O_SiO2_Tm",

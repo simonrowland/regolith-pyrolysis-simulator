@@ -217,14 +217,13 @@ def test_table2_standard_gibbs_energies_are_model_derived():
         "MgO",
         "shornikov_2020_mgo_feo_melts_p002_t03_r03_c02",
     )
-    assert row["values"]["method_class"] == "typed_refusal"
-    assert row["values"]["method_class_as_printed"] == "model_derived"
-    assert row["values"]["admission_status"] == "typed_refusal"
-    assert "equation" in row["values"]["reason"]
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["values"]["value"] == row["values"]["value_as_printed"]
     assert row["values"]["value_as_printed"] == "-355.557"
     assert "semi-empirical model" in row["values"]["method_as_printed"].lower()
     assert "Shornikov (2019)" in row["values"]["attribution"]
-    assert "derivation" not in row
+    assert row["derivation"]["method"]["locator"]["section"] == "Theoretical calculations"
+    assert row["derivation"]["references"] == ["Shornikov (2019)"]
 
 
 def test_figure_reads_match_literal_render_pins() -> None:
@@ -348,10 +347,10 @@ def test_isolated_migration_preserves_conditions_for_all_observations() -> None:
     result = migrator.result
     observations = list(result.observations.values())
     assert len(observations) == 146
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 0
-    assert sum(row.admission.status.value == "rejected" for row in observations) == 146
-    assert sum(row.value.kind is ValueKind.POINT for row in observations) == 110
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 36
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 17
+    assert sum(row.admission.status.value == "rejected" for row in observations) == 129
+    assert sum(row.value.kind is ValueKind.POINT for row in observations) == 127
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 19
     assert result.validation is not None
     source_rows = {row["observation_id"]: row for row in _observations(document)}
     for row in observations:

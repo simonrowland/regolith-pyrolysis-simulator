@@ -30,16 +30,15 @@ SOURCE_ID = "shornikov-2019-mgo-titania-melts"
 
 
 def _assert_sc456_model_class(row: dict) -> None:
-    assert row["values"]["method_class"] == "typed_refusal"
-    assert row["values"]["method_class_as_printed"] == "model_derived"
-    assert row["values"]["admission_status"] == "typed_refusal"
-    assert "equation" in row["values"]["reason"]
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["values"]["value"] == row["values"]["value_as_printed"]
     assert row["values"]["method_as_printed"].startswith("Calculated in the developed")
     assert "Standard Gibbs energies calculated" in row["values"]["method_description"]
     assert row["values"]["attribution"] == (
         "Cited model input references: Glushko et al. (1978–1982); Bale et al. (2016)"
     )
-    assert "derivation" not in row
+    assert row["derivation"]["method"]["locator"]["section"]
+    assert row["derivation"]["references"]
 
 
 def test_render_pins_and_isolated_migration_preserve_every_temperature():
@@ -58,7 +57,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     assert len(table_rows) == 42
     model_table_rows = [row for row in table_rows if row["locator"].get("table") == "2"]
     assert len(model_table_rows) == 20
-    assert all(row["values"]["method_class"] == "typed_refusal" for row in model_table_rows)
+    assert all(row["values"]["method_class"] == "model_derived" for row in model_table_rows)
     _assert_sc456_model_class(model_table_rows[0])
     flipped = deepcopy(model_table_rows[0])
     flipped["values"]["method_class"] = "quoted_attributed"
@@ -174,11 +173,11 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == SOURCE_ID]
     assert len(migrated) == 63
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 17
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 45
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 37
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 25
     assert sum(row.value.kind is ValueKind.CATEGORICAL for row in migrated) == 1
-    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 2
-    assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 61
+    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 22
+    assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 41
     assert not result.registry_issues
     assert result.validation is not None
     assert not result.validation.hard_issues

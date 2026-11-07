@@ -232,12 +232,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1046.788'
+        value: "-1046.788"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -258,6 +257,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c04
       type: gibbs_table
       locator:
@@ -270,12 +292,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1029.796'
+        value: "-1029.796"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -296,6 +317,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c06
       type: gibbs_table
       locator:
@@ -308,12 +352,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-407.794'
+        value: "-407.794"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -334,6 +377,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_fig1_c_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -979,12 +1045,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '89.605'
+        value: "89.605"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1005,6 +1070,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   CaO:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
@@ -1019,12 +1107,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-425.847'
+        value: "-425.847"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1045,6 +1132,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c04
       type: gibbs_table
       locator:
@@ -1057,12 +1167,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-413.472'
+        value: "-413.472"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1083,6 +1192,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c06
       type: gibbs_table
       locator:
@@ -1095,12 +1227,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-72.634'
+        value: "-72.634"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1121,6 +1252,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_fig1_a_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -1667,12 +1821,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-72.492'
+        value: "-72.492"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1693,6 +1846,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   CaAl2O4:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c02
@@ -1707,12 +1883,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1533.967'
+        value: "-1533.967"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1733,6 +1908,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c04
       type: gibbs_table
       locator:
@@ -1745,12 +1943,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1536.789'
+        value: "-1536.789"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1771,6 +1968,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   AlO2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c06
@@ -1785,12 +2005,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-99.299'
+        value: "-99.299"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1811,6 +2030,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   CaAl4O7:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c02
@@ -1825,12 +2067,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-2596.897'
+        value: "-2596.897"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1851,6 +2092,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Al2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c06
@@ -1865,12 +2129,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '196.232'
+        value: "196.232"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1891,6 +2154,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   CaAl12O19:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c02
@@ -1905,12 +2191,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-6795.323'
+        value: "-6795.323"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1931,6 +2216,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Al2O:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c06
@@ -1945,12 +2253,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-280.491'
+        value: "-280.491"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -1971,6 +2278,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Ca3Al2O6:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c02
@@ -1985,12 +2315,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-2400.664'
+        value: "-2400.664"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2011,6 +2340,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Al2O2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c06
@@ -2025,12 +2377,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-387.192'
+        value: "-387.192"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2051,6 +2402,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Ca5Al6O14:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c02
@@ -2065,12 +2439,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-5489.050'
+        value: "-5489.050"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2091,6 +2464,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Ca12Al14O33:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c02
@@ -2105,12 +2501,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-12932.929'
+        value: "-12932.929"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2131,6 +2526,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c04
       type: gibbs_table
       locator:
@@ -2143,12 +2561,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-13005.601'
+        value: "-13005.601"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2169,6 +2586,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Ca:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c06
@@ -2183,12 +2623,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-17.589'
+        value: "-17.589"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2209,6 +2648,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Ca3MgAl4O10:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c02
@@ -2223,12 +2685,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-3885.890'
+        value: "-3885.890"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2249,6 +2710,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c04
       type: gibbs_table
       locator:
@@ -2261,12 +2745,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-3885.257'
+        value: "-3885.257"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2287,6 +2770,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     context:
     - observation_id: shornikov_2011_text_ca3mgal4o10_composition
       type: composition
@@ -2316,12 +2822,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1471.685'
+        value: "-1471.685"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2342,6 +2847,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c04
       type: gibbs_table
       locator:
@@ -2354,12 +2882,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-1434.364'
+        value: "-1434.364"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2380,6 +2907,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   Mg:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06
@@ -2394,12 +2944,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-53.734'
+        value: "-53.734"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2420,6 +2969,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   MgO:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c02
@@ -2434,12 +3006,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-381.143'
+        value: "-381.143"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2460,6 +3031,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c04
       type: gibbs_table
       locator:
@@ -2472,12 +3066,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-359.587'
+        value: "-359.587"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2498,6 +3091,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c06
       type: gibbs_table
       locator:
@@ -2510,12 +3126,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '-106.108'
+        value: "-106.108"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -2536,6 +3151,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
     - observation_id: shornikov_2011_fig1_b_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -3271,12 +3909,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '124.333'
+        value: "124.333"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -3297,6 +3934,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   O2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r15_c06
@@ -3311,12 +3971,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '0.000'
+        value: "0.000"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -3337,6 +3996,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   O3:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
@@ -3351,12 +4033,11 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: typed_refusal
-        method_class_as_printed: model_derived
-        admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        method_class: model_derived
         T_K: '1960'
         value_as_printed: '271.522'
+        value: "271.522"
+        standard_state: "Gibbs energy of formation from elements for the Table 1 condensed and gas phases at 1960 K."
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
           1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
         method_as_printed: 'ideal associated solutions theory with Gibbs energy minimization'
@@ -3377,6 +4058,29 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: model_derived
+      derivation:
+        relation: "Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization."
+        output_unit: "kJ/mole"
+        method:
+          state:
+            tag: value
+            value: "ideal associated solutions theory with Gibbs energy minimization"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: "Opening calculation paragraph and paragraph following Table 1"
+        references:
+        - "Glushko et al. (1978–1982)"
+        - "Allibert et al. (1979)"
+        - "Shornikov et al. (1997)"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 1
+            pdf_page_index: 0
+            paragraph: Opening calculation paragraph and paragraph following Table 1
   CaO-MgO-Al2O3_melt:
     observations:
     - observation_id: shornikov_2011_text_minimum_delta_fG1960_melt
@@ -3395,7 +4099,7 @@ species:
         method_class: typed_refusal
         method_class_as_printed: model_derived
         admission_status: typed_refusal
-        reason: 'Model-derived value refused: raw inputs are not printed and its method locator has no equation required by the provenance guard.'
+        reason: 'Printed model-derived melt minimum refused: only 45 mole % Al2O3 is reported, so the melt composition is incomplete.'
         value_as_printed: '−31.5'
         T_K: '1960'
         composition_Al2O3_mole_pct_as_printed: '45'
