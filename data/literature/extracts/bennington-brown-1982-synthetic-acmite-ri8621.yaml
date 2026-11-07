@@ -93,6 +93,50 @@ species:
           is printed.
         correction_note: No corrections were made for impurities or the slight composition deviation from theoretical
           values.
+    - observation_id: bennington_1982_table5_reference_element_footnotes
+      type: sample_and_method_context
+      locator:
+        page: 14
+        published_page: 8
+        pdf_page_index: 13
+        table: '5'
+        note: Table 5 footnotes 1–3
+      units: as printed
+      values:
+        footnotes:
+          '1':
+            printed_note: Melting point for sodium.
+            reference_material: sodium
+            affected_temperature_K_as_stored: ['371']
+          '2':
+            printed_note: Transition points for iron.
+            reference_material: iron
+            affected_temperature_K_as_stored: ['1043', '1185']
+          '3':
+            printed_note: Boiling point for sodium.
+            reference_material: sodium
+            affected_temperature_K_as_stored: ['1177']
+        event_scope: These are reference-element events, not acmite transitions.
+    - observation_id: bennington_1982_table6_reference_oxide_footnotes
+      type: sample_and_method_context
+      locator:
+        page: 15
+        published_page: 9
+        pdf_page_index: 14
+        table: '6'
+        note: Table 6 footnotes 1–2
+      units: as printed
+      values:
+        footnotes:
+          '1':
+            printed_note: Transition point for SiO2.
+            reference_material: SiO2
+            affected_temperature_K_as_stored: ['847']
+          '2':
+            printed_note: Transition point for Fe2O3.
+            reference_material: Fe2O3
+            affected_temperature_K_as_stored: ['960']
+        event_scope: These are reference-oxide transitions, not acmite transitions.
     - observation_id: bennington_1982_hf_solution_calorimetry_conditions
       type: sample_and_method_context
       locator:

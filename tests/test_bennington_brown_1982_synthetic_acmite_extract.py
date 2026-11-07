@@ -101,6 +101,15 @@ TABLE1_REACTION_HEAT_SCALING = (
         5,
     ),
 )
+TABLE5_REFERENCE_FOOTNOTES = {
+    "1": ("Melting point for sodium.", "sodium", ("371",)),
+    "2": ("Transition points for iron.", "iron", ("1043", "1185")),
+    "3": ("Boiling point for sodium.", "sodium", ("1177",)),
+}
+TABLE6_REFERENCE_FOOTNOTES = {
+    "1": ("Transition point for SiO2.", "SiO2", ("847",)),
+    "2": ("Transition point for Fe2O3.", "Fe2O3", ("960",)),
+}
 
 
 def _document() -> dict:
@@ -287,6 +296,55 @@ def test_table6_log_kf_is_preserved_as_an_oxide_frame_schema_gap() -> None:
     assert all("value" not in point for point in points)
     assert all(point["locator"]["page"] == 15 for point in points)
     assert all(point["locator"]["table"] == "6" for point in points)
+
+
+def test_reference_footnotes_are_located_and_joined_to_table_temperatures() -> None:
+    document = _document()
+    observations = _observations(document)
+    for table, expected_footnotes, event_scope, expected_pairs in (
+        (
+            "5",
+            TABLE5_REFERENCE_FOOTNOTES,
+            "These are reference-element events, not acmite transitions.",
+            {("371", "1"), ("1043", "2"), ("1185", "2"), ("1177", "3")},
+        ),
+        (
+            "6",
+            TABLE6_REFERENCE_FOOTNOTES,
+            "These are reference-oxide transitions, not acmite transitions.",
+            {("847", "1"), ("960", "2")},
+        ),
+    ):
+        context = _context(
+            document,
+            f"bennington_1982_table{table}_reference_"
+            f"{'element' if table == '5' else 'oxide'}_footnotes",
+        )
+        assert context["locator"]["page"] == (14 if table == "5" else 15)
+        assert context["locator"]["table"] == table
+        assert context["values"]["event_scope"] == event_scope
+        footnotes = context["values"]["footnotes"]
+        assert set(footnotes) == set(expected_footnotes)
+        for mark, (printed_note, material, temperatures) in expected_footnotes.items():
+            entry = footnotes[mark]
+            assert entry["printed_note"] == printed_note
+            assert entry["reference_material"] == material
+            assert tuple(entry["affected_temperature_K_as_stored"]) == temperatures
+
+        table_series = [
+            row
+            for observation_id, (_, row) in observations.items()
+            if observation_id.startswith(f"bennington_1982_table{table}_")
+            and row["values"].get("points")
+        ]
+        assert table_series
+        for row in table_series:
+            point_pairs = {
+                (point["T_K"], point["temperature_footnote_as_printed"])
+                for point in row["values"]["points"]
+                if point.get("temperature_footnote_as_printed")
+            }
+            assert point_pairs == expected_pairs
 
 
 def test_table1_reaction_heats_apply_the_printed_stoichiometric_factors() -> None:
