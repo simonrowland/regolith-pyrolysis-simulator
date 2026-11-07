@@ -224,6 +224,12 @@ def test_rendered_values_table_rows_and_mutation_are_pinned() -> None:
         "Li": "148.1 ± 5.8 kcal/mol",
     }
     assert (d2["locator"]["page"], d2["locator"]["table"]) == (167, "D.2")
+    e4 = _record(document, "hastie_bonnell_1980_appendixE_tableE4_full_rendered_table")
+    assert (
+        e4["locator"]["page"],
+        e4["locator"]["published_page"],
+        e4["locator"]["table"],
+    ) == (201, "E15", "E.4")
 
     comparison_species, comparison = _record_with_species(
         document, "hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison"
