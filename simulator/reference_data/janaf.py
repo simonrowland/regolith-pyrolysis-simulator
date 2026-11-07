@@ -17,6 +17,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -1168,6 +1169,96 @@ def table_delta_fh_298_uncertainty_kj_per_mol(
             "delta_fH_298_uncertainty value must be finite and non-negative"
         )
     return value
+
+
+def table_fusion_transition(
+    table: Mapping[str, Any],
+) -> dict[str, Decimal | str] | None:
+    """Return printed liquid-element fusion values and uncertainties.
+
+    The optional metadata uses the same unit-and-locator shape for its
+    temperature and enthalpy entries. Missing values or uncertainties remain
+    unavailable; they are never replaced with zero.
+    """
+
+    metadata = table.get("fusion_transition")
+    if metadata is None:
+        return None
+    if not isinstance(metadata, Mapping):
+        raise JanafParseError("fusion_transition must be a mapping")
+
+    def value_and_uncertainty(
+        name: str, unit: str
+    ) -> tuple[Decimal, Decimal, str]:
+        entry = metadata.get(name)
+        if not isinstance(entry, Mapping):
+            raise JanafParseError(f"fusion_transition.{name} must be a mapping")
+        if entry.get("unit") != unit:
+            raise JanafParseError(
+                f"fusion_transition.{name} unit must be {unit!r}"
+            )
+        try:
+            value = Decimal(str(entry.get("value")))
+            uncertainty = Decimal(str(entry.get("uncertainty")))
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise JanafParseError(
+                f"fusion_transition.{name} value and uncertainty must be decimals"
+            ) from exc
+        locator = entry.get("locator")
+        if not isinstance(locator, str) or not locator.strip():
+            raise JanafParseError(f"fusion_transition.{name} needs a locator")
+        if (
+            not value.is_finite()
+            or value <= 0
+            or not uncertainty.is_finite()
+            or uncertainty < 0
+        ):
+            raise JanafParseError(
+                f"fusion_transition.{name} values must be finite and non-negative"
+            )
+        return value, uncertainty, locator
+
+    temperature, temperature_uncertainty, temperature_locator = (
+        value_and_uncertainty("temperature", "K")
+    )
+    enthalpy, enthalpy_uncertainty, enthalpy_locator = value_and_uncertainty(
+        "enthalpy", "kJ mol^-1"
+    )
+    return {
+        "temperature_K": temperature,
+        "temperature_uncertainty_K": temperature_uncertainty,
+        "enthalpy_kJ_per_mol": enthalpy,
+        "enthalpy_uncertainty_kJ_per_mol": enthalpy_uncertainty,
+        "temperature_locator": temperature_locator,
+        "enthalpy_locator": enthalpy_locator,
+    }
+
+
+@lru_cache(maxsize=None)
+def _compiled_table_by_id(table_id: str) -> dict[str, Any]:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document.get("table")
+    if not isinstance(table, Mapping) or table.get("table_id") != table_id:
+        raise JanafParseError(f"{table_id}: compiled table metadata is missing")
+    return dict(table)
+
+
+def table_delta_fh_298_uncertainty_for_table_id(
+    table_id: str,
+) -> Decimal | None:
+    """Load one table's optional printed ΔfH°(298.15 K) uncertainty."""
+
+    return table_delta_fh_298_uncertainty_kj_per_mol(
+        _compiled_table_by_id(table_id)
+    )
+
+
+def table_fusion_transition_for_table_id(
+    table_id: str,
+) -> dict[str, Decimal | str] | None:
+    """Load one table's optional printed fusion transition metadata."""
+
+    return table_fusion_transition(_compiled_table_by_id(table_id))
 
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
