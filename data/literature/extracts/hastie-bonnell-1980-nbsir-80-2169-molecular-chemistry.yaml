@@ -106,6 +106,7 @@ species:
       regime: high-pressure sampling mass spectrometry
       standard_state: Partial pressure of PO in the sampled phosphorus-containing flame.
       units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      uncertainty: Relative ±10%; absolute ±30%; confidence level not stated.
       values:
         quantity: partial_pressure
         method_class: measured_reduced
@@ -114,7 +115,6 @@ species:
         printed_scale: 10^-4 atm
         normalization_as_printed: The authors estimated ionization cross sections and normalized the data assuming
           mass balance between P added and P produced.
-        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
         derivation:
           relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
             and mass-balance normalization.
@@ -1082,13 +1082,13 @@ species:
       regime: high-pressure sampling mass spectrometry
       standard_state: Partial pressure of HPO2 in the sampled phosphorus-containing flame.
       units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      uncertainty: Relative ±10%; absolute ±30%; confidence level not stated.
       values:
         quantity: partial_pressure
         method_class: measured_reduced
         admission_status: admitted
         ion_pressure_basis_as_printed: Partial Pressure × 10^-4 atm
         printed_scale: 10^-4 atm
-        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
         derivation:
           relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
             and mass-balance normalization.
@@ -1939,13 +1939,13 @@ species:
       regime: high-pressure sampling mass spectrometry
       standard_state: Partial pressure of PN in the sampled phosphorus-containing flame.
       units: atm; printed coefficients are multiplied by the printed scale 10^-4 atm.
+      uncertainty: Relative ±10%; absolute ±30%; confidence level not stated.
       values:
         quantity: partial_pressure
         method_class: measured_reduced
         admission_status: admitted
         ion_pressure_basis_as_printed: Partial Pressure × 10^-4 atm
         printed_scale: 10^-4 atm
-        uncertainty_as_printed: Relative ±10%; absolute ±30%; confidence level not stated.
         derivation:
           relation: Mass-spectrometric ion signal reduced to partial pressure using estimated ionization cross sections
             and mass-balance normalization.
@@ -4265,6 +4265,7 @@ species:
       regime: high-pressure sampling mass spectrometry
       standard_state: Partial pressure of P2 in the sampled phosphorus-containing flame.
       units: atm; printed coefficient is multiplied by 10^-4 atm.
+      uncertainty: Relative ±10%; absolute ±30%; confidence level not stated.
       values:
         quantity: partial_pressure
         method_class: measured_reduced

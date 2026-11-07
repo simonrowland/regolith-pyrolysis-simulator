@@ -31,7 +31,7 @@ table_mappings:
       - hastie_bonnell_1980_table2_po2_equilibrium_predictions
       - hastie_bonnell_1980_table2_hpo_equilibrium_predictions
     columns: Flame input gas ratio, TMP, temperature, flow time, measured partial-pressure coefficients, and parenthesized equilibrium predictions.
-    evidence: Measured pressures are measured_reduced using the mass-spectrometric reduction and mass-balance normalization. Parenthesized predictions are model_derived using the CEC-76 equilibrium calculation and JANAF (1971) data.
+    evidence: Measured pressures are measured_reduced using the mass-spectrometric reduction and mass-balance normalization; all 14 measured rows carry the printed relative ±10% and absolute ±30% uncertainty statements. Parenthesized predictions are model_derived using the CEC-76 equilibrium calculation and JANAF (1971) data, with no measurement uncertainty attached.
     unresolved_cells: Eight upper-limit pressure cells remain verbatim in the complete table record; current pressure selection does not migrate partial-pressure bounds. See the blocker in the companion audit.
   - printed_table: '3'
     pdf_page: 32

@@ -320,12 +320,40 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     table2_po = migrated("hastie_bonnell_1980_table2_po_measured_pressures", "2100")
     assert table2_po.value.point == Decimal("202.650")
     assert (table2_po.locator.page, table2_po.locator.table) == (22, "2")
+    assert table2_po.uncertainty.kind.value == "printed"
+    assert table2_po.uncertainty.verbatim == (
+        "Relative ±10%; absolute ±30%; confidence level not stated."
+    )
     assert table2_po.identity.species.formula == "PO"
     assert table2_po.identity.temperature_K.value == Decimal("2100")
     assert table2_po.identity.composition.tag.value == "unknown"
     assert table2_po.identity.fO2_Pa.tag.value == "unknown"
     assert table2_po.identity.total_pressure_Pa.tag.value == "unknown"
     assert table2_po.point_conditions["gas_mix"].state.value == "H2/O2/N2=3.1/1/4; NTP burner-input mole ratio"
+
+    table2_measured_ids = {
+        "hastie_bonnell_1980_table2_po_measured_pressures",
+        "hastie_bonnell_1980_table2_hpo2_measured_pressures",
+        "hastie_bonnell_1980_table2_pn_measured_pressures",
+        "hastie_bonnell_1980_table2_p2_measured_pressure",
+    }
+    table2_measured = [
+        row
+        for row in observations
+        if any(f"::{observation_id}" in row.observation_id for observation_id in table2_measured_ids)
+    ]
+    assert len(table2_measured) == 14
+    assert all(row.uncertainty.kind.value == "printed" for row in table2_measured)
+    assert all(
+        row.uncertainty.verbatim
+        == "Relative ±10%; absolute ±30%; confidence level not stated."
+        for row in table2_measured
+    )
+    table2_predictions = [
+        row for row in observations if "_equilibrium_predictions" in row.observation_id
+    ]
+    assert table2_predictions
+    assert all(row.uncertainty.kind.value == "none" for row in table2_predictions)
 
     appendix_d_o2 = migrated(
         "hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures", "2450"
