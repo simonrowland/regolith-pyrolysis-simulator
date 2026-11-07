@@ -419,6 +419,28 @@ def test_repo_source_status_counts_match_rows() -> None:
     }
 
 
+def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    counts = index["counts"]
+    # Each pin is the green 91061cdad count plus the stack-owned row delta.
+    assert counts["sources"] == 775 + 18  # green 775 + stack delta 18
+    assert counts["extracts"] == 773 + 18  # green 773 + stack delta 18
+    assert counts["extracts_without_pdf"] == 773 + 18  # green 773 + stack delta 18
+    assert counts["alias_groups_needing_resolution"] == 83 + 2  # green 83 + stack delta 2
+
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    assert status["counts"]["sources"] == 2311 + 16  # green 2311 + stack delta 16
+    assert status["counts"]["by_stage"] == {
+        "located": 209 + 0,  # green 209 + stack delta 0
+        "inbox": 1261 - 12,  # green 1261 + stack delta -12
+        "in_progress": 249 + 2,  # green 249 + stack delta 2
+        "ingested_partial": 145 + 10,  # green 145 + stack delta 10
+        "ingested_complete": 130 + 6,  # green 130 + stack delta 6
+        "wired": 0 + 0,  # green 0 + stack delta 0
+        "unknown": 317 + 10,  # green 317 + stack delta 10
+    }
+
+
 def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:
     root = tmp_path / "sim"
     corpus = tmp_path / "corpus"

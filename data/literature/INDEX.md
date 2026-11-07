@@ -15,13 +15,13 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 789
-- Extracts (`literature_extract.v1`): 787
+- Sources: 793
+- Extracts (`literature_extract.v1`): 791
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 787
-- Alias groups needing owner/controller resolution: 84
+- Extracts with no PDF: 791
+- Alias groups needing owner/controller resolution: 85
 - Extracts with private/non-public row locators: 79
 
 ## Sources
@@ -148,6 +148,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `deguzman-2026-simulant-physicochemical` | De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou, Kyriaki & Gacesa, Marko (2026), "Physicochemical properties of lunar regolith simulant for in situ oxygen production", arXiv:2601.14719. |  | ABSENT, `` | `raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf` (present, ebfc9d3f); `text/deguzman-2026-simulant-physicochemical/` (32 files, exists); `tables/deguzman-2026-simulant-physicochemical/` (0 files, ABSENT) | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` (10 rows, draft) | `ledger/deguzman-2026-simulant-physicochemical.yaml`: decoded (2026-09-06) |
 | `delgado-2015-mg-thermite-regolith` | Delgado, A., Cordova, S. & Shafirovich, E. (2015), "Thermite Reactions in the Mixtures of Magnesium with Lunar and Martian Regolith Simulants", AIAA SciTech Forum, 8th Symposium on Space Resource Utilization, AIAA 2015-1179. | 10.2514/6.2015-1179 | ABSENT, `` | `raw/delgado-2015-mg-thermite-regolith/delgado-2015-mg-thermite-regolith.pdf` (present, 1b9f4b9d); `text/delgado-2015-mg-thermite-regolith/` (1 files, exists); `tables/delgado-2015-mg-thermite-regolith/` (0 files, ABSENT) | `data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml` (22 rows, draft) | `ledger/delgado-2015-mg-thermite-regolith.yaml`: — (—) |
 | `di-donato-granati-2000` | Di Donato, A. and Granati, P. (2000), “Experimental Determination of Activity of FeO, MnO and Cr2O3 in Slags”, Centro Sviluppo Materiali research manuscript. |  | ABSENT, `` | `raw/di-donato-granati-2000/di-donato-granati-2000.pdf` (present, 78dd1d4d); `text/di-donato-granati-2000/` (8 files, exists); `tables/di-donato-granati-2000/` (10 files, exists) | `data/literature/extracts/di-donato-granati-2000.yaml` (95 rows, draft) | `ledger/di-donato-granati-2000.yaml`: extracted (2026-10-05) |
+| `dikov-2009-luna16-condensate-iron` | Dikov, Yu. P., Gerasimov, M. V., Yakovlev, O. I. & Ivanov, A. V. (2009), "Valence State of Iron in a Condensate from the Luna 16 Regolith", Petrology 17(5):429–438. DOI 10.1134/S0869591109050014. | 10.1134/S0869591109050014 | ABSENT, `` | `raw/dikov-2009-luna16-condensate-iron/dikov-2009-luna16-condensate-iron.pdf` (present, 6f2f39dd); `text/dikov-2009-luna16-condensate-iron/` (18 files, exists); `tables/dikov-2009-luna16-condensate-iron/` (0 files, ABSENT) | `data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml` (13 rows, draft) | `ledger/dikov-2009-luna16-condensate-iron.yaml`: — (—) |
 | `distin-1971-ferrous-silicate-melts` | Distin, P. A., Whiteway, S. G. & Masson, C. R. (1971), "Thermodynamics and constitution of ferrous silicate melts", Canadian Metallurgical Quarterly 10(2):73-78. | 10.1179/cmq.1971.10.2.73 | ABSENT, `` | `raw/distin-1971-ferrous-silicate-melts/distin-1971-ferrous-silicate-melts.pdf` (present, 3049d522); `text/distin-1971-ferrous-silicate-melts/` (27 files, exists); `tables/distin-1971-ferrous-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` (24 rows, draft) | `ledger/distin-1971-ferrous-silicate-melts.yaml`: — (—) |
 | `dohmen-1998-olivine-fe-gas` | Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (1998), "Solid-solid reactions mediated by a gas phase: An experimental study of reaction progress and the role of surfaces in the system olivine+iron metal," American Mineralogist 83, 970-984. | 10.2138/am-1998-9-1005 | ABSENT, `` | `raw/dohmen-1998-olivine-fe-gas/dohmen-1998-olivine-fe-gas.pdf` (present, d99c7803); `text/dohmen-1998-olivine-fe-gas/` (44 files, exists); `tables/dohmen-1998-olivine-fe-gas/` (0 files, ABSENT) | `data/literature/extracts/dohmen-1998-olivine-fe-gas.yaml` (5 rows, draft) | `ledger/dohmen-1998-olivine-fe-gas.yaml`: — (—) |
 | `dohmen-2003-coupled-kinetics` | Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (2003), "Role of element solubility on the kinetics of element partitioning: In situ observations and a thermodynamic kinetic model," Journal of Geophysical Research: Solid Earth, 108(B3), 2157. | 10.1029/2001JB000587 | ABSENT, `` | `raw/dohmen-2003-coupled-kinetics/dohmen-2003-coupled-kinetics.pdf` (present, 8a559094); `text/dohmen-2003-coupled-kinetics/` (62 files, exists); `tables/dohmen-2003-coupled-kinetics/` (0 files, ABSENT) | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` (2 rows, draft) | `ledger/dohmen-2003-coupled-kinetics.yaml`: — (—) |
@@ -443,6 +444,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `metsoc-2024-6224` | Prince, B. S., Zega, T. J., Connolly Jr., H. C. & Lauretta, D. S. (2024), "Nanometer-sized Fluid Inclusions in OSIRIS-REx Samples of Bennu", 86th Annual Meeting of the Meteoritical Society, LPI Contribution No. 3036, abstract 6224. |  | ABSENT, `` | `raw/metsoc-2024-6224/metsoc-2024-6224.pdf` (present, e456326c); `text/metsoc-2024-6224/` (10 files, exists); `tables/metsoc-2024-6224/` (0 files, ABSENT) | `data/literature/extracts/metsoc-2024-6224.yaml` (5 rows, draft) | `ledger/metsoc-2024-6224.yaml`: decoded (2026-09-06) |
 | `miao-li-yan-2023-fe-v-spinel-gibbs` | Miao Q, Li M, Yan B (2023). Experimental Determination of the Standard Gibbs Energy of Formation of Fe3−xVxO4 at 1473 K. Metals 13, 1498. | 10.3390/met13081498 | ABSENT, `` | `raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf` (present, dd991cc8); `text/miao-li-yan-2023-fe-v-spinel-gibbs/` (47 files, exists); `tables/miao-li-yan-2023-fe-v-spinel-gibbs/` (0 files, ABSENT) | `data/literature/extracts/miao-li-yan-2023-fe-v-spinel-gibbs.yaml` (39 rows, draft, private_path) | `ledger/miao-li-yan-2023-fe-v-spinel-gibbs.yaml`: — (—) |
 | `miki-1999-si-alloy-thermodynamics` | T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al, –Ti, –Fe Ternary Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116. |  | ABSENT, `` | `raw/miki-1999-si-alloy-thermodynamics/miki-1999-si-alloy-thermodynamics.pdf` (present, 2bdfe16d); `text/miki-1999-si-alloy-thermodynamics/` (71 files, exists); `tables/miki-1999-si-alloy-thermodynamics/` (20 files, exists) | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` (111 rows, draft) | `ledger/miki-1999-si-alloy-thermodynamics.yaml`: extracted (2026-10-04) |
+| `moeller-2007-silicon-oxide-evaporation-condensation` | Michael Möller (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation und des Temperns von Siliziumoxid, Diplomarbeit, Ruprecht-Karls-Universität Heidelberg, Kirchhoff-Institut für Physik, HD-KIP 07-37. |  | ABSENT, `` | `raw/moeller-2007-silicon-oxide-evaporation-condensation/moeller-2007-silicon-oxide-evaporation-condensation.pdf` (present, fcb1940a); `text/moeller-2007-silicon-oxide-evaporation-condensation/` (253 files, exists); `tables/moeller-2007-silicon-oxide-evaporation-condensation/` (0 files, ABSENT) | `data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml` (0 rows, draft) | `ledger/moeller-2007-silicon-oxide-evaporation-condensation.yaml`: — (—) |
 | `mogul-2023-pioneer-venus-co2-icarus` | Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical model for mass spectra obtained by the Pioneer Venus Large Probe Neutral Mass Spectrometer", Icarus 392:115374. | 10.1016/j.icarus.2022.115374 | ABSENT, `` | `raw/mogul-2023-pioneer-venus-co2-icarus/mogul-2023-pioneer-venus-co2-icarus.pdf` (present, 2e0f7062); `text/mogul-2023-pioneer-venus-co2-icarus/` (55 files, exists); `tables/mogul-2023-pioneer-venus-co2-icarus/` (0 files, ABSENT) | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` (3 rows, draft) | `ledger/mogul-2023-pioneer-venus-co2-icarus.yaml`: decoded (2026-09-06) |
 | `moosavi-khoonsari-2015-na-fe-cmas-thesis` | Moosavi-Khoonsari, Elmira (2015). Coupled Thermodynamic Modeling and Experimental Study of Na2O-FeO-Fe2O3-CaO-MgO-Al2O3-SiO2 System. PhD thesis, Department of Mining and Materials Engineering, McGill University, Montreal, July 2015. |  | ABSENT, `` | `raw/moosavi-khoonsari-2015-na-fe-cmas-thesis/moosavi-khoonsari-2015-na-fe-cmas-thesis.pdf` (present, 7d37aeec); `text/moosavi-khoonsari-2015-na-fe-cmas-thesis/` (251 files, exists); `tables/moosavi-khoonsari-2015-na-fe-cmas-thesis/` (0 files, ABSENT) | `data/literature/extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml` (72 rows, draft) | `ledger/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml`: — (—) |
 | `morey-1964-usgs-pp440l-phase-equilibria` | G. W. Morey, Phase-Equilibrium Relations of the Common Rock-Forming Oxides Except Water, Data of Geochemistry (6th ed.), Chapter L, U.S. Geological Survey Professional Paper 440-L, 1964. |  | ABSENT, `` | `raw/morey-1964-usgs-pp440l-phase-equilibria/morey-1964-usgs-pp440l-phase-equilibria.pdf` (present, 6e996717); `text/morey-1964-usgs-pp440l-phase-equilibria/` (92 files, exists); `tables/morey-1964-usgs-pp440l-phase-equilibria/` (74 files, exists) | `data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml` (0 rows, draft) | `ledger/morey-1964-usgs-pp440l-phase-equilibria.yaml`: extracted (2026-10-04) |
@@ -527,6 +529,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `rau-1974-se-vp` | Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation measurements (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions separate from total P. |  | ABSENT, `` | `raw/rau-1974-se-vp/rau-1974-se-vp.pdf` (ABSENT, ); `text/rau-1974-se-vp/` (0 files, ABSENT); `tables/rau-1974-se-vp/` (0 files, ABSENT) | `data/literature/extracts/rau-1974-se-vp.yaml` (1 rows, draft) | `ledger/rau-1974-se-vp.yaml`: extracted (2026-09-06) |
 | `rb86-capobianco-navrotsky-1982` | Capobianco, C. and Navrotsky, A. (1982). Calorimetric evidence for ideal mixing of silicon and germanium in glasses and crystals of sodium feldspar composition. American Mineralogist 67, 718–724. |  | ABSENT, `` | `raw/rb86-capobianco-navrotsky-1982/rb86-capobianco-navrotsky-1982.pdf` (present, ffd56ef1); `text/rb86-capobianco-navrotsky-1982/` (18 files, exists); `tables/rb86-capobianco-navrotsky-1982/` (0 files, ABSENT) | `data/literature/extracts/rb86-capobianco-navrotsky-1982.yaml` (3 rows, draft) | `ledger/rb86-capobianco-navrotsky-1982.yaml`: — (—) |
 | `rb86-neuvonen-1952` | Neuvonen, K. J. (1952). Thermochemical Investigation of the Akermanite-Gehlenite Series. Bulletin de la Commission Géologique de Finlande, N:o 158. |  | ABSENT, `` | `raw/rb86-neuvonen-1952/rb86-neuvonen-1952.pdf` (present, bd8948ae); `text/rb86-neuvonen-1952/` (101 files, exists); `tables/rb86-neuvonen-1952/` (0 files, ABSENT) | `data/literature/extracts/rb86-neuvonen-1952.yaml` (0 rows, draft) | `ledger/rb86-neuvonen-1952.yaml`: — (—) |
+| `rb86-stebbins-carmichael-1984` | Stebbins, J. F. and Carmichael, I. S. E. (1984), The heat of fusion of fayalite, American Mineralogist 69, 292–297. |  | ABSENT, `` | `raw/rb86-stebbins-carmichael-1984/rb86-stebbins-carmichael-1984.pdf` (present, 049acd9f); `text/rb86-stebbins-carmichael-1984/` (25 files, exists); `tables/rb86-stebbins-carmichael-1984/` (0 files, ABSENT) | `data/literature/extracts/rb86-stebbins-carmichael-1984.yaml` (45 rows, draft) | `ledger/rb86-stebbins-carmichael-1984.yaml`: — (—) |
+| `rb86-stebbins-etal-1984` | Stebbins, J. F., Carmichael, I. S. E. & Moret, L. K. (1984), “Heat capacities and entropies of silicate liquids and glasses”, Contributions to Mineralogy and Petrology 86, 131–148. | 10.1007/BF00381840 | ABSENT, `` | `raw/rb86-stebbins-etal-1984/rb86-stebbins-etal-1984.pdf` (present, 121eb7d5); `text/rb86-stebbins-etal-1984/` (52 files, exists); `tables/rb86-stebbins-etal-1984/` (0 files, ABSENT) | `data/literature/extracts/rb86-stebbins-etal-1984.yaml` (275 rows, draft) | `ledger/rb86-stebbins-etal-1984.yaml`: — (—) |
 | `rb86-takahashi-yoshio-1970` | Takahashi, K. and Yoshio, T. (1970). Energy Relations in Alkali Silicates by Solution Calorimetry (Thermochemical Investigations of Glasses Part I). Yogyo-Kyokai-Shi, 78(893), 35–44. DOI 10.2109/jcersj1950.78.35. | 10.2109/jcersj1950.78.35 | ABSENT, `` | `raw/rb86-takahashi-yoshio-1970/rb86-takahashi-yoshio-1970.pdf` (present, f13d5af0); `text/rb86-takahashi-yoshio-1970/` (55 files, exists); `tables/rb86-takahashi-yoshio-1970/` (0 files, ABSENT) | `data/literature/extracts/rb86-takahashi-yoshio-1970.yaml` (0 rows, draft) | `ledger/rb86-takahashi-yoshio-1970.yaml`: — (—) |
 | `ref-032-al` | Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020). |  | ABSENT, `` | `raw/ref-032-al/ref-032-al.pdf` (ABSENT, ); `text/ref-032-al/` (0 files, ABSENT); `tables/ref-032-al/` (0 files, ABSENT) | `data/literature/extracts/ref-032-al.yaml` (1 rows, draft) | `ledger/ref-032-al.yaml`: extracted (2026-09-06) |
 | `ref-032-bi` | Alcock et al. (1984) REF-032 Bi; JANAF Bi(g) |  | ABSENT, `` | `raw/ref-032-bi/ref-032-bi.pdf` (ABSENT, ); `text/ref-032-bi/` (0 files, ABSENT); `tables/ref-032-bi/` (0 files, ABSENT) | `data/literature/extracts/ref-032-bi.yaml` (1 rows, draft) | `ledger/ref-032-bi.yaml`: extracted (2026-09-06) |
@@ -944,6 +948,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `deguzman-2026-simulant-physicochemical`
 - `delgado-2015-mg-thermite-regolith`
 - `di-donato-granati-2000`
+- `dikov-2009-luna16-condensate-iron`
 - `distin-1971-ferrous-silicate-melts`
 - `dohmen-1998-olivine-fe-gas`
 - `dohmen-2003-coupled-kinetics`
@@ -1239,6 +1244,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `metsoc-2024-6224`
 - `miao-li-yan-2023-fe-v-spinel-gibbs`
 - `miki-1999-si-alloy-thermodynamics`
+- `moeller-2007-silicon-oxide-evaporation-condensation`
 - `mogul-2023-pioneer-venus-co2-icarus`
 - `moosavi-khoonsari-2015-na-fe-cmas-thesis`
 - `morey-1964-usgs-pp440l-phase-equilibria`
@@ -1322,6 +1328,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `rau-1974-se-vp`
 - `rb86-capobianco-navrotsky-1982`
 - `rb86-neuvonen-1952`
+- `rb86-stebbins-carmichael-1984`
+- `rb86-stebbins-etal-1984`
 - `rb86-takahashi-yoshio-1970`
 - `ref-032-al`
 - `ref-032-bi`
@@ -1733,6 +1741,7 @@ The builder does not pick a winner.
 - same_doi `10.1007/s11663-024-02995-6`: `halwax_sergeev_mueller_schenk_2024`, `kems-031-halwax-2024` — needs owner/controller resolution
 - same_doi `10.1016/j.actaastro.2024.08.009`: `kems-036-sesko-2024`, `sesko_2024` — needs owner/controller resolution
 - same_doi `10.1016/j.actaastro.2025.06.028`: `ntrs-20250004626`, `paper`, `yu_2025_acta_astronautica_235_723_735` — needs owner/controller resolution
+- same_doi `10.1016/j.asr.2026.02.003`: `kems-044-robinot-2026`, `robinot_2026` — needs owner/controller resolution
 - same_doi `10.1016/j.gca.2005.08.014`: `REF-014`, `kems-005-fedkin-2006` — needs owner/controller resolution
 - same_doi `10.1016/j.gca.2007.09.005`: `kems-010-richter-2007`, `richter-et-al-2007` — needs owner/controller resolution
 - same_doi `10.1016/j.icarus.2003.08.023`: `kems-008-schaefer-fegley-2004`, `sf04-magma-companion-workbook` — needs owner/controller resolution
@@ -1742,13 +1751,20 @@ The builder does not pick a winner.
 - same_doi `10.1063/1.3253096`: `REF-040`, `kems-003-pound-1972` — needs owner/controller resolution
 - same_doi `10.1063/1.555706`: `lamoreaux-hildenbrand-1984`, `ref-052-k-o-gas`, `ref-052-na-o-gas` — needs owner/controller resolution
 - same_doi `10.1063/1.555799`: `lamoreaux-hildenbrand-hildenbrand-1987`, `lh87-al-o-gas-species`, `lh87-cao-g`, `lh87-mgo-g` — needs owner/controller resolution
+- same_doi `10.2138/rmg.2018.84.11`: `arxiv-1902-05005`, `kems-041-sossi-fegley-2018` — needs owner/controller resolution
 - same_doi `10.2355/isijinternational.33.26`: `kems-190-wu-1993`, `wu-1993-feo-mgo-sio2` — needs owner/controller resolution
 - same_report `NBS Special Publication 561`: `kems-042-plante-1979`, `kems-184-behrens-1979` — needs owner/controller resolution
+- same_report `NTRS 20150002321`: `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
+- source_id_alias `abdul-2023`: `abdul-2023-cao-sio2-calphad`, `abdul-2023-clinker-thesis` — needs owner/controller resolution
 - source_id_alias `alcock-1984`: `ref-032-al`, `ref-032-bi`, `ref-032-ca`, `ref-032-fe-liquid-equation`, `ref-032-k`, `ref-032-mg`, `ref-032-na`, `ref-032-pb`, `ref-032-si`, `ref-032-zr` — needs owner/controller resolution
+- source_id_alias `banya-1985`: `banya-hino-takezoe-1985-na-fe-silicate-redox`, `banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity` — needs owner/controller resolution
 - source_id_alias `beyer-1980`: `beyer-1980-potassium-metasilicate-disilicate-ri8410`, `beyer-brown-ferrante-1980-kalo2-thermodynamics` — needs owner/controller resolution
+- source_id_alias `bischof-2023`: `kems-137-bischof-2023`, `kems-138-bischof-2023` — needs owner/controller resolution
 - source_id_alias `borisov-2004`: `borisov-2004-karrooite-liquidus-redox`, `borisov-2004-tio2-pd-ni-fe-solubilities` — needs owner/controller resolution
 - source_id_alias `cacciatore-2026`: `cacciatore-zajacz-2026-v-sc-oxybarometer`, `cacciatore-zajacz-2026-v-sc-oxybarometer-supplement` — needs owner/controller resolution
+- source_id_alias `chen-2022`: `chen-2022-mgo-sio2-tio2-phase-equilibria`, `chen-2022-sio2-mno-slag-activities` — needs owner/controller resolution
 - source_id_alias `colson-1998`: `colson-floden-1998-lpsc-co-nickel-activity`, `colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc` — needs owner/controller resolution
+- source_id_alias `costa-2015`: `costa-2015-yb-silicate-silica-activity`, `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
 - source_id_alias `datz-1961`: `datz-1961-na2cl2`, `datz-and-smith-1961`, `datz-smith-taylor-1961-nacl-vapor` — needs owner/controller resolution
 - source_id_alias `fegley-2016`: `arxiv-1602-00658-fegley-rock-steam-solubility`, `fegley-2016-rock-steam-solubility` — needs owner/controller resolution
 - source_id_alias `fray-2009`: `fray-schmitt-2009-ch4-1`, `fray-schmitt-2009-co-1`, `fray-schmitt-2009-nh3` — needs owner/controller resolution
@@ -1759,56 +1775,49 @@ The builder does not pick a winner.
 - source_id_alias `ichise-1989`: `kems-112-ichise-1989`, `kems-198-ichise-ueshima-1989` — needs owner/controller resolution
 - source_id_alias `inoue-1982`: `inoue-suito-1982-na-silicate-sulfur-partitions`, `inoue-suito-1982-vanadium-mgo-saturated-slag` — needs owner/controller resolution
 - source_id_alias `jeon-2025`: `jeon-2025-metal-slag-refractory-thesis`, `jeon-lindberg-2025-mgo-refractory-slag-interface` — needs owner/controller resolution
+- source_id_alias `kassis-1981`: `kassis-frischat-1981-mixed-alkali-vapor-pressures`, `kassis-frischat-1981-silicate-glass-vapour` — needs owner/controller resolution
 - source_id_alias `khedim-2010`: `khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate`, `khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility` — needs owner/controller resolution
+- source_id_alias `kirschen-1999`: `kirschen-1999-si-ti-al-miscibility`, `kirschen-decapitani-1999-liquid-miscibility` — needs owner/controller resolution
 - source_id_alias `lamoreaux-1987`: `lamoreaux-hildenbrand-hildenbrand-1987`, `lh87-al-o-gas-species`, `lh87-cao-g`, `lh87-mgo-g`, `lh87-pbo-g` — needs owner/controller resolution
 - source_id_alias `leister-1999`: `leister-1999-fe-v-redox-2000c`, `leister-1999-v-sodium-silicate-high-temperature` — needs owner/controller resolution
 - source_id_alias `metsoc-2024`: `metsoc-2024-6131`, `metsoc-2024-6224` — needs owner/controller resolution
 - source_id_alias `meyer-2010`: `lpi-compendium-15013`, `lpi-compendium-62231`, `lpi-compendium-65701` — needs owner/controller resolution
 - source_id_alias `morris-2006`: `morris-2006-gusev-mossbauer`, `morris-2006-meridiani-mossbauer` — needs owner/controller resolution
+- source_id_alias `rb86-1984`: `rb86-stebbins-carmichael-1984`, `rb86-stebbins-etal-1984` — needs owner/controller resolution
+- source_id_alias `robinot-2026`: `kems-044-robinot-2026`, `robinot_2026`, `robinot_2026_vacuum_pyrolysis` — needs owner/controller resolution
 - source_id_alias `schneider-1980`: `kems-212-schneider-1980-nbsir-80-2059`, `kems-213-schneider-1980-nbsir-80-2139` — needs owner/controller resolution
 - source_id_alias `schreiber-1977`: `schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu`, `schreiber-1977-tetravalent-cr-diopside` — needs owner/controller resolution
 - source_id_alias `schreiber-1979`: `schreiber-1979-lpsc-fe-redox-abstract`, `schreiber-1979-lpsc-redox-interactions-abstract` — needs owner/controller resolution
 - source_id_alias `schreiber-1986`: `schreiber-1986-internal-electron-exchange`, `schreiber-1986-oxygen-diffusion-redox` — needs owner/controller resolution
 - source_id_alias `senior-1991`: `senior-1991-solar-heating-jbis`, `senior-1991-vacuum-pyrolysis` — needs owner/controller resolution
 - source_id_alias `sesko-2024`: `kems-036-sesko-2024`, `sesko_2024`, `sesko_2024_vapor_phase_pyrolysis` — needs owner/controller resolution
+- source_id_alias `shornikov-1997`: `shornikov-1997-cao-al2o3`, `shornikov-1997-cao-alumina-vapor`, `shornikov-1997-diopside-vaporization` — needs owner/controller resolution
 - source_id_alias `shornikov-1999`: `shornikov-1999-alumina-silica-vaporization`, `shornikov-1999-silica-partial-vaporization-coefficients` — needs owner/controller resolution
 - source_id_alias `shornikov-2000`: `shornikov-2000-aluminosilicate-thermodynamics`, `shornikov-2000-aluminosilicate-vaporization`, `shornikov-2000-cao-silica-vaporization`, `shornikov-2000-na-zno-phosphate-vaporization`, `shornikov-2000-silica-gas-equilibria`, `shornikov-2000-titania-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2002`: `shornikov-2002-alumina-silica-melt-thermodynamics`, `shornikov-2002-aluminosilicate-solid-phases`, `shornikov-2002-mullite-thermodynamics`, `shornikov-2002-spinel-mgal2o4` — needs owner/controller resolution
-- source_id_alias `shornikov-2007`: `shornikov-2007-ca-aluminosilicate-activities`, `shornikov-2007-cao-aluminosilicate-melts` — needs owner/controller resolution
-- source_id_alias `shornikov-2013`: `shornikov-2013-cai-genesis-thermodynamics`, `shornikov-2013-potassium-silicate-thermodynamics` — needs owner/controller resolution
-- source_id_alias `shornikov-2014`: `shornikov-2014-ca-al-evaporation-coefficients`, `shornikov-2014-complex-oxide-vapor`, `shornikov-2014-sodium-germanate-melts`, `shornikov-2014-sodium-silicate-model` — needs owner/controller resolution
-- source_id_alias `shornikov-2018`: `shornikov-2018-cai-complex-gas-species`, `shornikov-2018-cai-double-inversion`, `shornikov-2018-spinel-solid-solutions`, `shornikov-2018-thermodynamic-evaporation-model` — needs owner/controller resolution
-- source_id_alias `shornikov-2022`: `shornikov-2022-k2o-al2o3-melts`, `shornikov-2022-meteorite-redox-evaporation`, `shornikov-2022-na2o-al2o3-melts` — needs owner/controller resolution
-- source_id_alias `shornikov-2023`: `shornikov-2023-cai-melt-evaporation`, `shornikov-2023-calcium-phosphate`, `shornikov-2023-mgo-phosphate-melts`, `shornikov-2023-natural-cai-evaporation`, `shornikov-2023-silica-phosphate-melts` — needs owner/controller resolution
-- source_id_alias `shornikov-2026`: `shornikov-2026-hatrurite-evaporation`, `shornikov-2026-wollastonite-kems` — needs owner/controller resolution
-- source_id_alias `slag-1993`: `slag-001-banya-1993`, `slag-002-banya-hino-nagasaka-1993`, `slag-003-hino-kitagawa-banya-1993` — needs owner/controller resolution
-- source_id_alias `sossi-2020`: `sossi-2020-cu-zn-isotope-evap-formalism`, `sossi-2020-magma-ocean-redox` — needs owner/controller resolution
-- source_id_alias `tsukihashi-1985`: `tsukihashi-1985-na-silicate-mn-p-nitrogen`, `tsukihashi-1985-v-nb-sb-soda-silicate-distribution` — needs owner/controller resolution
-- source_id_alias `vickerfalt-2024`: `vickerfalt-2024-al-si-v-phase-diagram`, `vickerfalt-2024-autogenous-slag-thesis` — needs owner/controller resolution
-- source_id_alias `yamada-1980`: `kems-067-yamada-1980`, `kems-087-yamada-kato-1980` — needs owner/controller resolution
-- source_id_alias `zhang-2021`: `kems-006-zhang-2021`, `zhang-2021-acsesc-si` — needs owner/controller resolution
-- same_doi `10.1016/j.asr.2026.02.003`: `kems-044-robinot-2026`, `robinot_2026` — needs owner/controller resolution
-- same_doi `10.2138/rmg.2018.84.11`: `arxiv-1902-05005`, `kems-041-sossi-fegley-2018` — needs owner/controller resolution
-- same_report `NTRS 20150002321`: `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
-- source_id_alias `abdul-2023`: `abdul-2023-cao-sio2-calphad`, `abdul-2023-clinker-thesis` — needs owner/controller resolution
-- source_id_alias `banya-1985`: `banya-hino-takezoe-1985-na-fe-silicate-redox`, `banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity` — needs owner/controller resolution
-- source_id_alias `bischof-2023`: `kems-137-bischof-2023`, `kems-138-bischof-2023` — needs owner/controller resolution
-- source_id_alias `chen-2022`: `chen-2022-mgo-sio2-tio2-phase-equilibria`, `chen-2022-sio2-mno-slag-activities` — needs owner/controller resolution
-- source_id_alias `costa-2015`: `costa-2015-yb-silicate-silica-activity`, `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
-- source_id_alias `kassis-1981`: `kassis-frischat-1981-mixed-alkali-vapor-pressures`, `kassis-frischat-1981-silicate-glass-vapour` — needs owner/controller resolution
-- source_id_alias `kirschen-1999`: `kirschen-1999-si-ti-al-miscibility`, `kirschen-decapitani-1999-liquid-miscibility` — needs owner/controller resolution
-- source_id_alias `robinot-2026`: `kems-044-robinot-2026`, `robinot_2026`, `robinot_2026_vacuum_pyrolysis` — needs owner/controller resolution
-- source_id_alias `shornikov-1997`: `shornikov-1997-cao-al2o3`, `shornikov-1997-cao-alumina-vapor`, `shornikov-1997-diopside-vaporization` — needs owner/controller resolution
 - source_id_alias `shornikov-2003`: `shornikov-2003-aluminosilicate-solids`, `shornikov-2003-mullite-thermodynamics`, `shornikov-2003-silica-catitanoate-melts` — needs owner/controller resolution
+- source_id_alias `shornikov-2007`: `shornikov-2007-ca-aluminosilicate-activities`, `shornikov-2007-cao-aluminosilicate-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2008`: `shornikov-2008-mgo-aluminosilicate-melts`, `shornikov-2008-redox-oxide-evaporation`, `shornikov-2008-zinc-phosphate-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2011`: `shornikov-2011-cao-mgo-alumina-melts`, `shornikov-2011-titania-melt-evaporation` — needs owner/controller resolution
+- source_id_alias `shornikov-2013`: `shornikov-2013-cai-genesis-thermodynamics`, `shornikov-2013-potassium-silicate-thermodynamics` — needs owner/controller resolution
+- source_id_alias `shornikov-2014`: `shornikov-2014-ca-al-evaporation-coefficients`, `shornikov-2014-complex-oxide-vapor`, `shornikov-2014-sodium-germanate-melts`, `shornikov-2014-sodium-silicate-model` — needs owner/controller resolution
 - source_id_alias `shornikov-2015`: `shornikov-2015-cai-mineral-thermodynamics`, `shornikov-2015-cai-mineral-thermodynamics-metsoc`, `shornikov-2015-cai-vaporization-coefficients`, `shornikov-2015-complex-oxide-vapor` — needs owner/controller resolution
 - source_id_alias `shornikov-2016`: `shornikov-2016-ca-al-evaporation`, `shornikov-2016-cao-mgo-silicate` — needs owner/controller resolution
 - source_id_alias `shornikov-2017`: `shornikov-2017-cai-mgo-sio-fugacity`, `shornikov-2017-spinel-evaporation`, `shornikov-2017-spinel-thermodynamics` — needs owner/controller resolution
+- source_id_alias `shornikov-2018`: `shornikov-2018-cai-complex-gas-species`, `shornikov-2018-cai-double-inversion`, `shornikov-2018-spinel-solid-solutions`, `shornikov-2018-thermodynamic-evaporation-model` — needs owner/controller resolution
 - source_id_alias `shornikov-2019`: `shornikov-2019-ca-feo-vapor`, `shornikov-2019-lunar-meteorite-evaporation-model`, `shornikov-2019-mgo-titania-melts`, `shornikov-2019-perovskite-evaporation`, `shornikov-2019-perovskite-evaporation-rjpc`, `shornikov-2019-perovskite-evaporation-thermodynamics`, `shornikov-2019-spinel-evaporation-abstract` — needs owner/controller resolution
 - source_id_alias `shornikov-2020`: `shornikov-2020-cao-mgo-thermodynamics`, `shornikov-2020-cao-tio2-melts`, `shornikov-2020-mgo-feo-melts`, `shornikov-2020-perovskite-chemical-fractionation` — needs owner/controller resolution
+- source_id_alias `shornikov-2022`: `shornikov-2022-k2o-al2o3-melts`, `shornikov-2022-meteorite-redox-evaporation`, `shornikov-2022-na2o-al2o3-melts` — needs owner/controller resolution
+- source_id_alias `shornikov-2023`: `shornikov-2023-cai-melt-evaporation`, `shornikov-2023-calcium-phosphate`, `shornikov-2023-mgo-phosphate-melts`, `shornikov-2023-natural-cai-evaporation`, `shornikov-2023-silica-phosphate-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2024`: `shornikov-2024-alkali-phosphate`, `shornikov-2024-cai-silica-evaporation`, `shornikov-2024-iron-phosphate-melts`, `shornikov-2024-sodium-phosphate-melts`, `shornikov-2024-wollastonite-evaporation` — needs owner/controller resolution
 - source_id_alias `shornikov-2025`: `shornikov-2025-ca-al-inclusion-evaporation`, `shornikov-2025-ca-al-inclusion-kems`, `shornikov-2025-ca-al-inclusion-thermodynamics`, `shornikov-2025-calcium-oxide-evaporation`, `shornikov-2025-lithium-phosphate-melts`, `shornikov-2025-lithium-silicate-melts`, `shornikov-2025-perovskite-condensation`, `shornikov-2025-saratov-alkali-evaporation` — needs owner/controller resolution
+- source_id_alias `shornikov-2026`: `shornikov-2026-hatrurite-evaporation`, `shornikov-2026-wollastonite-kems` — needs owner/controller resolution
+- source_id_alias `slag-1993`: `slag-001-banya-1993`, `slag-002-banya-hino-nagasaka-1993`, `slag-003-hino-kitagawa-banya-1993` — needs owner/controller resolution
 - source_id_alias `sossi-2018`: `kems-041-sossi-fegley-2018`, `kems-045-sossi-2018-pnas-cr` — needs owner/controller resolution
+- source_id_alias `sossi-2020`: `sossi-2020-cu-zn-isotope-evap-formalism`, `sossi-2020-magma-ocean-redox` — needs owner/controller resolution
+- source_id_alias `tsukihashi-1985`: `tsukihashi-1985-na-silicate-mn-p-nitrogen`, `tsukihashi-1985-v-nb-sb-soda-silicate-distribution` — needs owner/controller resolution
+- source_id_alias `vickerfalt-2024`: `vickerfalt-2024-al-si-v-phase-diagram`, `vickerfalt-2024-autogenous-slag-thesis` — needs owner/controller resolution
 - source_id_alias `wang-2017`: `wang-2017-cao-sio2-vox-tables-s1-s32`, `wang-2017-sodium-stannate-formation-emf` — needs owner/controller resolution
+- source_id_alias `yamada-1980`: `kems-067-yamada-1980`, `kems-087-yamada-kato-1980` — needs owner/controller resolution
 - source_id_alias `zaitsev-2000`: `zaitsev-2000-ms2000-045`, `zaitsev-2000-sodium-silicate-thermodynamics` — needs owner/controller resolution
+- source_id_alias `zhang-2021`: `kems-006-zhang-2021`, `zhang-2021-acsesc-si` — needs owner/controller resolution

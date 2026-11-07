@@ -41,6 +41,10 @@ SCIPY_SOBOL_SAMPLER = "scipy-sobol"
 DEPENDENCY_FREE_LHC_SAMPLER = "dependency-free-lhc"
 SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER, DEPENDENCY_FREE_LHC_SAMPLER)
 STREAMING_SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER,)
+PRESSURE_PAIR_SAMPLER_DESCRIPTION = (
+    "Pressure pairs sample p_total uniformly and condition pO2 on it, which "
+    "underweights high-pO2 corners (2.76% vs 4.94% for area-uniform sampling)."
+)
 
 
 class ConditionalSubspaceExhausted(ValueError):
@@ -429,7 +433,12 @@ def sample_recipe_candidates(
     anchor: RecipePatch | None = None,
     delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
 ) -> tuple[SampledRecipePatch, ...]:
-    """Sample the two fixed-dimensional C5 conditional subspaces."""
+    """Sample fixed-dimensional C5 subspaces with existing pressure conditioning.
+
+    For pressure-coupled pairs, p_total is sampled uniformly and pO2 is
+    conditioned on it. This underweights high-pO2 corners versus area-uniform
+    sampling (2.76% vs 4.94%); the sampler behavior is unchanged.
+    """
 
     active_schema = schema or RecipeSchema()
     _validate_positive_int("n_samples", n_samples)

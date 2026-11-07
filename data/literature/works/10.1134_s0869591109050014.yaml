@@ -1,0 +1,242 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0869591109050014
+  citation: Dikov, Yu. P., Gerasimov, M. V., Yakovlev, O. I. & Ivanov, A. V. (2009), "Valence State of Iron in a Condensate
+    from the Luna 16 Regolith", Petrology 17(5):429–438. DOI 10.1134/S0869591109050014.
+  source_ids:
+  - dikov-2009-luna16-condensate-iron
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:dikov-2009-luna16-condensate-iron
+      role: pdf
+      path: raw/dikov-2009-luna16-condensate-iron/dikov-2009-luna16-condensate-iron.pdf
+      sha256:
+        tag: value
+        value: 6f2f39dd5f465e06bae9e721478520e0810a04ee7d60109c1edf52364c2d4b4d
+    - asset_id: pdftotext:dikov-2009-luna16-condensate-iron
+      role: pdftotext
+      path: text/dikov-2009-luna16-condensate-iron
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:dikov-2009-luna16-condensate-iron
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0869591109050014
+experiments:
+- experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'laser simulation of impact heating, vaporization, and quench condensation' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '18'
+          - - Al
+            - '4.3'
+          - - Fe2+
+            - '2.1'
+          - - Fe3+
+            - '0.4'
+          - - Mg
+            - '7.1'
+          - - Ca
+            - '6.1'
+          - - Na
+            - '2'
+          - - O
+            - '59.8'
+          amount_basis: mol_inventory
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    printed_composition:
+      state:
+        tag: value
+        value: augite sample; initial XPS composition reported in at.% in prose
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+  conditions:
+    atmosphere:
+      state:
+        tag: unknown
+        reason: condition atmosphere is not a scalar numeric value
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+    duration_s:
+      state:
+        tag: unknown
+        reason: condition duration_s is not a scalar numeric value
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+    temperature_range_as_published:
+      state:
+        tag: unknown
+        reason: condition temperature_range_as_published is not a scalar numeric value
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    abstract_temperature_range_as_published:
+      state:
+        tag: unknown
+        reason: condition abstract_temperature_range_as_published is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 429
+        pdf_page_index: 0
+        section: Abstract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591109050014
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+- experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'X-ray photoelectron spectroscopy (XPS), layer-by-layer Ar+ etching' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Luna 16 regolith sample L1639, fine fraction <70 µm
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591109050014
+  locator:
+    page: 2
+    published_page: 430
+    pdf_page_index: 1
+    section: Analytical Methods
+context:
+- observation_id: dikov_2009_augite_initial_sample_composition
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 433
+    section: EXPERIMENTAL
+  phase: augite
+  units: at.% as printed
+  values:
+    quantity: initial_augite_elemental_at_percent_composition
+    method_class: measured_direct
+    method: XPS analysis of initial augite sample
+    Si_at_pct: '18.0'
+    Al_at_pct: '4.3'
+    Fe2plus_at_pct: '2.1'
+    Fe3plus_at_pct: '0.4'
+    Mg_at_pct: '7.1'
+    Ca_at_pct: '6.1'
+    Na_at_pct: '2.0'
+    O_at_pct: '59.8'
+    total_at_pct: '99.8'
+  context_id: dikov-2009-luna16-condensate-iron::context::dikov_2009_augite_initial_sample_composition
+  work_id: 10.1134/s0869591109050014
+  source_id: dikov-2009-luna16-condensate-iron
+  species: augite_condensate
+- observation_id: dikov_2009_figures_deferred
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 430
+    figure: '1'
+  units: figure-only values not transcribed
+  values:
+    quantity: unextracted_figure_data
+    reason: Figures 1–9 contain plotted composition correlations, spectral line profiles, Fe valence depth profiles, and Fe0/Fe2+
+      and Fe3+/Fe2+ ratios with no printed numeric tables for their plotted cells. Values read only from figures are deferred
+      in this extraction wave.
+  context_id: dikov-2009-luna16-condensate-iron::context::dikov_2009_figures_deferred
+  work_id: 10.1134/s0869591109050014
+  source_id: dikov-2009-luna16-condensate-iron
+  species: L1639
+- observation_id: dikov_2009_prior_vaporization_comparisons
+  type: literature_comparison_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 435
+    section: Discussion
+  units: ratio as printed; qualitative order-of-magnitude comparison
+  values:
+    method_class: quoted_attributed
+    comparisons:
+    - attribution: Brewer and Rosenblatt (1969)
+      statement_as_printed: P(FeO)/P(Fe) ± 0.2 in equilibrium vapor at T = 1700°C for FeO1.11(l).
+    - attribution: Yakovlev et al. (1984); Markova et al. (1986)
+      statement_as_printed: at 1700–1750 °C, Fe2+ content was approximately two orders of magnitude lower than Fe0 when FeO
+        partial pressures were maximal.
+    note: Attributions and approximate forms are retained verbatim in meaning. The first is a ratio of partial pressures,
+      and the second is an approximate order-of-magnitude comparison; neither is rewritten as a scalar partial pressure or
+      converted to a numeric valence ratio.
+  context_id: dikov-2009-luna16-condensate-iron::context::dikov_2009_prior_vaporization_comparisons
+  work_id: 10.1134/s0869591109050014
+  source_id: dikov-2009-luna16-condensate-iron
+  species: L1639

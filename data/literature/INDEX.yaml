@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 789
-  extracts: 787
+  sources: 793
+  extracts: 791
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 79
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 787
-  alias_groups_needing_resolution: 84
+  extracts_without_pdf: 791
+  alias_groups_needing_resolution: 85
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -140,6 +140,7 @@ gaps:
   - deguzman-2026-simulant-physicochemical
   - delgado-2015-mg-thermite-regolith
   - di-donato-granati-2000
+  - dikov-2009-luna16-condensate-iron
   - distin-1971-ferrous-silicate-melts
   - dohmen-1998-olivine-fe-gas
   - dohmen-2003-coupled-kinetics
@@ -435,6 +436,7 @@ gaps:
   - metsoc-2024-6224
   - miao-li-yan-2023-fe-v-spinel-gibbs
   - miki-1999-si-alloy-thermodynamics
+  - moeller-2007-silicon-oxide-evaporation-condensation
   - mogul-2023-pioneer-venus-co2-icarus
   - moosavi-khoonsari-2015-na-fe-cmas-thesis
   - morey-1964-usgs-pp440l-phase-equilibria
@@ -518,6 +520,8 @@ gaps:
   - rau-1974-se-vp
   - rb86-capobianco-navrotsky-1982
   - rb86-neuvonen-1952
+  - rb86-stebbins-carmichael-1984
+  - rb86-stebbins-etal-1984
   - rb86-takahashi-yoshio-1970
   - ref-032-al
   - ref-032-bi
@@ -891,95 +895,95 @@ gaps:
   sidecars_missing_fields:
   - source_id: ivtan-cro2-g
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-    missing_fields: &id001
+    missing_fields:
     - doi
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-    missing_fields: &id002
+    missing_fields:
     - retrieval_url
   - source_id: kems-005-fedkin-2006
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-    missing_fields: &id003
+    missing_fields:
     - retrieval_url
   - source_id: kems-011-wetzel-gail-2013
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-    missing_fields: &id004
+    missing_fields:
     - retrieved_date
     - retrieval_url
   - source_id: kems-012-sossi-2019
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-    missing_fields: &id005
+    missing_fields:
     - sha256
     - retrieved_date
   - source_id: kems-014-drowart-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-    missing_fields: &id006
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-022-demaria-1971
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-    missing_fields: &id007
+    missing_fields:
     - doi
   - source_id: kems-035-sauerborn-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-    missing_fields: &id008
+    missing_fields:
     - doi
   - source_id: kems-036-sesko-2024
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-    missing_fields: &id009
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-041-sossi-fegley-2018
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-    missing_fields: &id010
+    missing_fields:
     - retrieval_url
   - source_id: kems-042-plante-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-    missing_fields: &id011
+    missing_fields:
     - sha256
   - source_id: kems-050-gorokhov-1977
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-    missing_fields: &id012
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-093-piacente-1975
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-    missing_fields: &id013
+    missing_fields:
     - doi
   - source_id: kems-103-fraser-1983
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-    missing_fields: &id014
+    missing_fields:
     - sha256
   - source_id: kems-114-nichols-1995
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-    missing_fields: &id015
+    missing_fields:
     - doi
   - source_id: kems-133-costa-2017
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-    missing_fields: &id016
+    missing_fields:
     - sha256
   - source_id: kems-140-heck-2025
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-    missing_fields: &id017
+    missing_fields:
     - sha256
   - source_id: kems-184-behrens-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-    missing_fields: &id018
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-ms2000-044
     sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-    missing_fields: &id019
+    missing_fields:
     - doi
     - retrieval_url
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-    missing_fields: &id020
+    missing_fields:
     - doi
     - retrieved_date
   - source_id: stebbins-carmichael-weill-1983
     sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-    missing_fields: &id021
+    missing_fields:
     - doi
     - retrieved_date
   source_id_collisions:
@@ -1013,6 +1017,12 @@ gaps:
     - ntrs-20250004626
     - paper
     - yu_2025_acta_astronautica_235_723_735
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1016/j.asr.2026.02.003
+    source_ids:
+    - kems-044-robinot-2026
+    - robinot_2026
     resolution: owner/controller
   - type: same_doi
     key: 10.1016/j.gca.2005.08.014
@@ -1072,6 +1082,12 @@ gaps:
     - lh87-mgo-g
     resolution: owner/controller
   - type: same_doi
+    key: 10.2138/rmg.2018.84.11
+    source_ids:
+    - arxiv-1902-05005
+    - kems-041-sossi-fegley-2018
+    resolution: owner/controller
+  - type: same_doi
     key: 10.2355/isijinternational.33.26
     source_ids:
     - kems-190-wu-1993
@@ -1082,6 +1098,18 @@ gaps:
     source_ids:
     - kems-042-plante-1979
     - kems-184-behrens-1979
+    resolution: owner/controller
+  - type: same_report
+    key: NTRS 20150002321
+    source_ids:
+    - costa-jacobson-2015
+    - kems-007-costa-2015
+    resolution: owner/controller
+  - type: source_id_alias
+    key: abdul-2023
+    source_ids:
+    - abdul-2023-cao-sio2-calphad
+    - abdul-2023-clinker-thesis
     resolution: owner/controller
   - type: source_id_alias
     key: alcock-1984
@@ -1098,10 +1126,22 @@ gaps:
     - ref-032-zr
     resolution: owner/controller
   - type: source_id_alias
+    key: banya-1985
+    source_ids:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox
+    - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+    resolution: owner/controller
+  - type: source_id_alias
     key: beyer-1980
     source_ids:
     - beyer-1980-potassium-metasilicate-disilicate-ri8410
     - beyer-brown-ferrante-1980-kalo2-thermodynamics
+    resolution: owner/controller
+  - type: source_id_alias
+    key: bischof-2023
+    source_ids:
+    - kems-137-bischof-2023
+    - kems-138-bischof-2023
     resolution: owner/controller
   - type: source_id_alias
     key: borisov-2004
@@ -1116,10 +1156,23 @@ gaps:
     - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
     resolution: owner/controller
   - type: source_id_alias
+    key: chen-2022
+    source_ids:
+    - chen-2022-mgo-sio2-tio2-phase-equilibria
+    - chen-2022-sio2-mno-slag-activities
+    resolution: owner/controller
+  - type: source_id_alias
     key: colson-1998
     source_ids:
     - colson-floden-1998-lpsc-co-nickel-activity
     - colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+    resolution: owner/controller
+  - type: source_id_alias
+    key: costa-2015
+    source_ids:
+    - costa-2015-yb-silicate-silica-activity
+    - costa-jacobson-2015
+    - kems-007-costa-2015
     resolution: owner/controller
   - type: source_id_alias
     key: datz-1961
@@ -1184,10 +1237,22 @@ gaps:
     - jeon-lindberg-2025-mgo-refractory-slag-interface
     resolution: owner/controller
   - type: source_id_alias
+    key: kassis-1981
+    source_ids:
+    - kassis-frischat-1981-mixed-alkali-vapor-pressures
+    - kassis-frischat-1981-silicate-glass-vapour
+    resolution: owner/controller
+  - type: source_id_alias
     key: khedim-2010
     source_ids:
     - khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
     - khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+    resolution: owner/controller
+  - type: source_id_alias
+    key: kirschen-1999
+    source_ids:
+    - kirschen-1999-si-ti-al-miscibility
+    - kirschen-decapitani-1999-liquid-miscibility
     resolution: owner/controller
   - type: source_id_alias
     key: lamoreaux-1987
@@ -1222,6 +1287,19 @@ gaps:
     source_ids:
     - morris-2006-gusev-mossbauer
     - morris-2006-meridiani-mossbauer
+    resolution: owner/controller
+  - type: source_id_alias
+    key: rb86-1984
+    source_ids:
+    - rb86-stebbins-carmichael-1984
+    - rb86-stebbins-etal-1984
+    resolution: owner/controller
+  - type: source_id_alias
+    key: robinot-2026
+    source_ids:
+    - kems-044-robinot-2026
+    - robinot_2026
+    - robinot_2026_vacuum_pyrolysis
     resolution: owner/controller
   - type: source_id_alias
     key: schneider-1980
@@ -1261,6 +1339,13 @@ gaps:
     - sesko_2024_vapor_phase_pyrolysis
     resolution: owner/controller
   - type: source_id_alias
+    key: shornikov-1997
+    source_ids:
+    - shornikov-1997-cao-al2o3
+    - shornikov-1997-cao-alumina-vapor
+    - shornikov-1997-diopside-vaporization
+    resolution: owner/controller
+  - type: source_id_alias
     key: shornikov-1999
     source_ids:
     - shornikov-1999-alumina-silica-vaporization
@@ -1285,10 +1370,30 @@ gaps:
     - shornikov-2002-spinel-mgal2o4
     resolution: owner/controller
   - type: source_id_alias
+    key: shornikov-2003
+    source_ids:
+    - shornikov-2003-aluminosilicate-solids
+    - shornikov-2003-mullite-thermodynamics
+    - shornikov-2003-silica-catitanoate-melts
+    resolution: owner/controller
+  - type: source_id_alias
     key: shornikov-2007
     source_ids:
     - shornikov-2007-ca-aluminosilicate-activities
     - shornikov-2007-cao-aluminosilicate-melts
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2008
+    source_ids:
+    - shornikov-2008-mgo-aluminosilicate-melts
+    - shornikov-2008-redox-oxide-evaporation
+    - shornikov-2008-zinc-phosphate-melts
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2011
+    source_ids:
+    - shornikov-2011-cao-mgo-alumina-melts
+    - shornikov-2011-titania-melt-evaporation
     resolution: owner/controller
   - type: source_id_alias
     key: shornikov-2013
@@ -1303,168 +1408,6 @@ gaps:
     - shornikov-2014-complex-oxide-vapor
     - shornikov-2014-sodium-germanate-melts
     - shornikov-2014-sodium-silicate-model
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2018
-    source_ids:
-    - shornikov-2018-cai-complex-gas-species
-    - shornikov-2018-cai-double-inversion
-    - shornikov-2018-spinel-solid-solutions
-    - shornikov-2018-thermodynamic-evaporation-model
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2022
-    source_ids:
-    - shornikov-2022-k2o-al2o3-melts
-    - shornikov-2022-meteorite-redox-evaporation
-    - shornikov-2022-na2o-al2o3-melts
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2023
-    source_ids:
-    - shornikov-2023-cai-melt-evaporation
-    - shornikov-2023-calcium-phosphate
-    - shornikov-2023-mgo-phosphate-melts
-    - shornikov-2023-natural-cai-evaporation
-    - shornikov-2023-silica-phosphate-melts
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2026
-    source_ids:
-    - shornikov-2026-hatrurite-evaporation
-    - shornikov-2026-wollastonite-kems
-    resolution: owner/controller
-  - type: source_id_alias
-    key: slag-1993
-    source_ids:
-    - slag-001-banya-1993
-    - slag-002-banya-hino-nagasaka-1993
-    - slag-003-hino-kitagawa-banya-1993
-    resolution: owner/controller
-  - type: source_id_alias
-    key: sossi-2020
-    source_ids:
-    - sossi-2020-cu-zn-isotope-evap-formalism
-    - sossi-2020-magma-ocean-redox
-    resolution: owner/controller
-  - type: source_id_alias
-    key: tsukihashi-1985
-    source_ids:
-    - tsukihashi-1985-na-silicate-mn-p-nitrogen
-    - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
-    resolution: owner/controller
-  - type: source_id_alias
-    key: vickerfalt-2024
-    source_ids:
-    - vickerfalt-2024-al-si-v-phase-diagram
-    - vickerfalt-2024-autogenous-slag-thesis
-    resolution: owner/controller
-  - type: source_id_alias
-    key: yamada-1980
-    source_ids:
-    - kems-067-yamada-1980
-    - kems-087-yamada-kato-1980
-    resolution: owner/controller
-  - type: source_id_alias
-    key: zhang-2021
-    source_ids:
-    - kems-006-zhang-2021
-    - zhang-2021-acsesc-si
-    resolution: owner/controller
-  - type: same_doi
-    key: 10.1016/j.asr.2026.02.003
-    source_ids:
-    - kems-044-robinot-2026
-    - robinot_2026
-    resolution: owner/controller
-  - type: same_doi
-    key: 10.2138/rmg.2018.84.11
-    source_ids:
-    - arxiv-1902-05005
-    - kems-041-sossi-fegley-2018
-    resolution: owner/controller
-  - type: same_report
-    key: NTRS 20150002321
-    source_ids:
-    - costa-jacobson-2015
-    - kems-007-costa-2015
-    resolution: owner/controller
-  - type: source_id_alias
-    key: abdul-2023
-    source_ids:
-    - abdul-2023-cao-sio2-calphad
-    - abdul-2023-clinker-thesis
-    resolution: owner/controller
-  - type: source_id_alias
-    key: banya-1985
-    source_ids:
-    - banya-hino-takezoe-1985-na-fe-silicate-redox
-    - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
-    resolution: owner/controller
-  - type: source_id_alias
-    key: bischof-2023
-    source_ids:
-    - kems-137-bischof-2023
-    - kems-138-bischof-2023
-    resolution: owner/controller
-  - type: source_id_alias
-    key: chen-2022
-    source_ids:
-    - chen-2022-mgo-sio2-tio2-phase-equilibria
-    - chen-2022-sio2-mno-slag-activities
-    resolution: owner/controller
-  - type: source_id_alias
-    key: costa-2015
-    source_ids:
-    - costa-2015-yb-silicate-silica-activity
-    - costa-jacobson-2015
-    - kems-007-costa-2015
-    resolution: owner/controller
-  - type: source_id_alias
-    key: kassis-1981
-    source_ids:
-    - kassis-frischat-1981-mixed-alkali-vapor-pressures
-    - kassis-frischat-1981-silicate-glass-vapour
-    resolution: owner/controller
-  - type: source_id_alias
-    key: kirschen-1999
-    source_ids:
-    - kirschen-1999-si-ti-al-miscibility
-    - kirschen-decapitani-1999-liquid-miscibility
-    resolution: owner/controller
-  - type: source_id_alias
-    key: robinot-2026
-    source_ids:
-    - kems-044-robinot-2026
-    - robinot_2026
-    - robinot_2026_vacuum_pyrolysis
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-1997
-    source_ids:
-    - shornikov-1997-cao-al2o3
-    - shornikov-1997-cao-alumina-vapor
-    - shornikov-1997-diopside-vaporization
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2003
-    source_ids:
-    - shornikov-2003-aluminosilicate-solids
-    - shornikov-2003-mullite-thermodynamics
-    - shornikov-2003-silica-catitanoate-melts
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2008
-    source_ids:
-    - shornikov-2008-mgo-aluminosilicate-melts
-    - shornikov-2008-redox-oxide-evaporation
-    - shornikov-2008-zinc-phosphate-melts
-    resolution: owner/controller
-  - type: source_id_alias
-    key: shornikov-2011
-    source_ids:
-    - shornikov-2011-cao-mgo-alumina-melts
-    - shornikov-2011-titania-melt-evaporation
     resolution: owner/controller
   - type: source_id_alias
     key: shornikov-2015
@@ -1488,6 +1431,14 @@ gaps:
     - shornikov-2017-spinel-thermodynamics
     resolution: owner/controller
   - type: source_id_alias
+    key: shornikov-2018
+    source_ids:
+    - shornikov-2018-cai-complex-gas-species
+    - shornikov-2018-cai-double-inversion
+    - shornikov-2018-spinel-solid-solutions
+    - shornikov-2018-thermodynamic-evaporation-model
+    resolution: owner/controller
+  - type: source_id_alias
     key: shornikov-2019
     source_ids:
     - shornikov-2019-ca-feo-vapor
@@ -1505,6 +1456,22 @@ gaps:
     - shornikov-2020-cao-tio2-melts
     - shornikov-2020-mgo-feo-melts
     - shornikov-2020-perovskite-chemical-fractionation
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2022
+    source_ids:
+    - shornikov-2022-k2o-al2o3-melts
+    - shornikov-2022-meteorite-redox-evaporation
+    - shornikov-2022-na2o-al2o3-melts
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2023
+    source_ids:
+    - shornikov-2023-cai-melt-evaporation
+    - shornikov-2023-calcium-phosphate
+    - shornikov-2023-mgo-phosphate-melts
+    - shornikov-2023-natural-cai-evaporation
+    - shornikov-2023-silica-phosphate-melts
     resolution: owner/controller
   - type: source_id_alias
     key: shornikov-2024
@@ -1528,10 +1495,41 @@ gaps:
     - shornikov-2025-saratov-alkali-evaporation
     resolution: owner/controller
   - type: source_id_alias
+    key: shornikov-2026
+    source_ids:
+    - shornikov-2026-hatrurite-evaporation
+    - shornikov-2026-wollastonite-kems
+    resolution: owner/controller
+  - type: source_id_alias
+    key: slag-1993
+    source_ids:
+    - slag-001-banya-1993
+    - slag-002-banya-hino-nagasaka-1993
+    - slag-003-hino-kitagawa-banya-1993
+    resolution: owner/controller
+  - type: source_id_alias
     key: sossi-2018
     source_ids:
     - kems-041-sossi-fegley-2018
     - kems-045-sossi-2018-pnas-cr
+    resolution: owner/controller
+  - type: source_id_alias
+    key: sossi-2020
+    source_ids:
+    - sossi-2020-cu-zn-isotope-evap-formalism
+    - sossi-2020-magma-ocean-redox
+    resolution: owner/controller
+  - type: source_id_alias
+    key: tsukihashi-1985
+    source_ids:
+    - tsukihashi-1985-na-silicate-mn-p-nitrogen
+    - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
+    resolution: owner/controller
+  - type: source_id_alias
+    key: vickerfalt-2024
+    source_ids:
+    - vickerfalt-2024-al-si-v-phase-diagram
+    - vickerfalt-2024-autogenous-slag-thesis
     resolution: owner/controller
   - type: source_id_alias
     key: wang-2017
@@ -1540,10 +1538,22 @@ gaps:
     - wang-2017-sodium-stannate-formation-emf
     resolution: owner/controller
   - type: source_id_alias
+    key: yamada-1980
+    source_ids:
+    - kems-067-yamada-1980
+    - kems-087-yamada-kato-1980
+    resolution: owner/controller
+  - type: source_id_alias
     key: zaitsev-2000
     source_ids:
     - zaitsev-2000-ms2000-045
     - zaitsev-2000-sodium-silicate-thermodynamics
+    resolution: owner/controller
+  - type: source_id_alias
+    key: zhang-2021
+    source_ids:
+    - kems-006-zhang-2021
+    - zhang-2021-acsesc-si
     resolution: owner/controller
 sources:
 - source_id: 1997jonesthermo
@@ -8559,6 +8569,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: dikov-2009-luna16-condensate-iron
+  aliases: []
+  citation: Dikov, Yu. P., Gerasimov, M. V., Yakovlev, O. I. & Ivanov, A. V. (2009), "Valence State of
+    Iron in a Condensate from the Luna 16 Regolith", Petrology 17(5):429–438. DOI 10.1134/S0869591109050014.
+  doi: 10.1134/S0869591109050014
+  report_number: null
+  identifier: 10.1134/S0869591109050014
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/dikov-2009-luna16-condensate-iron/dikov-2009-luna16-condensate-iron.pdf
+      present: true
+      sha256: 6f2f39dd5f465e06bae9e721478520e0810a04ee7d60109c1edf52364c2d4b4d
+      matches_simulator: null
+    sidecar:
+      path: raw/dikov-2009-luna16-condensate-iron/sidecar.yaml
+      present: true
+    text:
+      path: text/dikov-2009-luna16-condensate-iron
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/dikov-2009-luna16-condensate-iron
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/dikov-2009-luna16-condensate-iron.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/dikov-2009-luna16-condensate-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: distin-1971-ferrous-silicate-melts
   aliases: []
   citation: Distin, P. A., Whiteway, S. G. & Masson, C. R. (1971), "Thermodynamics and constitution of
@@ -13483,7 +13551,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-  sidecar_missing_fields: *id001
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/ivtan-cro2-g.yaml
@@ -15235,7 +15304,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-  sidecar_missing_fields: *id002
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
@@ -15292,7 +15362,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-  sidecar_missing_fields: *id003
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
@@ -15641,7 +15712,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-  sidecar_missing_fields: *id004
+  sidecar_missing_fields:
+  - retrieved_date
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
@@ -15695,7 +15768,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-  sidecar_missing_fields: *id005
+  sidecar_missing_fields:
+  - sha256
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
@@ -15750,7 +15825,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-  sidecar_missing_fields: *id006
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
@@ -16192,7 +16269,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-  sidecar_missing_fields: *id007
+  sidecar_missing_fields:
+  - doi
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
@@ -16832,7 +16910,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-  sidecar_missing_fields: *id008
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
@@ -16888,7 +16967,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-  sidecar_missing_fields: *id009
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
@@ -17182,7 +17263,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-  sidecar_missing_fields: *id010
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
@@ -17239,7 +17321,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-  sidecar_missing_fields: *id011
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
@@ -17653,7 +17736,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-  sidecar_missing_fields: *id012
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -18290,7 +18375,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-  sidecar_missing_fields: *id013
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-093-piacente-1975.yaml
@@ -18454,7 +18540,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-  sidecar_missing_fields: *id014
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-103-fraser-1983.yaml
@@ -18683,7 +18770,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-  sidecar_missing_fields: *id015
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-114-nichols-1995.yaml
@@ -19080,7 +19168,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-  sidecar_missing_fields: *id016
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-133-costa-2017.yaml
@@ -19292,7 +19381,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-  sidecar_missing_fields: *id017
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-140-heck-2025.yaml
@@ -19404,7 +19494,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-  sidecar_missing_fields: *id018
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-184-behrens-1979.yaml
@@ -20039,7 +20131,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-  sidecar_missing_fields: *id019
+  sidecar_missing_fields:
+  - doi
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
@@ -25704,6 +25798,65 @@ sources:
       last_stage: extracted
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  aliases: []
+  citation: Michael Möller (2007), Infrarotspektroskopische Untersuchungen des Verdampfens, der Kondensation
+    und des Temperns von Siliziumoxid, Diplomarbeit, Ruprecht-Karls-Universität Heidelberg, Kirchhoff-Institut
+    für Physik, HD-KIP 07-37.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/moeller-2007-silicon-oxide-evaporation-condensation/moeller-2007-silicon-oxide-evaporation-condensation.pdf
+      present: true
+      sha256: fcb1940aba122cb6f4c2a93130266e41f0fbc6fd8d5ba8883dac264b713ccbbe
+      matches_simulator: null
+    sidecar:
+      path: raw/moeller-2007-silicon-oxide-evaporation-condensation/sidecar.yaml
+      present: true
+    text:
+      path: text/moeller-2007-silicon-oxide-evaporation-condensation
+      exists: true
+      file_count: 253
+    tables:
+      path: tables/moeller-2007-silicon-oxide-evaporation-condensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: mogul-2023-pioneer-venus-co2-icarus
   aliases: []
   citation: 'Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical
@@ -30621,6 +30774,122 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: rb86-stebbins-carmichael-1984
+  aliases: []
+  citation: Stebbins, J. F. and Carmichael, I. S. E. (1984), The heat of fusion of fayalite, American
+    Mineralogist 69, 292–297.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/rb86-stebbins-carmichael-1984.yaml
+    review_status: draft
+    rows: 45
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/rb86-stebbins-carmichael-1984/rb86-stebbins-carmichael-1984.pdf
+      present: true
+      sha256: 049acd9f0417fa7d8a23980ab93c21683a34a373bd8a01f76a1f2b210eee871d
+      matches_simulator: null
+    sidecar:
+      path: raw/rb86-stebbins-carmichael-1984/sidecar.yaml
+      present: true
+    text:
+      path: text/rb86-stebbins-carmichael-1984
+      exists: true
+      file_count: 25
+    tables:
+      path: tables/rb86-stebbins-carmichael-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/rb86-stebbins-carmichael-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/rb86-stebbins-carmichael-1984.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
+- source_id: rb86-stebbins-etal-1984
+  aliases: []
+  citation: Stebbins, J. F., Carmichael, I. S. E. & Moret, L. K. (1984), “Heat capacities and entropies
+    of silicate liquids and glasses”, Contributions to Mineralogy and Petrology 86, 131–148.
+  doi: 10.1007/BF00381840
+  report_number: null
+  identifier: 10.1007/BF00381840
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/rb86-stebbins-etal-1984.yaml
+    review_status: draft
+    rows: 275
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/rb86-stebbins-etal-1984/rb86-stebbins-etal-1984.pdf
+      present: true
+      sha256: 121eb7d51dd31dc49430264ac73eaaa7b317065996fdf97e633ca227b6c78492
+      matches_simulator: null
+    sidecar:
+      path: raw/rb86-stebbins-etal-1984/sidecar.yaml
+      present: true
+    text:
+      path: text/rb86-stebbins-etal-1984
+      exists: true
+      file_count: 52
+    tables:
+      path: tables/rb86-stebbins-etal-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/rb86-stebbins-etal-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/rb86-stebbins-etal-1984.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8874a0416966327981e980469e6df38dfd9855c1
 - source_id: rb86-takahashi-yoshio-1970
   aliases: []
   citation: Takahashi, K. and Yoshio, T. (1970). Energy Relations in Alkali Silicates by Solution Calorimetry
@@ -40457,7 +40726,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-  sidecar_missing_fields: *id020
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
@@ -40808,7 +41079,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-  sidecar_missing_fields: *id021
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml

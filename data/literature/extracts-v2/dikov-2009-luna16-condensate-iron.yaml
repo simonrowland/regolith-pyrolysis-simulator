@@ -1,0 +1,3494 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml
+observations:
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_augite_condensate_fe0_fraction::points:h=dc9336306af9
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.078'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: quench-condensed augite vapor on Ni foil
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_range_as_published:
+      state:
+        tag: value
+        value: 4000–5000 K characteristic sample temperature
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    atmosphere:
+      state:
+        tag: value
+        value: He at 1 atm
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+        note: Source prints He at 1 atm; identity uses Pa.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Only a 4000–5000 K characteristic range is printed, not a single temperature.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: unknown
+        reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    duration_s:
+      state:
+        tag: value
+        value: ~10^-3 s laser pulse
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.8'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_augite_condensate_fe2_fraction::points:h=15fdc6e7a4d3
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.466'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: quench-condensed augite vapor on Ni foil
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_range_as_published:
+      state:
+        tag: value
+        value: 4000–5000 K characteristic sample temperature
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    atmosphere:
+      state:
+        tag: value
+        value: He at 1 atm
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+        note: Source prints He at 1 atm; identity uses Pa.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Only a 4000–5000 K characteristic range is printed, not a single temperature.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: unknown
+        reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    duration_s:
+      state:
+        tag: value
+        value: ~10^-3 s laser pulse
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '46.6'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_augite_condensate_fe3_fraction::points:h=23587bd64778
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.456'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: quench-condensed augite vapor on Ni foil
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_range_as_published:
+      state:
+        tag: value
+        value: 4000–5000 K characteristic sample temperature
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    atmosphere:
+      state:
+        tag: value
+        value: He at 1 atm
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+        note: Source prints He at 1 atm; identity uses Pa.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Only a 4000–5000 K characteristic range is printed, not a single temperature.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: unknown
+        reason: The fraction is reported as an average; no aggregate condensate composition is printed.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    duration_s:
+      state:
+        tag: value
+        value: ~10^-3 s laser pulse
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '45.6'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_initial_augite_fe0_fraction::points:h=18582f06056a
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '18'
+        - - Al
+          - '4.3'
+        - - Fe2+
+          - '2.1'
+        - - Fe3+
+          - '0.4'
+        - - Mg
+          - '7.1'
+        - - Ca
+          - '6.1'
+        - - Na
+          - '2'
+        - - O
+          - '59.8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: initial augite sample
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '18'
+          - - Al
+            - '4.3'
+          - - Fe2+
+            - '2.1'
+          - - Fe3+
+            - '0.4'
+          - - Mg
+            - '7.1'
+          - - Ca
+            - '6.1'
+          - - Na
+            - '2'
+          - - O
+            - '59.8'
+          amount_basis: mol_inventory
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No measurement temperature for initial augite XPS fractions is reported.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_initial_augite_fe2_fraction::points:h=7cb99073d47b
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '18'
+        - - Al
+          - '4.3'
+        - - Fe2+
+          - '2.1'
+        - - Fe3+
+          - '0.4'
+        - - Mg
+          - '7.1'
+        - - Ca
+          - '6.1'
+        - - Na
+          - '2'
+        - - O
+          - '59.8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.84'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: initial augite sample
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '18'
+          - - Al
+            - '4.3'
+          - - Fe2+
+            - '2.1'
+          - - Fe3+
+            - '0.4'
+          - - Mg
+            - '7.1'
+          - - Ca
+            - '6.1'
+          - - Na
+            - '2'
+          - - O
+            - '59.8'
+          amount_basis: mol_inventory
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No measurement temperature for initial augite XPS fractions is reported.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '84'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_initial_augite_fe3_fraction::points:h=433fd823920e
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '18'
+        - - Al
+          - '4.3'
+        - - Fe2+
+          - '2.1'
+        - - Fe3+
+          - '0.4'
+        - - Mg
+          - '7.1'
+        - - Ca
+          - '6.1'
+        - - Na
+          - '2'
+        - - O
+          - '59.8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.16'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical error for Fe valence-form concentrations: ±10 relative; confidence level not stated (published page
+        436).'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 5
+    published_page: 433
+    pdf_page_index: 4
+    section: EXPERIMENTAL
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: initial augite sample
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '18'
+          - - Al
+            - '4.3'
+          - - Fe2+
+            - '2.1'
+          - - Fe3+
+            - '0.4'
+          - - Mg
+            - '7.1'
+          - - Ca
+            - '6.1'
+          - - Na
+            - '2'
+          - - O
+            - '59.8'
+          amount_basis: mol_inventory
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No measurement temperature for initial augite XPS fractions is reported.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas ratio is reported for initial augite XPS fractions.
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '16'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 433
+          pdf_page_index: 4
+          section: EXPERIMENTAL
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table1_l1639_elemental_at_percent
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_at_percent_composition'
+    species:
+      formula: L1639
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_at_percent_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical-method accuracy: ±5% for absolute contents >10 at.%; ±10% for contents <10 at.%. Confidence level
+        not stated.'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 2
+    published_page: 430
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=1b67aa9856f2
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '11.6'
+        - - Ti
+          - '1.1'
+        - - Al
+          - '6.5'
+        - - Fe
+          - '2.8'
+        - - Mg
+          - '2.9'
+        - - Ca
+          - '4.8'
+        - - Na
+          - '3.3'
+        - - O
+          - '60.7'
+        - - C
+          - '2.9'
+        - - S
+          - '0.7'
+        - - Zn
+          - '2.3'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.43'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '400'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '11.6'
+          - - Ti
+            - '1.1'
+          - - Al
+            - '6.5'
+          - - Fe
+            - '2.8'
+          - - Mg
+            - '2.9'
+          - - Ca
+            - '4.8'
+          - - Na
+            - '3.3'
+          - - O
+            - '60.7'
+          - - C
+            - '2.9'
+          - - S
+            - '0.7'
+          - - Zn
+            - '2.3'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=2a359a40e476
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '11.8'
+        - - Ti
+          - '1.1'
+        - - Al
+          - '7.6'
+        - - Fe
+          - '2.4'
+        - - Mg
+          - '4.7'
+        - - Ca
+          - '3.6'
+        - - Na
+          - '3'
+        - - O
+          - '58.6'
+        - - C
+          - '6.4'
+        - - S
+          - '0.5'
+        - - Zn
+          - '0.4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.25'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '11.8'
+          - - Ti
+            - '1.1'
+          - - Al
+            - '7.6'
+          - - Fe
+            - '2.4'
+          - - Mg
+            - '4.7'
+          - - Ca
+            - '3.6'
+          - - Na
+            - '3'
+          - - O
+            - '58.6'
+          - - C
+            - '6.4'
+          - - S
+            - '0.5'
+          - - Zn
+            - '0.4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=2b17b1c1ae45
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '13.1'
+        - - Ti
+          - '1.8'
+        - - Al
+          - '6.9'
+        - - Fe
+          - '2.5'
+        - - Mg
+          - '3.3'
+        - - Ca
+          - '3.3'
+        - - Na
+          - '1.1'
+        - - O
+          - '63.7'
+        - - C
+          - '3'
+        - - S
+          - '1.2'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '13.1'
+          - - Ti
+            - '1.8'
+          - - Al
+            - '6.9'
+          - - Fe
+            - '2.5'
+          - - Mg
+            - '3.3'
+          - - Ca
+            - '3.3'
+          - - Na
+            - '1.1'
+          - - O
+            - '63.7'
+          - - C
+            - '3'
+          - - S
+            - '1.2'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=58abb4130f41
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '13.4'
+        - - Ti
+          - '0.6'
+        - - Al
+          - '7.7'
+        - - Fe
+          - '2.2'
+        - - Mg
+          - '3.9'
+        - - Ca
+          - '3.9'
+        - - Na
+          - '2.9'
+        - - O
+          - '56.2'
+        - - C
+          - '6.1'
+        - - S
+          - '0.7'
+        - - Zn
+          - '2.4'
+        - - Bi
+          - '0.01'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.32'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '13.4'
+          - - Ti
+            - '0.6'
+          - - Al
+            - '7.7'
+          - - Fe
+            - '2.2'
+          - - Mg
+            - '3.9'
+          - - Ca
+            - '3.9'
+          - - Na
+            - '2.9'
+          - - O
+            - '56.2'
+          - - C
+            - '6.1'
+          - - S
+            - '0.7'
+          - - Zn
+            - '2.4'
+          - - Bi
+            - '0.01'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=65765b43478c
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '20.7'
+        - - Ti
+          - '2.6'
+        - - Al
+          - '6.1'
+        - - Fe
+          - '4.2'
+        - - Mg
+          - '4.1'
+        - - Ca
+          - '2.5'
+        - - O
+          - '36.4'
+        - - C
+          - '21.9'
+        - - S
+          - '1.4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.21'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: Surface
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '20.7'
+          - - Ti
+            - '2.6'
+          - - Al
+            - '6.1'
+          - - Fe
+            - '4.2'
+          - - Mg
+            - '4.1'
+          - - Ca
+            - '2.5'
+          - - O
+            - '36.4'
+          - - C
+            - '21.9'
+          - - S
+            - '1.4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=6d0e4eec02bb
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '11.2'
+        - - Ti
+          - '2.3'
+        - - Al
+          - '6.3'
+        - - Fe
+          - '2.3'
+        - - Mg
+          - '3.5'
+        - - Ca
+          - '9.4'
+        - - O
+          - '56.7'
+        - - C
+          - '7.4'
+        - - S
+          - '0.9'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.26'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '11.2'
+          - - Ti
+            - '2.3'
+          - - Al
+            - '6.3'
+          - - Fe
+            - '2.3'
+          - - Mg
+            - '3.5'
+          - - Ca
+            - '9.4'
+          - - O
+            - '56.7'
+          - - C
+            - '7.4'
+          - - S
+            - '0.9'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=d2274200c721
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '22.2'
+        - - Ti
+          - '2.2'
+        - - Al
+          - '10.6'
+        - - Fe
+          - '6.4'
+        - - Mg
+          - '3.6'
+        - - Ca
+          - '4.1'
+        - - Na
+          - '5.7'
+        - - O
+          - '34.7'
+        - - C
+          - '7.2'
+        - - S
+          - '1.1'
+        - - Zn
+          - '2.1'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '50'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '22.2'
+          - - Ti
+            - '2.2'
+          - - Al
+            - '10.6'
+          - - Fe
+            - '6.4'
+          - - Mg
+            - '3.6'
+          - - Ca
+            - '4.1'
+          - - Na
+            - '5.7'
+          - - O
+            - '34.7'
+          - - C
+            - '7.2'
+          - - S
+            - '1.1'
+          - - Zn
+            - '2.1'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=d3c7aa64e72e
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '20'
+        - - Ti
+          - '2'
+        - - Al
+          - '9.6'
+        - - Fe
+          - '6.7'
+        - - Mg
+          - '6.8'
+        - - Ca
+          - '3.9'
+        - - Na
+          - '5.3'
+        - - O
+          - '38'
+        - - C
+          - '3.5'
+        - - S
+          - '1.4'
+        - - Zn
+          - '2.8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.46'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '100'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '20'
+          - - Ti
+            - '2'
+          - - Al
+            - '9.6'
+          - - Fe
+            - '6.7'
+          - - Mg
+            - '6.8'
+          - - Ca
+            - '3.9'
+          - - Na
+            - '5.3'
+          - - O
+            - '38'
+          - - C
+            - '3.5'
+          - - S
+            - '1.4'
+          - - Zn
+            - '2.8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_fe0_fraction::points:h=f533ee657308
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_atomic_percent
+        components:
+        - - Si
+          - '13.5'
+        - - Ti
+          - '0.7'
+        - - Al
+          - '6.7'
+        - - Fe
+          - '3.4'
+        - - Mg
+          - '3.7'
+        - - Ca
+          - '3.4'
+        - - Na
+          - '3'
+        - - O
+          - '59'
+        - - C
+          - '3.6'
+        - - S
+          - '1.1'
+        - - Zn
+          - '2'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.21'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 gives no per-cell uncertainty. The analytical-method section states ±10% accuracy for elemental contents
+        below 10 at.%; all Fe contents in Table 2 are below that threshold. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe0/ΣFe
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper reports no sample temperature for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no oxygen fugacity for the lunar XPS profile.
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        section: Analytical Methods
+    depth_A:
+      state:
+        tag: value
+        value: '700'
+      locator:
+        page: 3
+        published_page: 431
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_atomic_percent
+          components:
+          - - Si
+            - '13.5'
+          - - Ti
+            - '0.7'
+          - - Al
+            - '6.7'
+          - - Fe
+            - '3.4'
+          - - Mg
+            - '3.7'
+          - - Ca
+            - '3.4'
+          - - Na
+            - '3'
+          - - O
+            - '59'
+          - - C
+            - '3.6'
+          - - S
+            - '1.1'
+          - - Zn
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 430
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters: []
+    output_unit: fraction as printed
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table2_l1639_valence_composition_at_percent
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_valence_at_percent_composition'
+    species:
+      formula: L1639
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_valence_at_percent_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical-method accuracy: ±5% for absolute contents >10 at.%; ±10% for contents <10 at.%. Confidence level
+        not stated.'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 3
+    published_page: 431
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_table3_augite_condensate_composition
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_augite_laser_vaporization_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_at_percent_composition'
+    species:
+      formula: augite_condensate
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_at_percent_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Analytical-method accuracy: ±5% for absolute contents >10 at.%; ±10% for contents <10 at.%. Confidence level
+        not stated.'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 6
+    published_page: 434
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    temperature_range_as_published:
+      state:
+        tag: value
+        value: 4000–5000 K characteristic sample temperature in Experimental section; abstract separately says approximately
+          3000–4000 K
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    atmosphere:
+      state:
+        tag: value
+        value: He at 1 atm
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+    duration_s:
+      state:
+        tag: value
+        value: ~10^-3 s laser pulse
+      locator:
+        page: 5
+        published_page: 433
+        pdf_page_index: 4
+        section: EXPERIMENTAL
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_upper_layer_fe0_fraction::points:h=cc089d085fa5
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: No single bulk composition is reported for the upper-zone proportions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 0
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.33'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for the reported 33:45:22 proportions.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 4
+    published_page: 432
+    pdf_page_index: 3
+    section: Analytical Results
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: upper layers with maximum condensate products
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No sample temperature is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    composition:
+      state:
+        tag: unknown
+        reason: No single bulk composition is reported for the upper-zone proportions.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '33'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_upper_layer_fe2_fraction::points:h=6daa569f6248
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: No single bulk composition is reported for the upper-zone proportions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.45'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for the reported 33:45:22 proportions.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 4
+    published_page: 432
+    pdf_page_index: 3
+    section: Analytical Results
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: upper layers with maximum condensate products
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No sample temperature is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    composition:
+      state:
+        tag: unknown
+        reason: No single bulk composition is reported for the upper-zone proportions.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '45'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    output_unit: dimensionless
+    references: []
+- observation_id: dikov-2009-luna16-condensate-iron::dikov_2009_upper_layer_fe3_fraction::points:h=b02efd062657
+  experiment_id: 10.1134/s0869591109050014::experiment::dikov_2009_l1639_xps_depth_profile
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: No single bulk composition is reported for the upper-zone proportions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for the reported 33:45:22 proportions.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dikov-2009-luna16-condensate-iron
+  locator:
+    page: 4
+    published_page: 432
+    pdf_page_index: 3
+    section: Analytical Results
+  read_from: pdf:dikov-2009-luna16-condensate-iron
+  point_conditions:
+    sample_zone:
+      state:
+        tag: value
+        value: upper layers with maximum condensate products
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No sample temperature is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is reported for this lunar XPS ratio.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+    composition:
+      state:
+        tag: unknown
+        reason: No single bulk composition is reported for the upper-zone proportions.
+      locator:
+        page: 4
+        published_page: 432
+        pdf_page_index: 3
+        section: Analytical Results
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:dikov-2009-luna16-condensate-iron
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '22'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 432
+          pdf_page_index: 3
+          section: Analytical Results
+    output_unit: dimensionless
+    references: []

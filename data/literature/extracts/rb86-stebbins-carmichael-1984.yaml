@@ -1,0 +1,4920 @@
+schema_version: literature_extract.v1
+source_id: rb86-stebbins-carmichael-1984
+source:
+  citation: Stebbins, J. F. and Carmichael, I. S. E. (1984), The heat of fusion of fayalite, American
+    Mineralogist 69, 292–297.
+  doi: null
+  url: null
+  year: 1984
+  erratum: American Mineralogist 69, 1198; correction to the laihunite reference only.
+extraction:
+  method: Manual transcription from MinerU table blocks and markdown, reconciled with pdftotext-layout
+    and checked against rendered source pages.
+  date: '2026-11-06'
+  worker: w1106cp-sc84
+  provenance_path: text/rb86-stebbins-carmichael-1984/pdftotext-layout.txt
+  source_note: Table 1 prints H_T − H_300 K, not H_T − H_400 K. Exact printed increments remain on J g−1
+    basis; no molar conversion or liquid Cp derivative was made. All run conditions absent from the source
+    remain unknown.
+  machine_read_note: MinerU and pdftotext table QA agreement was low; rendered pages were used to confirm
+    table cell digits, signs, footnote markers, and row/column assignments.
+review_status: draft
+fidelity_samples:
+- path: species.Fe2SiO4.observations[sc1984_table1_c2_run238_enthalpy_increment].values.value
+  value: '1516.2'
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    row: run 238
+    column: ΔH
+    note: 300 dpi page render; C-2 Fe-plated capsule.
+- path: species.Fe2SiO4.observations[sc1984_table1_c1_run294_enthalpy_increment].values.value
+  value: '578.9'
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    row: run 294
+    column: ΔH
+    note: 300 dpi page render; printed run number 294 retained.
+- path: species.Fe2SiO4.observations[sc1984_table1_c1_run219_enthalpy_increment].values.value
+  value: '1775.2'
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    row: run 219
+    column: ΔH
+    note: 300 dpi page render; C-1 Pt-10%Rh above peritectic.
+- path: species.Fe2SiO4.observations[sc1984_incongruent_fusion_1490k_1bar].values.value
+  value: '88.4'
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    equation: '11'
+    note: 300 dpi render; stated at 1 bar and 1490 K.
+- path: species.Fe2SiO4.observations[sc1984_hypothetical_congruent_fusion].values.value
+  value: '89.3'
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    paragraph: hypothetical congruent melting
+    note: 300 dpi render; value after reaction (13) correction.
+experiments:
+- experiment_id: sc1984_drop_calorimetry_c1
+  series: C-1 Pt-10%Rh capsule drop-calorimetry runs, Table 1.
+  method_as_printed: drop calorimetry
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: sc1984_drop_calorimetry_c2
+  series: C-2 iron-plated capsule drop-calorimetry runs, Table 1.
+  method_as_printed: drop calorimetry
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: sc1984_table2_bulk_sample_analyses
+  series: Table 2 analysis of C-1 and C-2 starting materials and run products after calorimetry.
+  method_as_printed: wet chemical analysis and electron microprobe; analyte-specific methods and reductions
+    are in the observation values.
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+- experiment_id: sc1984_incongruent_fusion_1490k_1bar
+  series: Authors' reduction to incongruent fusion enthalpy at the printed 1 bar and 1490 K condition.
+  method_as_printed: measured-reduced calorimetric result
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '11'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: The source states 1 bar; expressed in Pa for the identity axis.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: No sweep-gas condition is printed for the fusion calculation.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: sc1984_fusion_enthalpy_calculation
+  series: Authors' reduction of drop-calorimetry results to hypothetical congruent fusion enthalpy; no
+    pressure or temperature is stated for this value.
+  method_as_printed: measured-reduced calorimetric result
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '12'
+species:
+  Fe2SiO4:
+    observations:
+    - observation_id: sc1984_table1_c2_run238_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c2
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 238
+        table_row_number: 3
+        table_column_number: 3
+        column: ΔH
+        phase: liquid
+      table_row_number: 3
+      table_column_number: 3
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1516.2'
+        value_as_published: '1516.2'
+        unit: J g−1
+        T_K: '1520'
+        sample_as_printed: C-2
+        run_number_as_printed: '238'
+        capsule_type_as_printed: Fe-plated capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: C-2 iron-plated sample; fully molten apart from minor Fe metal precipitated
+          during melting.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 238
+            table_row_number: 3
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 238
+            table_row_number: 3
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 238
+            table_row_number: 3
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1520'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 238
+            table_row_number: 3
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c2_run241_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c2
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 241
+        table_row_number: 4
+        table_column_number: 3
+        column: ΔH
+        phase: liquid
+      table_row_number: 4
+      table_column_number: 3
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1523.6'
+        value_as_published: '1523.6'
+        unit: J g−1
+        T_K: '1520'
+        sample_as_printed: C-2
+        run_number_as_printed: '241'
+        capsule_type_as_printed: Fe-plated capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Fe-plated C-2 sample.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 241
+            table_row_number: 4
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 241
+            table_row_number: 4
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 241
+            table_row_number: 4
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1520'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 241
+            table_row_number: 4
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c2_run242_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c2
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 242
+        table_row_number: 5
+        table_column_number: 3
+        column: ΔH
+        phase: liquid
+      table_row_number: 5
+      table_column_number: 3
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1532.5'
+        value_as_published: '1532.5'
+        unit: J g−1
+        T_K: '1524'
+        sample_as_printed: C-2
+        run_number_as_printed: '242'
+        capsule_type_as_printed: Fe-plated capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Fe-plated C-2 sample.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 242
+            table_row_number: 5
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 242
+            table_row_number: 5
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 242
+            table_row_number: 5
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1524'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 242
+            table_row_number: 5
+            table_column_number: 3
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run198_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 198
+        table_row_number: 8
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 8
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '923.8'
+        value_as_published: '923.8'
+        unit: J g−1
+        T_K: '1352'
+        sample_as_printed: C-1
+        run_number_as_printed: '198'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; Table 1 run number.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 198
+            table_row_number: 8
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 198
+            table_row_number: 8
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 198
+            table_row_number: 8
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1352'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 198
+            table_row_number: 8
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run199_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 199
+        table_row_number: 9
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 9
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '923.5'
+        value_as_published: '923.5'
+        unit: J g−1
+        T_K: '1351'
+        sample_as_printed: C-1
+        run_number_as_printed: '199'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; Table 1 run number.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 199
+            table_row_number: 9
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 199
+            table_row_number: 9
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 199
+            table_row_number: 9
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1351'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 199
+            table_row_number: 9
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run202_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 202
+        table_row_number: 10
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 10
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '925.5'
+        value_as_published: '925.5'
+        unit: J g−1
+        T_K: '1351'
+        sample_as_printed: C-1
+        run_number_as_printed: '202'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; Table 1 run number.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 202
+            table_row_number: 10
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 202
+            table_row_number: 10
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 202
+            table_row_number: 10
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1351'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 202
+            table_row_number: 10
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run294_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 294
+        table_row_number: 11
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 11
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '578.9'
+        value_as_published: '578.9'
+        unit: J g−1
+        T_K: '985'
+        sample_as_printed: C-1
+        run_number_as_printed: '294'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; run identifier 294 is retained exactly as printed.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 294
+            table_row_number: 11
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 294
+            table_row_number: 11
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 294
+            table_row_number: 11
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '985'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 294
+            table_row_number: 11
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run205_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 205
+        table_row_number: 12
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 12
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '588.5'
+        value_as_published: '588.5'
+        unit: J g−1
+        T_K: '985'
+        sample_as_printed: C-1
+        run_number_as_printed: '205'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; Table 1 run number.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 205
+            table_row_number: 12
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 205
+            table_row_number: 12
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 205
+            table_row_number: 12
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '985'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 205
+            table_row_number: 12
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run208_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 208
+        table_row_number: 13
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+      table_row_number: 13
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '573.8'
+        value_as_published: '573.8'
+        unit: J g−1
+        T_K: '985'
+        sample_as_printed: C-1
+        run_number_as_printed: '208'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; Table 1 run number.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 208
+            table_row_number: 13
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 208
+            table_row_number: 13
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 208
+            table_row_number: 13
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '985'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 208
+            table_row_number: 13
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+    - observation_id: sc1984_table1_c1_run223_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 223
+        table_row_number: 14
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+        run_footnote_as_printed: '2'
+      table_row_number: 14
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '934.5'
+        value_as_published: '934.5'
+        unit: J g−1
+        T_K: '1350'
+        sample_as_printed: C-1
+        run_number_as_printed: 223²
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; superscript 2 says repeated after runs in the liquid region.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 223
+            table_row_number: 14
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 223
+            table_row_number: 14
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 223
+            table_row_number: 14
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1350'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 223
+            table_row_number: 14
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+    - observation_id: sc1984_table1_c1_run226_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 226
+        table_row_number: 15
+        table_column_number: 3
+        column: ΔH
+        phase: solid
+        run_footnote_as_printed: '2'
+      table_row_number: 15
+      table_column_number: 3
+      phase: cr
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '928.1'
+        value_as_published: '928.1'
+        unit: J g−1
+        T_K: '1350'
+        sample_as_printed: C-1
+        run_number_as_printed: 226²
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Below peritectic; superscript 2 says repeated after runs in the liquid region.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 226
+            table_row_number: 15
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 226
+            table_row_number: 15
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 226
+            table_row_number: 15
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1350'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 226
+            table_row_number: 15
+            table_column_number: 3
+            column: ΔH
+            phase: solid
+            run_footnote_as_printed: '2'
+    - observation_id: sc1984_table1_c1_run210_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 210
+        table_row_number: 8
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 8
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1564.4'
+        value_as_published: '1564.4'
+        unit: J g−1
+        T_K: '1521'
+        sample_as_printed: C-1
+        run_number_as_printed: '210'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 210
+            table_row_number: 8
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 210
+            table_row_number: 8
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 210
+            table_row_number: 8
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1521'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 210
+            table_row_number: 8
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run211_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 211
+        table_row_number: 9
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 9
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1554.4'
+        value_as_published: '1554.4'
+        unit: J g−1
+        T_K: '1521'
+        sample_as_printed: C-1
+        run_number_as_printed: '211'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 211
+            table_row_number: 9
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 211
+            table_row_number: 9
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 211
+            table_row_number: 9
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1521'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 211
+            table_row_number: 9
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run213_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 213
+        table_row_number: 10
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 10
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1559.2'
+        value_as_published: '1559.2'
+        unit: J g−1
+        T_K: '1521'
+        sample_as_printed: C-1
+        run_number_as_printed: '213'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 213
+            table_row_number: 10
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 213
+            table_row_number: 10
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 213
+            table_row_number: 10
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1521'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 213
+            table_row_number: 10
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run215_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 215
+        table_row_number: 11
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 11
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1686.7'
+        value_as_published: '1686.7'
+        unit: J g−1
+        T_K: '1617'
+        sample_as_printed: C-1
+        run_number_as_printed: '215'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 215
+            table_row_number: 11
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 215
+            table_row_number: 11
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 215
+            table_row_number: 11
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1617'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 215
+            table_row_number: 11
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run218_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 218
+        table_row_number: 12
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 12
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1692.3'
+        value_as_published: '1692.3'
+        unit: J g−1
+        T_K: '1615'
+        sample_as_printed: C-1
+        run_number_as_printed: '218'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 218
+            table_row_number: 12
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 218
+            table_row_number: 12
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 218
+            table_row_number: 12
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1615'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 218
+            table_row_number: 12
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run219_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 219
+        table_row_number: 14
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 14
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1775.2'
+        value_as_published: '1775.2'
+        unit: J g−1
+        T_K: '1705'
+        sample_as_printed: C-1
+        run_number_as_printed: '219'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 219
+            table_row_number: 14
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 219
+            table_row_number: 14
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 219
+            table_row_number: 14
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1705'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 219
+            table_row_number: 14
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run221_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 221
+        table_row_number: 15
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 15
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1778.9'
+        value_as_published: '1778.9'
+        unit: J g−1
+        T_K: '1704'
+        sample_as_printed: C-1
+        run_number_as_printed: '221'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 221
+            table_row_number: 15
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 221
+            table_row_number: 15
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 221
+            table_row_number: 15
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1704'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 221
+            table_row_number: 15
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_run230_enthalpy_increment
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 230
+        table_row_number: 16
+        table_column_number: 6
+        column: ΔH
+        phase: liquid
+      table_row_number: 16
+      table_column_number: 6
+      phase: l
+      units: J g−1
+      reference_temperature_K: 300
+      standard_state: Relative enthalpy increment H(T) − H(300 K), per gram of sample, as printed in Table
+        1; it is not an absolute enthalpy.
+      values:
+        quantity: enthalpy_increment_H_T_minus_H_300K_as_printed
+        method_class: measured_direct
+        admission_status: typed_refusal
+        value: '1671.9'
+        value_as_published: '1671.9'
+        unit: J g−1
+        T_K: '1615'
+        sample_as_printed: C-1
+        run_number_as_printed: '230'
+        capsule_type_as_printed: Pt-10%Rh capsule
+        reference_temperature_K: 300
+        point_uncertainty_status: not_reported_individually
+        schema_gap: The exact printed quantity is H(T)−H(300 K), but the closest token H_minus_H298 has a 298.15 K anchor. No exact 300 K token exists, so this row stays typed-refused under a descriptive non-token label. Preserve J g−1 as printed; do not convert or differentiate it.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/migrate.py::_H_MINUS_H298_ANCHOR
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/migrate.py::_convert_compilation_amount
+        printed_reading_note: Above peritectic; C-1 run.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 230
+            table_row_number: 16
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 230
+            table_row_number: 16
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 230
+            table_row_number: 16
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+            note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature
+              liquid composition is not printed as a complete composition.
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1615'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: run 230
+            table_row_number: 16
+            table_column_number: 6
+            column: ΔH
+            phase: liquid
+    - observation_id: sc1984_table1_c1_liquid_fit_coefficients
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator: &id003
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: runs 210–220 fit note
+        table_row_number: 17
+        table_column_number: 1
+        column: fit equation and uncertainties
+      phase: l
+      units: J g−1 and J g−1 K−1 as printed
+      standard_state: Authors' fitted liquid relative-enthalpy relation; fit group is the printed run
+        interval 210–220, not a printed temperature interval.
+      values:
+        quantity: printed_liquid_enthalpy_fit_coefficients_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        equation_as_printed: 'runs 210–220: ΔH = 1.1960 T − 255.86 J g−1'
+        fit_uncertainty_as_printed: σ_H = 9.2 J g−1; σ_Cp = 0.045 J g−1 K−1
+        fit_temperature_interval_as_printed: not stated; the note identifies runs 210–220
+        schema_gap: The source prints an authors' fit coefficient bundle, not a scalar liquid Cp or enthalpy
+          point. No exact quantity token represents this coefficient bundle; do not differentiate the
+          slope to create a Cp value.
+        schema_gap_symbols: &id002
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/enums.py::Quantity.H_MINUS_H298
+        - simulator/battery/enums.py::Quantity.CP
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        derivation:
+          relation: Authors' fit to their C-1 liquid drop-calorimetry measurements for runs 210–220.
+          inputs:
+          - sc1984_table1_c1_run210_enthalpy_increment
+          - sc1984_table1_c1_run211_enthalpy_increment
+          - sc1984_table1_c1_run213_enthalpy_increment
+          - sc1984_table1_c1_run215_enthalpy_increment
+          - sc1984_table1_c1_run218_enthalpy_increment
+          - sc1984_table1_c1_run219_enthalpy_increment
+      point_conditions:
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: runs 210–220 fit note
+            table_row_number: 17
+            table_column_number: 1
+            column: fit equation and uncertainties
+            note: No temperature interval is printed for this fit note.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: runs 210–220 fit note
+            table_row_number: 17
+            table_column_number: 1
+            column: fit equation and uncertainties
+            note: No run fO2 is printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: runs 210–220 fit note
+            table_row_number: 17
+            table_column_number: 1
+            column: fit equation and uncertainties
+            note: No total pressure is printed.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            table: '1'
+            row: runs 210–220 fit note
+            table_row_number: 17
+            table_column_number: 1
+            column: fit equation and uncertainties
+            note: The complete C-1 liquid composition is not printed for the fit interval.
+      derived_from:
+      - sc1984_table1_c1_run210_enthalpy_increment
+      - sc1984_table1_c1_run211_enthalpy_increment
+      - sc1984_table1_c1_run213_enthalpy_increment
+      - sc1984_table1_c1_run215_enthalpy_increment
+      - sc1984_table1_c1_run218_enthalpy_increment
+      - sc1984_table1_c1_run219_enthalpy_increment
+    - observation_id: sc1984_table2_c1_starting_material_sio2_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: SiO2
+        table_row_number: 3
+        table_column_number: 2
+        column: C-1 starting material
+      table_row_number: 3
+      table_column_number: 2
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: SiO2
+        sample_as_printed: C-1 starting material
+        method_class: not_applicable
+        method_as_printed: Silicon dioxide was not determined for C-1.
+        admission_status: typed_refusal
+        value: null
+        value_as_published: n.d.
+        unit: '%'
+        source_value_status: not_determined
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: &id001
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+        - simulator/battery/enums.py::PhaseRole
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 2
+            column: C-1 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 2
+            column: C-1 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 2
+            column: C-1 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 2
+            column: C-1 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_after_calorimetry_sio2_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: SiO2
+        table_row_number: 3
+        table_column_number: 3
+        column: C-1 after calorimetry
+      table_row_number: 3
+      table_column_number: 3
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: SiO2
+        sample_as_printed: C-1 after calorimetry
+        method_class: not_applicable
+        method_as_printed: Silicon dioxide was not determined for the C-1 run product.
+        admission_status: typed_refusal
+        value: null
+        value_as_published: n.d.
+        unit: '%'
+        source_value_status: not_determined
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_starting_material_sio2_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: SiO2
+        table_row_number: 3
+        table_column_number: 4
+        column: C-2 starting material
+      table_row_number: 3
+      table_column_number: 4
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: SiO2
+        sample_as_printed: C-2 starting material
+        method_class: measured_direct
+        method_as_printed: Electron-microprobe analysis; footnote 1.
+        admission_status: typed_refusal
+        value: '29.4'
+        value_as_published: 29.4¹
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        reference_marker_as_printed: '1'
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 4
+            column: C-2 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 4
+            column: C-2 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 4
+            column: C-2 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 4
+            column: C-2 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_after_calorimetry_sio2_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: SiO2
+        table_row_number: 3
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 3
+      table_column_number: 5
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: SiO2
+        sample_as_printed: C-2 after calorimetry
+        method_class: measured_direct
+        method_as_printed: Electron-microprobe analysis; footnote 1.
+        admission_status: typed_refusal
+        value: '29.8'
+        value_as_published: '29.8'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: SiO2
+            table_row_number: 3
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_starting_material_feotot_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeOtot
+        table_row_number: 4
+        table_column_number: 2
+        column: C-1 starting material
+      table_row_number: 4
+      table_column_number: 2
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeOtot
+        sample_as_printed: C-1 starting material
+        method_class: measured_direct
+        method_as_printed: Total iron reported as FeO; total iron assay.
+        admission_status: typed_refusal
+        value: '70.3'
+        value_as_published: '70.3'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 2
+            column: C-1 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 2
+            column: C-1 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 2
+            column: C-1 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 2
+            column: C-1 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeOtot
+        table_row_number: 4
+        table_column_number: 3
+        column: C-1 after calorimetry
+      table_row_number: 4
+      table_column_number: 3
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeOtot
+        sample_as_printed: C-1 after calorimetry
+        method_class: measured_direct
+        method_as_printed: Total iron reported as FeO; total iron assay.
+        admission_status: typed_refusal
+        value: '68.9'
+        value_as_published: '68.9'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_starting_material_feotot_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeOtot
+        table_row_number: 4
+        table_column_number: 4
+        column: C-2 starting material
+      table_row_number: 4
+      table_column_number: 4
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeOtot
+        sample_as_printed: C-2 starting material
+        method_class: measured_direct
+        method_as_printed: Electron-microprobe analysis; footnotes 1 and 2.
+        admission_status: typed_refusal
+        value: '70.7'
+        value_as_published: 70.7¹
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        reference_marker_as_printed: '1'
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 4
+            column: C-2 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 4
+            column: C-2 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 4
+            column: C-2 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 4
+            column: C-2 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeOtot
+        table_row_number: 4
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 4
+      table_column_number: 5
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeOtot
+        sample_as_printed: C-2 after calorimetry
+        method_class: measured_direct
+        method_as_printed: Total iron reported as FeO; total iron assay.
+        admission_status: typed_refusal
+        value: '70.1'
+        value_as_published: '70.1'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeOtot
+            table_row_number: 4
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_starting_material_femetallic_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe°
+        table_row_number: 5
+        table_column_number: 2
+        column: C-1 starting material
+      table_row_number: 5
+      table_column_number: 2
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe°
+        sample_as_printed: C-1 starting material
+        method_class: measured_direct
+        method_as_printed: Determined as zero in starting material by absence of magnetic material; footnote
+          3.
+        admission_status: typed_refusal
+        value: '0'
+        value_as_published: '0'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 2
+            column: C-1 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 2
+            column: C-1 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 2
+            column: C-1 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 2
+            column: C-1 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_after_calorimetry_femetallic_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe°
+        table_row_number: 5
+        table_column_number: 3
+        column: C-1 after calorimetry
+      table_row_number: 5
+      table_column_number: 3
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe°
+        sample_as_printed: C-1 after calorimetry
+        method_class: not_applicable
+        method_as_printed: Metallic iron was not determined for this cell.
+        admission_status: typed_refusal
+        value: null
+        value_as_published: n.d.
+        unit: '%'
+        source_value_status: not_determined
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_starting_material_femetallic_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe°
+        table_row_number: 5
+        table_column_number: 4
+        column: C-2 starting material
+      table_row_number: 5
+      table_column_number: 4
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe°
+        sample_as_printed: C-2 starting material
+        method_class: measured_direct
+        method_as_printed: Determined as zero in starting material by absence of magnetic material; footnote
+          3.
+        admission_status: typed_refusal
+        value: '0'
+        value_as_published: '0'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 4
+            column: C-2 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 4
+            column: C-2 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 4
+            column: C-2 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 4
+            column: C-2 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe°
+        table_row_number: 5
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 5
+      table_column_number: 5
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe°
+        sample_as_printed: C-2 after calorimetry
+        method_class: measured_reduced
+        method_as_printed: Calculated from total iron and the two ferrous-iron analyses; footnote 3.
+        admission_status: typed_refusal
+        value: '1.5'
+        value_as_published: '1.5'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        derivation:
+          relation: C-2 post-run Fe° is calculated from total iron and two ferrous-iron analyses (Table
+            2 footnote 3).
+          inputs:
+          - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+          - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe°
+            table_row_number: 5
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+      derived_from:
+      - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+      - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+    - observation_id: sc1984_table2_c1_starting_material_feo_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeO
+        table_row_number: 6
+        table_column_number: 2
+        column: C-1 starting material
+      table_row_number: 6
+      table_column_number: 2
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeO
+        sample_as_printed: C-1 starting material
+        method_class: measured_direct
+        method_as_printed: Ferrous iron from the chemical-analysis methods described in the text.
+        admission_status: typed_refusal
+        value: '69.7'
+        value_as_published: '69.7'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 2
+            column: C-1 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 2
+            column: C-1 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 2
+            column: C-1 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 2
+            column: C-1 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeO
+        table_row_number: 6
+        table_column_number: 3
+        column: C-1 after calorimetry
+      table_row_number: 6
+      table_column_number: 3
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeO
+        sample_as_printed: C-1 after calorimetry
+        method_class: measured_direct
+        method_as_printed: Ferrous iron from the chemical-analysis methods described in the text.
+        admission_status: typed_refusal
+        value: '61.5'
+        value_as_published: '61.5'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_starting_material_feo_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeO
+        table_row_number: 6
+        table_column_number: 4
+        column: C-2 starting material
+      table_row_number: 6
+      table_column_number: 4
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeO
+        sample_as_printed: C-2 starting material
+        method_class: measured_reduced
+        method_as_printed: Electron-microprobe analysis; FeO calculated by comparison with 100% total,
+          footnote 1.
+        admission_status: typed_refusal
+        value: '70.7'
+        value_as_published: 70.7¹
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        reference_marker_as_printed: '1'
+        derivation:
+          relation: C-2 starting-material FeO is a reduced electron-microprobe composition; the underlying
+            probe totals are not tabulated (Table 2 footnote 1).
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: 294
+              pdf_page_index: 2
+              table: '2'
+              row: FeO
+              table_row_number: 6
+              table_column_number: 4
+              column: C-2 starting material
+              note: The electron-microprobe input totals used in this reduction are not separately printed.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 4
+            column: C-2 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 4
+            column: C-2 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 4
+            column: C-2 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 4
+            column: C-2 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: FeO
+        table_row_number: 6
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 6
+      table_column_number: 5
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: FeO
+        sample_as_printed: C-2 after calorimetry
+        method_class: measured_reduced
+        method_as_printed: "Chemical ferrous-iron assays: colorimetric (Wilson, 1960) and titrimetric (Wilson, 1955) methods; both were calibrated for metallic Fe, and combination with total-iron analysis yields ferrous, ferric, and metallic contents (p. 293)."
+        admission_status: typed_refusal
+        value: '62.3'
+        value_as_published: '62.3'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        derivation:
+          relation: The published C-2 post-calorimetry FeO composition is reduced from the total-iron
+            assay and the colorimetric and titrimetric ferrous-iron assays, which were calibrated for
+            metallic Fe. The underlying chemical assay readings are not separately tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: 294
+              pdf_page_index: 2
+              table: '2'
+              row: FeO
+              table_row_number: 6
+              table_column_number: 5
+              column: C-2 after calorimetry
+              note: The individual chemical assay readings are not separately printed; 62.3 wt.% is the published C-2 post-calorimetry FeO composition.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: FeO
+            table_row_number: 6
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c1_starting_material_fe2o3_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe2O3
+        table_row_number: 7
+        table_column_number: 2
+        column: C-1 starting material
+      table_row_number: 7
+      table_column_number: 2
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe2O3
+        sample_as_printed: C-1 starting material
+        method_class: measured_reduced
+        method_as_printed: Calculated from FeO and FeOtot; footnote 5. Footnote 6 notes that Mössbauer
+          spectroscopy detected no ferric iron in this sample (S. R. Bohlen, personal communication).
+        admission_status: typed_refusal
+        value: '0.7'
+        value_as_published: 0.7⁶
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        reference_marker_as_printed: '6'
+        derivation:
+          relation: Fe2O3 is calculated from FeO and FeOtot (Table 2 footnote 5).
+          inputs:
+          - sc1984_table2_c1_starting_material_feo_bulk_analysis
+          - sc1984_table2_c1_starting_material_feotot_bulk_analysis
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 2
+            column: C-1 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 2
+            column: C-1 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 2
+            column: C-1 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 2
+            column: C-1 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+      derived_from:
+      - sc1984_table2_c1_starting_material_feo_bulk_analysis
+      - sc1984_table2_c1_starting_material_feotot_bulk_analysis
+    - observation_id: sc1984_table2_c1_after_calorimetry_fe2o3_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe2O3
+        table_row_number: 7
+        table_column_number: 3
+        column: C-1 after calorimetry
+      table_row_number: 7
+      table_column_number: 3
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe2O3
+        sample_as_printed: C-1 after calorimetry
+        method_class: measured_reduced
+        method_as_printed: Calculated from FeO and FeOtot; footnote 5.
+        admission_status: typed_refusal
+        value: '8.7'
+        value_as_published: '8.7'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        derivation:
+          relation: Fe2O3 is calculated from FeO and FeOtot (Table 2 footnote 5).
+          inputs:
+          - sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+          - sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 3
+            column: C-1 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+      derived_from:
+      - sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+      - sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+    - observation_id: sc1984_table2_c2_starting_material_fe2o3_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe2O3
+        table_row_number: 7
+        table_column_number: 4
+        column: C-2 starting material
+      table_row_number: 7
+      table_column_number: 4
+      phase: cr
+      units: '%'
+      sample_state_as_printed: starting material
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe2O3
+        sample_as_printed: C-2 starting material
+        method_class: measured_reduced
+        method_as_printed: Electron-microprobe analysis; Fe2O3 calculated by comparison with 100% total,
+          footnote 1.
+        admission_status: typed_refusal
+        value: '0'
+        value_as_published: 0¹
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        reference_marker_as_printed: '1'
+        derivation:
+          relation: C-2 starting-material Fe2O3 is calculated by comparison with 100% total; the underlying
+            probe totals are not tabulated (Table 2 footnote 1).
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: 294
+              pdf_page_index: 2
+              table: '2'
+              row: Fe2O3
+              table_row_number: 7
+              table_column_number: 4
+              column: C-2 starting material
+              note: The electron-microprobe input totals used in this reduction are not separately printed.
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 4
+            column: C-2 starting material
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 4
+            column: C-2 starting material
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 4
+            column: C-2 starting material
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 4
+            column: C-2 starting material
+            note: The chemical-analysis measurement temperature is not printed.
+    - observation_id: sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: concentration_series
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe2O3
+        table_row_number: 7
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 7
+      table_column_number: 5
+      phase: cr
+      units: '%'
+      sample_state_as_printed: bulk sample after quench
+      values:
+        quantity: whole_sample_chemical_analysis_as_printed
+        analyte_as_printed: Fe2O3
+        sample_as_printed: C-2 after calorimetry
+        method_class: measured_reduced
+        method_as_printed: Calculated from FeO and FeOtot; footnote 5.
+        admission_status: typed_refusal
+        value: '6.5'
+        value_as_published: '6.5'
+        unit: '%'
+        source_value_status: value
+        schema_gap: This is a wet-chemical or electron-microprobe analyte value for a multiphase whole
+          sample, not a concentration of one admitted phase. concentration_series is an allowed observation
+          type, but the closed Quantity enum has no exact generic whole-sample chemical-analysis quantity.
+          equilibrium_phase_composition is a near miss for a component of a defined single phase; it would
+          misstate these bulk analyses. Keep the printed percent with unit % and refuse typing.
+        schema_gap_symbols: *id001
+        uncertainty_as_printed: No individual cell uncertainty is printed. Method precision is described
+          separately in the Table 2 analysis-method note.
+        derivation:
+          relation: Table 2 footnote 5 calculates Fe2O3 from FeO and FeOtot. The p. 293 chemical methods
+            distinguish metallic iron as well; the C-2 balance includes printed FeO 62.3 wt.%, FeOtot
+            70.1 wt.% as FeO, and Fe° 1.5 wt.%. The rounded inputs reproduce about 6.52 wt.% Fe2O3,
+            consistent with the printed 6.5 wt.% value.
+          inputs:
+          - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+          - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+          - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+      point_conditions:
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No run fO2 is printed for this calorimetry observation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for this calorimetry observation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The whole analyzed sample is the subject of these analyte measurements; a separate complete
+              phase composition at the analytical measurement condition is not stated.
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3
+            table_row_number: 7
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: The chemical-analysis measurement temperature is not printed.
+      derived_from:
+      - sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+      - sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+      - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+    - observation_id: sc1984_equation6_liquid_enthalpy_fit
+      experiment: sc1984_drop_calorimetry_c1
+      type: heat_capacity_and_heat_content_series
+      locator: &id004
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        equation: '6'
+        section: Heat of fusion calculations
+      phase: l
+      units: J g−1
+      standard_state: Selected C-1 liquid enthalpy line constrained to equal the C-2 value at 1520 K;
+        no fit temperature interval is stated.
+      values:
+        quantity: printed_liquid_enthalpy_fit_coefficients_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        equation_as_printed: ΔH_T^liq = −295.23 + 1.1960 T J per g sample
+        fit_temperature_interval_as_printed: not stated
+        schema_gap: The source prints an authors' fit coefficient bundle, not a scalar liquid Cp or enthalpy
+          point. No exact quantity token represents this coefficient bundle; do not differentiate the
+          slope to create a Cp value.
+        schema_gap_symbols: *id002
+        derivation:
+          relation: Equation (6) uses the liquid heat-capacity slope from the C-1 data and constrains
+            relative enthalpy to the C-2 result at 1520 K.
+          inputs:
+          - sc1984_table1_c1_liquid_fit_coefficients
+          - sc1984_table1_c2_run238_enthalpy_increment
+          - sc1984_table1_c2_run241_enthalpy_increment
+          - sc1984_table1_c2_run242_enthalpy_increment
+      point_conditions:
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            equation: '6'
+            section: Heat of fusion calculations
+            note: No fit temperature interval is printed for Eq. (6).
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            equation: '6'
+            section: Heat of fusion calculations
+            note: No run fO2 is printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            equation: '6'
+            section: Heat of fusion calculations
+            note: No total pressure is printed.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            equation: '6'
+            section: Heat of fusion calculations
+            note: A complete liquid composition is not printed for the Eq. (6) line.
+      derived_from:
+      - sc1984_table1_c1_liquid_fit_coefficients
+      - sc1984_table1_c2_run238_enthalpy_increment
+      - sc1984_table1_c2_run241_enthalpy_increment
+      - sc1984_table1_c2_run242_enthalpy_increment
+    - observation_id: sc1984_incongruent_fusion_1490k_1bar
+      experiment: sc1984_incongruent_fusion_1490k_1bar
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+      phase: cr
+      units: kJ mol−1
+      per: mol_species
+      standard_state: Incongruent melting reaction (4), fayalite solid to the equilibrium peritectic liquid
+        plus Fe metal, at the stated 1 bar peritectic temperature.
+      values:
+        quantity: incongruent_fusion_enthalpy_to_peritectic_liquid_and_Fe_as_printed
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        refusal_reason: The printed reaction produces a multicomponent peritectic liquid plus metallic Fe.
+          The heat_of_fusion identity represents pure same-formula solid-to-liquid fusion and would
+          misidentify this reaction; no exact reaction-bearing identity is available.
+        schema_gap: No exact quantity token represents the printed incongruent fusion reaction. Keep
+          88.4 kJ mol−1 as a typed refusal instead of assigning the pure-endmember heat_of_fusion token.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+        - simulator/battery/generators/janaf.py::janaf_fusion_enthalpy
+        - simulator/battery/compilation_tier.py::predict_thermo_attempt
+        value: '88.4'
+        value_as_published: '88.4'
+        T_K: '1490'
+        unit: kJ mol−1
+        uncertainty_as_printed: ±1.1 kJ mol−1
+        reaction_as_printed: Fe2SiO4(sol) = 0.9620Fe2SiO4(liq) + 0.0253Fe2O3(liq) + 0.0380SiO2(liq) +
+          0.0253Fe°(sol)
+        method_as_printed: Authors' correction of measured enthalpy for phases other than fayalite in
+          the quenched products.
+        error_bracket_as_printed: Twice the standard error calculated from uncertainty in calorimetric
+          data and an assumed 50% uncertainty in ferric content of the peritectic liquid.
+        derivation:
+          relation: Equations (7)–(11) correct the measured liquid-plus-metal enthalpy relative to the
+            fayalite and quench-product mixture; Eq. (11) is evaluated at 1490 K.
+          inputs:
+          - sc1984_equation6_liquid_enthalpy_fit
+          - sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+          - sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+      uncertainty:
+        kind: printed
+        value: '1.1'
+        unit: kJ mol−1
+        verbatim: ±1.1 kJ mol−1
+        confidence_level: not_stated
+        basis: The authors state that the error bracket is twice the standard error and includes an assumed
+          50% uncertainty in liquid ferric content.
+      point_conditions:
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1490'
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '11'
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '100000'
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '11'
+            note: The source states 1 bar; 1 bar = 100000 Pa.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '11'
+            note: No fO2 is printed for the fusion calculation.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '11'
+            note: The reaction stoichiometry and approximate Fe2O3 content are printed, but no complete
+              liquid composition is given.
+      derived_from:
+      - sc1984_equation6_liquid_enthalpy_fit
+      - sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+      - sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+    - observation_id: sc1984_hypothetical_congruent_fusion
+      experiment: sc1984_fusion_enthalpy_calculation
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '12'
+        paragraph: hypothetical congruent melting enthalpy
+      phase: cr
+      units: kJ mol−1
+      per: mol_species
+      standard_state: Hypothetical congruent melting, fayalite solid to fayalite liquid.
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_reduced
+        admission_status: admitted
+        value: '89.3'
+        value_as_published: '89.3'
+        unit: kJ mol−1
+        uncertainty_as_printed: ±1.1 kJ mol−1
+        reaction_as_printed: Fe2SiO4(solid) = Fe2SiO4(liquid)
+        correction_as_printed: Add reaction (13), 0.025Fe°(sol) + 0.025Fe3O4(liq) = 0.10FeO(liq); estimated
+          correction 0.025 × 35 kJ mol−1, giving 900 J mol−1 added to ΔH_inc.
+        derivation:
+          relation: The authors add the estimated reaction (13) correction to the incongruent enthalpy
+            to obtain the hypothetical congruent value.
+          inputs:
+          - sc1984_incongruent_fusion_1490k_1bar
+      uncertainty:
+        kind: printed
+        value: '1.1'
+        unit: kJ mol−1
+        verbatim: ±1.1 kJ mol−1
+        confidence_level: not_stated
+        basis: Printed uncertainty width; confidence level not stated.
+      point_conditions:
+        T_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '12'
+            paragraph: hypothetical congruent melting enthalpy
+            note: No temperature is explicitly attached to the hypothetical congruent result.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '12'
+            paragraph: hypothetical congruent melting enthalpy
+            note: No fO2 is printed for the hypothetical congruent calculation.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '12'
+            paragraph: hypothetical congruent melting enthalpy
+            note: No total pressure is explicitly attached to the hypothetical congruent result.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 296
+            pdf_page_index: 4
+            section: Heat of fusion calculations
+            equation: '12'
+            paragraph: hypothetical congruent melting enthalpy
+            note: The hypothetical reaction is stoichiometric fayalite; no measured liquid composition
+              is printed for this result.
+      derived_from:
+      - sc1984_incongruent_fusion_1490k_1bar
+    context:
+    - observation_id: sc1984_table1_run229_partly_molten_excluded
+      type: excluded_table_reading
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        row: run 229³
+        table_row_number: 16
+        table_column_number: 3
+        column: ΔH
+      units: T in K; ΔH in J g−1
+      values:
+        sample_as_printed: C-1, Pt-10%Rh capsule
+        run_number_as_printed: 229³
+        temperature_K_as_printed: '1441'
+        relative_enthalpy_as_printed: '1446.2'
+        reference_temperature_K: 300
+        exclusion_reason: Superscript 3 says partly molten; the value falls between crystalline and liquid
+          curves and is excluded from the requested crystalline and fully liquid observation sets.
+    - observation_id: sc1984_table1_reading_census_and_reference
+      type: table_reading_census
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+      units: K and J g−1 as printed
+      values:
+        printed_reading_count: 20
+        stored_crystalline_reading_count: 8
+        stored_liquid_reading_count: 11
+        excluded_partly_molten_reading_count: 1
+        excluded_reading:
+          run: 229³
+          T_K: '1441'
+          relative_enthalpy_J_g-1: '1446.2'
+        reference_temperature_K: 300
+        reference_as_printed: Table 1 caption defines ΔH = H_T − H_300 K; the Calorimetry section states
+          a reference temperature of 300 K.
+        task_prompt_reference_discrepancy: The task wording says H(T)−H(400 K), but the paper's Table
+          1 and text print 300 K. The extraction preserves the source's 300 K frame.
+        reading_note: Table 1 run numbers indicate measurement order; run 294 is the printed identifier
+          and is retained unchanged.
+    - observation_id: sc1984_capsules_and_calorimetry_method
+      type: experimental_method_context
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        section: Calorimetry
+      units: as printed
+      values:
+        method_as_printed: Diphenyl ether drop calorimeter; reference temperature 300 K; Pt-40%Rh wire-wound
+          furnace.
+        sample_mass_as_printed: about 2 g
+        capsules_as_printed: Capsules made from 0.25 mm Pt–10%Rh sheet and tubing; argon filled and arc
+          sealed. C-2 interior plated with about 0.03 mm iron.
+        calibration_as_printed: NBS 720 sapphire standard run once for every one or two sample drops.
+        capsule_mass_change_as_printed: Neither capsule showed weight changes greater than a few tenths
+          of a milligram.
+        source_note: The capsule material is recorded here as printed; the argon fill is not promoted
+          to a total-pressure condition.
+    - observation_id: sc1984_table1_fit_note
+      type: author_fit_context
+      locator: *id003
+      units: J g−1 and J g−1 K−1 as printed
+      values:
+        equation_as_printed: 'runs 210–220: ΔH = 1.1960 T − 255.86 J g−1'
+        fit_uncertainty_as_printed: σ_H = 9.2 J g−1; σ_Cp = 0.045 J g−1 K−1
+        temperature_range_status: No fit temperature interval is printed; the note names runs 210–220.
+        standalone_liquid_Cp: No standalone liquid Cp is printed. The slope is retained only as a coefficient;
+          no Cp was calculated from it.
+    - observation_id: sc1984_table2_method_and_precision
+      type: chemical_analysis_method_context
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        section: Analysis of samples after experiments
+      units: '% and stated relative precision'
+      values:
+        total_iron_method: Total iron determined by ammoniacal thioglycolic acid and reported as FeO.
+        ferrous_iron_methods: Colorimetric Wilson (1960) includes metallic iron as FeO; titrimetric Wilson
+          (1955) responds differently. Sensitivity was calibrated using samples with known metal amounts.
+        reduction_note: Combination of the three analyses yields ferrous, ferric, and metallic iron. Fe2O3
+          is calculated from FeO and FeOtot; Fe° is calculated from FeOtot and two FeO analyses except
+          zeros determined from absence of magnetic material.
+        method_precision_as_printed: Total iron ±0.5% of amount present; Fe2O3 ±20%; Fe° ±50%. Errors
+          for Fe2O3 and Fe° are larger because values are calculated from small differences between large
+          numbers.
+        confidence_level: not stated
+        post_quench_state: The analysis is of quenched bulk sample and excludes metal precipitated onto
+          or dissolved in capsule walls.
+    - observation_id: sc1984_table2_theoretical_fayalite_reference
+      type: reference_composition_context
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: theoretical fayalite
+      units: '% by weight'
+      values:
+        SiO2_as_printed: '29.5'
+        FeO_as_printed: '70.5'
+        scope_note: Reference composition column, not an experimental run or whole-sample measurement
+          row.
+    - observation_id: sc1984_table2_c2_postquench_liquid_and_iron_loss
+      type: quench_correction_context
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        section: Results and discussion
+      units: '% by weight as printed'
+      values:
+        c2_iron_loss_as_feo: about 0.5 ± 0.5%
+        c2_metal_in_bulk_analysis: about 1.5% Fe°
+        equilibrium_peritectic_liquid_fe2o3_from_iron_loss_only: 0–2 wt.%
+        quench_disproportionation: Each mole of metallic Fe formed during quench generated one mole of
+          ferric iron; Eq. (3) is 2Fe2SiO4(liq) = Fe°(sol) + Fe2O3(liq) + FeO(liq) + 2SiO2(liq).
+        liquid_equilibrium_fe2o3: Table 2 footnote 7 calculates 2.1 wt.% Fe2O3 for the liquid in equilibrium
+          with metallic iron at 1520 K, assuming the metal formed during quench.
+        other_run: For Orr (1953), some fayalite apparently remained unmelted and nucleated during cooling;
+          the paper says that liquid did not apparently disproportionate on quench and cites 2.3% Fe2O3
+          from Bowen and Schairer.
+    - observation_id: sc1984_capsule_iron_loss_and_c1_liquid_correction
+      type: iron_loss_correction_context
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        section: Run products
+      units: '% by weight as printed'
+      values:
+        c1_capsule_wall: At least 15% Fe at silicate contact, falling to near zero by 0.1 mm into platinum.
+        c1_required_iron_loss: 1–2% as FeO from sample.
+        c2_plating: Iron plating remained intact; iron precipitated on the capsule wall during melting
+          could not be distinguished from original plating.
+        c1_liquid_fe2o3_before_quench: about 3.7 ± 1 wt.% Fe2O3; also stored as a measured-reduced liquid
+          composition observation.
+        cp_composition_corrections: The adjustment to equilibrium peritectic liquid Cp is 0.18%; correction
+          to pure Fe2SiO4 liquid Cp is 0.34%; both are much less than experimental Cp error of about 3.5%
+          and were ignored.
+    - observation_id: sc1984_incongruent_fusion_equations_and_result
+      type: fusion_result_context
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+      units: kJ mol−1 and J mol−1 as printed
+      values:
+        incongruent_fit_eq10_as_printed: ΔH_inc = 67.689T + 4.404 × 10−3 T² − 3.889 × 10^6 T−1 − 8.237
+          × 10−6 T³ + 7770 J mol−1
+        eq10_temperature_range: not stated
+        simplified_fit_eq11_as_printed: ΔH_inc = 119.91 T − 3.1167 × 10−2 T² − 21057 J mol−1
+        eq11_temperature_range_as_printed: 900–1900 K
+        incongruent_fusion_as_printed: 88.4 ± 1.1 kJ mol−1 at the 1 bar peritectic temperature of 1490
+          K.
+        error_definition: Error bracket is twice the standard error calculated from calorimetry uncertainty
+          and an assumed 50% uncertainty in peritectic liquid ferric content; quench phase-ratio uncertainty
+          is probably smaller.
+    - observation_id: sc1984_congruent_fusion_correction_and_result
+      type: fusion_result_context
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        equation: '12'
+        section: Heat of fusion calculations
+      units: kJ mol−1 and J mol−1 as printed
+      values:
+        reaction12_as_printed: Fe2SiO4(solid) = Fe2SiO4(liquid)
+        reaction13_as_printed: 0.025Fe°(sol) + 0.025Fe3O4(liq) = 0.10FeO(liq)
+        estimated_reaction_enthalpy_as_printed: 0.025 × 35 kJ mol−1 ≈ 900 J mol−1
+        hypothetical_congruent_fusion_as_printed: 89.3 ± 1.1 kJ mol−1
+    - observation_id: sc1984_inherited_solid_enthalpy_and_quench_mixture_correction
+      type: inherited_input_context
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        equation: '8'
+        section: Heat of fusion calculations
+      units: J mol−1 and J g−1 as printed
+      values:
+        attribution: Robie, Finch, and Hemingway (1982), inherited high-temperature fayalite solid enthalpy
+          equation based on Orr (1953) drop calorimetry and 5–383 K adiabatic heat capacity.
+        equation8_as_printed: H_T − H_300 = 123.80T + 3.1167 × 10−2 T² − 36771 J mol−1
+        accuracy_and_range_as_printed: Within 200 J mol−1 between 900 and 1900 K.
+        glass_correction_as_printed: If non-fayalite mixture were primarily glass, computed fusion heat
+          could be too low by 10–15%; careful microscopy found no glass and authors estimate less than
+          2% of sample.
+        laihunite_caveat: If the interstitial mix contained a high proportion of laihunite, precise correction
+          could not be made because thermochemical data were unavailable; the erratum changes only the
+          laihunite reference, not measured values or equations.
+        equation9_as_printed: Fe3O4(sol) + Fe°(sol) + 2SiO2(sol) = 2Fe2SiO4(sol); ΔH = −121.0 J per g
+          magnetite, attributed to Robie et al. (1979).
+        c2_magnetite_mixture_estimate: C-2 indicates 0.0946 g Fe3O4 per g sample; assuming interstitial
+          residuum is magnetite plus tridymite gives H_300^fay − H_300^mix = −11.45 J per g sample, about
+          2.5% of ΔH_inc.
+    - observation_id: sc1984_erratum_laihunite_reference_only
+      type: erratum_context
+      locator:
+        published_page: 1198
+        section: Erratum
+        url: https://msaweb.org/AmMin/AM69/AM69_1198.pdf
+      units: bibliographic correction
+      values:
+        correction_as_printed: Erratum at American Mineralogist 69:1198 corrects the laihunite reference
+          only, identifying G. Y. Chao (1978), American Mineralogist 63, 424–425.
+        data_or_formula_change: none
+        verification: The erratum has no change to Table 1, Table 2, or any thermodynamic value or equation.
+    - observation_id: sc1984_figure1_candidate_not_extracted
+      type: figure_read_candidate
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        figure: '1'
+      units: not transcribed
+      values:
+        candidate: Additional relative-enthalpy points and the plotted fits shown in Figure 1.
+        reason_not_extracted: This wave excludes values read only from figures; Table 1 and printed equations
+          are retained.
+  Fe2O3:
+    observations:
+    - observation_id: sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+      experiment: sc1984_table2_bulk_sample_analyses
+      type: equilibrium_phase_composition
+      locator: &id005
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        row: Fe2O3(liq) calculated liquid composition
+        table_row_number: 8
+        table_column_number: 5
+        column: C-2 after calorimetry
+      table_row_number: 8
+      table_column_number: 5
+      phase: l
+      units: '%'
+      standard_state: Fe2O3 component of the liquid in equilibrium with metallic iron at 1520 K; footnote
+        7 assumes the Fe metal was produced during quench.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe2O3
+        phase_label: melt
+        basis: wt_percent
+        T_K: '1520'
+        component_amount: '2.1'
+        component_amount_as_published: 2.1 wt.%
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: 'Eq. (3): subtract the mole fraction of metallic Fe formed during quench from the
+            mole fraction of Fe2O3 in the quenched sample; Table 2 footnote 7 reports the resulting liquid
+            composition.'
+          inputs:
+          - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+          - sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+          locator: *id005
+      point_conditions:
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1520'
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3(liq) calculated liquid composition
+            table_row_number: 8
+            table_column_number: 5
+            column: C-2 after calorimetry
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3(liq) calculated liquid composition
+            table_row_number: 8
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No fO2 is printed for the C-2 run.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3(liq) calculated liquid composition
+            table_row_number: 8
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: No total pressure is printed for the C-2 run.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 294
+            pdf_page_index: 2
+            table: '2'
+            row: Fe2O3(liq) calculated liquid composition
+            table_row_number: 8
+            table_column_number: 5
+            column: C-2 after calorimetry
+            note: Only Fe2O3 in the liquid is calculated; the complete liquid composition is not printed.
+      derived_from:
+      - sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+      - sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+    - observation_id: sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+      experiment: sc1984_drop_calorimetry_c1
+      type: equilibrium_phase_composition
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        section: Heat of fusion calculations
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+      phase: l
+      units: '%'
+      standard_state: C-1 liquid composition immediately before quench; reported as about 3.7 ± 1 wt.%
+        Fe2O3.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe2O3
+        phase_label: melt
+        basis: wt_percent
+        T_K: '1615'
+        component_amount: '3.7'
+        component_amount_as_published: about 3.7 wt.%
+        method_class: measured_reduced
+        admission_status: admitted
+        uncertainty_as_printed: ± 1 wt.%
+        derivation:
+          relation: Authors infer the C-1 liquid ferric content from total-iron loss measured in C-1 before
+            quench.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              published_page: 293
+              pdf_page_index: 1
+              section: Run products
+              note: The capsule-wall iron concentration is described spatially and integrated to an estimated
+                1–2% iron loss as FeO; the underlying spatial measurements and integration are not tabulated.
+      uncertainty:
+        kind: printed
+        value: '1'
+        unit: '% Fe2O3'
+        verbatim: ±1 wt.%
+        confidence_level: not_stated
+        basis: Printed uncertainty width; confidence level not stated.
+      point_conditions:
+        T_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1615'
+          locator:
+            page: 2
+            published_page: 293
+            pdf_page_index: 1
+            section: Run products
+            note: C-1 was quenched from 1615 K.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            section: Heat of fusion calculations
+            paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+            note: No fO2 is printed for the C-1 run.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            section: Heat of fusion calculations
+            paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+            note: No total pressure is printed for the C-1 run.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 295
+            pdf_page_index: 3
+            section: Heat of fusion calculations
+            paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+            note: Only the Fe2O3 component of the pre-quench liquid is estimated; the full liquid composition
+              is not printed.

@@ -19,6 +19,7 @@ from simulator.optimize.doe import (
     FidelityCorrelationResult,
     PHASE_ORDER_OXIDIZE_FIRST,
     PHASE_ORDER_VACUUM_FIRST,
+    PRESSURE_PAIR_SAMPLER_DESCRIPTION,
     phase_order_grid,
     sample_recipe_patch_at_index,
     sample_recipe_candidate_at_index,
@@ -34,9 +35,32 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     _default_setpoint_value,
 )
+from simulator.optimize.study import _study_manifest_payload
 
 C5_PO2_DEFAULT = tuple("campaigns.C5.pO2_mbar_default".split("."))
 C5_PTOTAL_DEFAULT = tuple("campaigns.C5.p_total_mbar_default".split("."))
+
+
+def test_pressure_pair_conditioning_bias_is_documented_in_sampler_and_manifest() -> None:
+    description = sample_recipe_candidates.__doc__ or ""
+    assert "2.76%" in description and "4.94%" in description
+    manifest = _study_manifest_payload(
+        study_id="test",
+        created_at="2026-01-01T00:00:00+00:00",
+        study_status="completed",
+        profile={},
+        feedstock="test",
+        fidelity="analytical",
+        config=None,
+        strategy_name="random",
+        sampler_name="scipy-sobol",
+        search_space_identity=None,
+        strategy_config={},
+        replayable=True,
+    )
+    assert manifest["sampler_description"] == PRESSURE_PAIR_SAMPLER_DESCRIPTION
+    assert "2.76%" in manifest["sampler_description"]
+    assert "4.94%" in manifest["sampler_description"]
 
 
 def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal():
