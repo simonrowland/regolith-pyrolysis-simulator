@@ -222,6 +222,7 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
         sample_id: table1_assemblages[sample_id][0]
         for sample_id in expected_printed_assemblages
     } == expected_printed_assemblages
+    parents_with_unknown_run_composition = set()
     for observation in source_observations.values():
         run_composition = observation["point_conditions"]["composition"]
         assert run_composition["state"] == {
@@ -229,6 +230,7 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
             "reason": "run_composition_not_reported_per_sample",
         }
         assert run_composition["locator"] == {"pdf_page_index": 1}
+        parents_with_unknown_run_composition.add(observation["observation_id"])
         oxygen = observation["point_conditions"]["fO2_log"]
         assert oxygen["state"] == {"tag": "unknown", "reason": "fo2_not_reported"}
         assert oxygen["locator"] == {"pdf_page_index": 1}
@@ -241,6 +243,7 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
             "value": printed_assemblage,
         }
         assert phase_assemblage["locator"] == assemblage_locator
+    assert len(parents_with_unknown_run_composition) == len(source_observations) == 219
 
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -257,13 +260,38 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
         assert condition.locator is not None
         assert observation.identity.temperature_K.is_value
         assert condition.state.value == observation.identity.temperature_K.value
-        run_composition = observation.point_conditions["composition"]
-        assert run_composition.state.is_unknown
-        assert run_composition.state.reason == "run_composition_not_reported_per_sample"
-        assert run_composition.locator is not None
-        assert run_composition.locator.pdf_page_index == 1
+        if (
+            observation.identity.quantity.is_value
+            and observation.identity.quantity.value.value
+            == "equilibrium_phase_composition"
+            and observation.identity.species.phase.is_value
+            and observation.identity.species.phase.value.value == "l"
+        ):
+            assert "composition" not in observation.point_conditions
+        else:
+            run_composition = observation.point_conditions["composition"]
+            assert run_composition.state.is_unknown
+            assert run_composition.state.reason == "run_composition_not_reported_per_sample"
+            assert run_composition.locator is not None
+            assert run_composition.locator.pdf_page_index == 1
         assert observation.identity.composition is not None
-        assert observation.identity.composition.is_unknown
+        identity_quantity = observation.identity.quantity
+        identity_subtype = observation.identity.subtype
+        if (
+            identity_quantity.is_value
+            and identity_quantity.value.value == "equilibrium_phase_composition"
+            and identity_subtype is not None
+            and identity_subtype.is_value
+            and identity_subtype.value == "oxide mole percent in solid phase"
+        ):
+            # This profile excludes a starting composition from identity; the
+            # row still records that its run composition was not reported.
+            assert observation.identity.composition.is_not_applicable
+            assert observation.identity.composition.reason == (
+                "profile equilibrium_phase_composition does not use composition"
+            )
+        else:
+            assert observation.identity.composition.is_unknown
         oxygen = observation.point_conditions["fO2_log"]
         assert oxygen.state.is_unknown
         assert oxygen.state.reason == "fo2_not_reported"
@@ -355,10 +383,10 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
         if raw["values"].get("quantity") == "equilibrium_phase_composition"
         and raw.get("phase_as_printed") in {"L", "Liquid"}
         and isinstance(raw["values"].get("composition_mass_percent"), dict)
-        and "composition" not in (raw.get("point_conditions") or {})
     ]
     for raw in printed_liquid_rows:
         parent_id = raw["observation_id"]
+        assert parent_id in parents_with_unknown_run_composition
         printed = raw["values"]["composition_mass_percent"]
         assert set(printed) == set(components)
         for formula in components:

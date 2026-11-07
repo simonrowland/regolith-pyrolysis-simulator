@@ -2392,11 +2392,6 @@ def _composition_located_from_plain(
                 inputs=tuple(
                     dict.fromkeys((*derivation.inputs, *projection_inputs))
                 ),
-                input_provenance=(
-                    None
-                    if payload.get("input_provenance") in (None, "")
-                    else str(payload.get("input_provenance"))
-                ),
             )
         return Located(
             State.of(composition),
@@ -3543,6 +3538,25 @@ def _sample_from_plain(
         )
     if owner_initial is not None:
         initial_located = owner_initial
+    if (
+        initial_located is not None
+        and initial_located.state.is_value
+        and isinstance(initial_located.state.value, Composition)
+        and initial_located.state.value.input_provenance is None
+        and (
+            composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            or initial_located.state.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
+    ):
+        initial_located = replace(
+            initial_located,
+            state=State.of(
+                composition_with_provenance(
+                    initial_located.state.value, PRINTED_STARTING_BULK
+                )
+            ),
+        )
     return Sample(
         mass_kg=None
         if mass is None
@@ -28910,6 +28924,33 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        parent_composition = (parent_point_conditions or {}).get("composition")
+        raw_row_conditions = (
+            raw_item.get("point_conditions")
+            if isinstance(raw_item, Mapping)
+            else None
+        )
+        row_composition = (point_conditions or {}).get("composition")
+        row_has_printed_composition = (
+            isinstance(raw_row_conditions, Mapping)
+            and "composition" in raw_row_conditions
+            and row_composition is not None
+            and row_composition.state.is_value
+            and row_composition.locator is not None
+        )
+        if (
+            identity.quantity.is_value
+            and identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and identity.species.phase.is_value
+            and identity.species.phase.value is Phase.L
+            and (parent_composition is None or parent_composition.state.is_unknown)
+            and not row_has_printed_composition
+        ):
+            # A liquid equilibrium-composition child reports composition as
+            # its measured quantity. Drop an absent/unknown inherited condition,
+            # but keep an explicitly located printed row condition.
+            point_conditions = dict(point_conditions or {})
+            point_conditions.pop("composition", None)
         if (
             q_token_point not in PHASE_ROW_QUANTITIES
             and isinstance(q_token_point, Quantity)

@@ -977,7 +977,7 @@ def test_printed_mineral_mole_fraction_is_not_filtered_as_an_oxide() -> None:
 
 
 def test_oxide_wt_derivation_names_components_the_charge_cannot_use() -> None:
-    """H2O and Ag2O stay in the stored map and are named on the engine charge."""
+    """Closure volatiles stay out of oxides but remain visible to the engine charge."""
 
     # The mass-percent gate admits at most 0.5 wt% of dropped components.
     converted = wt_pct_to_mole_fraction(
@@ -991,8 +991,21 @@ def test_oxide_wt_derivation_names_components_the_charge_cannot_use() -> None:
             Derivation(
                 "wt_pct_to_mole_fraction", ("wt_pct",), (), "mole_fraction"
             ),
-        )
+        ),
+        printed_composition=factories.located(
+            {
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [
+                    ["SiO2", "99.5"],
+                    ["H2O", "0.25"],
+                    ["Ag2O", "0.25"],
+                ],
+            }
+        ),
     )
+    assert "H2O" not in stored
+    assert "Ag2O" in stored
     result = normalized_composition(
         replace(factories.kems_experiment(), sample=sample), _bench()
     )
@@ -1000,9 +1013,10 @@ def test_oxide_wt_derivation_names_components_the_charge_cannot_use() -> None:
     assert set(result.selected.value) == {"SiO2"}
     assert result.selected.value["SiO2"] == Decimal(1)
     notice = result.selected.notice or ""
-    assert "excluded_unsupported_composition_components:" in notice
-    assert f"H2O {stored['H2O']}" in notice
-    assert f"Ag2O {stored['Ag2O']}" in notice
+    assert "omitted non-oxide H2O 0.25 wt%, Ag2O 0.25 wt%" in notice
+    assert "omitted total 0.5 wt% <= 1.0 wt%" in notice
+
+
 def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes() -> None:
     experiment = factories.kems_experiment()
     bench = _bench()

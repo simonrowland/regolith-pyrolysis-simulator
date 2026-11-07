@@ -5888,7 +5888,8 @@ def test_unavailable_model_derived_value_keeps_supplied_derivation_references(
         ("figure_only", False, False, False),
         ("figure_only", False, True, False),
         ("figure_only", True, False, True),
-        ("admitted", False, False, True),
+        # Admission metadata alone does not create a numeric value with lineage.
+        ("admitted", False, False, False),
     ],
 )
 def test_b879_caption_only_figure_model_lineage_requirement(

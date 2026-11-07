@@ -500,8 +500,13 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
         )
         assert float(recovered) == pytest.approx(0.0006, rel=1e-12)
         initial = sample.initial_composition
-        assert initial is not None and initial.state.is_value
-        assert set(dict(initial.state.value.components)) == {"SiO2", "Cl"}
+        assert initial is not None and initial.state.is_unknown
+        assert "Cl=40 wt%" in initial.state.reason
+        assert sample.printed_composition.state.value == {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [["SiO2", "60"], ["Cl", "40"]],
+        }
     elif feot_printed:
         assert selected is not None
         assert set(selected.value) == {"SiO2", "FeO"}

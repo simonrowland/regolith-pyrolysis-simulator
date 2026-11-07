@@ -2526,7 +2526,7 @@ def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() ->
     assert located.state.is_value
     assert set(dict(located.state.value.components)) == {"SiO2", "MgO"}
     assert printed is not None and printed.state.is_value
-    assert printed.state.value == {"SiO2": "50", "MgO": "50", "H2O": None}
+    assert printed.state.value == composition
     assert identity.composition is not None and identity.composition.is_value
     assert set(dict(identity.composition.value.components)) == {"SiO2", "MgO"}
 
