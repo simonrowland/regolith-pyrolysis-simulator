@@ -442,7 +442,7 @@ def test_table2_values_remain_a_typed_frame_gap_pending_physics(
     )
 
 
-def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_rows(
+def test_condensed_element_frame_diagnostics_and_injected_compiler_predictions(
     tmp_path: Path,
 ) -> None:
     source_paths = {
@@ -473,42 +473,117 @@ def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_row
         ("shornikov-2020-mgo-feo-melts", "table:2"),
     }
     assert set(diagnostics) == expected_keys
-    assert all(diagnostics[key]["accepted"] for key in expected_keys)
-    table_diagnostic_pins = {
-        ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"): (
+    rejected_2011_key = (
+        "shornikov-2011-cao-mgo-alumina-melts",
+        "table:1",
+    )
+    accepted_keys = expected_keys - {rejected_2011_key}
+    assert all(diagnostics[key]["accepted"] for key in accepted_keys)
+    assert not diagnostics[rejected_2011_key]["accepted"]
+    assert [
+        row["formula"]
+        for row in diagnostics[rejected_2011_key]["contradicting_rows"]
+    ] == ["Ca"]
+    table_diagnostic_pins = (
+        (
+            ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"),
             "Mg",
             "shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r12_c06",
             Decimal("0.35091975521285301480427524"),
+            True,
         ),
-        ("shornikov-2011-cao-mgo-alumina-melts", "table:1"): (
+        (
+            rejected_2011_key,
             "Mg",
             "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06",
             Decimal("0.3104"),
+            True,
         ),
-        ("shornikov-2019-ca-feo-vapor", "table:1"): (
+        (
+            ("shornikov-2011-cao-mgo-alumina-melts", "table:1"),
+            "Ca",
+            "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c06",
+            Decimal("-2.0726"),
+            True,
+        ),
+        (
+            ("shornikov-2019-ca-feo-vapor", "table:1"),
+            "Ca",
+            "shornikov_2019_ca_feo_vapor_p003_t01_r03_c06",
+            Decimal("-1.68288"),
+            True,
+        ),
+        (
+            ("shornikov-2019-ca-feo-vapor", "table:1"),
             "Fe",
             "shornikov_2019_ca_feo_vapor_p003_t01_r06_c06",
             Decimal("-1.29457"),
+            False,
         ),
-        (SOURCE_ID, "table:2"): (
+        (
+            (SOURCE_ID, "table:2"),
+            "Mg",
+            "shornikov_2019_mgo_titania_melts_p003_t02_r03_c06",
+            Decimal("0.3988030760135288711447779"),
+            True,
+        ),
+        (
+            (SOURCE_ID, "table:2"),
             "Ti",
             "shornikov_2019_mgo_titania_melts_p003_t02_r06_c06",
             Decimal("0.30671"),
+            False,
         ),
-        ("shornikov-2020-mgo-feo-melts", "table:2"): (
+        (
+            ("shornikov-2020-mgo-feo-melts", "table:2"),
             "Mg",
             "shornikov_2020_mgo_feo_melts_p002_t03_r03_c06",
             Decimal("0.5629336104482892795225964"),
+            True,
         ),
-    }
-    for table_key, (formula, observation_id, residual) in table_diagnostic_pins.items():
-        diagnostic_row = diagnostics[table_key]["accepted_row"]
-        assert diagnostic_row is not None
+        (
+            ("shornikov-2020-mgo-feo-melts", "table:2"),
+            "Fe",
+            "shornikov_2020_mgo_feo_melts_p002_t03_r06_c06",
+            Decimal("-1.324"),
+            False,
+        ),
+    )
+    for (
+        table_key,
+        formula,
+        observation_id,
+        residual,
+        frame_discriminating,
+    ) in table_diagnostic_pins:
+        diagnostic_row = next(
+            (
+                row
+                for row in diagnostics[table_key]["diagnostic_rows"]
+                if row.get("formula") == formula
+                and row["observation"].observation_id.endswith(observation_id)
+            ),
+            None,
+        )
+        assert diagnostic_row is not None, (table_key, formula, observation_id)
         assert diagnostic_row["formula"] == formula
         assert diagnostic_row["observation"].observation_id.endswith(observation_id)
         assert abs(diagnostic_row["residual_kJ_per_mol"] - residual) < Decimal(
             "1e-6"
         )
+        assert diagnostic_row["frame_discriminating"] is frame_discriminating
+        if table_key == rejected_2011_key:
+            assert diagnostics[table_key]["accepted_row"] is None
+    accepted_row_formulas = {
+        table_key: diagnostics[table_key]["accepted_row"]["formula"]
+        for table_key in accepted_keys
+    }
+    assert accepted_row_formulas == {
+        ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"): "Mg",
+        ("shornikov-2019-ca-feo-vapor", "table:1"): "Ca",
+        (SOURCE_ID, "table:2"): "Mg",
+        ("shornikov-2020-mgo-feo-melts", "table:2"): "Mg",
+    }
 
     # The 2019 paper's three independent checks are recomputed from the JANAF
     # owner, rather than copied into the conversion path as expected values.
@@ -559,6 +634,11 @@ def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_row
             observations=observations,
             table_diagnostics=diagnostics,
         )
+        if table_key == rejected_2011_key:
+            assert resolved.identity.reaction.is_unknown
+            assert resolved.identity.formation_elements.is_unknown
+            assert not (resolved.provenance or {}).get("derived_by")
+            continue
         assert resolved.identity.standard_pressure_Pa.is_value, row.observation_id
         assert resolved.identity.reaction.is_value, row.observation_id
         assert resolved.identity.formation_elements.is_value, row.observation_id
@@ -597,7 +677,7 @@ def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_row
     # Each accepted source has a real numeric residual on a model-derived
     # gas-element row. Feed that independent JANAF value through the ordinary
     # residual compiler to prove the restored literature-modelled tier can score.
-    for table_key in sorted(expected_keys):
+    for table_key in sorted(accepted_keys):
         diagnostic_row = diagnostics[table_key]["accepted_row"]
         assert diagnostic_row is not None
         raw = diagnostic_row["observation"]
@@ -770,3 +850,62 @@ def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_row
     assert unresolved.identity.reaction.is_unknown
     assert unresolved.identity.formation_elements.is_unknown
     assert not (unresolved.provenance or {}).get("derived_by")
+
+
+def test_condensed_element_frame_requires_discriminating_reproduction(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    observations = list(result.observations.values())
+    table_key = (SOURCE_ID, "table:2")
+    mg_observation_id = "shornikov_2019_mgo_titania_melts_p003_t02_r03_c06"
+
+    # The stable-element frame prints ΔfG(Mg(g)) = 0 at this T. The Mg row
+    # therefore contradicts the liquid-element frame; Ti(l) and O(g) have no
+    # frame offset and must not rescue the table.
+    stable_frame_values = [
+        replace(
+            row,
+            value=replace(row.value, point=Decimal("0")),
+        )
+        if row.observation_id.endswith(mg_observation_id)
+        else row
+        for row in observations
+    ]
+    stable_diagnostics = _condensed_element_reference_table_diagnostics(
+        stable_frame_values
+    )
+    assert not stable_diagnostics[table_key]["accepted"]
+    assert [
+        row["formula"]
+        for row in stable_diagnostics[table_key]["contradicting_rows"]
+    ] == ["Mg"]
+    ti_row = next(
+        row
+        for row in stable_diagnostics[table_key]["diagnostic_rows"]
+        if row.get("formula") == "Ti"
+    )
+    assert ti_row["frame_offset_kJ_per_mol"] == Decimal("0")
+    assert not ti_row["frame_discriminating"]
+
+    # With only the stable-frame Ti row and shared-reference oxygen check,
+    # there is no evidence that can select the condensed-metal frame.
+    nondiscriminating_rows = [
+        row
+        for row in observations
+        if _condensed_element_reference_table_key(row) == table_key
+        and isinstance(row.identity, Identity)
+        and row.identity.species is not None
+        and row.identity.species.formula in {"Ti", "O"}
+    ]
+    absent_diagnostics = _condensed_element_reference_table_diagnostics(
+        nondiscriminating_rows
+    )
+    assert set(absent_diagnostics) == {table_key}
+    assert not absent_diagnostics[table_key]["accepted"]
+    assert absent_diagnostics[table_key]["accepted_row"] is None
+    assert not any(
+        row.get("frame_discriminating")
+        for row in absent_diagnostics[table_key]["diagnostic_rows"]
+    )

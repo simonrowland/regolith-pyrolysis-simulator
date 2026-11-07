@@ -2746,6 +2746,7 @@ def _condensed_element_reference_table_diagnostics(
 
     from simulator.battery.generators.janaf import (
         janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+        janaf_liquid_element_reference_at_temperature,
     )
 
     rows_by_table: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
@@ -2780,6 +2781,13 @@ def _condensed_element_reference_table_diagnostics(
             predicted = janaf_condensed_element_gas_delta_fG_kJ_per_mol(
                 formula, temperature_K
             )
+            frame_offset = (
+                Decimal(0)
+                if formula == "O"
+                else janaf_liquid_element_reference_at_temperature(
+                    formula, temperature_K
+                ).delta_fG_kJ_per_mol
+            )
         except (KeyError, ValueError, ArithmeticError) as exc:
             rows_by_table[table_key].append(
                 {
@@ -2799,7 +2807,13 @@ def _condensed_element_reference_table_diagnostics(
                 "printed_kJ_per_mol": observation.value.point,
                 "predicted_kJ_per_mol": predicted,
                 "residual_kJ_per_mol": residual,
-                "frame_discriminating": formula != "O",
+                "frame_offset_kJ_per_mol": frame_offset,
+                # A row cannot choose between frames when their JANAF offset
+                # is within the same error allowance used for reproduction.
+                "frame_discriminating": (
+                    abs(frame_offset)
+                    > _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+                ),
             }
         )
 
@@ -2813,18 +2827,26 @@ def _condensed_element_reference_table_diagnostics(
             and abs(row["residual_kJ_per_mol"])
             <= _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
         ]
+        contradicting = [
+            row
+            for row in comparable
+            if row.get("frame_discriminating")
+            and abs(row["residual_kJ_per_mol"])
+            > _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+        ]
         diagnostics[key] = {
-            "accepted": bool(passing),
+            "accepted": bool(passing) and not contradicting,
             "tolerance_kJ_per_mol": (
                 _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
             ),
             "diagnostic_rows": tuple(rows),
+            "contradicting_rows": tuple(contradicting),
             "accepted_row": (
                 min(
                     passing,
                     key=lambda row: abs(row["residual_kJ_per_mol"]),
                 )
-                if passing
+                if passing and not contradicting
                 else None
             ),
         }
