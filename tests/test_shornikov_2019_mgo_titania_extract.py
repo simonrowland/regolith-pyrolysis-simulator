@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -11,20 +12,42 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    Authority,
+    Engine,
+    EvidenceClass,
+    ExecutionState,
     NoticeKind,
+    Phase,
+    QUANTITY_UNITS,
     Quantity,
+    ReferenceStateConvention,
     UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import (
+    Identity,
     IdentityEqualKind,
     PA_PER_ATM_DEC,
     PA_PER_BAR_DEC,
     identity_equal,
     standard_pressure_delta_g_kJ_per_mol,
+    quantity_token,
 )
 from simulator.battery.migrate import Migrator
-from simulator.battery.score import _printed_uncertainty_band
+from simulator.battery.records import Execution, phase_token
+from simulator.battery.score import (
+    ENGINE_CHANNELS,
+    EnginePrediction,
+    ScoreContext,
+    _condensed_element_reference_table_diagnostics,
+    _condensed_element_reference_table_key,
+    _printed_uncertainty_band,
+    _resolve_condensed_element_reference,
+    compile_residual,
+)
+from simulator.battery.generators.janaf import (
+    janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+)
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -417,3 +440,333 @@ def test_table2_values_remain_a_typed_frame_gap_pending_physics(
         identity_equal(scored_source.identity, scored_source.identity).kind
         is IdentityEqualKind.IDENTITY_UNKNOWN
     )
+
+
+def test_condensed_element_frame_requires_table_diagnostics_and_scores_model_rows(
+    tmp_path: Path,
+) -> None:
+    source_paths = {
+        "shornikov-2008-mgo-aluminosilicate-melts": ROOT
+        / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml",
+        "shornikov-2011-cao-mgo-alumina-melts": ROOT
+        / "data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml",
+        "shornikov-2019-ca-feo-vapor": ROOT
+        / "data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml",
+        SOURCE_ID: EXTRACT,
+        "shornikov-2020-mgo-feo-melts": ROOT
+        / "data/literature/extracts/shornikov-2020-mgo-feo-melts.yaml",
+    }
+    results = {}
+    observations = []
+    for source_id, path in source_paths.items():
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        result = _migrate_extract_document(document, tmp_path / path.name)
+        results[source_id] = result
+        observations.extend(result.observations.values())
+
+    diagnostics = _condensed_element_reference_table_diagnostics(observations)
+    expected_keys = {
+        ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"),
+        ("shornikov-2011-cao-mgo-alumina-melts", "table:1"),
+        ("shornikov-2019-ca-feo-vapor", "table:1"),
+        (SOURCE_ID, "table:2"),
+        ("shornikov-2020-mgo-feo-melts", "table:2"),
+    }
+    assert set(diagnostics) == expected_keys
+    assert all(diagnostics[key]["accepted"] for key in expected_keys)
+    table_diagnostic_pins = {
+        ("shornikov-2008-mgo-aluminosilicate-melts", "unnumbered:2:1"): (
+            "Mg",
+            "shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r12_c06",
+            Decimal("0.35091975521285301480427524"),
+        ),
+        ("shornikov-2011-cao-mgo-alumina-melts", "table:1"): (
+            "Mg",
+            "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06",
+            Decimal("0.3104"),
+        ),
+        ("shornikov-2019-ca-feo-vapor", "table:1"): (
+            "Fe",
+            "shornikov_2019_ca_feo_vapor_p003_t01_r06_c06",
+            Decimal("-1.29457"),
+        ),
+        (SOURCE_ID, "table:2"): (
+            "Ti",
+            "shornikov_2019_mgo_titania_melts_p003_t02_r06_c06",
+            Decimal("0.30671"),
+        ),
+        ("shornikov-2020-mgo-feo-melts", "table:2"): (
+            "Mg",
+            "shornikov_2020_mgo_feo_melts_p002_t03_r03_c06",
+            Decimal("0.5629336104482892795225964"),
+        ),
+    }
+    for table_key, (formula, observation_id, residual) in table_diagnostic_pins.items():
+        diagnostic_row = diagnostics[table_key]["accepted_row"]
+        assert diagnostic_row is not None
+        assert diagnostic_row["formula"] == formula
+        assert diagnostic_row["observation"].observation_id.endswith(observation_id)
+        assert abs(diagnostic_row["residual_kJ_per_mol"] - residual) < Decimal(
+            "1e-6"
+        )
+
+    # The 2019 paper's three independent checks are recomputed from the JANAF
+    # owner, rather than copied into the conversion path as expected values.
+    # O(g) checks its oxygen reference but is excluded from metal-frame acceptance.
+    janaf_pins = {
+        "Mg": (
+            "shornikov_2019_mgo_titania_melts_p003_t02_r03_c06",
+            "-72.400",
+            "0.399",
+        ),
+        "Ti": (
+            "shornikov_2019_mgo_titania_melts_p003_t02_r06_c06",
+            "170.472",
+            "0.316",
+        ),
+        "O": (
+            "shornikov_2019_mgo_titania_melts_p003_t02_r11_c06",
+            "110.091",
+            "0.122",
+        ),
+    }
+    for element, (observation_id, printed, expected_residual) in janaf_pins.items():
+        row = next(
+            item
+            for item in observations
+            if item.observation_id.endswith(observation_id)
+        )
+        prediction = janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+            element, row.identity.temperature_K.value
+        )
+        residual = row.value.point - prediction
+        assert row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert row.value.point == Decimal(printed)
+        assert abs(residual - Decimal(expected_residual)) < Decimal("0.01")
+
+    for row in observations:
+        table_key = _condensed_element_reference_table_key(row)
+        if (
+            table_key not in expected_keys
+            or not isinstance(row.identity, Identity)
+            or quantity_token(row.identity) is not Quantity.DELTA_FG
+            or row.value.kind is not ValueKind.POINT
+            or row.value.point is None
+        ):
+            continue
+        resolved = _resolve_condensed_element_reference(
+            row,
+            observations=observations,
+            table_diagnostics=diagnostics,
+        )
+        assert resolved.identity.standard_pressure_Pa.is_value, row.observation_id
+        assert resolved.identity.reaction.is_value, row.observation_id
+        assert resolved.identity.formation_elements.is_value, row.observation_id
+        assert resolved.value.point == row.value.point
+        derived_by = resolved.provenance["derived_by"]
+        assert derived_by["standard_pressure_Pa"] == "d351_nominal_p0"
+        assert derived_by["reaction"] == "d338_reference_state_owner"
+        assert derived_by["formation_elements"] == "d338_reference_state_owner"
+        assert any(
+            notice.reason == "standard pressure unprinted (1 bar vs 1 atm)"
+            for notice in resolved.notices
+        )
+        if phase_token(row.identity.species) is Phase.G:
+            assert resolved.uncertainty.kind is UncertaintyKind.DERIVED
+        else:
+            assert resolved.uncertainty == row.uncertainty
+
+    mgo_solid = next(
+        row
+        for row in results[SOURCE_ID].observations.values()
+        if row.observation_id.endswith(
+            "shornikov_2019_mgo_titania_melts_p003_t02_r03_c02"
+        )
+    )
+    resolved_mgo_solid = _resolve_condensed_element_reference(
+        mgo_solid,
+        observations=results[SOURCE_ID].observations.values(),
+        table_diagnostics=diagnostics,
+    )
+    assert resolved_mgo_solid.identity.species.polymorph.is_value
+    assert (
+        resolved_mgo_solid.provenance["derived_by"]["species.polymorph"]
+        == "d338_reference_state_owner"
+    )
+
+    # Each accepted source has a real numeric residual on a model-derived
+    # gas-element row. Feed that independent JANAF value through the ordinary
+    # residual compiler to prove the restored literature-modelled tier can score.
+    for table_key in sorted(expected_keys):
+        diagnostic_row = diagnostics[table_key]["accepted_row"]
+        assert diagnostic_row is not None
+        raw = diagnostic_row["observation"]
+        result = results[table_key[0]]
+        resolved = _resolve_condensed_element_reference(
+            raw,
+            observations=result.observations.values(),
+            table_diagnostics=diagnostics,
+        )
+        assert resolved.identity.standard_pressure_Pa.is_value
+        assert resolved.identity.standard_pressure_Pa.value == Decimal("100000")
+        assert resolved.identity.reaction.is_value
+        assert resolved.identity.formation_elements.is_value
+        assert resolved.uncertainty.kind is UncertaintyKind.DERIVED
+        expected_pressure_width = abs(
+            standard_pressure_delta_g_kJ_per_mol(
+                Decimal("1"),
+                resolved.identity.temperature_K.value,
+                PA_PER_BAR_DEC,
+                PA_PER_ATM_DEC,
+            )
+        )
+        assert abs(resolved.uncertainty.value - expected_pressure_width) < Decimal(
+            "1e-20"
+        )
+        assert (
+            resolved.provenance["formation_reference_convention"]
+            == ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+        )
+        assert (
+            resolved.provenance["derived_by"]["standard_pressure_Pa"]
+            == "d351_nominal_p0"
+        )
+        assert resolved.notices
+        engine = Engine.INTERNAL_ANALYTICAL
+        prediction = EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.PRODUCED),
+            value=diagnostic_row["predicted_kJ_per_mol"],
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            coefficient_sources=("ellingham",),
+            lineage_complete=True,
+            identity=resolved.identity,
+        )
+        context = ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+            root=ROOT,
+        )
+        residual, _candidate = compile_residual(
+            resolved,
+            engine,
+            context=context,
+            prediction=prediction,
+            condensed_frame_diagnostics=diagnostics,
+        )
+        assert resolved.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert residual.numeric is not None, (table_key, residual.refusal)
+        assert residual.numeric.value == (
+            diagnostic_row["predicted_kJ_per_mol"] - raw.value.point
+        )
+        assert any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in residual.notices
+        )
+
+    # d-351's family check explicitly retains the 2020 MgO(cr) disagreement:
+    # the independent JANAF condensed-frame prediction is -320.338 kJ/mol,
+    # while the printed model value is -355.557 kJ/mol. This is numeric evidence,
+    # not a reason to tune the source value or turn the row into a refusal.
+    mgo_2020 = next(
+        row
+        for row in results["shornikov-2020-mgo-feo-melts"].observations.values()
+        if row.observation_id.endswith(
+            "shornikov_2020_mgo_feo_melts_p002_t03_r03_c02"
+        )
+    )
+    result_2020 = results["shornikov-2020-mgo-feo-melts"]
+    resolved_mgo_2020 = _resolve_condensed_element_reference(
+        mgo_2020,
+        observations=result_2020.observations.values(),
+        table_diagnostics=diagnostics,
+    )
+    prediction_2020 = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel=ENGINE_CHANNELS[Engine.INTERNAL_ANALYTICAL],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("-320.338"),
+        unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+        coefficient_sources=("janaf-condensed-element-reference",),
+        lineage_complete=True,
+        identity=resolved_mgo_2020.identity,
+    )
+    residual_2020, _candidate = compile_residual(
+        resolved_mgo_2020,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ScoreContext(
+            works=result_2020.works,
+            experiments=result_2020.experiments,
+            observations=result_2020.observations,
+            root=ROOT,
+        ),
+        prediction=prediction_2020,
+        condensed_frame_diagnostics=diagnostics,
+    )
+    assert residual_2020.numeric is not None, residual_2020.refusal
+    assert abs(residual_2020.numeric.value - Decimal("35.219")) < Decimal("0.001")
+    assert any(
+        notice.kind is NoticeKind.FIGURE_ONLY
+        and notice.reason == "evidence_class:model_derived"
+        for notice in residual_2020.notices
+    )
+
+    mg_row = next(
+        row["observation"]
+        for row in diagnostics[(SOURCE_ID, "table:2")]["diagnostic_rows"]
+        if row.get("formula") == "Mg"
+    )
+    resolved_mg = _resolve_condensed_element_reference(
+        mg_row,
+        observations=observations,
+        table_diagnostics=diagnostics,
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "condensed_element_reference_extrapolated"
+        and notice.authority is Authority.EXTRAPOLATED
+        for notice in resolved_mg.notices
+    )
+
+    failed_table_key = (SOURCE_ID, "table:2")
+    failing_observation_ids = {
+        row["observation"].observation_id
+        for row in diagnostics[failed_table_key]["diagnostic_rows"]
+        if "residual_kJ_per_mol" in row
+    }
+    shifted_observations = [
+        replace(
+            observation,
+            value=replace(
+                observation.value,
+                point=observation.value.point + Decimal("100"),
+            ),
+        )
+        if observation.observation_id in failing_observation_ids
+        else observation
+        for observation in observations
+    ]
+    failed_diagnostics = _condensed_element_reference_table_diagnostics(
+        shifted_observations
+    )
+    assert not failed_diagnostics[failed_table_key]["accepted"]
+    frame_gap = next(
+        row
+        for row in shifted_observations
+        if row.source_id == SOURCE_ID
+        and row.locator is not None
+        and row.locator.table == "2"
+        and row.value.kind is ValueKind.POINT
+        and row.identity.species.formula == "MgO"
+    )
+    unresolved = _resolve_condensed_element_reference(
+        frame_gap,
+        observations=shifted_observations,
+        table_diagnostics=failed_diagnostics,
+    )
+    assert unresolved.identity.reaction.is_unknown
+    assert unresolved.identity.formation_elements.is_unknown
+    assert not (unresolved.provenance or {}).get("derived_by")

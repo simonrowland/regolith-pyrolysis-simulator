@@ -1073,6 +1073,11 @@ def _comparison_method_cancellation_notice_reason(
     )
 
 
+_STANDARD_PRESSURE_UNPRINTED_REASON = (
+    "standard pressure unprinted (1 bar vs 1 atm)"
+)
+
+
 def _hold_reason_notice(
     reason: str,
     *,
@@ -1086,7 +1091,7 @@ def _hold_reason_notice(
     lowered = reason.lower()
     if include_misprint and lowered.startswith("probable source misprint"):
         kind = NoticeKind.PROBABLE_SOURCE_MISPRINT
-    elif lowered == "standard pressure unprinted (1 bar vs 1 atm)":
+    elif lowered == _STANDARD_PRESSURE_UNPRINTED_REASON:
         kind = NoticeKind.INPUT_OMITTED
     elif lowered.startswith("out_of_certified_band:"):
         kind = NoticeKind.OUT_OF_CERTIFIED_BAND
@@ -1102,6 +1107,44 @@ def _hold_reason_notice(
         reason=reason,
         origin=origin,
         band=str(band) if kind is NoticeKind.OUT_OF_CERTIFIED_BAND and band else None,
+    )
+
+
+def _standard_pressure_ambiguity_uncertainty(
+    temperature_K: Decimal, uncertainty: Uncertainty
+) -> Uncertainty:
+    """Attach the row's bounded 1 bar/1 atm width without changing its value."""
+
+    if temperature_K <= 0 or not temperature_K.is_finite():
+        raise ValueError("standard-pressure ambiguity requires positive finite T")
+    # Premise: the printed gas standard state may mean 1 bar or 1 atm.
+    # Algebra: |ΔG| = |RT ln(p_atm/p_bar)| per mole of gas.
+    # Units: J/(mol K) × K / 1000 = kJ/mol. Check: at 2973 K the width
+    # is about 0.33 kJ/mol.
+    pressure_width = abs(
+        standard_pressure_delta_g_kJ_per_mol(
+            Decimal("1"),
+            temperature_K,
+            PA_PER_BAR_DEC,
+            PA_PER_ATM_DEC,
+        )
+    )
+    printed_uncertainty = (
+        uncertainty.verbatim
+        if uncertainty.kind is UncertaintyKind.PRINTED
+        else None
+    )
+    return Uncertainty(
+        kind=UncertaintyKind.DERIVED,
+        verbatim=printed_uncertainty,
+        value=pressure_width,
+        basis="kJ/mol",
+        derivation=Derivation(
+            relation=_STANDARD_PRESSURE_AMBIGUITY_RELATION,
+            inputs=(),
+            parameters=(),
+            output_unit="kJ/mol",
+        ),
     )
 
 
@@ -23855,7 +23898,7 @@ class Migrator:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
             standard_pressure_notice = _hold_reason_notice(
-                "standard pressure unprinted (1 bar vs 1 atm)",
+                _STANDARD_PRESSURE_UNPRINTED_REASON,
                 quantity=q_token,
                 origin=obs_id,
             )
@@ -23872,34 +23915,8 @@ class Migrator:
                         f"{obs_id}: gas delta_fG with unprinted standard pressure "
                         "requires a positive row values.T_K"
                     )
-                # Premise: the printed gas standard state may mean 1 bar or 1 atm.
-                # Algebra: |ΔG| = |RT ln(p_atm/p_bar)| per mole of gas.
-                # Units: J/(mol K) × K / 1000 = kJ/mol.
-                # Check: at 2973 K the width is about 0.33 kJ/mol.
-                pressure_width = abs(
-                    standard_pressure_delta_g_kJ_per_mol(
-                        Decimal("1"),
-                        row_temperature_K,
-                        PA_PER_BAR_DEC,
-                        PA_PER_ATM_DEC,
-                    )
-                )
-                printed_uncertainty = (
-                    uncertainty.verbatim
-                    if uncertainty.kind is UncertaintyKind.PRINTED
-                    else None
-                )
-                uncertainty = Uncertainty(
-                    kind=UncertaintyKind.DERIVED,
-                    verbatim=printed_uncertainty,
-                    value=pressure_width,
-                    basis="kJ/mol",
-                    derivation=Derivation(
-                        relation=_STANDARD_PRESSURE_AMBIGUITY_RELATION,
-                        inputs=(),
-                        parameters=(),
-                        output_unit="kJ/mol",
-                    ),
+                uncertainty = _standard_pressure_ambiguity_uncertainty(
+                    row_temperature_K, uncertainty
                 )
         identity, point_conditions, observation_notices = (
             _initial_charge_only_missing_composition(

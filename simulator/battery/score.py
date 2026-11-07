@@ -142,6 +142,9 @@ from simulator.battery.migrate import (
     path_matches_source_tokens,
     _phase_for_sample_description,
     _phase_for_recorded_vapour_sample,
+    _hold_reason_notice,
+    _STANDARD_PRESSURE_UNPRINTED_REASON,
+    _standard_pressure_ambiguity_uncertainty,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -2364,12 +2367,13 @@ def _reference_polymorph_notice(
     kind: NoticeKind,
     reason: str,
     band: str,
+    quantity: Quantity = Quantity.ACTIVITY,
     authority: Authority | None = None,
     certification: str | None = None,
 ) -> Notice:
     return Notice(
         kind=kind,
-        affected_quantities=(Quantity.ACTIVITY,),
+        affected_quantities=(quantity,),
         reason=reason,
         origin=reference.observation_id,
         band=band,
@@ -2450,9 +2454,12 @@ def _feo1_5_hematite_field_refusal(
 def _decide_omitted_reference_polymorph(
     reference: Observation,
     identity: Identity,
-    standard_state: StandardState,
+    standard_state: StandardState | None,
     formula: str,
     temperature_K: Decimal,
+    *,
+    identity_axis: Literal["reference_state", "species"] = "reference_state",
+    quantity: Quantity = Quantity.ACTIVITY,
 ) -> tuple[Observation | None, Notice | None]:
     """Infer the stable JANAF crystal for a printed, unnamed pure solid.
 
@@ -2471,8 +2478,18 @@ def _decide_omitted_reference_polymorph(
         janaf_solid_stability_transitions,
     )
 
-    polymorph_state = standard_state.endmember.polymorph
-    assert polymorph_state is not None
+    if identity_axis == "species":
+        endmember = identity.species
+        assert endmember is not None
+        polymorph_state = endmember.polymorph or State.unknown(
+            "source does not state polymorph",
+            rejection_kind=PolymorphRejectionKind.OMITTED,
+        )
+    else:
+        assert standard_state is not None
+        endmember = standard_state.endmember
+        polymorph_state = endmember.polymorph
+        assert polymorph_state is not None
     reason_text = polymorph_state.reason or ""
     if _polymorph_reason_states_quench_or_metastable(reason_text):
         return None, _reference_polymorph_notice(
@@ -2480,6 +2497,7 @@ def _decide_omitted_reference_polymorph(
             kind=NoticeKind.INPUT_OMITTED,
             reason=REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
             band="source states a quench or a metastable reference phase",
+            quantity=quantity,
         )
 
     # Premise: a printed one-cation solid references the dimer's crystal,
@@ -2489,7 +2507,11 @@ def _decide_omitted_reference_polymorph(
     # FeO1.5 is hematite only inside the Fe-030/Fe-032 fO2 field; otherwise
     # the printed point is kept and the refusal names that field.
     mapped_from: str | None = None
-    dimer = _ONE_CATION_OXIDE_DIMER.get(formula)
+    dimer = (
+        _ONE_CATION_OXIDE_DIMER.get(formula)
+        if identity_axis == "reference_state"
+        else None
+    )
     if dimer is not None:
         if formula == "FeO1.5":
             field_refusal = _feo1_5_hematite_field_refusal(
@@ -2500,7 +2522,8 @@ def _decide_omitted_reference_polymorph(
         mapped_from = formula
         formula = dimer
         assert reference.value.point is not None
-        endmember = replace(standard_state.endmember, formula=formula)
+        endmember = replace(endmember, formula=formula)
+        assert standard_state is not None
         standard_state = replace(
             standard_state, endmember=endmember, component_basis=formula
         )
@@ -2517,6 +2540,7 @@ def _decide_omitted_reference_polymorph(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             reason=f"fusion conversion missing input for {formula}: {detail}",
             band=f"JANAF fusion data for {formula}: {detail}",
+            quantity=quantity,
         )
 
     try:
@@ -2549,6 +2573,7 @@ def _decide_omitted_reference_polymorph(
                 f"{fusion.melting_temperature_K} K; "
                 f"tables={fusion.crystal_table}/{fusion.liquid_table}"
             ),
+            quantity=quantity,
         )
 
     try:
@@ -2576,6 +2601,7 @@ def _decide_omitted_reference_polymorph(
                 f"({nearest.stable_below.polymorph.value}"
                 f"/{nearest.stable_above.polymorph.value})"
             ),
+            quantity=quantity,
         )
 
     selected = stability.selected
@@ -2637,6 +2663,7 @@ def _decide_omitted_reference_polymorph(
                 f"JANAF stable polymorph {selected.polymorph.value} "
                 f"table {selected.table_id}"
             ),
+            quantity=quantity,
             authority=Authority.CERTIFIED,
             certification=(
                 "NIST-JANAF solid formation Gibbs energies compared at T"
@@ -2650,24 +2677,328 @@ def _decide_omitted_reference_polymorph(
                 kind=NoticeKind.DERIVATION_USES_COMPILATION,
                 reason=REFERENCE_SOLID_INFERRED_REASON,
                 band="solid reference is inferred secondary evidence",
+                quantity=quantity,
                 authority=Authority.CERTIFIED,
                 certification=(
                     "source omission reason states the solid itself was inferred"
                 ),
             )
         )
-    endmember = replace(
-        standard_state.endmember, polymorph=State.of(selected.polymorph)
-    )
-    updated = replace(
-        reference,
-        identity=replace(
+    endmember = replace(endmember, polymorph=State.of(selected.polymorph))
+    if identity_axis == "species":
+        updated_identity = replace(identity, species=endmember)
+    else:
+        assert standard_state is not None
+        updated_identity = replace(
             identity,
             reference_state=State.of(replace(standard_state, endmember=endmember)),
-        ),
+        )
+    updated = replace(
+        reference,
+        identity=updated_identity,
         notices=union_notices(reference.notices, tuple(notices)),
     )
     return updated, None
+
+
+_CONDENSED_ELEMENT_REFERENCE_TABLES: Mapping[str, frozenset[str]] = {
+    "shornikov-2008-mgo-aluminosilicate-melts": frozenset(
+        {"unnumbered:2:1"}
+    ),
+    "shornikov-2011-cao-mgo-alumina-melts": frozenset({"table:1"}),
+    "shornikov-2019-ca-feo-vapor": frozenset({"table:1"}),
+    "shornikov-2019-mgo-titania-melts": frozenset({"table:2"}),
+    "shornikov-2020-mgo-feo-melts": frozenset({"table:2"}),
+}
+# The 2.0 kJ/mol cut admits the reported 2019 Mg/Ti/O residuals
+# (0.399/0.316/0.122 kJ/mol), the 2020 Fe(g) check (1.324 kJ/mol), and the
+# 2008/2011 diagnostic checks with rounding headroom. The 2011 Ca(g) residual
+# (2.073 kJ/mol) is deliberately outside; its Mg(g) row independently passes.
+_CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL = Decimal("2.0")
+
+
+def _condensed_element_reference_table_key(
+    reference: Observation,
+) -> tuple[str, str] | None:
+    source_id = reference.source_id
+    locator = reference.locator
+    if (
+        source_id not in _CONDENSED_ELEMENT_REFERENCE_TABLES
+        or locator is None
+        or locator.figure is not None
+    ):
+        return None
+    if source_id == "shornikov-2008-mgo-aluminosilicate-melts":
+        table_key = f"unnumbered:{locator.page}:{locator.pdf_page_index}"
+    elif locator.table is not None:
+        table_key = f"table:{locator.table}"
+    else:
+        return None
+    if table_key not in _CONDENSED_ELEMENT_REFERENCE_TABLES[source_id]:
+        return None
+    return source_id, table_key
+
+
+def _condensed_element_reference_table_diagnostics(
+    observations: Iterable[Observation],
+) -> dict[tuple[str, str], dict[str, object]]:
+    """Select a table's element frame only when a printed gas atom confirms it."""
+
+    from simulator.battery.generators.janaf import (
+        janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+    )
+
+    rows_by_table: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
+    for observation in observations:
+        table_key = _condensed_element_reference_table_key(observation)
+        identity = observation.identity
+        if (
+            table_key is None
+            or not isinstance(identity, Identity)
+            or quantity_token(identity) is not Quantity.DELTA_FG
+            or identity.species is None
+            or phase_token(identity.species) is not Phase.G
+            or observation.value.kind is not ValueKind.POINT
+            or observation.value.point is None
+        ):
+            continue
+        formula = identity.species.formula
+        composition = formula_composition(formula)
+        # A single metal gas atom diagnoses the condensed-metal frame.
+        # O(g) remains an independent oxygen check, but its reference is O2(g)
+        # in both conventions, so it cannot accept the metal-frame change.
+        # O2(g)=0 is a reaction reference and is not an atom diagnostic.
+        if (
+            composition is None
+            or composition != ((formula, Fraction(1)),)
+        ):
+            continue
+        temperature_K = temperature_of(identity)
+        if temperature_K is None:
+            continue
+        try:
+            predicted = janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+                formula, temperature_K
+            )
+        except (KeyError, ValueError, ArithmeticError) as exc:
+            rows_by_table[table_key].append(
+                {
+                    "observation": observation,
+                    "formula": formula,
+                    "temperature_K": temperature_K,
+                    "error": str(exc),
+                }
+            )
+            continue
+        residual = observation.value.point - predicted
+        rows_by_table[table_key].append(
+            {
+                "observation": observation,
+                "formula": formula,
+                "temperature_K": temperature_K,
+                "printed_kJ_per_mol": observation.value.point,
+                "predicted_kJ_per_mol": predicted,
+                "residual_kJ_per_mol": residual,
+                "frame_discriminating": formula != "O",
+            }
+        )
+
+    diagnostics: dict[tuple[str, str], dict[str, object]] = {}
+    for key, rows in rows_by_table.items():
+        comparable = [row for row in rows if "residual_kJ_per_mol" in row]
+        passing = [
+            row
+            for row in comparable
+            if row.get("frame_discriminating")
+            and abs(row["residual_kJ_per_mol"])
+            <= _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+        ]
+        diagnostics[key] = {
+            "accepted": bool(passing),
+            "tolerance_kJ_per_mol": (
+                _CONDENSED_ELEMENT_REFERENCE_DIAGNOSTIC_TOLERANCE_KJ_PER_MOL
+            ),
+            "diagnostic_rows": tuple(rows),
+            "accepted_row": (
+                min(
+                    passing,
+                    key=lambda row: abs(row["residual_kJ_per_mol"]),
+                )
+                if passing
+                else None
+            ),
+        }
+    return diagnostics
+
+
+def _resolve_condensed_element_reference(
+    reference: Observation,
+    *,
+    observations: Iterable[Observation],
+    table_diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
+) -> Observation:
+    """Derive the ruled formation frame at score time for confirmed tables."""
+
+    table_key = _condensed_element_reference_table_key(reference)
+    identity = reference.identity
+    if (
+        table_key is None
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.DELTA_FG
+        or identity.species is None
+    ):
+        return reference
+    diagnostics = (
+        table_diagnostics
+        if table_diagnostics is not None
+        else _condensed_element_reference_table_diagnostics(observations)
+    )
+    table_diagnostic = diagnostics.get(table_key)
+    if table_diagnostic is None or not table_diagnostic.get("accepted"):
+        return reference
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        return reference
+
+    from simulator.battery.generators.janaf import (
+        _formation_basis_with_condensed_elements,
+    )
+
+    species = identity.species
+    notices: tuple[Notice, ...] = reference.notices
+    derived_by = dict((reference.provenance or {}).get("derived_by") or {})
+    if (
+        phase_token(species) is Phase.CR
+        and species.polymorph is not None
+        and species.polymorph.is_unknown
+        and species.polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
+    ):
+        resolved, refusal = _decide_omitted_reference_polymorph(
+            reference,
+            identity,
+            None,
+            species.formula,
+            temperature_K,
+            identity_axis="species",
+            quantity=Quantity.DELTA_FG,
+        )
+        if resolved is not None:
+            identity = resolved.identity
+            species = identity.species
+            notices = union_notices(notices, resolved.notices)
+            derived_by["species.polymorph"] = "d338_reference_state_owner"
+        elif refusal is not None:
+            notices = union_notices(notices, (refusal,))
+    try:
+        basis = _formation_basis_with_condensed_elements(
+            species.formula, species, temperature_K
+        )
+    except (KeyError, ValueError, ArithmeticError):
+        return reference
+
+    if not any(
+        notice.reason == "condensed_element_reference_from_janaf"
+        for notice in notices
+    ):
+        notices = union_notices(
+            notices,
+            (
+                Notice(
+                    kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                    affected_quantities=(Quantity.DELTA_FG,),
+                    reason="condensed_element_reference_from_janaf",
+                    origin=reference.observation_id,
+                    band=basis.locator_note,
+                    authority=Authority.CERTIFIED,
+                    certification="NIST-JANAF elemental reference Gibbs energies at T",
+                ),
+            ),
+        )
+
+    derived_pressure = (
+        identity.standard_pressure_Pa is None
+        or identity.standard_pressure_Pa.is_unknown
+    )
+    if derived_pressure:
+        identity = replace(
+            identity,
+            standard_pressure_Pa=State.of(Decimal("100000")),
+        )
+        derived_by["standard_pressure_Pa"] = "d351_nominal_p0"
+    if identity.reaction is None or identity.reaction.is_unknown:
+        identity = replace(identity, reaction=basis.reaction)
+        derived_by["reaction"] = "d338_reference_state_owner"
+    if identity.formation_elements is None or identity.formation_elements.is_unknown:
+        identity = replace(identity, formation_elements=basis.formation_elements)
+        derived_by["formation_elements"] = "d338_reference_state_owner"
+        derived_by["formation_reference_convention"] = (
+            ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+        )
+
+    # d-351 adopts 1 bar as nominal p0 while retaining the bounded
+    # 1 bar/1 atm ambiguity. Its width is the existing row-owned RT ln(1.01325)
+    # conversion; use it here too so each table's gas rows widen at its own T.
+    uncertainty = reference.uncertainty
+    if (
+        derived_pressure
+        and not any(
+            notice.reason == _STANDARD_PRESSURE_UNPRINTED_REASON
+            for notice in notices
+        )
+    ):
+        notices = union_notices(
+            notices,
+            (
+                _hold_reason_notice(
+                    _STANDARD_PRESSURE_UNPRINTED_REASON,
+                    quantity=Quantity.DELTA_FG,
+                    origin=reference.observation_id,
+                ),
+            ),
+        )
+    if (
+        derived_pressure
+        and phase_token(species) is Phase.G
+        and not _is_standard_pressure_ambiguity_uncertainty(uncertainty)
+        and uncertainty.kind in {UncertaintyKind.NONE, UncertaintyKind.PRINTED}
+    ):
+        uncertainty = _standard_pressure_ambiguity_uncertainty(
+            temperature_K, uncertainty
+        )
+    provenance = dict(reference.provenance or {})
+    if basis.extrapolated_elements:
+        for element, table_id, low_K, high_K in basis.extrapolated_elements:
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.DELTA_FG,),
+                        reason="condensed_element_reference_extrapolated",
+                        origin=reference.observation_id,
+                        band=(
+                            f"{element}: {table_id} Cp(l)-Cp(g), "
+                            f"{low_K}–{high_K} K extrapolated to {temperature_K} K"
+                        ),
+                        authority=Authority.EXTRAPOLATED,
+                    ),
+                ),
+            )
+            derived_by[f"formation_elements.{element}"] = (
+                "d338_reference_state_owner_extrapolated"
+            )
+    provenance["derived_by"] = derived_by
+    provenance["formation_reference_convention"] = (
+        ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+    )
+    provenance["formation_reference_basis"] = basis.locator_note
+    return replace(
+        reference,
+        identity=identity,
+        uncertainty=uncertainty,
+        notices=notices,
+        provenance=provenance,
+    )
 
 
 def _fusion_energy_when_polymorph_absent(
@@ -14060,9 +14391,17 @@ def compile_residual(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
+    condensed_frame_diagnostics: Mapping[
+        tuple[str, str], Mapping[str, object]
+    ] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
+    reference = _resolve_condensed_element_reference(
+        reference,
+        observations=context.observations.values(),
+        table_diagnostics=condensed_frame_diagnostics,
+    )
     source_reference = reference
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(reference.identity)
@@ -14400,6 +14739,7 @@ def compile_residual(
                 table_index=table_index,
                 derived_band=derived_band,
                 point_observations=point_observations,
+                condensed_frame_diagnostics=condensed_frame_diagnostics,
             )
             bulk_detail["bulk_composition_diagnostic"] = _bulk_composition_diagnostic(
                 diagnostic
@@ -15843,6 +16183,9 @@ def _score_store_with_decisions(
     observations = dict(context.observations)
     origins = context.origins
     live_context = replace(context, observations=observations, origins=origins)
+    condensed_frame_diagnostics = _condensed_element_reference_table_diagnostics(
+        observations.values()
+    )
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
@@ -16026,6 +16369,7 @@ def _score_store_with_decisions(
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
                             ),
+                            condensed_frame_diagnostics=condensed_frame_diagnostics,
                             fo2_mode=(
                                 Fo2Mode.SHARED_LADDER
                                 if intrinsic_redox_activity
@@ -16062,6 +16406,7 @@ def _score_store_with_decisions(
                                 point_observations=point_observations_by_experiment.get(
                                     point.experiment_id, ()
                                 ),
+                                condensed_frame_diagnostics=condensed_frame_diagnostics,
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
                             )
                             if _stream is None:
