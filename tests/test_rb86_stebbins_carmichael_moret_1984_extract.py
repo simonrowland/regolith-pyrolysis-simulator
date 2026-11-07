@@ -8,7 +8,6 @@ import yaml
 from yaml.nodes import MappingNode, SequenceNode, ScalarNode
 
 from simulator.battery.enums import ValueKind
-from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -30,6 +29,12 @@ RENDER_PINS = {
     ),
 }
 
+APPENDIX_RENDER_PINS = {
+    "rb86_scm84_appendix1_mgsio3_heat_of_fusion_wagner_based_value": "77.4",
+    "rb86_scm84_appendix1_mgsio3_heat_of_fusion_high_pressure_curve": "81.2",
+    "rb86_scm84_appendix1_mgsio3_heat_of_fusion_authors_solid_data": "66.0",
+}
+
 TYPED_REFUSAL_COUNTS = {
     "relative_enthalpy_increment_as_printed": 137,
     "glass_cp_fit_coefficients_context": 29,
@@ -37,6 +42,10 @@ TYPED_REFUSAL_COUNTS = {
     "glass_partial_molar_cp_coefficients_context": 9,
     "cp_temperature_dependent_equation_context": 2,
     "relative_enthalpy_fit_equation_context": 1,
+    "heat_capacity_coefficient_per_oxide_mixture_gfw_as_printed": 17,
+    "partial_molar_oxide_component_heat_capacity_in_silicate_liquid_as_printed": 12,
+    "entropy_of_fusion_per_g_atom_as_printed": 47,
+    "heat_of_fusion_with_literal_J_per_mol_unit_discrepancy": 3,
 }
 
 
@@ -101,6 +110,14 @@ def test_render_pins_match_values_and_locators_and_detect_mutation() -> None:
             "column": column,
         }
 
+    for observation_id, value in APPENDIX_RENDER_PINS.items():
+        observation = raw[observation_id]
+        assert observation["values"]["value"] == value
+        assert observation["locator"]["page"] == 16
+        assert samples[observation_id]["value"] == value
+        assert samples[observation_id]["locator"]["page"] == 16
+        assert "Appendix 1" in samples[observation_id]["locator"]["note"]
+
     changed = deepcopy(document)
     raw_changed = _raw_observations(changed)
     raw_changed["rb86_scm84_table3_feab_1"]["values"]["value"] = "104234"
@@ -135,6 +152,34 @@ def test_table_counts_glass_70_and_ab_an_di_composition_assignment() -> None:
     }
     assert sum(map(Decimal, printed_components.values())) == Decimal("99.97")
 
+    table1 = document["extraction"]["table_context"]["table_1_compositions"]
+    table1_by_sample = {row["sample_as_printed"]: row for row in table1}
+    inline_component_pins = {
+        "$Li_2SiO_3$": {"SiO2": "49.33", "Li2O": "50.67"},
+        "$Rb_2Si_2O_5$": {"SiO2": "71.42", "Rb2O": "28.58"},
+        "$BaSi_2O_5$": {"SiO2": "66.64", "BaO": "32.35", "SrO": "1.01"},
+    }
+    for sample, expected in inline_component_pins.items():
+        assert dict(table1_by_sample[sample]["composition_mol_percent_as_printed"]) == expected
+    for observation_id, expected in (
+        (
+            "rb86_scm84_table4_li2sio3_liq_linear_fit",
+            {"SiO2": "49.33", "Li2O": "50.67"},
+        ),
+        (
+            "rb86_scm84_table4_rb2si2o5_linear_fit",
+            {"SiO2": "71.42", "Rb2O": "28.58"},
+        ),
+        (
+            "rb86_scm84_table4_basi2o5_linear_fit",
+            {"SiO2": "66.64", "BaO": "32.35", "SrO": "1.01"},
+        ),
+    ):
+        assert dict(
+            raw[observation_id]["point_conditions"]["composition"]["state"]["value"]["components"]
+        ) == expected
+        assert dict(raw[observation_id]["values"]["composition_as_printed"]) == expected
+
     ternary_groups = {
         "ab75an0di25": (1, 7, "ab 75 an 0 di 25", "75", "0", "25"),
         "ab50an0di50": (1, 9, "ab 50 an 0 di 50", "50", "0", "50"),
@@ -163,6 +208,30 @@ def test_table_counts_glass_70_and_ab_an_di_composition_assignment() -> None:
             derivation = observation["values"]["composition_derivation"]
             assert f"Ab {ab} mol %, An {an} mol %, Di {di} mol %" in derivation
 
+    ternary_derived = {
+        observation_id: row
+        for observation_id, row in raw.items()
+        if row.get("values", {}).get("composition_derivation")
+        and row.get("point_conditions", {}).get("composition", {})
+        .get("state", {})
+        .get("value", {})
+        .get("basis")
+        == "derived oxide mole percent from Ab-An-Di endmember mol %"
+    }
+    assert len(ternary_derived) == 103
+    for row in ternary_derived.values():
+        inference = row["point_conditions"]["composition"]["inference"]
+        assert "closed Ab-An-Di ternary" in inference["relation"]
+        assert len(inference["inputs"]) == 9
+        assert any(
+            "Di " in item and ("closure" in item or "closes" in item)
+            for item in inference["inputs"]
+        )
+        assert any("Ab NaAlSi3O8" in item for item in inference["inputs"])
+        assert any("An CaAl2Si2O8" in item for item in inference["inputs"])
+        assert any("Di CaMgSi2O6" in item for item in inference["inputs"])
+        assert all("PDF page" in item for item in inference["inputs"])
+
 
 def test_isolated_migration_has_only_typed_refusals_and_preserves_axes() -> None:
     document = _document()
@@ -173,8 +242,8 @@ def test_isolated_migration_has_only_typed_refusals_and_preserves_axes() -> None
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert len(migrated) == 275
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated.values()) == 79
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 196
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated.values()) == 0
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 275
 
     expected_unknown = {
         observation_id
@@ -199,6 +268,38 @@ def test_isolated_migration_has_only_typed_refusals_and_preserves_axes() -> None
         and observation.identity.species.phase.is_value
         for observation in migrated.values()
     )
+
+    fusion_ids = {
+        observation_id
+        for observation_id in raw
+        if observation_id.startswith("rb86_scm84_table10_")
+        or (
+            observation_id.startswith("rb86_scm84_appendix1_")
+            and "heat_of_fusion" in observation_id
+        )
+    }
+    assert len(fusion_ids) == 50
+    for observation_id in fusion_ids:
+        assert raw[observation_id]["phase"] == "cr"
+        assert migrated[observation_id].identity.species.phase.value.value == "cr"
+
+    ternary_derived = {
+        observation_id
+        for observation_id, source in raw.items()
+        if source.get("values", {}).get("composition_derivation")
+        and source.get("point_conditions", {})
+        .get("composition", {})
+        .get("state", {})
+        .get("value", {})
+        .get("basis")
+        == "derived oxide mole percent from Ab-An-Di endmember mol %"
+    }
+    assert len(ternary_derived) == 103
+    for observation_id in ternary_derived:
+        composition = migrated[observation_id].point_conditions["composition"]
+        assert composition.inference is not None
+        assert composition.inference.relation.startswith("Formula-unit oxide split")
+        assert len(composition.inference.inputs) == 9
 
     for observation_id, source in raw.items():
         conditions = source["point_conditions"]
@@ -249,45 +350,121 @@ def test_isolated_migration_has_only_typed_refusals_and_preserves_axes() -> None
     }
     assert sum(composition.values()) == Decimal(1)
 
-    fitted_cp = migrated["rb86_scm84_table4_feab_linear_fit"]
-    cp_profile = profile_for(fitted_cp.identity)
-    assert {"temperature_K", "standard_pressure_Pa", "per"} <= cp_profile.required
-    assert fitted_cp.identity.temperature_K.is_unknown
-    assert fitted_cp.identity.temperature_K.reason == (
-        "source T_range_K [1570, 1826]; no midpoint invented"
-    )
-    assert fitted_cp.identity.composition.is_not_applicable
-    assert fitted_cp.identity.total_pressure_Pa.is_not_applicable
-    assert fitted_cp.identity.fO2_Pa.is_not_applicable
+    table4_ids = {
+        observation_id
+        for observation_id, source in raw.items()
+        if observation_id.startswith("rb86_scm84_table4_")
+        and source.get("locator", {}).get("table") == "4"
+        and source.get("values", {}).get("quantity")
+        == "heat_capacity_coefficient_per_oxide_mixture_gfw_as_printed"
+    }
+    assert len(table4_ids) == 17
+    for observation_id in table4_ids:
+        source = raw[observation_id]
+        assert source["units"] == "J gfw^-1 K^-1"
+        assert "per" not in source
+        assert source["values"]["status"] == "typed_refusal"
+        assert source["values"]["units_as_printed"] == "J gfw^-1 K^-1"
+        assert migrated[observation_id].identity.quantity is None or migrated[
+            observation_id
+        ].identity.quantity.is_unknown
+        assert source["locator"]["column_header"] == "b"
+
+    table7_ids = {
+        observation_id
+        for observation_id, source in raw.items()
+        if observation_id.startswith("rb86_scm84_table7_")
+        and source.get("locator", {}).get("table") == "7"
+    }
+    assert len(table7_ids) == 12
+    for observation_id in table7_ids:
+        source = raw[observation_id]
+        assert source["values"]["status"] == "typed_refusal"
+        assert source["values"]["quantity"] == (
+            "partial_molar_oxide_component_heat_capacity_in_silicate_liquid_as_printed"
+        )
+        assert source["units"] == "J gfw^-1 K^-1"
+        assert "per" not in source
+
+    for observation_id, (fit_id, oxide_component) in {
+        "rb86_scm84_table7_bao_liquid_partial_molar_cp": (
+            "rb86_scm84_table4_basi2o5_linear_fit",
+            "BaO",
+        ),
+        "rb86_scm84_table7_li2o_liquid_partial_molar_cp": (
+            "rb86_scm84_table4_li2sio3_liq_linear_fit",
+            "Li2O",
+        ),
+        "rb86_scm84_table7_rb2o_liquid_partial_molar_cp": (
+            "rb86_scm84_table4_rb2si2o5_linear_fit",
+            "Rb2O",
+        ),
+    }.items():
+        source = raw[observation_id]
+        expected_parents = [fit_id, "rb86_scm84_table7_sio2_liquid_partial_molar_cp"]
+        assert source["derived_from"] == expected_parents
+        assert source["derivation"]["inputs"] == expected_parents
+        assert "derived from the linear regression" in source["values"]["source_method_note"]
+        assert source["values"]["oxide_component_as_printed"] == oxide_component
+        assert "fit_sample_count_as_printed" not in source["values"]
+        assert "fit_method_as_printed" not in source["values"]
+        assert "fit_statistics_as_printed" not in source["values"]
+        assert "no separate uncertainty calculation" in source["uncertainty"]["note"]
 
     fayalite_migrated = migrated[
         "rb86_scm84_table10_fe2sio4_tf_entropy_of_fusion"
     ]
-    fayalite_profile = profile_for(fayalite_migrated.identity)
-    assert {"subtype", "temperature_K"} <= fayalite_profile.required
+    assert fayalite_migrated.point_conditions["composition"].state.is_unknown
     assert fayalite_migrated.identity.composition.is_unknown
     assert fayalite_migrated.identity.temperature_K.is_value
     assert fayalite_migrated.identity.temperature_K.value == Decimal("1490")
-    assert fayalite_migrated.identity.total_pressure_Pa.is_not_applicable
-    assert fayalite_migrated.identity.fO2_Pa.is_not_applicable
+    assert fayalite_migrated.identity.total_pressure_Pa is None
+    assert fayalite_migrated.identity.fO2_Pa is None
+
+    for observation_id, temperature in (
+        ("rb86_scm84_table10_fe2sio4_tf_entropy_of_fusion", "1490"),
+        ("rb86_scm84_table10_fe2sio4_1600k_entropy_of_fusion", "1600"),
+        ("rb86_scm84_table10_mgsio3_tf_entropy_of_fusion", "1840"),
+    ):
+        identity = migrated[observation_id].identity
+        assert identity.quantity is None or identity.quantity.is_unknown
+        assert identity.composition.is_unknown
+        assert identity.total_pressure_Pa is None
+        assert identity.fO2_Pa is None
+        assert identity.temperature_K.value == Decimal(temperature)
 
     mgsio3_fusion = migrated[
         "rb86_scm84_appendix1_mgsio3_heat_of_fusion_authors_solid_data"
     ]
-    mgsio3_profile = profile_for(mgsio3_fusion.identity)
-    assert {"composition", "subtype", "temperature_K"} <= mgsio3_profile.required
-    assert mgsio3_fusion.identity.composition.is_value
-    assert mgsio3_fusion.identity.composition.value.as_map() == {
+    assert mgsio3_fusion.point_conditions["composition"].state.value.as_map() == {
         "MgO": Decimal("0.5"),
         "SiO2": Decimal("0.5"),
     }
-    assert mgsio3_fusion.identity.temperature_K.is_unknown
-    assert mgsio3_fusion.identity.total_pressure_Pa.is_not_applicable
-    assert mgsio3_fusion.identity.fO2_Pa.is_not_applicable
+
+    appendix_fusion_ids = {
+        "rb86_scm84_appendix1_mgsio3_heat_of_fusion_wagner_based_value",
+        "rb86_scm84_appendix1_mgsio3_heat_of_fusion_high_pressure_curve",
+        "rb86_scm84_appendix1_mgsio3_heat_of_fusion_authors_solid_data",
+    }
+    for observation_id in appendix_fusion_ids:
+        source = raw[observation_id]
+        assert source["locator"]["page"] == 16
+        assert source["locator"]["published_page"] == 146
+        assert source["locator"]["pdf_page_index"] == 15
+        assert source["values"]["quantity"] == (
+            "heat_of_fusion_with_literal_J_per_mol_unit_discrepancy"
+        )
+        assert source["values"]["units_as_printed"] == "J mol^-1"
+        assert source["values"]["status"] == "typed_refusal"
 
     fayalite = raw["rb86_scm84_table10_fe2sio4_tf_entropy_of_fusion"]
     assert fayalite["values"]["value_as_printed"] == "$8.56±0.11^1$"
+    assert fayalite["values"]["quantity"] == "entropy_of_fusion_per_g_atom_as_printed"
+    assert fayalite["values"]["units_as_printed"] == "J g-atom^-1 K^-1"
+    assert fayalite["per"] == "mol_atom"
+    assert fayalite["values"]["status"] == "typed_refusal"
     assert fayalite["uncertainty"]["value"] == "0.11"
+    assert fayalite["uncertainty"]["unit"] == "J/mol/K"
     assert fayalite["uncertainty"]["confidence_level"] == "not_stated"
     assert fayalite["values"]["source_attribution_as_printed"] == (
         "Stebbins & Carmichael 1983 (fayalite)"

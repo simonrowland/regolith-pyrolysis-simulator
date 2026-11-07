@@ -20,6 +20,7 @@ tables:
       10: K2O, mol %
     stored_as: source_context.table_1_compositions; composition for observations is attached by printed sample label.
     condition_mapping: printed oxide mol % -> point_conditions.composition using the migrator's mole-percent path.
+    inline_label_overrides: Li2O 50.67 for Li2SiO3, Rb2O 28.58 for Rb2Si2O5, BaO 32.35 and SrO 1.01 for BaSi2O5; page-render labels override nominal column headers.
     method_class: measured_direct analyses, with composition notes retained exactly as printed.
     render_audit: Page 4 table layout checked in render; all numeric composition cells transcribed and row labels reconciled.
   - page: 5
@@ -40,7 +41,7 @@ tables:
     unit: J K^-1 gfw^-1
     phase: glass
     evidence_class: measured_reduced
-    condition_mapping: Table 1 oxide mol % or closed Ab-An-Di coordinates; no point temperature, absolute fO2, or total pressure is printed.
+    condition_mapping: Table 1 oxide mol % or closed Ab-An-Di coordinates; derived oxide compositions carry a located inference through the existing composition path. No point temperature, absolute fO2, or total pressure is printed.
     render_audit: Page 5 table layout and all numeric cells checked in render; flagged decimal cells resolved there.
   - page: 7
     table: '3'
@@ -53,7 +54,7 @@ tables:
     unit: J gfw^-1
     phase: liquid or solid, according to the printed series label.
     evidence_class: measured_direct
-    condition_mapping: Table 1 composition or printed closed Ab-An-Di coordinates; every T and Delta H cell uses its own row and column locator.
+    condition_mapping: Table 1 composition or printed closed Ab-An-Di coordinates; every T and Delta H cell uses its own row and column locator. The condition composition inference records the endmember formulas, oxide splits, basis and normalization.
     render_audit: Page 7 table layout and all numeric cells checked in render. The three composition headings at rows 1, 19, and 32 were assigned to their own panel; all 18 series headings and 136 point rows reconciled.
   - page: 8
     table: '4'
@@ -68,8 +69,8 @@ tables:
       6: sigma_Cp, J gfw^-1 K^-1
       7: Tmin, K
       8: Tmax, K
-    quantity: Cp=b from least-squares fit Delta H=bT-a.
-    unit: J gfw^-1 K^-1
+    quantity: fitted b values retained typed-refused because the printed denominator is an oxide-mixture gram formula weight, not a species mole.
+    unit: J gfw^-1 K^-1 as printed; no mol_species basis is assigned.
     phase: liquid, except printed solid rows.
     evidence_class: measured_reduced
     condition_mapping: fit temperature interval is retained verbatim; no midpoint is invented. Compositions follow Table 1 or Table 3 as printed.
@@ -98,10 +99,11 @@ tables:
     columns:
       1: liquid oxide component
       2-4: printed partial-molar heat-capacity fit columns and statistics
-    quantity: liquid partial-molar Cp fit coefficients; stored for FeO, Fe2O3, Al2O3, and all other printed components.
+    quantity: partial-molar oxide-component Cp in silicate liquid; all 12 numeric rows retained typed-refused because no exact quantity token exists.
     phase: liquid
     evidence_class: measured_reduced
     temperature_range: about 1200-1850 K, exactly as printed in the caption.
+    excluded_components: BaO, Li2O and Rb2O are excluded from regression; their printed calculation uses the corresponding silicate Cp and Cp,SiO2 derived from regression, with those two stored parent rows only.
     render_audit: Page 10 table layout and all numeric cells checked in render; row labels verified against oxide component names.
   - page: 12
     table: '8'
@@ -139,8 +141,9 @@ tables:
       7: Delta Sconfig at Tf/Ts=1.5
       8: S0,liq at 1600 K
       9: -Sx,liq at 1600 K
-    quantity: entropy_of_fusion for printed Delta Sf columns; remaining numerical columns are retained in source_context.table_10_liquid_entropy_rows.
+    quantity: printed fusion entropy rows retained typed-refused because the current scorer does not retain their per-gram-atom basis; remaining numerical columns are retained in source_context.table_10_liquid_entropy_rows.
     unit: J g-atom^-1 K^-1
+    phase: crystal for all fusion observations.
     evidence_class: quoted_attributed for cited rows; measured_reduced for the authors' own reductions.
     render_audit: Page 13 table layout and all numeric cells checked in render; plus-minus widths and footnote markers are retained as printed.
   - page: 2
@@ -149,11 +152,11 @@ tables:
     stored_as: typed-refused equation-valued Cp observations with attribution and printed coefficients.
     evidence_class: quoted_attributed
     render_audit: Prose locator and equations checked on the page 2 render.
-  - page: 15
+  - page: 16
     table: null
     printed_material: Appendix 1 fusion enthalpy discussion for Li2SiO3 and MgSiO3.
-    stored_as: MgSiO3 liquid relative enthalpy, the printed solution enthalpies, and three printed MgSiO3 fusion-enthalpy estimates.
-    render_audit: Appendix 1 prose and equations checked on the page 15 render.
+    stored_as: Three MgSiO3 fusion-enthalpy estimates literally as printed in J mol^-1, typed-refused without a unit correction.
+    render_audit: Appendix 1 fusion values and their J mol^-1 unit checked on the page 16 render; other Appendix 1 values remain on page 15.
 excluded:
   - table: '6'
     reason: liquid-volume fit parameters, outside the requested heat-capacity and enthalpy scope.
