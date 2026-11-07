@@ -213,6 +213,18 @@ def test_rendered_values_table_rows_and_mutation_are_pinned() -> None:
         "hastie_bonnell_1980_appendixE_tableE4_full_rendered_table": 8,
     }
 
+    d1 = _record(document, "hastie_bonnell_1980_appendixD_tableD1_typed_refusal")
+    assert d1["values"]["reaction_enthalpy_average_as_printed"] == (
+        "21.4 ± 3.5 kcal/mol"
+    )
+    assert (d1["locator"]["page"], d1["locator"]["table"]) == (163, "D.1")
+    d2 = _record(document, "hastie_bonnell_1980_appendixD_tableD2_typed_refusal")
+    assert d2["values"]["reaction_enthalpy_averages_as_printed"] == {
+        "Na": "143.8 ± 5.5 kcal/mol",
+        "Li": "148.1 ± 5.8 kcal/mol",
+    }
+    assert (d2["locator"]["page"], d2["locator"]["table"]) == (167, "D.2")
+
     comparison_species, comparison = _record_with_species(
         document, "hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison"
     )

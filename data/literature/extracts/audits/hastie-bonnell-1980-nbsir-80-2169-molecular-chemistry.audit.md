@@ -2,7 +2,7 @@
 
 ## Machine reads and full-cell audit
 
-MinerU table blocks and Markdown were read first, then checked against the born-digital `pdftotext-layout.txt`. The seat's table draft and QA tools were used. The complete cell ledger is `hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.cells.csv`: 509 nonblank stored cell instances across the included tables and comparison rows. Each listed cell was checked against its rendered PDF page, with row and column assignment checked once per table. The count includes duplicated stored representations where a full table context and a separate typed or admitted observation both retain printed cells.
+MinerU table blocks and Markdown were read first, then checked against the born-digital `pdftotext-layout.txt`. The seat's table draft and QA tools were used. The complete cell ledger is `hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.cells.csv`: 512 nonblank stored cell instances across the included tables and comparison rows. Each listed cell was checked against its rendered PDF page, with row and column assignment checked once per table. The count includes duplicated stored representations where a full table context and a separate typed or admitted observation both retain printed cells.
 
 The table QA pre-screen found 18 table blocks, nine flagged blocks, no scanned-table pages, and 63 invented `<details>` blocks. The invented blocks were excluded. The flagged readings included fused-reference-decimal and LaTeX marks on PDF page 22; numeric mismatches on PDF pages 122, 163, 167, 192, 197, 199, and 201; and low numeric agreement on PDF pages 32 and 39. Every included table was checked cell by cell against its render. The rendered read resolved Appendix D.2 O2 row 5 as `6.74(-3)` and PO row 5 as `2.63(-4)`; Appendix E.4 PO ΔHf,2000 as `-26.8` where the text layer reads `-26.3`; and the Appendix B Table 2 footer as printed page 1130. The audit ledger records the source row, column, absolute PDF page, printed table, cell text, and render method.
 
@@ -24,7 +24,7 @@ The table comparer output is committed as `hastie-bonnell-1980-nbsir-80-2169-mol
 | Appendix E Table E.3 | 199 | 4 | Full table, entropy values, POH estimate, and relative-frame refusals |
 | Appendix E Table E.4 | 201 | 8 | Full table, entropy and elemental-reference formation enthalpies |
 
-The census matches the printed table bodies. Rows are assigned to the printed species or reaction labels. The duplicate Table D.2 image on PDF page 169 was checked as a duplicate and stored once. Tables on PDF pages 21, 114, and 143 were rendered and excluded as qualitative or apparatus/flame-property inventories outside the requested vapor and thermochemistry results.
+The census matches the printed table bodies. Rows are assigned to the printed species or reaction labels. The three reaction-average summaries printed beneath the Appendix D table bodies are separately audited in the cell ledger and retained in their typed-refusal contexts; they are not extra body rows. The duplicate Table D.2 image on PDF page 169 was checked as a duplicate and stored once. Tables on PDF pages 21, 114, and 143 were rendered and excluded as qualitative or apparatus/flame-property inventories outside the requested vapor and thermochemistry results.
 
 ## Evidence, units, and schema
 
@@ -39,6 +39,10 @@ Schema-gap refusals are documented in the extract with code symbols. Tables 3 an
 The 300 dpi crops distinguish the reaction enthalpies from the final formation values. On PDF p. 163, Table D.1's `ΔH298` column is a reaction enthalpy for `PO + H2O = HPO2 + H`; the prose on PDF p. 162 says the third-law reaction enthalpies are used to derive the HPO2 heat of formation and prints `ΔHf,298 HPO2 = −94 ± 4 kcal/mol`. Combining the printed +21.4 kcal/mol reaction enthalpy with the selected PO `ΔHf,298 = −5.5 ± 2 kcal/mol` (PDF p. 193) and the elemental-reference H2O and H values reproduces approximately −94.0 kcal/mol. The reaction enthalpy remains its own refused quantity; the derived HPO2 formation value uses `delta_fH` and retains ±4 kcal/mol.
 
 Table D.2 is captioned “Third Law Analysis of NaPO2 and LiPO2 Reaction Enthalpy” on PDF p. 167, and its `−ΔHNa,298`/`−ΔHLi,298` columns are reaction enthalpies. Its separate footer says “From these data, ΔHf,298 NaPO2 = −123.5 ± 5.5 kcal/mol and ΔHf,298 LiPO2 = −115.2 ± 5.8 kcal/mol”; these final formation values are retained as `delta_fH` with their printed uncertainties and the PO reference lineage.
+
+### Printed reaction enthalpy averages
+
+The PDF p. 163 Table D.1 `ΔH298` summary reads `Average 21.4 ± 3.5 kcal/mol`. It remains exactly 21.4 as printed even though the three displayed rounded rows average 21.5667. The PDF p. 167 Table D.2 summary values in the `−ΔHNa,298` and `−ΔHLi,298` reaction-enthalpy columns are `143.8 ± 5.5` and `148.1 ± 5.8 kcal/mol`. All three are stored only in the typed-refusal table contexts because the source values are reaction enthalpies; their full printed strings and render checks are in the cell ledger.
 
 Table E.3's printed header is `ΔHf,298.15 (kcal/mol)` on PDF p. 199, and Table E.4's is `ΔHf,2000 (kcal/mol)` on PDF p. 201. Their HPO2, LiPO2, and NaPO2 entries are formation enthalpies, not reaction enthalpies. Appendix E, section 3 (PDF p. 193), explains that these P-species formation enthalpies were measured relative to PO; the final tabulated `ΔHf` values use the selected PO formation value in the elemental formation frame. The separately admitted E.3 values have no printed uncertainty; E.4's HPO2 value is model-derived from the formation result and thermodynamic functions, also without a printed uncertainty.
 

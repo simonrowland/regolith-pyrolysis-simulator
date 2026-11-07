@@ -8,7 +8,7 @@ machine_read_order:
   - tools/mineru_table_qa.py ranked 18 table blocks; nine blocks were flagged and 63 invented details blocks were ignored.
 cell_audit:
   file: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.cells.csv
-  audited_nonblank_cell_instances: 509
+  audited_nonblank_cell_instances: 512
   method: Every listed cell was checked against its rendered PDF page; the printed row and column assignment was checked for each table.
   duplicate_record_cells: The count includes repeated printed cells where a complete table context and a typed-refusal or typed observation record both retain that table material.
   source_pages_are_absolute_pdf_pages: true
@@ -69,8 +69,8 @@ table_mappings:
     extract_records:
       - hastie_bonnell_1980_appendixD_tableD1_typed_refusal
       - hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law
-    columns: HPO2/PO and H/H2O pressure ratios, Kp, third-law reaction enthalpy, and a derived HPO2 formation enthalpy.
-    evidence: Reaction pressure ratios, linear Kp, and reaction enthalpy remain typed-refused; the separately derived elemental ΔHf value is measured_reduced.
+    columns: HPO2/PO and H/H2O pressure ratios, Kp, third-law reaction enthalpy, the printed reaction-enthalpy average, and a derived HPO2 formation enthalpy.
+    evidence: Reaction pressure ratios, linear Kp, the printed 21.4 ± 3.5 kcal/mol average, and reaction enthalpy remain typed-refused; the separately derived elemental ΔHf value is measured_reduced.
   - printed_table: D.2
     pdf_page: 167
     printed_page: D7
@@ -82,8 +82,8 @@ table_mappings:
       - hastie_bonnell_1980_tableD2_o2_calculated_partial_pressures
       - hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law
       - hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law
-    columns: Temperature, flame gas ratio, calculated PO and O2 pressures, alkali-phosphate pressure ratios, Kp, reaction enthalpies, and final formation enthalpies.
-    evidence: Calculated PO and O2 pressures are model_derived. The pressure ratios, linear Kp, and reaction enthalpies remain typed-refused; final elemental ΔHf values are measured_reduced.
+    columns: Temperature, flame gas ratio, calculated PO and O2 pressures, alkali-phosphate pressure ratios, Kp, reaction enthalpies and their printed averages, and final formation enthalpies.
+    evidence: Calculated PO and O2 pressures are model_derived. The pressure ratios, linear Kp, reaction enthalpies, and their 143.8 ± 5.5 and 148.1 ± 5.8 kcal/mol averages remain typed-refused; final elemental ΔHf values are measured_reduced.
   - printed_table: E.1
     appendix: E
     pdf_page: 192
