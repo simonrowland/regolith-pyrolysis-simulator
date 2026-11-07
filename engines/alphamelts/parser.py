@@ -23,7 +23,10 @@ import re
 import math
 from typing import Any, Dict, Mapping, Optional, Tuple
 
-from engines.alphamelts.domain import _canonical_oxide_activity_map_with_notices
+from engines.alphamelts.domain import (
+    _canonical_oxide_activity_map_with_notices,
+    _endmember_activity_repair_notices,
+)
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
@@ -37,6 +40,23 @@ class ParserError(RuntimeError):
 _LIQUIDUS_C_WARNING_RE = re.compile(
     r'AlphaMELTS liquidus_C=\s*([0-9.+\-Ee]+)'
 )
+
+
+def _projection_repair_notice(
+    site: str,
+    *,
+    field: str,
+    item: str,
+    reason: str,
+    replacement: str | None = None,
+) -> str:
+    notice = (
+        f'{site}:alphamelts_parser_repaired producer=AlphaMELTS '
+        f'field={field} item={item!r} reason={reason}'
+    )
+    if replacement is not None:
+        notice += f' replacement={replacement}'
+    return notice
 
 
 def project_equilibrium_to_diagnostics(
@@ -80,14 +100,16 @@ def project_equilibrium_to_diagnostics(
             intrinsic_fO2_log=intrinsic_fO2_log,
         )
 
-    warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
+    warnings = list(getattr(equilibrium_result, 'warnings', ()) or ())
     raw_activities = dict(
         getattr(equilibrium_result, 'activity_coefficients', {}) or {}
     )
     _oxide_activities, activity_notices = (
         _canonical_oxide_activity_map_with_notices(raw_activities)
     )
-    warnings += tuple(notice for notice in activity_notices if notice not in warnings)
+    warnings.extend(notice for notice in activity_notices if notice not in warnings)
+    endmember_notices = _endmember_activity_repair_notices(raw_activities)
+    warnings.extend(notice for notice in endmember_notices if notice not in warnings)
     # An absent or empty status is the ABSENCE of an answer, not a good one.
     # This seam previously manufactured 'ok' for a statusless result, and no
     # amount of validation further downstream can recover the lost
@@ -112,24 +134,48 @@ def project_equilibrium_to_diagnostics(
     phases_present = tuple(
         str(p) for p in (getattr(equilibrium_result, 'phases_present', ()) or ())
     )
-    phase_masses = _phase_masses_kg(equilibrium_result)
+    phase_masses = _phase_masses_kg(equilibrium_result, warnings=warnings)
     phase_modes = _phase_modes_wt_pct(phase_masses)
     liquid_fraction = _safe_attr_float(equilibrium_result, 'liquid_fraction')
     if liquid_fraction is None and backend_status == 'ok':
         raise ParserError('liquid_fraction_missing')
     fO2_log = _safe_attr_float(equilibrium_result, 'fO2_log')
-    liquid_comp = {
-        str(k): float(v)
-        for k, v in dict(
-            getattr(equilibrium_result, 'liquid_composition_wt_pct', {}) or {}
-        ).items()
-        if is_finite(v)
-    }
-    activities = {
-        str(k): float(v)
-        for k, v in raw_activities.items()
-        if is_finite(v)
-    }
+    liquid_comp = {}
+    for key, raw_value in dict(
+        getattr(equilibrium_result, 'liquid_composition_wt_pct', {}) or {}
+    ).items():
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if not is_finite(raw_value):
+            if math.isfinite(value):
+                continue
+            warnings.append(_projection_repair_notice(
+                'SR10',
+                field='liquid_composition_wt_pct',
+                item=str(key),
+                reason='nonfinite_value_dropped',
+            ))
+            continue
+        liquid_comp[str(key)] = value
+    activities = {}
+    for key, raw_value in raw_activities.items():
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if not is_finite(raw_value):
+            if math.isfinite(value):
+                continue
+            warnings.append(_projection_repair_notice(
+                'SR10',
+                field='activity_coefficients',
+                item=str(key),
+                reason='nonfinite_value_dropped',
+            ))
+            continue
+        activities[str(key)] = value
 
     return LiquidusDiagnostics(
         liquidus_T_C=liquidus_T_C,
@@ -165,7 +211,10 @@ def project_equilibrium_to_diagnostics(
         ),
         liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=liquid_comp,
-        liquid_fraction_path=_liquid_fraction_path(equilibrium_result),
+        liquid_fraction_path=_liquid_fraction_path(
+            equilibrium_result,
+            repair_notices=warnings,
+        ),
         activity_coefficients=activities,
         fO2_log=fO2_log,
         system_enthalpy=_safe_attr_float(
@@ -192,7 +241,7 @@ def project_equilibrium_to_diagnostics(
         mode=mode,
         engine_version=engine_version,
         backend_status=backend_status,
-        backend_warnings=warnings,
+        backend_warnings=tuple(warnings),
         backend_diagnostics=dict(
             getattr(equilibrium_result, 'diagnostics', {}) or {}
         ),
@@ -211,9 +260,15 @@ def diagnostics_to_equilibrium(
     )
 
     controls = dict(request_controls or {})
+    control_notices: list[str] = []
     fO2_log = diagnostics.fO2_log
     if fO2_log is None:
-        fO2_log = _control_float(controls, 'fO2_log', -9.0)
+        fO2_log = _control_float(
+            controls,
+            'fO2_log',
+            -9.0,
+            repair_notices=control_notices,
+        )
     status = str(diagnostics.backend_status)
     backend_diagnostics = dict(diagnostics.backend_diagnostics)
     requested_point_non_authoritative = (
@@ -265,28 +320,48 @@ def diagnostics_to_equilibrium(
                     f'phase_masses={computed!r}'
                 )
         liquid_fraction = computed
-    requested_temperature_C = _control_float(controls, 'temperature_C', 0.0)
+    requested_temperature_C = _control_float(
+        controls,
+        'temperature_C',
+        0.0,
+        repair_notices=control_notices,
+    )
     temperature_C = _control_float(
         backend_diagnostics,
         'executed_temperature_C',
         requested_temperature_C,
+        repair_notices=control_notices,
     )
     pressure_bar = _control_float(
         backend_diagnostics,
         'condensed_phase_reference_pressure_bar',
-        _control_float(controls, 'pressure_bar', 0.0),
+        _control_float(
+            controls,
+            'pressure_bar',
+            0.0,
+            repair_notices=control_notices,
+        ),
+        repair_notices=control_notices,
     )
     if requested_point_non_authoritative:
         temperature_C = _control_float(
             backend_diagnostics,
             'solved_temperature_C',
             temperature_C,
+            repair_notices=control_notices,
         )
         pressure_bar = _control_float(
             backend_diagnostics,
             'solved_pressure_bar',
             pressure_bar,
+            repair_notices=control_notices,
         )
+    requested_temperature_output = _control_float(
+        backend_diagnostics,
+        'requested_temperature_C',
+        requested_temperature_C,
+        repair_notices=control_notices,
+    )
     return EquilibriumResult(
         temperature_C=temperature_C,
         pressure_bar=pressure_bar,
@@ -302,23 +377,21 @@ def diagnostics_to_equilibrium(
             backend_diagnostics,
             'liquid_viscosity_Pa_s',
             0.0,
+            repair_notices=control_notices,
         ) or None,
         activity_coefficients=dict(diagnostics.activity_coefficients),
         fO2_log=float(fO2_log),
-        warnings=list(diagnostics.backend_warnings),
         status=status,
         liquidus_T_C=diagnostics.liquidus_T_C,
         diagnostics=backend_diagnostics,
-        requested_temperature_C=_control_float(
-            backend_diagnostics,
-            'requested_temperature_C',
-            requested_temperature_C,
-        ),
+        requested_temperature_C=requested_temperature_output,
         liquid_density_kg_m3=_control_float(
             backend_diagnostics,
             'liquid_density_kg_m3',
             0.0,
+            repair_notices=control_notices,
         ) or None,
+        warnings=[*diagnostics.backend_warnings, *control_notices],
         system_enthalpy=diagnostics.system_enthalpy,
         system_entropy=diagnostics.system_entropy,
         system_volume=diagnostics.system_volume,
@@ -355,14 +428,34 @@ def diagnostics_to_equilibrium(
     )
 
 
-def _phase_masses_kg(equilibrium_result: Any) -> Dict[str, float]:
-    return {
-        str(phase): float(mass_kg)
-        for phase, mass_kg in dict(
-            getattr(equilibrium_result, 'phase_masses_kg', {}) or {}
-        ).items()
-        if is_finite(mass_kg) and float(mass_kg) > 0.0
-    }
+def _phase_masses_kg(
+    equilibrium_result: Any,
+    *,
+    warnings: list[str] | None = None,
+) -> Dict[str, float]:
+    masses: Dict[str, float] = {}
+    for phase, raw_mass in dict(
+        getattr(equilibrium_result, 'phase_masses_kg', {}) or {}
+    ).items():
+        try:
+            mass = float(raw_mass)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(mass) or mass <= 0.0:
+            if warnings is not None:
+                warnings.append(_projection_repair_notice(
+                    'SR10',
+                    field='phase_masses_kg',
+                    item=str(phase),
+                    reason=(
+                        'nonfinite_value_dropped'
+                        if not math.isfinite(mass)
+                        else 'nonpositive_value_dropped'
+                    ),
+                ))
+            continue
+        masses[str(phase)] = mass
+    return masses
 
 
 def _phase_modes_wt_pct(masses_kg: Mapping[str, float]) -> Dict[str, float]:
@@ -385,7 +478,11 @@ def _phase_modes_wt_pct(masses_kg: Mapping[str, float]) -> Dict[str, float]:
     }
 
 
-def _liquid_fraction_path(equilibrium_result: Any) -> Tuple[Dict[str, Any], ...]:
+def _liquid_fraction_path(
+    equilibrium_result: Any,
+    *,
+    repair_notices: list[str] | None = None,
+) -> Tuple[Dict[str, Any], ...]:
     path = []
     for point in tuple(getattr(equilibrium_result, 'liquid_fraction_path', ()) or ()):
         if isinstance(point, Mapping):
@@ -399,14 +496,28 @@ def _liquid_fraction_path(equilibrium_result: Any) -> Tuple[Dict[str, Any], ...]
             liquid_fraction = getattr(point, 'liquid_fraction')
             composition = getattr(point, 'liquid_composition_wt_pct', {})
         try:
+            point_temperature_C = float(temperature_C)
+            point_fraction = float(liquid_fraction)
+            clean_composition = {}
+            for oxide, raw_value in dict(composition or {}).items():
+                try:
+                    value = float(raw_value)
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(value):
+                    if repair_notices is not None:
+                        repair_notices.append(_projection_repair_notice(
+                            'SR11',
+                            field='liquid_composition_wt_pct',
+                            item=f'T={point_temperature_C!r}C {oxide}',
+                            reason='nonfinite_path_value_dropped',
+                        ))
+                    continue
+                clean_composition[str(oxide)] = value
             path.append({
-                'temperature_C': float(temperature_C),
-                'liquid_fraction': float(liquid_fraction),
-                'liquid_composition_wt_pct': {
-                    str(k): float(v)
-                    for k, v in dict(composition or {}).items()
-                    if is_finite(v)
-                },
+                'temperature_C': point_temperature_C,
+                'liquid_fraction': point_fraction,
+                'liquid_composition_wt_pct': clean_composition,
             })
         except (TypeError, ValueError):
             continue
@@ -417,15 +528,43 @@ def _control_float(
     controls: Mapping[str, Any],
     name: str,
     default: float,
+    *,
+    repair_notices: list[str] | None = None,
 ) -> float:
-    value = controls.get(name, default)
+    if name not in controls:
+        if repair_notices is not None:
+            repair_notices.append(_projection_repair_notice(
+                'SR12',
+                field=name,
+                item=name,
+                reason='absent_control_defaulted',
+                replacement=repr(float(default)),
+            ))
+        return float(default)
+    value = controls[name]
     if not is_declared_real_scalar(value, allow_numeric_str=True):
+        if repair_notices is not None:
+            repair_notices.append(_projection_repair_notice(
+                'SR12',
+                field=name,
+                item=name,
+                reason='non_declared_control_defaulted',
+                replacement=repr(float(default)),
+            ))
         return float(default)
     try:
         result = float(value)
     except (TypeError, ValueError):
         return float(default)
     if not is_finite(result):
+        if repair_notices is not None:
+            repair_notices.append(_projection_repair_notice(
+                'SR12',
+                field=name,
+                item=name,
+                reason='nonfinite_control_defaulted',
+                replacement=repr(float(default)),
+            ))
         return float(default)
     return result
 

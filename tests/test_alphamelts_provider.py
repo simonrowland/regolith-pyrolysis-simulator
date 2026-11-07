@@ -1372,7 +1372,7 @@ def test_parser_raises_when_liquid_fraction_missing():
         )
 
 
-def test_parser_sr10_current_filtered_values_are_pinned_without_notice():
+def test_parser_sr10_filtered_values_keep_values_and_emit_notices():
     legacy = SimpleNamespace(
         phases_present=['liquid', 'olivine'],
         phase_masses_kg={
@@ -1405,7 +1405,23 @@ def test_parser_sr10_current_filtered_values_are_pinned_without_notice():
     assert diagnostics.phase_modes_wt_pct == {'liquid': 80.0, 'olivine': 20.0}
     assert diagnostics.liquid_composition_wt_pct == {'SiO2': 49.0}
     assert diagnostics.activity_coefficients == {'SiO2': 0.95}
-    assert diagnostics.backend_warnings == ()
+    repair_warnings = [
+        warning for warning in diagnostics.backend_warnings
+        if warning.startswith('SR10:')
+    ]
+    assert len(repair_warnings) == 5
+    assert any(
+        "field=phase_masses_kg" in warning
+        and "item='zero_phase'" in warning
+        and 'reason=nonpositive_value_dropped' in warning
+        for warning in repair_warnings
+    )
+    assert any(
+        "field=phase_masses_kg" in warning
+        and "item='nonfinite_phase'" in warning
+        and 'reason=nonfinite_value_dropped' in warning
+        for warning in repair_warnings
+    )
 
 
 def test_parser_sr03_invalid_oxide_activity_omissions_emit_repair_notices():
@@ -1438,7 +1454,11 @@ def test_parser_sr03_invalid_oxide_activity_omissions_emit_repair_notices():
         'CaO': -0.1,
         'Na': 0.7,
     }
-    assert diagnostics.backend_warnings == (
+    oxide_activity_notices = tuple(
+        warning for warning in diagnostics.backend_warnings
+        if warning.startswith('AlphaMELTS provider omitted ')
+    )
+    assert oxide_activity_notices == (
         "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
         "'Al2O3' for phase liquid: nan",
         "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
@@ -1448,9 +1468,17 @@ def test_parser_sr03_invalid_oxide_activity_omissions_emit_repair_notices():
         "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
         "'CaO' for phase liquid: -0.1",
     )
+    assert sum(
+        warning.startswith('SR04:')
+        for warning in diagnostics.backend_warnings
+    ) == 1
+    assert sum(
+        warning.startswith('SR10:')
+        for warning in diagnostics.backend_warnings
+    ) == 2
 
 
-def test_parser_sr11_current_path_values_are_pinned_without_notice():
+def test_parser_sr11_path_values_keep_values_and_emit_notice():
     legacy = SimpleNamespace(
         phases_present=['liquid'],
         phase_masses_kg={'liquid': 1.0},
@@ -1482,10 +1510,13 @@ def test_parser_sr11_current_path_values_are_pinned_without_notice():
             'liquid_composition_wt_pct': {'SiO2': 49.0},
         },
     )
-    assert diagnostics.backend_warnings == ()
+    assert len(diagnostics.backend_warnings) == 1
+    assert diagnostics.backend_warnings[0].startswith('SR11:')
+    assert 'T=1000.0C bad_liquid' in diagnostics.backend_warnings[0]
+    assert 'nonfinite_path_value_dropped' in diagnostics.backend_warnings[0]
 
 
-def test_parser_sr12_current_default_values_are_pinned_without_notice():
+def test_parser_sr12_default_values_keep_results_and_emit_notices():
     diagnostics = LiquidusDiagnostics(
         phases_present=('liquid',),
         phase_masses_kg={'liquid': 1.0},
@@ -1506,7 +1537,18 @@ def test_parser_sr12_current_default_values_are_pinned_without_notice():
     assert result.temperature_C == 1200.0
     assert result.pressure_bar == 1.0
     assert result.liquid_viscosity_Pa_s is None
-    assert result.warnings == []
+    assert len(result.warnings) == 5
+    assert all(warning.startswith('SR12:') for warning in result.warnings)
+    assert any(
+        'field=executed_temperature_C' in warning
+        and 'replacement=1200.0' in warning
+        for warning in result.warnings
+    )
+    assert any(
+        'field=condensed_phase_reference_pressure_bar' in warning
+        and 'replacement=1.0' in warning
+        for warning in result.warnings
+    )
     assert result.status == 'ok'
     assert set(result.diagnostics) == {
         'executed_temperature_C',

@@ -1845,13 +1845,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     continue
                 if math.isfinite(value) and value > 0.0:
                     native_activities[formula] = value
+        repair_notices: List[str] = []
         (
             phases_present,
             phase_masses_kg,
             phase_compositions,
             liquid_fraction,
             liquid_composition_wt_pct,
-        ) = self._phase_assemblage_payload(raw)
+        ) = self._phase_assemblage_payload(
+            raw,
+            repair_notices=repair_notices,
+        )
+        all_warnings.extend(repair_notices)
         result = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -3756,23 +3761,30 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         upstream Python entry point is stable.  Today this is a
         best-effort projection.
         """
+        repair_notices: List[str] = []
         (
             phases_present,
             phase_masses_kg,
             phase_compositions,
             liquid_fraction,
             liquid_composition_wt_pct,
-        ) = self._phase_assemblage_payload(raw)
+        ) = self._phase_assemblage_payload(
+            raw,
+            repair_notices=repair_notices,
+        )
         result.phases_present.extend(phases_present)
         result.phase_masses_kg.update(phase_masses_kg)
         result.phase_compositions.update(phase_compositions)
         result.liquid_fraction = liquid_fraction
         if liquid_composition_wt_pct:
             result.liquid_composition_wt_pct = liquid_composition_wt_pct
+        result.warnings.extend(repair_notices)
 
     def _phase_assemblage_payload(
         self,
         raw: Any,
+        *,
+        repair_notices: List[str] | None = None,
     ) -> Tuple[
         List[str],
         Dict[str, float],
@@ -3783,7 +3795,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if raw is None:
             raise MeltCompositionError('zero_total_phase_mass')
 
-        phases = self._extract_phases(raw)
+        phases = self._extract_phases(
+            raw,
+            repair_notices=repair_notices,
+        )
         liquid_fraction = liquid_fraction_from_phase_masses({
             name: mass_kg for name, mass_kg, _ in phases
         })
@@ -3819,6 +3834,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     @staticmethod
     def _extract_phases(
         raw: Any,
+        *,
+        repair_notices: List[str] | None = None,
     ) -> List[Tuple[str, Any, Dict[str, float]]]:
         """
         Convert the upstream phase block into a list of
@@ -3842,7 +3859,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if isinstance(phases_block, dict):
             for name, state in phases_block.items():
                 mass_kg = MAGEMinBackend._extract_mass_kg(state)
-                composition = MAGEMinBackend._extract_phase_composition(state)
+                composition = MAGEMinBackend._extract_phase_composition(
+                    state,
+                    phase=str(name),
+                    repair_notices=repair_notices,
+                )
                 output.append((str(name), mass_kg, composition))
         return output
 
@@ -3880,7 +3901,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
 
     @staticmethod
-    def _extract_phase_composition(state: Any) -> Dict[str, float]:
+    def _extract_phase_composition(
+        state: Any,
+        *,
+        phase: str = 'unknown',
+        repair_notices: List[str] | None = None,
+    ) -> Dict[str, float]:
         if isinstance(state, dict):
             comp = (
                 state.get('composition_wt_pct')
@@ -3901,8 +3927,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 v = float(value)
             except (TypeError, ValueError):
                 continue
-            if v > 0:
-                out[str(species)] = v
+            if not math.isfinite(v) or v <= 0.0:
+                if repair_notices is not None:
+                    reason = 'nonfinite' if not math.isfinite(v) else 'nonpositive'
+                    repair_notices.append(
+                        'SR16:magemin_phase_composition_repaired '
+                        f'producer=MAGEMin field=phase_compositions '
+                        f'phase={phase!r} oxide={str(species)!r} '
+                        f'action=dropped reason={reason}'
+                    )
+                continue
+            out[str(species)] = v
         return out
 
     # ------------------------------------------------------------------

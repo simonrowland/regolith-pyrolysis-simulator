@@ -575,7 +575,7 @@ def test_projected_phase_and_liquid_fields_pin_has_no_repair_warning():
     assert diagnostic.backend_warnings == ()
 
 
-def test_projected_invalid_fields_warn_without_changing_replay_record():
+def test_projected_invalid_fields_are_filtered_without_changing_replay_record():
     from types import SimpleNamespace
 
     from simulator.melt_backend.base import EquilibriumResult
@@ -612,10 +612,24 @@ def test_projected_invalid_fields_warn_without_changing_replay_record():
 
     assert diagnostic.phase_masses_kg == {'liquid': 1.0}
     assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
-    assert diagnostic.liquid_composition_wt_pct == {
-        'SiO2': 50.0, 'MgO': 50.0, 'FeO': 0.0, 'CaO': -1.0,
-    }
-    assert len(diagnostic.backend_warnings) == 1
+    assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
+    repair_warnings = [
+        warning for warning in diagnostic.backend_warnings
+        if warning.startswith('SR17:')
+    ]
+    assert len(repair_warnings) == 3
+    assert any(
+        "phase='olivine'" in warning and 'phase_masses_kg' in warning
+        for warning in repair_warnings
+    )
+    assert any(
+        "item='FeO'" in warning and 'reason=nonpositive' in warning
+        for warning in repair_warnings
+    )
+    assert any(
+        "item='CaO'" in warning and 'reason=nonpositive' in warning
+        for warning in repair_warnings
+    )
     assert any(
         "phase 'olivine'" in warning and 'nonpositive' in warning
         for warning in diagnostic.backend_warnings
