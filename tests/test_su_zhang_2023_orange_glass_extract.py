@@ -7,13 +7,16 @@ from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
+import re
 
+import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
+    resolve_field_path,
     validate_extract_document,
 )
 
@@ -43,6 +46,30 @@ def _migrated_point(migrator: Migrator, parent_id: str, point_suffix: str):
         for row in migrator.result.observations.values()
         if f"::{parent_id}::{point_suffix}" in row.observation_id
     )
+
+
+_MATRIX_TARGET = re.compile(r"^(.*\.matrix_as_printed)\[(\d+)\]\[(\d+)\]$")
+
+
+def _resolve_audit_target(document: dict, path: str):
+    matrix_match = _MATRIX_TARGET.fullmatch(path)
+    if matrix_match:
+        matrix = resolve_field_path(document, matrix_match.group(1))
+        return matrix[int(matrix_match.group(2))][int(matrix_match.group(3))]
+    return resolve_field_path(document, path)
+
+
+def _assert_cell_audit_matches(document: dict, cell_audit: list[dict]) -> None:
+    for row in cell_audit:
+        assert float(row["xml_stored_value"]) == float(row["openpyxl_value"]), (
+            row["sheet"], row["cell"], row["xml_stored_value"], row["openpyxl_value"]
+        )
+        for target in row["extract_target"].split(" | "):
+            actual = str(_resolve_audit_target(document, target))
+            assert actual == row["displayed_value"], (
+                f"{row['sheet']}!{row['cell']} target {target}: "
+                f"extract has {actual!r}, workbook displays {row['displayed_value']!r}"
+            )
 
 
 def test_extract_validates_and_fidelity_mutation_is_detected() -> None:
@@ -213,13 +240,29 @@ def test_all_printed_rows_cells_and_maps_are_accounted_for() -> None:
         "Table S4": 1_884,
         "Table S5": 63_996,
     }
-    assert all(row["independent_reads_agree"] == "yes" for row in cell_audit)
-    assert all(row["extracted_value_matches"] == "yes" for row in cell_audit)
+    _assert_cell_audit_matches(document, cell_audit)
     with (AUDIT / f"{SID}.compare.csv").open(encoding="utf-8", newline="") as stream:
         compare_audit = list(csv.DictReader(stream))
     assert len(compare_audit) == 71_773
-    assert all(row["result"] == "match" for row in compare_audit)
-    assert all(row["extracted_value_matches"] == "yes" for row in compare_audit)
+
+
+def test_cell_audit_detects_unpinned_profile_mutation() -> None:
+    document = _document()
+    with (AUDIT / f"{SID}.cells.csv").open(encoding="utf-8", newline="") as stream:
+        cell_audit = list(csv.DictReader(stream))
+    _assert_cell_audit_matches(document, cell_audit)
+
+    mutated = deepcopy(document)
+    manganese = _observation(
+        mutated, "MnO", "su_zhang_2023_table_s2_empa_mno_profile"
+    )
+    g13 = next(
+        point for point in manganese["values"]["series"]
+        if "G13 displayed" in point["locator"]["note"]
+    )
+    g13["MnO_wt_pct"] = "9.999"
+    with pytest.raises(AssertionError, match=r"Table S2!G13"):
+        _assert_cell_audit_matches(mutated, cell_audit)
 
 
 def test_isolated_migration_pins_values_conditions_and_schema_gaps() -> None:
