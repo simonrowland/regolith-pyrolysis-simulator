@@ -1,0 +1,74 @@
+source_id: jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation
+input_order:
+  primary: MinerU table drafts and pdftotext-layout machine text
+  backup: PDF page renders only for cell and row/column verification
+render_checks:
+  pages: [3, 4, 7, 8, 10, 11]
+  resolution_dpi: 300
+tables:
+  - table: '1'
+    pdf_page: 3
+    published_page: 785
+    printed_rows: 11
+    mapping: Nine starting-material columns across SiO2, TiO2, Al2O3, Cr2O3, FeO, MgO, CaO, Na2O, Total, Mg-no. and n are retained in starting-material context.
+    stored_as: context
+    analysis: Synthetic glasses prepared from high-purity oxides and carbonates and analyzed for composition and homogeneity by EMPA; Gaetani and Grove (1998) source columns remain attributed.
+  - table: '2'
+    pdf_page: 4
+    published_page: 786
+    printed_run_count: 14
+    mapping: Capsule type and eight phase-addition mass rows are retained by run in context. Nine normalized bulk-oxide rows including SO3 bind to the corresponding run composition condition.
+    stored_as: context and point_conditions.composition
+    capsule_key: C–Pt means graphite-lined platinum capsules per the printed footnote; AuPd is retained as printed.
+  - table: '3'
+    pdf_page: 7
+    published_page: 789
+    printed_run_count: 22
+    mapping: Run id, products, pressure, temperature and duration are retained per experiment; T_C and point_conditions carry located conditions.
+    stored_as: experiment metadata and point_conditions
+    pressure_identity: Table value in GPa retained in experiment metadata; identity pressure is the same printed value converted to Pa for the migrator.
+  - table: '4'
+    pdf_page: 8
+    published_page: 790
+    printed_run_count: 22
+    printed_numeric_cells: 220
+    mapping: Nine oxide and total-S components per run are measured_direct quenched-glass observations. The calculated total column is context and is not emitted as a glass component.
+    stored_as: 198 equilibrium_phase_composition observations and 22 total context values
+    method: EMPA with wavelength-dispersive spectrometry; Table 4 parenthetical widths are 1 sigma as printed.
+    sulfur: Total S in wt%; no S6+/ΣS value is printed.
+    render_verified: true
+  - table: '5'
+    pdf_page: 10
+    published_page: 792
+    printed_run_count: 13
+    mapping: Olivine oxide analyses, formula-unit values, totals, Mg number and printed DFMQ are retained. DFMQ also binds to each corresponding fO2_control condition.
+    stored_as: context and point_conditions.fO2_control
+    analysis_method: EMPA with wavelength-dispersive spectrometry, stated for all phases on PDF page 6.
+    derived_condition: Authors calculate DFMQ from Tables 5 and 6 using the Ballhaus et al. (1990, 1991) oxybarometer; this is their reduction of measured phase analyses, not an external quoted value or a model fit.
+  - table: '6'
+    pdf_page: 10
+    published_page: 792
+    printed_run_count: 13
+    mapping: Spinel oxide analyses, formula-unit values, Fe3+/ΣFe, and totals are retained by run in context.
+    stored_as: context
+    analysis_method: EMPA with wavelength-dispersive spectrometry, stated for all phases on PDF page 6.
+    derived_value: Fe3+ is estimated from stoichiometry as printed in the footnote; the Fe3+/ΣFe ratio is not emitted as a scoreable observation because its required measured-reduced lineage inputs cannot be stored as crystal phase observations.
+  - table: '7'
+    pdf_page: 11
+    published_page: 793
+    printed_run_count: 9
+    mapping: Clinopyroxene oxide analyses, formula-unit values and both totals are retained by run in context.
+    stored_as: context
+    analysis_method: EMPA with wavelength-dispersive spectrometry, stated for all phases on PDF page 6.
+  - table: '8'
+    pdf_page: 11
+    published_page: 793
+    printed_run_count: 14
+    mapping: Orthopyroxene oxide analyses, formula-unit values and both totals are retained by run in context.
+    stored_as: context
+    analysis_method: EMPA with wavelength-dispersive spectrometry, stated for all phases on PDF page 6.
+schema_gaps:
+  - Mineral analyses use phase cr but the closed PhaseRole set has no crystal/mineral role; _phase_row_rejection requires a supported role. See simulator/battery/enums.py::PhaseRole and simulator/battery/migrate.py::_phase_row_rejection.
+  - Formula-unit cations and Mg number have no exact composition basis/quantity token. See simulator/battery/enums.py::PHASE_BASIS_TOKENS, simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+  - No numeric anhydrite composition is printed; WDS analysis was not possible and EDS is qualitative.
+  - No printed SCSS regression equation or fitted parameter is present; Figure 2 and Figure 3 values are figure-only candidates and are not digitized.
