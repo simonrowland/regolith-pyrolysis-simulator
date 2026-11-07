@@ -73,6 +73,12 @@ fidelity_samples:
     row: 3
     table: '9'
     column: 6
+- path: species.NaFeSi2O6.observations[aegirine_discussion_pure_endmember_delta_fH].values.points[0].value
+  value: '-615.649'
+  locator:
+    page: 19
+    published_page: 14
+    row: discussion
 scope_assessment:
   direct_measured_series: 3
   measured_reduced_observations: Table 6 smoothed functions; Table 3 reaction 10 and overall reaction 11; Table 4
@@ -29328,6 +29334,157 @@ species:
         basis: Printed uncertainty in kcal/mol; confidence level not stated.
   NaFeSi2O6:
     observations:
+    - observation_id: aegirine_pure_endmember_adjusted_heat_of_solution
+      type: gibbs_table
+      locator:
+        page: 18
+        published_page: 13
+        row: pure endmember heat of solution
+        section: Discussion
+      phase: cr
+      units: kcal/mol
+      per: mol_species
+      method_as_published: Authors’ heat-of-solution value for pure aegirine after thermal adjustments for substitutions
+        and formula-weight correction.
+      standard_state: Heat-of-solution value in the pure endmember discussion; no pressure is stated.
+      values:
+        quantity: adjusted_heat_of_solution_endmember
+        method_class: measured_reduced
+        points:
+        - T_K: '298.15'
+          value: '-99.368'
+          locator: &id049
+            page: 18
+            published_page: 13
+            row: pure endmember heat of solution
+            section: Discussion
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '298.15'
+              locator: *id049
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id049
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id049
+          uncertainty:
+            kind: printed
+            value: '0.200'
+            units: kcal/mol
+            verbatim: ±0.200 kcal/mol
+            confidence_level: not_stated
+        admission_status: typed_refusal
+        refusal_reason: The battery has no exact adjusted heat-of-solution quantity token; retained as typed-refused measured data.
+        schema_gap: The battery has no exact adjusted heat-of-solution quantity token; retained as typed-refused measured data.
+      derivation:
+        relation: Authors calculate the pure-endmember heat of solution after thermal substitution adjustments and formula-weight correction.
+        inputs:
+        - aegirine_table3_reaction_10
+        - aegirine_table1_sample_characterization
+        method:
+          state:
+            tag: value
+            value: Pure-endmember heat-of-solution adjustment from the natural mineral result and printed sample analysis.
+          locator:
+            page: 18
+            published_page: 13
+            section: Discussion
+        output_unit: kcal/mol
+      derived_from:
+      - aegirine_table3_reaction_10
+      - aegirine_table1_sample_characterization
+      uncertainty:
+        kind: printed
+        value: '0.200'
+        verbatim: ±0.200 kcal/mol
+        basis: Printed uncertainty in kcal/mol; confidence level not stated.
+    - observation_id: aegirine_pure_endmember_overall_calorimetric_reaction
+      type: gibbs_table
+      locator:
+        page: 18
+        published_page: 13
+        row: pure endmember overall calorimetric reaction
+        section: Discussion
+      phase: cr
+      units: kcal per reaction as written
+      per: mol_species
+      method_as_published: Authors substitute the adjusted pure-aegirine heat of solution into reaction 10 with ideal composition
+        numbers for reactions 1, 3, and 8.
+      standard_state: Overall calorimetric reaction uses the Table 3 protocol; no numerical pressure is stated.
+      values:
+        quantity: adjusted_overall_calorimetric_reaction_enthalpy
+        method_class: measured_reduced
+        points:
+        - value: '+13.214'
+          locator: &id050
+            page: 18
+            published_page: 13
+            row: pure endmember overall calorimetric reaction
+            section: Discussion
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_single_temperature
+              locator:
+                page: 18
+                published_page: 13
+                row: pure endmember overall calorimetric reaction
+                section: Discussion
+                note: Table 3 protocol states reactants at 25°C and solvent/products at 73.7°C.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id050
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id050
+          uncertainty:
+            kind: printed
+            value: '0.206'
+            units: kcal
+            verbatim: ±0.206 kcal
+            confidence_level: not_stated
+        admission_status: typed_refusal
+        refusal_reason: The battery has no exact reaction-enthalpy quantity token for the adjusted overall calorimetric reaction.
+        schema_gap: The battery has no exact reaction-enthalpy quantity token for the adjusted overall calorimetric reaction.
+      derivation:
+        relation: Authors substitute the adjusted pure-endmember heat of solution into Table 3 reaction 10 and use ideal
+          composition numbers for reactions 1, 3, and 8 to calculate the overall calorimetric reaction.
+        inputs:
+        - aegirine_pure_endmember_adjusted_heat_of_solution
+        - aegirine_table3_reaction_1
+        - aegirine_table3_reaction_3
+        - aegirine_table3_reaction_8
+        method:
+          state:
+            tag: value
+            value: Adjusted overall calorimetric reaction from the pure-endmember solution heat and printed composition coefficients.
+          locator:
+            page: 18
+            published_page: 13
+            section: Discussion
+        output_unit: kcal
+      derived_from:
+      - aegirine_pure_endmember_adjusted_heat_of_solution
+      - aegirine_table3_reaction_1
+      - aegirine_table3_reaction_3
+      - aegirine_table3_reaction_8
+      uncertainty:
+        kind: printed
+        value: '0.206'
+        verbatim: ±0.206 kcal
+        basis: Printed uncertainty; confidence level not stated.
     - observation_id: aegirine_discussion_pure_endmember_delta_fH
       type: gibbs_table
       locator:
@@ -29375,13 +29532,33 @@ species:
             confidence_level: not_stated
         reaction_as_printed: 2Si(c) + Fe(c) + Na(c) + 3O2(g) -> NaFe3+Si2O6(c)
       derivation:
-        relation: The source calculates pure aegirine heat of solution and the standard formation enthalpy by adjusting
-          the natural aegirine calorimetric result to the NaFeSi2O6 endmember.
+        relation: ΔHf°298(pure aegirine) = (+13.214 ±0.206) + 1/2ΔH21 + 4ΔH20 + 2ΔH12 + 1/2ΔH15 − 1/2ΔH23.
         inputs:
-        - aegirine_table3_reaction_10
+        - aegirine_pure_endmember_overall_calorimetric_reaction
+        - aegirine_table4_reaction_21_constituent_delta_fH
+        - aegirine_table4_reaction_20_constituent_delta_fH
+        - aegirine_table4_reaction_12_constituent_delta_fH
+        - aegirine_table4_reaction_15_constituent_delta_fH
+        - aegirine_table4_reaction_23_constituent_delta_fH
+        references:
+        - Pankratz (19): reactions 12 (SiO2), 15 (Fe2O3), 20 (H2O(l)), and 21 (Na2SO4-III).
+        - Wagman (21): reaction 23 (H2SO4·7H2O(l)).
+        method:
+          state:
+            tag: value
+            value: Authors’ printed Hess cycle for the pure aegirine endmember.
+          locator:
+            page: 19
+            published_page: 14
+            section: Discussion
         output_unit: kcal/mol
       derived_from:
-      - aegirine_table3_reaction_10
+      - aegirine_pure_endmember_overall_calorimetric_reaction
+      - aegirine_table4_reaction_21_constituent_delta_fH
+      - aegirine_table4_reaction_20_constituent_delta_fH
+      - aegirine_table4_reaction_12_constituent_delta_fH
+      - aegirine_table4_reaction_15_constituent_delta_fH
+      - aegirine_table4_reaction_23_constituent_delta_fH
       uncertainty:
         kind: printed
         value: '0.737'

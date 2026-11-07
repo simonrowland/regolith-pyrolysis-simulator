@@ -33,7 +33,7 @@ def _assert_render_pins(document: dict) -> None:
     point_count = sum(
         len(row["values"]["points"]) for row in observations.values()
     )
-    assert point_count == 614
+    assert point_count == 616
     assert len(observations["aegirine_table5_low_temperature_cp"]["values"]["points"]) == 52
     assert len(observations["aegirine_table6_smoothed_cp"]["values"]["points"]) == 54
     assert len(observations["aegirine_table7_high_temperature_cp"]["values"]["points"]) == 18
@@ -182,6 +182,62 @@ def _assert_render_pins(document: dict) -> None:
     assert table6_fidelity["value"] == "40.499"
     assert table6_fidelity["locator"]["row"] == 34
 
+    adjusted_solution = observations["aegirine_pure_endmember_adjusted_heat_of_solution"]
+    adjusted_solution_point = adjusted_solution["values"]["points"][0]
+    assert adjusted_solution_point["value"] == "-99.368"
+    assert adjusted_solution_point["uncertainty"]["value"] == "0.200"
+    assert adjusted_solution_point["uncertainty"]["verbatim"] == "±0.200 kcal/mol"
+    assert adjusted_solution_point["locator"]["page"] == 18
+    assert adjusted_solution_point["locator"]["published_page"] == 13
+    assert adjusted_solution["derivation"]["inputs"] == [
+        "aegirine_table3_reaction_10",
+        "aegirine_table1_sample_characterization",
+    ]
+
+    adjusted_reaction = observations["aegirine_pure_endmember_overall_calorimetric_reaction"]
+    adjusted_reaction_point = adjusted_reaction["values"]["points"][0]
+    assert adjusted_reaction_point["value"] == "+13.214"
+    assert adjusted_reaction_point["uncertainty"]["value"] == "0.206"
+    assert adjusted_reaction_point["uncertainty"]["verbatim"] == "±0.206 kcal"
+    assert adjusted_reaction_point["point_conditions"]["temperature_K"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_single_temperature",
+    }
+    assert adjusted_reaction["derivation"]["inputs"] == [
+        "aegirine_pure_endmember_adjusted_heat_of_solution",
+        "aegirine_table3_reaction_1",
+        "aegirine_table3_reaction_3",
+        "aegirine_table3_reaction_8",
+    ]
+
+    pure = observations["aegirine_discussion_pure_endmember_delta_fH"]
+    pure_point = pure["values"]["points"][0]
+    assert pure_point["value"] == "-615.649"
+    assert pure_point["uncertainty"]["value"] == "0.737"
+    assert pure_point["uncertainty"]["verbatim"] == "±0.737 kcal/mol"
+    assert pure_point["locator"]["page"] == 19
+    assert pure_point["locator"]["published_page"] == 14
+    expected_pure_lineage = [
+        "aegirine_pure_endmember_overall_calorimetric_reaction",
+        "aegirine_table4_reaction_21_constituent_delta_fH",
+        "aegirine_table4_reaction_20_constituent_delta_fH",
+        "aegirine_table4_reaction_12_constituent_delta_fH",
+        "aegirine_table4_reaction_15_constituent_delta_fH",
+        "aegirine_table4_reaction_23_constituent_delta_fH",
+    ]
+    assert pure["derived_from"] == expected_pure_lineage
+    assert pure["derivation"]["inputs"] == expected_pure_lineage
+    assert pure["derivation"]["references"] == [
+        "Pankratz (19): reactions 12 (SiO2), 15 (Fe2O3), 20 (H2O(l)), and 21 (Na2SO4-III).",
+        "Wagman (21): reaction 23 (H2SO4·7H2O(l)).",
+    ]
+    assert "raw_inputs" not in pure["derivation"]
+    assert pure["derivation"]["method"]["locator"] == {
+        "page": 19,
+        "published_page": 14,
+        "section": "Discussion",
+    }
+
     expected_marked_temperatures = {
         "aegirine_table8_delta_fH": [
             ("1", "371.00"),
@@ -241,6 +297,36 @@ def test_render_pins_and_row_count_reject_mutations() -> None:
     with pytest.raises(AssertionError):
         _assert_render_pins(changed_count)
 
+    changed_pure_value = deepcopy(document)
+    pure_row = next(
+        row
+        for row in changed_pure_value["species"]["NaFeSi2O6"]["observations"]
+        if row["observation_id"] == "aegirine_discussion_pure_endmember_delta_fH"
+    )
+    pure_row["values"]["points"][0]["value"] = "-999.999"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_pure_value)
+
+    changed_pure_uncertainty = deepcopy(document)
+    pure_row = next(
+        row
+        for row in changed_pure_uncertainty["species"]["NaFeSi2O6"]["observations"]
+        if row["observation_id"] == "aegirine_discussion_pure_endmember_delta_fH"
+    )
+    pure_row["values"]["points"][0]["uncertainty"]["value"] = "0.738"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_pure_uncertainty)
+
+    changed_pure_lineage = deepcopy(document)
+    pure_row = next(
+        row
+        for row in changed_pure_lineage["species"]["NaFeSi2O6"]["observations"]
+        if row["observation_id"] == "aegirine_discussion_pure_endmember_delta_fH"
+    )
+    pure_row["derived_from"].remove("aegirine_table4_reaction_21_constituent_delta_fH")
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_pure_lineage)
+
 
 def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -277,9 +363,9 @@ def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() ->
     result = migrator.result
     migrated = list(result.observations.values())
     assert result.validation.hard_issues == ()
-    assert len(migrated) == 614
-    assert sum(row.value.kind.value == "unavailable" for row in migrated) == 257
-    assert sum(not row.identity.quantity.is_value for row in migrated) == 257
+    assert len(migrated) == 616
+    assert sum(row.value.kind.value == "unavailable" for row in migrated) == 259
+    assert sum(not row.identity.quantity.is_value for row in migrated) == 259
     assert sum(not row.identity.species.phase.is_value for row in migrated) == 0
 
     unknown_quantities = Counter(
@@ -300,6 +386,8 @@ def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() ->
             "aegirine_solution_correction_terms": 5,
             "aegirine_table4_reaction_25_formation_from_oxides": 1,
             "aegirine_abstract_delta_fH_oxides": 1,
+            "aegirine_pure_endmember_adjusted_heat_of_solution": 1,
+            "aegirine_pure_endmember_overall_calorimetric_reaction": 1,
             **{f"aegirine_table3_reaction_{number}": 1 for number in range(1, 10)},
             "aegirine_table3_reaction_10": 1,
             "aegirine_table3_overall_reaction_11": 1,
