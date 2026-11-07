@@ -3499,7 +3499,9 @@ class EvaporationMixin:
             max(0.0, float(value))
             for value in overhead_partials_Pa.values()
         )
-        declared_total_pressure_Pa = self._melt_total_pressure_Pa()
+        declared_total_pressure_Pa = EvaporationMixin._melt_total_pressure_Pa(
+            self.melt
+        )
         control_floor_Pa = (
             declared_total_pressure_Pa
             if declared_total_pressure_Pa is not None
@@ -3507,10 +3509,11 @@ class EvaporationMixin:
         )
         return max(partial_sum_Pa, control_floor_Pa)
 
-    def _melt_total_pressure_Pa(self) -> float | None:
+    @staticmethod
+    def _melt_total_pressure_Pa(melt: Any) -> float | None:
         """Return a supplied, finite positive melt pressure in Pa."""
 
-        pressure_mbar = getattr(self.melt, 'p_total_mbar', None)
+        pressure_mbar = getattr(melt, 'p_total_mbar', None)
         if pressure_mbar is None or isinstance(pressure_mbar, bool):
             return None
         try:
@@ -3572,7 +3575,7 @@ class EvaporationMixin:
                 or source_reaction_fO2_bar <= 0.0
             ):
                 source_reaction_fO2_bar = None
-        total_pressure_Pa = self._melt_total_pressure_Pa()
+        total_pressure_Pa = EvaporationMixin._melt_total_pressure_Pa(self.melt)
         try:
             reported_activities = EvaporationMixin._vapor_pressure_activity_operands(
                 equilibrium, vapor_pressure_diagnostic,

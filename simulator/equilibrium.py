@@ -29,6 +29,7 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
     _activity_for_crystalline_vapor_k,
+    _vapor_k_standard_state,
     _vapor_activity_source_standard_state,
     melt_oxide_activity,
     single_cation_mole_fractions,
@@ -390,8 +391,10 @@ class EquilibriumMixin:
             _pow10_pressure_or_raise,
             _raise_invalid_antoine_coefficient,
             _range_tuple,
+            _publishes_vapor_pressure,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
+            openimcc_binding_selected_by_inputs,
             physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
@@ -436,6 +439,20 @@ class EquilibriumMixin:
                 status='ok',
                 diagnostics={'vapor_pressure_zero_reason': 'internal_analytical_below_400K'},
             )
+
+        # The built-in provider gates its high-T carrier retention through
+        # this same authority selector. Its OpenIMCC vapour authority is
+        # selected exactly when this returns true; keep the legacy shadow on
+        # the same retain_subthreshold input without reimplementing the policy.
+        retain_high_t_openimcc_carriers = openimcc_binding_selected_by_inputs(
+            temperature_K=T_K,
+            controls={
+                'high_t_melt_activity': getattr(
+                    self, '_high_t_melt_activity', 'openimcc'
+                )
+            },
+            quantity_class='vapour',
+        )
 
         vapor_pressures = {}
         vapor_pressure_sources = {}
@@ -1192,7 +1209,7 @@ class EquilibriumMixin:
             activity_provenance_for_species = None
             activity_conversion = None
             if parent_oxide == 'FeO':
-                a_oxide = max(
+                fe_activity = max(
                     0.0,
                     float(
                         feo_activity_diagnostic.get(
@@ -1202,6 +1219,37 @@ class EquilibriumMixin:
                         or 0.0
                     ),
                 )
+                # The legacy Fe evaluator uses liquid Kress91 a(FeO), while
+                # JANAF Fe-020's Ellingham segment is crystalline below its
+                # 1650 K transition and liquid above. Resolve both declarations
+                # through the shared d-144 owner; the sign follows the source
+                # liquid -> the selected K standard, with identity above 1650 K.
+                fe_standard_pair = d144_vapor_standard_state_pair(parent_oxide)
+                if fe_standard_pair is None:
+                    raise RuntimeError('FeO: missing d-144 vapor standard pair')
+                source_standard_state_id, source_standard_state_phase = (
+                    fe_standard_pair[0]
+                )
+                (
+                    target_standard_state_id,
+                    target_standard_state_phase,
+                ) = _vapor_k_standard_state(parent_oxide, T_K, {})
+                (
+                    activity_for_k,
+                    activity_conversion,
+                    conversion_warning,
+                ) = _activity_for_crystalline_vapor_k(
+                    parent_oxide,
+                    fe_activity,
+                    T_K,
+                    source_standard_state_id=source_standard_state_id,
+                    target_standard_state_id=target_standard_state_id,
+                    source_standard_state_phase=source_standard_state_phase,
+                    target_standard_state_phase=target_standard_state_phase,
+                )
+                if conversion_warning:
+                    warnings.append(conversion_warning)
+                a_oxide = activity_for_k
                 oxide_activity = None
             else:
                 oxide_activity = melt_oxide_activity(
@@ -1250,14 +1298,6 @@ class EquilibriumMixin:
                     )
                     if conversion_warning:
                         warnings.append(conversion_warning)
-                    activity_provenance_for_species.update(
-                        {
-                            'activity_standard_state_conversion': activity_conversion,
-                            'vapor_activity_used_for_K': activity_for_k,
-                            'vapor_k_standard_state_id': target_standard_state_id,
-                            'vapor_k_standard_state_phase': target_standard_state_phase,
-                        }
-                    )
                 a_oxide = replace(
                     oxide_activity, activity=activity_for_k
                 ).equivalent_parent_activity(n_ox / n_M)
@@ -1283,10 +1323,10 @@ class EquilibriumMixin:
                         ZeroBecause.PROVEN_BELOW_THRESHOLD,
                         field='a_FeO_authoritative',
                         detail=(
-                            f'a_FeO_authoritative={a_oxide!r} <= 1e-10; '
-                            'species omitted by the 1e-10 activity skip '
-                            '(computed authoritative FeO activity, not missing '
-                            'input; skip is not a 1e-15 Pa pressure proof)'
+                            f'vapor_activity_used_for_K={a_oxide!r} <= 1e-10; '
+                            'species omitted by the 1e-10 activity skip after '
+                            'putting authoritative liquid FeO activity on the '
+                            'selected JANAF FeO K basis'
                         ),
                         category=CATEGORY_PROVEN_ZERO,
                     )
@@ -1323,7 +1363,11 @@ class EquilibriumMixin:
                     )
 
             activities[species] = (
-                a_oxide if oxide_activity is None else oxide_activity.activity
+                fe_activity
+                if parent_oxide == 'FeO'
+                else (
+                    a_oxide if oxide_activity is None else oxide_activity.activity
+                )
             )
             if oxide_activity is not None:
                 activity_provenance[species] = activity_provenance_for_species
@@ -1338,6 +1382,21 @@ class EquilibriumMixin:
                     'melt_oxide_activity_evidence_tier': 'ANALYTICAL_EXTERNAL_GROUNDED',
                     'melt_oxide_activity_model': 'kress_calphad_ferrous_feo',
                 }
+            if activity_conversion is not None:
+                activity_provenance[species].update(
+                    {
+                        'melt_oxide_activity_reference_state': (
+                            source_standard_state_id
+                        ),
+                        'melt_oxide_activity_reference_state_phase': (
+                            source_standard_state_phase
+                        ),
+                        'activity_standard_state_conversion': activity_conversion,
+                        'vapor_activity_used_for_K': activity_for_k,
+                        'vapor_k_standard_state_id': target_standard_state_id,
+                        'vapor_k_standard_state_phase': target_standard_state_phase,
+                    }
+                )
 
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
@@ -1403,15 +1462,14 @@ class EquilibriumMixin:
                 field="P_effective_Pa",
             )
 
-            retain_converted_positive_pressure = bool(
-                activity_conversion
-                and activity_conversion.get('conversion_performed')
-                and P_effective_Pa > 0.0
-            )
-            # Match the kernel's positive sub-threshold retention for a
-            # converted carrier; the legacy 1e-15 Pa cutoff caused the shadow
-            # path to drop Mg/Ca keys that the converted route still reports.
-            if P_effective_Pa > 1e-15 or retain_converted_positive_pressure:
+            if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
+                publish_pressure = _publishes_vapor_pressure(
+                    P_effective_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
+                )
+            else:
+                publish_pressure = P_effective_Pa > 1e-15
+            if publish_pressure:
                 vapor_pressures[species] = P_effective_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
                 fit_extrapolated = (
