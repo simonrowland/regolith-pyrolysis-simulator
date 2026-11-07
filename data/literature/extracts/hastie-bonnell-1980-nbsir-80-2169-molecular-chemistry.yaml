@@ -2995,56 +2995,6 @@ species:
             row: pressure
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
-    - observation_id: hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
-      type: gibbs_table
-      experiment: hastie_bonnell_1980_experiment_10
-      locator: &id019
-        page: 193
-        pdf_page_index: 192
-        published_page: E7
-        section: Appendix E, section 3
-        note: Unnumbered PO formation-enthalpy comparison
-      phase: gas
-      units: kcal/mol
-      values:
-        quantity: delta_fH
-        method_class: measured_reduced
-        admission_status: admitted
-        delta_fH: '-5.5'
-        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as designated by the printed formation
-          symbol.
-        T_K: '298.15'
-        comparison_rows_as_printed:
-        - - -5.5 ± 2
-          - Present study
-        - - -2.3 ± 2
-          - Drowart et al. (1972)
-        - - -1.5 ± 2
-          - JANAF (1971), Interim Table
-        method_as_printed: Present-study value selected for consistency with the report's experimental data base.
-        derivation:
-          relation: PO formation enthalpy selected from the authors' thermochemical reduction.
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 193
-              published_page: E7
-              section: 3
-              note: Supporting experimental inputs are not printed here.
-          method:
-            state:
-              tag: value
-              value: Authors' present-study value; mass-spectrometric thermochemical analysis
-            locator:
-              page: 193
-              published_page: E7
-      uncertainty:
-        reported_status: printed
-        value: '2'
-        units: kcal/mol
-        confidence_level: not_stated
     - observation_id: hastie_bonnell_1980_appendixE_tableE2_bond_energies_typed_refusal
       type: gibbs_table
       experiment: hastie_bonnell_1980_experiment_09
@@ -3199,6 +3149,31 @@ species:
             table: E.3
             row: pressure
     context:
+    - observation_id: hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
+      type: printed_comparison_context
+      locator: &id019
+        page: 193
+        pdf_page_index: 192
+        published_page: E7
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+      phase: gas
+      units: kcal/mol
+      values:
+        quantity: PO formation-enthalpy comparison rows as printed
+        method_class: context_only
+        admission_status: context_only
+        reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as designated by the printed formation
+          symbol.
+        T_K: '298.15'
+        comparison_rows_as_printed:
+        - - -5.5 ± 2
+          - Present study
+        - - -2.3 ± 2
+          - Drowart et al. (1972)
+        - - -1.5 ± 2
+          - JANAF (1971), Interim Table
+        method_as_printed: Present-study value selected for consistency with the report's experimental data base.
     - observation_id: hastie_bonnell_1980_main_table2_full_rendered_table
       type: printed_table_context
       locator:

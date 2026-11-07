@@ -213,6 +213,26 @@ def test_rendered_values_table_rows_and_mutation_are_pinned() -> None:
         "hastie_bonnell_1980_appendixE_tableE4_full_rendered_table": 8,
     }
 
+    comparison_species, comparison = _record_with_species(
+        document, "hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison"
+    )
+    assert comparison_species == "unknown"
+    assert comparison in document["species"]["unknown"]["context"]
+    assert comparison["type"] == "printed_comparison_context"
+    assert comparison["values"]["method_class"] == "context_only"
+    assert "delta_fH" not in comparison["values"]
+    assert comparison["values"]["comparison_rows_as_printed"] == [
+        ["-5.5 ± 2", "Present study"],
+        ["-2.3 ± 2", "Drowart et al. (1972)"],
+        ["-1.5 ± 2", "JANAF (1971), Interim Table"],
+    ]
+    po_species, po_formation = _record_with_species(
+        document, "hastie_bonnell_1980_appendixE_po_delta_fH298_present_study"
+    )
+    assert po_species == "PO"
+    assert po_formation["values"]["quantity"] == "delta_fH"
+    assert po_formation["values"]["delta_fH"] == "-5.5"
+
     table2 = _record(document, "hastie_bonnell_1980_main_table2_full_rendered_table")
     rows = {row[0]: row[1:] for row in table2["values"]["rows_as_printed"]}
     assert rows["P2"][:3] == ["<0.05 (0.005)", "1.2 (0.4)*", "<0.2"]
@@ -252,7 +272,7 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     document = _document()
     result = migrate(isolated_root(tmp_path, document), write=False)
     observations = list(result.observations.values())
-    assert len(observations) == 86
+    assert len(observations) == 85
     assert len(result.experiments) == 20
     assert len(result.validation.hard_issues) == 0
     unavailable = [
@@ -374,6 +394,16 @@ def test_isolated_migration_preserves_values_conditions_and_refusals(tmp_path: P
     ]
     assert len(entropy_migrated) == 18
     assert all(row.value.kind is ValueKind.POINT for row in entropy_migrated)
+    assert not any(
+        "::hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison"
+        in row.observation_id
+        for row in observations
+    )
+    po_formation_migration = migrated_source(
+        "hastie_bonnell_1980_appendixE_po_delta_fH298_present_study"
+    )
+    assert po_formation_migration.value.point == Decimal("-23.0120")
+    assert po_formation_migration.identity.species.formula == "PO"
 
     boron_analogy_pins = (
         ("hastie_bonnell_1980_tableE2_hpo2_S_boron_analogy", "264.4288"),
