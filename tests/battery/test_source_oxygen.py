@@ -166,6 +166,7 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
         point_conditions={
             **(original.point_conditions or {}),
             "fO2_Pa": linked,
+            "temperature_K": Located(State.of(temperature), locator=original.locator),
             "total_pressure_Pa": Located(
                 State.of(Value.point_of("100000")), locator=original.locator
             ),

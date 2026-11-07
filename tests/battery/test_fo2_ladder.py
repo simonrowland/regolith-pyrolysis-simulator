@@ -721,6 +721,7 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
         ),
         point_conditions={
             **(observation.point_conditions or {}),
+            "temperature_K": F.located(Decimal("1200")),
             "total_pressure_Pa": F.located(Value.point_of("100000")),
         },
     )
@@ -751,6 +752,10 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
 
     buffer_experiment = replace(
         experiment,
+        conditions={
+            **experiment.conditions,
+            "temperature_K": F.located(Decimal("1200")),
+        },
         fO2_control=FO2Control(
             channel=State.of(FO2Channel.BUFFER),
             buffer=F.located("IW"),
