@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 90160
-records out (observations): 181324
-works: 777
-experiments: 6901
-queue size: 122522
+rows in: 90257
+records out (observations): 182248
+works: 779
+experiments: 6903
+queue size: 123143
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 775
+index sources: 777
 hard issues: 1685
 
 ## Unavailable input work census
@@ -197,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 774 (mismatch) |
+| citations | 147 | 776 (mismatch) |
 | doi_works | 56 | 419 (mismatch) |
-| no_doi_works | 91 | 358 (mismatch) |
-| admission_statuses | 374 | 31130 (mismatch) |
+| no_doi_works | 91 | 360 (mismatch) |
+| admission_statuses | 374 | 31179 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1359 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1921 (mismatch) |
@@ -208,9 +208,9 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 639 (mismatch) |
 | formulas | 1625 | 22042 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15904 (mismatch) |
+| absent_admissions | 3511 | 15952 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2997 (mismatch) |
+| range_only_T | 3125 | 3011 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -19073,6 +19073,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 70 | 210 |
+| `data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml` | 43 | 308 | 264 |
+| `data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml` | 54 | 616 | 357 |
 | `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` | 8 | 27 | 35 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 2 | 2 |
 | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` | 219 | 219 | 0 |
@@ -19878,8 +19880,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 298020
+advisory issues: 298930
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 298020 |
+| `identity_incomplete` | 298930 |

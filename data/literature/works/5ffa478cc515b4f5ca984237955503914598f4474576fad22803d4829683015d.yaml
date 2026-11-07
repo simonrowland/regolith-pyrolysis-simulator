@@ -1,0 +1,259 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  citation: Bennington, K. O. & Brown, R. R. (1982), Thermodynamic Properties of Synthetic Acmite (NaFe3+Si2O6), U.S. Bureau
+    of Mines Report of Investigations 8621.
+  source_ids:
+  - bennington-brown-1982-synthetic-acmite-ri8621
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9fab7bc5edc14849ae601a0e6f546aaec1553960
+    files:
+    - asset_id: pdf:bennington-brown-1982-synthetic-acmite-ri8621
+      role: pdf
+      path: raw/bennington-brown-1982-synthetic-acmite-ri8621/bennington-brown-1982-synthetic-acmite-ri8621.pdf
+      sha256:
+        tag: value
+        value: f8112cdb11fb15aaba135f286fa8563c35be0a53e655d078eb1d69c2d8add99b
+    - asset_id: pdftotext:bennington-brown-1982-synthetic-acmite-ri8621
+      role: pdftotext
+      path: text/bennington-brown-1982-synthetic-acmite-ri8621
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:bennington-brown-1982-synthetic-acmite-ri8621
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d::bennington-brown-1982-synthetic-acmite-ri8621
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  locator:
+    page: 10
+    published_page: 4
+    pdf_page_index: 9
+    table: '1'
+    note: Table 1 reaction (6); table_row_number=7; table_column_number=3
+context:
+- observation_id: bennington_1982_abstract_formation_summary
+  type: sample_and_method_context
+  locator:
+    page: 7
+    published_page: 1
+    pdf_page_index: 6
+    note: Abstract
+  units: kcal/mol
+  values:
+    delta_fH298_from_elements_as_printed: '-615.87'
+    delta_fH298_from_elements_uncertainty_as_printed: ±0.71
+    delta_fH298_from_oxides_as_printed: '-32.08'
+    delta_fH298_from_oxides_uncertainty_as_printed: ±0.53
+    delta_fG298_from_elements_as_printed: '-575.8'
+    reference_temperature_K_as_printed: '298.15'
+    reported_thermodynamic_temperature_range_K_as_printed:
+    - '298'
+    - '1263'
+    printed_reference_frame: Elements for ΔfH° and ΔfG°; the enthalpy-from-oxides result is a separate reaction frame.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_abstract_formation_summary
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_hf_solution_calorimetry_conditions
+  type: sample_and_method_context
+  locator:
+    page: 9
+    published_page: 3
+    pdf_page_index: 8
+    note: Hydrofluoric-acid solution calorimetry procedure
+  units: as printed
+  values:
+    solvent_mass_g_as_printed: '950'
+    hydrofluoric_acid_concentration_wt_percent_as_printed: '20.1'
+    potassium_dichromate_mass_g_approx_as_printed: '0.60'
+    stoichiometric_silica_mass_g_as_printed: '0.742'
+    reactant_temperature_C_as_printed: '25'
+    calorimeter_and_solution_product_temperature_C_as_printed: '73.7'
+    process_as_printed: Pure reacting substance at 25°C plus solvent at 73.7°C is converted to solution product at 73.7°C.
+    thermochemical_calorie_as_printed: 1 cal = 4.1840 J
+    uncertainty_convention_as_printed: Precision uncertainty assigned to solution heat values is twice the standard deviation;
+      confidence level is not stated.
+    combined_uncertainty_convention_as_printed: For two or more separate heat values, uncertainty is the square root of the
+      sum of squares of the individual uncertainties.
+    temperature_scale_as_printed: International Practical Temperature Scale of 1968.
+    standard_pressure_note: No numerical total pressure is reported for these measurements.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_hf_solution_calorimetry_conditions
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_melting_point_context
+  type: sample_and_method_context
+  locator:
+    page: 15
+    published_page: 9
+    pdf_page_index: 14
+    note: Discussion; statement that high-temperature enthalpy data end below the reported acmite melting point
+  units: K
+  values:
+    acmite_melting_point_K_as_printed: '1263'
+    note: The reported melting point is a limit in the discussion; Tables 5 and 6 also end at 1263 K. No fusion enthalpy or
+      liquid acmite property is reported.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_melting_point_context
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_sample_characterisation
+  type: sample_and_method_context
+  locator:
+    page: 9
+    published_page: 3
+    pdf_page_index: 8
+    note: Acmite preparation and analysis; final sample
+  units: as printed
+  values:
+    sample_formula_as_printed: NaFe3+Si2O6
+    same_sample_used_for_low_temperature_heat_capacity_and_high_temperature_enthalpy: true
+    composition_analysis_wt_percent_as_printed:
+      Na2O: '13.32'
+      Fe2O3: '34.64'
+      SiO2: '51.99'
+    theoretical_composition_wt_percent_as_printed:
+      Na2O: '13.41'
+      Fe2O3: '34.57'
+      SiO2: '52.02'
+    x_ray_diffraction_as_printed: Only acmite was observed, with possibly a trace of hematite (Fe2O3).
+    spectrographic_trace_impurities_ppm_as_printed:
+      Cr: '600'
+      Mn: '200'
+      Ni: '200'
+    iron_valence_note: The sample formula is printed with Fe3+ and analysis reports Fe2O3; no Fe2+/Fe3+ ratio is printed.
+    correction_note: No corrections were made for impurities or the slight composition deviation from theoretical values.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_sample_characterisation
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_table4_auxiliary_data_status
+  type: sample_and_method_context
+  locator:
+    page: 13
+    published_page: 7
+    pdf_page_index: 12
+    table: '4'
+    note: Table 4, Auxiliary thermodynamic data
+  units: as printed
+  values:
+    table_content_as_printed: Table 4 lists thermodynamic data sources and functions for reaction constituents; it contains
+      no numerical thermodynamic values.
+    numerical_auxiliary_inputs_status: Table 4 names the cited sources for auxiliary constituent data; their numerical values
+      are not tabulated in this report. Those citations are carried as named derivation references for Tables 5 and 6.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_table4_auxiliary_data_status
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_table5_reference_element_footnotes
+  type: sample_and_method_context
+  locator:
+    page: 14
+    published_page: 8
+    pdf_page_index: 13
+    table: '5'
+    note: Table 5 footnotes 1–3
+  units: as printed
+  values:
+    footnotes:
+      '1':
+        printed_note: Melting point for sodium.
+        reference_material: sodium
+        affected_temperature_K_as_stored:
+        - '371'
+      '2':
+        printed_note: Transition points for iron.
+        reference_material: iron
+        affected_temperature_K_as_stored:
+        - '1043'
+        - '1185'
+      '3':
+        printed_note: Boiling point for sodium.
+        reference_material: sodium
+        affected_temperature_K_as_stored:
+        - '1177'
+    event_scope: These are reference-element events, not acmite transitions.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_table5_reference_element_footnotes
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_table6_reference_oxide_footnotes
+  type: sample_and_method_context
+  locator:
+    page: 15
+    published_page: 9
+    pdf_page_index: 14
+    table: '6'
+    note: Table 6 footnotes 1–2
+  units: as printed
+  values:
+    footnotes:
+      '1':
+        printed_note: Transition point for SiO2.
+        reference_material: SiO2
+        affected_temperature_K_as_stored:
+        - '847'
+      '2':
+        printed_note: Transition point for Fe2O3.
+        reference_material: Fe2O3
+        affected_temperature_K_as_stored:
+        - '960'
+    event_scope: These are reference-oxide transitions, not acmite transitions.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_table6_reference_oxide_footnotes
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
+- observation_id: bennington_1982_unprinted_ko_data_and_fit
+  type: sample_and_method_context
+  locator:
+    page: 7
+    published_page: 1
+    pdf_page_index: 6
+    note: Introduction; Ko citation (15)
+  units: as printed
+  values:
+    low_temperature_cp_data_status: The paper says low-temperature heat capacities were reported by Ko et al. (15), but does
+      not reproduce their measurement rows.
+    high_temperature_relative_enthalpy_data_status: The paper says high-temperature enthalpies were reported by Ko et al.
+      (15), but does not reproduce their drop-calorimetry measurement rows.
+    cp_fit_coefficients_status: No Cp fit coefficients or fit range are printed in this report.
+    H298_minus_H0_status: H298−H0 is not printed in this report.
+    figure_read_candidates: No figure-only numerical values were extracted.
+  context_id: bennington-brown-1982-synthetic-acmite-ri8621::context::bennington_1982_unprinted_ko_data_and_fit
+  work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  species: NaFeSi2O6
