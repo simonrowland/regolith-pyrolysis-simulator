@@ -559,9 +559,9 @@ def test_r2_f6_custom_predictor_keyword_contract_is_unchanged() -> None:
 
 # ---------------------------------------------------------------------------
 # Finding 5 [P2] (d-062) behaviour pin, committed before the one-owner move:
-# the oxygen-input decision (commanded / missing_fO2 / omitted) must be the
-# same policy on the unmodelled-reactive Knudsen branch and the general
-# branch; only the reactive-cell label differs.
+# the oxygen-input decision (commanded / missing_fO2 / omitted) must agree
+# across the unmodelled-reactive Knudsen branch and the general branch.
+# Knudsen results also carry the physics-95 rung label.
 # ---------------------------------------------------------------------------
 
 
@@ -614,14 +614,11 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     )
     assert not any(n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in general.notices)
     if case == "p_partial_no_o2":
-        # The Re cell cannot close, so it does not take the effusion closure
-        # and it does not borrow the melt's intrinsic fO2. The carrier-free
-        # tabulation of the same melt is the congruent closure.
-        assert (
-            reactive_outcome[0],
-            reactive_outcome[1].get("reason"),
-            reactive_outcome[2],
-        ) == ("identity_incomplete", "missing_fO2", None)
+        # The unknown Re wall gets a flagged melt-only balance when composition
+        # and temperature are available; it does not borrow intrinsic melt fO2.
+        assert reactive_outcome[:4] == general_outcome[:4]
+        assert reactive_outcome[2] == "oxygen_balance_effusion"
+        assert reactive_outcome[3] is None
         assert general_outcome[2] == "oxygen_balance_effusion"
         assert any(
             notice.reason == (
@@ -631,7 +628,19 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
             for notice in general.notices
         )
         return
-    assert reactive_outcome == general_outcome
+    assert reactive_outcome[:4] == general_outcome[:4]
+    if case == "p_partial_printed_o2":
+        assert any(
+            notice.reason == (
+                "fo2_tier=1; physics_rung=1:printed_fO2_or_buffer; "
+                "route=identity_fO2_Pa"
+            )
+            for notice in on_reactive_knudsen.notices
+        )
+        assert any(
+            notice.reason == "fo2_tier=1; route=identity_fO2_Pa"
+            for notice in general.notices
+        )
     expected = {
         "p_partial_printed_o2": ("unsupported", None, "commanded"),
         "p_sat_pure_reservoir": ("unsupported", None, "not_an_input"),
