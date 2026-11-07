@@ -51,6 +51,11 @@ def _assert_render_pins(document: dict) -> None:
     assert acr_rows[0]["derivation"]["method"]["locator"]["section"] == (
         "3.3. Activity of Chromium Oxide in Slags"
     )
+    assert acr_rows[0]["derivation"]["method"]["state"]["value"] == (
+        "The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. "
+        "In the present research, it is calculated to be 11.91 at 1 823 K (1 550°C)."
+    )
+    assert "equation" not in acr_rows[0]["derivation"]["method"]["locator"]
     assert acr_rows[0]["derivation"]["references"] == [
         "Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]"
     ]
