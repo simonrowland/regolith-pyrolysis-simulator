@@ -7,8 +7,9 @@ source:
   year: 2023
   corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
   corpus_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
-  supplementary_document_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
-  supplementary_document_sha256: 18afaf45a603291100c46cbb8143ff79fd473fc7e9bc0f81d072334f1f91d818
+  supplementary_document:
+    corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+    sha256: 18afaf45a603291100c46cbb8143ff79fd473fc7e9bc0f81d072334f1f91d818
   source_pdf_status: Article PDF not present in the corpus; this extract uses the supplementary workbook and supplementary
     DOCX only.
 extraction:
@@ -10563,7 +10564,7 @@ species:
         method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
           profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
         method_locator: &id265
-          asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+          corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
           section: S3
           paragraphs: P69-P88
         schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
