@@ -59,6 +59,7 @@ from simulator.vapour_rail.catalog import (
 from simulator.vapour_rail.request import (
     REFUSAL_ABSENT_SOURCE_ATOM,
     REFUSAL_INAPPLICABLE_PREDICATE,
+    REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
     REFUSAL_NO_ADMITTED_SOURCE,
@@ -1759,7 +1760,7 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
         )
         answer = batch.channel("K")
         assert isinstance(answer.pressure, PressureRefusal)
-        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert answer.pressure.code == REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2
         assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
     else:
         activation_context = (
@@ -1847,7 +1848,7 @@ def test_pre_rg_run_state_is_validated_before_channel_answers(
                 ActivityRefusalCode.MISSING_EVIDENCE
             )
         else:
-            assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+            assert answer.pressure.code == REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2
             assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
 
 
@@ -4582,7 +4583,7 @@ def test_intrinsic_fo2_missing_is_local_but_malformed_fails_validation(
             flux_activation_context=_rg_activation_context(),
         ).channel("K")
         assert isinstance(answer.pressure, PressureRefusal)
-        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert answer.pressure.code == REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2
         assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
     else:
         with pytest.raises(

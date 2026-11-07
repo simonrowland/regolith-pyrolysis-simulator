@@ -115,6 +115,8 @@ REFUSAL_NO_COMPLETE_BUNDLE_SOURCE = "no_complete_bundle_source"
 # Outcome-determining process state missing (HI-8 / DESIGN-REV5 §1.2):
 # never fabricate PressureValue(0.0) + FluxEligible as a stand-in.
 REFUSAL_MISSING_OUTCOME_STATE = "missing_outcome_determining_state"
+# Evaluator-specific intrinsic fO2 evidence is absent for this channel.
+REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2 = "missing_evaluator_intrinsic_fo2"
 # t-571 chemical-potential channel refusals (design §9).  Distinct from the
 # legacy formula/evaluator/alpha/route "channel contract" check below.
 REFUSAL_CHEMICAL_POTENTIAL_CHANNEL = "refused_missing_channel_input"
@@ -128,7 +130,7 @@ REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_ABSENT_SOURCE_ATOM,
-    REFUSAL_MISSING_OUTCOME_STATE,
+    REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2,
     ActivityRefusalCode.MISSING_EVIDENCE.value,
     ActivityRefusalCode.UNMAPPED_PHASE.value,
     ActivityRefusalCode.UNMAPPED_ENDMEMBER.value,
@@ -1788,7 +1790,7 @@ def refusal_closure(
                     if state.source_reaction_fO2_bar is None:
                         return _make_refusal(
                             rule,
-                            REFUSAL_MISSING_OUTCOME_STATE,
+                            REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2,
                             "intrinsic_melt oxygen fugacity is unavailable; "
                             "transport/headspace fO2 substitution is forbidden",
                             source_reaction_activity=source_reaction_activity,
@@ -3053,7 +3055,7 @@ def resolve_vapour_batch(
     # closure proves every *remaining debit claim* is catalog-eligible.
     # Typed non-debiting answers and species-local refusals demote only that
     # species' seam claim. Run-wide temperature is validated before closure;
-    # an evaluator-specific outcome gap remains a typed channel refusal.
+    # missing evaluator-specific intrinsic fO2 has its own local refusal code.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
