@@ -16,6 +16,7 @@ from simulator.optimize.objective import (
     ObjectiveVector,
 )
 from simulator.optimize.recipe import KnobSpec, RecipeSchema
+from simulator.optimize.strategy.screen import _sigma
 
 
 def _canonical_candidates(candidates: list[Candidate]) -> tuple[tuple[str, str], ...]:
@@ -84,6 +85,11 @@ def _screen_signature(strategy: MorrisScreenStrategy) -> tuple[tuple[object, ...
         )
         for group in result.groups
     )
+
+
+def test_morris_sigma_uses_sample_denominator_and_is_unestimable_for_one_effect() -> None:
+    assert _sigma((0.0, 1.0, 2.0, 3.0)) == pytest.approx(math.sqrt(5.0 / 3.0))
+    assert _sigma((3.0,)) is None
 
 
 def _unit_value(schema: RecipeSchema, candidate: Candidate, path: tuple[str, ...]) -> float:
