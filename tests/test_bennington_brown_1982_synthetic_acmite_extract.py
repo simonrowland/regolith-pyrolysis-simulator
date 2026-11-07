@@ -282,6 +282,23 @@ def test_table6_log_kf_is_preserved_as_an_oxide_frame_schema_gap() -> None:
     row = _observations(document)["bennington_1982_table6_log10_Kf"][1]
     values = row["values"]
 
+    assert values["standard_state_as_printed"] == "Formation from the oxides."
+    source = EXTRACT.read_text(encoding="utf-8")
+    observation_marker = "    - observation_id: bennington_1982_table6_log10_Kf\n"
+    assert source.count(observation_marker) == 1
+    observation_source = source.split(observation_marker, 1)[1].split(
+        "\n    - observation_id:", 1
+    )[0]
+    values_marker = "\n      values:\n"
+    assert observation_source.count(values_marker) == 1
+    values_source = observation_source.split(values_marker, 1)[1].split(
+        "\n      derived_from:", 1
+    )[0]
+    assert sum(
+        line.startswith("        standard_state_as_printed:")
+        for line in values_source.splitlines()
+    ) == 1
+
     assert values["quantity"] == "log10_formation_from_oxides_as_printed"
     assert values["quantity_as_printed"] == "Log Kf"
     assert values["reference_state_as_printed"] == "formation from simple oxides"
