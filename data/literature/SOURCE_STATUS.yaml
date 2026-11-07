@@ -8,14 +8,14 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2308
+  sources: 2311
   by_stage:
-    in_progress: 248
-    inbox: 1262
+    in_progress: 249
+    inbox: 1261
     ingested_complete: 130
-    ingested_partial: 143
+    ingested_partial: 145
     located: 209
-    unknown: 316
+    unknown: 317
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -39,7 +39,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 324
+      count: 328
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -109,6 +109,7 @@ anti_loss:
       - day-2020-trinitite-volatility
       - de-abreu-2024-li2o-sio2-thermochemistry
       - decapitani-kirschen-1998-excess-function
+      - dikov-2009-luna16-condensate-iron
       - distin-1971-ferrous-silicate-melts
       - dohmen-2003-coupled-kinetics
       - dong-2009-cr-v-slag-activities
@@ -216,6 +217,7 @@ anti_loss:
       - mccready-1948-sodium-silicate
       - mendybaev-2013-fun-cai-evaporation
       - miao-li-yan-2023-fe-v-spinel-gibbs
+      - moeller-2007-silicon-oxide-evaporation-condensation
       - morishita-2004-sio2-partial-enthalpy
       - morita-1999-chromium-oxide-activity
       - morita-sano-2004-cr-oxide-activity-cao-sio2
@@ -250,6 +252,8 @@ anti_loss:
       - raberg-2007-salt-stability-na2s-thermochemistry-thesis
       - rb86-capobianco-navrotsky-1982
       - rb86-neuvonen-1952
+      - rb86-stebbins-carmichael-1984
+      - rb86-stebbins-etal-1984
       - rb86-takahashi-yoshio-1970
       - rego-1988-silicate-na2o-activities
       - richet-bottinga-1986-silicate-thermochemistry
@@ -763,7 +767,7 @@ anti_loss:
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
   stale_inbox:
-    count: 763
+    count: 762
     ids:
     - abdelkarim-1977-ferrous-oxide-activities
     - ackerson-2020-ti-nmr-xafs
@@ -1319,7 +1323,6 @@ anti_loss:
     - rb86-proks-etal-1977
     - rb86-richet-bottinga-1982
     - rb86-rogez-etal-1983
-    - rb86-stebbins-carmichael-1984
     - rb86-takahashi-etal-1977
     - rb86-takahashi-yoshio-1977
     - recio-2026-po-ps-photoelectron
@@ -6615,6 +6618,16 @@ sources:
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: dikov-2009-luna16-condensate-iron
+  stage: ingested_partial
+  evidence:
+    decided_by: ingested_partial
+    artefacts:
+    - data/literature/extracts-v2/dikov-2009-luna16-condensate-iron.yaml
+    reason: v2.1 store present; 18/21 rows battery-usable
+  usable_rows: 18
+  total_rows: 21
   inbox_exclusion_reason: null
 - source_id: dingwell-1988-nfs-density-redox
   stage: inbox
@@ -22903,6 +22916,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: moeller-2007-silicon-oxide-evaporation-condensation
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: mogul-2023-pioneer-venus-co2-icarus
   stage: unknown
   evidence:
@@ -26916,14 +26939,25 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: rb86-stebbins-carmichael-1984
-  stage: inbox
+  stage: ingested_partial
   evidence:
-    decided_by: inbox
+    decided_by: ingested_partial
     artefacts:
-    - raw/rb86-stebbins-carmichael-1984/rb86-stebbins-carmichael-1984.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/rb86-stebbins-carmichael-1984.yaml
+    reason: v2.1 store present; 3/45 rows battery-usable
+  usable_rows: 3
+  total_rows: 45
+  inbox_exclusion_reason: null
+- source_id: rb86-stebbins-etal-1984
+  stage: unknown
+  evidence:
+    decided_by: unknown
+    artefacts:
+    - data/literature/extracts-v2/rb86-stebbins-etal-1984.yaml
+    reason: v2.1 store present but 0 of 275 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 275
   inbox_exclusion_reason: null
 - source_id: rb86-takahashi-etal-1977
   stage: inbox
