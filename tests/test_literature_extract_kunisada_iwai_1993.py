@@ -11,6 +11,12 @@ from simulator.battery.migrate import Migrator
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kunisada-iwai-1993-na-silicate-sulfide-capacity.yaml"
 TABLE_ID = "kunisada_iwai_1993_table1_slag_compositions"
+PARTIAL_COMPOSITION_ROWS = frozenset(
+    {
+        "1", "3", "4", "5", "7", "9", "11", "101", "104",
+        "107", "108", "110", "201", "203", "205", "207", "209", "211",
+    }
+)
 
 
 def _table_record(document: dict) -> dict:
@@ -104,6 +110,9 @@ def test_unprinted_pressure_stays_unknown_and_figures_are_not_digitized() -> Non
 def test_isolated_migration_preserves_observations_conditions_and_locators() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     expected_ids = _observations(document)
+    printed_rows = {
+        row[0]: row for row in _table_record(document)["values"]["rows_as_printed"]
+    }
     assert len(expected_ids) == 214
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
@@ -128,7 +137,8 @@ def test_isolated_migration_preserves_observations_conditions_and_locators() -> 
         row.evidence.class_.value.value == "measured_direct" for row in rows.values()
     )
 
-    for row in rows.values():
+    unknown_composition_rows: set[str] = set()
+    for observation_id, row in rows.items():
         temperature = row.point_conditions["temperature_K"]
         gas = row.point_conditions["gas_mix"]
         p_o2 = row.point_conditions["pO2_Pa"]
@@ -144,8 +154,27 @@ def test_isolated_migration_preserves_observations_conditions_and_locators() -> 
         assert p_s2.state.value == Decimal("181")
         assert p_s2.locator.page == 2
         assert total_pressure.state.is_unknown
-        assert composition.state.is_value
+        sample_id = expected_ids[observation_id]["values"]["sample_id"]
+        if sample_id in PARTIAL_COMPOSITION_ROWS:
+            unknown_composition_rows.add(sample_id)
+            assert composition.state.is_unknown
+            printed_row = printed_rows[sample_id]
+            kept_sum = sum(
+                (Decimal(value) for value in printed_row[1:] if value not in ("", None)),
+                Decimal("0"),
+            )
+            assert (
+                f"kept sum={kept_sum} wt% is below 95 wt%"
+                in (composition.state.reason or "")
+            )
+        else:
+            assert composition.state.is_value
         assert composition.locator.page == 2
+    assert unknown_composition_rows == PARTIAL_COMPOSITION_ROWS
+    assert sum(
+        row.point_conditions["composition"].state.is_unknown
+        for row in rows.values()
+    ) == 65
 
     rendered_values = {
         "kunisada_iwai_1993_table1_sample_1_s_composition": "0.003",
@@ -157,7 +186,11 @@ def test_isolated_migration_preserves_observations_conditions_and_locators() -> 
         assert row.value.point == Decimal(amount)
         assert row.identity.subtype.is_value
         assert row.identity.subtype.value == "wt_percent"
-        assert row.identity.composition.is_value
+        sample_id = expected_ids[observation_id]["values"]["sample_id"]
+        if sample_id in PARTIAL_COMPOSITION_ROWS:
+            assert row.identity.composition.is_unknown
+        else:
+            assert row.identity.composition.is_value
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_value
         assert row.identity.temperature_K.value == Decimal("1773.15")

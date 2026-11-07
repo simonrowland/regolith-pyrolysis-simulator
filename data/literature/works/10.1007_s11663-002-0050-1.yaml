@@ -1,0 +1,441 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11663-002-0050-1
+  citation: Forsberg, S., Wikström, P. and Rosén, E. (2002). Determination of Gibbs Energies of Formation of CaFe2O4 and Ca2Fe2O5
+    from Solid-State EMF Measurements Using CaF2 as Solid Electrolyte. Metallurgical and Materials Transactions B, 33B, 385–392.
+  source_ids:
+  - forsberg-2002-ca-fe-o-incongruent-melting
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+      role: pdf
+      path: raw/forsberg-2002-ca-fe-o-incongruent-melting/forsberg-2002-ca-fe-o-incongruent-melting.pdf
+      sha256:
+        tag: value
+        value: 7e1e6a18740a51114b0860f5cae840ea80015a74c32241a47860d1d465a886b3
+    - asset_id: pdftotext:forsberg-2002-ca-fe-o-incongruent-melting
+      role: pdftotext
+      path: text/forsberg-2002-ca-fe-o-incongruent-melting
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:forsberg-2002-ca-fe-o-incongruent-melting
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11663-002-0050-1
+experiments:
+- experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_emf' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: No total pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Materials Used and Preparations
+        note: The measurement gas is reported as a mixture; no separate sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-002-0050-1
+  locator:
+    page: 2
+    equation: '2'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_emf' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: No total pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Materials Used and Preparations
+        note: The measurement gas is reported as a mixture; no separate sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-002-0050-1
+  locator:
+    page: 2
+    equation: '3'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        output_unit: Pa
+        references: []
+context:
+- observation_id: forsberg2002_cell2_emf_fit
+  type: experiment_series
+  locator:
+    page: 3
+    equation: '4'
+    published_page: 387
+  units: mV
+  values:
+    method_class: measured_reduced
+    quantity: electromotive_force
+    cell: '[2]'
+    fit_as_printed: E(2/mV) = 163.3 + 0.01664 T ±2.2 mV
+    uncertainty_as_printed: ±2.2 mV
+    confidence_level: two standard deviations
+    temperature_range_as_printed: 1030 < T/K < 1280
+    temperature_range_locator:
+      page: 4
+      published_page: 388
+    raw_inputs: not_printed; experimental values are plotted in Figure 3
+    number_of_independent_cells: 3
+    cell_scheme_as_printed: (-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + Fe2O3 + CaFe2O4, O2, Pt (+)
+    reaction_as_printed: CaO(s) + Fe2O3(s) → CaFe2O4(s)
+    gas_as_printed: 20 mole pct O2 in Ar
+    oxygen_activity_as_printed: about 0.2 bars
+    total_pressure: not stated
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_cell2_emf_fit
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: CaFe2O4
+- observation_id: forsberg2002_cell3_emf_fit
+  type: experiment_series
+  locator:
+    page: 4
+    equation: '5'
+    published_page: 388
+  units: mV
+  values:
+    method_class: measured_reduced
+    quantity: electromotive_force
+    cell: '[3]'
+    fit_as_printed: E(3/mV) = −31.20 + 0.1267 T ±2.9 mV
+    temperature_range_as_printed: 1140 < T/K < 1340
+    uncertainty_as_printed: ±2.9 mV
+    confidence_level: two standard deviations
+    raw_inputs: not_printed; experimental values are plotted in Figure 3
+    number_of_independent_cells: 2
+    cell_scheme_as_printed: (-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + CaFe2O4 + Ca2Fe2O5, O2, Pt (+)
+    reaction_as_printed: CaO(s) + CaFe2O4(s) → Ca2Fe2O5(s)
+    gas_as_printed: 20 mole pct O2 in Ar
+    oxygen_activity_as_printed: about 0.2 bars
+    total_pressure: not stated
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_cell3_emf_fit
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: Ca2Fe2O5
+- observation_id: forsberg2002_electrochemical_cell_scheme_and_reactions
+  type: experimental_method_context
+  locator:
+    page: 2
+    equations:
+    - '2'
+    - '3'
+    published_page: 386
+  units: not_applicable
+  values:
+    electrolyte: CaF2 single crystal
+    cell2_scheme_as_printed: (-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + Fe2O3 + CaFe2O4, O2, Pt (+)
+    cell3_scheme_as_printed: (-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + CaFe2O4 + Ca2Fe2O5, O2, Pt (+)
+    reference_electrode_reaction: CaO(s) + 2F− ↔ CaF2(s) + 1/2 O2(g) + 2e−
+    cell2_working_electrode_reaction: CaF2(s) + Fe2O3(s) + 1/2 O2(g) + 2e− ↔ CaFe2O4(s) + 2F−
+    cell3_working_electrode_reaction: CaF2(s) + CaFe2O4(s) + 1/2 O2(g) + 2e− ↔ Ca2Fe2O5(s) + 2F−
+    cell2_reaction: CaO(s) + Fe2O3(s) → CaFe2O4(s)
+    cell3_reaction: CaO(s) + CaFe2O4(s) → Ca2Fe2O5(s)
+    combined_reaction: 2CaO(s) + Fe2O3(s) → Ca2Fe2O5(s)
+    emf_to_gibbs_relation_as_printed: ΔG = −2FE; F = 96.48456 J (mV)−1
+    gas_as_printed: 20 mole pct O2 in Ar
+    oxygen_activity_as_printed: about 0.2 bars
+    total_pressure: not stated
+    phase_labels_as_printed: CaO(s), Fe2O3(s), CaFe2O4(s), Ca2Fe2O5(s), CaF2(s)
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_electrochemical_cell_scheme_and_reactions
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: Source_data
+- observation_id: forsberg2002_emf_slope_entropy_uncertainty
+  type: reaction_thermochemistry_context
+  locator:
+    page: 6
+    published_page: 390
+    section: Optimization of calorimetric function for CaFe2O4
+  units: mixed as printed
+  values:
+    quantity: reaction_entropy_uncertainty
+    method_class: measured_reduced
+    emf_slope_uncertainty_as_printed: δ(dE/dT) = ±5.3 × 10−3 mV/K
+    reaction_entropy_uncertainty_as_printed: δ(ΔS°) = ±1.0 J mol−1 K−1
+    confidence_level: two standard deviations
+    temperature_range_as_printed: range of measurements
+    note: The authors give an uncertainty in the reaction entropy, not a nominal ΔS° value here.
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_emf_slope_entropy_uncertainty
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: CaFe2O4
+- observation_id: forsberg2002_eq17_18_janaf_auxiliary_functions
+  type: gibbs_energy_function_context
+  locator:
+    page: 4
+    equations:
+    - '17'
+    - '18'
+    published_page: 388
+  units: J/mol
+  values:
+    method_class: quoted_attributed
+    attribution: JANAF Thermochemical Tables [9], as cited by Forsberg et al.
+    status: typed_refused_schema_gap
+    schema_gap: The printed auxiliary equations are ΔfG° fits rather than point rows; retained as quoted source context because
+      the battery migrator does not evaluate coefficient-only functions.
+    CaO_delta_fG_function_as_printed: −607.5 × 10^3 − 116.4 T + 27.95 T ln(T) ±1200 J mol−1; 1000 < T/K < 1400
+    Fe2O3_delta_fG_function_as_printed: −809.4 × 10^3 + 247.6 T ±1300 J mol−1; 1000 < T/K < 1400
+    confidence_level: not_stated
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_eq17_18_janaf_auxiliary_functions
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: Ca2Fe2O5
+- observation_id: forsberg2002_kubaschewski_reaction_enthalpy_comparison
+  type: reaction_thermochemistry_context
+  locator:
+    page: 6
+    published_page: 390
+    paragraph: Discussion
+  units: kJ/mol
+  values:
+    quantity: reaction_enthalpy_from_component_oxides
+    method_class: quoted_attributed
+    attribution: Kubaschewski [22], as cited by Forsberg et al.
+    reaction_as_printed: CaO(s) + Fe2O3(s) → CaFe2O4(s)
+    delta_H298_as_cited: −21 kJ mol−1
+    comparison_note: The authors state their third-law result is in reasonable agreement with this cited value.
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_kubaschewski_reaction_enthalpy_comparison
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: CaFe2O4
+- observation_id: forsberg2002_tableII_calorimetry
+  type: thermochemical_data_context
+  locator:
+    page: 5
+    table: II
+    published_page: 389
+  units: mixed as printed
+  values:
+    status: context_only_auxiliary_data
+    table_caption: Calorimetric Data for CaFe2O4
+    row_count_printed: 4
+    rows_as_printed:
+    - S298_King_J_mol_K: '145.2'
+      S298_this_work_J_mol_K: '146.1'
+      temperature_K: '1000'
+      H_increment_Bonnickson_J_mol: 121,130
+      H_increment_this_work_J_mol: 121,790
+      S_increment_Bonnickson_J_mol_K: '205.94'
+      S_increment_this_work_J_mol_K: '207.07'
+    - S298_King_J_mol_K: not_reported
+      S298_this_work_J_mol_K: not_reported
+      temperature_K: '1100'
+      H_increment_Bonnickson_J_mol: 139,580
+      H_increment_this_work_J_mol: 140,350
+      S_increment_Bonnickson_J_mol_K: '223.51'
+      S_increment_this_work_J_mol_K: '224.74'
+    - S298_King_J_mol_K: not_reported
+      S298_this_work_J_mol_K: not_reported
+      temperature_K: '1200'
+      H_increment_Bonnickson_J_mol: 158,240
+      H_increment_this_work_J_mol: 159,110
+      S_increment_Bonnickson_J_mol_K: '239.74'
+      S_increment_this_work_J_mol_K: '241.06'
+    - S298_King_J_mol_K: not_reported
+      S298_this_work_J_mol_K: not_reported
+      temperature_K: '1300'
+      H_increment_Bonnickson_J_mol: 177,150
+      H_increment_this_work_J_mol: 178,120
+      S_increment_Bonnickson_J_mol_K: '254.89'
+      S_increment_this_work_J_mol_K: '256.29'
+    attribution: King [14] for S298 and Bonnickson [15] for enthalpy/entropy increments, with revised values calculated by
+      this work.
+    note: H°−H°298 and S°−S°298 are calorimetric increments, not formation enthalpy or absolute entropy rows. The this-work
+      values are auxiliary inputs to the third-law analysis.
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_tableII_calorimetry
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: CaFe2O4
+- observation_id: forsberg2002_tableI_auxiliary_calorimetry
+  type: thermochemical_fit_context
+  locator:
+    page: 5
+    table: I
+    published_page: 389
+  units: mixed as printed
+  values:
+    quantity: gibbs_energy_function
+    status: typed_refused_schema_gap
+    schema_gap: Gef is a Gibbs energy function (ΔG°−ΔH°298)/T, not an exact stored thermodynamic quantity; simulator/battery/enums.py::Quantity
+      has no Gibbs-energy-function token. The coefficients are retained as cited auxiliary context.
+    table_caption: Thermodynamic Data Used in the Third-Law Analysis
+    function_as_printed: Gef = a + b/T + c ln(T) (J mol−1 K−1)
+    row_count_printed: 6
+    rows_as_printed:
+    - substance: CaO
+      a: '333.1190'
+      b: −19,270.8409
+      c: −54.4766
+      temperature_K: 1000 to 1300
+      S298_reference: '[9]'
+      Cp_reference: '[9]'
+    - substance: Fe2O3
+      a: '868.8466'
+      b: −41,056.0743
+      c: −141.8913
+      temperature_K: 1000 to 1300
+      S298_reference: '[9]'
+      Cp_reference: '[9]'
+    - substance: CaO*
+      a: '318.3092'
+      b: −18,034.5854
+      c: −52.4607
+      temperature_K: 1000 to 1300
+      S298_reference: '[9]'
+      Cp_reference: '[18]'
+    - substance: Fe2O3*
+      a: '886.5340'
+      b: −44,088.8862
+      c: −143.9768
+      temperature_K: 1000 to 1300
+      S298_reference: '[19]'
+      Cp_reference: '[20, 21]'
+    - substance: CaFe2O4
+      a: '1135.3123'
+      b: −67,158.2032
+      c: −187.9286
+      temperature_K: 1000 to 1300
+      S298_reference: '[14]'
+      Cp_reference: '[15]'
+    - substance: CaFe2O4**
+      a: '1141.4551'
+      b: −67,527.5733
+      c: −188.9622
+      temperature_K: 1000 to 1300
+      S298_reference: this work
+      Cp_reference: this work
+    footnotes_as_printed: '* Gef function based on improved thermodynamic data; ** Gef function based on optimized thermodynamic
+      data.'
+    attribution: JANAF [9], King [14], Bonnickson [15], Grønvold and Westrum [19], Coughlin et al. [20], Grønvold and Samuelsen
+      [21], and Forsberg et al. (this work), as cited in Table I.
+    reference_sources_as_printed: '[9], [14], [15], [18], [19], [20], [21]'
+  context_id: forsberg-2002-ca-fe-o-incongruent-melting::context::forsberg2002_tableI_auxiliary_calorimetry
+  work_id: 10.1007/s11663-002-0050-1
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  species: CaFe2O4

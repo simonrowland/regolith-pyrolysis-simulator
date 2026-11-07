@@ -8,15 +8,15 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2312
+  sources: 2324
   by_stage:
     located: 209
     inbox: 1250
-    in_progress: 244
-    ingested_partial: 151
-    ingested_complete: 133
+    in_progress: 250
+    ingested_partial: 153
+    ingested_complete: 136
     wired: 0
-    unknown: 325
+    unknown: 326
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -2667,14 +2667,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: asai-yokokawa-maekawa-1982-na-borate-activity
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: ashida-2014-analysis
   stage: inbox
@@ -4065,6 +4066,16 @@ sources:
   usable_rows: 110
   total_rows: 628
   inbox_exclusion_reason: null
+- source_id: beyer-brown-ferrante-1980-kalo2-thermodynamics
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: bhatnagar-1993-high-concentration-minority-ion-cyclotron
   stage: inbox
   evidence:
@@ -4259,6 +4270,16 @@ sources:
     decided_by: in_progress
     artefacts:
     - data/literature/extracts/bonnell-hastie-1990-htsci-26-313.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -5588,6 +5609,16 @@ sources:
     artefacts:
     - raw/chowdhury-2023-shergotty-apatite-sulfur/chowdhury-2023-shergotty-apatite-sulfur.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -7333,6 +7364,17 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  stage: unknown
+  evidence:
+    decided_by: unknown
+    artefacts:
+    - data/literature/extracts-v2/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+    reason: v2.1 store present but 0 of 17 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
+  usable_rows: 0
+  total_rows: 17
+  inbox_exclusion_reason: null
 - source_id: elliott-2018-determining-alpha
   stage: inbox
   evidence:
@@ -7972,6 +8014,16 @@ sources:
     artefacts:
     - raw/fonseca-2026-zenodo-supplementary-tables
     reason: source folder exists in the corpus, but no document
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/forsberg-2002-ca-fe-o-incongruent-melting.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -9049,6 +9101,16 @@ sources:
     reason: v2.1 store present; 3/3 rows battery-usable
   usable_rows: 3
   total_rows: 3
+  inbox_exclusion_reason: null
+- source_id: gronvold-sveen-1974-magnetite-high-temperature-cp
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: grote-nd-transient-beam
   stage: inbox
@@ -11225,6 +11287,16 @@ sources:
     decided_by: in_progress
     artefacts:
     - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -19018,14 +19090,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kim-2004-na2o-float-glass-emf
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kim-2004-na2o-float-glass-emf.yaml
+    reason: v2.1 store present; 21/21 rows battery-usable
+  usable_rows: 21
+  total_rows: 21
   inbox_exclusion_reason: null
 - source_id: kim-2014-carbon-fe-v-mo-ni
   stage: ingested_partial
@@ -19094,6 +19166,16 @@ sources:
     artefacts:
     - raw/king-1951-calcium-zinc-silicate-formation/king-1951-calcium-zinc-silicate-formation.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: king-1954-cafe2o4-ca2fe2o5-low-t-cp
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/king-1954-cafe2o4-ca2fe2o5-low-t-cp.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -19390,6 +19472,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: konar-2018-alkali-cmas-thesis
   stage: ingested_complete
   evidence:
@@ -19628,25 +19720,24 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml
-    reason: v2.1 store present but 0 of 127 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 127
+    reason: v2.1 store present; 63/64 rows battery-usable
+  usable_rows: 63
+  total_rows: 64
   inbox_exclusion_reason: null
 - source_id: kress-carmichael-1989-lime-iron-silicate-redox
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+    reason: v2.1 store present; 208/260 rows battery-usable
+  usable_rows: 208
+  total_rows: 260
   inbox_exclusion_reason: null
 - source_id: kress-carmichael-1991-iron-redox-calibration
   stage: ingested_partial
@@ -22369,6 +22460,16 @@ sources:
   usable_rows: 0
   total_rows: 17
   inbox_exclusion_reason: null
+- source_id: mcgill-na-fe-o-critical-assessment
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/mcgill-na-fe-o-critical-assessment.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: mcintosh-2022-ucsd-lunar-magmatism-thesis
   stage: inbox
   evidence:
@@ -23789,14 +23890,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mysen-1984-alkaline-earth-redox
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/mysen-1984-alkaline-earth-redox.yaml
+    reason: v2.1 store present; 34/34 rows battery-usable
+  usable_rows: 34
+  total_rows: 34
   inbox_exclusion_reason: null
 - source_id: mysen-1985-cmas-redox
   stage: in_progress
@@ -23963,14 +24064,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mysen-virgo-1989-nas-redox
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/mysen-virgo-1989-nas-redox.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/mysen-virgo-1989-nas-redox.yaml
+    reason: v2.1 store present; 53/53 rows battery-usable
+  usable_rows: 53
+  total_rows: 53
   inbox_exclusion_reason: null
 - source_id: naess-2014-liquid-silicon-oxidation-fume-flux
   stage: in_progress
@@ -30709,6 +30810,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: shannon-1976-effective-ionic-radii
   stage: inbox
   evidence:
@@ -31570,8 +31681,8 @@ sources:
     decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/shornikov-2017-spinel-thermodynamics.yaml
-    reason: v2.1 store present; 5/30 rows battery-usable
-  usable_rows: 5
+    reason: v2.1 store present; 3/30 rows battery-usable
+  usable_rows: 3
   total_rows: 30
   inbox_exclusion_reason: null
 - source_id: shornikov-2018-cai-complex-gas-species
@@ -37284,6 +37395,16 @@ sources:
       AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
   total_rows: 1
+  inbox_exclusion_reason: null
+- source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yamashita-2008-redox-glass-thesis
   stage: inbox

@@ -3301,6 +3301,16 @@ observations:
     table: '2'
   read_from: pdf:volovetskii-2012-iron-redox
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          Cl=0.81 wt%'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
     printed_composition:
       state:
         tag: value

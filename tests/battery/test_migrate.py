@@ -22,6 +22,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    AmountBasis,
     PerBasis,
     AdmissionStatus,
     BenchIdentityBasis,
@@ -2399,6 +2400,8 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
                 "per-run composition is not published"
                 in point_composition.state.reason
             )
+
+
             role_notices = [
                 notice
                 for notice in observation.notices
@@ -2536,6 +2539,33 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
         observation.identity.species.phase.is_value
         and observation.identity.species.phase.value is Phase.G
         for observation in na_kms_migrated
+    )
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "kems-020-hastie-1981-nbsir.yaml",
+        "kang-2007-sio2-activity-cas-low-silica.yaml",
+    ],
+)
+def test_empirical_composition_locators_survive_migration(
+    tmp_path: Path, name: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, name)
+
+    missing_locator_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.detail == "empirical Located value requires a locator"
+        and (
+            issue.path.endswith(".initial_composition")
+            or ".initial_composition.inference.parameters[" in issue.path
+            or issue.path.endswith(".printed_composition")
+        )
+    ]
+    assert not missing_locator_issues, "\n".join(
+        f"{issue.path}: {issue.detail}" for issue in missing_locator_issues
     )
 
 
@@ -3260,6 +3290,119 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
         for p in points
     )
     assert all(p.derivation.output_unit == "Pa" for p in points)
+
+
+def test_near_complete_phase_sample_composition_round_trips_as_value(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "partial-phase",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "oxide_weight_percent_as_published",
+                            "amount_basis": "mass_percent",
+                            "components": [["SiO2", "70"], ["MgO", "27.55"]],
+                        },
+                    },
+                    "locator": {"table": "1", "row": "4"},
+                }
+            },
+        }
+    ]
+    extract["species"] = {
+        "SiO2": {
+            "observations": [
+                {
+                    "observation_id": "partial-phase-silica",
+                    "experiment": "partial-phase",
+                    "type": "composition_series",
+                    "units": "wt_percent",
+                    "phase": "melt",
+                    "values": {
+                        "quantity": "equilibrium_phase_composition",
+                        "formula": "SiO2",
+                        "phase_label": "melt",
+                        "basis": "wt_percent",
+                        "component_amount": "70",
+                        "admission_status": "admitted",
+                    },
+                }
+            ]
+        }
+    }
+
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _works, _experiments, observations = load_migrated_store(root)
+
+    composition = observations[
+        "fixture-source::partial-phase-silica"
+    ].identity.composition
+    assert composition is not None
+    # The source assay is 70.00 + 27.55 = 97.55 wt%, above b-704's 95 wt% floor.
+    assert composition.is_value
+
+    for case, initial_row in (
+        (
+            "flagged-initial-charge",
+            {
+                "T_C": 0,
+                "T_C_is_initial_composition": True,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+        (
+            "zero-loss-initial-charge",
+            {
+                "T_C": 0,
+                "mass_loss_pct": 0,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+    ):
+        initial_extract = _scalar_extract(
+            quantity="equilibrium_phase_composition",
+            units="wt percent",
+            obs_type="composition_series",
+            values={
+                "quantity": "equilibrium_phase_composition",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "phase_label": "melt",
+                "basis": "wt_percent",
+                "points": [initial_row, {"T_C": 1300, "component_amount": 70}],
+            },
+        )
+        initial_extract["species"]["Na"]["observations"][0]["observation_id"] = case
+        initial_root = _write_min_tree(tmp_path / case, initial_extract)
+        migrate(initial_root, write=True)
+        _works, initial_experiments, initial_observations = load_migrated_store(
+            initial_root
+        )
+
+        migrated_rows = [
+            observation
+            for observation_id, observation in initial_observations.items()
+            if observation_id.startswith(f"fixture-source::{case}")
+        ]
+        assert migrated_rows
+        assert any(
+            observation.identity.composition is not None
+            and observation.identity.composition.is_value
+            for observation in migrated_rows
+        )
+        experiment = initial_experiments[migrated_rows[0].experiment_id]
+        assert experiment.sample.initial_composition is not None
+        assert experiment.sample.initial_composition.state.is_value
 
 
 def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
@@ -8997,10 +9140,11 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Pankratz (1968) adds 71 measured and 47 smoothed H-H298 cells. Its
     # relative entropy increments remain typed refusals; it prints no Cp or
     # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
-    # A fresh migration of this seat adds Fredrickson & Chasanov's 74
-    # H_minus_H298 and 12 cp points: H_minus_H298 377->451, cp 1752->1764,
-    # and n_numeric 8818->8904. Its per-source census also has 62 unavailable
-    # series cells; the full fresh store has 949 unavailable cells.
+    # A fresh migration adds Fredrickson & Chasanov's 74 H_minus_H298 and 12 cp
+    # points: H_minus_H298 377->451 and cp 1752->1764. The Beyer schema-gap
+    # rows stop exposing 93 unsupported glass-S and oxide-formation cells as
+    # numeric, so n_numeric is 8818 + 86 - 93 = 8811. The full fresh store has
+    # 949 unavailable cells.
     assert census.get("cp") == 1764
     assert census.get("H_minus_H298") == 451
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
@@ -12627,14 +12771,14 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
     assert result.validation is not None
-    # 829ce3701 withholds two owner-selected initials (samples 10017 and
-    # 12073) instead of picking one. 243fb508c admits both Na series.
+    # The 10017 and 12073 proxy totals (99.79 and 99.48 wt%) are in b-704's
+    # 95–102 interval, so the selected initials expose their source conflict.
     issues = result.validation.hard_issues
     assert len(issues) == 1
     assert issues[0].reason is RefusalReason.INVALID_SOURCE
     assert "initial_composition_conflict" in issues[0].detail
-    assert "10017" in issues[0].detail
-    assert "12073" in issues[0].detail
+    assert "lpi-compendium-10017" in issues[0].detail
+    assert "lpi-compendium-12073" in issues[0].detail
     rows = [
         obs
         for obs in result.observations.values()
@@ -19085,7 +19229,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        assert identity.composition.value.amount_basis.value == "mass_percent"
+        # The source reports five major oxides totaling 99.75 wt%, within b-704's 95–102 interval.
+        assert (
+            sum(expected_start_composition.values(), Decimal("0"))
+            == Decimal("99.75")
+        )
+        assert identity.composition.is_value
+        assert identity.composition.value.amount_basis is AmountBasis.MASS_PERCENT
         assert identity.composition.value.basis == "printed_oxides"
         assert dict(identity.composition.value.components) == expected_start_composition
         assert identity.temperature_K.value == run_key[1]

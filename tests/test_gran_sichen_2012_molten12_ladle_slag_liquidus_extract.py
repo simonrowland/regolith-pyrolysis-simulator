@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
@@ -323,3 +325,65 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
     assert calcium_point.identity.species.formula == "CaO"
     assert calcium_point.identity.species.phase.is_value
     assert calcium_point.identity.species.phase.value.value == "l"
+
+    components = ("CaO", "Al2O3", "SiO2", "MgO")
+    migrated_children = {}
+    for observation in observations:
+        parent, separator, _child = observation.observation_id.partition("::rows:")
+        if not separator:
+            continue
+        parent_id = parent.rsplit("::", 1)[-1]
+        key = (parent_id, observation.identity.species.formula)
+        assert key not in migrated_children
+        migrated_children[key] = observation
+
+    no_composition_liquid_rows = {
+        observation.observation_id
+        for observation in observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "equilibrium_phase_composition"
+        and observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value.value == "l"
+        and "composition" not in (observation.point_conditions or {})
+    }
+    assert len(no_composition_liquid_rows) == 624
+
+    checked_siblings = set()
+    printed_liquid_rows = [
+        raw
+        for _species, raw in _observations(_document())
+        if raw["values"].get("quantity") == "equilibrium_phase_composition"
+        and raw.get("phase_as_printed") in {"L", "Liquid"}
+        and isinstance(raw["values"].get("composition_mass_percent"), dict)
+        and "composition" not in (raw.get("point_conditions") or {})
+    ]
+    for raw in printed_liquid_rows:
+        parent_id = raw["observation_id"]
+        printed = raw["values"]["composition_mass_percent"]
+        assert set(printed) == set(components)
+        for formula in components:
+            sibling = migrated_children.get((parent_id, formula))
+            assert sibling is not None, (parent_id, formula)
+            assert sibling.observation_id in no_composition_liquid_rows
+            assert "printed_composition" not in (sibling.point_conditions or {})
+            assert sibling.identity.species.formula == formula
+            assert sibling.value.point == Decimal(str(printed[formula]))
+            checked_siblings.add(sibling.observation_id)
+
+    assert len(checked_siblings) == 624
+    assert checked_siblings == no_composition_liquid_rows
+
+    sample_one = next(
+        raw
+        for raw in printed_liquid_rows
+        if raw.get("sample_no") == 1 and raw["locator"].get("table") == "1"
+    )
+    assert {
+        formula: Decimal(str(amount))
+        for formula, amount in sample_one["values"]["composition_mass_percent"].items()
+    } == {
+        "CaO": Decimal("53.8"),
+        "Al2O3": Decimal("30.7"),
+        "SiO2": Decimal("8.5"),
+        "MgO": Decimal("6.9"),
+    }

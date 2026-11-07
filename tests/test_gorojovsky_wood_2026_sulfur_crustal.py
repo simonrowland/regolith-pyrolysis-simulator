@@ -89,6 +89,15 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         observation.observation_id.rsplit("::", 1)[-1]: observation
         for observation in all_rows
     }
+    high_mg_basalt = migrated_by_raw_id["t2-r016-capacity"]
+    high_mg_composition = (high_mg_basalt.point_conditions or {}).get(
+        "composition"
+    )
+    assert high_mg_composition is not None
+    assert high_mg_composition.state.is_unknown
+    assert "kept sum=94.37 wt% is below 95 wt%" in high_mg_composition.state.reason
+    assert high_mg_composition.locator is not None
+
     experiment_by_id = {
         experiment["experiment_id"]: experiment for experiment in doc["experiments"]
     }
@@ -99,6 +108,7 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
     }
     assert len(raw_observations) == len(all_rows)
 
+    refused_partial_analyses = 0
     for raw_id, (formula, raw) in raw_observations.items():
         observation = migrated_by_raw_id[raw_id]
         assert observation.identity.species.formula == raw["values"].get("formula", formula)
@@ -126,7 +136,19 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
                 isinstance(printed_composition, dict)
                 and printed_composition["state"]["tag"] == "value"
             ):
-                assert observation.identity.composition.is_value, raw_id
+                if observation.identity.composition.is_value:
+                    assert observation.identity.composition.value is not None
+                else:
+                    # Green's mass-percent refusal gate runs before the
+                    # stack-4 conversion when a printed subset does not close.
+                    assert observation.identity.composition.is_unknown, raw_id
+                    reason = observation.identity.composition.reason or ""
+                    if "kept sum=94.37 wt% is below 95 wt%" in reason:
+                        refused_partial_analyses += 1
+                    else:
+                        # Table 1's dash leaves its starting bulk composition
+                        # incomplete before the row-level closure calculation.
+                        assert "printed dash" in reason, raw_id
             else:
                 assert observation.identity.composition.is_unknown, raw_id
 
@@ -143,7 +165,11 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         if row.experiment_id == _row(result, "t2-r003-sio2").experiment_id
     ]
     assert t2_r003_rows
-    assert all(row.identity.composition.is_value for row in t2_r003_rows)
+    assert all(row.identity.composition.is_unknown for row in t2_r003_rows)
+    assert all(
+        "printed dash" in (row.identity.composition.reason or "")
+        for row in t2_r003_rows
+    )
 
     partial_product_glass = experiment_by_id["t2-r001"]["sample"]["printed_composition"]
     assert partial_product_glass["state"] == {
@@ -157,6 +183,8 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
     ]
     assert t2_r001_rows
     assert all(row.identity.composition.is_unknown for row in t2_r001_rows)
+
+    assert refused_partial_analyses == 54
 
     for suffix, quantity, expected in RENDER_PINS:
         observation = _row(result, suffix)

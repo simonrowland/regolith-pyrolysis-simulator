@@ -331,30 +331,44 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
     assert sb5.point_conditions["pressure_MPa"].state.value == Decimal("200")
     assert sb5.point_conditions["composition"].state.value["SiO2"] == Decimal("47.48")
     assert sb41.value.point == expected["SB-41"]
-    assert all(
-        row.identity.quantity.value is Quantity.VALENCE_RATIO
-        and row.admission.status is AdmissionStatus.ADMITTED
-        and row.identity.temperature_K.value == Decimal("1323.15")
-        and row.identity.composition is not None
-        and row.identity.composition.is_value
-        # t-1649 inherits explicit parent phase-analysis evidence; phase L alone has no stamp.
-        and row.identity.composition.value
-        == wt_pct_to_mole_fraction(row.point_conditions["composition"].state.value)
-        and row.identity.total_pressure_Pa is not None
-        and row.identity.total_pressure_Pa.is_value
-        and row.identity.total_pressure_Pa.value == Decimal("200000000")
-        and row.identity.fO2_Pa is not None
-        and row.identity.fO2_Pa.is_value
-        and row.identity.fO2_Pa.value == _jugo_qfm_pa(
+    accepted_compositions = 0
+    refused_compositions = 0
+    for row in rows:
+        assert row.identity.quantity.value is Quantity.VALENCE_RATIO
+        assert row.admission.status is AdmissionStatus.ADMITTED
+        assert row.identity.temperature_K.value == Decimal("1323.15")
+        assert row.identity.composition is not None
+        printed = row.point_conditions["composition"].state.value
+        kept_sum = sum(printed.values(), Decimal("0"))
+        if kept_sum >= Decimal("95"):
+            assert row.identity.composition.is_value
+            assert row.identity.composition.value == wt_pct_to_mole_fraction(printed)
+            accepted_compositions += 1
+        else:
+            # b-704 refuses the row composition when its kept mass-percent
+            # components do not close. The explicit buffer and pressure
+            # conditions remain independently located and convertible.
+            assert row.identity.composition.is_unknown
+            assert (
+                f"kept sum={kept_sum} wt% is below 95 wt%"
+                in row.identity.composition.reason
+            )
+            refused_compositions += 1
+        assert row.identity.total_pressure_Pa is not None
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("200000000")
+        assert row.identity.fO2_Pa is not None
+        assert row.identity.fO2_Pa.is_value
+        assert row.identity.fO2_Pa.value == _jugo_qfm_pa(
             row.point_conditions["fO2_control"].state.value
         )
-        and row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
-        and row.point_conditions["temperature_K"].locator.pdf_page_index == 7
-        and row.point_conditions["pressure_MPa"].state.value == Decimal("200")
-        and row.point_conditions["fO2_control"].locator.published_page == 5928
-        and row.point_conditions["composition"].locator.published_page == 5928
-        for row in rows
-    )
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
+        assert row.point_conditions["temperature_K"].locator.pdf_page_index == 7
+        assert row.point_conditions["pressure_MPa"].state.value == Decimal("200")
+        assert row.point_conditions["fO2_control"].locator.published_page == 5928
+        assert row.point_conditions["composition"].locator.published_page == 5928
+    assert accepted_compositions == 1
+    assert refused_compositions == 6
     qfm = evaluate_buffer(
         "QFM", Decimal("1323.15"), pressure_bar=Decimal(2000)
     )

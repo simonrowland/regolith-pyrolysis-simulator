@@ -2620,7 +2620,16 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
         assert conditions["fO2_Pa"].state.is_unknown
         assert conditions["fO2_Pa"].locator.published_page == 509
         assert "not an imposed condition" in conditions["fO2_Pa"].state.reason
-        assert conditions["composition"].state.is_value
+        composition = conditions["composition"]
+        if composition.state.is_unknown:
+            # b-704 refuses the six 91.43 wt% residual maps below its 95 wt%
+            # kept-sum floor; their printed cells and locators remain present.
+            assert (
+                "kept sum=91.43 wt% is below 95 wt%"
+                in composition.state.reason
+            )
+        else:
+            assert composition.state.is_value
         assert conditions["composition"].locator.published_page == 510
         assert conditions["composition"].locator.table == "2"
         assert conditions["starting_composition"].state.is_value
@@ -2653,6 +2662,10 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
         assert experiment.pressure_environment.sweep_gas.state.is_unknown
         assert item.identity.total_pressure_Pa.is_unknown
         assert item.identity.fO2_Pa.is_unknown
+    assert sum(
+        (item.point_conditions or {})["composition"].state.is_unknown
+        for item in table2_rows
+    ) == 6
 
     expected_quantity_unknown = {
         "kems-026-markova-1984::markova_1984_table1_initial_sample_compositions",

@@ -149,6 +149,12 @@ def _assert_table1_migrated_pressures(result):
 
 def test_table_values_conditions_and_uncertainties_reach_migrated_records():
     result = _migrated()
+    source_document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_rows = {
+        observation["observation_id"]: observation
+        for block in source_document["species"].values()
+        for observation in block["observations"]
+    }
     records = list(result.observations.values())
     assert len(records) == 81
 
@@ -199,18 +205,26 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
     assert len(table4_rows) == 6
     expected = {
         "cao_partial_enthalpy": (Quantity.PARTIAL_MOLAR_ENTHALPY, Decimal("0.0"), Decimal("1.4")),
-        "cao_partial_entropy": (Quantity.S, Decimal("17.0"), Decimal("1.5")),
+        "cao_partial_entropy": (None, Decimal("17.0"), Decimal("1.5")),
         "mgo_partial_enthalpy": (Quantity.PARTIAL_MOLAR_ENTHALPY, Decimal("-40.2"), Decimal("2.6")),
-        "mgo_partial_entropy": (Quantity.S, Decimal("19.1"), Decimal("1.5")),
+        "mgo_partial_entropy": (None, Decimal("19.1"), Decimal("1.5")),
         "sio2_partial_enthalpy": (Quantity.PARTIAL_MOLAR_ENTHALPY, Decimal("9.6"), Decimal("2.4")),
-        "sio2_partial_entropy": (Quantity.S, Decimal("23.2"), Decimal("2.4")),
+        "sio2_partial_entropy": (None, Decimal("23.2"), Decimal("2.4")),
     }
     for name, (quantity, value, sigma) in expected.items():
         row = next(record for record in table4_rows if name in record.observation_id)
-        assert row.identity.quantity.value is quantity
-        assert row.value.kind is ValueKind.POINT
-        assert row.value.point == value
-        assert Decimal(str(row.uncertainty.verbatim["sigma"])) == sigma
+        if quantity is None:
+            assert not row.identity.quantity.is_value
+            assert row.value.kind is ValueKind.UNAVAILABLE
+            source_points = source_rows[row.observation_id.rsplit("::", 1)[-1]][
+                "values"
+            ]["points"]
+            assert Decimal(str(source_points[0]["sigma"])) == sigma
+        else:
+            assert row.identity.quantity.value is quantity
+            assert row.value.kind is ValueKind.POINT
+            assert row.value.point == value
+            assert Decimal(str(row.uncertainty.verbatim["sigma"])) == sigma
         assert row.point_conditions["composition"].state.is_value
         if quantity is Quantity.PARTIAL_MOLAR_ENTHALPY:
             assert row.identity.composition.is_value

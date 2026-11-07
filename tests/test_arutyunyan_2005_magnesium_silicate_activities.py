@@ -148,6 +148,31 @@ def test_arutyunyan_2005_deferred_figures_are_context_only_and_pinned() -> None:
         assert "points" not in values
 
 
+def test_partial_gibbs_rows_name_oxide_field_quantities_not_measurement_reaction() -> None:
+    document = _document()
+    rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("context", [])
+    }
+    gas_exchange_reaction = "SiO2(solid, liquid) + Mg(gas) = MgO(solid, liquid) + SiO(gas)"
+    for row_id, component in (
+        ("arutyunyan_2005_partial_gibbs_mgo_from_oxide_field", "MgO"),
+        ("arutyunyan_2005_partial_gibbs_sio2_from_oxide_field", "SiO2"),
+    ):
+        values = rows[row_id]["values"]
+        assert values["quantity_as_printed"] == f"ΔfG''({component})"
+        assert "MgSiO3 + Mg2SiO4" in values["phase_field_as_printed"]
+        assert values["reference_components_as_printed"] == "crystalline MgO and β-cristobalite"
+        assert values["measurement_lineage_as_printed"].endswith("(3)")
+        assert values["reaction_as_printed"] == (
+            f"ΔfG''({component}) in the MgSiO3 + Mg2SiO4 two-phase field, "
+            "referenced to crystalline MgO and β-cristobalite"
+        )
+        assert gas_exchange_reaction not in values["reaction_as_printed"]
+        assert rows[row_id]["values"]["admission_status"] == "context_only"
+
+
 def test_arutyunyan_2005_fidelity_pin_rejects_a_mutated_activity() -> None:
     document = _document()
     assert vle.check_all_fidelity_samples_match(document, label="arutyunyan-2005") == []

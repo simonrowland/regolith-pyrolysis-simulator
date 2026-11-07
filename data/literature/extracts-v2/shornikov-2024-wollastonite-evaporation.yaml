@@ -110,8 +110,8 @@ observations:
   experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaSiO3
       phase:
@@ -124,54 +124,13 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1751, 1818]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-38.92'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -183,14 +142,9 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -214,8 +168,8 @@ observations:
   experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
-      tag: value
-      value: S
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaSiO3
       phase:
@@ -228,54 +182,13 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1751, 1818]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
   value:
-    kind: point
-    point: '2.33'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -287,14 +200,9 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - S
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -997,8 +905,8 @@ observations:
   experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaSiO3
       phase:
@@ -1011,54 +919,13 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1818, 2087]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-11.29'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1070,14 +937,9 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -1101,8 +963,8 @@ observations:
   experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
-      tag: value
-      value: S
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaSiO3
       phase:
@@ -1115,54 +977,13 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1818, 2087]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
   value:
-    kind: point
-    point: '17.53'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1174,14 +995,9 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - S
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7

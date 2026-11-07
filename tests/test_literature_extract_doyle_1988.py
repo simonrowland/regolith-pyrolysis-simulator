@@ -5,8 +5,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import MethodToken, Quantity
-from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from simulator.battery.enums import MethodToken, NoticeKind, Quantity
+from simulator.battery.migrate import (
+    Migrator,
+    _mass_percent_composition_state,
+    wt_pct_to_mole_fraction,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = REPO_ROOT / "data/literature/extracts/doyle-1988-feo-activity-multicomponent-magma.yaml"
@@ -211,6 +215,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
     assert set(migrated) == target_ids and len(migrated) == 130
     assert sum(row.value.kind.value == "point" for row in migrated.values()) == 130
     assert sum(row.value.kind.value == "unavailable" for row in migrated.values()) == 0
+    renormalized_admissions = 0
     for raw in source_rows:
         row = migrated[raw["observation_id"]]
         assert row.value.point == Decimal(raw["values"]["activity"])
@@ -236,21 +241,104 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             assert row.identity.temperature_K.value == Decimal("1600")
             assert row.identity.fO2_Pa.is_value
             components = raw["point_conditions"]["composition"]["state"]["value"]["components"]
-            expected_composition = wt_pct_to_mole_fraction(
-                {name: Decimal(value) for name, value in components.items()}
-            ).components
-            assert row.point_conditions["composition"].state.value.components == expected_composition
-            assert row.identity.composition.is_value
-            assert row.identity.composition.value.components == expected_composition
+            printed_composition = {
+                name: Decimal(value) for name, value in components.items()
+            }
+            kept_sum = sum(printed_composition.values(), Decimal("0"))
+            condition = row.point_conditions["composition"]
+            if kept_sum > Decimal("102"):
+                renormalized_admissions += 1
+                assert kept_sum <= Decimal("105")
+                assert condition.state.is_value
+                expected_composition = wt_pct_to_mole_fraction(
+                    printed_composition
+                ).components
+                assert condition.state.value.components == expected_composition
+                assert row.identity.composition.value.components == expected_composition
+                notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                    and notice.band == "95-102 wt% kept oxide total"
+                )
+                assert notice.band == "95-102 wt% kept oxide total"
+                assert notice.original == kept_sum
+                assert "renormalized to 100 wt%" in notice.reason
+                assert "d-336 item 2" in notice.reason
+            else:
+                assert Decimal("95") <= kept_sum <= Decimal("102")
+                expected_composition = wt_pct_to_mole_fraction(
+                    printed_composition
+                ).components
+                assert condition.state.value.components == expected_composition
+                assert row.identity.composition.is_value
+                assert row.identity.composition.value.components == expected_composition
         else:
             assert raw["values"]["standard_state_as_printed"] == "stoichiometric liquid FeO (STULL and PROPHET, 1971)"
             assert row.point_conditions["T_C"].state.value == Decimal("1380")
             assert row.point_conditions["fO2_log"].state.is_unknown
             assert row.identity.fO2_Pa.is_unknown
             assert row.identity.composition.is_unknown
+            assert (
+                row.identity.composition.reason
+                == "The quoted Fe-O liquid composition is not stated numerically."
+            )
             assert row.identity.temperature_K.value == Decimal("1653.15")
         assert row.identity.total_pressure_Pa.is_unknown
     assert migrated["doyle_1988_quoted_activity_stoichiometric_liquid_feo_1_93"].value.point == Decimal("1.93")
+    assert renormalized_admissions == 16
+    # Printed cells total S=102.4; these values are 100*w_i/S by hand.
+    printed = {
+        "SiO2": Decimal("46.0"),
+        "Al2O3": Decimal("8.6"),
+        "FeO": Decimal("45.0"),
+        "CaO": Decimal("2.8"),
+    }
+    normalized = _mass_percent_composition_state(
+        printed, basis="printed_oxides"
+    ).value.as_map()
+    assert normalized == {
+        "SiO2": Decimal("44.921875"),
+        "Al2O3": Decimal("8.3984375"),
+        "FeO": Decimal("43.9453125"),
+        "CaO": Decimal("2.734375"),
+    }
+    molar_masses = {
+        "SiO2": Decimal("60.083"),
+        "Al2O3": Decimal("101.960077"),
+        "FeO": Decimal("71.844"),
+        "CaO": Decimal("56.077"),
+    }
+    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
+    total_moles = sum(moles.values(), Decimal("0"))
+    independent_mole_fractions = {
+        name: amount / total_moles for name, amount in moles.items()
+    }
+    renormalized_row = next(
+        raw
+        for raw in source_rows
+        if raw.get("point_conditions", {}).get("composition", {})
+        .get("state", {})
+        .get("value", {})
+        .get("components")
+        == {name: str(value) for name, value in printed.items()}
+    )
+    actual_mole_fractions = dict(
+        migrated[renormalized_row["observation_id"]]
+        .identity.composition.value.components
+    )
+    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert all(
+        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
+        for name, expected in independent_mole_fractions.items()
+    )
+    pinned = migrated["doyle_1988_activity_p004_t01_r4_c1"]
+    assert pinned.identity.composition.value.components == (
+        ("SiO2", Decimal("0.5029497309599392770874071368")),
+        ("Al2O3", Decimal("0.03728834454498900760855715041")),
+        ("FeO", Decimal("0.4352142821519382941830932491")),
+        ("CaO", Decimal("0.02454764234313342112094246387")),
+    )
     for row in [migrated[x["observation_id"]] for x in source_rows[:3]]:
         print("identity axes", row.observation_id, {axis: getattr(row.identity, axis) for axis in ("composition", "total_pressure_Pa", "fO2_Pa", "temperature_K")})
         assert row.identity.total_pressure_Pa.is_unknown

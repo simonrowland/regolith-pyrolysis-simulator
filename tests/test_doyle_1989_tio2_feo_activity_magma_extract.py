@@ -10,8 +10,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, MethodToken, Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
+from simulator.battery.enums import EvidenceClass, MethodToken, NoticeKind, Phase, Quantity, ValueKind
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    _mass_percent_composition_state,
+    wt_pct_to_mole_fraction,
+)
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -394,7 +399,8 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in observations.values())
     assert all(row.identity.reference_state is None or row.identity.reference_state.is_unknown for row in observations.values())
     assert all(row.identity.total_pressure_Pa.is_unknown for row in observations.values())
-    assert all(row.identity.composition.is_value for row in observations.values())
+    assert sum(row.identity.composition.is_value for row in observations.values()) == 167
+    renormalized_admissions = 0
     assert all(row.identity.temperature_K.value == Decimal("1600") for row in observations.values())
     assert not [row for row in observations.values() if row.identity.quantity.is_unknown]
     assert not [row for row in observations.values() if row.identity.species.phase.is_unknown]
@@ -505,15 +511,85 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         assert migrated.locator.page == 4
         assert migrated.locator.table == "1A"
 
-        expected_composition = wt_pct_to_mole_fraction({
-            oxide: Decimal(value) for oxide, value in zip(OXIDES, composition_values, strict=True)
-        })
-        assert identity.composition.value == expected_composition
-        assert migrated.point_conditions["composition"].state.value == expected_composition
+        printed_composition = {
+            oxide: Decimal(value)
+            for oxide, value in zip(OXIDES, composition_values, strict=True)
+        }
+        kept_sum = sum(printed_composition.values(), Decimal("0"))
+        composition_condition = migrated.point_conditions["composition"]
+        if kept_sum > Decimal("102"):
+            renormalized_admissions += 1
+            assert kept_sum <= Decimal("105")
+            assert composition_condition.state.is_value
+            expected_composition = wt_pct_to_mole_fraction(printed_composition)
+            assert identity.composition.value == expected_composition
+            assert composition_condition.state.value == expected_composition
+            notice = next(
+                notice
+                for notice in migrated.notices
+                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == "95-102 wt% kept oxide total"
+            )
+            assert notice.band == "95-102 wt% kept oxide total"
+            assert notice.original == kept_sum
+            assert "renormalized to 100 wt%" in notice.reason
+            assert "d-336 item 2" in notice.reason
+        else:
+            assert Decimal("95") <= kept_sum <= Decimal("102")
+            expected_composition = wt_pct_to_mole_fraction(printed_composition)
+            assert identity.composition.value == expected_composition
+            assert composition_condition.state.value == expected_composition
         assert migrated.point_conditions["composition"].locator.page == 4
         assert identity.reference_state.is_unknown
         assert source["standard_state"] == "molten Fe0.947O"
         assert "ReferenceStateConvention" in source["values"]["standard_state_schema_gap"]
+
+    assert renormalized_admissions == 33
+
+    # Printed row 4A/35 totals S=102.3; each mass value is hand-derived as 100*w_i/S.
+    printed = {
+        "SiO2": Decimal("28.3"),
+        "TiO2": Decimal("12.1"),
+        "Al2O3": Decimal("6.7"),
+        "FeO": Decimal("51.2"),
+        "CaO": Decimal("4.0"),
+        "K2O": Decimal("0.0"),
+    }
+    normalized = _mass_percent_composition_state(
+        printed, basis="printed_oxides"
+    ).value.as_map()
+    assert normalized == {
+        "SiO2": Decimal("27.66373411534701857282502444"),
+        "TiO2": Decimal("11.82795698924731182795698925"),
+        "Al2O3": Decimal("6.549364613880742913000977517"),
+        "FeO": Decimal("50.04887585532746823069403715"),
+        "CaO": Decimal("3.910068426197458455522971652"),
+        "K2O": Decimal("0"),
+    }
+    molar_masses = {
+        "SiO2": Decimal("60.083"),
+        "TiO2": Decimal("79.865"),
+        "Al2O3": Decimal("101.960077"),
+        "FeO": Decimal("71.844"),
+        "CaO": Decimal("56.077"),
+        "K2O": Decimal("94.1956"),
+    }
+    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
+    total_moles = sum(moles.values(), Decimal("0"))
+    independent_mole_fractions = {
+        name: amount / total_moles for name, amount in moles.items()
+    }
+    pinned_renormalized = observations[
+        f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r35"
+    ]
+    actual_mole_fractions = dict(
+        pinned_renormalized.identity.composition.value.components
+    )
+    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert all(
+        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
+        for name, expected in independent_mole_fractions.items()
+    )
 
     # Render-backed locators from both printed tables reach migrated values.
     first = observations[f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r01"]
@@ -527,4 +603,12 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     )
     assert (last.value.point, last.locator.page, last.locator.table) == (
         Decimal("0.50"), 4, "1A"
+    )
+    assert first.identity.composition.value.components == (
+        ("SiO2", Decimal("0.5363533193686149898776297670")),
+        ("TiO2", Decimal("0.04287212642346588034698394932")),
+        ("Al2O3", Decimal("0.06123703270131157116655978668")),
+        ("FeO", Decimal("0.2924927986513158938905799942")),
+        ("CaO", Decimal("0.06704472285529166471824650286")),
+        ("K2O", Decimal("0E+27")),
     )

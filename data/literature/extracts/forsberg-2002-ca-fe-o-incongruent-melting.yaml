@@ -1,0 +1,359 @@
+schema_version: literature_extract.v1
+source_id: forsberg-2002-ca-fe-o-incongruent-melting
+source:
+  citation: >-
+    Forsberg, S., Wikström, P. and Rosén, E. (2002). Determination of Gibbs Energies of Formation of CaFe2O4 and Ca2Fe2O5 from Solid-State EMF Measurements Using CaF2 as Solid Electrolyte. Metallurgical and Materials Transactions B, 33B, 385–392.
+  doi: 10.1007/s11663-002-0050-1
+  year: 2002
+  corpus_asset: raw/forsberg-2002-ca-fe-o-incongruent-melting/forsberg-2002-ca-fe-o-incongruent-melting.pdf
+extraction:
+  method: >-
+    Transcribed from MinerU markdown/content-list table blocks and the born-digital pdftotext layout. Render checks confirmed equations and cell/reaction assignments on PDF pages 2–4 and all cells and row assignments in Tables I and II on PDF page 5.
+  date: '2026-11-05'
+  worker: w1105b-fors02
+  provenance_path: text/forsberg-2002-ca-fe-o-incongruent-melting/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.CaFe2O4.observations[forsberg2002_eq19_dfG_caFe2o4].values.delta_fG_function_as_printed
+    value: '−1448.4 × 10^3 + 128.0 T + 27.95 T ln(T) ±1800 J mol−1'
+    locator: {page: 4, equation: '19'}
+  - path: species.Ca2Fe2O5.observations[forsberg2002_eq20_dfG_ca2fe2o5].values.delta_fG_function_as_printed
+    value: '−2049.9 × 10^3 − 12.84 T + 55.91 T ln(T) ±2800 J mol−1'
+    locator: {page: 4, equation: '20'}
+  - path: species.CaFe2O4.observations[forsberg2002_eq24_dfH298_caFe2o4].values.delta_H298_as_printed
+    value: '−17.5 ± 0.4 kJ mol−1'
+    locator: {page: 6, equation: '24'}
+  - path: species.CaFe2O4.context[forsberg2002_tableI_auxiliary_calorimetry].values.rows_as_printed[5].a
+    value: '1141.4551'
+    locator: {page: 5, table: 'I', row: CaFe2O4**}
+  - path: species.CaFe2O4.context[forsberg2002_tableII_calorimetry].values.rows_as_printed[3].H_increment_this_work_J_mol
+    value: '178,120'
+    locator: {page: 5, table: 'II', row: '1300 K'}
+experiments:
+  - experiment_id: forsberg2002_cell2
+    method: solid_state_emf
+    locator: {page: 2, equation: '2'}
+    fO2_control:
+      channel: gas_mix
+      atmosphere: {state: {tag: value, value: '20 mole pct O2 in Ar'}, locator: {page: 2, section: 'Materials Used and Preparations'}}
+      oxygen_partial_pressure_Pa: {state: {tag: value, value: {kind: point, point: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars; converted to Pa.'}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Materials Used and Preparations', note: 'The measurement gas is reported as a mixture; no separate sweep gas is stated.'}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+  - experiment_id: forsberg2002_cell3
+    method: solid_state_emf
+    locator: {page: 2, equation: '3'}
+    fO2_control:
+      channel: gas_mix
+      atmosphere: {state: {tag: value, value: '20 mole pct O2 in Ar'}, locator: {page: 2, section: 'Materials Used and Preparations'}}
+      oxygen_partial_pressure_Pa: {state: {tag: value, value: {kind: point, point: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars; converted to Pa.'}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Materials Used and Preparations', note: 'The measurement gas is reported as a mixture; no separate sweep gas is stated.'}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+species:
+  CaFe2O4:
+    observations:
+      - observation_id: forsberg2002_eq13_reaction_gibbs_caFe2o4
+        experiment: forsberg2002_cell2
+        point_conditions:
+          fO2_control: {state: {tag: value, value: {channel: gas_mix, atmosphere: '20 mole pct O2 in Ar', oxygen_partial_pressure_Pa: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars.'}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+        type: gibbs_table
+        locator: {page: 4, equation: '13', published_page: 388}
+        T_range_K: [1030, 1280]
+        phase: cr
+        units: J/mol as printed
+        values:
+          quantity: delta_rG_from_component_oxides
+          method_class: measured_reduced
+          reaction_as_printed: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          delta_G_function_as_printed: '−31.51 × 10^3 − 3.210 T ±420 J mol−1'
+          uncertainty_as_printed: '±420 J mol−1'
+          confidence_level: not_stated
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed value is reaction Gibbs energy ΔG° for formation from component oxides, not standard formation Gibbs energy ΔfG°. No exact reaction-Gibbs quantity token exists in simulator/battery/enums.py::Quantity; it remains explicitly typed-refused rather than bound to delta_fG.
+          method_class_reason: Authors' least-squares reduction of their own EMF data through ΔG = −2FE; measured EMF points are plotted only in Figure 3.
+          cell_equation_as_printed: 'ΔG = −2FE; F = 96.48456 J (mV)−1'
+          printed_uncertainty_note: confidence level not stated
+          lineage_note: Derived from the measured cell [2] EMF fit, Equation (4), with raw readings not printed.
+        derivation:
+          relation: 'Equation (12), ΔG = −2FE, applied to the measured cell [2] EMF series.'
+          locator: {page: 4, equation: '12'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, figure: '3', note: 'Raw EMF readings are plotted, not tabulated.'}
+      - observation_id: forsberg2002_eq19_dfG_caFe2o4
+        experiment: forsberg2002_cell2
+        point_conditions:
+          fO2_control: {state: {tag: value, value: {channel: gas_mix, atmosphere: '20 mole pct O2 in Ar', oxygen_partial_pressure_Pa: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars.'}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+        type: gibbs_table
+        locator: {page: 4, equation: '19', published_page: 388}
+        T_range_K: [1030, 1280]
+        phase: cr
+        units: J/mol as printed
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          reaction_as_printed: 'Ca(s) + 2Fe(s) + 2O2(g) → CaFe2O4(s)'
+          reference_oxide_reaction_as_printed: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          delta_fG_function_as_printed: '−1448.4 × 10^3 + 128.0 T + 27.95 T ln(T) ±1800 J mol−1'
+          uncertainty_as_printed: '±1800 J mol−1'
+          confidence_level: not_stated
+          standard_state_as_printed: formation from the elements
+          auxiliary_data_as_printed: 'CaO and Fe2O3 ΔfG° functions from JANAF Thermochemical Tables [9], Equations (17) and (18).'
+          status: typed_refused_schema_gap
+          schema_gap: Coefficient-only Gibbs-energy functions have no point-series representation in the extract-to-battery migrator; Equation (19) is retained as printed.
+          method_class_reason: Authors' reduction of their own measured EMF data combined with JANAF auxiliary thermochemistry; not an attributed result.
+          printed_uncertainty_note: confidence level not stated
+        derivation:
+          relation: >-
+            Equation (15) combines the measured reaction Gibbs fit in Equation (13) with the JANAF CaO and Fe2O3 formation functions in Equations (17) and (18). The source does not print numeric EMF rows.
+          locator: {page: 4, equation: '15'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, figure: '3', note: 'Raw EMF readings for Equation (13) are plotted, not tabulated.'}
+      - observation_id: forsberg2002_eq24_dfH298_caFe2o4
+        experiment: forsberg2002_cell2
+        point_conditions:
+          fO2_control: {state: {tag: value, value: {channel: gas_mix, atmosphere: '20 mole pct O2 in Ar', oxygen_partial_pressure_Pa: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars.'}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+        type: gibbs_table
+        locator: {page: 6, equation: '24', published_page: 390}
+        T_K: 298
+        phase: cr
+        units: kJ/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          method_class: measured_reduced
+          delta_H_reaction_kJ_mol: '-17.5'
+          delta_H298_as_printed: '−17.5 ± 0.4 kJ mol−1'
+          uncertainty_as_printed: '±0.4 kJ mol−1'
+          uncertainty: '0.4'
+          uncertainty_unit: kJ/mol
+          confidence_level: two_sigma
+          reaction_as_printed: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          standard_state_as_printed: formation from component oxides at 298 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Equation (24) reports reaction enthalpy for formation from component oxides, not standard enthalpy of formation from the elements. simulator/battery/enums.py::Quantity has DELTA_FH but no exact reaction-enthalpy token, so the value is retained as typed-refused rather than mapped to delta_fH.
+          method_class_reason: Authors' third-law reduction of their own EMF data with independent calorimetric functions.
+          printed_uncertainty_note: The source states two standard deviations; it cautions that the true uncertainty is several kJ/mol.
+        derivation:
+          relation: 'ΔH°298(CaFe2O4) = ΔG°(CaFe2O4) − T Δ(Gef), Equation (21).'
+          locator: {page: 5, equation: '21'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, figure: '4', note: 'Individual calculated ΔH values use plotted EMF data.'}
+    context:
+      - observation_id: forsberg2002_cell2_emf_fit
+        type: experiment_series
+        locator: {page: 3, equation: '4', published_page: 387}
+        units: mV
+        values:
+          method_class: measured_reduced
+          quantity: electromotive_force
+          cell: '[2]'
+          fit_as_printed: 'E(2/mV) = 163.3 + 0.01664 T ±2.2 mV'
+          uncertainty_as_printed: '±2.2 mV'
+          confidence_level: two standard deviations
+          temperature_range_as_printed: '1030 < T/K < 1280'
+          temperature_range_locator: {page: 4, published_page: 388}
+          raw_inputs: not_printed; experimental values are plotted in Figure 3
+          number_of_independent_cells: 3
+          cell_scheme_as_printed: '(-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + Fe2O3 + CaFe2O4, O2, Pt (+)'
+          reaction_as_printed: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          gas_as_printed: 20 mole pct O2 in Ar
+          oxygen_activity_as_printed: about 0.2 bars
+          total_pressure: not stated
+      - observation_id: forsberg2002_tableI_auxiliary_calorimetry
+        type: thermochemical_fit_context
+        locator: {page: 5, table: 'I', published_page: 389}
+        units: mixed as printed
+        values:
+          quantity: gibbs_energy_function
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Gef is a Gibbs energy function (ΔG°−ΔH°298)/T, not an exact stored thermodynamic quantity; simulator/battery/enums.py::Quantity has no Gibbs-energy-function token. The coefficients are retained as cited auxiliary context.
+          table_caption: Thermodynamic Data Used in the Third-Law Analysis
+          function_as_printed: 'Gef = a + b/T + c ln(T) (J mol−1 K−1)'
+          row_count_printed: 6
+          rows_as_printed:
+            - {substance: CaO, a: '333.1190', b: '−19,270.8409', c: '−54.4766', temperature_K: '1000 to 1300', S298_reference: '[9]', Cp_reference: '[9]'}
+            - {substance: Fe2O3, a: '868.8466', b: '−41,056.0743', c: '−141.8913', temperature_K: '1000 to 1300', S298_reference: '[9]', Cp_reference: '[9]'}
+            - {substance: 'CaO*', a: '318.3092', b: '−18,034.5854', c: '−52.4607', temperature_K: '1000 to 1300', S298_reference: '[9]', Cp_reference: '[18]'}
+            - {substance: 'Fe2O3*', a: '886.5340', b: '−44,088.8862', c: '−143.9768', temperature_K: '1000 to 1300', S298_reference: '[19]', Cp_reference: '[20, 21]'}
+            - {substance: CaFe2O4, a: '1135.3123', b: '−67,158.2032', c: '−187.9286', temperature_K: '1000 to 1300', S298_reference: '[14]', Cp_reference: '[15]'}
+            - {substance: 'CaFe2O4**', a: '1141.4551', b: '−67,527.5733', c: '−188.9622', temperature_K: '1000 to 1300', S298_reference: this work, Cp_reference: this work}
+          footnotes_as_printed: '* Gef function based on improved thermodynamic data; ** Gef function based on optimized thermodynamic data.'
+          attribution: JANAF [9], King [14], Bonnickson [15], Grønvold and Westrum [19], Coughlin et al. [20], Grønvold and Samuelsen [21], and Forsberg et al. (this work), as cited in Table I.
+          reference_sources_as_printed: '[9], [14], [15], [18], [19], [20], [21]'
+      - observation_id: forsberg2002_tableII_calorimetry
+        type: thermochemical_data_context
+        locator: {page: 5, table: 'II', published_page: 389}
+        units: mixed as printed
+        values:
+          status: context_only_auxiliary_data
+          table_caption: Calorimetric Data for CaFe2O4
+          row_count_printed: 4
+          rows_as_printed:
+            - {S298_King_J_mol_K: '145.2', S298_this_work_J_mol_K: '146.1', temperature_K: '1000', H_increment_Bonnickson_J_mol: '121,130', H_increment_this_work_J_mol: '121,790', S_increment_Bonnickson_J_mol_K: '205.94', S_increment_this_work_J_mol_K: '207.07'}
+            - {S298_King_J_mol_K: not_reported, S298_this_work_J_mol_K: not_reported, temperature_K: '1100', H_increment_Bonnickson_J_mol: '139,580', H_increment_this_work_J_mol: '140,350', S_increment_Bonnickson_J_mol_K: '223.51', S_increment_this_work_J_mol_K: '224.74'}
+            - {S298_King_J_mol_K: not_reported, S298_this_work_J_mol_K: not_reported, temperature_K: '1200', H_increment_Bonnickson_J_mol: '158,240', H_increment_this_work_J_mol: '159,110', S_increment_Bonnickson_J_mol_K: '239.74', S_increment_this_work_J_mol_K: '241.06'}
+            - {S298_King_J_mol_K: not_reported, S298_this_work_J_mol_K: not_reported, temperature_K: '1300', H_increment_Bonnickson_J_mol: '177,150', H_increment_this_work_J_mol: '178,120', S_increment_Bonnickson_J_mol_K: '254.89', S_increment_this_work_J_mol_K: '256.29'}
+          attribution: King [14] for S298 and Bonnickson [15] for enthalpy/entropy increments, with revised values calculated by this work.
+          note: >-
+            H°−H°298 and S°−S°298 are calorimetric increments, not formation enthalpy or absolute entropy rows. The this-work values are auxiliary inputs to the third-law analysis.
+      - observation_id: forsberg2002_kubaschewski_reaction_enthalpy_comparison
+        type: reaction_thermochemistry_context
+        locator: {page: 6, published_page: 390, paragraph: Discussion}
+        units: kJ/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          method_class: quoted_attributed
+          attribution: Kubaschewski [22], as cited by Forsberg et al.
+          reaction_as_printed: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          delta_H298_as_cited: '−21 kJ mol−1'
+          comparison_note: The authors state their third-law result is in reasonable agreement with this cited value.
+      - observation_id: forsberg2002_emf_slope_entropy_uncertainty
+        type: reaction_thermochemistry_context
+        locator: {page: 6, published_page: 390, section: 'Optimization of calorimetric function for CaFe2O4'}
+        units: mixed as printed
+        values:
+          quantity: reaction_entropy_uncertainty
+          method_class: measured_reduced
+          emf_slope_uncertainty_as_printed: 'δ(dE/dT) = ±5.3 × 10−3 mV/K'
+          reaction_entropy_uncertainty_as_printed: 'δ(ΔS°) = ±1.0 J mol−1 K−1'
+          confidence_level: two standard deviations
+          temperature_range_as_printed: range of measurements
+          note: The authors give an uncertainty in the reaction entropy, not a nominal ΔS° value here.
+  Ca2Fe2O5:
+    observations:
+      - observation_id: forsberg2002_eq14_reaction_gibbs_ca2fe2o5
+        experiment: forsberg2002_cell3
+        point_conditions:
+          fO2_control: {state: {tag: value, value: {channel: gas_mix, atmosphere: '20 mole pct O2 in Ar', oxygen_partial_pressure_Pa: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars.'}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+        type: gibbs_table
+        locator: {page: 4, equation: '14', published_page: 388}
+        T_range_K: [1140, 1340]
+        phase: cr
+        units: J/mol as printed
+        values:
+          quantity: delta_rG_from_component_oxides
+          method_class: measured_reduced
+          reaction_as_printed: '2CaO(s) + Fe2O3(s) → Ca2Fe2O5(s)'
+          delta_G_function_as_printed: '−25.49 × 10^3 − 27.67 T ±700 J mol−1'
+          uncertainty_as_printed: '±700 J mol−1'
+          confidence_level: not_stated
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed value is reaction Gibbs energy ΔG° for the written oxide-combination reaction, not standard formation Gibbs energy ΔfG°. No exact reaction-Gibbs quantity token exists in simulator/battery/enums.py::Quantity; it remains explicitly typed-refused rather than bound to delta_fG.
+          method_class_reason: Authors' reduction of the printed cell [2] reaction Gibbs fit in Equation (13) plus −2FE for cell [3]; the resulting Equation (14) is for reaction [11]. The raw cell [3] EMF readings are plotted only in Figure 3.
+          cell_equation_as_printed: 'ΔG = −2FE; F = 96.48456 J (mV)−1'
+          printed_uncertainty_note: confidence level not stated
+          lineage_note: Equation (14) combines the Equation (13) reaction fit with −2FE from the cell [3] EMF fit in Equation (5); this is reaction [11], not the cell [3] reaction [10]. Raw cell [3] readings are not printed.
+        derivation:
+          relation: 'Equation (13) plus Equation (12), ΔG_cell3 = −2FE, gives the Equation (14) fit for reaction [11].'
+          locator: {page: 4, equations: ['12', '13', '14'], published_page: 388}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, figure: '3', note: 'The cell [3] EMF readings used with Equation (13) are plotted, not tabulated.'}
+      - observation_id: forsberg2002_eq20_dfG_ca2fe2o5
+        experiment: forsberg2002_cell3
+        point_conditions:
+          fO2_control: {state: {tag: value, value: {channel: gas_mix, atmosphere: '20 mole pct O2 in Ar', oxygen_partial_pressure_Pa: '20000'}}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'Oxygen activity is reported as about 0.2 bars.'}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'Emf Cells and Experimental Procedure', note: 'No total pressure is reported.'}}
+        type: gibbs_table
+        locator: {page: 4, equation: '20', published_page: 388}
+        T_range_K: [1140, 1340]
+        phase: cr
+        units: J/mol as printed
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          reaction_as_printed: '2Ca(s) + 2Fe(s) + 5/2 O2(g) → Ca2Fe2O5(s)'
+          reference_oxide_reaction_as_printed: '2CaO(s) + Fe2O3(s) → Ca2Fe2O5(s)'
+          delta_fG_function_as_printed: '−2049.9 × 10^3 − 12.84 T + 55.91 T ln(T) ±2800 J mol−1'
+          uncertainty_as_printed: '±2800 J mol−1'
+          confidence_level: not_stated
+          standard_state_as_printed: formation from the elements
+          auxiliary_data_as_printed: 'CaO and Fe2O3 ΔfG° functions from JANAF Thermochemical Tables [9], Equations (17) and (18).'
+          status: typed_refused_schema_gap
+          schema_gap: Coefficient-only Gibbs-energy functions have no point-series representation in the extract-to-battery migrator; Equation (20) is retained as printed.
+          method_class_reason: Authors' reduction of their own measured EMF data combined with JANAF auxiliary thermochemistry; not an attributed result.
+          printed_uncertainty_note: confidence level not stated
+        derivation:
+          relation: >-
+            Equation (16) combines the measured reaction Gibbs fit in Equation (14), twice the JANAF CaO function, and the JANAF Fe2O3 function. The source does not print numeric EMF rows.
+          locator: {page: 4, equation: '16'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, figure: '3', note: 'Raw EMF readings for Equation (14) are plotted, not tabulated.'}
+    context:
+      - observation_id: forsberg2002_cell3_emf_fit
+        type: experiment_series
+        locator: {page: 4, equation: '5', published_page: 388}
+        units: mV
+        values:
+          method_class: measured_reduced
+          quantity: electromotive_force
+          cell: '[3]'
+          fit_as_printed: 'E(3/mV) = −31.20 + 0.1267 T ±2.9 mV'
+          temperature_range_as_printed: '1140 < T/K < 1340'
+          uncertainty_as_printed: '±2.9 mV'
+          confidence_level: two standard deviations
+          raw_inputs: not_printed; experimental values are plotted in Figure 3
+          number_of_independent_cells: 2
+          cell_scheme_as_printed: '(-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + CaFe2O4 + Ca2Fe2O5, O2, Pt (+)'
+          reaction_as_printed: 'CaO(s) + CaFe2O4(s) → Ca2Fe2O5(s)'
+          gas_as_printed: 20 mole pct O2 in Ar
+          oxygen_activity_as_printed: about 0.2 bars
+          total_pressure: not stated
+      - observation_id: forsberg2002_eq17_18_janaf_auxiliary_functions
+        type: gibbs_energy_function_context
+        locator: {page: 4, equations: ['17', '18'], published_page: 388}
+        units: J/mol
+        values:
+          method_class: quoted_attributed
+          attribution: JANAF Thermochemical Tables [9], as cited by Forsberg et al.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed auxiliary equations are ΔfG° fits rather than point rows; retained as quoted source context because the battery migrator does not evaluate coefficient-only functions.
+          CaO_delta_fG_function_as_printed: '−607.5 × 10^3 − 116.4 T + 27.95 T ln(T) ±1200 J mol−1; 1000 < T/K < 1400'
+          Fe2O3_delta_fG_function_as_printed: '−809.4 × 10^3 + 247.6 T ±1300 J mol−1; 1000 < T/K < 1400'
+          confidence_level: not_stated
+  Electromotive_force:
+    observations: []
+    context: []
+  Source_data:
+    observations: []
+    context:
+      - observation_id: forsberg2002_electrochemical_cell_scheme_and_reactions
+        type: experimental_method_context
+        locator: {page: 2, equations: ['2', '3'], published_page: 386}
+        units: not_applicable
+        values:
+          electrolyte: CaF2 single crystal
+          cell2_scheme_as_printed: '(-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + Fe2O3 + CaFe2O4, O2, Pt (+)'
+          cell3_scheme_as_printed: '(-) Pt, O2, CaO + CaF2 | CaF2 | CaF2 + CaFe2O4 + Ca2Fe2O5, O2, Pt (+)'
+          reference_electrode_reaction: 'CaO(s) + 2F− ↔ CaF2(s) + 1/2 O2(g) + 2e−'
+          cell2_working_electrode_reaction: 'CaF2(s) + Fe2O3(s) + 1/2 O2(g) + 2e− ↔ CaFe2O4(s) + 2F−'
+          cell3_working_electrode_reaction: 'CaF2(s) + CaFe2O4(s) + 1/2 O2(g) + 2e− ↔ Ca2Fe2O5(s) + 2F−'
+          cell2_reaction: 'CaO(s) + Fe2O3(s) → CaFe2O4(s)'
+          cell3_reaction: 'CaO(s) + CaFe2O4(s) → Ca2Fe2O5(s)'
+          combined_reaction: '2CaO(s) + Fe2O3(s) → Ca2Fe2O5(s)'
+          emf_to_gibbs_relation_as_printed: 'ΔG = −2FE; F = 96.48456 J (mV)−1'
+          gas_as_printed: 20 mole pct O2 in Ar
+          oxygen_activity_as_printed: about 0.2 bars
+          total_pressure: not stated
+          phase_labels_as_printed: CaO(s), Fe2O3(s), CaFe2O4(s), Ca2Fe2O5(s), CaF2(s)
+  CaO:
+    observations: []
+    context: []
+  Fe2O3:
+    observations: []
+    context: []

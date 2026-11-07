@@ -1128,6 +1128,13 @@ fidelity_samples:
 - path: species.MoO3.observations[shornikov_1997_moo3_pressure_table1].values.points[5].pressure_as_printed
   value: '12 ± 1'
   locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
+schema_gaps:
+  - observation_id: shornikov_1997_sio2_partial_entropy_table4
+    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+  - observation_id: shornikov_1997_cao_partial_entropy_table4
+    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+  - observation_id: shornikov_1997_mgo_partial_entropy_table4
+    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
 species:
   Ca:
     observations:
@@ -1416,7 +1423,11 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_sio2_activity_table3]
         values:
-          quantity: S
+          quantity_as_printed: "ΔS_i(SiO2)"
+          reference_state_as_printed: "partial component entropy"
+          schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          value_as_printed: "23.2 ± 2.4"
+
           method_class: derived
           formula: SiO2
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
@@ -1507,7 +1518,11 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_cao_activity_table3]
         values:
-          quantity: S
+          quantity_as_printed: "ΔS_i(CaO)"
+          reference_state_as_printed: "partial component entropy"
+          schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          value_as_printed: "17.0 ± 1.5"
+
           method_class: derived
           formula: CaO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
@@ -1611,7 +1626,11 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_mgo_activity_table3]
         values:
-          quantity: S
+          quantity_as_printed: "ΔS_i(MgO)"
+          reference_state_as_printed: "partial component entropy"
+          schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          value_as_printed: "19.1 ± 1.5"
+
           method_class: derived
           formula: MgO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}

@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -227,7 +227,11 @@ def test_tables_and_figure_markers_match_the_render_pins() -> None:
         values = oxide_frame_rows[observation_id]["values"]
         assert "quantity" not in values
         assert "value" not in values
-        assert values["quantity_as_printed"] == "Gibbs energy of melt formation from oxides, as captioned."
+        assert values["quantity_as_printed"] == (
+            "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of "
+            "formation from oxides (d) of the CaO–MgO–Al2O3 system melt at "
+            "the temperature 1960 K"
+        )
         assert values["reference_state_as_printed"] == "formation from simple oxides"
         assert values["value_as_printed"] == printed_value
         assert values["admission_status"] == "pending"
@@ -362,6 +366,16 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     assert minimum.identity.temperature_K is not None
     assert minimum.point_conditions["composition"].state.is_unknown
     assert minimum.point_conditions["composition"].locator is not None
+    for suffix in ("01", "02", "03", "04"):
+        marker = next(
+            row
+            for row in observations
+            if row.observation_id.endswith(
+                f"::shornikov_2011_fig1_d_allibert_marker_{suffix}"
+            )
+        )
+        assert marker.value.kind is ValueKind.UNAVAILABLE
+        assert marker.admission.status is AdmissionStatus.PENDING
     for row in observations:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value

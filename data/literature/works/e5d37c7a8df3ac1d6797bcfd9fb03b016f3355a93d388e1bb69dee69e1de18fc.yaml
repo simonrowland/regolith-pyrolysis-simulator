@@ -1,0 +1,234 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  citation: Christensen, A. U., Conway, J. B., and Kelley, K. K. (1960). High-temperature heat contents and entropies of aluminates
+    and ferrites of lithium and sodium. U.S. Bureau of Mines Report of Investigations 5565.
+  source_ids:
+  - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      role: pdf
+      path: raw/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.pdf
+      sha256:
+        tag: value
+        value: 41edf14ec0263664dc29b6604eb1e12057a71e1b297b09fe908f68252755d32c
+    - asset_id: pdftotext:christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      role: pdftotext
+      path: text/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc::christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    table: '7'
+    note: row=all rows; column=H_T-H_298.15
+context:
+- observation_id: cck60_nafeo2_heat_capacity_narrative
+  type: heat_capacity_narrative_context
+  locator:
+    page: 12
+    published_page: 5
+    pdf_page_index: 11
+    section: sodium ferrite discussion
+  units: cal/mol/K
+  values:
+    method_class: measured_reduced
+    statements_as_printed:
+    - 20.20 at 298.15 K (King measurement); exceeding 30.7 near 870 K; drops to 27.0; increases to 29.1 at 1,270 K; 28.8 from
+      1,270 to 1,620 K; liquid is 37.3 over 1,620–1,802 K.
+    attribution_for_29815: King (reference 16 as cited here)
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_heat_capacity_narrative
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
+- observation_id: cck60_nafeo2_l_printed_thermochemical_equations
+  type: heat_capacity_equation_context
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: equation block
+    column: H(T)-H(298.15 K) and Cp(T)
+  T_range_K:
+  - '1620'
+  - '1802'
+  phase: l
+  phase_label_as_printed: l
+  standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+  values:
+    quantity: cp
+    method_class: measured_reduced
+    evidence_class: measured_reduced
+    enthalpy_equation_as_printed: H_T − H_298.15 = 37.30T − 12,286.
+    heat_capacity_equation_as_printed: Cₚ = 37.30
+    note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average equation deviations
+      are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+    quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+    schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar cp token
+      exists but does not represent a formula.
+  units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_l_printed_thermochemical_equations
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
+- observation_id: cck60_nafeo2_margrave_grimley_comparison
+  type: literature_comparison_context
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    section: Margrave and Grimley comparison
+  units: percent
+  values:
+    method_class: quoted_attributed
+    attribution: Margrave and Grimley (1958), as cited in this paper
+    statement_as_printed: Their sodium-ferrite heat-content results over 298–1,378 K are higher than the authors’ results
+      by 0.4 to 3.5 percent (average, 2.1 percent); the authors repeated their measurements and concluded the discrepancy
+      was not in their measurements.
+    higher_by_percent_range:
+    - '0.4'
+    - '3.5'
+    average_higher_by_percent: '2.1'
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_margrave_grimley_comparison
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
+- observation_id: cck60_nafeo2_α_printed_thermochemical_equations
+  type: heat_capacity_equation_context
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: equation block
+    column: H(T)-H(298.15 K) and Cp(T)
+  T_range_K:
+  - '298.15'
+  - '870'
+  phase: cr
+  condensed_form:
+    polymorph: alpha
+  standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+  values:
+    quantity: cp
+    method_class: measured_reduced
+    evidence_class: measured_reduced
+    enthalpy_equation_as_printed: H_T − H_298.15 = 17.92T + 7.05 × 10⁻³T² + 1.72 × 10⁵T⁻¹ − 6,546; T.P. = 870 K; ΔH₈₇₀ = 0.
+    heat_capacity_equation_as_printed: Cₚ = 17.92 + 14.10 × 10⁻³T − 1.72 × 10⁵T⁻²
+    note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average equation deviations
+      are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+    quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+    schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar cp token
+      exists but does not represent a formula.
+  units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_α_printed_thermochemical_equations
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
+- observation_id: cck60_nafeo2_β_printed_thermochemical_equations
+  type: heat_capacity_equation_context
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: equation block
+    column: H(T)-H(298.15 K) and Cp(T)
+  T_range_K:
+  - '870'
+  - '1270'
+  phase: cr
+  condensed_form:
+    polymorph: beta
+  standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+  values:
+    quantity: cp
+    method_class: measured_reduced
+    evidence_class: measured_reduced
+    enthalpy_equation_as_printed: H_T − H_298.15 = 22.55T + 2.55 × 10⁻³T² − 6,969; T.P. = 1,270 K; ΔH₁₂₇₀ = 520.
+    heat_capacity_equation_as_printed: Cₚ = 22.55 + 5.10 × 10⁻³T
+    note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average equation deviations
+      are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+    quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+    schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar cp token
+      exists but does not represent a formula.
+  units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_β_printed_thermochemical_equations
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
+- observation_id: cck60_nafeo2_γ_printed_thermochemical_equations
+  type: heat_capacity_equation_context
+  locator:
+    page: 13
+    published_page: 6
+    pdf_page_index: 12
+    table: '8'
+    row: equation block
+    column: H(T)-H(298.15 K) and Cp(T)
+  T_range_K:
+  - '1270'
+  - '1620'
+  phase: cr
+  condensed_form:
+    polymorph: gamma
+  standard_state: As printed, referenced to H(298.15 K); no pressure is stated.
+  values:
+    quantity: cp
+    method_class: measured_reduced
+    evidence_class: measured_reduced
+    enthalpy_equation_as_printed: H_T − H_298.15 = 28.80T − 10,276; M.P. = 1,620 K; ΔH₁₆₂₀ = 11,760.
+    heat_capacity_equation_as_printed: Cₚ = 28.80
+    note: Authors fit the smooth equations to their measured Table 7 heat-content values. The reported average equation deviations
+      are α 0.3%, β 0.1%, γ 0.2%, and liquid 0.1% (PDF p. 13, Table 8 discussion).
+    quantity_as_printed: Cp(T) equation and H(T)-H(298.15 K) fit
+    schema_note: No function-valued Cp(T) quantity carrier; retain the complete printed equations here. A scalar cp token
+      exists but does not represent a formula.
+  units: cal/mol for H(T)-H(298.15 K); cal/mol/K for Cp(T)
+  context_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::context::cck60_nafeo2_γ_printed_thermochemical_equations
+  work_id: e5d37c7a8df3ac1d6797bcfd9fb03b016f3355a93d388e1bb69dee69e1de18fc
+  source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+  species: NaFeO2
