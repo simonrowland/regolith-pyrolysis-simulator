@@ -2104,6 +2104,31 @@ species:
               point: '2050'
           locator: *id011
       experiment: shornikov-2008-table-calculations
+    context:
+    - observation_id: shornikov_2008_mgo_aluminosilicate_melts_kems_apparatus
+      type: apparatus
+      experiment: shornikov-archakov-2001-kems
+      locator:
+        page: 1
+        published_page: 147
+        pdf_page_index: 0
+        note: Paragraph comparing the present calculations with the cited experimental data.
+      units: as printed
+      values:
+        quantity: cited_mgo_aluminosilicate_kems_apparatus
+        method_class: method_only
+        apparatus: mass spectrometric Knudsen effusion method
+        method_as_published: >-
+          The obtained results are shown in the Figure below in comparison with the experimental data obtained by the mass spectrometric Knudsen effusion method in MgAl2O4 - SiO2 concentration range at 2050 K [1].
+        notes: |
+          Series stated in this paper: MgAl2O4 - SiO2 concentration range at 2050 K; data attributed to reference [1], Shornikov and Archakov (2001).
+          Sample holder or cell material: not stated in this article.
+          Cell inner dimensions and orifice size: not stated.
+          Sample mass: not stated.
+          Run duration at temperature: not stated.
+          Fe-presaturation of loops and how: not stated.
+          Post-run bulk analyses (total Fe, alkalis, or Mo/W/Pt/Ir/Re pickup): not stated.
+          Cell oxygen condition: not stated.
   Mg2SiO4:
     observations:
     - observation_id: shornikov_2008_mgo_aluminosilicate_melts_p002_t03_r14_c02
