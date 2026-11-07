@@ -604,6 +604,69 @@ def test_d349_internal_metal_fallback_uses_the_converted_activity(
     )
 
 
+@pytest.mark.parametrize(
+    ("feedstock_key", "additives_kg"),
+    (
+        ("lunar_mare_low_ti", None),
+        ("mars_basalt", {"C": 60.0}),
+        ("s_type_asteroid_silicate", None),
+    ),
+)
+def test_d349_legacy_mg_ca_publication_matches_provider(
+    feedstock_key,
+    additives_kg,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        feedstock_key,
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg=additives_kg,
+    )
+    sim.melt.p_total_mbar = 1000.0
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    account = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": sim.atom_ledger.mol_by_account(
+                "process.cleaned_melt"
+            )
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    for temperature_C in (225.0, 425.0, 625.0, 825.0, 1500.0, 1650.0):
+        sim.melt.temperature_C = temperature_C
+        legacy = sim._internal_analytical_equilibrium()
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=account,
+            temperature_C=temperature_C,
+            pressure_bar=legacy.pressure_bar,
+            fO2_log=legacy.fO2_log,
+            control_inputs={
+                "pO2_bar": 1.0,
+                "intrinsic_fO2_log": legacy.fO2_log,
+            },
+        )
+        kernel = provider.dispatch(request)
+        assert kernel.status == "ok"
+        legacy_pressures = legacy.vapor_pressures_Pa
+        kernel_pressures = kernel.diagnostic["vapor_pressures_Pa"]
+
+        for species in ("Mg", "Ca"):
+            assert (species in legacy_pressures) == (species in kernel_pressures), (
+                f"{feedstock_key} at {temperature_C:g} C: legacy and provider "
+                f"disagree whether {species} is published"
+            )
+            if species in legacy_pressures:
+                assert legacy_pressures[species] == pytest.approx(
+                    kernel_pressures[species], rel=1e-9, abs=0.0
+                ), f"{feedstock_key} at {temperature_C:g} C: {species} pressure"
+
+
 def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     above_melting, above_notice, _warning = (
         vapor_pressure_module._activity_for_crystalline_vapor_k(
