@@ -532,6 +532,78 @@ def test_d349_removing_vapor_conversion_restores_the_fusion_factor(
     assert unconverted / converted == pytest.approx(0.1253892371, rel=1e-6)
 
 
+@pytest.mark.parametrize(
+    ("species", "source_standard_state_id", "target_standard_state_id"),
+    (
+        ("Mg", "Mg-009", "Mg-010"),
+        ("Ca", "Ca-028", "Ca-029"),
+    ),
+)
+def test_d349_internal_metal_fallback_uses_the_converted_activity(
+    species,
+    source_standard_state_id,
+    target_standard_state_id,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = 1000.0
+
+    legacy = sim._internal_analytical_equilibrium()
+    provider, request = _lunar_mare_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        sim=sim,
+        temperature_C=1500.0,
+    )
+    request = IntentRequest(
+        intent=request.intent,
+        account_view=request.account_view,
+        temperature_C=request.temperature_C,
+        pressure_bar=legacy.pressure_bar,
+        fO2_log=legacy.fO2_log,
+        control_inputs={
+            **request.control_inputs,
+            "intrinsic_fO2_log": legacy.fO2_log,
+        },
+    )
+    kernel = provider.dispatch(request)
+
+    route = legacy.diagnostics["activity_provenance"][species]
+    notice = route["activity_standard_state_conversion"]
+    expected_activity, expected_notice, _warning = (
+        _activity_for_crystalline_vapor_k(
+            "MgO" if species == "Mg" else "CaO",
+            float(route["melt_oxide_activity"]),
+            1773.15,
+            source_standard_state_id=source_standard_state_id,
+            target_standard_state_id=target_standard_state_id,
+            source_standard_state_phase="liquid",
+            target_standard_state_phase="solid",
+        )
+    )
+
+    assert legacy.vapor_pressures_Pa[species] == pytest.approx(
+        kernel.diagnostic["vapor_pressures_Pa"][species],
+        rel=2e-5,
+        abs=3e-7,
+    )
+    assert notice == expected_notice
+    assert route["vapor_activity_used_for_K"] == pytest.approx(
+        expected_activity,
+        rel=1e-12,
+        abs=0.0,
+    )
+
+
 def test_d349_conversion_extrapolates_and_flags_outside_janaf_overlap():
     above_melting, above_notice, _warning = (
         vapor_pressure_module._activity_for_crystalline_vapor_k(
