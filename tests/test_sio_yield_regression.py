@@ -717,22 +717,18 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # at 5e-12 percent.
     # t-1217 restores source-preserving causal capture and changes the bulk-
     # inventory subtraction's roundoff path; d-137fix4 integrates the Stage-3
-    # band before applying the same excess-inventory balance. b-1119's CaO/MgO
-    # liquid reference via d-144 fusion shifts the Studio-3 cancellation
-    # residuals from green to tip: lunar 6.164333585288513e-7 ->
-    # 6.904942247340407e-7 (+7.40608662052e-8, +0.120144156997 relative),
-    # Mars 2.2716049134323923e-7 -> 8.041771960548321e-7
-    # (+5.77016704712e-7, +2.54012791265 relative). The independent atom-ledger
-    # closure bound remains 5e-12%; these full-run pins are Studio-3 values.
+    # band before applying the same excess-inventory balance. b-1119 d-349
+    # converts liquid CaO/MgO activities to the crystalline vapor-K basis with
+    # exp(+DeltaG_fus/RT). At 1473.15 K the factors are 31.4520770207 and
+    # 20.5811789811; at 1848.15 K they are 8.67464656129 and 6.60246040551.
+    # Those source terms alter the campaign's Ca/Mg removal, melt/redox path,
+    # and near-canceling Si inventory projection. Studio-2 reports closure
+    # residuals of 9.910691898274657e-7% for lunar and 5.61964928631159e-7%
+    # for Mars; canonical atom-ledger balance remains independently bounded
+    # at 5e-12%.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.904942247340407e-7,
-        # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
-        # from reservoir.fo2_buffer; the unbacked remainder is held and the
-        # resulting subtraction residual is reported by the production resolver.
-        # The piecewise segment solve changes the cancellation residual by
-        # 1.134167275e-14 percentage points from the single-exponential pin;
-        # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 8.041771960548321e-7,
+        "lunar_mare_low_ti": 9.910691898274657e-7,
+        "mars_basalt": 5.61964928631159e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -787,15 +783,14 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    # Mg retains cited_hkl_accommodation, but is absent because it leaves the
-    # one-hour participating roster under d-144; Na supplies
-    # hkl_ideal_upper_bound.
+    # Na supplies hkl_ideal_upper_bound. The d-349 liquid-to-crystalline MgO
+    # activity conversion at 1873.15 K is exp(+DeltaG_fus/RT)=6.22050972745;
+    # Mg now passes the evaporation engine's 1e-12 kg/hr insertion gate and
+    # carries its cited wall-alpha record into this notice.
     assert "hkl_ideal_upper_bound" in notice["source_classes"]
     assert "uncertified_na_analogy_default" in notice["source_classes"]
-    # d-144 (5b5d2a080) removes Mg from the one-hour participating roster.
-    assert notice["species"] == ["Fe", "K", "Mn", "Na"]
-    assert "Mg" not in notice["species"]
-    assert "Mg" not in notice["alpha_s_by_species"]
+    assert notice["species"] == ["Fe", "K", "Mg", "Mn", "Na"]
+    assert notice["alpha_s_by_species"]["Mg"] > 0.0
     assert (
         notice["grounding_target"]
         == "data/literature/vacuum_pyrolysis_sticking.yaml"
