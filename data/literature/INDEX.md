@@ -15,13 +15,13 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 771
-- Extracts (`literature_extract.v1`): 769
+- Sources: 775
+- Extracts (`literature_extract.v1`): 773
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 769
-- Alias groups needing owner/controller resolution: 82
+- Extracts with no PDF: 773
+- Alias groups needing owner/controller resolution: 83
 - Extracts with private/non-public row locators: 79
 
 ## Sources
@@ -927,6 +927,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `deguzman-2026-simulant-physicochemical`
 - `delgado-2015-mg-thermite-regolith`
 - `di-donato-granati-2000`
+- `dikov-2009-luna16-condensate-iron`
 - `distin-1971-ferrous-silicate-melts`
 - `dohmen-2003-coupled-kinetics`
 - `dong-2009-cr-v-slag-activities`
@@ -1215,6 +1216,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `metsoc-2024-6224`
 - `miao-li-yan-2023-fe-v-spinel-gibbs`
 - `miki-1999-si-alloy-thermodynamics`
+- `moeller-2007-silicon-oxide-evaporation-condensation`
 - `mogul-2023-pioneer-venus-co2-icarus`
 - `moosavi-khoonsari-2015-na-fe-cmas-thesis`
 - `morey-1964-usgs-pp440l-phase-equilibria`
@@ -1297,6 +1299,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `rau-1974-se-vp`
 - `rb86-capobianco-navrotsky-1982`
 - `rb86-neuvonen-1952`
+- `rb86-stebbins-carmichael-1984`
+- `rb86-stebbins-etal-1984`
 - `rb86-takahashi-yoshio-1970`
 - `ref-032-al`
 - `ref-032-bi`
@@ -1741,6 +1745,7 @@ The builder does not pick a winner.
 - source_id_alias `metsoc-2024`: `metsoc-2024-6131`, `metsoc-2024-6224` — needs owner/controller resolution
 - source_id_alias `meyer-2010`: `lpi-compendium-15013`, `lpi-compendium-62231`, `lpi-compendium-65701` — needs owner/controller resolution
 - source_id_alias `morris-2006`: `morris-2006-gusev-mossbauer`, `morris-2006-meridiani-mossbauer` — needs owner/controller resolution
+- source_id_alias `rb86-1984`: `rb86-stebbins-carmichael-1984`, `rb86-stebbins-etal-1984` — needs owner/controller resolution
 - source_id_alias `robinot-2026`: `kems-044-robinot-2026`, `robinot_2026`, `robinot_2026_vacuum_pyrolysis` — needs owner/controller resolution
 - source_id_alias `schneider-1980`: `kems-212-schneider-1980-nbsir-80-2059`, `kems-213-schneider-1980-nbsir-80-2139` — needs owner/controller resolution
 - source_id_alias `schreiber-1977`: `schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu`, `schreiber-1977-tetravalent-cr-diopside` — needs owner/controller resolution
