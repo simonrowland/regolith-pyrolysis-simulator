@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -72,3 +71,81 @@ def test_isolated_migration_preserves_temperature_conditions_and_lineage(tmp_pat
             if identity_temperature is not None and identity_temperature.is_value:
                 assert identity_temperature.value == condition.state.value
     assert temperatures > 0
+
+
+def test_table1_fit_and_alpha_rows_keep_located_methods_and_score(tmp_path: Path):
+    document = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    observations = {
+        row["observation_id"]: row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+    }
+    expected = {
+        "ge_2005_t1_geo_03": ("1.51e-5", "(1.51×10^-5)", "18473", "9.389"),
+        "ge_2005_t1_geo_05": ("1.39e-5", "(1.39×10^-5)", "17957", "8.955"),
+        "ge_2005_t1_geo_06": ("1.58e-5", "(1.58×10^-5)", "18551", "9.469"),
+        "ge_2005_t1_o2_08": ("7.56e-6", "(7.56×10^-6)", "18487", "9.100"),
+        "ge_2005_t1_o2_10": ("6.50e-6", "(6.50×10^-6)", "17746", "8.464"),
+    }
+    pressure_references = ("[23]", "[24]", "[29]", "[30]")
+    for observation_id, (value, printed, log_a, log_b) in expected.items():
+        row = observations[observation_id]
+        assert row["values"]["value"] == value
+        assert row["values"]["value_as_printed"] == printed
+        assert row["values"]["log10_p_A_K"] == log_a
+        assert row["values"]["log10_p_B"] == log_b
+        derivation = row["derivation"]
+        locator = derivation["method"]["locator"]
+        assert locator["published_page"] == 1347
+        assert locator["equation"] == "5"
+        assert all(
+            reference in " ".join(derivation["references"])
+            for reference in pressure_references
+        )
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert "derived_from" not in row
+        assert "inputs" not in derivation
+
+    alpha_expected = {
+        "ge_2005_alpha_geo": ("0.227", "(2.27 ± 0.43) × 10^−1"),
+        "ge_2005_alpha_o2": ("0.198", "(1.98 ± 0.85) × 10^−1"),
+    }
+    for observation_id, (value, printed) in alpha_expected.items():
+        row = observations[observation_id]
+        assert row["values"]["value"] == value
+        assert row["values"]["value_as_printed"] == printed
+        derivation = row["derivation"]
+        locator = derivation["method"]["locator"]
+        assert locator["published_page"] == 1348
+        assert locator["paragraph"] == "partial vaporization coefficients"
+        assert all(
+            reference in " ".join(derivation["references"])
+            for reference in ("[28]", "[30]")
+        )
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert "derived_from" not in row
+        assert "inputs" not in derivation
+
+    result = _migrate_real_extract(tmp_path / "migration", EXTRACT_NAME)
+    assert result.validation is not None
+    migrated_by_raw_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+    for observation_id in expected:
+        migrated = migrated_by_raw_id[observation_id]
+        assert migrated.value.kind.value == "point"
+        assert migrated.value.point is not None and migrated.value.point > 0
+        assert migrated.evidence.class_.value.value == "model_derived"
+        assert migrated.admission.status.value == "admitted"
+    for observation_id in alpha_expected:
+        migrated = migrated_by_raw_id[observation_id]
+        assert migrated.value.kind.value == "point"
+        assert migrated.value.point is not None and migrated.value.point > 0
+        assert migrated.evidence.class_.value.value == "model_derived"
+        assert migrated.admission.status.value == "admitted"
+    target_ids = expected.keys() | alpha_expected.keys()
+    assert not any(
+        observation_id.rsplit("::", 1)[-1] in target_ids
+        for observation_id in result.validation.hard_issues_by_observation
+    )

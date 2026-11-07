@@ -192,8 +192,8 @@ species:
         composition_as_printed: over GeO2
         x_GeO2: '1'
         phase_as_printed: The table does not state the condensed phase for this row.
-        parents_not_printed: The fit coefficients are printed. The ion-current points and the [23, 24]
-          equilibrium constants used as parents are not printed in this paper. No derived_from link is
+        parents_not_printed: The fit coefficients and pressure cell are printed. The underlying experimental
+          series used in the fit is not reproduced here. No derived_from link to an unprinted series is
           invented.
       phase: g
       uncertainty:
@@ -213,6 +213,35 @@ species:
               kind: point
               point: '1300'
           locator: *id005
+      derivation:
+        relation: "Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values are evaluated from earlier thermodynamic data [23, 24]."
+        output_unit: atm
+        method:
+          state:
+            tag: value
+            value: "Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental data [29, 30]."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+        references:
+        - "Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]"
+        - "Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]"
+        - "Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+            note: "The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental series used in the fit."
     - observation_id: ge_2005_t1_geo_04
       type: partial_pressure
       locator: &id006
@@ -287,8 +316,8 @@ species:
         composition_as_printed: over GeO2
         x_GeO2: '1'
         phase_as_printed: The table does not state the condensed phase for this row.
-        parents_not_printed: The fit coefficients are printed. The ion-current points and the [23, 24]
-          equilibrium constants used as parents are not printed in this paper. No derived_from link is
+        parents_not_printed: The fit coefficients and pressure cell are printed. The underlying experimental
+          series used in the fit is not reproduced here. No derived_from link to an unprinted series is
           invented.
       phase: g
       uncertainty:
@@ -308,6 +337,35 @@ species:
               kind: point
               point: '1300'
           locator: *id007
+      derivation:
+        relation: "Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values are evaluated from earlier thermodynamic data [23, 24]."
+        output_unit: atm
+        method:
+          state:
+            tag: value
+            value: "Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental data [29, 30]."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+        references:
+        - "Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]"
+        - "Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]"
+        - "Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+            note: "The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental series used in the fit."
     - observation_id: ge_2005_t1_geo_06
       type: partial_pressure
       locator: &id008
@@ -335,8 +393,8 @@ species:
         composition_as_printed: over GeO2
         x_GeO2: '1'
         phase_as_printed: The table does not state the condensed phase for this row.
-        parents_not_printed: The fit coefficients are printed. The ion-current points and the [23, 24]
-          equilibrium constants used as parents are not printed in this paper. No derived_from link is
+        parents_not_printed: The fit coefficients and pressure cell are printed. The underlying experimental
+          series used in the fit is not reproduced here. No derived_from link to an unprinted series is
           invented.
       phase: g
       uncertainty:
@@ -356,6 +414,35 @@ species:
               kind: point
               point: '1300'
           locator: *id008
+      derivation:
+        relation: "Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values are evaluated from earlier thermodynamic data [23, 24]."
+        output_unit: atm
+        method:
+          state:
+            tag: value
+            value: "Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental data [29, 30]."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+        references:
+        - "Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]"
+        - "Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]"
+        - "Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+            note: "The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental series used in the fit."
     - observation_id: ge_2005_alpha_geo
       type: alpha
       locator: &id009
@@ -376,8 +463,8 @@ species:
         condensed_as_printed: GeO2
         Sv_over_sor_as_printed: about 3000
         attribution: This work, from [28] and [30].
-        parents_not_printed: The paper states the comparison and the result. It does not print the arithmetic,
-          so no derived_from link is invented.
+        parents_not_printed: The paper names comparison data [28] and [30] and prints alpha, but does not
+          reproduce the underlying pressure series or coefficient arithmetic. No derived_from link is invented.
       uncertainty:
         kind: printed
         value: '0.043'
@@ -391,6 +478,31 @@ species:
             reason: The sentence does not assign one temperature to alpha. The compared sets are [28]
               at 1213–1364 K and the [30] effusion-cell intervals. No midpoint is invented.
           locator: *id009
+      derivation:
+        relation: "The paper calculates alpha by comparing GeO2 vaporization data from cylindrical crucibles [28] and effusion cells [30] with vaporization-area to orifice-area ratio about 3000."
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: "Evaluate the partial vaporization coefficients from the discrepancy between cylindrical-crucible data and effusion-cell data at area ratio about 3000."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1348
+            paragraph: partial vaporization coefficients
+        references:
+        - "Kazenas, Chizhikov, Tsvetkov, and Vasyuta, Mass Spectrometric Study of GeO2 Sublimation [28]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1348
+            paragraph: partial vaporization coefficients
+            note: "The paper names the comparison sources and area ratio but does not reproduce the underlying pressure series or alpha arithmetic."
     context:
     - observation_id: ge_2005_t1_geo_fit_01
       type: vapor_pressure_fit
@@ -576,8 +688,8 @@ species:
         composition_as_printed: over GeO2
         x_GeO2: '1'
         phase_as_printed: The table does not state the condensed phase for this row.
-        parents_not_printed: The fit coefficients are printed. The ion-current points and the [23, 24]
-          equilibrium constants used as parents are not printed in this paper. No derived_from link is
+        parents_not_printed: The fit coefficients and pressure cell are printed. The underlying experimental
+          series used in the fit is not reproduced here. No derived_from link to an unprinted series is
           invented.
       phase: g
       uncertainty:
@@ -597,6 +709,35 @@ species:
               kind: point
               point: '1300'
           locator: *id011
+      derivation:
+        relation: "Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values are evaluated from earlier thermodynamic data [23, 24]."
+        output_unit: atm
+        method:
+          state:
+            tag: value
+            value: "Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental data [29, 30]."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+        references:
+        - "Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]"
+        - "Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]"
+        - "Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+            note: "The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental series used in the fit."
     - observation_id: ge_2005_t1_o2_09
       type: partial_pressure
       locator: &id012
@@ -671,8 +812,8 @@ species:
         composition_as_printed: over GeO2
         x_GeO2: '1'
         phase_as_printed: The table does not state the condensed phase for this row.
-        parents_not_printed: The fit coefficients are printed. The ion-current points and the [23, 24]
-          equilibrium constants used as parents are not printed in this paper. No derived_from link is
+        parents_not_printed: The fit coefficients and pressure cell are printed. The underlying experimental
+          series used in the fit is not reproduced here. No derived_from link to an unprinted series is
           invented.
       phase: g
       uncertainty:
@@ -692,6 +833,35 @@ species:
               kind: point
               point: '1300'
           locator: *id013
+      derivation:
+        relation: "Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values are evaluated from earlier thermodynamic data [23, 24]."
+        output_unit: atm
+        method:
+          state:
+            tag: value
+            value: "Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental data [29, 30]."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+        references:
+        - "Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]"
+        - "Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]"
+        - "Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1347
+            section: "K2O and GeO2 vaporization and thermodynamic properties"
+            equation: "5"
+            note: "The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental series used in the fit."
     - observation_id: ge_2005_alpha_o2
       type: alpha
       locator: &id014
@@ -712,8 +882,8 @@ species:
         condensed_as_printed: GeO2
         Sv_over_sor_as_printed: about 3000
         attribution: This work, from [28] and [30].
-        parents_not_printed: The paper states the comparison and the result. It does not print the arithmetic,
-          so no derived_from link is invented.
+        parents_not_printed: The paper names comparison data [28] and [30] and prints alpha, but does not
+          reproduce the underlying pressure series or coefficient arithmetic. No derived_from link is invented.
       uncertainty:
         kind: printed
         value: '0.085'
@@ -727,6 +897,31 @@ species:
             reason: The sentence does not assign one temperature to alpha. The compared sets are [28]
               at 1213–1364 K and the [30] effusion-cell intervals. No midpoint is invented.
           locator: *id014
+      derivation:
+        relation: "The paper calculates alpha by comparing GeO2 vaporization data from cylindrical crucibles [28] and effusion cells [30] with vaporization-area to orifice-area ratio about 3000."
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: "Evaluate the partial vaporization coefficients from the discrepancy between cylindrical-crucible data and effusion-cell data at area ratio about 3000."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1348
+            paragraph: partial vaporization coefficients
+        references:
+        - "Kazenas, Chizhikov, Tsvetkov, and Vasyuta, Mass Spectrometric Study of GeO2 Sublimation [28]"
+        - "Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen System [30]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1348
+            paragraph: partial vaporization coefficients
+            note: "The paper names the comparison sources and area ratio but does not reproduce the underlying pressure series or alpha arithmetic."
     context:
     - observation_id: ge_2005_t1_o2_fit_06
       type: vapor_pressure_fit
