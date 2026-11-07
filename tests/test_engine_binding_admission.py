@@ -1750,3 +1750,72 @@ def test_live_admission_error_does_not_keep_provider_finalizer_alive(
 
     assert provider_ref() is None
     assert closed == [True]
+
+
+def test_thermoengine_failed_initialization_does_not_keep_provider_alive(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import thermoengine as thermoengine_module
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    closed: list[bool] = []
+
+    class FakeBackend:
+        def close(self) -> None:
+            closed.append(True)
+
+    class FakeProvider:
+        def __init__(self) -> None:
+            self.backend = FakeBackend()
+            weakref.finalize(self, self.backend.close)
+
+    def fail_initialization_with_provider() -> tuple[
+        ThermoEngineBackend, weakref.ReferenceType[FakeProvider]
+    ]:
+        provider = FakeProvider()
+        provider_ref = weakref.ref(provider)
+        provider_holder = [provider]
+        provider = None
+
+        class FailingTransport:
+            def __init__(self, **_kwargs) -> None:
+                self.provider = provider_holder.pop()
+
+            def initialize(self) -> None:
+                provider_from_frame = self.provider
+                self.provider = None
+                assert provider_from_frame is not None
+                raise ImportError("synthetic ThermoEngine init failure")
+
+            def close(self) -> None:
+                pass
+
+        with monkeypatch.context() as patch:
+            patch.setattr(
+                thermoengine_module, "ThermoEngineTransport", FailingTransport
+            )
+            patch.setattr(
+                ThermoEngineBackend,
+                "_initialize_vaporock_delegate",
+                lambda _self: None,
+            )
+            backend = ThermoEngineBackend()
+            try:
+                backend.initialize({})
+            except ImportError as error:
+                assert str(error) == (
+                    "ThermoEngine transport unavailable: ImportError: "
+                    "synthetic ThermoEngine init failure"
+                )
+        return backend, provider_ref
+
+    backend, provider_ref = fail_initialization_with_provider()
+
+    assert backend._thermoengine_import_error == (
+        "ImportError",
+        "synthetic ThermoEngine init failure",
+    )
+    assert backend.transport is None
+    gc.collect()
+    assert provider_ref() is None
+    assert closed == [True]

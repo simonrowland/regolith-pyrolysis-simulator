@@ -99,6 +99,7 @@ def _detached_exception_copy(exc: Exception) -> Exception:
                 detached = type(exc)(*exc.args)
             except Exception:
                 detached = RuntimeError(f"{type(exc).__name__}: {exc}")
+    # This clears standard traceback/cause/context links only.
     detached.__traceback__ = None
     detached.__cause__ = None
     detached.__context__ = None

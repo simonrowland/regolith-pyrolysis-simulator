@@ -85,6 +85,74 @@ def _wait_until_running(future, *, timeout_s=5.0):
     assert future.running()
 
 
+def test_failed_future_does_not_keep_provider_finalizer_alive():
+    closed = []
+    consumer_idle = threading.Event()
+
+    class FakeWorker:
+        name = "failed-request-test"
+        process = None
+
+        def start(self):
+            pass
+
+        def _begin_pool_call(self):
+            return threading.Event()
+
+        def _end_pool_call(self, _abort_event):
+            pass
+
+        def call(self, _request, *, timeout_s=None):
+            raise RuntimeError("synthetic handler failure")
+
+        def request_disable(self):
+            pass
+
+        def _reap_pending(self, *, timeout_s):
+            return True
+
+        def close(self):
+            pass
+
+    pool = EngineWorkerPool(lambda _index: FakeWorker(), size=1)
+    original_task_done = pool._queue.task_done
+
+    def observed_task_done():
+        original_task_done()
+        if pool._queue.unfinished_tasks == 0:
+            consumer_idle.set()
+
+    pool._queue.task_done = observed_task_done
+
+    class FakeBackend:
+        def close(self):
+            closed.append(True)
+
+    class FakeProvider:
+        def __init__(self):
+            self.backend = FakeBackend()
+            weakref.finalize(self, self.backend.close)
+
+    def fail_while_holding_provider():
+        provider = FakeProvider()
+        provider_ref = weakref.ref(provider)
+        future = pool.submit(None, timeout_s=1.0)
+        try:
+            future.result(timeout=2.0)
+        except RuntimeError as error:
+            assert str(error) == "synthetic handler failure"
+        return provider_ref
+
+    try:
+        provider_ref = fail_while_holding_provider()
+        assert consumer_idle.wait(timeout=2.0)
+        gc.collect()
+        assert provider_ref() is None
+        assert closed == [True]
+    finally:
+        pool.close(cancel_pending=True, timeout_s=2.0)
+
+
 def _close_all_reaps_pools_after_callers_drop_references():
     close_all_engine_pools(cancel_pending=True)
     assert not _direct_spawn_child_pids()
