@@ -700,10 +700,9 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         ).items():
             finite = is_finite(value)
             numeric = float(value) if finite else None
-            if numeric is None or numeric <= 0.0:
-                reason = 'nonfinite' if numeric is None else 'nonpositive'
+            if numeric is None:
                 projection_warnings.append(
-                    f'MAGEMin provider omitted {reason} '
+                    'MAGEMin provider omitted nonfinite '
                     'liquid_composition_wt_pct field '
                     f'{str(field)!r} for phase liquid: {value!r}'
                 )
@@ -711,7 +710,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     'SR17:magemin_provider_projection_repaired '
                     'producer=MAGEMin field=liquid_composition_wt_pct '
                     f'phase=liquid item={str(field)!r} '
-                    f'action=dropped reason={reason}'
+                    'action=dropped reason=nonfinite'
                 )
                 continue
             liquid_comp[str(field)] = numeric

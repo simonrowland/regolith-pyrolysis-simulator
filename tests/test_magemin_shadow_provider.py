@@ -575,7 +575,7 @@ def test_projected_phase_and_liquid_fields_pin_has_no_repair_warning():
     assert diagnostic.backend_warnings == ()
 
 
-def test_projected_invalid_fields_are_filtered_without_changing_replay_record():
+def test_projected_liquid_nonpositive_values_match_green_and_nonfinite_is_filtered():
     from types import SimpleNamespace
 
     from simulator.melt_backend.base import EquilibriumResult
@@ -603,7 +603,6 @@ def test_projected_invalid_fields_are_filtered_without_changing_replay_record():
         _last_vapor_pressure_diagnostic={},
     )
     cached_before = canonical_json_bytes(equilibrium_payload(sim, equilibrium))
-
     diagnostic = MAGEMinShadowProvider._project_equilibrium(
         equilibrium,
         mode='shadow',
@@ -612,31 +611,46 @@ def test_projected_invalid_fields_are_filtered_without_changing_replay_record():
 
     assert diagnostic.phase_masses_kg == {'liquid': 1.0}
     assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
-    assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
+    assert diagnostic.liquid_composition_wt_pct == {
+        'SiO2': 50.0, 'MgO': 50.0, 'FeO': 0.0, 'CaO': -1.0,
+    }
     repair_warnings = [
         warning for warning in diagnostic.backend_warnings
         if warning.startswith('SR17:')
     ]
-    assert len(repair_warnings) == 3
+    assert len(repair_warnings) == 1
     assert any(
         "phase='olivine'" in warning and 'phase_masses_kg' in warning
-        for warning in repair_warnings
-    )
-    assert any(
-        "item='FeO'" in warning and 'reason=nonpositive' in warning
-        for warning in repair_warnings
-    )
-    assert any(
-        "item='CaO'" in warning and 'reason=nonpositive' in warning
         for warning in repair_warnings
     )
     assert any(
         "phase 'olivine'" in warning and 'nonpositive' in warning
         for warning in diagnostic.backend_warnings
     )
+    assert equilibrium.warnings == []
     cached_after = canonical_json_bytes(equilibrium_payload(sim, equilibrium))
     assert cached_after == cached_before
-    assert equilibrium.warnings == []
+
+    nonfinite = EquilibriumResult(
+        temperature_C=1400.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_composition_wt_pct={'Na2O': float('inf')},
+        liquid_fraction=1.0,
+    )
+    filtered = MAGEMinShadowProvider._project_equilibrium(
+        nonfinite,
+        mode='shadow',
+        engine_version='test',
+    )
+    assert filtered.liquid_composition_wt_pct == {}
+    assert any(
+        warning.startswith('SR17:')
+        and "item='Na2O'" in warning
+        and 'reason=nonfinite' in warning
+        for warning in filtered.backend_warnings
+    )
+    assert nonfinite.liquid_composition_wt_pct == {'Na2O': float('inf')}
 
 
 def test_projected_nonfinite_liquid_scalars_are_reported():

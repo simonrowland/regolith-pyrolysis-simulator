@@ -484,13 +484,7 @@ def test_sr06_empty_thermoengine_liquid_composition_uses_bulk_with_notice() -> N
     )
 
     assert payload.liquid_composition_wt_pct == {"SiO2": 60.0, "MgO": 40.0}
-    assert component_moles == {"SiO2": 0.5}
-    assert any(
-        warning.startswith("SR05:")
-        and "field=Liquid.component" in warning
-        and "item='MgO'" in warning
-        for warning in payload.warnings
-    )
+    assert component_moles == {"SiO2": 0.5, "MgO": float("inf")}
     assert any(
         warning.startswith("SR06:")
         and "field=liquid_composition_wt_pct" in warning
@@ -498,6 +492,27 @@ def test_sr06_empty_thermoengine_liquid_composition_uses_bulk_with_notice() -> N
         for warning in payload.warnings
     )
     assert any("composition_of_phase returned an empty payload" in warning for warning in payload.warnings)
+
+
+def test_sr05_nonfinite_component_vector_keeps_typed_failure() -> None:
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineNonFiniteField,
+        ThermoEngineTransport,
+    )
+
+    class FakeLiquid:
+        endmember_names = ("SiO2", "MgO")
+
+    transport = ThermoEngineTransport.__new__(ThermoEngineTransport)
+    transport._liq_phase = FakeLiquid()
+
+    with pytest.raises(ThermoEngineNonFiniteField):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={"SiO2": 0.5, "MgO": float("inf")},
+            comp_wt={"SiO2": 60.0, "MgO": 40.0},
+        )
 
 
 def test_sr07_empty_component_vector_uses_wt_moles_without_changing_activity() -> None:
@@ -637,27 +652,44 @@ def test_sr11_path_point_omission_names_temperature_and_oxide() -> None:
     )
 
 
-def test_sr12_absent_nondeclared_and_nonfinite_controls_use_noticed_defaults() -> None:
+def test_sr12_default_notices_preserve_green_control_conversion() -> None:
     from engines.alphamelts.parser import _control_float
 
     notices: list[str] = []
     assert _control_float({}, "pressure_bar", 1.0, repair_notices=notices) == 1.0
     assert _control_float({"temperature_C": None}, "temperature_C", 0.0, repair_notices=notices) == 0.0
     assert _control_float({"fO2_log": float("nan")}, "fO2_log", -9.0, repair_notices=notices) == -9.0
+    assert _control_float({"temperature_C": True}, "temperature_C", 0.0, repair_notices=notices) == 1.0
 
-    assert len(notices) == 3
+    assert len(notices) == 2
     assert all(notice.startswith("SR12:") for notice in notices)
     assert any("field=pressure_bar" in notice and "replacement=1.0" in notice for notice in notices)
-    assert any("field=temperature_C" in notice and "non_declared" in notice for notice in notices)
     assert any("field=fO2_log" in notice and "nonfinite_control" in notice for notice in notices)
 
 
-def test_sr13_empty_activity_source_names_selected_later_source() -> None:
+def test_sr13_incomplete_first_activity_source_matches_green_selection() -> None:
     backend = AlphaMELTSBackend()
     repairs: list[dict[str, str]] = []
     values, diagnostics = backend._extract_activity_mapping(
         {
             "melt_oxide_activities": {"SiO2": 0.3},
+            "activities": {"Liquid": {"SiO2": 0.4, "MgO": 0.5}},
+        },
+        liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
+        repair_issues=repairs,
+    )
+
+    assert values == {"SiO2": 0.3}
+    assert diagnostics["diagnostic_activity_source"] == "melt_oxide_activities"
+    assert not any(item["site"] == "SR13" for item in repairs)
+
+
+def test_sr13_empty_activity_source_notice_keeps_green_fallback_value() -> None:
+    backend = AlphaMELTSBackend()
+    repairs: list[dict[str, str]] = []
+    values, diagnostics = backend._extract_activity_mapping(
+        {
+            "melt_oxide_activities": {},
             "activities": {"Liquid": {"SiO2": 0.4, "MgO": 0.5}},
         },
         liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
@@ -669,11 +701,12 @@ def test_sr13_empty_activity_source_names_selected_later_source() -> None:
     ]
 
     assert values == {"SiO2": 0.4, "MgO": 0.5}
+    assert diagnostics["diagnostic_activity_source"] == "activities"
     assert any(
         notice.startswith("SR13:")
         and "source='melt_oxide_activities'" in notice
         and "selected_source='activities'" in notice
-        and "empty_or_incomplete_source_skipped" in notice
+        and "empty_source_skipped" in notice
         for notice in notices
     )
 
@@ -720,6 +753,7 @@ def test_sr16_magemin_phase_composition_filters_invalid_values_with_notices() ->
                         "MgO": 0.0,
                         "FeO": -1.0,
                         "CaO": float("inf"),
+                        "MnO": float("nan"),
                     },
                 },
                 "olivine": {"mass_kg": 1.0, "composition": {"MgO": 50.0}},
@@ -728,7 +762,10 @@ def test_sr16_magemin_phase_composition_filters_invalid_values_with_notices() ->
         repair_notices=notices,
     )
 
-    assert payload[2] == {"liq": {"SiO2": 60.0}, "olivine": {"MgO": 50.0}}
+    assert payload[2] == {
+        "liq": {"SiO2": 60.0, "CaO": float("inf")},
+        "olivine": {"MgO": 50.0},
+    }
     assert payload[3] == 0.5
     assert len(notices) == 3
     assert all(notice.startswith("SR16:") and "phase='liq'" in notice for notice in notices)

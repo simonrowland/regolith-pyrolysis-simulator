@@ -28,7 +28,7 @@ from engines.alphamelts.domain import (
     _endmember_activity_repair_notices,
 )
 from engines.alphamelts.result import LiquidusDiagnostics
-from simulator.scalar_boundary import is_declared_real_scalar, is_finite
+from simulator.scalar_boundary import is_finite
 
 
 class ParserError(RuntimeError):
@@ -531,6 +531,7 @@ def _control_float(
     *,
     repair_notices: list[str] | None = None,
 ) -> float:
+    value = controls.get(name, default)
     if name not in controls:
         if repair_notices is not None:
             repair_notices.append(_projection_repair_notice(
@@ -538,17 +539,6 @@ def _control_float(
                 field=name,
                 item=name,
                 reason='absent_control_defaulted',
-                replacement=repr(float(default)),
-            ))
-        return float(default)
-    value = controls[name]
-    if not is_declared_real_scalar(value, allow_numeric_str=True):
-        if repair_notices is not None:
-            repair_notices.append(_projection_repair_notice(
-                'SR12',
-                field=name,
-                item=name,
-                reason='non_declared_control_defaulted',
                 replacement=repr(float(default)),
             ))
         return float(default)

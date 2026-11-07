@@ -5418,12 +5418,6 @@ class _MELTSBackendSupport(MeltBackend):
         failed_conversion_sources: Optional[set[str]] = None,
     ) -> tuple[dict, dict[str, object]]:
         skipped_sources: list[str] = []
-        partial_candidate: tuple[
-            dict,
-            str,
-            dict[str, object],
-            tuple[str, ...],
-        ] | None = None
         failed_sources = (
             failed_conversion_sources
             if failed_conversion_sources is not None
@@ -5440,24 +5434,13 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
-                source_diagnostics = {'diagnostic_activity_source': key}
-                if self._activity_mapping_is_complete(
-                    mapped, liquid_composition_wt_pct
-                ):
-                    self._record_skipped_activity_sources(
-                        skipped_sources,
-                        key,
-                        repair_issues,
-                        failed_sources,
-                    )
-                    return mapped, source_diagnostics
-                if partial_candidate is None:
-                    partial_candidate = (
-                        mapped,
-                        key,
-                        source_diagnostics,
-                        tuple(skipped_sources),
-                    )
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    key,
+                    repair_issues,
+                    failed_sources,
+                )
+                return mapped, {'diagnostic_activity_source': key}
             skipped_sources.append(key)
 
         for key in ('activities', 'Activities'):
@@ -5471,24 +5454,13 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
-                source_diagnostics = {'diagnostic_activity_source': key}
-                if self._activity_mapping_is_complete(
-                    mapped, liquid_composition_wt_pct
-                ):
-                    self._record_skipped_activity_sources(
-                        skipped_sources,
-                        key,
-                        repair_issues,
-                        failed_sources,
-                    )
-                    return mapped, source_diagnostics
-                if partial_candidate is None:
-                    partial_candidate = (
-                        mapped,
-                        key,
-                        source_diagnostics,
-                        tuple(skipped_sources),
-                    )
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    key,
+                    repair_issues,
+                    failed_sources,
+                )
+                return mapped, {'diagnostic_activity_source': key}
             skipped_sources.append(key)
 
         coefficient_source = 'activity_coefficients_times_oxide_mole_fraction'
@@ -5516,27 +5488,16 @@ class _MELTSBackendSupport(MeltBackend):
                     # gamma, before a = gamma * x. Not a second convention.
                     'reported_activity_coefficients': gammas,
                 }
-                if self._activity_mapping_is_complete(
-                    mapped, liquid_composition_wt_pct
-                ):
-                    self._record_skipped_activity_sources(
-                        skipped_sources,
-                        coefficient_source,
-                        repair_issues,
-                        failed_sources,
-                    )
-                    return mapped, source_diagnostics
-                if partial_candidate is None:
-                    partial_candidate = (
-                        mapped,
-                        coefficient_source,
-                        source_diagnostics,
-                        tuple(skipped_sources),
-                    )
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    coefficient_source,
+                    repair_issues,
+                    failed_sources,
+                )
+                return mapped, source_diagnostics
             skipped_sources.append(coefficient_source)
 
         activities: Dict[str, float] = {}
-        phase_source_present = False
         for key, value in results.items():
             name = str(key)
             if not name.endswith('_prop'):
@@ -5544,7 +5505,6 @@ class _MELTSBackendSupport(MeltBackend):
             phase_name = name[: -len('_prop')]
             if not self._is_liquid_activity_phase(phase_name):
                 continue
-            phase_source_present = True
             row = self._first_row_mapping(value)
             for prop_name, prop_value in row.items():
                 prop = str(prop_name)
@@ -5587,70 +5547,14 @@ class _MELTSBackendSupport(MeltBackend):
             source_diagnostics = {
                 'diagnostic_activity_source': 'phase_activity_fields'
             }
-            if self._activity_mapping_is_complete(
-                mapped, liquid_composition_wt_pct
-            ):
-                self._record_skipped_activity_sources(
-                    skipped_sources,
-                    'phase_activity_fields',
-                    repair_issues,
-                    failed_sources,
-                )
-                return mapped, source_diagnostics
-            if partial_candidate is None:
-                partial_candidate = (
-                    mapped,
-                    'phase_activity_fields',
-                    source_diagnostics,
-                    tuple(skipped_sources),
-                )
-        if phase_source_present:
-            skipped_sources.append('phase_activity_fields')
-        if partial_candidate is not None:
-            mapped, source, source_diagnostics, prior_skipped_sources = (
-                partial_candidate
-            )
             self._record_skipped_activity_sources(
-                list(prior_skipped_sources),
-                source,
+                skipped_sources,
+                'phase_activity_fields',
                 repair_issues,
                 failed_sources,
             )
             return mapped, source_diagnostics
-        self._record_skipped_activity_sources(
-            skipped_sources,
-            'none',
-            repair_issues,
-            failed_sources,
-        )
         return {}, {}
-
-    @staticmethod
-    def _activity_mapping_is_complete(
-        activities: Mapping[str, float],
-        liquid_composition_wt_pct: Mapping[str, float],
-    ) -> bool:
-        required_oxides = set()
-        for raw_name, raw_wt_pct in dict(
-            liquid_composition_wt_pct or {}
-        ).items():
-            oxide = canonical_melt_oxide_activity_name(raw_name)
-            if oxide is None:
-                continue
-            try:
-                wt_pct = float(raw_wt_pct)
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(wt_pct) and wt_pct > 0.0:
-                required_oxides.add(oxide)
-        if not required_oxides:
-            return bool(activities)
-        available_oxides = {
-            oxide
-            for label in activities
-            if (oxide := canonical_melt_oxide_activity_name(label)) is not None
-        }
-        return required_oxides.issubset(available_oxides)
 
     @staticmethod
     def _record_skipped_activity_sources(
@@ -5675,7 +5579,7 @@ class _MELTSBackendSupport(MeltBackend):
                 'site': 'SR13',
                 'source': source,
                 'item': 'activity_map',
-                'reason': 'empty_or_incomplete_source_skipped',
+                'reason': 'empty_source_skipped',
             })
 
     @staticmethod

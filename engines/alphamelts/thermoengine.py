@@ -1818,33 +1818,16 @@ print('ok')
                         replacement='bulk_composition',
                     ),
                 ))
-            # Nonfinite numeric values are dropped with SR05 above. Preserve
-            # finite invalid fractions and values that fail conversion so the
-            # activity adapter keeps their existing failure classification.
-            liquid_components = {}
-            for component, raw_value in dict(
+            # Preserve the component payload unchanged so the activity adapter
+            # retains its existing failure classification for invalid values.
+            liquid_components = dict(
                 _thermoengine_native_call(
                     lambda: melts.get_composition_of_phase(
                         root, liquid_phase, 'component'
                     )
                 )
                 or {}
-            ).items():
-                try:
-                    value = float(raw_value)
-                except (TypeError, ValueError, OverflowError):
-                    liquid_components[component] = raw_value
-                    continue
-                if not math.isfinite(value):
-                    repair_notices.append(_thermoengine_repair_notice(
-                        'SR05',
-                        field=f'{liquid_phase}.component',
-                        item=str(component),
-                        action='dropped',
-                        reason='nonfinite_component',
-                    ))
-                    continue
-                liquid_components[component] = value
+            )
         else:
             # No liquid phase: leave composition + activities + Fe redox
             # empty.  Subsolidus / fully crystallized states surface as

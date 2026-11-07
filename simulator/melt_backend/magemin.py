@@ -3927,7 +3927,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 v = float(value)
             except (TypeError, ValueError):
                 continue
-            if not math.isfinite(v) or v <= 0.0:
+            if not v > 0.0:
                 if repair_notices is not None:
                     reason = 'nonfinite' if not math.isfinite(v) else 'nonpositive'
                     repair_notices.append(
