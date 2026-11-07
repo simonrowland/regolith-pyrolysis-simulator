@@ -3015,19 +3015,47 @@ def test_request_fingerprint_refuses_nonfinite(
         "nonfinite-evaluation", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         {"K": 139.0}, state_fingerprint=fingerprint,
     )
-    answer = resolve_vapour_batch(
-        rules=(_selector_rule("K"),),
-        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
-        provider_candidates_by_species={"K": (candidate,)},
-        catalog_species=_selector_catalog_species("K"),
-        flux_activation_context=_rg_activation_context(),
-    ).channel("K")
-    assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
-    assert isinstance(answer.pressure, PressureRefusal)
-    assert isinstance(answer.flux, FluxRefusal)
-    assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
-    assert answer.flux.code == REFUSAL_MISSING_OUTCOME_STATE
-    assert "non-finite" in answer.extra["detail"]
+    if field_name == "source_reaction_composition_wt_pct":
+        with pytest.raises(VapourRequestConstructionError, match="fail-closed"):
+            resolve_vapour_batch(
+                rules=(_selector_rule("K"),),
+                ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+                state=state,
+                provider_candidates_by_species={"K": (candidate,)},
+                catalog_species=_selector_catalog_species("K"),
+                flux_activation_context=_pre_rg_activation_context("K"),
+            )
+    else:
+        answer = resolve_vapour_batch(
+            rules=(_selector_rule("K"),),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=state,
+            provider_candidates_by_species={"K": (candidate,)},
+            catalog_species=_selector_catalog_species("K"),
+            flux_activation_context=_rg_activation_context(),
+        ).channel("K")
+        assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert answer.flux.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert "non-finite" in answer.extra["detail"]
+
+
+def test_evaluator_without_pressure_fails_closed() -> None:
+    catalog_species = _selector_catalog_species("K")
+    catalog_species["K"].evaluator = SimpleNamespace(
+        evaluate=lambda *_args, **_kwargs: SimpleNamespace(pressure_pa=None)
+    )
+
+    with pytest.raises(VapourRequestConstructionError, match="fail-closed"):
+        resolve_vapour_batch(
+            rules=(_selector_rule("K"),),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=VapourResolveState(temperature_K=1600.0),
+            catalog_species=catalog_species,
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
 
 
 def test_missing_live_evaluator_selects_source_refusal_code_when_unclaimed() -> None:
