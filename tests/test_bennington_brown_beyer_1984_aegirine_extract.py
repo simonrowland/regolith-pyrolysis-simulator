@@ -249,10 +249,6 @@ def _assert_render_pins(document: dict) -> None:
             ("7", "1177.00"),
             ("8", "1185.00"),
         ],
-        "aegirine_table9_delta_fH_from_oxides": [
-            ("1", "847.00"),
-            ("2", "960.00"),
-        ],
     }
     for observation_id, expected in expected_marked_temperatures.items():
         points = observations[observation_id]["values"]["points"]
@@ -262,6 +258,41 @@ def _assert_render_pins(document: dict) -> None:
             if "transition_marker" in point
         ]
         assert marked == expected
+
+    table9_transition_meanings = {
+        "1": ("847.00", "α–β transition point for SiO2"),
+        "2": ("960.00", "Transition point for Fe2O3"),
+    }
+    table9_ids = (
+        "cp",
+        "S",
+        "negative_gibbs_function_over_T_from_H298",
+        "enthalpy_increment_from_H298",
+        "delta_fH_from_oxides",
+        "delta_fG_from_oxides",
+        "log10_Kf",
+    )
+    table9_annotations = []
+    for column in table9_ids:
+        observation_id = f"aegirine_table9_{column}"
+        points = observations[observation_id]["values"]["points"]
+        marked = [point for point in points if "transition_marker" in point]
+        assert len(marked) == 2
+        assert all(point["locator"]["page"] == 18 for point in marked)
+        assert all(point["locator"]["table"] == "9" for point in marked)
+        table9_annotations.extend(
+            (
+                point["transition_marker"],
+                point["T_K"],
+                point["transition_as_footnoted"],
+            )
+            for point in marked
+        )
+    assert table9_annotations == [
+        (marker, temperature, meaning)
+        for _ in table9_ids
+        for marker, (temperature, meaning) in table9_transition_meanings.items()
+    ]
 
     sample = next(
         row["values"]
@@ -326,6 +357,20 @@ def test_render_pins_and_row_count_reject_mutations() -> None:
     pure_row["derived_from"].remove("aegirine_table4_reaction_21_constituent_delta_fH")
     with pytest.raises(AssertionError):
         _assert_render_pins(changed_pure_lineage)
+
+    changed_table9_footnote = deepcopy(document)
+    table9_row = next(
+        row
+        for row in changed_table9_footnote["species"][NATURAL]["observations"]
+        if row["observation_id"] == "aegirine_table9_cp"
+    )
+    next(
+        point
+        for point in table9_row["values"]["points"]
+        if point.get("transition_marker") == "1"
+    )["transition_as_footnoted"] = "Na melting point"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_table9_footnote)
 
 
 def test_isolated_migration_preserves_rows_units_conditions_and_schema_gaps() -> None:
