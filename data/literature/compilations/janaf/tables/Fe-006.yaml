@@ -43,6 +43,17 @@ table:
     state: l
   title_as_published: Iron (Fe)  |  Fe1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  fusion_transition:
+    temperature:
+      value: 1809
+      uncertainty: 5
+      unit: K
+      locator: "JANAF 4th ed. p. 1224 (PDF p. 1235), T_fus = 1809 ± 5 K"
+    enthalpy:
+      value: 13.807
+      uncertainty: 0.4
+      unit: kJ mol^-1
+      locator: "JANAF 4th ed. p. 1224 (PDF p. 1235), Δ_fusH° = 13.807 ± 0.4 kJ mol^-1"
   units_as_published:
     temperature: K
     heat_capacity: J K^-1 mol^-1
