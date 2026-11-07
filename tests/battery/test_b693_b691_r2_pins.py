@@ -38,10 +38,13 @@ from simulator.battery.enums import QUANTITY_UNITS
 from simulator.battery.identity import quantity_token
 from simulator.battery.records import (
     Execution,
+    Derivation,
+    Located,
     Notice,
     Species,
     State,
     Uncertainty,
+    Value,
 )
 from simulator.battery.score import (
     ENGINE_CHANNELS,
@@ -582,7 +585,14 @@ def _oxygen_outcome(prediction, seen) -> tuple[object, ...]:
 
 
 @pytest.mark.parametrize(
-    "case", ("p_partial_no_o2", "p_partial_printed_o2", "p_sat_pure_reservoir")
+    "case",
+    (
+        "p_partial_no_o2",
+        "p_partial_printed_o2",
+        "p_sat_pure_reservoir",
+        "p_sat_pure_reservoir_printed_o2",
+        "p_sat_pure_reservoir_linked_o2",
+    ),
 )
 def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     monkeypatch, case: str
@@ -590,9 +600,35 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     from tests.battery import test_silent_fills as sf
 
     seen = sf._capture_cell(monkeypatch)
-    if case == "p_sat_pure_reservoir":
+    if case.startswith("p_sat_pure_reservoir"):
         observation = F.observation("na-psat", "kems-1", F.psat_identity("Na"), Decimal("1"))
         kems = F.kems_experiment()
+        if case.endswith("printed_o2"):
+            observation = replace(
+                observation,
+                point_conditions={
+                    "fO2_Pa": Located(
+                        State.of(Value.point_of(Decimal("1e-4"))),
+                        locator=observation.locator,
+                    )
+                },
+            )
+        elif case.endswith("linked_o2"):
+            observation = replace(
+                observation,
+                point_conditions={
+                    "fO2_Pa": Located(
+                        State.of(Value.point_of(Decimal("1e-4"))),
+                        locator=observation.locator,
+                        inference=Derivation(
+                            "source_oxygen_condition; same-cell measured O/O2",
+                            inputs=("same-cell-O2-observation",),
+                            parameters=(),
+                            output_unit="Pa",
+                        ),
+                    )
+                },
+            )
     else:
         observation, kems = sf._kems_partial(
             cell_material=None,
@@ -629,6 +665,13 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         )
         return
     assert reactive_outcome[:4] == general_outcome[:4]
+    if case.startswith("p_sat_pure_reservoir"):
+        assert reactive_outcome[2] == "not_an_input"
+        assert all(
+            "measured condition: same-cell source-linked oxygen" not in reason
+            and "fo2_tier=" not in reason
+            for reason in (*reactive_outcome[4], *general_outcome[4])
+        )
     if case == "p_partial_printed_o2":
         assert any(
             notice.reason == (
@@ -644,6 +687,8 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     expected = {
         "p_partial_printed_o2": ("unsupported", None, "commanded"),
         "p_sat_pure_reservoir": ("unsupported", None, "not_an_input"),
+        "p_sat_pure_reservoir_printed_o2": ("unsupported", None, "not_an_input"),
+        "p_sat_pure_reservoir_linked_o2": ("unsupported", None, "not_an_input"),
     }[case]
     assert (
         reactive_outcome[0],

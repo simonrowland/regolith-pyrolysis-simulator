@@ -17,7 +17,7 @@ from simulator.battery.enums import (
     Quantity,
 )
 from simulator.battery.records import (
-    Bench, BenchIdentity, Derivation, FO2Control, Located, Reaction,
+    Bench, BenchIdentity, Derivation, FO2Control, Located, Notice, Reaction,
     ReactionTerm, Species, State, Value,
 )
 from simulator.battery.score import (
@@ -174,6 +174,55 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     assert "basis=source_oxygen_condition;" in substitution.reason
     assert "inputs=" in substitution.reason
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
+
+
+def test_linked_oxygen_replaces_stale_derived_identity_in_prediction_and_comparison(
+    source_context, monkeypatch
+):
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    row = replace(
+        row,
+        identity=replace(row.identity, fO2_Pa=State.of(Decimal("1e-4"))),
+        notices=(
+            *row.notices,
+            Notice(
+                kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                reason="fO2_Pa is a DERIVED condition from scorer context",
+                origin="test derived condition",
+            ),
+        ),
+    )
+    requests, handles = _capture_engine(monkeypatch, row)
+    compared = _capture_comparison_identities(monkeypatch)
+    scoring_context = replace(
+        source_context,
+        observations={**source_context.observations, row.observation_id: row},
+    )
+    point_observations = tuple(
+        observation
+        for observation in scoring_context.observations.values()
+        if observation.experiment_id == row.experiment_id
+    )
+
+    residual, candidate = compile_residual(
+        row,
+        Engine.OPENIMCC,
+        context=scoring_context,
+        handles=handles,
+        point_observations=point_observations,
+    )
+
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert candidate is not None and residual.numeric is not None
+    commanded_pa = Decimal(str(requests[0].po2_bar)) * Decimal("1e5")
+    assert all(identity.fO2_Pa == State.of(commanded_pa) for identity in compared)
+    assert candidate.identity.fO2_Pa == State.of(commanded_pa)
+    selected = candidate.provenance["selected_oxygen_condition"]
+    assert Decimal(selected["value_Pa"]) == commanded_pa
+    assert selected["physics_rung"] == 2
+    assert selected["route"] == "source_linked_oxygen_condition"
 
 
 @pytest.mark.parametrize("printed_control", ("oxygen_pressure", "IW_buffer"))

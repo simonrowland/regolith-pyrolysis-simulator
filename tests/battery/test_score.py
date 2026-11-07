@@ -30,6 +30,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    Fo2Mode,
     IdentityEqualKind,
     MethodToken,
     MetricOperation,
@@ -536,6 +537,18 @@ def test_pressure_dependent_prediction_still_refuses_unknown_total_pressure() ->
     reference = replace(reference, point_conditions=None)
     prediction = replace(
         _partial_prediction(Engine.VAPOROCK, reference),
+        notices=(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                reason=(
+                    "fo2_tier=3; physics_rung=2:measured_same_cell_oxygen; "
+                    "route=source_linked_oxygen_condition"
+                ),
+                origin="fo2_ladder",
+                fo2_mode=Fo2Mode.SHARED_LADDER,
+            ),
+        ),
         identity=replace(
             identity, total_pressure_Pa=State.of(Decimal("0.1"))
         ),
