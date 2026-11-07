@@ -184,6 +184,21 @@ def test_wt_percent_conversion_keeps_v2o3_in_the_printed_slag_composition() -> N
     assert migrate_module._is_engine_oxide_component("V2O3") is False
 
 
+def test_wt_percent_conversion_keeps_trace_b2o3_without_dropping_it() -> None:
+    printed = {"SiO2": Decimal("99.75"), "B2O3": Decimal("0.25")}
+
+    result = migrate_module._wt_percent_conversion_or_refusal(
+        printed,
+        closure_context=printed,
+        declared_component_map=printed,
+    )
+
+    assert result.refusal is None
+    assert result.composition is not None
+    assert set(dict(result.composition.components)) == {"SiO2", "B2O3"}
+    assert result.dropped_components == ()
+
+
 def test_v2o3_phase_composition_component_row_migrates(tmp_path: Path) -> None:
     source = "wang-2017-cao-sio2-vox-tables-s1-s32"
     result = _migrate_real_extract(tmp_path, f"{source}.yaml")

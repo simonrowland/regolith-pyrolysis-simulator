@@ -5352,13 +5352,10 @@ def _unrecognized_printed_chemical_components(
             # Explicit ppm units are not mass-percent amounts for closure.
             or str(raw_name).strip().casefold().endswith(("_ppm", " ppm"))
             or (volatile is not None and volatile[0] != "Cl")
-            # Count recognized non-oxide components (such as Cl/H2O) against
-            # the dropped-mass limit; FeOT is retained via canonical FeO.
-            or (_is_engine_oxide_component(name) or name == "FeOT")
-            or (
-                equivalent is not None
-                and _is_engine_oxide_component(equivalent[0])
-            )
+            # Only Cl is a recognized composition component that this
+            # conversion deliberately omits; its mass still counts as dropped.
+            or (name in _COMPOSITION_COMPONENTS and name != "Cl")
+            or (equivalent is not None and equivalent[0] != "Cl")
         ):
             continue
         amount = _printed_mass_percent_number(raw_amount)
