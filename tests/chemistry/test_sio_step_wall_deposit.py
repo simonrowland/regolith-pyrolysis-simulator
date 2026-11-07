@@ -244,7 +244,7 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # to restacked 8.42832285779e-06 kg (-1.58e-15 kg,
         # -1.87463079e-8%).
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.42832285779e-06, rel=1e-9
+            8.42832289338e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9

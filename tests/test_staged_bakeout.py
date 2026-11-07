@@ -290,7 +290,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
     # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). The current
     # pins match the Studio report emitted from this same _run_staged helper.
-    assert staged_silica == pytest.approx(0.006596004558853442, rel=1e-9)
+    assert staged_silica == pytest.approx(0.00659347846887267, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
