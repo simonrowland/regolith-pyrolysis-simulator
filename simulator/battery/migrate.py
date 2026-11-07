@@ -5135,7 +5135,7 @@ def _is_closure_only_volatile(name: str) -> bool:
     token = _canonical_printed_oxide_name(str(name).strip())
     return (
         _volatile_closure_component(token) is not None
-        and token not in _COMPOSITION_COMPONENTS
+        and token != "S"
     )
 
 
@@ -5697,7 +5697,9 @@ def _printed_volatile_mass_percent(
     reported: set[str] = set()
 
     def reject(reason: str, component: str, source: str) -> None:
-        if component not in _COMPOSITION_COMPONENTS:
+        # Volatiles are closure contributors, not oxide-map cells, even when
+        # their names are also recognized by the composition converter.
+        if _is_closure_only_volatile(component):
             source = _M1_ONLY_CLOSURE_CONTRIBUTOR
         if diagnostics is not None and reason not in reported:
             diagnostics.append((source, reason))
@@ -6742,7 +6744,11 @@ def _wt_percent_conversion_or_refusal(
                     str(raw_name)
                 )
                 component = _COMPOSITION_COMPONENTS.get(name)
-                if component is None or component[1] in oxide_wt:
+                if (
+                    component is None
+                    or component[1] in oxide_wt
+                    or (_is_closure_only_volatile(name) and name != "Cl")
+                ):
                     continue
                 kind, amount = _classify_composition_cell(raw_amount)
                 if kind == "number" and amount is not None:
