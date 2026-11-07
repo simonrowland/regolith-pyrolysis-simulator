@@ -1143,6 +1143,33 @@ def load_table_document(path: Path) -> dict[str, Any]:
     return dict(document)
 
 
+def table_delta_fh_298_uncertainty_kj_per_mol(
+    table: Mapping[str, Any],
+) -> Decimal | None:
+    """Return a table's printed ΔfH°(298.15 K) uncertainty in kJ/mol."""
+
+    metadata = table.get("delta_fH_298_uncertainty")
+    if metadata is None:
+        return None
+    if not isinstance(metadata, Mapping):
+        raise JanafParseError("delta_fH_298_uncertainty must be a mapping")
+    if metadata.get("unit") != "kJ mol^-1":
+        raise JanafParseError(
+            "delta_fH_298_uncertainty unit must be 'kJ mol^-1'"
+        )
+    try:
+        value = Decimal(str(metadata.get("value")))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise JanafParseError(
+            "delta_fH_298_uncertainty value must be a decimal"
+        ) from exc
+    if not value.is_finite() or value < 0:
+        raise JanafParseError(
+            "delta_fH_298_uncertainty value must be finite and non-negative"
+        )
+    return value
+
+
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
     payload = load_cached_safe_yaml(
         (path or MANIFEST_PATH).read_text(encoding="utf-8")
