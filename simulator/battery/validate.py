@@ -1238,6 +1238,10 @@ def _validate_observation(
     model_references_declared = (
         derivation is not None and derivation.has_named_references
     )
+    has_resolved_lineage = any(
+        parent in observations or parent in asset_ids or parent in context_ids
+        for parent in observation.derived_from or ()
+    )
     declares_printed_unresolved = (
         derivation is not None and derivation.declares_unresolved_printed_inputs
     )
@@ -1340,6 +1344,7 @@ def _validate_observation(
             ev.value is EvidenceClass.MODEL_DERIVED
             and _value_has_numeric_value(observation.value)
             and not declares_unprinted_raw_inputs
+            and not has_resolved_lineage
         ):
             if not method_located:
                 issues.append(
@@ -1425,10 +1430,6 @@ def _validate_observation(
                         "model_derived raw_inputs method requires named references",
                     )
                 )
-        has_resolved_lineage = any(
-            parent in observations or parent in asset_ids or parent in context_ids
-            for parent in observation.derived_from or ()
-        )
         raw_inputs_supply_lineage = (
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs

@@ -1478,6 +1478,40 @@ def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
+def test_model_derived_resolved_parent_keeps_legacy_lineage_route() -> None:
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        "raw-1",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observation = F.observation(
+        "model-derived-without-method",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    assert observation.derivation is not None
+    observation = replace(
+        observation,
+        derived_from=(parent.observation_id,),
+        derivation=replace(
+            observation.derivation,
+            method=None,
+            references=("none_printed",),
+            raw_inputs=None,
+        ),
+    )
+
+    report = validate_corpus([F.work()], [experiment], [parent, observation])
+
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
 def test_model_derived_notice_does_not_replace_method_or_named_references() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
