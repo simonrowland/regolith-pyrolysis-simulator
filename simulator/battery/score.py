@@ -6270,13 +6270,13 @@ def _comparison_identity(
 
 def _selected_shared_ladder_oxygen(
     prediction: EnginePrediction,
-) -> tuple[Decimal | None, int, str] | None:
-    """Read the shared ladder's selected pressure, rung, and route once.
+) -> tuple[Decimal | None, int, int | None, str] | None:
+    """Read the selected pressure, generic tier, physics rung, and route once.
 
-    The prediction identity is the pressure passed to the engine. Ladder and
-    source-selection notices record its route and rung. Effusion balance has
-    no commanded pressure, so use its solver output when the engine reports
-    one.
+    The prediction identity is the pressure passed to the engine. The ladder
+    notice records generic tier and physics rung separately. Effusion balance
+    has no commanded pressure, so use its solver output when the engine
+    reports one.
     """
 
     for notice in prediction.notices:
@@ -6285,21 +6285,17 @@ def _selected_shared_ladder_oxygen(
             or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
         ):
             continue
-        match = re.fullmatch(r"fo2_tier=(\d+); route=(.+)", notice.reason)
+        match = re.fullmatch(
+            r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)",
+            notice.reason,
+        )
         if match is None:
             continue
-        route = match.group(2)
+        route = match.group(3)
         borrowed_suffix = "; borrowed"
         if route.endswith(borrowed_suffix):
             route = route[:-len(borrowed_suffix)]
-        rung = int(match.group(1))
-        for condition_notice in prediction.notices:
-            if condition_notice.origin != "source oxygen selection":
-                continue
-            selected_rung = re.search(r"\brung=(\d+):", condition_notice.reason)
-            if selected_rung is not None:
-                rung = int(selected_rung.group(1))
-            break
+        physics_rung = None if match.group(2) is None else int(match.group(2))
         value_pa: Decimal | None = None
         if isinstance(prediction.identity, Identity):
             state = prediction.identity.fO2_Pa
@@ -6311,7 +6307,7 @@ def _selected_shared_ladder_oxygen(
             po2_bar = _solved_effusion_po2_bar(prediction)
             if po2_bar is not None:
                 value_pa = Decimal(str(po2_bar)) * Decimal("1e5")
-        return value_pa, rung, route
+        return value_pa, int(match.group(1)), physics_rung, route
     return None
 
 
@@ -7510,6 +7506,16 @@ def _knudsen_vapour_equilibrium(
     )
 
 
+def _knudsen_oxygen_refusal_notices(
+    quantity: Quantity, experiment: Experiment | None
+) -> tuple[Notice, ...]:
+    if not _knudsen_vapour_equilibrium(quantity, experiment):
+        return ()
+    from simulator.battery.fo2_ladder import fo2_refusal_notice
+
+    return (fo2_refusal_notice(quantity),)
+
+
 def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
     tier = payload.get("fO2_tier")
     if tier is None:
@@ -7653,6 +7659,11 @@ def _oxygen_input_request(
                             "identity_fO2_Pa",
                             False,
                             po2_bar=po2_bar,
+                            physics_rung=(
+                                1
+                                if _knudsen_vapour_equilibrium(quantity, experiment)
+                                else None
+                            ),
                         ),
                     )
                 )
@@ -7704,7 +7715,10 @@ def _oxygen_input_request(
                     "why": oxygen_why,
                     "multivalent": list(redox),
                 },
-                notices=tuple(input_notices),
+                notices=(
+                    *input_notices,
+                    *_knudsen_oxygen_refusal_notices(quantity, experiment),
+                ),
             )
     input_notices.append(_omission_notice(quantity, oxygen_why))
     return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
@@ -7769,6 +7783,7 @@ def _borrow_internal_analytical_effusion(
                 "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
                 True,
                 po2_bar=bar,
+                physics_rung=3,
             ),
         )
     )
@@ -9395,6 +9410,7 @@ def _predict_with_engine(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             coefficient_sources=sources,
             lineage_complete=False,
+            notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "temperature_unknown"},
             identity=identity,
@@ -9955,6 +9971,7 @@ def _predict_with_engine(
                 requested=requested,
                 reason=RefusalReason.IDENTITY_INCOMPLETE,
                 detail=detail,
+                notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
             )
         formula_pot, phase_name = stated
         wt = {formula_pot: 100.0}
@@ -10955,8 +10972,9 @@ def candidate_observation(
             "value_Pa": (
                 None if selected_oxygen[0] is None else str(selected_oxygen[0])
             ),
-            "rung": selected_oxygen[1],
-            "route": selected_oxygen[2],
+            "fo2_tier": selected_oxygen[1],
+            "physics_rung": selected_oxygen[2],
+            "route": selected_oxygen[3],
         }
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",

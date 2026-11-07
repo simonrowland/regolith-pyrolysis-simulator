@@ -94,10 +94,26 @@ class ResolvedFo2:
     # ``cell_material`` is the modelled reservoir (W or Mo), or None.
     closure: bool = False
     cell_material: str | None = None
+    # Physics-95 rung is separate from the existing generic ``tier`` taxonomy.
+    physics_rung: int | None = None
+
+
+_PHYSICS_RUNG_LABELS = {
+    1: "printed_fO2_or_buffer",
+    2: "measured_same_cell_oxygen",
+    3: "congruent_effusion_balance",
+    4: "refusal",
+}
 
 
 def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
-    reason = f"fo2_tier={resolved.tier}; route={resolved.route}"
+    reason = f"fo2_tier={resolved.tier}"
+    if resolved.physics_rung is not None:
+        reason += (
+            f"; physics_rung={resolved.physics_rung}:"
+            f"{_PHYSICS_RUNG_LABELS[resolved.physics_rung]}"
+        )
+    reason += f"; route={resolved.route}"
     if resolved.borrowed:
         reason += "; borrowed"
     return Notice(
@@ -112,6 +128,15 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
+    )
+
+
+def fo2_refusal_notice(quantity: Quantity) -> Notice:
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=f"physics_rung=4:{_PHYSICS_RUNG_LABELS[4]}",
+        origin="fo2_ladder",
     )
 
 
@@ -195,17 +220,23 @@ def resolve_row_fo2(
     else:
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
+    knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
     for route in routes:
         if _is_tier1(route, observation):
             log = _log_point(route.value)
             if log is not None:
-                return ResolvedFo2(log, 1, route.route, False)
+                return ResolvedFo2(
+                    log, 1, route.route, False,
+                    physics_rung=1 if knudsen_vapour else None,
+                )
     printed = _printed_identity_bar(observation, identity)
     if printed is not None:
         bar, log = printed
-        return ResolvedFo2(log, 1, "identity_fO2_Pa", False, po2_bar=bar)
+        return ResolvedFo2(
+            log, 1, "identity_fO2_Pa", False, po2_bar=bar,
+            physics_rung=1 if knudsen_vapour else None,
+        )
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
-    knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
     if not knudsen_vapour:
@@ -216,9 +247,23 @@ def resolve_row_fo2(
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)
             if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
+                return ResolvedFo2(
+                    log, 3, route.route, False,
+                    physics_rung=1 if knudsen_vapour else None,
+                )
     atmosphere = _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
+        if knudsen_vapour:
+            return ResolvedFo2(
+                atmosphere.log10_fO2_bar,
+                atmosphere.tier,
+                atmosphere.route,
+                atmosphere.borrowed,
+                po2_bar=atmosphere.po2_bar,
+                closure=atmosphere.closure,
+                cell_material=atmosphere.cell_material,
+                physics_rung=1,
+            )
         return atmosphere
     if knudsen_vapour and source_oxygen_bar is not None:
         try:
@@ -232,6 +277,7 @@ def resolve_row_fo2(
                 "source_linked_oxygen_condition",
                 False,
                 po2_bar=bar,
+                physics_rung=2,
             )
     if knudsen_vapour and (temperature is None or not weights):
         return None
@@ -801,6 +847,7 @@ def _effusion_closure(
             False,
             closure=True,
             cell_material=material,
+            physics_rung=3,
         )
     if quantity is Quantity.P_SAT or not _oxide_or_melt(weights):
         return None
@@ -811,6 +858,7 @@ def _effusion_closure(
         False,
         closure=True,
         cell_material=None,
+        physics_rung=3,
     )
 
 
