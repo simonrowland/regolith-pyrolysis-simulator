@@ -37,6 +37,29 @@ def _run_rows(document):
     }
 
 
+def _assert_uncertainty_locators_resolve_to_table_cells(document) -> None:
+    table2_rows = {
+        row["run_id"]: row
+        for row in _context(document, "2")["values"]["rows_as_printed"]
+    }
+    observations = _run_rows(document)
+    assert len(observations) == 28
+    field_by_column = {7: ("S_ppm", "S (ppm)"), 8: ("observed_SD_ppm", "Obs. St. Dev.")}
+    for run_id, raw in observations.items():
+        uncertainty = raw["uncertainty"]
+        locator = uncertainty["locator"]
+        assert locator["page"] == 4
+        assert locator["table"] == "2"
+        assert locator["row_label"] == run_id
+        assert locator["table_column_number"] in field_by_column
+        field, header = field_by_column[locator["table_column_number"]]
+        cell = table2_rows[run_id][field]
+        assert locator["column"] == header
+        assert locator["printed_cell"] == cell
+        assert uncertainty["value"] == cell
+        assert uncertainty["as_printed"] == cell
+
+
 def _assert_render_pins(document) -> None:
     """Values below were checked against the rendered PDF pages 3, 4 and 6."""
 
@@ -146,6 +169,18 @@ def test_mavrogenes_1999_render_pin_rejects_mutated_value() -> None:
     _run_rows(document)["MAV1"]["values"]["value"] = "1121"
     with pytest.raises(AssertionError):
         _assert_render_pins(document)
+
+
+def test_mavrogenes_1999_uncertainty_locators_resolve_to_table_cells() -> None:
+    _assert_uncertainty_locators_resolve_to_table_cells(_document())
+
+
+def test_mavrogenes_1999_uncertainty_locator_rejects_column_mutation() -> None:
+    document = deepcopy(_document())
+    first_observation = document["species"]["S"]["observations"][0]
+    first_observation["uncertainty"]["locator"]["table_column_number"] = 7
+    with pytest.raises(AssertionError):
+        _assert_uncertainty_locators_resolve_to_table_cells(document)
 
 
 def test_mavrogenes_1999_isolated_migration_binds_conditions_and_identity() -> None:
