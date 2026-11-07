@@ -101,6 +101,12 @@ def _capture_comparison_identities(monkeypatch):
     return compared
 
 
+def _single_physics_rung(notices):
+    labels = [notice.reason for notice in notices if "physics_rung=" in notice.reason]
+    assert len(labels) == 1
+    return labels[0]
+
+
 def _fallback_notice(context, monkeypatch, row, rows):
     requests, handles = _capture_engine(monkeypatch, row)
     residual, _ = compile_residual(
@@ -109,6 +115,10 @@ def _fallback_notice(context, monkeypatch, row, rows):
     )
     assert len(requests) == 1
     assert requests[0].mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
+    assert _single_physics_rung(residual.notices) == (
+        "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+        "route=effusion_oxygen_balance"
+    )
     return next(
         notice for notice in residual.notices
         if notice.reason.startswith("predict-and-flag substitution: congruent vapour-only zero-storage closure;")
@@ -140,8 +150,13 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     assert all(identity.fO2_Pa == State.of(expected_pa) for identity in compared)
     selected = candidate.provenance["selected_oxygen_condition"]
     assert Decimal(selected["value_Pa"]) == expected_pa
-    assert selected["rung"] == 2
+    assert selected["fo2_tier"] == 3
+    assert selected["physics_rung"] == 2
     assert selected["route"] == "source_linked_oxygen_condition"
+    assert _single_physics_rung(residual.notices) == (
+        "fo2_tier=3; physics_rung=2:measured_same_cell_oxygen; "
+        "route=source_linked_oxygen_condition"
+    )
     condition = candidate.provenance["source_oxygen_condition"]
     assert condition["derived_from"]
     assert condition["derivation"]["inputs"] == condition["derived_from"]
@@ -154,7 +169,8 @@ def test_linked_row_commands_source_oxygen(source_context, monkeypatch, source, 
     )
     assert condition["observation_id"] in substitution.reason
     assert "target row has no printed fO2" in substitution.reason
-    assert "rung=2:measured_same_cell_oxygen" in substitution.reason
+    assert "condition=measured_same_cell_oxygen" in substitution.reason
+    assert "rung=" not in substitution.reason
     assert "basis=source_oxygen_condition;" in substitution.reason
     assert "inputs=" in substitution.reason
     assert float(condition["value"]["point"]) / 1e5 == pytest.approx(expected_bar, rel=1e-10)
@@ -256,7 +272,10 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     assert requests[0].mode == battery.PO2_COMMANDED
     assert requests[0].po2_bar == pytest.approx(expected_bar)
     assert any(
-        notice.reason == f"fo2_tier={resolved.tier}; route={resolved.route}"
+        notice.reason == (
+            f"fo2_tier={resolved.tier}; "
+            f"physics_rung=1:printed_fO2_or_buffer; route={resolved.route}"
+        )
         for notice in prediction.notices
     )
     assert not any(
@@ -291,8 +310,13 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     assert all(identity.fO2_Pa == State.of(selected_pa) for identity in compared)
     selected = candidate.provenance["selected_oxygen_condition"]
     assert Decimal(selected["value_Pa"]) == selected_pa
-    assert selected["rung"] == resolved.tier
+    assert selected["fo2_tier"] == resolved.tier
+    assert selected["physics_rung"] == 1
     assert selected["route"] == resolved.route
+    assert _single_physics_rung(residual.notices) == (
+        f"fo2_tier={resolved.tier}; physics_rung=1:printed_fO2_or_buffer; "
+        f"route={resolved.route}"
+    )
 
 
 def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_context):
@@ -460,6 +484,31 @@ def test_missing_point_axes_report_untyped_linkage(source_context, axis):
     row = _row(source_context, "kems-053-stolyarova-1991")
     row = replace(row, identity=replace(row.identity, **{axis: State.unknown("not printed")}))
     assert _resolve(source_context, row).reason is FallbackReason.UNTYPED_LINEAGE
+
+
+def test_missing_temperature_is_labeled_as_physics_rung_four_refusal(
+    source_context, monkeypatch
+):
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    row = replace(
+        row,
+        identity=replace(
+            row.identity, temperature_K=State.unknown("temperature not printed")
+        ),
+    )
+    experiment = source_context.experiments[row.experiment_id]
+    requests, handles = _capture_engine(monkeypatch, row)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        row,
+        handles=handles,
+        experiment=experiment,
+        bench=_bench_for_score(experiment, source_context.benches),
+    )
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "temperature_unknown"
+    assert requests == []
+    assert _single_physics_rung(prediction.notices) == "physics_rung=4:refusal"
 
 
 @pytest.mark.parametrize("axis", ("source", "temperature", "composition"))
