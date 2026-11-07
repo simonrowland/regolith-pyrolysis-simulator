@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import gzip
 import io
 import json
@@ -47,7 +48,7 @@ from scripts.battery_hero_plot import (
     TIER_MINOR,
     TIER_TRACE,
 )
-from matplotlib.colors import ListedColormap, Normalize, to_rgba
+from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
 from matplotlib.transforms import Bbox
@@ -485,7 +486,7 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     assert "Green landing date" not in polymerisation_svg
 
 
-def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
+def test_deck_fingerprint_uses_fixed_traffic_light_bands(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -523,19 +524,18 @@ def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
     original_draw = hero_plot._draw_hero_sweet_spot
 
     def capture_color(axis, engine, cells, **kwargs):
-        colors.setdefault(engine, []).append(
-            kwargs["colormap"](kwargs["normalization"](1.0))
-        )
-        return original_draw(axis, engine, cells, **kwargs)
+        drawn = original_draw(axis, engine, cells, **kwargs)
+        if drawn and axis.patches:
+            colors.setdefault(engine, []).append(axis.patches[0].get_facecolor())
+        return drawn
 
     monkeypatch.setattr(hero_plot, "_draw_hero_sweet_spot", capture_color)
     hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
 
-    assert len(colors["openimcc"]) == len(colors["magemin"]) == 2
-    for openimcc_color, magemin_color in zip(
-        colors["openimcc"], colors["magemin"]
-    ):
-        assert openimcc_color == pytest.approx(magemin_color)
+    assert colors["openimcc"]
+    assert colors["magemin"]
+    assert all(color == pytest.approx(to_rgba("#f6c90e")) for color in colors["openimcc"])
+    assert all(color == pytest.approx(to_rgba("#d7191c")) for color in colors["magemin"])
 
 
 def test_polymerisation_deck_facets_points_by_species_and_keeps_comparisons(
@@ -1273,6 +1273,10 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     )
     assert default_caption_tail == redox_caption_tail == expected_caption_tail
 
+    redox_rows.append(uncalibrated_other_rail)
+    redox_residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in redox_rows), encoding="utf-8"
+    )
     assert main(
         [
             "--input",
@@ -1294,17 +1298,22 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         ]
     ) == 0
     summary = json.loads(capsys.readouterr().out)
-    redox_svgs = [
+    redox_collection_pngs = [
         Path(path)
         for name, path in summary["files"].items()
-        if name.endswith(":tile_svg")
+        if name == "chart:B:redox"
     ]
-    assert redox_svgs
-    assert all(
-        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial"
-        in path.read_text(encoding="utf-8")
-        for path in redox_svgs
+    assert len(redox_collection_pngs) == 1
+    assert redox_collection_pngs[0].is_file()
+    with Path(summary["files"]["table:panels"]).open(newline="") as panels_file:
+        panels = list(csv.DictReader(panels_file))
+    uncalibrated_melt_panel = next(
+        row
+        for row in panels
+        if row["rail"] == "melt_activity" and row["engine"] == "openimcc"
     )
+    assert uncalibrated_melt_panel["n"] == "2"
+    assert uncalibrated_melt_panel["plotted_n"] == "1"
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
@@ -1576,7 +1585,7 @@ def test_melt_activity_refusals_and_diagnostics_are_collected(
     assert "magemin 1" in svg
 
 
-def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
+def test_fingerprint_panels_leave_sparse_cells_blank(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1637,17 +1646,13 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
         axis,
         "openimcc",
         openimcc_cells,
-        colormap=plt.get_cmap("viridis"),
-        normalization=Normalize(vmin=0, vmax=1),
         x_limits=x_limits,
         temperature_limits=temperature_limits,
     )
     assert axis.get_xlim() == x_limits
     assert axis.get_ylim() == temperature_limits
-    assert any(patch.get_hatch() == "///" for patch in axis.patches)
-    assert "1" in {text.get_text() for text in axis.texts}
-    assert "0" not in {text.get_text() for text in axis.texts}
-    assert len(axis.patches) == sum(int(cell["n"]) > 0 for cell in openimcc_cells)
+    assert not axis.patches
+    assert not axis.texts
     plt.close(fig)
 
     import scripts.battery_hero_plot as plotter
@@ -1666,21 +1671,22 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     assert len(rendered_limits) == 2
     assert rendered_limits[0] == rendered_limits[1]
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
-    assert "cell label=n" in svg
-    assert "sweet-spot fill=median" in svg
+    assert "fingerprint fill uses median |dex| traffic-light bands" in svg
+    assert "n&lt;3 cells are blank" in svg
+    assert "cell label=n" not in svg
+    assert "hatched" not in svg
     assert (
         "scatter marker face=engine colour; flagged/extrapolated=white face with "
         "engine-coloured edge"
     ) in svg
     assert "marker edge=sio₂ mole fraction" not in svg
-    assert "1≤n&lt;3 is grey and hatched; n=0 is blank" in svg
     assert files["hero:vapour:png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "140/147 rows" in melt_svg
     assert "main's fix is pending" in melt_svg
 
 
-def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
+def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
     cell = {
         "sio2_lower": "0.2",
         "sio2_upper": "0.25",
@@ -1690,32 +1696,22 @@ def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
         "color_eligible": True,
         "median_abs_dex": "0.25",
     }
-    colormap = plt.get_cmap("viridis")
     fig, axis = plt.subplots()
     try:
         assert _draw_hero_sweet_spot(
             axis,
             "openimcc",
             [cell],
-            colormap=colormap,
-            normalization=Normalize(vmin=0, vmax=1),
             x_limits=(0.2, 0.25),
             temperature_limits=(1900, 2000),
         )
-        assert axis.patches[0].get_facecolor() == pytest.approx(
-            colormap(0.25)
-        )
-        assert axis.patches[0].get_hatch() is None
+        assert not axis.patches
     finally:
         plt.close(fig)
 
 
-def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
-    viridis = plt.get_cmap("viridis")
-    fills = [viridis(index / 10) for index in range(11)] + [
-        (0.395, 0.797, 0.368, 1.0)
-    ]
-    colormap = ListedColormap(fills)
+def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
+    fills = ["#1a9641", "#f6c90e", "#d7191c"]
     cells = [
         {
             "sio2_lower": str(index * 0.05),
@@ -1723,10 +1719,9 @@ def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
             "temperature_lower_K": "1000",
             "temperature_upper_K": "1100",
             "n": 3,
-            "color_eligible": True,
-            "median_abs_dex": str(index),
+            "median_abs_dex": value,
         }
-        for index in range(len(fills))
+        for index, value in enumerate(("0.5", "0.8", "1.1"))
     ]
     figure, axis = plt.subplots()
     try:
@@ -1734,50 +1729,14 @@ def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
             axis,
             "openimcc",
             cells,
-            colormap=colormap,
-            normalization=Normalize(vmin=0, vmax=len(fills) - 1),
             x_limits=(0, len(fills) * 0.05),
             temperature_limits=(1000, 1100),
         )
         assert [patch.get_facecolor() for patch in axis.patches] == pytest.approx(
-            fills
+            [to_rgba(fill) for fill in fills]
         )
-        # WCAG contrast winners for viridis at 0.0 through 1.0, followed by
-        # the review's actual mid-tone green cell. At 0.5 neither candidate
-        # reaches 4.5:1, so the higher-contrast dark text is expected.
-        assert [text.get_color() for text in axis.texts] == [
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-        ]
-        assert hero_plot._wcag_contrast_ratio("#000000", "#ffffff") == pytest.approx(
-            21.0
-        )
-        assert hero_plot._wcag_contrast_ratio(
-            fills[-1], "#222222"
-        ) == pytest.approx(7.785, abs=0.001)
-        assert hero_plot._wcag_contrast_ratio(
-            fills[-1], "#f7f7f7"
-        ) == pytest.approx(1.908, abs=0.001)
-        for fill, label in zip(fills, axis.texts, strict=True):
-            chosen = hero_plot._wcag_contrast_ratio(fill, label.get_color())
-            best = max(
-                hero_plot._wcag_contrast_ratio(fill, "#222222"),
-                hero_plot._wcag_contrast_ratio(fill, "#f7f7f7"),
-            )
-            if best >= 4.5:
-                assert chosen >= 4.5
-            else:
-                assert chosen == pytest.approx(best)
+        assert not axis.texts
+        assert all(patch.get_hatch() is None for patch in axis.patches)
     finally:
         plt.close(figure)
 
@@ -3178,7 +3137,7 @@ def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures
     render_hero_charts(data, tmp_path / "formatted-render", history_path=history)
 
     assert legend_labels
-    assert all(len(labels) <= len(data.engines) + 2 for labels in legend_labels)
+    assert all(len(labels) <= len(data.engines) + 5 for labels in legend_labels)
     labels = [
         artist.get_text()
         for figure in figures
