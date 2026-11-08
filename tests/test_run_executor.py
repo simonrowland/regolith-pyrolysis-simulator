@@ -108,8 +108,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # the laptop and studio-3, so this digest is not a laptop re-run.
     # Re-pinned 2026-11-07 on rpp-ctrl with the gate engine set at eeadc6585
     # (openimcc 66ec4a3); payload changed and ledger digest reproduced.
+    # Re-pinned 2026-11-08 on rpp-ctrl after merging green 9450ca26a: b-1129's
+    # below-liquidus FeO notice enters the payload; the ledger digest is unchanged.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "dd69684d2afa08d3a6e9a47a774bb74076465d149feda3f351e1db745e5a1149"
+        "f06a6b0a3a1f517118cc61822f6a2d41ae41ef926ed605e7cc1bb717cdf8911b"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

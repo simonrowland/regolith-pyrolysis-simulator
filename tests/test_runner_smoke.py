@@ -2088,9 +2088,11 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # serialized authority notices; the Studio-3 digest moves from green
         # e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386
         # to tip e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74
-        # (a byte-hash change, not a numeric delta).
+        # (a byte-hash change, not a numeric delta). Merging green 9450ca26a adds
+        # b-1129's below-liquidus FeO notice to the serialized hours; the hours
+        # still equal the regenerated fixture above, so this too is notice-only.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "c15f0878fb124b07a2bf35f12a7b1d3d318c153fe98278cb573f5d10be9e01d4"
+            "9aa35ce72b96a42ba3f22907340c77b01264ce460ff736d6acefb878840a70af"
         )
 
 
