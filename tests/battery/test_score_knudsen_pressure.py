@@ -66,11 +66,19 @@ def _mock_knudsen_prediction(
     sensitivity_dex: float = 0.0,
     na_pressure: float = 10.0,
     o2_pressure: float = 10.0,
+    updated_o2_pressure: float | None = None,
+    invalid_components_call: int | None = None,
+    oxygen_balance_pO2_values: tuple[float, ...] | None = None,
+    po2_calls: list[tuple[float, str, float | None]] | None = None,
+    oxygen_balance_calls: list[float] | None = None,
 ):
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
         EngineHandle,
         EquilibrateCell,
+        PO2_COMMANDED,
+        PO2_OXYGEN_BALANCE_EFFUSION,
+        Po2Request,
     )
     import simulator.battery.score as score_mod
 
@@ -88,11 +96,26 @@ def _mock_knudsen_prediction(
         physical_pressure_bar,
         **_kwargs,
     ):
+        call_number = len(calls) + 1
         calls.append(physical_pressure_bar)
-        reported_na_pressure = (
-            na_pressure
-            if len(calls) == 1
-            else na_pressure * math.pow(10.0, sensitivity_dex)
+        if po2_calls is not None:
+            po2_calls.append((physical_pressure_bar, po2.mode, po2.po2_bar))
+        if oxygen_balance_pO2_values is None:
+            reported_na_pressure = (
+                na_pressure
+                if call_number == 1
+                else na_pressure * math.pow(10.0, sensitivity_dex)
+            )
+        else:
+            reported_na_pressure = (
+                na_pressure
+                if po2.po2_bar == oxygen_balance_pO2_values[0]
+                else na_pressure * math.pow(10.0, sensitivity_dex)
+            )
+        reported_o2_pressure = (
+            o2_pressure
+            if call_number == 1 or updated_o2_pressure is None
+            else updated_o2_pressure
         )
         return EquilibrateCell(
             pot_id=pot.pot_id,
@@ -106,12 +129,53 @@ def _mock_knudsen_prediction(
             melt_activities={},
             gas_partial_pressures_Pa={
                 "Na": reported_na_pressure,
-                "O2": o2_pressure,
+                "O2": reported_o2_pressure,
             },
             liquid_fraction=1.0,
             wall_s=0.0,
             cpu_s=0.0,
             hostname="test",
+            invalid_gas_partial_pressure_components=(
+                ("O2",) if call_number == invalid_components_call else ()
+            ),
+        )
+
+    if oxygen_balance_pO2_values is not None:
+        def fake_oxygen_balance(engine_call_at_po2, **_kwargs):
+            index = 0 if oxygen_balance_calls is None else len(oxygen_balance_calls)
+            solved_po2_bar = oxygen_balance_pO2_values[index]
+            if oxygen_balance_calls is not None:
+                oxygen_balance_calls.append(solved_po2_bar)
+            cell = engine_call_at_po2(solved_po2_bar)
+            return (
+                solved_po2_bar,
+                cell.gas_partial_pressures_Pa,
+                {
+                    "residual": 0.0,
+                    "bracket": (-2.0, -1.0),
+                    "dominant_O_carriers": (),
+                    "dominant_metal_carriers": (),
+                },
+                1.0,
+                {
+                    "cell_material": "W",
+                    "buffer_pinned": False,
+                    "buffer_pO2_bar": None,
+                    "cell_oxide_janaf_sources": (),
+                },
+            )
+
+        monkeypatch.setattr(
+            battery, "_solve_vapor_engine_cell_oxygen_balance", fake_oxygen_balance
+        )
+        monkeypatch.setattr(
+            score_mod,
+            "_oxygen_input_request",
+            lambda **_kwargs: Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material="W",
+            ),
         )
 
     monkeypatch.setattr(
@@ -212,6 +276,109 @@ def test_knudsen_total_pressure_sensitivity_above_row_band_refuses(
         notice.origin == _PRESSURE_NOTICE_ORIGIN
         for notice in residual.notices
     )
+
+
+@pytest.mark.parametrize(
+    ("invalid_call", "expected_pass"), ((1, "seed"), (2, "derived"))
+)
+def test_invalid_gas_channel_refuses_knudsen_pressure_sum(
+    invalid_call, expected_pass, monkeypatch
+) -> None:
+    experiment, reference, _context = _partial_row(
+        f"knudsen-invalid-pressure-{invalid_call}"
+    )
+    prediction, _calls = _mock_knudsen_prediction(
+        Engine.VAPOROCK,
+        experiment,
+        reference,
+        monkeypatch,
+        invalid_components_call=invalid_call,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == (
+        "knudsen_total_pressure_invalid_gas_components"
+    )
+    assert prediction.refusal_detail["pressure_pass"] == expected_pass
+    assert prediction.refusal_detail["invalid_components"] == ["O2"]
+
+
+def test_knudsen_sensitivity_uses_target_species_not_other_channels(
+    monkeypatch,
+) -> None:
+    experiment, reference, context = _partial_row(
+        "knudsen-pressure-target-species-sensitivity"
+    )
+    prediction, _calls = _mock_knudsen_prediction(
+        Engine.VAPOROCK,
+        experiment,
+        reference,
+        monkeypatch,
+        updated_o2_pressure=100.0,
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        prediction=prediction,
+        derived_band=DecisionBand(
+            Decimal("0.01"), "dimensionless", "test row band"
+        ),
+    )
+
+    assert prediction.value == Decimal("10.0")
+    assert residual.status is ResidualStatus.MATCH
+    pressure_notice = next(
+        notice
+        for notice in residual.notices
+        if notice.origin == _PRESSURE_NOTICE_ORIGIN
+    )
+    assert "sensitivity_dex=0" in pressure_notice.reason
+
+
+def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
+    monkeypatch,
+) -> None:
+    experiment, reference, context = _partial_row(
+        "knudsen-pressure-coupled-oxygen-sensitivity"
+    )
+    pressure_calls: list[tuple[float, str, float | None]] = []
+    oxygen_balance_calls: list[float] = []
+    prediction, _calls = _mock_knudsen_prediction(
+        Engine.VAPOROCK,
+        experiment,
+        reference,
+        monkeypatch,
+        sensitivity_dex=1.0,
+        oxygen_balance_pO2_values=(0.01, 0.1),
+        po2_calls=pressure_calls,
+        oxygen_balance_calls=oxygen_balance_calls,
+    )
+
+    assert oxygen_balance_calls == pytest.approx([0.01, 0.1])
+    assert [call[0] for call in pressure_calls] == pytest.approx(
+        [1e-3, 1e-3, 20 / 1e5, 20 / 1e5]
+    )
+    assert [call[2] for call in pressure_calls] == pytest.approx(
+        [0.01, 0.01, 0.1, 0.1]
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        prediction=prediction,
+        derived_band=DecisionBand(
+            Decimal("0.01"), "dimensionless", "test row band"
+        ),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == (
+        "knudsen_total_pressure_sensitivity_exceeds_band"
+    )
+    assert float(residual.refusal.detail["sensitivity_dex"]) == pytest.approx(1.0)
 
 
 def test_knudsen_total_pressure_round_trip_matches_prediction_identity(
