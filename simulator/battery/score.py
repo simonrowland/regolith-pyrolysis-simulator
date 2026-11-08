@@ -13928,10 +13928,58 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
         return None
     ordered = sorted(values)
     n = len(ordered)
-    mid = n // 2
-    if n % 2:
-        return ordered[mid]
-    return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
+    indices = _battery_hero_ordered_percentile_indices(n, (0.5,))
+    samples = {index: ordered[index] for index in indices}
+    percentile = _battery_hero_ordered_percentiles_from_samples(
+        n, samples, (0.5,)
+    )[0]
+    return percentile if isinstance(percentile, Decimal) else Decimal(str(percentile))
+
+
+def _battery_hero_ordered_percentile_indices(
+    count: int, percentiles: Sequence[float]
+) -> frozenset[int]:
+    """Rank offsets needed to interpolate inclusive ordered percentiles."""
+
+    if count < 1:
+        return frozenset()
+    return frozenset(
+        index
+        for percentile in percentiles
+        for index in (
+            math.floor((count - 1) * percentile),
+            math.ceil((count - 1) * percentile),
+        )
+    )
+
+
+def _battery_hero_ordered_percentiles_from_samples(
+    count: int,
+    samples: Mapping[int, Decimal | float],
+    percentiles: Sequence[float],
+) -> tuple[Decimal | float, ...]:
+    """Interpolate percentiles from only the required ordered rank samples."""
+
+    results: list[Decimal | float] = []
+    for percentile in percentiles:
+        position = (count - 1) * percentile
+        lower_index = math.floor(position)
+        upper_index = math.ceil(position)
+        lower_value = samples[lower_index]
+        upper_value = samples[upper_index]
+        fraction = position - lower_index
+        if isinstance(lower_value, Decimal):
+            if fraction == 0.5:
+                results.append((lower_value + upper_value) / Decimal(2))
+            else:
+                decimal_fraction = Decimal(str(fraction))
+                results.append(
+                    lower_value
+                    + (upper_value - lower_value) * decimal_fraction
+                )
+        else:
+            results.append(lower_value + (upper_value - lower_value) * fraction)
+    return tuple(results)
 
 
 def _bias_to_scatter_ratio(
@@ -13972,16 +14020,13 @@ def _iqr(values: Sequence[Decimal]) -> Decimal | None:
         return None
     ordered = sorted(values)
     n = len(ordered)
-
-    def _quartile(p: float) -> Decimal:
-        # Inclusive rank; matches the descriptive IQR used in the report.
-        pos = p * (n - 1)
-        lo = int(pos)
-        hi = min(lo + 1, n - 1)
-        frac = Decimal(str(pos - lo))
-        return ordered[lo] + (ordered[hi] - ordered[lo]) * frac
-
-    return _quartile(0.75) - _quartile(0.25)
+    percentiles = (0.25, 0.75)
+    indices = _battery_hero_ordered_percentile_indices(n, percentiles)
+    samples = {index: ordered[index] for index in indices}
+    q1, q3 = _battery_hero_ordered_percentiles_from_samples(
+        n, samples, percentiles
+    )
+    return Decimal(q3) - Decimal(q1)
 
 
 def _measured_residuals(

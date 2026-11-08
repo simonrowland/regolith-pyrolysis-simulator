@@ -93,6 +93,8 @@ from simulator.battery.score import (  # noqa: E402
     BATTERY_HERO_TEMPERATURE_FLOOR_K as HERO_TEMPERATURE_FLOOR_K,
     BATTERY_HERO_TEMPERATURE_VIEWS as HERO_TEMPERATURE_VIEWS,
     _battery_hero_binned_score_records,
+    _battery_hero_ordered_percentile_indices,
+    _battery_hero_ordered_percentiles_from_samples,
     _battery_hero_metric_records_from_database,
     _battery_hero_pair_comparison_records_from_database,
     _battery_hero_deck_payload,
@@ -3714,20 +3716,10 @@ def _collection_raw_tables(
 
     def save_quantiles(key: tuple[str, str, int], values: Mapping[int, float]) -> None:
         count = bins_by_key[key]
-
-        def percentile(fraction: float) -> float:
-            position = (count - 1) * fraction
-            lower_index = math.floor(position)
-            upper_index = math.ceil(position)
-            lower_value = values[lower_index]
-            upper_value = values[upper_index]
-            return lower_value + (upper_value - lower_value) * (position - lower_index)
-
-        bin_values[key] = {
-            0: percentile(0.25),
-            1: percentile(0.5),
-            2: percentile(0.75),
-        }
+        quantiles = _battery_hero_ordered_percentiles_from_samples(
+            count, values, (0.25, 0.5, 0.75)
+        )
+        bin_values[key] = dict(enumerate(float(value) for value in quantiles))
 
     for rail, engine, temperature_bin, residual in database.execute(
         """SELECT rail, engine, temperature_bin, residual_dex
@@ -3741,13 +3733,9 @@ def _collection_raw_tables(
             current_key = key
             current_index = 0
             count = bins_by_key[key]
-            current_targets = {
-                math.floor((count - 1) * fraction)
-                for fraction in (0.25, 0.5, 0.75)
-            } | {
-                math.ceil((count - 1) * fraction)
-                for fraction in (0.25, 0.5, 0.75)
-            }
+            current_targets = _battery_hero_ordered_percentile_indices(
+                count, (0.25, 0.5, 0.75)
+            )
             current_values = {}
         if current_index in current_targets:
             current_values[current_index] = float(residual)
