@@ -509,6 +509,8 @@ def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
             "engine": "openimcc",
             "temperature_center_K": "1600",
             "residual_center_dex": "0.25",
+            "hex_x_radius_K": "10",
+            "hex_y_radius_dex": "0.5",
             "flagged": "0",
             "clipped": "0",
             "row_count": "5",
@@ -518,6 +520,8 @@ def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
             "engine": "openimcc",
             "temperature_center_K": "1700",
             "residual_center_dex": "-0.25",
+            "hex_x_radius_K": "10",
+            "hex_y_radius_dex": "0.5",
             "flagged": "0",
             "clipped": "0",
             "row_count": "7",
@@ -680,4 +684,39 @@ def test_collection_cli_flags_are_applied_or_rejected(tmp_path: Path) -> None:
             source_path=archive,
             omit_empty_engines=True,
         )
+
+
+def test_full_silica_window_keeps_exact_totals_for_unknown_compositions(
+    tmp_path: Path,
+) -> None:
+    rows = [{"kind": "battery_store_stamp", "revision": "unknown-sio2-fixture"}]
+    for index, residual in enumerate((0.3, -0.4)):
+        row = _residual("openimcc", "vapour", f"unknown-{index}", 1500, residual)
+        row["candidate_observation"]["identity"]["composition"] = {"tag": "unknown"}
+        rows.append(row)
+    residuals = "".join(json.dumps(row) + "\n" for row in rows).encode()
+    archive_path = tmp_path / "unknown-sio2.tgz"
+    with tarfile.open(archive_path, "w:gz") as archive:
+        member = tarfile.TarInfo("data/battery/residuals.jsonl")
+        member.size = len(residuals)
+        archive.addfile(member, io.BytesIO(residuals))
+
+    data = hero_plot.read_scores(archive_path)
+    files = hero_plot.render_hero_collection(
+        data,
+        archive_path,
+        tmp_path / "unknown-collection",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-07",
+    )
+    page = files["html"].read_text(encoding="utf-8")
+    cells = json.loads(page.split('id="cell-data">', 1)[1].split("</script>", 1)[0])
+    unknown = next(cell for cell in cells if cell.get("sio2_unknown"))
+    assert unknown["rail"] == "vapour"
+    assert unknown["engine"] == "openimcc"
+    assert unknown["temperature_lower_K"] == "1500"
+    assert int(unknown["n"]) == 2
+    assert math.isclose(float(unknown["sum_residual_dex"]), -0.1)
+    assert math.isclose(float(unknown["sum_squared_residual_dex"]), 0.25)
 
