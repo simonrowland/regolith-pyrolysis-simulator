@@ -8913,7 +8913,18 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
-    assert census.get("residue_component_composition") == 4353
+    # Data offers 3+4 add Su & Zhang (2023)'s 2,570 Table S2 + 61 Table S3 +
+    # 804 Table S4 numeric residue cells and Richter et al. (2011)'s 324 numeric
+    # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
+    # typed-refused. The count moved because these data became visible, not
+    # because a check was relaxed; mismatches stay 0.
+    assert census.get("residue_component_composition") == 8112
+    assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
+        "residue_component_composition": 3435
+    }
+    assert per_source.get(
+        "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
+    ) == {"isotope_delta": 21, "residue_component_composition": 324}
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -8941,15 +8952,18 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # A fresh migration adds Fredrickson & Chasanov's 74 H_minus_H298 and 12 cp
     # points: H_minus_H298 377->451 and cp 1752->1764. The Beyer schema-gap
     # rows stop exposing 93 unsupported glass-S and oxide-formation cells as
-    # numeric, so n_numeric is 8818 + 86 - 93 = 8811. The full fresh store has
-    # 949 unavailable cells.
+    # numeric, so n_numeric is 8818 + 86 - 93 = 8811. Offers 3+4 add 3,780
+    # numeric points (3,759 residue components plus 21 isotope deltas), moving
+    # n_numeric to 12,591. They also add 60 null Su & Zhang Table S2 cells
+    # (30 each for Cr2O3 and MnO) and Richter's printed <0.01 Na2O cell to the
+    # unavailable tally: 949->1,010. These cells are not numeric observations.
     assert census.get("cp") == 1764
     assert census.get("H_minus_H298") == 451
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
         "H_minus_H298": 74,
         "cp": 12,
     }
-    assert n_unavailable == 949
+    assert n_unavailable == 1010
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -8975,7 +8989,11 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # F22 also adds Wang 2001's 90 canonical isotope_delta cells and Ozawa's 6.
     # Sossi remains 22. Neuman's 96 single decorated columns (the oracle above)
     # bring the pin 118->214.
-    assert census.get("isotope_delta") == 214
+    # Richter et al. (2011), Table 1 adds 21 numeric delta41K cells; its two
+    # printed 0.00 starting-material values remain metadata, not observations.
+    # The count moved because the cells became visible, not because a check was
+    # relaxed; mismatches stay 0.
+    assert census.get("isotope_delta") == 235
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
@@ -8990,7 +9008,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8811, (n_numeric, census, n_unavailable)
+    assert n_numeric == 12591, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
