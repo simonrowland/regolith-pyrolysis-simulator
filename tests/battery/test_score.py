@@ -6962,6 +6962,8 @@ def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> Non
             source_id,
             "--limit",
             "1",
+            "--workers",
+            "3",
         ],
         cwd=repo_root,
         capture_output=True,

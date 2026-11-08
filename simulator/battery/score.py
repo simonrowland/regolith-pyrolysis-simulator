@@ -9,8 +9,10 @@ derived from resolve_backend.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+from multiprocessing import get_context
 import os
 import re
 import sqlite3
@@ -13877,27 +13879,44 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def _score_store_with_decisions(
+@dataclass(frozen=True)
+class _PreparedScoreRun:
+    context: ScoreContext
+    engine_set: tuple[Engine, ...]
+    refs: tuple[Observation, ...]
+    fusion_diagnostic_ids: frozenset[str]
+    comparison_ids: frozenset[str]
+    observations: Mapping[str, Observation]
+    origins: Mapping[str, str]
+    live_context: ScoreContext
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]]
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]]
+    ratchet_missing: bool
+    source_bands: Mapping[str, DecisionBand]
+    source_band_reasons: Mapping[str, str]
+    kems_partial_pressure_band: DecisionBand | None
+    series_point_counts: Mapping[str, int]
+
+
+def _prepare_score_run(
     context: ScoreContext,
     *,
-    engines: Sequence[Engine] | None = None,
-    rail: Rail | None = None,
-    work_id: str | None = None,
-    limit: int | None = None,
-    include_diagnostics: bool = True,
-    measured_only: bool = False,
-    predict: Callable[..., EnginePrediction] | None = None,
-    handles: Mapping[str, object] | None = None,
-    _stream: _ResidualJsonlStream | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    engines: Sequence[Engine] | None,
+    rail: Rail | None,
+    work_id: str | None,
+    limit: int | None,
+    include_diagnostics: bool,
+    measured_only: bool,
+) -> _PreparedScoreRun:
+    """Build global score inputs once so spawned shards share one snapshot."""
+
     engine_set = (
         _validated_score_engines(tuple(engines))
         if engines is not None
         else SCORE_ENGINE_SET
     )
-    provided_handles = dict(handles or {})
-    resolved_handles = dict(provided_handles)
-    refs = list(comparison_candidates(context))
+    comparison_observations = comparison_candidates(context)
+    refs = list(comparison_observations)
     fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
@@ -13937,7 +13956,11 @@ def _score_store_with_decisions(
     if rail is not None:
         kept: list[Observation] = []
         for obs in refs:
-            quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
+            quantity = (
+                quantity_token(obs.identity)
+                if isinstance(obs.identity, Identity)
+                else None
+            )
             formula = (
                 obs.identity.species.formula
                 if isinstance(obs.identity, Identity)
@@ -13950,33 +13973,16 @@ def _score_store_with_decisions(
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
-    from simulator.battery.compilation_tier import (
-        _compilation_series_point_count,
-        _iter_compilation_series_cells,
-        is_compilation_evidence,
-    )
 
-    comparison_ids = {o.observation_id for o in comparison_candidates(context)}
-    residuals: list[Residual] | None = [] if _stream is None else None
-    candidates: dict[str, Observation] = {}
-    # Snapshot. Engine candidates are returned separately and are not
-    # lineage inputs. The work-input index is this snapshot.
+    from simulator.battery.compilation_tier import _compilation_series_point_count
+    from simulator.battery.validate import build_printed_thermo_index
+
     observations = dict(context.observations)
     origins = context.origins
     live_context = replace(context, observations=observations, origins=origins)
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    empirical_ids = comparison_ids
-    started = time.monotonic()
-    last_progress = started
-    done = 0
-    total = sum(
-        _compilation_series_point_count(obs, origins.get(obs.observation_id))
-        for obs in refs
-    ) * max(len(engine_set), 1)
-    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
-
     table_index = build_printed_thermo_index(observations)
     ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
         context.root
@@ -13987,6 +13993,121 @@ def _score_store_with_decisions(
     kems_partial_pressure_band = derive_kems_partial_pressure_band(
         observations, context.experiments, benches=context.benches
     )
+    series_point_counts = {
+        obs.observation_id: _compilation_series_point_count(
+            obs, origins.get(obs.observation_id)
+        )
+        for obs in refs
+    }
+    return _PreparedScoreRun(
+        context=context,
+        engine_set=tuple(engine_set),
+        refs=tuple(refs),
+        fusion_diagnostic_ids=frozenset(fusion_diagnostic_ids),
+        comparison_ids=frozenset(o.observation_id for o in comparison_observations),
+        observations=observations,
+        origins=origins,
+        live_context=live_context,
+        point_observations_by_experiment=point_observations_by_experiment,
+        table_index=table_index,
+        ratchet_missing=ratchet_missing,
+        source_bands=source_bands,
+        source_band_reasons=source_band_reasons,
+        kems_partial_pressure_band=kems_partial_pressure_band,
+        series_point_counts=series_point_counts,
+    )
+
+
+def _score_group_id(observation: Observation) -> str:
+    if observation.source_id in {_HASHIMOTO_SOURCE_ID, _SOSSI_SOURCE_ID}:
+        return f"source:{observation.source_id}"
+    if observation.experiment_id:
+        return f"experiment:{observation.experiment_id}"
+    if observation.source_id:
+        return f"source:{observation.source_id}"
+    return "unassigned"
+
+
+def _partition_score_refs(
+    refs: Sequence[Observation], *, workers: int
+) -> tuple[tuple[Observation, ...], ...]:
+    """Assign whole experiment and residue-cohort groups to stable buckets."""
+
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    group_buckets = {
+        group_id: int.from_bytes(
+            hashlib.sha256(group_id.encode("utf-8")).digest()[:8], "big"
+        ) % workers
+        for group_id in {_score_group_id(observation) for observation in refs}
+    }
+    chunks: list[list[Observation]] = [[] for _ in range(workers)]
+    for observation in refs:
+        chunks[group_buckets[_score_group_id(observation)]].append(observation)
+    return tuple(tuple(chunk) for chunk in chunks)
+
+
+def _score_store_with_decisions(
+    context: ScoreContext,
+    *,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    measured_only: bool = False,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+    _prepared: _PreparedScoreRun | None = None,
+    _engine_set: Sequence[Engine] | None = None,
+    _refs: Sequence[Observation] | None = None,
+    _stream: _ResidualJsonlStream | None = None,
+) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    prepared = _prepared or _prepare_score_run(
+        context,
+        engines=engines,
+        rail=rail,
+        work_id=work_id,
+        limit=limit,
+        include_diagnostics=include_diagnostics,
+        measured_only=measured_only,
+    )
+    if prepared.context is not context:
+        raise ValueError("prepared score context does not match the scoring context")
+    engine_set = (
+        prepared.engine_set
+        if _engine_set is None
+        else _validated_score_engines(tuple(_engine_set))
+    )
+    refs = prepared.refs if _refs is None else tuple(_refs)
+    fusion_diagnostic_ids = prepared.fusion_diagnostic_ids
+    comparison_ids = prepared.comparison_ids
+    observations = prepared.observations
+    origins = prepared.origins
+    live_context = prepared.live_context
+    point_observations_by_experiment = prepared.point_observations_by_experiment
+    table_index = prepared.table_index
+    ratchet_missing = prepared.ratchet_missing
+    source_bands = prepared.source_bands
+    source_band_reasons = prepared.source_band_reasons
+    kems_partial_pressure_band = prepared.kems_partial_pressure_band
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        is_compilation_evidence,
+    )
+    from simulator.battery.validate import bound_work_inputs
+
+    provided_handles = dict(handles or {})
+    resolved_handles = dict(provided_handles)
+    residuals: list[Residual] | None = [] if _stream is None else None
+    candidates: dict[str, Observation] = {}
+    empirical_ids = comparison_ids
+    started = time.monotonic()
+    last_progress = started
+    done = 0
+    total = sum(
+        prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
+    ) * max(len(engine_set), 1)
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
@@ -14216,6 +14337,51 @@ def _score_store_with_decisions(
     return scored, candidates, _compilation_decision_strata(scored, context)
 
 
+_SCORE_WORKER_SETUP: (
+    tuple[_PreparedScoreRun, Callable[..., EnginePrediction] | None] | None
+) = None
+
+
+def _initialize_score_worker(
+    prepared: _PreparedScoreRun,
+    predict: Callable[..., EnginePrediction] | None,
+) -> None:
+    global _SCORE_WORKER_SETUP
+    _SCORE_WORKER_SETUP = (prepared, predict)
+
+
+def _score_group_shard(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None]
+) -> tuple[str, int]:
+    prepared, predict = _SCORE_WORKER_SETUP or (None, None)
+    if prepared is None:
+        raise RuntimeError("battery score worker was not initialized")
+    shard_index, engine, refs, path_text, root_text = task
+    del shard_index
+    stream = _ResidualJsonlStream(
+        Path(path_text),
+        root=None if root_text is None else Path(root_text),
+        sort_on_finalize=False,
+    )
+    try:
+        _score_store_with_decisions(
+            prepared.context,
+            predict=predict,
+            _prepared=prepared,
+            _engine_set=(engine,),
+            _refs=refs,
+            _stream=stream,
+        )
+        return str(stream.partial_path), stream.count
+    finally:
+        stream.close()
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _close_isolated_cell_workers,
+        )
+
+        _close_isolated_cell_workers()
+
+
 def _score_store_to_jsonl(
     context: ScoreContext,
     path: Path,
@@ -14229,23 +14395,96 @@ def _score_store_to_jsonl(
     measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    workers: int = 1,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    if workers > 1 and handles:
+        raise ValueError("spawned score workers open their own engine handles")
     stream = _ResidualJsonlStream(path, root=root)
     try:
-        _score_store_with_decisions(
-            context,
-            engines=engines,
-            rail=rail,
-            work_id=work_id,
-            limit=limit,
-            include_diagnostics=include_diagnostics,
-            measured_only=measured_only,
-            predict=predict,
-            handles=handles,
-            _stream=stream,
-        )
+        if workers == 1:
+            _score_store_with_decisions(
+                context,
+                engines=engines,
+                rail=rail,
+                work_id=work_id,
+                limit=limit,
+                include_diagnostics=include_diagnostics,
+                measured_only=measured_only,
+                predict=predict,
+                handles=handles,
+                _stream=stream,
+            )
+        else:
+            prepared = _prepare_score_run(
+                context,
+                engines=engines,
+                rail=rail,
+                work_id=work_id,
+                limit=limit,
+                include_diagnostics=include_diagnostics,
+                measured_only=measured_only,
+            )
+            chunks = _partition_score_refs(prepared.refs, workers=workers)
+            populated_chunks = [
+                (index, chunk)
+                for index, chunk in enumerate(chunks)
+                if chunk
+            ]
+            if not populated_chunks or not prepared.engine_set:
+                _score_store_with_decisions(
+                    context,
+                    _prepared=prepared,
+                    _refs=(),
+                    _stream=stream,
+                )
+            else:
+                root_text = None if root is None else str(root)
+                with tempfile.TemporaryDirectory(
+                    prefix="battery-score-shards-"
+                ) as temporary_dir:
+                    tasks = []
+                    for index, chunk in populated_chunks:
+                        for engine in prepared.engine_set:
+                            shard_path = Path(temporary_dir) / (
+                                f"shard-{index:04d}-{engine.value}.jsonl"
+                            )
+                            tasks.append(
+                                (index, engine, chunk, str(shard_path), root_text)
+                            )
+                    process_context = get_context("spawn")
+                    with process_context.Pool(
+                        processes=min(workers, len(tasks)),
+                        initializer=_initialize_score_worker,
+                        initargs=(prepared, predict),
+                    ) as pool:
+                        shard_paths = pool.map(_score_group_shard, tasks)
+                    with stream.partial_path.open("rb") as output:
+                        header = output.readline()
+                    shard_count = 0
+                    for shard_path_text, row_count in shard_paths:
+                        shard_count += row_count
+                        with Path(shard_path_text).open("rb") as shard:
+                            if shard.readline() != header:
+                                raise ValueError("score shard store stamp mismatch")
+                            for line in shard:
+                                if not line.strip():
+                                    continue
+                                payload = json.loads(line)
+                                if (
+                                    not isinstance(payload, dict)
+                                    or is_store_stamp_payload(payload)
+                                ):
+                                    continue
+                                stream.append_payload_line(line)
+                    if stream.count != shard_count:
+                        raise ValueError(
+                            "score shard row count does not match merged output"
+                        )
+                stream.finalize(context=context, engines=prepared.engine_set)
         return stream.count, _ResidualReportMetadata(
             family_band_values=dict(stream.band_values),
             headline_band_values=dict(stream.headline_band_values),
@@ -19210,7 +19449,9 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        sort_on_finalize: bool = True,
     ) -> None:
+        self.sort_on_finalize = sort_on_finalize
         self.partial_path = path.with_name(path.name + ".partial")
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = self.partial_path.open("wb")
@@ -19220,20 +19461,25 @@ class _ResidualJsonlStream:
             )
         )
         self.file.flush()
-        self._temporary = tempfile.TemporaryDirectory(prefix="battery-score-index-")
-        self._database = sqlite3.connect(
-            Path(self._temporary.name) / "residual-order.sqlite"
-        )
-        self._database.execute("PRAGMA cache_size=-16384")
-        self._database.execute("PRAGMA temp_store=FILE")
-        self._database.execute("PRAGMA journal_mode=OFF")
-        self._database.execute("PRAGMA synchronous=OFF")
-        self._database.execute(
-            "CREATE TABLE residual_order ("
-            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-            "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
-            "numeric_value TEXT)"
-        )
+        self._temporary: tempfile.TemporaryDirectory | None = None
+        self._database: sqlite3.Connection | None = None
+        if sort_on_finalize:
+            self._temporary = tempfile.TemporaryDirectory(
+                prefix="battery-score-index-"
+            )
+            self._database = sqlite3.connect(
+                Path(self._temporary.name) / "residual-order.sqlite"
+            )
+            self._database.execute("PRAGMA cache_size=-16384")
+            self._database.execute("PRAGMA temp_store=FILE")
+            self._database.execute("PRAGMA journal_mode=OFF")
+            self._database.execute("PRAGMA synchronous=OFF")
+            self._database.execute(
+                "CREATE TABLE residual_order ("
+                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+                "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
+                "numeric_value TEXT)"
+            )
         self._pending: list[tuple[str, str, str, int, str | None, str | None]] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
@@ -19249,26 +19495,64 @@ class _ResidualJsonlStream:
         residual: Residual,
         candidate: Observation | None,
     ) -> None:
-        offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
-        self.file.write(line + b"\n")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
-        self._pending.append(
-            (
-                "" if residual.rail is None else residual.rail.value,
-                residual.reference,
-                residual.key,
-                offset,
-                band_value,
-                numeric_value,
-            )
+        self._append_line(
+            line,
+            rail="" if residual.rail is None else residual.rail.value,
+            reference=residual.reference,
+            key=residual.key,
+            band_value=band_value,
+            numeric_value=numeric_value,
         )
+
+    def append_payload_line(self, line: bytes) -> None:
+        payload = json.loads(line)
+        if not isinstance(payload, Mapping):
+            raise ValueError("score shard row is not an object")
+        numeric = payload.get("numeric")
+        band = numeric.get("decision_band") if isinstance(numeric, Mapping) else None
+        band_value = (
+            str(band["value"])
+            if isinstance(band, Mapping) and band.get("value") is not None
+            else None
+        )
+        numeric_value = (
+            str(numeric["value"])
+            if isinstance(numeric, Mapping) and numeric.get("value") is not None
+            else None
+        )
+        self._append_line(
+            line.rstrip(b"\r\n"),
+            rail=str(payload.get("rail") or ""),
+            reference=str(payload.get("reference") or ""),
+            key=str(payload.get("key") or ""),
+            band_value=band_value,
+            numeric_value=numeric_value,
+        )
+
+    def _append_line(
+        self,
+        line: bytes,
+        *,
+        rail: str,
+        reference: str,
+        key: str,
+        band_value: str | None,
+        numeric_value: str | None,
+    ) -> None:
+        offset = self.file.tell()
+        self.file.write(line + b"\n")
+        if self.sort_on_finalize:
+            self._pending.append(
+                (rail, reference, key, offset, band_value, numeric_value)
+            )
+            if len(self._pending) >= self._INDEX_BATCH:
+                self._flush_index()
         self.count += 1
-        if len(self._pending) >= self._INDEX_BATCH:
-            self._flush_index()
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
@@ -19276,6 +19560,7 @@ class _ResidualJsonlStream:
     def _flush_index(self) -> None:
         if not self._pending:
             return
+        assert self._database is not None
         self._database.executemany(
             "INSERT INTO residual_order (rail, reference, key, offset, band_value, "
             "numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
@@ -19295,6 +19580,9 @@ class _ResidualJsonlStream:
         engines: Sequence[Engine],
     ) -> None:
         self.flush()
+        if not self.sort_on_finalize:
+            return
+        assert self._database is not None
         self._flush_index()
         self._database.execute(
             "CREATE INDEX residual_order_key ON residual_order("
@@ -19434,8 +19722,10 @@ class _ResidualJsonlStream:
     def close(self) -> None:
         if not self.file.closed:
             self.file.close()
-        self._database.close()
-        self._temporary.cleanup()
+        if self._database is not None:
+            self._database.close()
+        if self._temporary is not None:
+            self._temporary.cleanup()
 
 
 def flagged_stratum_payloads(
