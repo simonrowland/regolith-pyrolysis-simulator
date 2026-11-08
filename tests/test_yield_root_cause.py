@@ -396,7 +396,7 @@ def test_c5_present_rung_unreachable_at_cap_advances_after_minimum_hold():
     assert sim._mre_hold_hours == 0
 
 
-def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
+def test_c5_declared_ladder_hold_scopes_shared_voltage_species_with_raw_margin_veto():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -428,8 +428,20 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
 
     sim._step_mre()
 
-    assert sim.melt.composition_kg.get("Na2O", 0.0) < na2o_before
-    assert not hasattr(sim, "_last_mre_refusal_diagnostic")
+    # At 298 K, ΔG°red = −ΔGf°(Na2O) ≈ 375000 J/mol, so E° = ΔG°red/(2·96485 C/mol) ≈ 1.94 J/C = 1.94 V before the Nernst activity term.
+    assert sim.melt.composition_kg.get("Na2O", 0.0) == pytest.approx(na2o_before)
+    notices = sim._mre_ellingham_ladder_diagnostic["notices"]
+    assert notices
+    veto = notices[0]
+    assert veto["kind"] == "mre_raw_margin_veto"
+    assert veto["oxide"] == "Na2O"
+    assert veto["applied_voltage_V"] == pytest.approx(0.75)
+    assert veto["raw_requirement_V"] > veto["applied_voltage_V"]
+    assert veto["raw_margin_V"] == pytest.approx(
+        veto["applied_voltage_V"] - veto["raw_requirement_V"]
+    )
+    assert veto["raw_margin_V"] < 0.0
+    assert veto["reference_status"]
     electrolysis_controls = [c for c in captured if "voltage_V" in c]
     assert electrolysis_controls
     # Rung-scoped selectivity: the first hold is the declared Na2O rung only,
