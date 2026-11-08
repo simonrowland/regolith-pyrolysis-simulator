@@ -439,6 +439,24 @@ def _feo_equilibrium_sim(*, temperature_C, domain=None, with_domain_method=True)
     return sim
 
 
+def _feo_fe_row_equilibrium_sim(*, domain):
+    sim = _feo_equilibrium_sim(temperature_C=225.0, domain=domain)
+    sim.vapor_pressures["metals"] = {
+        "Fe": {
+            "parent_oxide": "FeO",
+            "fit_target": "pure_component_psat",
+            "valid_range_K": [400.0, 700.0],
+            "pure_component_antoine": {
+                "A": 50.0,
+                "B": 0.0,
+                "C": 0.0,
+            },
+        }
+    }
+    sim._ELLINGHAM_THERMO = ("Fe",)
+    return sim
+
+
 def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_activity():
     domain = LiquidFeODomain(
         below_liquidus=True,
@@ -494,6 +512,38 @@ def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
     assert liquid.diagnostics == plain.diagnostics
     assert liquid.vapor_pressures_Pa == plain.vapor_pressures_Pa
     assert "notices" not in liquid.diagnostics["a_FeO_calphad"]
+
+
+def test_equilibrium_fe_row_provenance_carries_only_below_liquidus_notice():
+    below_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=225.0 + 273.15,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    above_domain = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=225.0 + 273.15,
+        liquidus_T_C=200.0,
+        solidus_T_C=100.0,
+        source="gate_liquid_fraction",
+    )
+
+    below = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_fe_row_equilibrium_sim(domain=below_domain)
+    )
+    above = EquilibriumMixin._internal_analytical_equilibrium(
+        _feo_fe_row_equilibrium_sim(domain=above_domain)
+    )
+
+    below_row = below.diagnostics["activity_provenance"]["Fe"]
+    above_row = above.diagnostics["activity_provenance"]["Fe"]
+    assert below.vapor_pressures_Pa["Fe"] > 0.0
+    assert below_row["notices"] == below.diagnostics["a_FeO_calphad"]["notices"]
+    assert "notices" not in above_row
+    assert below.vapor_pressures_Pa == above.vapor_pressures_Pa
+    assert below.activity_coefficients == above.activity_coefficients
 
 
 def _gate_host(curve, *, pinned=True):

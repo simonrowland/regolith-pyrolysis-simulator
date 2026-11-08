@@ -890,7 +890,7 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
     assert refused.refusal_code == REFUSAL_NO_ADMITTED_SOURCE
 
 
-def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
+def _fe_typed_shadow_notice_inputs(*, below_liquidus, include_row_notice):
     rule = RequestRule(
         species_id="Fe",
         source_account="process.cleaned_melt",
@@ -915,6 +915,15 @@ def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
         identity_id="simulator.stoichiometric_FeO_l.current.v1",
         component_id="FeO",
     )
+    notice = {
+        "type": "typed_notice",
+        "kind": "liquid_model_below_liquidus",
+        "temperature_K": 1600.0,
+        "liquidus_T_C": 1700.0,
+        "solidus_T_C": 1050.0,
+        "source": "gate_liquid_fraction",
+        "authority": "extrapolated",
+    }
     typed_fe = SourceReactionActivity(
         component_id="FeO",
         value=0.2,
@@ -938,11 +947,32 @@ def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
             ),
             component_id="FeO",
         ),
+        derivation=(
+            {"redox_receipt": {"notices": [notice]}}
+            if below_liquidus
+            else {}
+        ),
     )
     state = VapourResolveState(
         temperature_K=1600.0,
+        source_reaction_activity_provenance=(
+            {"Fe": {"notices": [notice]}}
+            if below_liquidus and include_row_notice
+            else {}
+        ),
         source_reaction_activity_results={"FeO": typed_fe},
         melt_activity_shadow_state_fingerprint="state:fe",
+    )
+    return rule, state, typed_fe, notice
+
+
+@pytest.mark.parametrize("below_liquidus", [True, False])
+def test_fe_typed_shadow_and_liquidus_notice_traverse_answer_rows(
+    below_liquidus: bool,
+) -> None:
+    rule, state, typed_fe, notice = _fe_typed_shadow_notice_inputs(
+        below_liquidus=below_liquidus,
+        include_row_notice=True,
     )
 
     answer = refusal_closure(
@@ -958,6 +988,36 @@ def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
     assert answer.source_reaction_activity_shadow_evaluation["status"] == (
         "shadow_only_no_behavior_authority"
     )
+    expected_notices = [notice] if below_liquidus else None
+    assert serialize_vapour_answer(answer)["extra"].get("notices") == (
+        expected_notices
+    )
+
+
+@pytest.mark.parametrize("below_liquidus", [True, False])
+def test_fe_refusal_keeps_shadow_liquidus_notice_without_activity_value(
+    below_liquidus: bool,
+) -> None:
+    rule, state, _typed_fe, notice = _fe_typed_shadow_notice_inputs(
+        below_liquidus=below_liquidus,
+        include_row_notice=False,
+    )
+    refused = refusal_closure(
+        requested=frozenset({"Fe"}),
+        rules=(rule,),
+        ledger_snapshot={},
+        state=state,
+        provider_candidates_by_species=None,
+        catalog_species=_stub_catalog_species("Fe"),
+    ).answers["Fe"]
+    assert refused.is_refused
+    assert refused.source_reaction_activity is None
+    assert refused.source_reaction_activity_shadow is None
+    if below_liquidus:
+        assert "liquid_model_below_liquidus" in refused.pressure.detail
+        assert refused.extra["notices"] == [notice]
+    else:
+        assert "liquid_model_below_liquidus" not in refused.pressure.detail
 
 
 def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None:

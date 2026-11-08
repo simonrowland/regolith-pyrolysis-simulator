@@ -72,7 +72,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.fe_redox import kress91_ferrous_feo_activity
+from simulator.fe_redox import LiquidFeODomain, kress91_ferrous_feo_activity
 from simulator.state import CampaignPhase, DecisionType
 from tests.chemistry.conftest import _build_sim
 
@@ -3702,6 +3702,122 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     assert reduced_prov["degraded_activity_basis"] is None
     assert reduced_activity > static_activity
     assert oxidized_activity < reduced_activity
+
+
+def test_fe_liquidus_notice_reaches_builtin_row_and_resolved_answer(
+    vapor_pressure_data,
+):
+    from simulator.vapour_rail.batch import (
+        FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+        FluxActivationContext,
+        PressureValue,
+    )
+    from simulator.vapour_rail.instrumentation import serialize_vapour_answer
+    from simulator.vapour_rail.request import VapourResolveState
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    base_request = _fe_redox_request(
+        species_formula_registry={},
+        intrinsic_fO2_log=-12.0,
+    )
+    below_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=1773.15,
+        liquidus_T_C=1600.0,
+        solidus_T_C=1000.0,
+        source="gate_liquid_fraction",
+    )
+    above_domain = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=1773.15,
+        liquidus_T_C=1400.0,
+        solidus_T_C=1000.0,
+        source="gate_liquid_fraction",
+    )
+    below_request = replace(
+        base_request,
+        control_inputs={
+            **base_request.control_inputs,
+            "liquid_feo_domain": below_domain,
+        },
+    )
+    above_request = replace(
+        base_request,
+        control_inputs={
+            **base_request.control_inputs,
+            "liquid_feo_domain": above_domain,
+        },
+    )
+    below_result = provider.dispatch(below_request)
+    above_result = provider.dispatch(above_request)
+    below_diagnostic = below_result.diagnostic
+    above_diagnostic = above_result.diagnostic
+
+    below_row = below_diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    above_row = above_diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    assert below_row["activity_basis"] == "kress91_ferrous"
+    assert below_row["notices"] == below_diagnostic["a_FeO_calphad"]["notices"]
+    assert "notices" not in above_row
+    assert below_diagnostic["vapor_pressures_Pa"]["Fe"] == (
+        above_diagnostic["vapor_pressures_Pa"]["Fe"]
+    )
+    assert below_diagnostic["activities"]["Fe"] == (
+        above_diagnostic["activities"]["Fe"]
+    )
+
+    catalog = provider._vapour_rail_catalog
+    assert catalog is not None
+
+    def resolve_answer(request, diagnostic):
+        evidence_ref = "; ".join(
+            str(value)
+            for value in diagnostic["a_FeO_calphad"]["sources"].values()
+        )
+        state = VapourResolveState(
+            temperature_K=1773.15,
+            process_phase="pyrolysis",
+            total_pressure_Pa=0.1,
+            fO2_bar=diagnostic["pO2_bar"],
+            source_reaction_activities=diagnostic["activities"],
+            source_reaction_activity_provider=diagnostic["activities_provider"],
+            source_reaction_activity_evidence_refs={"Fe": evidence_ref},
+            source_reaction_activity_standard_states={
+                "Fe": catalog.species[
+                    "Fe"
+                ].source_reaction_activity.standard_state,
+            },
+            source_reaction_activity_provenance=(
+                diagnostic["vapor_pressure_numerator_provenance"]
+            ),
+            source_reaction_fO2_bar=diagnostic["source_reaction_fO2_bar"],
+            source_reaction_fO2_log10=diagnostic["source_reaction_fO2_log10"],
+            source_reaction_activity_pressure_bar=(
+                diagnostic["source_reaction_activity_pressure_bar"]
+            ),
+            source_reaction_redox_model_id=(
+                diagnostic["source_reaction_redox_model_id"]
+            ),
+            source_reaction_composition_wt_pct=(
+                diagnostic["source_reaction_composition_wt_pct"]
+            ),
+            liquid_feo_domain=request.control_inputs["liquid_feo_domain"],
+        )
+        return catalog.resolve_batch(
+            {"process.cleaned_melt": request.account_view.accounts["process.cleaned_melt"]},
+            state,
+            flux_activation_context=FluxActivationContext(
+                epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+            ),
+        ).channel("Fe")
+
+    below_answer = resolve_answer(below_request, below_diagnostic)
+    above_answer = resolve_answer(above_request, above_diagnostic)
+    assert isinstance(below_answer.pressure, PressureValue)
+    assert serialize_vapour_answer(below_answer)["extra"]["notices"] == (
+        below_row["notices"]
+    )
+    assert "notices" not in serialize_vapour_answer(above_answer)["extra"]
+    assert below_answer.pressure.pa == above_answer.pressure.pa
 
 
 def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
