@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -73,6 +74,8 @@ def _mock_knudsen_prediction(
     oxygen_balance_pO2_values: tuple[float, ...] | None = None,
     po2_calls: list[tuple[float, str, float | None]] | None = None,
     oxygen_balance_calls: list[float] | None = None,
+    backend_mode: str | None = None,
+    missing_na_call: int | None = None,
 ):
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -83,6 +86,13 @@ def _mock_knudsen_prediction(
         Po2Request,
     )
     import simulator.battery.score as score_mod
+
+    if backend_mode is None:
+        backend_mode = {
+            Engine.ALPHAMELTS: "subprocess",
+            Engine.THERMOENGINE: "thermoengine",
+        }.get(engine)
+    backend = SimpleNamespace(_mode=backend_mode)
 
     calls: list[float] = []
 
@@ -102,24 +112,25 @@ def _mock_knudsen_prediction(
         calls.append(physical_pressure_bar)
         if po2_calls is not None:
             po2_calls.append((physical_pressure_bar, po2.mode, po2.po2_bar))
-        if oxygen_balance_pO2_values is None:
-            reported_na_pressure = (
-                na_pressure
-                if call_number == 1 or na_pressure is None
-                else na_pressure * math.pow(10.0, sensitivity_dex)
-            )
-        else:
-            reported_na_pressure = (
-                na_pressure
-                if po2.po2_bar == oxygen_balance_pO2_values[0]
-                else (
-                    None
-                    if na_pressure is None
-                    else na_pressure * math.pow(10.0, sensitivity_dex)
-                )
-            )
+        seed_effective_pressure, _seed_policy = (
+            score_mod._knudsen_effective_pressure_bar(engine, 1e-3, backend)
+        )
+        effective_pressure, _policy = score_mod._knudsen_effective_pressure_bar(
+            engine, physical_pressure_bar, backend
+        )
+        reported_na_pressure = na_pressure
+        if (
+            na_pressure is not None
+            and sensitivity_dex != 0.0
+            and effective_pressure is not None
+            and seed_effective_pressure is not None
+            and effective_pressure != seed_effective_pressure
+        ):
+            reported_na_pressure = na_pressure * math.pow(10.0, sensitivity_dex)
         if call_number > 1 and updated_na_pressure is not None:
             reported_na_pressure = updated_na_pressure
+        if call_number == missing_na_call:
+            reported_na_pressure = None
         reported_o2_pressure = (
             o2_pressure
             if call_number == 1 or updated_o2_pressure is None
@@ -200,7 +211,7 @@ def _mock_knudsen_prediction(
     monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
     handle = EngineHandle(
         name=engine.value,
-        backend=object(),
+        backend=backend,
         available=True,
         unavailable_reason=None,
         takes_fo2=True,
@@ -217,19 +228,65 @@ def _mock_knudsen_prediction(
 
 
 @pytest.mark.parametrize(
-    ("engine", "sensitivity_status"),
     (
-        (Engine.ALPHAMELTS, "measured"),
-        (Engine.VAPOROCK, "not_evaluated"),
-        (Engine.THERMOENGINE, "measured"),
+        "engine",
+        "backend_mode",
+        "sensitivity_status",
+        "effective_seed_pressure",
+        "effective_derived_pressure",
+        "sensitivity_reason",
+    ),
+    (
+        (
+            Engine.ALPHAMELTS,
+            "subprocess",
+            "not_evaluated",
+            "1",
+            "1",
+            "effective_pressure_identical: alphamelts subprocess reference 1 bar",
+        ),
+        (
+            Engine.ALPHAMELTS,
+            "python_api",
+            "measured",
+            "0.001",
+            "0.0002",
+            "effective_pressure_differs: alphamelts Python API floor 1e-6 bar",
+        ),
+        (
+            Engine.VAPOROCK,
+            None,
+            "not_evaluated",
+            "null",
+            "null",
+            "engine_does_not_accept_total_pressure",
+        ),
+        (
+            Engine.THERMOENGINE,
+            "thermoengine",
+            "measured",
+            "0.001",
+            "0.0002",
+            "effective_pressure_differs: ThermoEngine floor 1e-6 bar",
+        ),
     ),
 )
 def test_knudsen_partial_pressure_derives_total_pressure_and_scores(
-    engine, sensitivity_status, monkeypatch
+    engine,
+    backend_mode,
+    sensitivity_status,
+    effective_seed_pressure,
+    effective_derived_pressure,
+    sensitivity_reason,
+    monkeypatch,
 ) -> None:
     experiment, reference, context = _partial_row(f"knudsen-pressure-{engine.value}")
     prediction, calls = _mock_knudsen_prediction(
-        engine, experiment, reference, monkeypatch
+        engine,
+        experiment,
+        reference,
+        monkeypatch,
+        backend_mode=backend_mode,
     )
 
     assert prediction.execution.state is ExecutionState.PRODUCED
@@ -246,10 +303,16 @@ def test_knudsen_partial_pressure_derives_total_pressure_and_scores(
     assert "not printed" in pressure_notices[0].reason
     assert "total_pressure_Pa=20" in pressure_notices[0].reason
     assert f"sensitivity_status={sensitivity_status}" in pressure_notices[0].reason
+    assert f"sensitivity_reason={sensitivity_reason}" in pressure_notices[0].reason
+    assert (
+        f"effective_seed_pressure_bar={effective_seed_pressure}"
+        in pressure_notices[0].reason
+    )
+    assert (
+        f"effective_derived_pressure_bar={effective_derived_pressure}"
+        in pressure_notices[0].reason
+    )
     if sensitivity_status == "not_evaluated":
-        assert "sensitivity_reason=engine_does_not_accept_total_pressure" in (
-            pressure_notices[0].reason
-        )
         assert "sensitivity_dex=null" in pressure_notices[0].reason
     else:
         assert "sensitivity_dex=0" in pressure_notices[0].reason
@@ -280,6 +343,7 @@ def test_knudsen_total_pressure_sensitivity_above_row_band_refuses(
         reference,
         monkeypatch,
         sensitivity_dex=0.02,
+        backend_mode="python_api",
     )
 
     residual, _candidate = compile_residual(
@@ -453,6 +517,35 @@ def test_missing_seed_target_refuses_without_a_band(monkeypatch) -> None:
     assert residual.refusal.detail == {
         "reason": "knudsen_total_pressure_target_species_missing",
         "pressure_pass": "seed",
+        "species": "Na",
+    }
+
+
+def test_missing_derived_target_refuses_without_a_band(monkeypatch) -> None:
+    experiment, reference, context = _partial_row(
+        "knudsen-pressure-missing-derived-target"
+    )
+    prediction, _calls = _mock_knudsen_prediction(
+        Engine.ALPHAMELTS,
+        experiment,
+        reference,
+        monkeypatch,
+        missing_na_call=2,
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.ALPHAMELTS,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail == {
+        "reason": "knudsen_total_pressure_target_species_missing",
+        "pressure_pass": "derived",
         "species": "Na",
     }
 
