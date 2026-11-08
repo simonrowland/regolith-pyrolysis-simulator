@@ -10424,10 +10424,13 @@ def _predict_with_engine(
             version=engine_version,
         )
 
+    solve_oxygen_balance_at_current_pressure = None
+    oxygen_balance_notice: Notice | None = None
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,
     }:
+        oxygen_balance_cell_material = po2.cell_material
 
         def engine_call_at_po2(pO2_bar: float) -> object:
             return equilibrate_cell(
@@ -10445,14 +10448,50 @@ def _predict_with_engine(
                 native_activity_formula=native_activity_formula,
             )
 
+        def solve_oxygen_balance_at_current_pressure():
+            return _solve_vapor_engine_cell_oxygen_balance(
+                engine_call_at_po2,
+                temperature_K=float(T),
+                cell_material=oxygen_balance_cell_material,
+                fixed_point_activities=engine is Engine.ALPHAMELTS,
+            )
+
+        def oxygen_balance_solved_notice(
+            solved_pO2_bar, balance, cell_fraction, cell_info
+        ) -> Notice:
+            solved_notice = {
+                "kind": "fo2_oxygen_balance_effusion_solved",
+                "pO2_bar": solved_pO2_bar,
+                "relative_residual": balance["residual"],
+                "bracket_log10_bar": balance["bracket"],
+                "dominant_O_carriers": balance["dominant_O_carriers"],
+                "dominant_metal_carriers": balance["dominant_metal_carriers"],
+                "cell_material": cell_info["cell_material"],
+                "cell_oxide_flux_fraction": cell_fraction,
+                "buffer_pinned": cell_info["buffer_pinned"],
+                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
+                "cell_oxide_janaf_sources": cell_info[
+                    "cell_oxide_janaf_sources"
+                ],
+            }
+            return Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(quantity,),
+                reason=(
+                    OXYGEN_BALANCE_NOTICE_PREFIX
+                    + " "
+                    + json.dumps(
+                        solved_notice,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
+                ),
+                origin=f"engine:{engine.value}",
+            )
+
         try:
             solved_pO2_bar, _pressures, balance, cell_fraction, cell_info = (
-                _solve_vapor_engine_cell_oxygen_balance(
-                    engine_call_at_po2,
-                    temperature_K=float(T),
-                    cell_material=po2.cell_material,
-                    fixed_point_activities=engine is Engine.ALPHAMELTS,
-                )
+                solve_oxygen_balance_at_current_pressure()
             )
         except _OxygenBalanceEngineTrialRefusal as exc:
             cell = exc.cell
@@ -10477,37 +10516,10 @@ def _predict_with_engine(
         except Exception as exc:
             return engine_call_failure(exc)
         else:
-            solved_notice = {
-                "kind": "fo2_oxygen_balance_effusion_solved",
-                "pO2_bar": solved_pO2_bar,
-                "relative_residual": balance["residual"],
-                "bracket_log10_bar": balance["bracket"],
-                "dominant_O_carriers": balance["dominant_O_carriers"],
-                "dominant_metal_carriers": balance["dominant_metal_carriers"],
-                "cell_material": cell_info["cell_material"],
-                "cell_oxide_flux_fraction": cell_fraction,
-                "buffer_pinned": cell_info["buffer_pinned"],
-                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
-                "cell_oxide_janaf_sources": cell_info[
-                    "cell_oxide_janaf_sources"
-                ],
-            }
-            extra_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(quantity,),
-                    reason=(
-                        OXYGEN_BALANCE_NOTICE_PREFIX
-                        + " "
-                        + json.dumps(
-                            solved_notice,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                        )
-                    ),
-                    origin=f"engine:{engine.value}",
-                )
+            oxygen_balance_notice = oxygen_balance_solved_notice(
+                solved_pO2_bar, balance, cell_fraction, cell_info
             )
+            extra_notices.append(oxygen_balance_notice)
             po2 = Po2Request(
                 mode=PO2_COMMANDED,
                 po2_bar=solved_pO2_bar,
@@ -10755,6 +10767,60 @@ def _predict_with_engine(
                 version=engine_version,
             )
         pressure_bar = total_pressure_pa / 1.0e5
+        if solve_oxygen_balance_at_current_pressure is not None:
+            # This callback closes over pressure_bar, so after the one-pass
+            # P_total update the same balance runs with the derived pressure.
+            try:
+                (
+                    solved_pO2_bar,
+                    _pressures,
+                    balance,
+                    cell_fraction,
+                    cell_info,
+                ) = solve_oxygen_balance_at_current_pressure()
+            except Exception as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                        call_evidence=(
+                            f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                        ),
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                    refusal_detail={
+                        "reason": "knudsen_total_pressure_re_evaluation_failed",
+                        "stage": "oxygen_balance",
+                        "detail": str(exc),
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=solved_pO2_bar,
+            )
+            updated_oxygen_balance_notice = oxygen_balance_solved_notice(
+                solved_pO2_bar, balance, cell_fraction, cell_info
+            )
+            if oxygen_balance_notice is not None:
+                extra_notices[:] = [
+                    notice
+                    for notice in extra_notices
+                    if notice != oxygen_balance_notice
+                ]
+                notices = tuple(
+                    notice for notice in notices if notice != oxygen_balance_notice
+                )
+            oxygen_balance_notice = updated_oxygen_balance_notice
+            extra_notices.append(oxygen_balance_notice)
+            notices = union_notices(notices, (oxygen_balance_notice,))
         try:
             cell = equilibrate_cell(
                 handle,
