@@ -690,10 +690,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 for key in species_maps:
                     bucket[key] = {}
         if availability['flag'] is not None:
-            if isinstance(bucket.get('flag'), Mapping):
-                bucket['availability_flag'] = availability['flag']
-            else:
-                bucket['flag'] = availability['flag']
+            bucket['availability_flag'] = availability['flag']
     if result['oxygen']['class_total_kg'] is None:
         for name, key in (
             ('oxygen', 'partition_kg'),

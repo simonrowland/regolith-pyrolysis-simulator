@@ -91,13 +91,19 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
     products = classify_products(two_hour_run)
     assert products["oxygen"]["class_total_kg"] == 1.0
     assert products["oxygen"]["status"] == "partial"
-    assert products["oxygen"]["excluded"] == products["oxygen"]["flag"]["excluded"]
+    assert (
+        products["oxygen"]["excluded"]
+        == products["oxygen"]["availability_flag"]["excluded"]
+    )
     assert products["oxygen"]["partition_kg"] == {"stored": 1.0, "total": 1.0}
     metals_partition = products["metals_plus_O2"]["O2_partition_kg"]
     assert all(value is not None for value in metals_partition.values())
     for bucket in ("oxygen", "metals_plus_O2"):
         assert products[bucket]["status"] == "partial"
-        assert "EvaporationFluxConfigurationError" in products[bucket]["flag"]["reason"]
+        assert (
+            "EvaporationFluxConfigurationError"
+            in products[bucket]["availability_flag"]["reason"]
+        )
 
 
 def test_unqualified_stage3_capture_stays_numeric_with_partial_class(

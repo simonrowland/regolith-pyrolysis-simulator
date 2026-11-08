@@ -86,6 +86,28 @@ def _source_accounts_block(source_accounts_by_species: Mapping[str, Any]) -> str
     return "\n".join(lines) if lines else "  (source accounts unavailable)"
 
 
+def _append_availability_flag(
+    lines: list[str],
+    bucket: Mapping[str, Any],
+    *,
+    fallback_to_legacy_flag: bool,
+) -> None:
+    flag = bucket.get('availability_flag')
+    if not isinstance(flag, Mapping) and fallback_to_legacy_flag:
+        flag = bucket.get('flag')
+    if not isinstance(flag, Mapping):
+        return
+    fields = [f"status={flag.get('status')}"]
+    if 'state' in flag:
+        fields.append(f"state={flag.get('state')}")
+    if 'authority' in flag:
+        fields.append(f"authority={flag.get('authority')}")
+    if 'reason' in flag:
+        fields.append(f"reason={flag.get('reason')}")
+    lines.append('- Availability flag: ' + '; '.join(fields))
+    lines.append('')
+
+
 def format_three_product_markdown(
     classification: Mapping[str, Any],
     *,
@@ -186,14 +208,11 @@ def format_three_product_markdown(
                 + ', '.join(estimated_species)
             )
         if bucket_key not in {'metals_plus_O2', 'pure_silica_glass'}:
-            flag = bucket.get('flag')
-            if isinstance(flag, Mapping):
-                lines.append(
-                    '- Availability flag: '
-                    f"status={flag.get('status')}; "
-                    f"authority={flag.get('authority')}; "
-                    f"reason={flag.get('reason')}"
-                )
+            _append_availability_flag(
+                lines,
+                bucket,
+                fallback_to_legacy_flag=True,
+            )
         lines.append("")
 
         if bucket_key == 'metals_plus_O2':
@@ -210,14 +229,11 @@ def format_three_product_markdown(
                 f"- Metals subtotal: "
                 f"{_format_kg(metals_total_kg)} kg"
             )
-            flag = bucket.get('flag')
-            if isinstance(flag, Mapping):
-                lines.append(
-                    '- Availability flag: '
-                    f"status={flag.get('status')}; "
-                    f"authority={flag.get('authority')}; "
-                    f"reason={flag.get('reason')}"
-                )
+            _append_availability_flag(
+                lines,
+                bucket,
+                fallback_to_legacy_flag=True,
+            )
             lines.append(
                 "- Source-side O₂ potential subtotal "
                 f"(emitted; not recovered/captured): {_format_kg(o2_kg)} kg"
@@ -239,16 +255,21 @@ def format_three_product_markdown(
                     'switch, with authoritative SiO evidence for every capture.'
                 )
                 lines.append('')
-            flag = bucket.get('flag')
-            if isinstance(flag, Mapping):
+            certification_flag = bucket.get('flag')
+            if isinstance(certification_flag, Mapping):
                 lines.append(
                     '- Certification flag: '
-                    f"status={flag.get('status')}; "
-                    f"authority={flag.get('authority')}; "
-                    f"band={flag.get('band')}; "
-                    f"reason={flag.get('reason')}"
+                    f"status={certification_flag.get('status')}; "
+                    f"authority={certification_flag.get('authority')}; "
+                    f"band={certification_flag.get('band')}; "
+                    f"reason={certification_flag.get('reason')}"
                 )
                 lines.append('')
+            _append_availability_flag(
+                lines,
+                bucket,
+                fallback_to_legacy_flag=False,
+            )
             lines.append(
                 f"- Stage 3 capture: "
                 f"{_format_kg(bucket.get('stage_3_capture_kg', 0.0))} kg"
