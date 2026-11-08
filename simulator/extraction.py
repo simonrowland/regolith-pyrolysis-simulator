@@ -1978,6 +1978,61 @@ class ExtractionMixin:
                 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
                 MRE_RAW_MARGIN_REFUSAL,
             )
+
+            def restore_pre_attempt_mre_state() -> None:
+                self._mre_metals_this_hr = {}
+                self._mre_voltage_V = 0.0
+                self._mre_current_A = 0.0
+                self._mre_effective_current_A = 0.0
+                self._mre_energy_this_hr = 0.0
+                self.melt.mre_voltage_V = 0.0
+                self.melt.mre_current_A = 0.0
+                if is_plant:
+                    self.melt.mre_declared_rung_V = float(
+                        mre_replay_state_before_dispatch[
+                            'melt_declared_rung_V'
+                        ]
+                    )
+                    self._mre_hold_hours = int(
+                        mre_replay_state_before_dispatch['hold_hours']
+                    )
+                    self._mre_voltage_step_idx = int(
+                        mre_replay_state_before_dispatch['voltage_step_idx']
+                    )
+                    self._mre_rung_ever_effective = bool(
+                        mre_replay_state_before_dispatch['rung_ever_effective']
+                    )
+                    self._mre_c5_sequence_complete_key = (
+                        mre_replay_state_before_dispatch['sequence_complete_key']
+                    )
+                    self.melt.mre_c5_on_final_rung = bool(
+                        mre_replay_state_before_dispatch[
+                            'melt_c5_on_final_rung'
+                        ]
+                    )
+                    self.melt.mre_c5_ladder_complete = bool(
+                        mre_replay_state_before_dispatch[
+                            'melt_c5_ladder_complete'
+                        ]
+                    )
+                restore_state = (
+                    mre_replay_state_before_dispatch
+                    if is_plant
+                    else mre_diagnostic_state_before_step
+                )
+                self._mre_uncertified_yield = dict(
+                    restore_state['uncertified_yield']
+                )
+                self._mre_ellingham_ladder_diagnostic = dict(
+                    restore_state['ellingham_ladder_diagnostic']
+                )
+                self._mre_effective_voltage_margin_V_by_oxide = dict(
+                    restore_state['effective_voltage_margin_by_oxide']
+                )
+                self._mre_effective_voltage_margin_temperature_C = (
+                    restore_state['effective_voltage_margin_temperature_C']
+                )
+
             if invalid_run_input:
                 refusal_record = {
                     'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
@@ -1994,45 +2049,10 @@ class ExtractionMixin:
                     self._mre_refusal_history = []
                 self._mre_refusal_history.append(refusal_record)
                 self._chem_no_op_dispatch_count += 1
-                self._mre_metals_this_hr = {}
-                self._mre_voltage_V = 0.0
-                self._mre_current_A = 0.0
-                self._mre_effective_current_A = 0.0
-                self._mre_energy_this_hr = 0.0
-                self.melt.mre_voltage_V = 0.0
-                if is_plant:
-                    self.melt.mre_declared_rung_V = float(
-                        mre_replay_state_before_dispatch['melt_declared_rung_V'])
-                self.melt.mre_current_A = 0.0
-                if is_plant:
-                    self._mre_hold_hours = int(
-                        mre_replay_state_before_dispatch['hold_hours'])
-                    self._mre_voltage_step_idx = int(
-                        mre_replay_state_before_dispatch['voltage_step_idx'])
-                    self._mre_rung_ever_effective = bool(
-                        mre_replay_state_before_dispatch['rung_ever_effective'])
-                    self._mre_c5_sequence_complete_key = (
-                        mre_replay_state_before_dispatch['sequence_complete_key'])
-                    self.melt.mre_c5_on_final_rung = bool(
-                        mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
-                    self.melt.mre_c5_ladder_complete = bool(
-                        mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
-                restore_state = (
-                    mre_replay_state_before_dispatch
-                    if is_plant
-                    else mre_diagnostic_state_before_step
-                )
-                self._mre_uncertified_yield = dict(
-                    restore_state['uncertified_yield'])
-                self._mre_ellingham_ladder_diagnostic = dict(
-                    restore_state['ellingham_ladder_diagnostic'])
-                self._mre_effective_voltage_margin_V_by_oxide = dict(
-                    restore_state['effective_voltage_margin_by_oxide'])
-                self._mre_effective_voltage_margin_temperature_C = (
-                    restore_state['effective_voltage_margin_temperature_C']
-                )
+                restore_pre_attempt_mre_state()
                 raise MREElectrolysisInvalidInput(reason, refusal_record)
             if not step_refusal:
+                restore_pre_attempt_mre_state()
                 raise RuntimeError(
                     f'unclassified ELECTROLYSIS_STEP refusal: {reason}'
                 )
