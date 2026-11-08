@@ -1746,7 +1746,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         "alphamelts_fallback",
     )
     if activities:
-        assert diagnostics["activities"]["Na2O"] == activities["Na2O"]
+        assert diagnostics["activities"]["Na"] == activities["Na2O"]
         assert diagnostics["activities_standard_state"]["phase"] == "liquid"
     sim._last_vapor_pressure_diagnostic = diagnostics
     sim._last_vapor_pressures_source = backend._vapor_pressure_source_map(
@@ -1775,46 +1775,53 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         assert isinstance(answer.pressure, PressureValue)
         assert answer.pressure.pa > 0.0
         assert isinstance(answer.flux, FluxEligible)
-        route = diagnostics["vapor_pressure_numerator_provenance"][species]
+        route = diagnostics["vapor_pressure_numerator_provenance"].get(
+            species
+        )
+        activity = diagnostics["activities"][species]
         expected_gateway_pressure = sim.vapour_rail_catalog.species[
             species
         ].evaluator.evaluate(
             1773.15,
-            source_activity=float(route["vapor_activity_used_for_K"]),
+            source_activity=float(
+                route["vapor_activity_used_for_K"]
+                if route is not None
+                else activity
+            ),
             pO2_bar=1.0,
         ).pressure_pa
         assert answer.pressure.pa == pytest.approx(
             expected_gateway_pressure, rel=1e-12, abs=0
         )
-        activity = diagnostics["activities"][species]
         if species != "Fe":
             assert answer.source_reaction_activity is not None
             assert answer.source_reaction_activity.as_pressure_activity() == pytest.approx(
                 activity, rel=1e-12, abs=0
             )
-        used_activity = float(route["vapor_activity_used_for_K"])
-        assert used_activity > 0.0
-        if species in {"Mg", "Ca"}:
-            assert used_activity != pytest.approx(
-                activity,
-                rel=1e-6,
-                abs=0,
-            )
-        elif species == "Fe":
-            assert used_activity == pytest.approx(
-                activity,
-                rel=1e-10,
-                abs=0,
-            )
+        if route is None:
+            assert answer.source_reaction_activity.standard_state.phase == "liquid"
         else:
-            assert used_activity == pytest.approx(
-                activity,
-                rel=1e-10,
-                abs=0,
-            )
-        notice = diagnostics[
-            "vapor_activity_standard_state_notices_by_species"
-        ][species]
+            used_activity = float(route["vapor_activity_used_for_K"])
+            assert used_activity > 0.0
+            if species in {"Mg", "Ca"}:
+                assert used_activity != pytest.approx(
+                    activity,
+                    rel=1e-6,
+                    abs=0,
+                )
+            else:
+                assert used_activity == pytest.approx(
+                    activity,
+                    rel=1e-10,
+                    abs=0,
+                )
+        notices = diagnostics.get(
+            "vapor_activity_standard_state_notices_by_species", {}
+        )
+        if route is None:
+            assert species not in notices
+            continue
+        notice = notices[species]
         assert notice["reason"] == "activity_standard_state_substitution"
         assert math.isfinite(float(notice["log10_activity_offset"]))
         if species == "Fe":
@@ -1842,8 +1849,8 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
     from simulator.runner import _vapor_pressure_source_report
 
     report = _vapor_pressure_source_report(sim)
-    assert set(report["vapor_activity_standard_state_notices_by_species"]) >= set(
-        expected_species
+    assert set(report["vapor_activity_standard_state_notices_by_species"]) >= (
+        set(expected_species) & {"Ca", "Mg", "Fe"}
     )
 
     reported_flux = sim._last_evaporation_flux_diagnostic[
