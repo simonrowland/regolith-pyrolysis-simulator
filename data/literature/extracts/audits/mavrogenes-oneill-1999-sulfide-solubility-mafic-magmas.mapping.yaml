@@ -1,0 +1,121 @@
+source_id: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
+source:
+  citation: Mavrogenes, J. A. and O’Neill, H. St.C. (1999), ‘The relative effects of pressure, temperature and oxygen
+    fugacity on the solubility of sulfide in mafic magmas’, Geochimica et Cosmochimica Acta 63(7/8), 1173–1180.
+  doi: 10.1016/S0016-7037(98)00289-0
+tables:
+- printed_table: '1'
+  pdf_page: 3
+  published_page: 1175
+  printed_row_count: 30
+  source_draft: MinerU table block; absolute PDF page 3 (chunk page_idx 2)
+  row_groups:
+  - Starting Material
+  - Run Products
+  columns:
+  - column: 1
+    header: sample/run label
+    destination: material_as_printed or run_id_as_printed
+  - column: 2
+    header: SiO2
+    destination: starting_materials_as_printed / run_products_as_printed / composition_wt_pct
+  - column: 3
+    header: TiO2
+    destination: same
+  - column: 4
+    header: Al2O3
+    destination: same
+  - column: 5
+    header: FeO(t)
+    destination: FeOT canonical key; printed header retained
+  - column: 6
+    header: MgO
+    destination: same
+  - column: 7
+    header: CaO
+    destination: same
+  - column: 8
+    header: Na2O
+    destination: same
+  - column: 9
+    header: K2O
+    destination: same
+  - column: 10
+    header: Total
+    destination: total_as_printed; not a component
+  analysis_method: Major elements by Cameca Microbeam electron probe; method paragraph PDF page 4. Starting-material
+    compositions remain distinct from run-product compositions.
+- printed_table: '2'
+  pdf_page: 4
+  published_page: 1176
+  printed_row_count: 28
+  source_draft: MinerU table block; absolute PDF page 4 (chunk page_idx 3)
+  columns:
+  - column: 1
+    header: sample number
+    destination: Table 2 run id; link to Table 1 run label by row sequence and material
+  - column: 2
+    header: Time (h)
+    destination: point_conditions.run_duration_h
+  - column: 3
+    header: Capsule
+    destination: point_conditions.capsule
+  - column: 4
+    header: log fO2* (ΔIW)
+    destination: point_conditions.delta_IW; IW buffer-relative, not absolute fO2
+  - column: 5
+    header: P (kb)
+    destination: point_conditions.pressure_kbar; values.total_pressure_Pa.value with kbar unit for identity conversion
+  - column: 6
+    header: T (°C)
+    destination: values.T_C and point_conditions.temperature_C
+  - column: 7
+    header: S (ppm)
+    destination: values.value; species S, equilibrium_phase_composition, phase_label glass, ppm_mass, measured_direct
+  - column: 8
+    header: Obs. St. Dev.
+    destination: observation uncertainty; SD of twelve analyses, confidence level not stated
+  - column: 9
+    header: S_calc (ppm)
+    destination: rows_as_printed.S_calc_ppm; model_derived regression output
+  - column: 10
+    header: X_FeS
+    destination: rows_as_printed.X_FeS; coexisting sulfide composition, ND preserved
+  - column: 11
+    header: a_FeS (1 atm)
+    destination: rows_as_printed.a_FeS_1_atm; model_derived activity relative to pure FeS standard state
+  capsule_footnote_discrepancy: Footnote prints Fe20Ir20; run rows and methods print Fe20Ir80. Preserve both without
+    correction.
+- printed_table: '3'
+  pdf_page: 6
+  published_page: 1178
+  printed_row_count: 8
+  source_draft: MinerU table block; absolute PDF page 6 (chunk page_idx 5)
+  columns:
+  - column: 1
+    header: Silicate melt
+    destination: source_material_as_printed
+  - column: 2
+    header: Number
+    destination: number or blank as printed
+  - column: 3
+    header: A
+    destination: model-fit parameter, printed string including parenthesized width
+  - column: 4
+    header: B
+    destination: model-fit parameter, printed string including parenthesized width
+  - column: 5
+    header: C
+    destination: model-fit parameter, printed fixed values and footnote marks retained
+  - column: 6
+    header: χ²
+    destination: chi_square as printed
+  method_class: model_derived
+  method: multiple non-linear least squares regression to Eqn. 10; own data and Wendlandt (1982) data are distinguished.
+  method_locator:
+    page: 5
+    published_page: 1177
+    section: Results
+row_linking: Table 1 run products and Table 2 runs are aligned by printed table sequence and material group. Table
+  1 label MACV26 differs from Table 2 MAV26; preserve both.
+excluded: Figures 1–5 have no numeric points transcribed.

@@ -1,0 +1,6674 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  citation: Richter, F. M., Mendybaev, R. A., Christensen, J. N., Ebel, D. S., Gaffney, A. M., and others (2011), Laboratory
+    experiments bearing on the origin and evolution of olivine-rich chondrules, Meteoritics & Planetary Science.
+  source_ids:
+  - richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 75e3b98190a442a2afc77502a9d21cae21701992
+    files:
+    - asset_id: pdf:richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      role: pdf
+      path: raw/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation.pdf
+      sha256:
+        tag: value
+        value: f6c51536305f01d66e20bfad5acfda082d9a51768801f0b3e70f552eddbe05ce
+    - asset_id: pdftotext:richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      role: pdftotext
+      path: text/richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/j.1945-5100.2011.01220.x
+experiments:
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-0
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Table 1 sample row; no run temperature is printed' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-0
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1685.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '180'
+          approximate: false
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-1
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-10
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '31'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-12
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '210'
+          approximate: false
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-2
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '780'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-3
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '105'
+          approximate: false
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-5
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '295'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-6
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '2520'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-7
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-50di50le-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.21'
+          MgO: '6.17'
+          Al2O3: '15.61'
+          CaO: '8.59'
+          K2O: '14.42'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '170'
+          approximate: false
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=50Di50Le-9
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-1
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-2
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-3
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '45'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-4
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-5
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-6
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '45'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-7
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-8
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1-9
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab1-start
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'starting-composition row in Table 1; no evaporation run conditions printed' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60'
+          MgO: '22'
+          Al2O3: '4.0'
+          CaO: '2.2'
+          Na2O: '3.5'
+          K2O: '3.5'
+          FeO: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB1 start
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-1
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-11
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-12
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-13
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '720'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-14
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-15
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-16
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-17
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '388'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-18
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '7'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-19
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-2
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '118'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-20
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-23
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-23
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-27
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '87'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-27
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-28
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-28
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-29
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: 'Starting assay not specified for later IIAB2 runs: IIAB2-13 or IIAB2-15 (Table 1, page 39, both zero-time);
+          the paper does not map assay rows to individual runs.'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-29
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-3
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-4
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-5
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-6
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab2-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.64'
+          MgO: '27.79'
+          Al2O3: '4.66'
+          CaO: '3.41'
+          Na2O: '0.88'
+          K2O: '0.34'
+          FeO: '11.55'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '25'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: No sweep gas is printed for the vacuum experiments.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001333223684210526315789473684'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 15
+        pdf_page_index: 15
+        section: 4.2 Vacuum Evaporation Experiments
+        note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 16
+              published_page: 15
+              pdf_page_index: 15
+              section: 4.2 Vacuum Evaporation Experiments
+              note: Printed P~10^-6 Torr; unit conversion to Pa. Approximate pressure, not a bound.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: No sweep gas is used in the reported vacuum experiment.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB2-7
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1705.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-1
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1699.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '731'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-15
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1699.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '2155'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-18
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '2'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-19
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1705.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-2
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1699.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '1442'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-20
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '360'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-21
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-22
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '180'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-22
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1705.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '45'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-3
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'one_bar_flowing_gas_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: Sample mass is not reported.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1705.15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints a buffer-relative value or no absolute fO2; no absolute fO2_Pa is inferred.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 26
+        published_page: 25
+        pdf_page_index: 25
+        section: 7.2 Isotope Fractionation by Evaporation into a Flowing Gas
+        note: The first one-bar CO2+H2 set is described as about 70% CO2 and 30% H2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 17
+        published_page: 16
+        pdf_page_index: 16
+        section: 4.3 One-bar Hydrogen Evaporation Experiments
+        note: One-bar experiments; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 17
+              published_page: 16
+              pdf_page_index: 16
+              section: 4.3 One-bar Hydrogen Evaporation Experiments
+              note: One-bar experiments; converted to Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Gas identity and mixture are retained in per-row point_conditions; no gas flow or partial pressure is reported
+          here.
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-4
+  apparatus: {}
+  bench_id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::experiment::richter-2011-iiab5-start
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'starting-composition row in Table 1; no evaporation run conditions printed' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55'
+          MgO: '15'
+          Al2O3: '3'
+          CaO: '2'
+          Na2O: '5'
+          K2O: '5'
+          FeO: '15'
+      locator:
+        page: 39
+        published_page: 38
+        pdf_page_index: 38
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 39
+    published_page: 38
+    pdf_page_index: 38
+    table: '1'
+    note: row=IIAB5-start
+- experiment_id: 10.1111/j.1945-5100.2011.01220.x::richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  locator:
+    page: 25
+    published_page: 24
+    pdf_page_index: 24
+    figure: '12'
+    section: 7.1 Isotope Fractionation by Evaporation into Vacuum
+benches:
+- id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-gas-mixing-furnace
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: vertical gas-mixing Deltech tube furnace
+    locator:
+      page: 17
+      published_page: 16
+      pdf_page_index: 16
+      section: 4.3 One-bar Hydrogen Evaporation Experiments
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 16
+      pdf_page_index: 16
+      section: 4.3 One-bar Hydrogen Evaporation Experiments
+  other_facts: []
+- id: 10.1111/j.1945-5100.2011.01220.x::bench::richter-2011-vacuum-furnace
+  work_id: 10.1111/j.1945-5100.2011.01220.x
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: high-temperature vacuum furnace
+    locator:
+      page: 16
+      published_page: 15
+      pdf_page_index: 15
+      section: 4.2 Vacuum Evaporation Experiments
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: 2.5 mm iridium wire loops; no crucible reported
+    locator:
+      page: 16
+      published_page: 15
+      pdf_page_index: 15
+      section: 4.2 Vacuum Evaporation Experiments
+  other_facts: []

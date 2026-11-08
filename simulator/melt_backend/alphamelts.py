@@ -105,6 +105,10 @@ from simulator.fe_redox import (
     RedoxState,
     normalize_redox_state,
 )
+from simulator.alphamelts_reference_pressure import (
+    ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
+    alphamelts_effective_pressure_policy,
+)
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -135,7 +139,6 @@ ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 # this name stays so importers keep the published number. Do not restore
 # a hard refusal on this constant.
 ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800.0
-ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
 # it independently to each native call rather than treating it as a run budget.
@@ -1195,7 +1198,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_available = False
         self._pet_module = None
         self._pet_melts = None
-        self._pet_import_error: Optional[ImportError] = None
+        self._pet_import_error: tuple[str, str] | None = None
         self._pet_payload_preloaded = False
         self._pet_worker: Optional[WarmEngineWorker] = None
         self._pet_warm_enabled = False
@@ -1437,12 +1440,14 @@ class _MELTSBackendSupport(MeltBackend):
             if self._pet_worker is not None:
                 self._pet_worker.close()
                 self._pet_worker = None
-            self._pet_import_error = ImportError(
+            self._pet_import_error = (
+                'ImportError',
                 'PetThermoTools Python path unavailable: '
-                'petthermotools and meltsdynamic must both import'
+                'petthermotools and meltsdynamic must both import',
             )
             if require_petthermotools:
-                raise self._pet_import_error
+                _, error_message = self._pet_import_error
+                raise ImportError(error_message)
 
     def _alphamelts_config(self, config: dict) -> dict:
         if not isinstance(config, Mapping):
@@ -1697,9 +1702,19 @@ class _MELTSBackendSupport(MeltBackend):
                 'ThermoEngine transport; other transports require an '
                 'explicit absolute fO2_log'
             )
+        composition_repair_notices: List[str] = []
         if composition_mol_by_account is not None:
             unsupported = self._unsupported_accounts(composition_mol_by_account)
             if unsupported:
+                unsupported_diagnostics = self._out_of_domain_diagnostics(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    composition_mol=composition_mol,
+                    composition_mol_by_account=composition_mol_by_account,
+                    reason=OutOfDomainReason.FORBIDDEN_SPECIES.value,
+                    repair_notices=composition_repair_notices,
+                )
                 return self._domain_gate_result(
                     temperature_C,
                     pressure_bar,
@@ -1710,15 +1725,8 @@ class _MELTSBackendSupport(MeltBackend):
                             f'{account}={species}'
                             for account, species in sorted(unsupported.items())
                         )
-                    ],
-                    diagnostics=self._out_of_domain_diagnostics(
-                        temperature_C=temperature_C,
-                        pressure_bar=pressure_bar,
-                        fO2_log=fO2_log,
-                        composition_mol=composition_mol,
-                        composition_mol_by_account=composition_mol_by_account,
-                        reason=OutOfDomainReason.FORBIDDEN_SPECIES.value,
-                    ),
+                    ] + composition_repair_notices,
+                    diagnostics=unsupported_diagnostics,
                     reason=OutOfDomainReason.FORBIDDEN_SPECIES,
                 )
             composition_mol = {}
@@ -1757,6 +1765,7 @@ class _MELTSBackendSupport(MeltBackend):
             reason=(
                 OutOfDomainReason.MAJOR_SUM.value if not raw_comp_wt else None
             ),
+            repair_notices=composition_repair_notices,
         )
         if not raw_comp_wt:
             # No melt oxides supplied - the engine has nothing valid to act on.
@@ -1764,6 +1773,7 @@ class _MELTSBackendSupport(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                warnings=composition_repair_notices,
                 status='out_of_domain',
                 diagnostics=crash_diagnostics,
             )
@@ -1775,6 +1785,10 @@ class _MELTSBackendSupport(MeltBackend):
             diagnostics=crash_diagnostics,
         )
         if domain_rejection is not None:
+            domain_rejection.warnings.extend(
+                notice for notice in composition_repair_notices
+                if notice not in domain_rejection.warnings
+            )
             return domain_rejection
         commissioning_warnings: List[str] = []
         commissioning_fields = self._apply_engine_commissioning(
@@ -1795,11 +1809,16 @@ class _MELTSBackendSupport(MeltBackend):
             composition_mol=composition_mol,
             composition_mol_by_account=composition_mol_by_account,
             reason=OutOfDomainReason.NOT_CONVERGED.value,
+            repair_notices=composition_repair_notices,
         )
         if commissioning_fields:
             crash_diagnostics.update(commissioning_fields)
         warnings = list(self._last_normalization_warnings)
         warnings.extend(commissioning_warnings)
+        warnings.extend(
+            notice for notice in composition_repair_notices
+            if notice not in warnings
+        )
 
         fo2_decision = imposed_absolute_fo2_without_iron_couple(
             comp_wt,
@@ -1810,12 +1829,17 @@ class _MELTSBackendSupport(MeltBackend):
             fo2_offset=self._fo2_offset,
         )
         if fo2_decision is not None and fo2_decision[0] == 'other_redox':
-            return other_redox_without_iron_couple_refusal(
+            result = other_redox_without_iron_couple_refusal(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 components=fo2_decision[1],
             )
+            result.warnings.extend(
+                notice for notice in composition_repair_notices
+                if notice not in result.warnings
+            )
+            return result
         gas_only_fo2_log = (
             None
             if fo2_decision is None
@@ -1995,6 +2019,7 @@ class _MELTSBackendSupport(MeltBackend):
                 ),
             )
 
+        composition_repair_notices: list[str] = []
         comp_wt_result = self._composition_for_liquidus_finder(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
@@ -2003,6 +2028,7 @@ class _MELTSBackendSupport(MeltBackend):
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             min_T_C=min_T_C,
+            repair_notices=composition_repair_notices,
         )
         if isinstance(comp_wt_result, LiquidusSolidusResult):
             return comp_wt_result
@@ -2040,6 +2066,10 @@ class _MELTSBackendSupport(MeltBackend):
                 for warning in result.warnings
                 if 'CommissioningNotice' not in warning
             ]
+            warnings_out.extend(
+                notice for notice in composition_repair_notices
+                if notice not in warnings_out
+            )
             evaluated_T_C: list[float] = []
             if liquidus_C is not None:
                 evaluated_T_C.append(float(liquidus_C))
@@ -2105,6 +2135,7 @@ class _MELTSBackendSupport(MeltBackend):
                         *ptt_warnings,
                         'AlphaMELTS liquidus finder unavailable: '
                         'PetThermoTools findLiq did not return a temperature',
+                        *composition_repair_notices,
                     ),
                 )
 
@@ -2163,6 +2194,10 @@ class _MELTSBackendSupport(MeltBackend):
             tolerance_C=tolerance_C,
         )
         warnings_out = [*ptt_warnings, *result.warnings, *sample_warnings[:6]]
+        warnings_out.extend(
+            notice for notice in composition_repair_notices
+            if notice not in warnings_out
+        )
         if (
             ptt_liquidus_C is not None
             and
@@ -2557,24 +2592,34 @@ class _MELTSBackendSupport(MeltBackend):
             Mapping[str, Mapping[str, float]]
         ] = None,
         reason: str | None = None,
+        repair_notices: Optional[List[str]] = None,
     ) -> dict[str, object]:
         crash_point: dict[str, object] = {
             'temperature_C': float(temperature_C),
             'pressure_bar': float(pressure_bar),
             'composition_wt_pct': self._finite_positive_mapping(
-                composition_wt_pct or {}
+                composition_wt_pct or {},
+                field='composition_wt_pct',
+                repair_notices=repair_notices,
             ),
             'composition_mol': self._finite_positive_mapping(
-                composition_mol or {}
+                composition_mol or {},
+                field='composition_mol',
+                repair_notices=repair_notices,
             ),
         }
         if fO2_log is not None:
             crash_point['fO2_log'] = float(fO2_log)
-        melts_wt = self._finite_positive_mapping(composition_melts_wt_pct or {})
+        melts_wt = self._finite_positive_mapping(
+            composition_melts_wt_pct or {},
+            field='composition_melts_wt_pct',
+            repair_notices=repair_notices,
+        )
         if melts_wt:
             crash_point['composition_melts_wt_pct'] = melts_wt
         by_account = self._finite_positive_nested_mapping(
-            composition_mol_by_account or {}
+            composition_mol_by_account or {},
+            repair_notices=repair_notices,
         )
         if by_account:
             crash_point['composition_mol_by_account'] = by_account
@@ -2618,25 +2663,46 @@ class _MELTSBackendSupport(MeltBackend):
         return payload
 
     @staticmethod
-    def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:
+    def _finite_positive_mapping(
+        values: Mapping[str, float],
+        *,
+        field: str = 'composition',
+        repair_notices: Optional[List[str]] = None,
+    ) -> dict[str, float]:
         result: dict[str, float] = {}
         for species, raw in values.items():
             try:
                 value = float(raw)
             except (TypeError, ValueError):
                 continue
-            if math.isfinite(value) and value > 0.0:
-                result[str(species)] = value
+            if not math.isfinite(value) or value <= 0.0:
+                if repair_notices is not None:
+                    reason = 'nonfinite' if not math.isfinite(value) else 'nonpositive'
+                    notice = (
+                        'SR15:alphamelts_composition_mapping_repaired '
+                        f'producer=AlphaMELTS field={field} '
+                        f'species={str(species)!r} action=dropped reason={reason}'
+                    )
+                    if notice not in repair_notices:
+                        repair_notices.append(notice)
+                continue
+            result[str(species)] = value
         return result
 
     @classmethod
     def _finite_positive_nested_mapping(
         cls,
         values: Mapping[str, Mapping[str, float]],
+        *,
+        repair_notices: Optional[List[str]] = None,
     ) -> dict[str, dict[str, float]]:
         result: dict[str, dict[str, float]] = {}
         for account, species_mol in values.items():
-            cleaned = cls._finite_positive_mapping(species_mol or {})
+            cleaned = cls._finite_positive_mapping(
+                species_mol or {},
+                field=f'composition_mol_by_account[{account}]',
+                repair_notices=repair_notices,
+            )
             if cleaned:
                 result[str(account)] = cleaned
         return result
@@ -3042,8 +3108,12 @@ class _MELTSBackendSupport(MeltBackend):
         try:
             ptt = self._require_petthermotools_runtime()
             ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
-            solved_pressure_bar = max(
-                float(pressure_bar), ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR)
+            solved_pressure_bar, _pressure_policy = (
+                alphamelts_effective_pressure_policy(
+                    pressure_bar,
+                    transport='python_api',
+                )
+            )
             clamp_diagnostics, result_warnings = (
                 self._clamped_operating_point_context(
                     requested_temperature_C=temperature_C,
@@ -3369,7 +3439,10 @@ class _MELTSBackendSupport(MeltBackend):
         pressure_bar: float,
         fO2_log: float,
         min_T_C: float,
+        repair_notices: Optional[List[str]] = None,
     ) -> dict | LiquidusSolidusResult:
+        if repair_notices is None:
+            repair_notices = []
         if composition_mol_by_account is not None:
             unsupported = self._unsupported_accounts(composition_mol_by_account)
             if unsupported:
@@ -3380,6 +3453,7 @@ class _MELTSBackendSupport(MeltBackend):
                     composition_wt_pct=None,
                     composition_mol=composition_mol,
                     composition_mol_by_account=composition_mol_by_account,
+                    repair_notices=repair_notices,
                 )
                 return LiquidusSolidusResult(
                     status='out_of_domain',
@@ -3389,6 +3463,7 @@ class _MELTSBackendSupport(MeltBackend):
                             f'{account}={species}'
                             for account, species in sorted(unsupported.items())
                         ),
+                        *repair_notices,
                     ),
                     diagnostics=diagnostics,
                 )
@@ -3419,11 +3494,15 @@ class _MELTSBackendSupport(MeltBackend):
             composition_wt_pct=raw_comp_wt,
             composition_mol=composition_mol,
             composition_mol_by_account=composition_mol_by_account,
+            repair_notices=repair_notices,
         )
         if not raw_comp_wt:
             return LiquidusSolidusResult(
                 status='out_of_domain',
-                warnings=('AlphaMELTS liquidus finder received no melt oxides',),
+                warnings=(
+                    'AlphaMELTS liquidus finder received no melt oxides',
+                    *repair_notices,
+                ),
                 diagnostics=diagnostics,
             )
         domain_rejection = self._domain_gate(
@@ -3436,7 +3515,10 @@ class _MELTSBackendSupport(MeltBackend):
         if domain_rejection is not None:
             return LiquidusSolidusResult(
                 status='out_of_domain',
-                warnings=tuple(domain_rejection.warnings),
+                warnings=tuple(dict.fromkeys((
+                    *domain_rejection.warnings,
+                    *repair_notices,
+                ))),
                 diagnostics=dict(domain_rejection.diagnostics),
             )
         self._apply_engine_commissioning(
@@ -3451,7 +3533,10 @@ class _MELTSBackendSupport(MeltBackend):
         except ValueError as exc:
             return LiquidusSolidusResult(
                 status='out_of_domain',
-                warnings=(f'AlphaMELTS composition rejected: {exc}',),
+                warnings=(
+                    f'AlphaMELTS composition rejected: {exc}',
+                    *repair_notices,
+                ),
                 diagnostics=diagnostics,
             )
 
@@ -3474,11 +3559,17 @@ class _MELTSBackendSupport(MeltBackend):
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
         find_liq = getattr(ptt, 'findLiq', None)
         self._melts_model_code()
+        evaluation_pressure_bar, _pressure_policy = (
+            alphamelts_effective_pressure_policy(
+                pressure_bar,
+                transport='python_api',
+            )
+        )
         if callable(find_liq_melts):
             operation = 'findLiq_MELTS'
             args = ()
             kwargs = {
-                'P_bar': max(pressure_bar, 1e-6),
+                'P_bar': evaluation_pressure_bar,
                 'Model': self._model,
                 'T_C_init': float(seed_T_C),
                 'comp': ptt_comp,
@@ -3491,7 +3582,7 @@ class _MELTSBackendSupport(MeltBackend):
             args = (None, 0)
             kwargs = {
                 'Model': self._model,
-                'P_bar': max(pressure_bar, 1e-6),
+                'P_bar': evaluation_pressure_bar,
                 'T_initial_C': float(seed_T_C),
                 'comp': ptt_comp,
                 'fO2_buffer': self._redox_buffer,
@@ -3770,7 +3861,12 @@ class _MELTSBackendSupport(MeltBackend):
                         ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C,
                     )
                 )
-            calculation_pressure_bar = requested_pressure_bar
+            calculation_pressure_bar, _pressure_policy = (
+                alphamelts_effective_pressure_policy(
+                    requested_pressure_bar,
+                    transport='subprocess',
+                )
+            )
             result_warnings = list(warnings or [])
             self._write_melts_file(
                 melts_path,
@@ -4347,6 +4443,8 @@ class _MELTSBackendSupport(MeltBackend):
     @staticmethod
     def _phase_species_from_instances(
         phase_instances: List[Mapping[str, object]],
+        *,
+        repair_notices: Optional[List[str]] = None,
     ) -> tuple[Dict[str, Dict[str, float]], Dict[str, Dict[str, float]]]:
         species_mol: Dict[str, Dict[str, float]] = {}
         species_kg: Dict[str, Dict[str, float]] = {}
@@ -4367,6 +4465,15 @@ class _MELTSBackendSupport(MeltBackend):
                     )
                 except ValueError:  # solver tokens are not always formulas
                     molar_mass = 0.0
+                    if repair_notices is not None:
+                        repair_notices.append(
+                            'SR14:alphamelts_phase_species_repaired '
+                            'producer=AlphaMELTS field=phase_species '
+                            f'phase={str(instance.get("phase") or "")!r} '
+                            f'token={formula_token!r} action=fallback '
+                            'reason=unparseable_phase_formula '
+                            'selected_source=returned_oxide_composition'
+                        )
                 if molar_mass > 0.0 and math.isfinite(molar_mass):
                     species_kg[instance_id] = {formula_token: mass_kg}
                     species_mol[instance_id] = {
@@ -5024,7 +5131,10 @@ class _MELTSBackendSupport(MeltBackend):
                 float(instance['solver_basis_mass_kg']) * mass_scale
             )
         phase_species_mol, phase_species_kg = (
-            self._phase_species_from_instances(phase_instances)
+            self._phase_species_from_instances(
+                phase_instances,
+                repair_notices=result_warnings,
+            )
         )
         reported_fO2_log = (
             None
@@ -5208,10 +5318,14 @@ class _MELTSBackendSupport(MeltBackend):
                 liquid_fraction = liquid_mass / total_mass
 
         result_warnings = [*(warnings or []), *fO2_warnings]
+        activity_repair_issues: list[dict[str, str]] = []
+        failed_activity_sources: set[str] = set()
         activity_coefficients, activity_diagnostics = (
             self._extract_activity_mapping(
                 run_result,
                 liquid_composition_wt_pct=liquid_composition_wt_pct,
+                repair_issues=activity_repair_issues,
+                failed_conversion_sources=failed_activity_sources,
             )
         )
         if not activity_coefficients:
@@ -5231,6 +5345,14 @@ class _MELTSBackendSupport(MeltBackend):
                 'gamma*x, phase field, or mu/mu0 path); '
                 'activity-scaled Antoine fallback skipped'
             )
+        selected_activity_source = str(
+            activity_diagnostics.get('diagnostic_activity_source') or 'none'
+        )
+        result_warnings.extend(
+            self._activity_repair_notice(issue, selected_activity_source)
+            for issue in activity_repair_issues
+            if issue.get('site') != 'uncacheable_conversion'
+        )
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=solved_pressure_bar,
@@ -5336,23 +5458,56 @@ class _MELTSBackendSupport(MeltBackend):
         results: Mapping[str, object],
         *,
         liquid_composition_wt_pct: Mapping[str, float],
+        repair_issues: Optional[List[dict[str, str]]] = None,
+        failed_conversion_sources: Optional[set[str]] = None,
     ) -> tuple[dict, dict[str, object]]:
+        skipped_sources: list[str] = []
+        failed_sources = (
+            failed_conversion_sources
+            if failed_conversion_sources is not None
+            else set()
+        )
         for key in ('melt_oxide_activities',):
             if key not in results:
                 continue
             row = self._first_row_mapping(results[key])
-            mapped = self._finite_activity_mapping(row)
+            mapped = self._finite_activity_mapping(
+                row,
+                source=key,
+                repair_issues=repair_issues,
+                failed_conversion_sources=failed_conversion_sources,
+            )
             if mapped:
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    key,
+                    repair_issues,
+                    failed_sources,
+                )
                 return mapped, {'diagnostic_activity_source': key}
+            skipped_sources.append(key)
 
         for key in ('activities', 'Activities'):
             if key not in results:
                 continue
             row = self._liquid_activity_row_mapping(results[key])
-            mapped = self._finite_activity_mapping(row)
+            mapped = self._finite_activity_mapping(
+                row,
+                source=key,
+                repair_issues=repair_issues,
+                failed_conversion_sources=failed_conversion_sources,
+            )
             if mapped:
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    key,
+                    repair_issues,
+                    failed_sources,
+                )
                 return mapped, {'diagnostic_activity_source': key}
+            skipped_sources.append(key)
 
+        coefficient_source = 'activity_coefficients_times_oxide_mole_fraction'
         if 'activity_coefficients' in results:
             row = self._liquid_activity_row_mapping(
                 results['activity_coefficients']
@@ -5367,15 +5522,24 @@ class _MELTSBackendSupport(MeltBackend):
             mapped, gammas = self._activities_from_coefficients(
                 row,
                 liquid_composition_wt_pct,
+                repair_issues=repair_issues,
             )
             if mapped:
-                return mapped, {
+                source_diagnostics = {
                     'diagnostic_activity_source': (
-                        'activity_coefficients_times_oxide_mole_fraction'
+                        coefficient_source
                     ),
                     # gamma, before a = gamma * x. Not a second convention.
                     'reported_activity_coefficients': gammas,
                 }
+                self._record_skipped_activity_sources(
+                    skipped_sources,
+                    coefficient_source,
+                    repair_issues,
+                    failed_sources,
+                )
+                return mapped, source_diagnostics
+            skipped_sources.append(coefficient_source)
 
         activities: Dict[str, float] = {}
         for key, value in results.items():
@@ -5387,8 +5551,6 @@ class _MELTSBackendSupport(MeltBackend):
                 continue
             row = self._first_row_mapping(value)
             for prop_name, prop_value in row.items():
-                if not self._is_number(prop_value):
-                    continue
                 prop = str(prop_name)
                 prop_lower = prop.lower()
                 if prop_lower.endswith('_activity'):
@@ -5397,17 +5559,109 @@ class _MELTSBackendSupport(MeltBackend):
                     species = prop[len('activity_'):]
                 else:
                     continue
-                if self._looks_like_activity_label(species):
-                    activities[species] = float(prop_value)
-        mapped = self._finite_activity_mapping(activities)
+                if not self._looks_like_activity_label(species):
+                    continue
+                if not self._is_number(prop_value):
+                    try:
+                        invalid_value = float(prop_value)
+                    except (TypeError, ValueError):
+                        if failed_conversion_sources is not None:
+                            failed_conversion_sources.add('phase_activity_fields')
+                        continue
+                    if repair_issues is not None:
+                        repair_issues.append({
+                            'site': 'SR02',
+                            'source': 'phase_activity_fields',
+                            'item': species,
+                            'reason': (
+                                'nonfinite_direct_activity'
+                                if not math.isfinite(invalid_value)
+                                else 'invalid_direct_activity'
+                            ),
+                        })
+                    continue
+                activities[species] = float(prop_value)
+        mapped = self._finite_activity_mapping(
+            activities,
+            source='phase_activity_fields',
+            repair_issues=repair_issues,
+            failed_conversion_sources=failed_conversion_sources,
+        )
         if mapped:
-            return mapped, {'diagnostic_activity_source': 'phase_activity_fields'}
+            source_diagnostics = {
+                'diagnostic_activity_source': 'phase_activity_fields'
+            }
+            self._record_skipped_activity_sources(
+                skipped_sources,
+                'phase_activity_fields',
+                repair_issues,
+                failed_sources,
+            )
+            return mapped, source_diagnostics
         return {}, {}
+
+    @staticmethod
+    def _record_skipped_activity_sources(
+        skipped_sources: List[str],
+        selected_source: str,
+        repair_issues: Optional[List[dict[str, str]]],
+        failed_conversion_sources: set[str],
+    ) -> None:
+        if repair_issues is None:
+            return
+        for source in skipped_sources:
+            if source == selected_source:
+                continue
+            has_value_repair = any(
+                issue.get('source') == source
+                and issue.get('site') in {'SR01', 'SR02'}
+                for issue in repair_issues
+            )
+            if source in failed_conversion_sources and not has_value_repair:
+                continue
+            repair_issues.append({
+                'site': 'SR13',
+                'source': source,
+                'item': 'activity_map',
+                'reason': 'empty_source_skipped',
+            })
+
+    @staticmethod
+    def _activity_repair_notice(
+        issue: Mapping[str, str],
+        selected_source: str,
+    ) -> str:
+        site = issue['site']
+        source = issue['source']
+        item = issue['item']
+        reason = issue['reason']
+        if site == 'SR13':
+            return (
+                'SR13:alphamelts_activity_source_repaired '
+                'producer=PetThermoTools field=activity_source '
+                f'source={source!r} action=skipped reason={reason} '
+                f'selected_source={selected_source!r}'
+            )
+        if site == 'SR01':
+            return (
+                'SR01:alphamelts_gamma_repaired '
+                'producer=PetThermoTools field=activity_coefficients '
+                f'oxide={item!r} source={source!r} action=dropped '
+                f'reason={reason} selected_source={selected_source!r}'
+            )
+        return (
+            'SR02:alphamelts_direct_activity_repaired '
+            'producer=PetThermoTools field=activity_map '
+            f'oxide={item!r} source={source!r} action=dropped '
+            f'reason={reason} alternate_source={selected_source!r}'
+        )
 
     def _activities_from_coefficients(
         self,
         coefficients: Mapping[str, object],
         liquid_composition_wt_pct: Mapping[str, float],
+        *,
+        repair_issues: Optional[List[dict[str, str]]] = None,
     ) -> tuple[dict[str, float], dict[str, float]]:
         mole_amounts: dict[str, float] = {}
         for raw_name, raw_wt_pct in dict(liquid_composition_wt_pct or {}).items():
@@ -5436,6 +5690,17 @@ class _MELTSBackendSupport(MeltBackend):
                 continue
             gamma = float(raw_gamma)
             if not math.isfinite(gamma) or gamma <= 0.0:
+                if repair_issues is not None:
+                    repair_issues.append({
+                        'site': 'SR01',
+                        'source': 'activity_coefficients_times_oxide_mole_fraction',
+                        'item': str(oxide),
+                        'reason': (
+                            'nonfinite_gamma'
+                            if not math.isfinite(gamma)
+                            else 'nonpositive_gamma'
+                        ),
+                    })
                 continue
             mole_fraction = mole_amounts[oxide] / total_moles
             # Premise: thermodynamic activity is a_i = gamma_i * x_i.
@@ -5447,7 +5712,14 @@ class _MELTSBackendSupport(MeltBackend):
             activities[str(raw_name)] = gamma * mole_fraction
         return activities, gammas
 
-    def _finite_activity_mapping(self, values: Mapping[str, object]) -> dict:
+    def _finite_activity_mapping(
+        self,
+        values: Mapping[str, object],
+        *,
+        source: str = 'direct_activity_map',
+        repair_issues: Optional[List[dict[str, str]]] = None,
+        failed_conversion_sources: Optional[set[str]] = None,
+    ) -> dict:
         activities: Dict[str, float] = {}
         for raw_name, raw_value in dict(values or {}).items():
             if not self._looks_like_activity_label(raw_name):
@@ -5455,9 +5727,22 @@ class _MELTSBackendSupport(MeltBackend):
             try:
                 value = float(raw_value)
             except (TypeError, ValueError):
+                if failed_conversion_sources is not None:
+                    failed_conversion_sources.add(source)
                 continue
             if value > 0.0 and math.isfinite(value):
                 activities[str(raw_name)] = value
+            elif repair_issues is not None:
+                repair_issues.append({
+                    'site': 'SR02',
+                    'source': source,
+                    'item': str(raw_name),
+                    'reason': (
+                        'nonfinite_direct_activity'
+                        if not math.isfinite(value)
+                        else 'nonpositive_direct_activity'
+                    ),
+                })
         return activities
 
     def _liquid_activity_row_mapping(self, table) -> dict:

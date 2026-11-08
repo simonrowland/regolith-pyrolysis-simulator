@@ -197,55 +197,68 @@ python3 -m simulator.runner \
   --output hero-run.json
 ```
 
-The 2026-09-26 figures previously shown here came from a run with a redox-runaway defect (fixed by b-894).
+This is one fixed campaign run with the default recipe. It is not an optimizer result.
 
-Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in analytical backend:
+The figures below come from green commit `883ad52548671b266616f1c5f44c1c40556a99bc`, run with the built-in analytical backend. The
+furnace reached 2200 °C at hour 213 and held there through hour 225. The largest per-element
+mass-closure residual is 1.5e-15, against a limit of 5e-14.
 
-Per-element destination atom fractions:
+**What leaves the melt.** This is the fraction of each element's feedstock atoms that evaporates out of
+the melt by the end of the run:
 
-| element | condensed | retained in melt | vented | other (O₂, wall, overhead) |
-|---|---:|---:|---:|---:|
-| Al | 0.000 | 1.000 | 0.000 | 0.000 |
-| Ca | 0.001 | 0.999 | 0.000 | 0.000 |
-| Ti | 0.001 | 0.999 | 0.000 | 0.000 |
-| Si | 0.956 | 0.001 | 0.043 | 0.000 |
-| Fe | 0.078 | 0.000 | 0.921 | 0.001 |
-| Mg | 0.088 | 0.806 | 0.105 | 0.000 |
-| Na | 0.633 | 0.000 | 0.367 | 0.000 |
-| K | 0.499 | 0.115 | 0.386 | 0.000 |
-| Cr | 0.265 | 0.735 | 0.000 | 0.000 |
-| O | 0.280 | 0.319 | 0.014 | 0.387 |
+| element | leaves the melt | stays in the melt |
+|---|---:|---:|
+| Fe | 1.000 | 0.000 |
+| Na | 1.000 | 0.000 |
+| Si | 0.999 | 0.001 |
+| K | 0.935 | 0.065 |
+| Cr | 0.256 | 0.744 |
+| Mg | 0.194 | 0.806 |
+| Ca | 0.001 | 0.999 |
+| Ti | 0.001 | 0.999 |
+| Al | 0.000 | 1.000 |
 
-| result | value |
-|---|---:|
-| Melt rump | 0.3485 kg |
-| Condensed | 0.3416 kg |
-| O₂, source-side and not recovered | 0.1645 kg |
-| Vented | 0.1442 kg |
-| Wall | 0.0002 kg |
-| Cleanup-sequestered | 0.0007 kg |
-| Tapped | 0.0002 kg |
-| Furnace endpoint | 2200 °C at hour 213; held through hour 225 |
-| Mass-closure residual | below 1e-14 (max element residual ~1e-15; limit 5e-14) |
+⚠ **Flagged: the Na, K, Mg, Fe, Si and Cr fractions carry a known model artefact (b-1146).** Through
+the mid-run campaigns (roughly hours 57–144), the evaporation flux of these species alternates
+between full rate and exactly zero from one hour to the next. The cause is a one-hour lag in the
+headspace pressure. Where the sweep gas cannot carry the full-rate flux, the hour-to-hour average
+overstates evaporation. So these fractions may be too high, by an amount not yet known per species.
+Separately, CrO evaporation is recorded as zero on this commit, which understates Cr. Fixes are in
+progress, and this table will be refreshed from a fresh run once they land.
+
+**Refractory terminal ceramic (the rump).** This is a product, not a loss: 0.348 kg of the 1 kg charge.
+It is the `refractory_ceramic_rump` class in `product_classification`. Its composition is Al₂O₃
+39.8 wt%, CaO 32.4, MgO 21.4, TiO₂ 4.4, Cr₂O₃ 0.8, MnO 0.5 and P₂O₅ 0.3, with traces including the REEs.
+This is the Ca, Al, Ti and REE-rich ceramic that the mandate expects to line the next furnace.
+
+**Oxygen.** 0.165 kg of O₂ is released from the melt. It is counted at the source and is not yet
+recovered.
+
+**Where the evaporated material ends up is not in this headline.** The condenser train is still
+being designed, so its capture and vent split is not yet a reliable result. The run report still
+records the full per-stage ledger under `yield_disposition` and `stage_purity_report`. Treat those
+figures as provisional until the train design is finished.
 
 ### Open issues in this run
 
-- 92% of Fe is vented past Stage 1 (b-591; capture-law fix pending an owner decision on collector areas).
-- About 80% of Mg stays in the melt; the hard-vacuum crown stage is not built.
-- 37% of alkalis are vented.
-- O₂ is counted at the source side, not captured.
+- About 81% of the Mg stays in the melt, because the hard-vacuum Mg/Ca crown stage is not implemented yet.
+  Ca stays in the rump for the same reason.
+- O₂ is counted at the source, not captured.
+- The condenser train design is in progress, so capture figures are not reported in the headline (see above).
+- The Na, K, Mg, Fe, Si and Cr fractions are flagged for the alternating-hour flux artefact and the
+  missing CrO evaporation described under the table.
 - This README table is hand-copied until the nightly hero golden exists.
 
 ### What this run does NOT yet show
 
-This run does not show Fe capture, Mg-crown extraction, full alkali capture (about 37% is vented), or
-O₂ recovery; see the open issues above. The refractory rump remains. `redox_buffer_retained` is 0 for
-every element, including oxygen.
+This run does not show Mg or Ca crown extraction, O₂ recovery, or a finished condenser train. It shows
+what the pressure-and-temperature sequence pulls out of the melt, and the refractory rump left behind.
+`redox_buffer_retained` is 0 for every element, including oxygen.
 
 Report fields: `status` is `ok`, `reason` is `''`, `error_message` is `''`, and
-`run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` has 32 species
-summaries; 30 of 32 are extrapolated beyond their fitted temperature range. No VapoRock shadow is
-recorded. The high-temperature yields are extrapolations, not certified values.
+`run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` covers 32 species, and
+30 of the 32 are evaluated beyond their fitted temperature range. The high-temperature evaporation
+fractions are therefore extrapolations, not certified values.
 
 From a source checkout, run the dependency installer:
 

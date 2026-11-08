@@ -64,6 +64,22 @@ def _commissioning_notice_fields(
 THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
 
 
+def thermoengine_effective_pressure_policy(
+    physical_pressure_bar: float,
+) -> tuple[float, str]:
+    """Return the pressure sent to ThermoEngine and its policy label."""
+
+    pressure_bar = float(physical_pressure_bar)
+    minimum_pressure = format(
+        THERMOENGINE_MIN_PRESSURE_BAR,
+        "g",
+    ).replace("e-0", "e-")
+    return (
+        max(pressure_bar, THERMOENGINE_MIN_PRESSURE_BAR),
+        f"ThermoEngine floor {minimum_pressure} bar",
+    )
+
+
 class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     """First-class MeltBackend using ENKI ThermoEngine's spawned worker."""
 
@@ -74,7 +90,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     def __init__(self) -> None:
         super().__init__()
         self._thermoengine_transport: Optional[ThermoEngineTransport] = None
-        self._thermoengine_import_error: Optional[BaseException] = None
+        self._thermoengine_import_error: tuple[str, str] | None = None
         self._unavailable_reason: Optional[str] = None
         self._transport_close_count = 0
         self._health_timeout_s = THERMOENGINE_HEALTH_TIMEOUT_S
@@ -175,7 +191,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             if classified is exc:
                 raise classified
             raise classified from exc
-        self._thermoengine_import_error = exc
+        self._thermoengine_import_error = (type(exc).__name__, str(exc))
         self._close_after_failure(exc)
         raise ImportError(
             f'ThermoEngine transport unavailable: {type(exc).__name__}: {exc}'
@@ -297,10 +313,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         if self._unavailable_reason:
             return self._unavailable_reason
         if self._thermoengine_import_error is not None:
+            error_type, error_message = self._thermoengine_import_error
             return (
                 'ThermoEngine transport unavailable: '
-                f'{type(self._thermoengine_import_error).__name__}: '
-                f'{self._thermoengine_import_error}'
+                f'{error_type}: {error_message}'
             )
         if self._thermoengine_transport is None:
             return 'ThermoEngine transport not initialized'
@@ -401,8 +417,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._mode = None
             raise ImportError('ThermoEngine transport not initialized')
         try:
-            solved_pressure_bar = max(
-                float(pressure_bar), THERMOENGINE_MIN_PRESSURE_BAR
+            solved_pressure_bar, _pressure_policy = (
+                thermoengine_effective_pressure_policy(pressure_bar)
             )
             clamp_diagnostics, result_warnings = (
                 self._clamped_operating_point_context(

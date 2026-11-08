@@ -1,0 +1,1188 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  citation: Hastie, J. W. and Bonnell, D. W. (1980), Molecular Chemistry of Inhibited Combustion Systems, National Bureau
+    of Standards, NBSIR 80-2169, final report, December 1980.
+  source_ids:
+  - hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2e5c4bcdf7b91bfd0c1bb897b48c054e4ebf50bc
+    files:
+    - asset_id: pdf:hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      role: pdf
+      path: raw/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.pdf
+      sha256:
+        tag: value
+        value: c3b410d8b5ca157836cc04dbd1762672dea6f8bd982e7859a1a8b4077dd43873
+    - asset_id: pdftotext:hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      role: pdftotext
+      path: text/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_01
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 194
+        published_page: E8
+        pdf_page_index: 193
+        section: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 194
+    published_page: E8
+    pdf_page_index: 193
+    section: '4'
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_02
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 32
+        published_page: 26
+        pdf_page_index: 31
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 32
+    published_page: 26
+    pdf_page_index: 31
+    table: '3'
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_03
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 39
+        published_page: 33
+        pdf_page_index: 38
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 39
+    published_page: 33
+    pdf_page_index: 38
+    table: '4'
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_04
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 192
+        published_page: E6
+        pdf_page_index: 191
+        table: E.1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 192
+    published_page: E6
+    pdf_page_index: 191
+    table: E.1
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_05
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 163
+        published_page: D3
+        pdf_page_index: 162
+        table: D.1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 163
+    published_page: D3
+    pdf_page_index: 162
+    table: D.1
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_06
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 162
+        published_page: D2
+        pdf_page_index: 161
+        section: Appendix D
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 162
+    published_page: D2
+    pdf_page_index: 161
+    section: Appendix D
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_07
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 167
+        published_page: D7
+        pdf_page_index: 166
+        table: D.2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 167
+    published_page: D7
+    pdf_page_index: 166
+    table: D.2
+    note: row=PO
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_08
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 22
+        published_page: 16
+        pdf_page_index: 21
+        table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 22
+    published_page: 16
+    pdf_page_index: 21
+    table: '2'
+    note: row=PO
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_09
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 197
+        published_page: E11
+        pdf_page_index: 196
+        table: E.2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 197
+    published_page: E11
+    pdf_page_index: 196
+    table: E.2
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_10
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 193
+        published_page: E7
+        pdf_page_index: 192
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 193
+    published_page: E7
+    pdf_page_index: 192
+    section: Appendix E, section 3
+    note: Unnumbered PO formation-enthalpy comparison
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_11
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 193
+        published_page: E7
+        pdf_page_index: 192
+        section: Appendix E, section 3
+        note: Unnumbered PO formation-enthalpy comparison
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 193
+    published_page: E7
+    pdf_page_index: 192
+    section: Appendix E, section 3
+    note: Unnumbered PO formation-enthalpy comparison; row=Drowart et al. (1972)
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_12
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 199
+        published_page: E13
+        pdf_page_index: 198
+        table: E.3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 199
+    published_page: E13
+    pdf_page_index: 198
+    table: E.3
+    note: row=POH
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_13
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 199
+        published_page: E13
+        pdf_page_index: 198
+        table: E.3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 199
+    published_page: E13
+    pdf_page_index: 198
+    table: E.3
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_14
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 199
+        published_page: E13
+        pdf_page_index: 198
+        table: E.3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 199
+    published_page: E13
+    pdf_page_index: 198
+    table: E.3
+    note: row=HOPO
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_15
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 199
+        published_page: E13
+        pdf_page_index: 198
+        table: E.3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 199
+    published_page: E13
+    pdf_page_index: 198
+    table: E.3
+    note: row=HOPO
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_16
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 201
+        published_page: E15
+        pdf_page_index: 200
+        table: E.4
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 201
+    published_page: E15
+    pdf_page_index: 200
+    table: E.4
+    note: row=PO
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_17
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 197
+        published_page: E11
+        pdf_page_index: 196
+        table: E.2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 197
+    published_page: E11
+    pdf_page_index: 196
+    table: E.2
+    note: row=S_HPO2 present_study
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_18
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 167
+        published_page: D7
+        pdf_page_index: 166
+        table: D.2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 167
+    published_page: D7
+    pdf_page_index: 166
+    table: D.2
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_19
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 167
+        published_page: D7
+        pdf_page_index: 166
+        table: D.2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 167
+    published_page: D7
+    pdf_page_index: 166
+    table: D.2
+    note: row=ΔHf,298 NaPO2
+- experiment_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1::experiment::hastie_bonnell_1980_experiment_20
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: This series contains multiple printed conditions or thermodynamic reference temperatures; row-level temperatures
+          are attached to observations.
+      locator:
+        page: 162
+        published_page: D2
+        pdf_page_index: 161
+        section: Appendix D
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  locator:
+    page: 162
+    published_page: D2
+    pdf_page_index: 161
+    section: Appendix D
+context:
+- observation_id: hastie_bonnell_1980_appendixB_table2_full_rendered_table
+  type: printed_table_context
+  locator:
+    page: 122
+    pdf_page_index: 121
+    published_page: 1130
+    table: '2'
+  phase: gas
+  units: K
+  values:
+    quantity: flame_temperature_comparison_as_printed
+    method_class: mixed_by_column_and_typed_refusal
+    admission_status: typed_refusal
+    schema_gap: The exact flame-temperature comparison is not a transition temperature and the report's closed Quantity set
+      has no flame-temperature token. The calculated adiabatic cells are authors' model results; measured cells and literature
+      values are kept with their own column labels.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.TRANSITION_TEMPERATURE
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    column_evidence:
+      Na-D line reversal: measured_direct, authors and W. Miller [47] comparison values are identified by footnotes c and
+        d.
+      OH absorption: measured_direct.
+      Vibrational Raman: measured_direct.
+      Rotational Raman: measured_direct or stated as a cross-technique comparison in footnote g.
+      Calculated adiabatic: model_derived; method is adiabatic thermodynamic calculation, source says accuracy within 1 K.
+    references_as_printed:
+    - W. Miller [47]
+    - references [2], [16], and [47] cited in the surrounding comparison section
+    rows_as_printed:
+    - - 4.0/1.0/4.0
+      - 'no'
+      - 2100 ± 20
+      - ''
+      - 2146 ± 40
+      - ''
+      - ''
+    - - 4.0/1.0/4.0
+      - 'yes'
+      - 2060 ± 20
+      - 2160 ± 40
+      - 1980 ± 40
+      - g
+      - '2019'
+    - - 4.0/1.0/4.0
+      - --
+      - 1990 ± 20 (underlined)
+      - ''
+      - 2010 ± 40 (underlined)
+      - ''
+      - ''
+    - - 4.0/1.0/4.0
+      - --
+      - 2020 (W. Miller [47])
+      - ''
+      - ''
+      - ''
+      - ''
+    - - 3.4/1.0/2.0
+      - 'yes'
+      - 2470 ± 20
+      - 2425 ± 60
+      - 2500 ± 150
+      - f
+      - '2545'
+    - - 3.4/1.0/2.0
+      - --
+      - 2475 (W. Miller [47])
+      - ''
+      - ''
+      - ''
+      - ''
+    footnotes_as_printed:
+    - Temperature in K at 30 mm (cylindrical burner) or 15 mm (rectangular burner) above burner face; rotational Raman uncertainty
+      is two standard deviations.
+    - Value with superscript b was measured at z=30 mm, y=0 mm; similar at z=15 mm (Fig. 11).
+    - Underlined data are for cylindrical burner; other data refer to rectangular burner.
+    - Miller [47] values were obtained with an almost identical burner and gas flow condition.
+    - Calculated adiabatic data should be accurate within a degree.
+    - See Figure 12 for data at z=30 mm, y=0 mm.
+    - Cross-technique Raman comparison at z=30 mm, y=2 mm: rotational 2113 ± 22 K and vibrational 2096 ± 40 K.
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_appendixB_table2_full_rendered_table
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
+- observation_id: hastie_bonnell_1980_appendixE_tableE2_full_comparison_table
+  type: printed_table_context
+  locator:
+    page: 197
+    pdf_page_index: 196
+    published_page: E11
+    table: E.2
+  phase: gas
+  units: 'D: kcal/mol; S: cal/(deg mol); reference temperature 298.15 K.'
+  values:
+    admission_status: D bond energies and difference column typed-refused; S values separately extracted.
+    rows_as_printed:
+    - - D_HO-PO
+      - 99.9 ± 4
+      - '103.1'
+      - '-3.6'
+    - - D_Na-PO2
+      - 88.3 ± 5.5
+      - 82.9 ± 3.0 or 85.0 ± 5.0
+      - 6.5 or 3.3
+    - - D_Li-PO2
+      - 92.4 ± 5.8
+      - '92.7'
+      - '-0.3'
+    - - S_HPO2
+      - 63.2 ± 2.0
+      - '63.2'
+      - '0'
+    - - S_NaPO2
+      - 73.4 ± 2.0
+      - '71.6'
+      - '2.5'
+    - - S_LiPO2
+      - 66.3 ± 2.0
+      - '68.0'
+      - '-2.5'
+    references_as_printed:
+    - Jensen (1969)
+    - JANAF (1971)
+    - Gingerich and Miller (1975)
+    - Smoes and Drowart (1974)
+    footnotes_as_printed:
+    - D values are kcal/mol; S values are cal/(deg mol), at 298.15 K.
+    - Jensen (1969) supplies LiBO2/NaBO2 analogy data.
+    - JANAF data are based on a single indirect measurement.
+    - Bond values are consistent with second-law data for Na + PO + 1/2 O2 = NaPO2 and similarly for Li.
+    - Two disparate literature values are 82.3 and 72.9 kcal/mol from Gingerich and Miller (1975) and Smoes and Drowart (1974).
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_appendixE_tableE2_full_comparison_table
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
+- observation_id: hastie_bonnell_1980_appendixE_tableE3_full_rendered_table
+  type: printed_table_context
+  locator:
+    page: 199
+    pdf_page_index: 198
+    published_page: E13
+    table: E.3
+  phase: gas
+  units: Mixed as printed.
+  values:
+    rows_as_printed:
+    - - POH
+      - HOP=118.0°
+      - rHO=1.0 Å
+      - rPO=1.6 Å
+      - '0.0284'
+      - 2400(v3);950(v1);500(v2)
+      - '56.3'
+      - '-9.5'
+    - - HOPO
+      - HOP=118.0°
+      - OPO=116.0°
+      - rPO=1.40 Å
+      - rOH=1.00 Å
+      - '1.516'
+      - 3680(v1);2030(v2);1420(v3);1195(v4);530(v5);1400(v6)
+      - '63.2'
+      - '-96.0'
+    - - Li-OPO
+      - Li-OP=100.0°
+      - OPO=116.0°
+      - rOP=1.6 Å
+      - rLi-O=1.62 Å
+      - '6.7'
+      - 850(v2);1250(v1);550(v4);925(v3);250(v6);325(v5)
+      - '66.3'
+      - '-115.0'
+    - - Na-OPO
+      - Na-OP=100.0°
+      - OPO=116.0°
+      - rOP=1.60 Å
+      - rO-Na=2.00 Å
+      - '30.50'
+      - 800(v1);1200(v2);500(v3);200(v4);100(v5);150(v6)
+      - '73.4'
+      - '-123.5'
+    footnotes_as_printed:
+    - Harmonic oscillator approximation sigma=1, epsilon=0, g=1.
+    - HPO entropy is isomer-dependent; the listed POH isomer is used.
+    - Angles and bond distances were estimated.
+    - Na/Li structures were assumed analogous to HOPO; a ring alternative could alter entropy by several cal/(deg mol).
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_appendixE_tableE3_full_rendered_table
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
+- observation_id: hastie_bonnell_1980_appendixE_tableE4_full_rendered_table
+  type: printed_table_context
+  locator:
+    page: 201
+    pdf_page_index: 200
+    published_page: E15
+    table: E.4
+  phase: gas
+  units: ΔHf,2000 kcal/mol; S2000 cal/(deg mol).
+  values:
+    admission_status: HPO2 formation value separately extracted as an admitted model-derived elemental ΔHf; all S and other
+      Hf cells are separately extracted.
+    rows_as_printed:
+    - - PO
+      - '-26.8'
+      - '69.0'
+    - - PO2
+      - '-81.9'
+      - '84.2'
+    - - HPO
+      - '-10.2'
+      - '77.5'
+    - - HPO2
+      - '-97.9'
+      - '90.0'
+    - - H
+      - '54.2'
+      - '36.8'
+    - - OH
+      - '8.9'
+      - '57.9'
+    - - H2
+      - '0.'
+      - '45.0'
+    - - H2O
+      - '-60.1'
+      - '63.2'
+    reference_frame_as_printed: ΔHf,2000 is the elemental standard formation quantity in JANAF (1971) convention where the
+      report uses JANAF data; Appendix E explicitly says P-containing derived enthalpies are relative to PO.
+    source_as_printed: JANAF (1971), unless indicated otherwise in the main text.
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_appendixE_tableE4_full_rendered_table
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
+- observation_id: hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
+  type: printed_comparison_context
+  locator:
+    page: 193
+    pdf_page_index: 192
+    published_page: E7
+    section: Appendix E, section 3
+    note: Unnumbered PO formation-enthalpy comparison
+  phase: gas
+  units: kcal/mol
+  values:
+    quantity: PO formation-enthalpy comparison rows as printed
+    method_class: context_only
+    admission_status: context_only
+    reference_frame_as_printed: ΔHf,298 PO; elemental formation enthalpy as designated by the printed formation symbol.
+    T_K: '298.15'
+    comparison_rows_as_printed:
+    - - -5.5 ± 2
+      - Present study
+    - - -2.3 ± 2
+      - Drowart et al. (1972)
+    - - -1.5 ± 2
+      - JANAF (1971), Interim Table
+    method_as_printed: Present-study value selected for consistency with the report's experimental data base.
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_appendixE_unnumbered_po_hf_comparison
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
+- observation_id: hastie_bonnell_1980_main_table2_full_rendered_table
+  type: printed_table_context
+  locator:
+    page: 22
+    pdf_page_index: 21
+    published_page: 16
+    table: '2'
+  phase: gas
+  units: Pressure coefficients ×10^-4 atm; TMP ×10^-3 atm; temperature K; time ×10^-3 s.
+  values:
+    admission_status: typed_refusal_for_limits_and_mixed_measured_model_cells
+    table_columns_as_printed:
+    - H2/O2/N2 flame mole ratio
+    - TMP (10^-3 atm)
+    - Temperature (K)
+    - Time (10^-3 s)
+    - PO
+    - HPO2
+    - PN
+    - P2
+    - PO2
+    - HPO
+    flame_columns_as_printed:
+    - 3.1/1/4
+    - 9.7/1/3.3
+    - 6.5/1/4.2
+    - 11.4/1/4
+    - 3.1/1/2.7
+    rows_as_printed:
+    - - TMP (10^-3 atm)
+      - '3.0'
+      - '2.0'
+      - '3.0'
+      - '3.0'
+      - '3.0'
+    - - Temp. (K)
+      - '2100'
+      - '1460'
+      - '1600'
+      - '1350'
+      - '2340'
+    - - Time (10^-3 s)
+      - '2.0'
+      - '3.0'
+      - '1.3'
+      - ~2.0
+      - ~2.0
+    - - P-Species
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - PO
+      - 20.0 (20.0)
+      - 12.0 (0.7)
+      - '24.0'
+      - '27.6'
+      - '28.5'
+    - - HPO2
+      - 0.4 (1.3)
+      - 3.1 (0.4)
+      - '2.4'
+      - '2.4'
+      - '1.5'
+    - - PN
+      - 1.5 (5.6)
+      - 1.6 (19.0)
+      - '2.4'
+      - —
+      - —
+    - - P2
+      - <0.05 (0.005)
+      - 1.2 (0.4)*
+      - <0.2
+      - —
+      - —
+    - - PO2
+      - <0.05 (2.1)
+      - <0.4 (0.006)
+      - <0.4
+      - —
+      - —
+    - - HPO
+      - <0.05 (0.02)
+      - <0.6 (0.002)
+      - <0.2
+      - —
+      - —
+    footnotes_as_printed:
+    - H2/O2/N2 values are NTP mole ratios of burner input.
+    - Temperature uncertainty is ±100 K; Na D-line reversal or adiabatic thermodynamic calculation with empirical burner heat-loss
+      correction.
+    - Flow time is referenced to reaction zone; typically 2 ms is approximately 1 cm.
+    - Relative pressure uncertainties ±10%, absolute ±30%; upper limits are mass-spectrometer detection limits.
+    - Parenthesized values are predicted equilibrium partial pressures.
+  context_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry::context::hastie_bonnell_1980_main_table2_full_rendered_table
+  work_id: a8c49e470729091f40df764a53bf55f3dac08fa95eda56becbce03cef460efa1
+  source_id: hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
+  species: unknown
