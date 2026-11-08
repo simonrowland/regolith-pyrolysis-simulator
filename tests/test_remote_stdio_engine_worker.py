@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import signal
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -352,4 +353,71 @@ def test_replacement_after_wrapper_death_kills_remote_subtree(
         _assert_caller_group_unchanged(caller_group)
     finally:
         worker.close()
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_close_during_cold_start_owns_the_remote_pgid_once(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'startup-subtree', str(worker_pid_file), str(grandchild_pid_file),
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+    pgid_read_started = threading.Event()
+    release_pgid_read = threading.Event()
+    start_results: list[object] = []
+    start_thread: threading.Thread | None = None
+    pids: tuple[int, ...] = ()
+    original_remote_pgid = worker._remote_pgid
+
+    def pause_start_pgid_read(*, timeout_s=0.0, closing=False):
+        if (
+            threading.current_thread().name == 'remote cold start'
+            and not closing
+        ):
+            pgid_read_started.set()
+            if not release_pgid_read.wait(timeout=5.0):
+                raise TimeoutError('test did not release startup PGID read')
+        return original_remote_pgid(
+            timeout_s=timeout_s,
+            closing=closing,
+        )
+
+    monkeypatch.setattr(worker, '_remote_pgid', pause_start_pgid_read)
+    try:
+        start_thread = threading.Thread(
+            target=lambda: start_results.append(worker.start()),
+            name='remote cold start',
+        )
+        start_thread.start()
+        assert pgid_read_started.wait(timeout=5.0)
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+        if inherit:
+            assert os.getpgid(wrapper.pid) == caller_group
+
+        worker.close()
+        release_pgid_read.set()
+        start_thread.join(timeout=5.0)
+
+        assert not start_thread.is_alive()
+        assert start_results == [None]
+        refusal = worker.call(_request())
+        assert refusal['status'] == 'refused'
+        assert refusal['code'] == 'startup_failure'
+        assert not wrapper.is_alive()
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        release_pgid_read.set()
+        worker.close()
+        if start_thread is not None:
+            start_thread.join(timeout=1.0)
         _kill_pids(pids)

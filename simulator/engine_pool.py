@@ -1754,7 +1754,10 @@ class _RemoteEngineStdioProcess:
             return
 
     def _closed_stream_failure(self) -> _RemoteEngineProtocolFailure:
-        returncode = self.process.poll()
+        try:
+            returncode = self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        except subprocess.TimeoutExpired:
+            returncode = None
         with self._stderr_lock:
             stderr = bytes(self._stderr).decode('utf-8', errors='replace').strip()
         detail = 'remote worker closed stdout before a complete response'
@@ -2072,6 +2075,11 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             duplex=False,
         )
         self._remote_process_group_id: int | None = None
+        self._remote_pgid_lock = threading.Lock()
+        self._remote_pgid_closed = False
+        self._remote_pgid_error: str | None = None
+        self._remote_startup_deadline = 0.0
+        self._parent_start_close_thread: int | None = None
         super().__init__(
             name=name,
             bootstrap=_remote_engine_stdio_bootstrap,
@@ -2087,68 +2095,115 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         )
 
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
+        self.close()
+        startup_timeout = self.startup_timeout_s
+        if timeout_s is not None:
+            startup_timeout = min(
+                startup_timeout,
+                max(0.001, float(timeout_s)),
+            )
+        start_thread = threading.get_ident()
+        with self._remote_pgid_lock:
+            self._remote_process_group_id = None
+            self._remote_pgid_error = None
+            self._remote_pgid_closed = False
+            self._remote_startup_deadline = (
+                time.monotonic()
+                + startup_timeout
+                + ENGINE_WORKER_SPAWN_SLACK_S
+            )
+            self._parent_start_close_thread = start_thread
         try:
             ready = super().start(timeout_s=timeout_s)
         except Exception as exc:
             self._pending_start_failure = exc
             return None
-        if not self._remote_pid_receive.poll(0.1):
+        finally:
+            with self._remote_pgid_lock:
+                if self._parent_start_close_thread == start_thread:
+                    self._parent_start_close_thread = None
+        remaining = max(
+            0.0, self._remote_startup_deadline - time.monotonic(),
+        )
+        if self._remote_pgid(timeout_s=remaining) is None:
             process, connection = self.process, self.connection
             self._discard_current(
                 diagnostic=False,
                 expected_process=process,
                 expected_connection=connection,
             )
+            with self._remote_pgid_lock:
+                detail = self._remote_pgid_error
+                if self._remote_pgid_closed:
+                    detail = 'remote worker was closed during startup'
             self._pending_start_failure = _RemoteEngineProtocolFailure(
-                'startup_failure', 'remote worker did not report its process group',
-            )
-            return None
-        try:
-            self._remote_process_group_id = int(
-                self._remote_pid_receive.recv()
-            )
-        except (EOFError, OSError, TypeError, ValueError) as exc:
-            process, connection = self.process, self.connection
-            self._discard_current(
-                diagnostic=False,
-                expected_process=process,
-                expected_connection=connection,
-            )
-            self._pending_start_failure = _RemoteEngineProtocolFailure(
-                'startup_failure', f'invalid remote process group report: {exc}',
+                'startup_failure',
+                detail or 'remote worker did not report its process group',
             )
             return None
         self._pending_start_failure = None
         return ready
 
+    def _remote_pgid(
+        self,
+        *,
+        timeout_s: float = 0.0,
+        closing: bool = False,
+    ) -> int | None:
+        with self._remote_pgid_lock:
+            if closing:
+                self._remote_pgid_closed = True
+            elif self._remote_pgid_closed:
+                return None
+            if self._remote_process_group_id is not None:
+                return self._remote_process_group_id
+            try:
+                if not self._remote_pid_receive.poll(max(0.0, timeout_s)):
+                    return None
+                group_id = self._remote_pid_receive.recv()
+            except (EOFError, OSError, ValueError) as exc:
+                self._remote_pgid_error = (
+                    f'could not receive remote process group: {exc}'
+                )
+                return None
+            if (
+                isinstance(group_id, bool)
+                or not isinstance(group_id, int)
+                or group_id <= 1
+                or group_id == os.getpgrp()
+            ):
+                self._remote_pgid_error = (
+                    f'invalid remote process group report: {group_id!r}'
+                )
+                return None
+            self._remote_process_group_id = group_id
+            return group_id
+
     def _stop_remote_process_tree(
         self,
         process: Any,
         connection: Any,
+        *,
+        closing: bool = False,
     ) -> None:
-        groups = []
-        if self._remote_process_group_id is not None:
-            groups.append(self._remote_process_group_id)
-            self._remote_process_group_id = None
-        receiver = self._remote_pid_receive
-        deadline = time.monotonic() + (0.1 if process is not None else 0.0)
-        while True:
-            remaining = deadline - time.monotonic()
-            if remaining > 0.0 and not receiver.poll(remaining):
-                break
-            if not receiver.poll():
-                break
-            try:
-                groups.append(int(receiver.recv()))
-            except (EOFError, OSError, TypeError, ValueError):
-                break
-        for group_id in dict.fromkeys(groups):
-            if group_id <= 1 or group_id == os.getpgrp():
-                continue
+        timeout_s = 0.0
+        if process is not None and process.is_alive():
+            timeout_s = max(
+                0.0,
+                self._remote_startup_deadline - time.monotonic(),
+            )
+        group_id = self._remote_pgid(
+            timeout_s=timeout_s,
+            closing=closing,
+        )
+        if group_id is not None:
             try:
                 os.killpg(group_id, signal.SIGKILL)
             except OSError:
                 pass
+            with self._remote_pgid_lock:
+                if self._remote_process_group_id == group_id:
+                    self._remote_process_group_id = None
         if (
             process is not None
             and process.is_alive()
@@ -2179,13 +2234,25 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
     def request_disable(self) -> None:
         with self._state_lock:
             process, connection = self.process, self.connection
-        self._stop_remote_process_tree(process, connection)
+        self._stop_remote_process_tree(
+            process, connection, closing=True,
+        )
         super().request_disable()
 
     def close(self) -> None:
+        with self._remote_pgid_lock:
+            if self._parent_start_close_thread == threading.get_ident():
+                skip_remote_cleanup = True
+            else:
+                skip_remote_cleanup = False
+        if skip_remote_cleanup:
+            super().close()
+            return
         with self._state_lock:
             process, connection = self.process, self.connection
-        self._stop_remote_process_tree(process, connection)
+        self._stop_remote_process_tree(
+            process, connection, closing=True,
+        )
         super().close()
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
