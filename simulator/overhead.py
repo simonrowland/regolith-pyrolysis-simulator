@@ -294,16 +294,21 @@ def _solve_same_hour_headspace_closure(
         ]
 
     try:
-        least_squares(
+        coupled_solution = least_squares(
             coupled_residual,
             [rates.get(species, 0.0) for species in coupled_species],
             bounds=(0.0, math.inf),
             x_scale=[coupled_scales[species] for species in coupled_species],
+            diff_step=1.0e-4,
             ftol=1.0e-12,
             xtol=1.0e-12,
             gtol=1.0e-12,
             max_nfev=min(512, max(1, evaluation_cap - evaluations)),
         )
+        # The optimizer's final residual call may be a finite-difference
+        # probe. Project its returned candidate explicitly so convergence is
+        # decided from the same source map that is returned to the caller.
+        coupled_residual(coupled_solution.x)
     except _ClosureEvaluationCapReached:
         pass
     if latest_coupled_evaluation is not None:

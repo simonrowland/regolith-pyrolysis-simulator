@@ -788,6 +788,45 @@ def test_stiff_species_coupling_closes_before_the_evaluation_cap():
     assert result.converged
     assert result.iterations < 2000
     assert result.rates_kg_hr == pytest.approx(
+        {name: 1.0 for name in species}, rel=1e-8
+    )
+
+
+def test_closure_projects_the_optimizer_candidate_before_returning(monkeypatch):
+    from types import SimpleNamespace
+
+    import scipy.optimize
+
+    species = tuple(f"S{index:02d}" for index in range(11))
+    coupling = 0.999
+
+    def partials_at_rates(rates):
+        return dict(rates)
+
+    def rates_at_partials(partials):
+        return {
+            name: 1.0 - coupling + coupling * sum(
+                partials[other] for other in species if other != name
+            ) / (len(species) - 1)
+            for name in species
+        }
+
+    def optimizer_with_a_final_probe(residual, x0, **_kwargs):
+        residual(x0)
+        return SimpleNamespace(x=[1.0 for _ in species])
+
+    monkeypatch.setattr(
+        scipy.optimize, "least_squares", optimizer_with_a_final_probe
+    )
+    result = _solve_same_hour_headspace_closure(
+        {name: 0.5 for name in species},
+        rates_at_partials,
+        partials_at_rates,
+    )
+
+    assert result.converged
+    assert result.iterations == 130
+    assert result.rates_kg_hr == pytest.approx(
         {name: 1.0 for name in species}, rel=1e-9
     )
 
