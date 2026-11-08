@@ -250,6 +250,67 @@ def _solve_same_hour_headspace_closure(
         previous_evaluated = evaluated
         rates = next_rates
 
+    # Species share the projected total pressure and mole fractions, so
+    # independently solving each scalar rate can require many outer sweeps.
+    # Use the already-required SciPy dependency to solve that coupled residual
+    # as a bounded vector system before spending the remaining budget on the
+    # scalar fallback. Every residual evaluation goes through ``evaluate`` so
+    # finite-difference probes and the final projected map share one cap.
+    from scipy.optimize import least_squares
+
+    coupled_species = tuple(sorted(species_names))
+    coupled_scales = {}
+    for species in coupled_species:
+        scale = max(
+            abs(rates.get(species, 0.0)),
+            abs(evaluated.get(species, 0.0)),
+            abs(float(initial_rates_kg_hr.get(species, 0.0))),
+        )
+        coupled_scales[species] = scale if scale > 0.0 else 1.0
+    latest_coupled_evaluation = None
+
+    class _ClosureEvaluationCapReached(Exception):
+        pass
+
+    def coupled_residual(candidate_values):
+        nonlocal latest_coupled_evaluation
+        candidate_rates = {
+            species: max(0.0, float(candidate_values[index]))
+            for index, species in enumerate(coupled_species)
+        }
+        candidate_evaluation = evaluate(candidate_rates)
+        if candidate_evaluation is None:
+            raise _ClosureEvaluationCapReached
+        candidate_partials, candidate_evaluated = candidate_evaluation
+        latest_coupled_evaluation = (
+            candidate_rates,
+            candidate_partials,
+            candidate_evaluated,
+        )
+        return [
+            (candidate_rates[species] - candidate_evaluated.get(species, 0.0))
+            / coupled_scales[species]
+            for species in coupled_species
+        ]
+
+    try:
+        least_squares(
+            coupled_residual,
+            [rates.get(species, 0.0) for species in coupled_species],
+            bounds=(0.0, math.inf),
+            x_scale=[coupled_scales[species] for species in coupled_species],
+            ftol=1.0e-12,
+            xtol=1.0e-12,
+            gtol=1.0e-12,
+            max_nfev=min(512, max(1, evaluation_cap - evaluations)),
+        )
+    except _ClosureEvaluationCapReached:
+        pass
+    if latest_coupled_evaluation is not None:
+        rates, last_partials, evaluated = latest_coupled_evaluation
+        if rates_close(rates, evaluated):
+            return result(rates, last_partials, converged=True)
+
     # A steep decreasing map can make Picard oscillate even when its fixed
     # point is unique. Solve the scalar residual for each species inside a
     # guaranteed nonnegative bracket, holding other rates at their current
