@@ -113,6 +113,9 @@ def _solve_same_hour_headspace_closure(
     initial_rates_kg_hr: Mapping[str, float],
     rates_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
     partials_at_rates: Callable[[Mapping[str, float]], Mapping[str, float]],
+    *,
+    closed_line_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
+    closed_line_total_pressure_Pa: float | None = None,
 ) -> SameHourHeadspaceClosureResult:
     """Close source rates against the pressure projected from those rates.
 
@@ -142,6 +145,29 @@ def _solve_same_hour_headspace_closure(
         str(species): max(0.0, float(rate))
         for species, rate in initial_rates_kg_hr.items()
     }
+    if (
+        closed_line_equilibrium_pressures_Pa is not None
+        and closed_line_total_pressure_Pa is not None
+    ):
+        equilibrium_pressures = {
+            str(species): max(0.0, float(pressure))
+            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
+        }
+        # With no gas feed, the closed-line zero-flow boundary is a real root
+        # whenever ΣP_eq <= P_total. Detect it before evaluating a zero-rate
+        # composition: species_partial_pressures intentionally returns an
+        # empty map at zero flow, which otherwise makes that boundary look
+        # like the infinite-sweep limit and sends the solver toward its cap.
+        if math.fsum(equilibrium_pressures.values()) <= max(
+            0.0, float(closed_line_total_pressure_Pa)
+        ):
+            zero_species = set(rates) | set(equilibrium_pressures)
+            return SameHourHeadspaceClosureResult(
+                rates_kg_hr={species: 0.0 for species in zero_species},
+                partial_pressures_mbar={},
+                iterations=0,
+                converged=True,
+            )
     species_names = set(rates)
     evaluations = 0
 

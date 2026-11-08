@@ -578,3 +578,22 @@ def test_pipe_geometry_limits_recover_vacuum_and_suppress_closed_line_flux():
         closed_candidate, closed_melt
     )["vapor_pressure_mbar"]
     assert closed_pressure >= 80.0 / 100.0
+
+
+def test_closed_line_subboiling_root_is_recognized_without_iteration():
+    equilibrium_pressures = {"A": 40.0, "B": 39.0}
+
+    def unexpected_evaluation(_values):
+        raise AssertionError("zero-boundary root must not iterate")
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": 1.0, "B": 2.0},
+        unexpected_evaluation,
+        unexpected_evaluation,
+        closed_line_equilibrium_pressures_Pa=equilibrium_pressures,
+        closed_line_total_pressure_Pa=80.0,
+    )
+
+    assert result.converged
+    assert result.iterations == 0
+    assert result.rates_kg_hr == {"A": 0.0, "B": 0.0}
