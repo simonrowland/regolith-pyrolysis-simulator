@@ -16,12 +16,12 @@ extraction:
   note: Table 1 contains 25 starting-silicate rows; Table 2 contains 31 quenched-glass runs; Table 3 contains seven
     reference/sample rows. Parenthesized Table 2 values are 1 sigma analytical errors. Table 3 uncertainty confidence
     is not stated. Starting compositions and analyzed glass compositions are separate. The table-tool compare output
-    is retained in audits; its 215 Table 2 mismatches are composite mean (sigma) cells the comparator cannot parse,
-    its five sample-shift mismatches are caused by the comparator not recognizing the printed glass phase, and its
+    is retained in audits; its 31 Table 2 sulfur mismatches are composite mean (sigma) cells the comparator cannot
+    parse, its five sample-shift mismatches are caused by the comparator not recognizing the printed glass phase, and its
     247 Table 1 locator warnings reflect the absent MinerU table block. The 618-token audit reconciles these against
-    pdftotext and the page renders. The 184 Table 2 oxide observations retain the printed mole-percent numbers and
-    are typed-refused because simulator/battery/enums.py::PHASE_BASIS_TOKENS excludes the scalar phase-row basis
-    and simulator/battery/migrate.py::_phase_row_rejection rejects it. The existing point-condition composition
+    pdftotext and the page renders. The 184 Table 2 oxide observations retain each full printed mean (sigma) cell
+    in values.value_as_published and are typed unavailable because simulator/battery/enums.py::PHASE_BASIS_TOKENS
+    excludes the scalar phase-row basis and simulator/battery/migrate.py::_phase_row_rejection rejects it. The existing point-condition composition
     owner preserves the printed mole-percent maps, but simulator/battery/migrate.py::_composition_from_plain
     rejects 15 run maps whose printed totals are 98.4–99.7 mol% under
     simulator/battery/migrate.py::_percent_composition_closure_error; those conditions remain in the source rows
@@ -51,8 +51,8 @@ fidelity_samples:
     table: '2'
     row: A01-1
     column: S (ppm)
-- path: species.SiO2.observations[tsujimura_kitakaze_2005_table2_sio2_glass_composition_a01_1].values.value
-  value: '70.9'
+- path: species.SiO2.observations[tsujimura_kitakaze_2005_table2_sio2_glass_composition_a01_1].values.value_as_published
+  value: 70.9 (1.0)
   locator:
     page: 3
     pdf_page_index: 2
@@ -84,6 +84,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -98,13 +99,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '70.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 70.9 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 70.9 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -274,6 +276,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -288,13 +291,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '68.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 68.0 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 68.0 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -453,6 +457,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -467,13 +472,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '49.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 49.0 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 49.0 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -632,6 +638,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -646,13 +653,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '60.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 60.4 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 60.4 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -811,6 +819,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -825,13 +834,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '70.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 70.0 (1.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 70.0 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -990,6 +1000,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1004,13 +1015,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '47.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 47.9 (3.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 47.9 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -1169,6 +1181,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1183,13 +1196,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '56.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 56.4 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 56.4 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -1348,6 +1362,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1362,13 +1377,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '56.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 56.3 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 56.3 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -1527,6 +1543,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1541,13 +1558,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '56.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 56.8 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 56.8 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -1706,6 +1724,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1720,13 +1739,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '56.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 56.1 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 56.1 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -1885,6 +1905,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -1899,13 +1920,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '42.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 42.6 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 42.6 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -2064,6 +2086,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b06
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2078,13 +2101,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '68.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 68.8 (1.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 68.8 mol %
         sample_id_as_published: B06
         run_id_as_published: B06
@@ -2227,6 +2251,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b07
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2241,13 +2266,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '62.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 62.4 (2.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 62.4 mol %
         sample_id_as_published: B07
         run_id_as_published: B07
@@ -2390,6 +2416,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b08
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2404,13 +2431,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '65.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 65.0 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 65.0 mol %
         sample_id_as_published: B08
         run_id_as_published: B08
@@ -2553,6 +2581,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b09
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2567,13 +2596,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '67.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 67.0 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 67.0 mol %
         sample_id_as_published: B09
         run_id_as_published: B09
@@ -2716,6 +2746,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b10
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2730,13 +2761,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '55.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 55.5 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 55.5 mol %
         sample_id_as_published: B10
         run_id_as_published: B10
@@ -2879,6 +2911,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b11
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -2893,13 +2926,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '58.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 58.0 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 58.0 mol %
         sample_id_as_published: B11
         run_id_as_published: B11
@@ -3042,6 +3076,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b12
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3056,13 +3091,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '66.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 66.3 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 66.3 mol %
         sample_id_as_published: B12
         run_id_as_published: B12
@@ -3205,6 +3241,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b13
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3219,13 +3256,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '62.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 62.0 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 62.0 mol %
         sample_id_as_published: B13
         run_id_as_published: B13
@@ -3368,6 +3406,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b14
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3382,13 +3421,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '66.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 66.7 (1.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 66.7 mol %
         sample_id_as_published: B14
         run_id_as_published: B14
@@ -3531,6 +3571,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b15
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3545,13 +3586,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '56.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 56.9 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 56.9 mol %
         sample_id_as_published: B15
         run_id_as_published: B15
@@ -3694,6 +3736,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b16
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3708,13 +3751,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '65.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 65.6 (1.8) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 65.6 mol %
         sample_id_as_published: B16
         run_id_as_published: B16
@@ -3857,6 +3901,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b17
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -3871,13 +3916,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '59.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 59.1 (1.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 59.1 mol %
         sample_id_as_published: B17
         run_id_as_published: B17
@@ -4020,6 +4066,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b18
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4034,13 +4081,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '53.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 53.9 (1.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 53.9 mol %
         sample_id_as_published: B18
         run_id_as_published: B18
@@ -4183,6 +4231,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b19
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4197,13 +4246,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '60.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 60.0 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 60.0 mol %
         sample_id_as_published: B19
         run_id_as_published: B19
@@ -4346,6 +4396,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_b20
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4360,13 +4411,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '64.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 64.4 (0.9) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 64.4 mol %
         sample_id_as_published: B20
         run_id_as_published: B20
@@ -4509,6 +4561,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_c21
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4523,13 +4576,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '76.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 76.7 (2.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 76.7 mol %
         sample_id_as_published: C21
         run_id_as_published: C21
@@ -4674,6 +4728,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_c22
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4688,13 +4743,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '77.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 77.1 (1.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 77.1 mol %
         sample_id_as_published: C22
         run_id_as_published: C22
@@ -4839,6 +4895,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_c23
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -4853,13 +4910,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '70.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 70.2 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 70.2 mol %
         sample_id_as_published: C23
         run_id_as_published: C23
@@ -5004,6 +5062,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_c24
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5018,13 +5077,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '75.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 75.7 (1.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 75.7 mol %
         sample_id_as_published: C24
         run_id_as_published: C24
@@ -5169,6 +5229,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_sio2_glass_composition_c25
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5183,13 +5244,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: SiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: SiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '75.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 75.6 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 75.6 mol %
         sample_id_as_published: C25
         run_id_as_published: C25
@@ -5336,6 +5398,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5350,13 +5413,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -5515,6 +5579,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5529,13 +5594,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.5 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.5 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -5694,6 +5760,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5708,13 +5775,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -5873,6 +5941,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -5887,13 +5956,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -6052,6 +6122,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6066,13 +6137,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -6231,6 +6303,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6245,13 +6318,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.3 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -6410,6 +6484,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6424,13 +6499,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.2 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.2 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -6589,6 +6665,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6603,13 +6680,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.0 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.0 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -6768,6 +6846,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6782,13 +6861,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.2 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -6947,6 +7027,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -6961,13 +7042,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.8 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.8 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -7126,6 +7208,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_tio2_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -7140,13 +7223,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: TiO2
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: TiO2
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.1 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.1 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -7307,6 +7391,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -7321,13 +7406,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.6 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.6 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -7486,6 +7572,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -7500,13 +7587,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '11.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 11.7 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 11.7 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -7665,6 +7753,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -7679,13 +7768,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '7.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 7.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 7.2 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -7844,6 +7934,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -7858,13 +7949,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.2 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.2 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -8023,6 +8115,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8037,13 +8130,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.1 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.1 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -8202,6 +8296,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8216,13 +8311,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '13.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 13.0 (1.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 13.0 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -8381,6 +8477,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8395,13 +8492,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.0 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.0 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -8560,6 +8658,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8574,13 +8673,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.2 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -8739,6 +8839,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8753,13 +8854,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.9 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.9 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -8918,6 +9020,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -8932,13 +9035,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.2 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -9097,6 +9201,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9111,13 +9216,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '5.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 5.7 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 5.7 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -9276,6 +9382,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b06
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9290,13 +9397,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.7 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.7 mol %
         sample_id_as_published: B06
         run_id_as_published: B06
@@ -9439,6 +9547,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b07
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9453,13 +9562,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.1 mol %
         sample_id_as_published: B07
         run_id_as_published: B07
@@ -9602,6 +9712,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b08
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9616,13 +9727,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.8 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.8 mol %
         sample_id_as_published: B08
         run_id_as_published: B08
@@ -9765,6 +9877,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b09
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9779,13 +9892,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.5 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.5 mol %
         sample_id_as_published: B09
         run_id_as_published: B09
@@ -9928,6 +10042,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b10
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -9942,13 +10057,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '13.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 13.7 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 13.7 mol %
         sample_id_as_published: B10
         run_id_as_published: B10
@@ -10091,6 +10207,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b11
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10105,13 +10222,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '13.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 13.6 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 13.6 mol %
         sample_id_as_published: B11
         run_id_as_published: B11
@@ -10254,6 +10372,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b12
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10268,13 +10387,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.5 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.5 mol %
         sample_id_as_published: B12
         run_id_as_published: B12
@@ -10417,6 +10537,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b13
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10431,13 +10552,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.0 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.0 mol %
         sample_id_as_published: B13
         run_id_as_published: B13
@@ -10580,6 +10702,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b14
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10594,13 +10717,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.5 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.5 mol %
         sample_id_as_published: B14
         run_id_as_published: B14
@@ -10743,6 +10867,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b15
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10757,13 +10882,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.8 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.8 mol %
         sample_id_as_published: B15
         run_id_as_published: B15
@@ -10906,6 +11032,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b16
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -10920,13 +11047,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.4 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.4 mol %
         sample_id_as_published: B16
         run_id_as_published: B16
@@ -11069,6 +11197,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b17
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11083,13 +11212,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.7 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.7 mol %
         sample_id_as_published: B17
         run_id_as_published: B17
@@ -11232,6 +11362,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b18
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11246,13 +11377,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '14.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 14.1 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 14.1 mol %
         sample_id_as_published: B18
         run_id_as_published: B18
@@ -11395,6 +11527,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b19
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11409,13 +11542,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.3 mol %
         sample_id_as_published: B19
         run_id_as_published: B19
@@ -11558,6 +11692,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_b20
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11572,13 +11707,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '11.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 11.7 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 11.7 mol %
         sample_id_as_published: B20
         run_id_as_published: B20
@@ -11721,6 +11857,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_c21
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11735,13 +11872,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.8 (1.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.8 mol %
         sample_id_as_published: C21
         run_id_as_published: C21
@@ -11886,6 +12024,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_c22
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -11900,13 +12039,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.8 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.8 mol %
         sample_id_as_published: C22
         run_id_as_published: C22
@@ -12051,6 +12191,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_c23
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12065,13 +12206,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '11.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 11.3 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 11.3 mol %
         sample_id_as_published: C23
         run_id_as_published: C23
@@ -12216,6 +12358,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_c24
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12230,13 +12373,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.3 mol %
         sample_id_as_published: C24
         run_id_as_published: C24
@@ -12381,6 +12525,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_al2o3_glass_composition_c25
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12395,13 +12540,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al2O3
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Al2O3
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.2 mol %
         sample_id_as_published: C25
         run_id_as_published: C25
@@ -12548,6 +12694,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12562,13 +12709,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.1 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -12727,6 +12875,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12741,13 +12890,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '4.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 4.1 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 4.1 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -12906,6 +13056,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -12920,13 +13071,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '32.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 32.8 (2.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 32.8 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -13085,6 +13237,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13099,13 +13252,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '16.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 16.2 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 16.2 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -13264,6 +13418,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13278,13 +13433,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '5.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 5.9 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 5.9 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -13443,6 +13599,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13457,13 +13614,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '34.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 34.5 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 34.5 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -13622,6 +13780,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13636,13 +13795,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.6 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.6 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -13801,6 +13961,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13815,13 +13976,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.1 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -13980,6 +14142,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -13994,13 +14157,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.6 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.6 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -14159,6 +14323,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -14173,13 +14338,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '4.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 4.2 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 4.2 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -14338,6 +14504,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -14352,13 +14519,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '24.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 24.9 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 24.9 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -14517,6 +14685,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b06
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -14531,13 +14700,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '4.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 4.6 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 4.6 mol %
         sample_id_as_published: B06
         run_id_as_published: B06
@@ -14680,6 +14850,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b07
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -14694,13 +14865,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.4 mol %
         sample_id_as_published: B07
         run_id_as_published: B07
@@ -14843,6 +15015,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b08
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -14857,13 +15030,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '13.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 13.4 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 13.4 mol %
         sample_id_as_published: B08
         run_id_as_published: B08
@@ -15006,6 +15180,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b09
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15020,13 +15195,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: B09
         run_id_as_published: B09
@@ -15169,6 +15345,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b10
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15183,13 +15360,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '29.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 29.8 (0.8) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 29.8 mol %
         sample_id_as_published: B10
         run_id_as_published: B10
@@ -15332,6 +15510,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b11
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15346,13 +15525,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '27.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 27.5 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 27.5 mol %
         sample_id_as_published: B11
         run_id_as_published: B11
@@ -15495,6 +15675,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b12
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15509,13 +15690,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.3 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.3 mol %
         sample_id_as_published: B12
         run_id_as_published: B12
@@ -15658,6 +15840,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b13
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15672,13 +15855,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '16.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 16.7 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 16.7 mol %
         sample_id_as_published: B13
         run_id_as_published: B13
@@ -15821,6 +16005,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b14
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15835,13 +16020,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '6.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 6.5 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 6.5 mol %
         sample_id_as_published: B14
         run_id_as_published: B14
@@ -15984,6 +16170,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b15
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -15998,13 +16185,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '21.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 21.1 (0.8) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 21.1 mol %
         sample_id_as_published: B15
         run_id_as_published: B15
@@ -16147,6 +16335,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b16
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16161,13 +16350,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '7.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 7.9 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 7.9 mol %
         sample_id_as_published: B16
         run_id_as_published: B16
@@ -16310,6 +16500,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b17
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16324,13 +16515,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '18.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 18.3 (1.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 18.3 mol %
         sample_id_as_published: B17
         run_id_as_published: B17
@@ -16473,6 +16665,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b18
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16487,13 +16680,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '30.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 30.9 (1.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 30.9 mol %
         sample_id_as_published: B18
         run_id_as_published: B18
@@ -16636,6 +16830,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b19
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16650,13 +16845,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '11.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 11.6 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 11.6 mol %
         sample_id_as_published: B19
         run_id_as_published: B19
@@ -16799,6 +16995,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_b20
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16813,13 +17010,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.0 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.0 mol %
         sample_id_as_published: B20
         run_id_as_published: B20
@@ -16962,6 +17160,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_c21
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -16976,13 +17175,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.2 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.2 mol %
         sample_id_as_published: C21
         run_id_as_published: C21
@@ -17127,6 +17327,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_c22
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17141,13 +17342,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.2 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.2 mol %
         sample_id_as_published: C22
         run_id_as_published: C22
@@ -17292,6 +17494,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_c23
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17306,13 +17509,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: C23
         run_id_as_published: C23
@@ -17457,6 +17661,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_c24
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17471,13 +17676,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.2 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.2 mol %
         sample_id_as_published: C24
         run_id_as_published: C24
@@ -17622,6 +17828,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_feo_glass_composition_c25
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17636,13 +17843,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: FeO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: FeO (t)
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.3 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.3 mol %
         sample_id_as_published: C25
         run_id_as_published: C25
@@ -17789,6 +17997,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17803,13 +18012,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -17968,6 +18178,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -17982,13 +18193,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -18147,6 +18359,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -18161,13 +18374,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -18326,6 +18540,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -18340,13 +18555,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -18505,6 +18721,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -18519,13 +18736,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -18684,6 +18902,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -18698,13 +18917,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -18863,6 +19083,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -18877,13 +19098,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -19042,6 +19264,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19056,13 +19279,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -19221,6 +19445,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19235,13 +19460,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -19400,6 +19626,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19414,13 +19641,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.2 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.2 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -19579,6 +19807,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mno_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19593,13 +19822,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MnO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MnO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.1 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.1 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -19760,6 +19990,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19774,13 +20005,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '4.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 4.5 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 4.5 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -19939,6 +20171,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -19953,13 +20186,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.3 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -20118,6 +20352,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -20132,13 +20367,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.4 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -20297,6 +20533,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -20311,13 +20548,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.8 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.8 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -20476,6 +20714,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -20490,13 +20729,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.8 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.8 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -20655,6 +20895,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -20669,13 +20910,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.3 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.3 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -20834,6 +21076,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -20848,13 +21091,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.0 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.0 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -21013,6 +21257,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21027,13 +21272,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '15.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 15.7 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 15.7 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -21192,6 +21438,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21206,13 +21453,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '14.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 14.2 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 14.2 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -21371,6 +21619,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21385,13 +21634,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '14.9'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 14.9 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 14.9 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -21550,6 +21800,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_mgo_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21564,13 +21815,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: MgO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: MgO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '14.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 14.3 (2.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 14.3 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -21731,6 +21983,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21745,13 +21998,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '6.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 6.3 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 6.3 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -21910,6 +22164,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -21924,13 +22179,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '7.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 7.0 (0.8) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 7.0 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -22089,6 +22345,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22103,13 +22360,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.6 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.6 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -22268,6 +22526,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22282,13 +22541,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.8 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.8 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -22447,6 +22707,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22461,13 +22722,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '5.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 5.5 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 5.5 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -22626,6 +22888,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22640,13 +22903,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.8 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.8 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -22805,6 +23069,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22819,13 +23084,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.8 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.8 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -22984,6 +23250,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -22998,13 +23265,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.8 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.8 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -23163,6 +23431,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -23177,13 +23446,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.6 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.6 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -23342,6 +23612,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -23356,13 +23627,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.1 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.1 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -23521,6 +23793,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -23535,13 +23808,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.7 (0.7) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.7 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -23700,6 +23974,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b06
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -23714,13 +23989,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '16.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 16.8 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 16.8 mol %
         sample_id_as_published: B06
         run_id_as_published: B06
@@ -23863,6 +24139,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b07
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -23877,13 +24154,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '24.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 24.8 (2.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 24.8 mol %
         sample_id_as_published: B07
         run_id_as_published: B07
@@ -24026,6 +24304,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b08
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24040,13 +24319,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.6 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.6 mol %
         sample_id_as_published: B08
         run_id_as_published: B08
@@ -24189,6 +24469,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b09
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24203,13 +24484,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '22.7'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 22.7 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 22.7 mol %
         sample_id_as_published: B09
         run_id_as_published: B09
@@ -24352,6 +24634,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b10
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24366,13 +24649,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: B10
         run_id_as_published: B10
@@ -24515,6 +24799,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b11
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24529,13 +24814,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: B11
         run_id_as_published: B11
@@ -24678,6 +24964,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b12
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24692,13 +24979,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '23.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 23.3 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 23.3 mol %
         sample_id_as_published: B12
         run_id_as_published: B12
@@ -24841,6 +25129,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b13
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -24855,13 +25144,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '12.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 12.8 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 12.8 mol %
         sample_id_as_published: B13
         run_id_as_published: B13
@@ -25004,6 +25294,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b14
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25018,13 +25309,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '17.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 17.2 (0.8) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 17.2 mol %
         sample_id_as_published: B14
         run_id_as_published: B14
@@ -25167,6 +25459,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b15
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25181,13 +25474,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '5.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 5.8 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 5.8 mol %
         sample_id_as_published: B15
         run_id_as_published: B15
@@ -25330,6 +25624,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b16
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25344,13 +25639,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '17.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 17.0 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 17.0 mol %
         sample_id_as_published: B16
         run_id_as_published: B16
@@ -25493,6 +25789,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b17
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25507,13 +25804,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '6.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 6.6 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 6.6 mol %
         sample_id_as_published: B17
         run_id_as_published: B17
@@ -25656,6 +25954,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b18
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25670,13 +25969,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: B18
         run_id_as_published: B18
@@ -25819,6 +26119,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b19
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25833,13 +26134,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '18.8'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 18.8 (1.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 18.8 mol %
         sample_id_as_published: B19
         run_id_as_published: B19
@@ -25982,6 +26284,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_b20
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -25996,13 +26299,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '8.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 8.5 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 8.5 mol %
         sample_id_as_published: B20
         run_id_as_published: B20
@@ -26145,6 +26449,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_c21
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26159,13 +26464,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: C21
         run_id_as_published: C21
@@ -26310,6 +26616,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_c22
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26324,13 +26631,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: C22
         run_id_as_published: C22
@@ -26475,6 +26783,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_c23
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26489,13 +26798,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '7.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 7.4 (0.5) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 7.4 mol %
         sample_id_as_published: C23
         run_id_as_published: C23
@@ -26640,6 +26950,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_c24
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26654,13 +26965,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.2 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.2 mol %
         sample_id_as_published: C24
         run_id_as_published: C24
@@ -26805,6 +27117,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_cao_glass_composition_c25
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26819,13 +27132,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: CaO
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: CaO
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.3 mol %
         sample_id_as_published: C25
         run_id_as_published: C25
@@ -26972,6 +27286,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -26986,13 +27301,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.1 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.1 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -27151,6 +27467,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -27165,13 +27482,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '4.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 4.3 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 4.3 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -27330,6 +27648,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -27344,13 +27663,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.3 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.3 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -27509,6 +27829,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -27523,13 +27844,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.5 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.5 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -27688,6 +28010,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -27702,13 +28025,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '3.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 3.1 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 3.1 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -27867,6 +28191,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -27881,13 +28206,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.6 (0.3) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.6 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -28046,6 +28372,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28060,13 +28387,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.3 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.3 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -28225,6 +28553,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28239,13 +28568,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.1 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -28404,6 +28734,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28418,13 +28749,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.2 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -28583,6 +28915,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28597,13 +28930,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.1 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.1 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -28762,6 +29096,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28776,13 +29111,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.5 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.5 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5
@@ -28941,6 +29277,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_c21
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -28955,13 +29292,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.2 (1.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.2 mol %
         sample_id_as_published: C21
         run_id_as_published: C21
@@ -29106,6 +29444,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_c22
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29120,13 +29459,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.4 (1.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.4 mol %
         sample_id_as_published: C22
         run_id_as_published: C22
@@ -29271,6 +29611,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_c23
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29285,13 +29626,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '10.2'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 10.2 (0.2) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 10.2 mol %
         sample_id_as_published: C23
         run_id_as_published: C23
@@ -29436,6 +29778,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_c24
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29450,13 +29793,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.5'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.5 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.5 mol %
         sample_id_as_published: C24
         run_id_as_published: C24
@@ -29601,6 +29945,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_na2o_glass_composition_c25
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29615,13 +29960,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: Na2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: Na2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '9.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 9.4 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 9.4 mol %
         sample_id_as_published: C25
         run_id_as_published: C25
@@ -29768,6 +30114,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a01_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29782,13 +30129,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.0 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.0 mol %
         sample_id_as_published: A01-1
         run_id_as_published: A01-1
@@ -29947,6 +30295,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a01_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -29961,13 +30310,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.0 (0.4) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.0 mol %
         sample_id_as_published: A01-2
         run_id_as_published: A01-2
@@ -30126,6 +30476,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a02
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -30140,13 +30491,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.6'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.6 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.6 mol %
         sample_id_as_published: A02
         run_id_as_published: A02
@@ -30305,6 +30657,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a03_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -30319,13 +30672,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '2.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 2.4 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 2.4 mol %
         sample_id_as_published: A03-1
         run_id_as_published: A03-1
@@ -30484,6 +30838,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a03_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -30498,13 +30853,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.0 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.0 mol %
         sample_id_as_published: A03-2
         run_id_as_published: A03-2
@@ -30663,6 +31019,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a04
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -30677,13 +31034,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '1.1'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 1.1 (0.6) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 1.1 mol %
         sample_id_as_published: A04
         run_id_as_published: A04
@@ -30842,6 +31200,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a05_1
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -30856,13 +31215,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A05-1
         run_id_as_published: A05-1
@@ -31021,6 +31381,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a05_2
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -31035,13 +31396,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A05-2
         run_id_as_published: A05-2
@@ -31200,6 +31562,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a05_3
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -31214,13 +31577,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.4'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.4 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.4 mol %
         sample_id_as_published: A05-3
         run_id_as_published: A05-3
@@ -31379,6 +31743,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a05_4
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -31393,13 +31758,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.3'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.3 (0.1) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.3 mol %
         sample_id_as_published: A05-4
         run_id_as_published: A05-4
@@ -31558,6 +31924,7 @@ species:
     - observation_id: tsujimura_kitakaze_2005_table2_k2o_glass_composition_a05_5
       type: equilibrium_phase_composition
       regime: quench_equilibration
+      phase: glass
       locator:
         page: 3
         pdf_page_index: 2
@@ -31572,13 +31939,14 @@ species:
         quantity: equilibrium_phase_composition
         formula: K2O
         basis: mole_percent
-        phase_label: glass
         basis_as_published: mol %
         component_as_printed: K2O
         method_class: measured_direct
         admission_status: typed_refusal
         method_as_printed: Electron microprobe analysis of quenched silicate glass.
-        value: '0.0'
+        value:
+          kind: unavailable
+          unavailable_reason: "printed cell 0.0 (0.0) mol% remains typed unavailable because the scalar phase-composition basis mole_percent is unsupported."
         component_amount_as_published: 0.0 mol %
         sample_id_as_published: A05-5
         run_id_as_published: A05-5

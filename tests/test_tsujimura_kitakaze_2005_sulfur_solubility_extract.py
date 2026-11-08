@@ -45,8 +45,15 @@ def _assert_source_pins(document: dict, tmp_path: Path) -> None:
     assert "sealed in a silica tube with a graphite rod" in preparation_note
     assert "final eight-hour runs instead used" in preparation_note
     silica = rows["tsujimura_kitakaze_2005_table2_sio2_glass_composition_a01_1"]
-    assert silica["values"]["value"] == "70.9"
+    assert silica["values"]["value"]["kind"] == "unavailable"
+    assert "unsupported" in silica["values"]["value"]["unavailable_reason"]
+    assert "mole_percent" in silica["values"]["value"]["unavailable_reason"]
+    assert silica["values"]["value_as_published"] == "70.9 (1.0)"
+    assert silica["values"]["component_amount_as_published"] == "70.9 mol %"
     assert silica["values"]["basis"] == "mole_percent"
+    assert silica["phase"] == "glass"
+    assert silica["uncertainty"]["value_uncertainty"] == "1.0"
+    assert silica["uncertainty"]["confidence_level"] == "one_sigma"
     assert silica["locator"]["page"] == 3
     assert silica["locator"]["table"] == "2"
     assert silica["locator"]["row"] == "A01-1"
@@ -139,6 +146,10 @@ def test_tables_are_complete_and_migration_preserves_supported_rows_and_refusals
         assert values["basis"] == "mole_percent"
         assert values["admission_status"] == "typed_refusal"
         assert "PHASE_BASIS_TOKENS" in values["schema_gap"]
+        assert values["value"]["kind"] == "unavailable"
+        assert "mole_percent" in values["value"]["unavailable_reason"]
+        assert values["value_as_published"]
+        assert row["phase"] == "glass"
         assert row["uncertainty"]["confidence_level"] == "one_sigma"
         assert row["uncertainty"]["locator"]["page"] == 3
 
@@ -146,21 +157,63 @@ def test_tables_are_complete_and_migration_preserves_supported_rows_and_refusals
     result = migrator.result
     assert result.validation is not None
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 38
-    assert sum(o.value.kind is ValueKind.UNAVAILABLE for o in result.observations.values()) == 7
+    assert len(result.observations) == 222
+    assert sum(o.value.kind is ValueKind.POINT for o in result.observations.values()) == 31
+    assert sum(o.value.kind is ValueKind.UNAVAILABLE for o in result.observations.values()) == 191
 
     oxide_ids = {row["observation_id"] for row in oxide_rows}
-    basis_refusals = [
-        item
-        for item in result.queue
-        if "basis is not" in item.why
-        and item.observation_id
-        and item.observation_id.rsplit("::", 1)[-1] in oxide_ids
-    ]
-    assert {item.observation_id.rsplit("::", 1)[-1] for item in basis_refusals} == oxide_ids
-    assert len(basis_refusals) == 184
-
     migrated = tuple(result.observations.values())
+    migrated_by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrated
+    }
+    migrated_oxides = [migrated_by_id[row_id] for row_id in oxide_ids]
+    oxide_rows_by_id = {row["observation_id"]: row for row in oxide_rows}
+    assert len(migrated_oxides) == 184
+    assert all(o.value.kind is ValueKind.UNAVAILABLE for o in migrated_oxides)
+    assert all(
+        o.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        for o in migrated_oxides
+    )
+    assert all(o.identity.species.phase.value is Phase.GLASS for o in migrated_oxides)
+    assert all(o.uncertainty.kind.value == "printed" for o in migrated_oxides)
+    for observation in migrated_oxides:
+        source_row = oxide_rows_by_id[
+            observation.observation_id.rsplit("::", 1)[-1]
+        ]
+        source_value = source_row["values"]["value_as_published"]
+        reason = observation.value.unavailable_reason or ""
+        assert "mole_percent" in reason and "unsupported" in reason
+        assert f"printed cell {source_value} mol%" in reason
+        assert observation.uncertainty.verbatim["confidence_level"] == "one_sigma"
+        assert (
+            observation.uncertainty.verbatim["value_uncertainty"]
+            == source_row["uncertainty"]["value_uncertainty"]
+        )
+    assert all(o.point_conditions["T_C"].state.value == Decimal("1250") for o in migrated_oxides)
+    assert all(o.point_conditions["total_pressure_bar"].state.value == Decimal("1000") for o in migrated_oxides)
+    oxide_composition_values = [
+        o.point_conditions["composition"].state
+        for o in migrated_oxides
+        if o.point_conditions["composition"].state.is_value
+    ]
+    oxide_composition_unknowns = [
+        o.point_conditions["composition"].state
+        for o in migrated_oxides
+        if o.point_conditions["composition"].state.is_unknown
+    ]
+    assert len(oxide_composition_values) == 108
+    assert len(oxide_composition_unknowns) == 76
+    assert all(
+        composition.value.amount_basis is AmountBasis.MOLE_FRACTION
+        for composition in oxide_composition_values
+    )
+    assert all(
+        (composition.reason or "").startswith(
+            "mole-percent composition does not close to 100"
+        )
+        for composition in oxide_composition_unknowns
+    )
     unknown_table3 = {
         o.observation_id.rsplit("::", 1)[-1]
         for o in migrated
@@ -218,6 +271,24 @@ def test_tables_are_complete_and_migration_preserves_supported_rows_and_refusals
 def test_source_pins_reject_mutated_sulfur_and_pressure(tmp_path):
     document = _document()
     _assert_source_pins(document, tmp_path / "baseline")
+
+    oxide_mutation = deepcopy(document)
+    oxide = next(
+        row for row in oxide_mutation["species"]["SiO2"]["observations"]
+        if row["locator"].get("table") == "2" and row["locator"].get("row") == "A01-1"
+    )
+    oxide["values"]["value_as_published"] = "70.8"
+    with pytest.raises(AssertionError):
+        _assert_source_pins(oxide_mutation, tmp_path / "oxide-mutated")
+
+    oxide_uncertainty_mutation = deepcopy(document)
+    oxide = next(
+        row for row in oxide_uncertainty_mutation["species"]["SiO2"]["observations"]
+        if row["locator"].get("table") == "2" and row["locator"].get("row") == "A01-1"
+    )
+    oxide["uncertainty"]["value_uncertainty"] = "1.1"
+    with pytest.raises(AssertionError):
+        _assert_source_pins(oxide_uncertainty_mutation, tmp_path / "oxide-sigma-mutated")
 
     sulfur_mutation = deepcopy(document)
     sulfur = next(

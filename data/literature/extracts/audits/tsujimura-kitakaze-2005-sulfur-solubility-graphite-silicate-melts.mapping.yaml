@@ -2,11 +2,15 @@ source_id: tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
 source:
   citation: Tsujimura & Kitakaze (2005), Resource Geology 55(1), 55–60.
 extraction:
-  method: 'Table 1 is render-only because MinerU emitted no table block. The required compare output is retained
-    in the audit directory: it reports 215 Table 2 mismatches because each source cell joins a mean and parenthesized
-    sigma that the comparator cannot parse; five Table 3 sample-shift mismatches because its phase matcher has no
-    glass token; and 247 Table 1 locator warnings because there is no MinerU caption evidence. The cell audit resolves
-    each printed token using MinerU plus pdftotext, with the row/column layout checked against the 600-dpi renders.'
+  method: >-
+    Table 1 is render-only because MinerU emitted no table block. The 184 Table 2 oxide-composition cells are typed
+    unavailable because mole_percent is not a scalar phase-composition basis accepted by
+    simulator/battery/enums.py::PHASE_BASIS_TOKENS; each complete printed cell remains in values.value_as_published
+    and its unavailable reason. The compare output therefore reports only numeric candidates: 31 Table 2 sulfur
+    mismatches because each source cell joins a mean and parenthesized sigma that the comparator cannot parse; five
+    Table 3 sample-shift mismatches because its phase matcher has no glass token; and 247 Table 1 locator warnings
+    because there is no MinerU caption evidence. The full-cell audit resolves all 618 printed numeric tokens using
+    MinerU plus pdftotext, with row and column placement checked against the 600-dpi renders.
   date: '2026-11-08'
   worker: w1107sx-tk05
 review_status: draft
