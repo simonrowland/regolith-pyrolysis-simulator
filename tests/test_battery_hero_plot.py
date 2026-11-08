@@ -1068,7 +1068,7 @@ def test_species_view_labels_major_curves_and_element_view_labels_elements(
         plt.close(element_figure)
 
 
-def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
+def test_d139_rows_are_flagged_in_panels_and_reported_in_footer(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -1157,15 +1157,15 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     data = read_scores(residuals)
 
     openimcc = data.summaries["openimcc"]
-    assert openimcc.excluded_d139_rows == 2
-    assert openimcc.scored_rows == 2
-    assert openimcc.unique_points == 2
-    assert openimcc.rms_dex == pytest.approx(5**0.5)
-    assert [
-        point.bin_index for point in data.series["openimcc", "SiO2", "vapour"]
-    ] == [10, 12]
-    assert data.summaries["thermoengine"].excluded_d139_rows == 1
-    assert data.summaries["thermoengine"].scored_rows == 0
+    assert openimcc.uncalibrated_kems_flagged_rows == 2
+    assert openimcc.scored_rows == 4
+    assert openimcc.unique_points == 4
+    assert openimcc.rms_dex == pytest.approx(math.hypot(1.0, 4.5, 3.0, 2.5) / 2)
+    vapour_points = data.series["openimcc", "SiO2", "vapour"]
+    assert [point.bin_index for point in vapour_points] == [10, 11, 12]
+    assert [point.flagged for point in vapour_points] == [False, True, False]
+    assert data.summaries["thermoengine"].uncalibrated_kems_flagged_rows == 1
+    assert data.summaries["thermoengine"].scored_rows == 1
 
     files = render_plots(
         data,
@@ -1178,14 +1178,16 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     )
     footer = files["species:tile_svg"].read_text(encoding="utf-8")
     assert (
-        "excluded under d-139: openimcc 2 uncalibrated KEMS p_partial, "
-        "thermoengine 1 uncalibrated KEMS p_partial"
+        "openimcc 2 flagged (uncalibrated KEMS), "
+        "thermoengine 1 flagged (uncalibrated KEMS)"
     ) in footer
     hero_files = render_hero_charts(data, tmp_path / "hero-images")
     hero_caption = hero_files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert (
-        "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
-        "openimcc 1, thermoengine 1; scorer all-numeric and same-row rms include them."
+        "vapour scatter, chart a, and the headline rms share one population; "
+        "uncalibrated kems p_partial rows (d-139) are drawn tinted and counted: "
+        "openimcc 1 flagged (uncalibrated kems), "
+        "thermoengine 1 flagged (uncalibrated kems)."
     ) in hero_caption
 
     redox_residuals = tmp_path / "redox-residuals.jsonl"
@@ -1224,10 +1226,14 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     default_redox_data = read_scores(redox_residuals)
     default_openimcc = default_redox_data.summaries["openimcc"]
     redox_openimcc = redox_data.summaries["openimcc"]
-    assert default_openimcc.excluded_d139_rows == redox_openimcc.excluded_d139_rows == 1
     assert (
-        default_openimcc.excluded_d139_by_rail
-        == redox_openimcc.excluded_d139_by_rail
+        default_openimcc.uncalibrated_kems_flagged_rows
+        == redox_openimcc.uncalibrated_kems_flagged_rows
+        == 1
+    )
+    assert (
+        default_openimcc.uncalibrated_kems_flagged_by_rail
+        == redox_openimcc.uncalibrated_kems_flagged_by_rail
     )
     unselected_melt_points = [
         point
@@ -1252,26 +1258,12 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         redox_data, tmp_path / "redox-rail-hero-images"
     )
     caption_marker = (
-        "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
+        "uncalibrated kems p_partial rows (d-139) are drawn tinted and counted: "
     )
-    expected_caption_tail = (
-        "openimcc 1; scorer all-numeric and same-row rms include them"
-    )
-    default_caption_tail = (
-        default_hero_files["hero:vapour:svg"]
-        .read_text(encoding="utf-8")
-        .casefold()
-        .split(caption_marker, 1)[1]
-        .split(".", 1)[0]
-    )
-    redox_caption_tail = (
-        redox_hero_files["hero:vapour:svg"]
-        .read_text(encoding="utf-8")
-        .casefold()
-        .split(caption_marker, 1)[1]
-        .split(".", 1)[0]
-    )
-    assert default_caption_tail == redox_caption_tail == expected_caption_tail
+    expected_caption_tail = "openimcc 1 flagged (uncalibrated kems)"
+    for rendered in (default_hero_files, redox_hero_files):
+        caption = rendered["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+        assert caption_marker + expected_caption_tail in caption
 
     redox_rows.append(uncalibrated_other_rail)
     redox_residuals.write_text(
