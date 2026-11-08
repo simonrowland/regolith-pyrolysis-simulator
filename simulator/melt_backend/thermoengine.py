@@ -74,7 +74,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     def __init__(self) -> None:
         super().__init__()
         self._thermoengine_transport: Optional[ThermoEngineTransport] = None
-        self._thermoengine_import_error: Optional[BaseException] = None
+        self._thermoengine_import_error: tuple[str, str] | None = None
         self._unavailable_reason: Optional[str] = None
         self._transport_close_count = 0
         self._health_timeout_s = THERMOENGINE_HEALTH_TIMEOUT_S
@@ -175,7 +175,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             if classified is exc:
                 raise classified
             raise classified from exc
-        self._thermoengine_import_error = exc
+        self._thermoengine_import_error = (type(exc).__name__, str(exc))
         self._close_after_failure(exc)
         raise ImportError(
             f'ThermoEngine transport unavailable: {type(exc).__name__}: {exc}'
@@ -297,10 +297,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         if self._unavailable_reason:
             return self._unavailable_reason
         if self._thermoengine_import_error is not None:
+            error_type, error_message = self._thermoengine_import_error
             return (
                 'ThermoEngine transport unavailable: '
-                f'{type(self._thermoengine_import_error).__name__}: '
-                f'{self._thermoengine_import_error}'
+                f'{error_type}: {error_message}'
             )
         if self._thermoengine_transport is None:
             return 'ThermoEngine transport not initialized'

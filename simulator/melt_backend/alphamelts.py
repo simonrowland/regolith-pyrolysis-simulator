@@ -1191,7 +1191,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_available = False
         self._pet_module = None
         self._pet_melts = None
-        self._pet_import_error: Optional[ImportError] = None
+        self._pet_import_error: tuple[str, str] | None = None
         self._pet_payload_preloaded = False
         self._pet_worker: Optional[WarmEngineWorker] = None
         self._pet_warm_enabled = False
@@ -1433,12 +1433,14 @@ class _MELTSBackendSupport(MeltBackend):
             if self._pet_worker is not None:
                 self._pet_worker.close()
                 self._pet_worker = None
-            self._pet_import_error = ImportError(
+            self._pet_import_error = (
+                'ImportError',
                 'PetThermoTools Python path unavailable: '
-                'petthermotools and meltsdynamic must both import'
+                'petthermotools and meltsdynamic must both import',
             )
             if require_petthermotools:
-                raise self._pet_import_error
+                _, error_message = self._pet_import_error
+                raise ImportError(error_message)
 
     def _alphamelts_config(self, config: dict) -> dict:
         if not isinstance(config, Mapping):
