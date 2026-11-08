@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 782
-  extracts: 780
+  sources: 787
+  extracts: 785
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 780
+  extracts_without_pdf: 785
   alias_groups_needing_resolution: 84
 gaps:
   pdfs_without_extract: []
@@ -96,6 +96,7 @@ gaps:
   - brewer-margrave-1952-alkali-oxides-ucrl1864
   - brillo-2025-al-ti-thermophysical
   - britt-2019-asteroid-simulants
+  - buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
   - burcat-third-millennium
   - burnham-2015-europium-redox
   - busemann-2000-phase-q-noble-gases
@@ -150,6 +151,7 @@ gaps:
   - eliezer-howald-1978-potassium-silicate-vapor-pressure
   - engelschion-2020-eac1a-simulant
   - evans-2009-sulfur-mn-ni-w-xanes
+  - evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
   - ewing-1963-sodium-potassium-properties
   - farah-1998-vanadium-silicate-melts-thesis
   - farber-1972-al2o3-suboxides
@@ -458,6 +460,7 @@ gaps:
   - nakamura-2022-science-ryugu-thermal
   - nakano-hashimoto-2020-bubbles-to-chondrites-i
   - nam-2025-cmas-vanadium-thesis
+  - namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility
   - nasa-cea-thermo
   - nasa-tm-2024-simulant-guide
   - nazarov-2015-dhofar-silicides
@@ -670,6 +673,7 @@ gaps:
   - shornikov-2025-saratov-alkali-evaporation
   - shornikov-2026-hatrurite-evaporation
   - shornikov-2026-wollastonite-kems
+  - shornikov-yakovlev-2025-ca2sio4-conference
   - shornikova-2019-perovskite-thermodynamics
   - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - shugurov-2024-gaseous-cerates-si
@@ -736,6 +740,7 @@ gaps:
   - tranell-2002-titanium-valence
   - ts1985
   - tsuchiyama-1998-forsterite-mg2sio4-h2
+  - tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
   - tsukihashi-1985-na-silicate-mn-p-nitrogen
   - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
   - tsukihashi-1988-na2o-v-nb-mn-ti-partition
@@ -1476,6 +1481,7 @@ gaps:
     - shornikov-2025-lithium-silicate-melts
     - shornikov-2025-perovskite-condensation
     - shornikov-2025-saratov-alkali-evaporation
+    - shornikov-yakovlev-2025-ca2sio4-conference
     resolution: owner/controller
   - type: source_id_alias
     key: shornikov-2026
@@ -5970,6 +5976,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+  aliases: []
+  citation: D. L. Buchanan and J. Nolan, ‘Solubility of sulfur and sulfide immiscibility in synthetic
+    tholeiitic melts and their relevance to Bushveld-Complex rocks,’ The Canadian Mineralogist 17 (1979),
+    483–494.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.yaml
+    review_status: draft
+    rows: 27
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.pdf
+      present: true
+      sha256: a9d11106eecfdab2ec9b3396e574ff97501ae2a0117cd8c86fbedf96ae527a72
+      matches_simulator: null
+    sidecar:
+      path: raw/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic/sidecar.yaml
+      present: true
+    text:
+      path: text/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+      exists: true
+      file_count: 27
+    tables:
+      path: tables/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/buchanan-nolan-1979-sulfur-sulfide-immiscibility-tholeiitic.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: burcat-third-millennium
   aliases: []
   citation: Burcat, A. & Ruscic, B. (2005), "Third Millennium Ideal Gas and Condensed Phase Thermochemical
@@ -9136,6 +9201,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
+  aliases: []
+  citation: K. Evans, H. St.C. O’Neill, J. Mavrogenes (2008), “Sulphur solubility and sulphide immiscibility
+    in silicate melts as a function of the concentration of manganese, nickel, tungsten and copper at
+    1 atm and 1400 °C,” Chemical Geology 255, 236–249.
+  doi: 10.1016/j.chemgeo.2008.06.042
+  report_number: null
+  identifier: 10.1016/j.chemgeo.2008.06.042
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu.yaml
+    review_status: draft
+    rows: 159
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu.pdf
+      present: true
+      sha256: 8b5a32ae61078d8410b235cc302d05385e07e70b220208cdafa1d5318cd07983
+      matches_simulator: null
+    sidecar:
+      path: raw/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu/sidecar.yaml
+      present: true
+    text:
+      path: text/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
+      exists: true
+      file_count: 71
+    tables:
+      path: tables/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: ewing-1963-sodium-potassium-properties
   aliases: []
   citation: Ewing C.T. et al. (1963) High temperature properties of sodium and potassium. DTIC AD0405673.
@@ -27078,6 +27202,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility
+  aliases: []
+  citation: 'Namur, O.; Charlier, B.; Holtz, F.; Cartier, C.; McCammon, C. (2016), “Sulfur solubility
+    in reduced mafic silicate melts: Implications for the speciation and distribution of sulfur on Mercury,”
+    Earth and Planetary Science Letters 448, 102–114.'
+  doi: 10.1016/j.epsl.2016.05.024
+  report_number: null
+  identifier: 10.1016/j.epsl.2016.05.024
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.pdf
+      present: true
+      sha256: ad8926f76e1026fb7b964b5b45cae508befb8465a9d01b883d401b3a08214b4e
+      matches_simulator: null
+    sidecar:
+      path: raw/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility/sidecar.yaml
+      present: true
+    text:
+      path: text/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility
+      exists: true
+      file_count: 37
+    tables:
+      path: tables/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: nasa-cea-thermo
   aliases: []
   citation: McBride, B. J., Zehe, M. J. & Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic
@@ -39525,6 +39708,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: shornikov-yakovlev-2025-ca2sio4-conference
+  aliases: []
+  citation: 'Shornikov, S. I., and Yakovlev, O. I. (2025). Thermodynamic Properties of Calcium Orthosilicate.
+    XXVI International Conference on Physicochemical and Petrophysical Research in Earth Sciences, Moscow:
+    IGEM RAS, pp. 264–267.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-yakovlev-2025-ca2sio4-conference.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-yakovlev-2025-ca2sio4-conference/shornikov-yakovlev-2025-ca2sio4-conference.pdf
+      present: true
+      sha256: d12a4867f996c12e1f505b8d894abf1c470c46a7b8c91fcd873c8913540d4983
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-yakovlev-2025-ca2sio4-conference/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-yakovlev-2025-ca2sio4-conference
+      exists: true
+      file_count: 15
+    tables:
+      path: tables/shornikov-yakovlev-2025-ca2sio4-conference
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-yakovlev-2025-ca2sio4-conference.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-yakovlev-2025-ca2sio4-conference.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: shornikova-2019-perovskite-thermodynamics
   aliases: []
   citation: Shornikov, S. I. (2019). High-temperature mass spectrometry study of the thermodynamic properties
@@ -43391,6 +43633,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
+  aliases: []
+  citation: Tsujimura, T. & Kitakaze, A. (2005). Experimental study of sulfur solubility in silicate melts
+    coexisting with graphite as a function of silicate melt composition. Resource Geology 55(1), 55–60.
+  doi: 10.1111/j.1751-3928.2005.tb00228.x
+  report_number: null
+  identifier: 10.1111/j.1751-3928.2005.tb00228.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts.yaml
+    review_status: draft
+    rows: 222
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts.pdf
+      present: true
+      sha256: be41ac6fa16d605f3fca4b8687280496de0e2b070536ecec1980d3b2932f28e2
+      matches_simulator: null
+    sidecar:
+      path: raw/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts/sidecar.yaml
+      present: true
+    text:
+      path: text/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
+      exists: true
+      file_count: 19
+    tables:
+      path: tables/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
   aliases: []
   citation: Tsukihashi F, Matsumoto F, Hyodo T, Yukinobu M, Sano N (1985). Phosphorus and Manganese Distribution
