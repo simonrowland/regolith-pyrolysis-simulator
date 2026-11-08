@@ -4,13 +4,73 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
-## [Unreleased]
+## [0.6.5] — 2026-11-08
 
-Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
-release boundary; commits land on `main` between pushes. 20 commits in
-the range, all reviewed by codex / `gstack /review` per chunk-review
-protocol + midflight cumulative review (HOLD-MAJOR → fixed inline) +
-post-batch morning review (HOLD, V2O5 P1 → fixed inline).
+### Literature and test battery
+
+- The indexed literature store summarizes 84,935 observation IDs across 969
+  shards. New source batches added alkali and ferrite thermochemistry, melt
+  activities, redox measurements, and silicate properties. Some observations
+  remain typed refusals where identity or engine coverage is incomplete.
+- Store validation, extract provenance, composition identity, and uncertainty
+  handling gained regression coverage. Superseded rows retain their evidence
+  lineage, while unsupported observations remain visible as refusals.
+
+### Scoring, uncertainty, and engines
+
+- Scoring uses source composition and condition evidence more consistently,
+  carries uncertainty through eligible comparisons, and separates missing
+  evidence from numeric zero. Additional experimental rows became scoreable
+  after oxygen-condition and phase-identity repairs.
+- OpenIMCC remains pinned to the declared 66ec4a3 source. Scoring now includes
+  additional redox, melt-activity, vapor, and SiO comparisons where the input
+  contract is met.
+- VapoRock predicts and flags temperatures outside its 1350–1950 K evidence
+  band; oxide-activity output is opt-in. alphaMELTS reports signal-death
+  diagnostics and projects oxygen balance at the requested fugacity.
+- ThermoEngine and other native engine workers capture and summarize output,
+  close cleanly after warm calls, and recover from worker failure. MAGEMin
+  timeout handling was tightened; local patch drafts are not loaded by the
+  simulator.
+- Knudsen-cell rows now use oxygen-condition precedence and a derived,
+  self-consistent total pressure, with the pressure basis recorded in the
+  score evidence.
+
+### Physics, redox, and reporting
+
+- FeO activity comparisons use the JANAF FeO(l) standard. Below-liquidus
+  activity estimates and deterministic melt repairs carry explicit notices;
+  the notices do not change those values.
+- Redox evidence and melt-activity comparisons gained additional source
+  coverage and clearer refusal reasons. The battery also preserves source-row
+  uncertainty and typed conditions through scoring.
+- The README hero now reports per-element melt departure and the terminal
+  refractory rump. Refreshed charts show shared comparison populations, flag
+  uncalibrated points, and include methods and data exports.
+- Engine output and failure diagnostics are handled at the process boundary.
+  FactSAGE/ChemApp and its GTT adapter are not shipped or selectable in this
+  release.
+
+### Tooling and CI
+
+- Optimizer worker timing, timeout handling, and winner provenance were
+  corrected. Engine warning output is deduplicated, and corpus indexes and
+  store-validation records are regenerated with data landings.
+- Store-neutral scorer and renderer changes were checked against the existing
+  store; the v0.6.5 release commit does not regenerate or modify the battery
+  store.
+
+### Known issues
+
+- The README hero melt-departure fractions for Na, K, Mg, Fe, Si, and Cr carry
+  a known period-2 lag artefact (b-1146). The true value is bracketed by the
+  unspecified sweep flow; a corrected hero table follows the b-1146 fix.
+- CrO evaporation is zero in this release, which understates Cr.
+
+### 0.5.4.1 hardening (folded in)
+
+The hardening and audit-closure changes below were initially grouped as
+0.5.4.1 and are included in this release.
 
 ### Changed — runner schema 1.9.0
 
@@ -22,7 +82,6 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
 
 - **A2** — `simulator/overhead.py::OverheadGasModel._pipe_conductance`
   fail-closed on `T_K <= 0`, `L <= 0`, `d <= 0`, negative `p_mean_Pa`.
-  Closes the 0.5.4 codex /challenge P3.
 - **B3 / M1** — `simulator/chemistry/kernel/registry.py::ProviderRegistry.replace_for_test`
   public test-seam replacing direct `_authoritative` mutation.
   `tests/test_extraction_ledger.py` migrated.
@@ -40,7 +99,7 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
   into the in-source fallback dict. Idempotent on first sim build.
   SiO=1050 °C is now explicitly documented as the engineering midpoint
   of the documented 900-1200 °C zone, NOT a literature-derived constant
-  (per codex /review corpus scan).
+  (per corpus scan).
 - **E3** — `HourSnapshot.knudsen_regime_summary` field carrying per-tick
   Knudsen-regime visibility from the latest condensation route
   (`status` / `knudsen_number` / `knudsen_regime` / `regime_factor` /
@@ -51,7 +110,7 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
 
 - **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** —
   moved to the END of the dataclass to preserve positional-constructor
-  ABI. Post-push codex /review P2.
+  ABI.
 - **Midflight P1 — B5 hold-hours**: published YAML now carries explicit
   `min_hold_hours` per species so the YAML-driven ladder reproduces
   the historical hardcoded MRE_BASELINE step-advance behavior
