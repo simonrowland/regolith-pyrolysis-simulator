@@ -219,10 +219,13 @@ the melt by the end of the run:
 | Al | 0.000 | 1.000 |
 
 ⚠ **Flagged: the Na, K, Mg, Fe, Si and Cr fractions carry a known model artefact (b-1146).** Through
-the mid-run campaigns (roughly hours 57–144), the evaporation flux of these species alternates
-between full rate and exactly zero from one hour to the next. The cause is a one-hour lag in the
-headspace pressure. Where the sweep gas cannot carry the full-rate flux, the hour-to-hour average
-overstates evaporation. So these fractions may be too high, by an amount not yet known per species.
+the mid-run campaigns (roughly hours 32–144), the evaporation flux of these species alternates
+between full rate and exactly zero from one hour to the next. This is a period-2 lag artefact: the
+headspace pressure feeding each hour is the previous hour's. Those hours run with the headspace
+held at a set total pressure, and the model does not yet have a carrier-gas or O₂ feed rate. Until
+it does, the true flux is only bracketed: between near zero (no feed) and the full film-limited
+rate (unlimited feed). So the direction of the error is not known, and these fractions could be
+too high or too low.
 Separately, CrO evaporation is recorded as zero on this commit, which understates Cr. Fixes are in
 progress, and this table will be refreshed from a fresh run once they land.
 
