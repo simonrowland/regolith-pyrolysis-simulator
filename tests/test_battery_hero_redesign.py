@@ -887,7 +887,7 @@ def test_collection_mode_does_not_retain_composition_keyed_series(
     assert not data.element_series
 
 
-def test_r2_metrics_remain_bit_identical_and_quantiles_use_scorer_rule(
+def test_r2_metric_pins_and_decimal_temperature_quantile_values(
     tmp_path: Path,
 ) -> None:
     rows: list[dict[str, object]] = [
@@ -913,17 +913,17 @@ def test_r2_metrics_remain_bit_identical_and_quantiles_use_scorer_rule(
     temperature_bin = next(
         row for row in tables["temperature_bins"] if row["engine"] == "openimcc"
     )
-    residuals = {
-        index: Decimal(str(residual))
-        for index, residual in enumerate((0.1, 0.2, 0.5, 1.1))
-    }
-    expected_quantiles = battery_score._battery_hero_ordered_percentiles_from_samples(
-        len(residuals), residuals, (0.25, 0.5, 0.75)
-    )
+    # Sorted residuals 0.1, 0.2, 0.5, 1.1 at ranks 0.75, 1.5, 2.25
+    # give Decimal quartiles 0.175, 0.35, 0.650. Decimal interpolation puts
+    # Q1 one ULP below the pre-r5 float result; this changes chart display only.
     assert tuple(
         float(temperature_bin[field]).hex()
         for field in ("q1_dex", "median_dex", "q3_dex")
-    ) == tuple(float(value).hex() for value in expected_quantiles)
+    ) == (
+        "0x1.6666666666666p-3",
+        "0x1.6666666666666p-2",
+        "0x1.4cccccccccccdp-1",
+    )
 
 
 def test_scorer_long_decimal_median_and_iqr_match_pre_r3_outputs() -> None:
@@ -973,7 +973,7 @@ def test_scorer_long_decimal_median_and_iqr_match_pre_r3_outputs() -> None:
         assert (None if iqr is None else str(iqr)) == expected_iqr
 
 
-def test_renderer_quartiles_use_scorer_decimal_percentile_helper(
+def test_renderer_quartiles_delegate_to_scorer_decimal_percentile_helper(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     archive = tmp_path / "quartile-renderer.tgz"
