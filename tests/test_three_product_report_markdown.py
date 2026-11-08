@@ -229,6 +229,47 @@ def test_flagged_silica_product_reports_mass_and_certification_evidence():
     assert 'reason=outside certified SiO source band' in report
 
 
+@pytest.mark.parametrize(
+    "certification_flag",
+    [
+        None,
+        {
+            "status": "flagged prediction",
+            "authority": "extrapolated",
+            "band": [1400.0, 2200.0],
+            "reason": "outside certified SiO source band",
+        },
+    ],
+    ids=("availability-only", "certification-and-availability"),
+)
+def test_silica_availability_flag_renders_with_or_without_certification(
+    certification_flag,
+):
+    classification = _empty_classification()
+    silica = classification["pure_silica_glass"]
+    silica.update({
+        "stage_3_capture_kg": 12.5,
+        "stage_3_kg_by_species": {"SiO2": 12.5},
+        "class_total_kg": 12.5,
+        "availability_flag": {
+            "status": "available",
+            "state": "evaluated_below_reporting_floor",
+            "reason": "provider pressure was below its reporting floor",
+        },
+    })
+    if certification_flag is not None:
+        silica["flag"] = certification_flag
+
+    report = format_three_product_markdown(classification)
+
+    assert "status=available" in report
+    assert "state=evaluated_below_reporting_floor" in report
+    assert "reason=provider pressure was below its reporting floor" in report
+    if certification_flag is not None:
+        assert "Certification flag: status=flagged prediction" in report
+        assert "reason=outside certified SiO source band" in report
+
+
 def test_refused_silica_product_quantity_is_unavailable_not_zero():
     classification = _empty_classification()
     classification['pure_silica_glass'].update({

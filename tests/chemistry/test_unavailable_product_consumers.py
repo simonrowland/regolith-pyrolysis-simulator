@@ -10,7 +10,10 @@ from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.cost_energy import is_unavailable_quantity
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.accounting.completeness import product_class_availability
-from simulator.optimize.objective import _metric_value
+from simulator.optimize.objective import (
+    _metric_value,
+    _silica_objective_evidence,
+)
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -197,8 +200,30 @@ def test_available_product_omission_flag_reaches_classification(
     ):
         bucket = products[name]
         assert bucket.get("status") == baseline[name].get("status")
-        assert bucket.get("availability_flag", bucket.get("flag")) == omission_flag
+        assert bucket.get("availability_flag") == omission_flag
+        assert bucket.get("flag") == baseline[name].get("flag")
         assert bucket["class_total_kg"] == baseline[name]["class_total_kg"]
+
+    baseline_silica = {
+        **baseline["pure_silica_glass"],
+        "class_total_kg": 12.5,
+        "stage_3_capture_kg": 12.5,
+    }
+    omission_silica = {
+        **products["pure_silica_glass"],
+        "class_total_kg": 12.5,
+        "stage_3_capture_kg": 12.5,
+    }
+    baseline_evidence = _silica_objective_evidence(
+        {"pure_silica_glass": baseline_silica}, 12.5
+    )
+    omission_evidence = _silica_objective_evidence(
+        {"pure_silica_glass": omission_silica}, 12.5
+    )
+    assert baseline_evidence["qualified_product_kg"] == pytest.approx(12.5)
+    assert omission_evidence["qualified_product_kg"] == pytest.approx(12.5)
+    assert omission_evidence["availability_flag"] == omission_flag
+    assert "certification_flag" not in omission_evidence
 
 
 def test_product_class_keeps_estimated_flux_and_marks_empty_refusal_partial():
