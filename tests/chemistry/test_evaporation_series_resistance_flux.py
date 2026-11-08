@@ -780,7 +780,10 @@ def test_stiff_species_coupling_closes_before_the_evaluation_cap():
         }
 
     result = _solve_same_hour_headspace_closure(
-        {name: 0.5 for name in species},
+        {
+            name: (0.5 if index == 0 else 1.0)
+            for index, name in enumerate(species)
+        },
         rates_at_partials,
         partials_at_rates,
     )
@@ -813,19 +816,23 @@ def test_closure_projects_the_optimizer_candidate_before_returning(monkeypatch):
 
     def optimizer_with_a_final_probe(residual, x0, **_kwargs):
         residual(x0)
+        # All initial species scales are one, so this is the unit-rate fixed point.
         return SimpleNamespace(x=[1.0 for _ in species])
 
     monkeypatch.setattr(
         scipy.optimize, "least_squares", optimizer_with_a_final_probe
     )
     result = _solve_same_hour_headspace_closure(
-        {name: 0.5 for name in species},
+        {
+            name: (0.5 if index == 0 else 1.0)
+            for index, name in enumerate(species)
+        },
         rates_at_partials,
         partials_at_rates,
     )
 
     assert result.converged
-    assert result.iterations == 130
+    assert result.iterations == 153
     assert result.rates_kg_hr == pytest.approx(
         {name: 1.0 for name in species}, rel=1e-9
     )

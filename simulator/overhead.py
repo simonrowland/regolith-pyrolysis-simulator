@@ -256,6 +256,8 @@ def _solve_same_hour_headspace_closure(
     # as a bounded vector system before spending the remaining budget on the
     # scalar fallback. Every residual evaluation goes through ``evaluate`` so
     # finite-difference probes and the final projected map share one cap.
+    # Dimensionless rate variables keep trace species' finite-difference steps
+    # relative to their own source scale instead of the dominant species.
     from scipy.optimize import least_squares
 
     coupled_species = tuple(sorted(species_names))
@@ -276,6 +278,7 @@ def _solve_same_hour_headspace_closure(
         nonlocal latest_coupled_evaluation
         candidate_rates = {
             species: max(0.0, float(candidate_values[index]))
+            * coupled_scales[species]
             for index, species in enumerate(coupled_species)
         }
         candidate_evaluation = evaluate(candidate_rates)
@@ -296,9 +299,12 @@ def _solve_same_hour_headspace_closure(
     try:
         coupled_solution = least_squares(
             coupled_residual,
-            [rates.get(species, 0.0) for species in coupled_species],
+            [
+                rates.get(species, 0.0) / coupled_scales[species]
+                for species in coupled_species
+            ],
             bounds=(0.0, math.inf),
-            x_scale=[coupled_scales[species] for species in coupled_species],
+            x_scale=1.0,
             diff_step=1.0e-4,
             ftol=1.0e-12,
             xtol=1.0e-12,
