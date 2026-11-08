@@ -27,6 +27,7 @@ from simulator.vapour_rail.batch import PressureValue
 from simulator.vapour_rail.batch import FluxEligible
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
+    flux_pressures_from_batch,
     serialize_vapour_batch,
 )
 from tests.chemistry.conftest import _build_sim
@@ -241,6 +242,55 @@ def _resolve_live_gateway_batch(
         temperature_K=temperature_K,
         effective_pressure_source=effective_source,
     )
+
+
+def _assert_d354_omission_reaches_batch_and_accounting(
+    sim,
+    diagnostic,
+    effective_source,
+    batch,
+    report,
+    species,
+):
+    omission = diagnostic["below_reporting_threshold_omissions"][species]
+    channel = batch.channel(species)
+    assert channel.extra["channel_state"] == "evaluated_below_reporting_floor"
+    assert channel.extra["below_reporting_threshold_omission"] == omission
+    assert isinstance(channel.pressure, PressureValue)
+    assert channel.pressure.pa == omission["computed_pressure_Pa"]
+    assert isinstance(channel.selected_runtime_pressure, PressureValue)
+    assert (
+        channel.selected_runtime_pressure.pa
+        == omission["computed_pressure_Pa"]
+    )
+    flux_pressures, overlay = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=effective_source,
+    )
+    assert species not in flux_pressures
+    assert (
+        overlay["batch_channel_states"][species]
+        == "evaluated_below_reporting_floor"
+    )
+    snapshot = SimpleNamespace(
+        evap_flux=SimpleNamespace(
+            species_kg_hr={},
+            carrier_authority_by_species={
+                species: report["channels_by_species"][species]
+            },
+        )
+    )
+    availability = product_class_availability(
+        sim,
+        species,
+        {},
+        has_computed_part=False,
+        snapshots=(snapshot,),
+    )
+    assert availability["status"] == "available"
+    assert availability["class_total_kg"] == 0.0
+    assert availability["flag"]["state"] == "evaluated_below_reporting_floor"
+    assert availability["flag"]["omissions_by_species"][species] == omission
 
 
 def test_d349_lunar_mare_vapor_pressures_match_green_q79_probe(
@@ -1186,6 +1236,14 @@ def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
     assert report is not None
     assert report["channels_by_species"]["Fe"]["is_refused"] is False
     assert "Fe" not in batch.flux_active_species_ids
+    _assert_d354_omission_reaches_batch_and_accounting(
+        sim,
+        diagnostic,
+        effective_source,
+        batch,
+        report,
+        "Fe",
+    )
 
 
 def test_d354_mars_low_temperature_ca_conversion_survives_reporting_floor(
@@ -1227,6 +1285,14 @@ def test_d354_mars_low_temperature_ca_conversion_survives_reporting_floor(
     assert report is not None
     assert report["channels_by_species"]["Ca"]["is_refused"] is False
     assert "Ca" not in batch.flux_active_species_ids
+    _assert_d354_omission_reaches_batch_and_accounting(
+        sim,
+        diagnostic,
+        effective_source,
+        batch,
+        report,
+        "Ca",
+    )
 
 
 def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
@@ -1245,6 +1311,7 @@ def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
     diagnostic["activities"].pop("Fe", None)
     diagnostic["vapor_pressure_numerator_provenance"].pop("Fe", None)
     diagnostic["vapor_pressures_Pa"].pop("Fe", None)
+    diagnostic["below_reporting_threshold_omissions"].pop("Fe", None)
     equilibrium.activity_coefficients = diagnostic["activities"]
     equilibrium.vapor_pressures_Pa = diagnostic["vapor_pressures_Pa"]
     effective_source = EffectivePressureSource(
