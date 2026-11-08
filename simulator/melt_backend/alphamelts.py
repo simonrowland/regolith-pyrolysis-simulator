@@ -100,7 +100,11 @@ from simulator.environment import (
     vacuum_floor_bar_for_environment,
 )
 from simulator.feedstock_composition import iron_oxide_values, total_fe
-from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.fe_redox import (
+    LiquidFeODomain,
+    RedoxState,
+    normalize_redox_state,
+)
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -1646,6 +1650,7 @@ class _MELTSBackendSupport(MeltBackend):
                     vapor_transport_pO2_bar: Optional[float] = None,
                     vapor_transport_floor_bar: Optional[float] = None,
                     vapor_transport_pO2_admission: str = 'environment',
+                    liquid_feo_domain: Optional[LiquidFeODomain] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
@@ -1829,6 +1834,8 @@ class _MELTSBackendSupport(MeltBackend):
             'redox_mode': redox_mode,
             'gas_only_fo2_log': gas_only_fo2_log,
         }
+        if liquid_feo_domain is not None:
+            prepared_kwargs['liquid_feo_domain'] = liquid_feo_domain
         if call_timeout_s is not None and self.backend_name == 'thermoengine':
             prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
         return self._equilibrate_prepared(**prepared_kwargs)
@@ -1846,6 +1853,7 @@ class _MELTSBackendSupport(MeltBackend):
         redox_mode: Optional[str],
         subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None,
         gas_only_fo2_log: Optional[float] = None,
+        liquid_feo_domain: Optional[LiquidFeODomain] = None,
     ) -> EquilibriumResult:
         if self._mode == 'python_api':
             return self._equilibrate_python(
@@ -1862,6 +1870,7 @@ class _MELTSBackendSupport(MeltBackend):
                 crash_diagnostics=crash_diagnostics,
                 redox_mode=redox_mode,
                 gas_only_fo2_log=gas_only_fo2_log,
+                liquid_feo_domain=liquid_feo_domain,
             )
         if self._mode == 'subprocess':
             subprocess_kwargs = {
@@ -3022,6 +3031,7 @@ class _MELTSBackendSupport(MeltBackend):
         crash_diagnostics: Optional[Mapping[str, object]] = None,
         redox_mode: Optional[str] = None,
         gas_only_fo2_log: Optional[float] = None,
+        liquid_feo_domain: Optional[LiquidFeODomain] = None,
     ):
         """
         Use PetThermoTools for equilibrium calculation.
@@ -3124,6 +3134,7 @@ class _MELTSBackendSupport(MeltBackend):
                         fO2_log=vapor_fO2_log,
                         pressure_bar=solved_pressure_bar,
                         activities=eq.activity_coefficients,
+                        liquid_feo_domain=liquid_feo_domain,
                     )
                 )
                 vaporock_envelope_diagnostics = (
@@ -3146,6 +3157,7 @@ class _MELTSBackendSupport(MeltBackend):
                     eq.activity_coefficients,
                     eq.liquid_composition_wt_pct,
                     context='PetThermoTools VapoRock fallback unavailable',
+                    liquid_feo_domain=liquid_feo_domain,
                     **antoine_kwargs,
                 )
                 eq.vapor_pressures_Pa, source = self._finalize_antoine_projection(
@@ -5856,6 +5868,7 @@ class _MELTSBackendSupport(MeltBackend):
         fO2_log: float,
         pressure_bar: float,
         activities: Mapping[str, float],
+        liquid_feo_domain: Optional[LiquidFeODomain] = None,
     ) -> tuple[
         Dict[str, float],
         str | Dict[str, str] | VaporPressureActivityRefusal,
@@ -5963,6 +5976,7 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(melt_wt),
                 pO2_bar=10.0 ** float(fO2_log),
                 context='VapoRock helper unavailable',
+                liquid_feo_domain=liquid_feo_domain,
             )
             return self._finalize_antoine_projection(
                 projection,
@@ -6039,6 +6053,7 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(melt_wt),
                 pO2_bar=10.0 ** float(fO2_log),
                 context=f'VapoRock status {result.status!r}',
+                liquid_feo_domain=liquid_feo_domain,
             )
             return self._finalize_antoine_projection(
                 projection,
@@ -6056,6 +6071,7 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         pO2_bar: float | None = None,
         context: str,
+        liquid_feo_domain: Optional[LiquidFeODomain] = None,
     ) -> Dict[str, float] | VaporPressureActivityRefusal:
         table = self._load_vapor_pressure_table()
         if not table:
@@ -6077,6 +6093,7 @@ class _MELTSBackendSupport(MeltBackend):
                     self, '_vapor_pressure_catalog_payload', None
                 ),
                 pO2_bar=pO2_bar,
+                liquid_domain=liquid_feo_domain,
             )
         )
         pressures = self._activities_times_antoine(
@@ -6085,6 +6102,7 @@ class _MELTSBackendSupport(MeltBackend):
             comp_wt,
             pO2_bar=pO2_bar,
             builtin_vapor_activities=builtin_vapor_activities,
+            liquid_feo_domain=liquid_feo_domain,
         )
         # Partial activity maps that omit melt-present volatiles (e.g. Na/K
         # when only FeO/SiO2 activities are present) would debit those
@@ -6316,6 +6334,7 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         pO2_bar: float | None = None,
         builtin_vapor_activities: Mapping[str, object] | None = None,
+        liquid_feo_domain: Optional[LiquidFeODomain] = None,
     ) -> Dict[str, float]:
         """Project melt-source reactions when VapoRock is unavailable.
 
@@ -6339,6 +6358,7 @@ class _MELTSBackendSupport(MeltBackend):
                         self, '_vapor_pressure_catalog_payload', None
                     ),
                     pO2_bar=pO2_bar,
+                    liquid_domain=liquid_feo_domain,
                 )
             )
         if not activities and not builtin_vapor_activities:
@@ -6427,6 +6447,10 @@ class _MELTSBackendSupport(MeltBackend):
                         else notice["from_standard_state_id"]
                     ),
                 }
+                if builtin_vapor_activity.source_activity_diagnostic is not None:
+                    activity_provenance["a_FeO_calphad"] = dict(
+                        builtin_vapor_activity.source_activity_diagnostic
+                    )
                 if (
                     str(notice.get("to_standard_state_phase") or "").lower()
                     in {"solid", "crystalline", "cr", "s"}

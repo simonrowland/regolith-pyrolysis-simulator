@@ -13,7 +13,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from simulator.reference_data.janaf_fusion import (
     FusionDomainVerdict,
@@ -22,6 +22,9 @@ from simulator.reference_data.janaf_fusion import (
     d144_vapor_standard_state_pair,
     d144_fusion_table_pair,
 )
+
+if TYPE_CHECKING:
+    from simulator.fe_redox import LiquidFeODomain
 
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
@@ -663,6 +666,7 @@ class _BuiltinVaporActivity:
     source_standard_state_id: str
     notice: dict[str, Any]
     warning: str
+    source_activity_diagnostic: dict[str, object] | None = None
 
 
 def _convert_melt_oxide_activity_reference_state(
@@ -1207,6 +1211,7 @@ def _builtin_vapor_activities_from_weight_composition(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     pO2_bar: float | None = None,
+    liquid_domain: LiquidFeODomain | None = None,
 ) -> dict[str, _BuiltinVaporActivity]:
     """Project AlphaMELTS composition onto built-in declared vapor activities."""
 
@@ -1244,19 +1249,30 @@ def _builtin_vapor_activities_from_weight_composition(
     if "FeO" in composition_mol:
         parents.add("FeO")
     for parent in sorted(parents):
+        source_activity_diagnostic = None
         if parent == "FeO":
             if pO2_bar is None:
                 continue
             from simulator.fe_redox import (
-                kress91_ferrous_feo_activity,
+                calphad_ferrous_feo_activity_diagnostic,
                 kress91_furnace_activity_pressure_bar,
             )
 
-            source_activity = kress91_ferrous_feo_activity(
+            source_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=composition_wt_pct,
                 fO2_log=math.log10(float(pO2_bar)),
                 T_K=float(temperature_K),
                 pressure_bar=kress91_furnace_activity_pressure_bar(),
+                liquid_domain=liquid_domain,
+            )
+            source_activity = max(
+                0.0,
+                float(
+                    source_activity_diagnostic.get(
+                        "a_FeO_authoritative", 0.0
+                    )
+                    or 0.0
+                ),
             )
             source_standard_state_id = _melt_oxide_activity_standard_state_id(
                 parent
@@ -1310,6 +1326,7 @@ def _builtin_vapor_activities_from_weight_composition(
             source_standard_state_id=source_standard_state_id,
             notice=notice,
             warning=warning,
+            source_activity_diagnostic=source_activity_diagnostic,
         )
     return projected
 

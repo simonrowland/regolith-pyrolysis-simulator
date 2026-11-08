@@ -36,6 +36,7 @@ from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
+    LiquidFeODomain,
     REDOX_STATE_REFERENCE_T_K,
     RedoxState,
 )
@@ -223,6 +224,43 @@ def test_alphamelts_antoine_fallback_uses_solved_liquid_composition():
     backend._equilibrate_python(1600.0, bulk, -9.0, 1.0)
 
     assert seen["composition_wt_pct"] == solved_liquid
+
+
+def test_alphamelts_vaporock_fallback_keeps_below_liquidus_feo_notice():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_helper = None
+    backend._set_vapor_transport_pO2_bar(
+        1.0e-9,
+        floor_bar=1.0e-30,
+    )
+    liquid_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=1473.15,
+        liquidus_T_C=1300.0,
+        solidus_T_C=1000.0,
+        source="test_liquidus_gate",
+    )
+
+    pressures, _source = backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1200.0,
+        solved_melt_wt_pct={"FeO": 50.0, "SiO2": 50.0},
+        liquid_fraction=0.5,
+        fO2_log=-9.0,
+        pressure_bar=1.0e-3,
+        activities={},
+        liquid_feo_domain=liquid_domain,
+    )
+
+    provenance = backend._antoine_activity_standard_state_provenance["Fe"]
+    notice = provenance["a_FeO_calphad"]["notices"][0]
+    assert notice["kind"] == "liquid_model_below_liquidus"
+    assert notice["authority"] == "extrapolated"
+    assert notice["temperature_K"] == liquid_domain.temperature_K
+    assert notice["liquidus_T_C"] == liquid_domain.liquidus_T_C
+    assert notice["source"] == liquid_domain.source
+    assert "activity_standard_state_conversion" in provenance
+    assert provenance["vapor_activity_used_for_K"] > 0.0
+    assert "Fe" in pressures
 
 
 @pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])

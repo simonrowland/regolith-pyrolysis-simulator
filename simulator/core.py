@@ -592,6 +592,7 @@ from simulator.feedstock_composition import (
     resolve_feedstock_composition,
 )
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import (
     LiquidFeODomain,
     RedoxState,
@@ -10109,6 +10110,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'subprocess_run_mode'
                 ):
                     backend_kwargs['subprocess_run_mode'] = 'isothermal'
+                alpha_backend = self._provider_registration_backend(
+                    self.backend
+                )
+                if (
+                    is_alphamelts_backend
+                    and self._backend_accepts_kwarg(
+                        'liquid_feo_domain', backend=alpha_backend
+                    )
+                ):
+                    backend_kwargs['liquid_feo_domain'] = (
+                        self.liquid_feo_domain_at(
+                            float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+                        )
+                    )
                 result = self.backend.equilibrate(**backend_kwargs)
                 if is_alphamelts_backend:
                     result = annotate_alphamelts_reference_pressure(
@@ -10733,9 +10748,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         tolerance = max(1e-9, 1e-9 * max(abs(lhs), abs(rhs)))
         return abs(lhs - rhs) <= tolerance
 
-    def _backend_accepts_kwarg(self, name: str) -> bool:
+    def _backend_accepts_kwarg(self, name: str, *, backend=None) -> bool:
         try:
-            signature = inspect.signature(self.backend.equilibrate)
+            target = self.backend if backend is None else backend
+            signature = inspect.signature(target.equilibrate)
         except (TypeError, ValueError):
             return False
         return name in signature.parameters
