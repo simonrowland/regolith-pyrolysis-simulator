@@ -363,3 +363,18 @@ def test_declared_version_requirements_match_uv_lock() -> None:
         lock = tomllib.load(lock_file)
 
     _assert_declared_versions_match_uv_lock(project, lock)
+
+
+def test_project_release_versions_are_synchronized() -> None:
+    with (ROOT / "pyproject.toml").open("rb") as project_file:
+        project = tomllib.load(project_file)["project"]
+    with (ROOT / "uv.lock").open("rb") as lock_file:
+        lock = tomllib.load(lock_file)
+
+    locked_project = next(
+        package for package in lock["package"]
+        if package["name"] == project["name"]
+    )
+    version_file = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+    assert project["version"] == version_file == locked_project["version"]
