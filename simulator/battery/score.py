@@ -20,7 +20,7 @@ import sys
 import tempfile
 import time
 import warnings
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
@@ -15088,6 +15088,606 @@ def _paired_engine_rail_comparisons(
     return records
 
 
+BATTERY_HERO_TEMPERATURE_FLOOR_K = Decimal(1700)
+BATTERY_HERO_MINIMUM_REPORT_N = 5
+BATTERY_HERO_TEMPERATURE_VIEWS = (
+    ("all", "all"),
+    (
+        "temperature_ge_1700",
+        f"T ≥ {int(BATTERY_HERO_TEMPERATURE_FLOOR_K)} K",
+    ),
+    (
+        "temperature_lt_1700",
+        f"T < {int(BATTERY_HERO_TEMPERATURE_FLOOR_K)} K",
+    ),
+)
+
+
+def _battery_hero_create_metric_rows(database: sqlite3.Connection) -> None:
+    database.execute(
+        """CREATE TABLE hero_rows (
+               id INTEGER PRIMARY KEY,
+               rail TEXT NOT NULL,
+               engine TEXT NOT NULL,
+               reference TEXT NOT NULL,
+               species TEXT NOT NULL,
+               residual_text TEXT NOT NULL,
+               temperature_text TEXT,
+               source_flag INTEGER NOT NULL,
+               exposure_status TEXT NOT NULL
+           )"""
+    )
+
+
+@dataclass
+class _BatteryHeroExactAccumulator:
+    count: int = 0
+    total: Decimal = field(default_factory=lambda: Decimal(0))
+    squares: Decimal = field(default_factory=lambda: Decimal(0))
+    deviations: Decimal = field(default_factory=lambda: Decimal(0))
+
+    def add(self, value: Decimal) -> None:
+        self.count += 1
+        self.total += value
+        self.squares += value * value
+
+
+def _battery_hero_metric_values_stats(
+    database: sqlite3.Connection,
+    table: str,
+    where: str,
+    params: Sequence[object],
+    accumulator: _BatteryHeroExactAccumulator | None,
+    *,
+    minimum_n: int = 1,
+    side: str = "value",
+) -> dict[str, object]:
+    _battery_hero_register_decimal_collation(database)
+    count = 0 if accumulator is None else accumulator.count
+    if accumulator is None or count < minimum_n:
+        return {
+            "n": count,
+            "rms_dex": None,
+            "sd_dex": None,
+            "median_abs_dex": None,
+        }
+    if table == "hero_metric_values":
+        absolute_text = "absolute_text"
+    else:
+        absolute_text = f"{side}_absolute_text"
+    median_rows = database.execute(
+        f"SELECT {absolute_text} FROM {table} WHERE {where} "
+        f"ORDER BY {absolute_text} COLLATE HERO_DECIMAL, id LIMIT 2 OFFSET ?",
+        (*params, (count - 1) // 2),
+    )
+    medians = [Decimal(str(row[0])) for row in median_rows]
+    median = medians[0] if count % 2 else (medians[0] + medians[1]) / Decimal(2)
+    return {
+        "n": count,
+        "rms_dex": _battery_hero_metric_decimal_text(
+            (accumulator.squares / Decimal(count)).sqrt()
+        ),
+        "sd_dex": _battery_hero_metric_decimal_text(
+            (accumulator.deviations / Decimal(count)).sqrt()
+        ),
+        "median_abs_dex": _battery_hero_metric_decimal_text(median),
+    }
+
+
+def _battery_hero_metric_decimal_text(value: Decimal) -> str:
+    return "0" if value == 0 else str(value)
+
+
+def _battery_hero_register_decimal_collation(database: sqlite3.Connection) -> None:
+    database.create_collation(
+        "HERO_DECIMAL",
+        lambda left, right: (Decimal(left) > Decimal(right))
+        - (Decimal(left) < Decimal(right)),
+    )
+
+
+def _battery_hero_metric_records_from_database(
+    database: sqlite3.Connection,
+    *,
+    engines: Sequence[str],
+    rails: Sequence[str],
+    minimum_held_out_n: int | None,
+) -> dict[tuple[str, str], dict[str, object]]:
+    _battery_hero_register_decimal_collation(database)
+    database.execute(
+        """CREATE TABLE hero_metric_values (
+            id INTEGER PRIMARY KEY,
+            rail TEXT NOT NULL,
+            engine TEXT NOT NULL,
+            view TEXT NOT NULL,
+            residual_text TEXT NOT NULL,
+            absolute_text TEXT NOT NULL,
+            source_flag INTEGER NOT NULL,
+            exposure_status TEXT NOT NULL,
+            no_temperature INTEGER NOT NULL
+        )"""
+    )
+    pending: list[tuple[object, ...]] = []
+    for rail, engine, residual_text, temperature, source_flag, exposure_status in database.execute(
+        """SELECT rail, engine, residual_text, temperature_text,
+                  source_flag, exposure_status FROM hero_rows ORDER BY id"""
+    ):
+        residual = Decimal(str(residual_text))
+        absolute = abs(residual)
+        views = [("all", int(temperature is None))]
+        if temperature is not None:
+            views.append(
+                (
+                    "temperature_ge_1700"
+                    if Decimal(str(temperature)) >= BATTERY_HERO_TEMPERATURE_FLOOR_K
+                    else "temperature_lt_1700",
+                    0,
+                )
+            )
+        for view, no_temperature in views:
+            pending.append(
+                (
+                    rail,
+                    engine,
+                    view,
+                    str(residual),
+                    str(absolute),
+                    int(source_flag),
+                    exposure_status,
+                    no_temperature,
+                )
+            )
+        if len(pending) >= 5000:
+            database.executemany(
+                """INSERT INTO hero_metric_values
+                   (rail, engine, view, residual_text, absolute_text,
+                    source_flag, exposure_status, no_temperature)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                pending,
+            )
+            pending.clear()
+    if pending:
+        database.executemany(
+            """INSERT INTO hero_metric_values
+               (rail, engine, view, residual_text, absolute_text,
+                source_flag, exposure_status, no_temperature)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            pending,
+        )
+    database.execute(
+        "CREATE INDEX hero_metric_group ON hero_metric_values(rail, engine, view, absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_metric_flag_abs ON hero_metric_values(rail, engine, view, source_flag, absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_metric_exposure_abs ON hero_metric_values(rail, engine, view, exposure_status, absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+
+    accumulators: dict[tuple[str, str, str, int | None, str | None], _BatteryHeroExactAccumulator] = {}
+    exposed_counts: Counter[tuple[str, str, str]] = Counter()
+    no_temperature_counts: Counter[tuple[str, str]] = Counter()
+    for rail, engine, view, value_text, source_flag, exposure_status, no_temperature in database.execute(
+        """SELECT rail, engine, view, residual_text, source_flag,
+                  exposure_status, no_temperature FROM hero_metric_values ORDER BY id"""
+    ):
+        group = (str(rail), str(engine), str(view))
+        value = Decimal(str(value_text))
+        accumulators.setdefault((*group, None, None), _BatteryHeroExactAccumulator()).add(value)
+        if rail == Rail.VAPOUR.value:
+            accumulators.setdefault((*group, int(source_flag), None), _BatteryHeroExactAccumulator()).add(value)
+        if minimum_held_out_n is not None:
+            if exposure_status == "exposed":
+                exposed_counts[group] += 1
+            elif exposure_status == "held_out":
+                accumulators.setdefault((*group, None, "held_out"), _BatteryHeroExactAccumulator()).add(value)
+        if view == "all" and no_temperature:
+            no_temperature_counts[(str(rail), str(engine))] += 1
+
+    for rail, engine, view, value_text, source_flag, exposure_status in database.execute(
+        """SELECT rail, engine, view, residual_text, source_flag, exposure_status
+             FROM hero_metric_values ORDER BY id"""
+    ):
+        value = Decimal(str(value_text))
+        group = (str(rail), str(engine), str(view))
+        for key in ((*group, None, None),):
+            accumulator = accumulators[key]
+            mean = accumulator.total / Decimal(accumulator.count)
+            delta = value - mean
+            accumulator.deviations += delta * delta
+        if rail == Rail.VAPOUR.value:
+            accumulator = accumulators[( *group, int(source_flag), None)]
+            mean = accumulator.total / Decimal(accumulator.count)
+            delta = value - mean
+            accumulator.deviations += delta * delta
+        if minimum_held_out_n is not None and exposure_status == "held_out":
+            accumulator = accumulators[( *group, None, "held_out")]
+            mean = accumulator.total / Decimal(accumulator.count)
+            delta = value - mean
+            accumulator.deviations += delta * delta
+
+    records: dict[tuple[str, str], dict[str, object]] = {}
+    for rail in sorted(set(rails)):
+        for engine in sorted(set(engines)):
+            views: dict[str, dict[str, object]] = {}
+            for view_name, _label in BATTERY_HERO_TEMPERATURE_VIEWS:
+                group = (rail, engine, view_name)
+                accumulator = accumulators.get((*group, None, None))
+                view = _battery_hero_metric_values_stats(
+                    database,
+                    "hero_metric_values",
+                    "rail = ? AND engine = ? AND view = ?",
+                    group,
+                    accumulator,
+                )
+                view["no_temperature_n"] = (
+                    no_temperature_counts[(rail, engine)]
+                    if view_name == "all"
+                    else 0
+                )
+                if rail == Rail.VAPOUR.value:
+                    for source_flag, name in ((1, "source_disagreement_flagged"), (0, "unflagged")):
+                        flag_accumulator = accumulators.get((*group, source_flag, None))
+                        view[name] = _battery_hero_metric_values_stats(
+                            database,
+                            "hero_metric_values",
+                            "rail = ? AND engine = ? AND view = ? AND source_flag = ?",
+                            (*group, source_flag),
+                            flag_accumulator,
+                        )
+                if minimum_held_out_n is not None:
+                    held_accumulator = accumulators.get((*group, None, "held_out"))
+                    held = _battery_hero_metric_values_stats(
+                        database,
+                        "hero_metric_values",
+                        "rail = ? AND engine = ? AND view = ? AND exposure_status = ?",
+                        (*group, "held_out"),
+                        held_accumulator,
+                        minimum_n=minimum_held_out_n,
+                    )
+                    held["minimum_n"] = minimum_held_out_n
+                    view["exposed_n"] = exposed_counts[group]
+                    view["held_out"] = held
+                views[view_name] = view
+            all_view = views["all"]
+            records[(rail, engine)] = {
+                "rail": rail,
+                "engine": engine,
+                "n": all_view["n"],
+                "n_dex": all_view["n"],
+                "rms_dex": all_view["rms_dex"],
+                "sd_dex": all_view["sd_dex"],
+                "median_abs_dex": all_view["median_abs_dex"],
+                "views": views,
+            }
+    return records
+
+
+def _battery_hero_pair_comparison_records_from_database(
+    database: sqlite3.Connection,
+    *,
+    primary_engines: Sequence[str],
+    comparison_engines: Sequence[str],
+    rails: Sequence[str],
+    minimum_held_out_n: int | None,
+    include_species: bool = False,
+    minimum_report_n: int = BATTERY_HERO_MINIMUM_REPORT_N,
+) -> list[dict[str, object]]:
+    _battery_hero_register_decimal_collation(database)
+    database.execute("DROP TABLE IF EXISTS temp.hero_pair_eligible")
+    species_key = "species" if include_species else "''"
+    database.execute(
+        f"""CREATE TEMP TABLE hero_pair_eligible AS
+            SELECT rail, reference, {species_key} AS pair_species, engine,
+                   MIN(id) AS row_id
+              FROM hero_rows
+             WHERE reference <> ''
+             GROUP BY rail, reference, pair_species, engine
+            HAVING COUNT(*) = 1"""
+    )
+    database.execute("DROP TABLE IF EXISTS temp.hero_pair_metric_values")
+    database.execute(
+        """CREATE TEMP TABLE hero_pair_metric_values (
+            id INTEGER PRIMARY KEY,
+            rail TEXT NOT NULL,
+            species TEXT NOT NULL,
+            primary_engine TEXT NOT NULL,
+            comparison_engine TEXT NOT NULL,
+            view TEXT NOT NULL,
+            primary_text TEXT NOT NULL,
+            comparison_text TEXT NOT NULL,
+            primary_absolute_text TEXT NOT NULL,
+            comparison_absolute_text TEXT NOT NULL,
+            source_flag INTEGER NOT NULL,
+            exposure_status TEXT NOT NULL,
+            no_temperature INTEGER NOT NULL
+        )"""
+    )
+    comparison_names = tuple(sorted(set(comparison_engines) - set(primary_engines)))
+    pending: list[tuple[object, ...]] = []
+    if primary_engines and comparison_names:
+        sql = f"""SELECT p.rail, p.pair_species, p.engine, c.engine,
+                           pv.residual_text, cv.residual_text, pv.temperature_text,
+                           pv.source_flag, pv.exposure_status
+                      FROM hero_pair_eligible AS p
+                      JOIN hero_pair_eligible AS c
+                        ON c.rail = p.rail AND c.reference = p.reference
+                       AND c.pair_species = p.pair_species
+                      JOIN hero_rows AS pv ON pv.id = p.row_id
+                      JOIN hero_rows AS cv ON cv.id = c.row_id
+                     WHERE p.engine IN ({','.join('?' for _ in primary_engines)})
+                       AND c.engine IN ({','.join('?' for _ in comparison_names)})
+                       AND p.rail IN ({','.join('?' for _ in rails)})"""
+        params = (*primary_engines, *comparison_names, *rails)
+        for rail, species, primary, comparison, primary_text, outside_text, temperature, source_flag, exposure_status in database.execute(sql, params):
+            views = ["all"]
+            if temperature is not None:
+                views.append(
+                    "temperature_ge_1700"
+                    if Decimal(str(temperature)) >= BATTERY_HERO_TEMPERATURE_FLOOR_K
+                    else "temperature_lt_1700"
+                )
+            primary_value = Decimal(str(primary_text))
+            outside_value = Decimal(str(outside_text))
+            for view in views:
+                pending.append(
+                    (
+                        rail,
+                        species,
+                        primary,
+                        comparison,
+                        view,
+                        str(primary_value),
+                        str(outside_value),
+                        str(abs(primary_value)),
+                        str(abs(outside_value)),
+                        int(source_flag),
+                        exposure_status,
+                        int(temperature is None),
+                    )
+                )
+                if len(pending) >= 5000:
+                    database.executemany(
+                        """INSERT INTO hero_pair_metric_values
+                           (rail, species, primary_engine, comparison_engine, view,
+                            primary_text, comparison_text, primary_absolute_text,
+                            comparison_absolute_text, source_flag, exposure_status,
+                            no_temperature)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                        pending,
+                    )
+                    pending.clear()
+    if pending:
+        database.executemany(
+            """INSERT INTO hero_pair_metric_values
+               (rail, species, primary_engine, comparison_engine, view,
+                primary_text, comparison_text, primary_absolute_text,
+                comparison_absolute_text, source_flag, exposure_status,
+                no_temperature)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            pending,
+        )
+    database.execute(
+        "CREATE INDEX hero_pair_primary_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, primary_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_pair_comparison_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, comparison_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_pair_flag_primary_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, source_flag, primary_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_pair_flag_comparison_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, source_flag, comparison_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_pair_exposure_primary_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, exposure_status, primary_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+    database.execute(
+        "CREATE INDEX hero_pair_exposure_comparison_abs ON hero_pair_metric_values(rail, species, primary_engine, comparison_engine, view, exposure_status, comparison_absolute_text COLLATE HERO_DECIMAL, id)"
+    )
+
+    accumulators: dict[
+        tuple[str, str, str, str, str, str, int | None, str | None],
+        _BatteryHeroExactAccumulator,
+    ] = {}
+    exposed_counts: Counter[tuple[str, str, str, str, str]] = Counter()
+    no_temperature_counts: Counter[tuple[str, str, str, str]] = Counter()
+    query = """SELECT rail, species, primary_engine, comparison_engine, view,
+                      primary_text, comparison_text, source_flag, exposure_status,
+                      no_temperature FROM hero_pair_metric_values ORDER BY id"""
+    for rail, species, primary, comparison, view, primary_text, outside_text, source_flag, exposure_status, no_temperature in database.execute(query):
+        group = (str(rail), str(species), str(primary), str(comparison), str(view))
+        for side, value_text in (("primary", primary_text), ("comparison", outside_text)):
+            value = Decimal(str(value_text))
+            accumulators.setdefault((*group, side, None, None), _BatteryHeroExactAccumulator()).add(value)
+            if rail == Rail.VAPOUR.value:
+                accumulators.setdefault((*group, side, int(source_flag), None), _BatteryHeroExactAccumulator()).add(value)
+            if minimum_held_out_n is not None and exposure_status == "held_out":
+                accumulators.setdefault((*group, side, None, "held_out"), _BatteryHeroExactAccumulator()).add(value)
+        if minimum_held_out_n is not None and exposure_status == "exposed":
+            exposed_counts[group] += 1
+        if view == "all" and no_temperature:
+            no_temperature_counts[group[:4]] += 1
+
+    for rail, species, primary, comparison, view, primary_text, outside_text, source_flag, exposure_status in database.execute(
+        """SELECT rail, species, primary_engine, comparison_engine, view,
+                  primary_text, comparison_text, source_flag, exposure_status
+             FROM hero_pair_metric_values ORDER BY id"""
+    ):
+        group = (str(rail), str(species), str(primary), str(comparison), str(view))
+        for side, value_text in (("primary", primary_text), ("comparison", outside_text)):
+            key = (*group, side, None, None)
+            accumulator = accumulators[key]
+            mean = accumulator.total / Decimal(accumulator.count)
+            delta = Decimal(str(value_text)) - mean
+            accumulator.deviations += delta * delta
+            if rail == Rail.VAPOUR.value:
+                key = (*group, side, int(source_flag), None)
+                accumulator = accumulators[key]
+                mean = accumulator.total / Decimal(accumulator.count)
+                delta = Decimal(str(value_text)) - mean
+                accumulator.deviations += delta * delta
+            if minimum_held_out_n is not None and exposure_status == "held_out":
+                key = (*group, side, None, "held_out")
+                accumulator = accumulators[key]
+                mean = accumulator.total / Decimal(accumulator.count)
+                delta = Decimal(str(value_text)) - mean
+                accumulator.deviations += delta * delta
+
+    pair_keys = {
+        (str(rail), str(species), str(primary), str(comparison))
+        for rail, species, primary, comparison in database.execute(
+            "SELECT DISTINCT rail, species, primary_engine, comparison_engine FROM hero_pair_metric_values"
+        )
+    }
+    species_by_rail: dict[str, set[str]] = defaultdict(set)
+    if include_species:
+        species_by_rail.update(
+            {
+                str(rail): set()
+                for rail, in database.execute(
+                    "SELECT DISTINCT rail FROM hero_rows WHERE reference <> ''"
+                )
+            }
+        )
+        for rail, species in database.execute(
+            "SELECT DISTINCT rail, species FROM hero_rows WHERE reference <> ''"
+        ):
+            if rail in rails:
+                species_by_rail[str(rail)].add(str(species))
+
+    def build_view(
+        pair: tuple[str, str, str, str],
+        view_name: str,
+        minimum_n: int,
+        include_source_disagreement: bool,
+    ) -> dict[str, object]:
+        rail, species, primary, comparison = pair
+        group = (*pair, view_name)
+        base_where = (
+            "rail = ? AND species = ? AND primary_engine = ? AND "
+            "comparison_engine = ? AND view = ?"
+        )
+
+        def stats(side: str, source_flag: int | None = None, held_out: bool = False, *, threshold: int = minimum_n) -> dict[str, object]:
+            clauses = [base_where]
+            params: tuple[object, ...] = group
+            if source_flag is not None:
+                clauses.append("source_flag = ?")
+                params += (source_flag,)
+            if held_out:
+                clauses.append("exposure_status = 'held_out'")
+            return _battery_hero_metric_values_stats(
+                database,
+                "hero_pair_metric_values",
+                " AND ".join(clauses),
+                params,
+                accumulators.get((*group, side, source_flag, "held_out" if held_out else None)),
+                minimum_n=threshold,
+                side=side,
+            )
+
+        primary_stats = stats("primary")
+        outside_stats = stats("comparison")
+        result: dict[str, object] = {
+            "n_shared": outside_stats["n"],
+            "no_temperature_n": (
+                no_temperature_counts[pair] if view_name == "all" else 0
+            ),
+            "outside_rms_dex": outside_stats["rms_dex"],
+            "outside_sd_dex": outside_stats["sd_dex"],
+            "outside_median_abs_dex": outside_stats["median_abs_dex"],
+            "primary_rms_dex_on_shared": primary_stats["rms_dex"],
+            "primary_sd_dex_on_shared": primary_stats["sd_dex"],
+            "primary_median_abs_dex_on_shared": primary_stats["median_abs_dex"],
+        }
+        if minimum_n > 1:
+            result["minimum_n"] = minimum_n
+        if include_source_disagreement:
+            for flag, name in ((1, "source_disagreement_flagged"), (0, "unflagged")):
+                primary_flag = stats("primary", flag)
+                outside_flag = stats("comparison", flag)
+                result[name] = {
+                    "n_shared": outside_flag["n"],
+                    "outside_rms_dex": outside_flag["rms_dex"],
+                    "outside_sd_dex": outside_flag["sd_dex"],
+                    "outside_median_abs_dex": outside_flag["median_abs_dex"],
+                    "primary_rms_dex_on_shared": primary_flag["rms_dex"],
+                    "primary_sd_dex_on_shared": primary_flag["sd_dex"],
+                    "primary_median_abs_dex": primary_flag["median_abs_dex"],
+                }
+        if minimum_held_out_n is not None:
+            primary_held = stats(
+                "primary", held_out=True,
+                threshold=minimum_held_out_n,
+            )
+            outside_held = stats(
+                "comparison", held_out=True,
+                threshold=minimum_held_out_n,
+            )
+            result["exposed_n"] = exposed_counts[group]
+            result["held_out"] = {
+                "n": outside_held["n"],
+                "minimum_n": minimum_held_out_n,
+                "outside_rms_dex": outside_held["rms_dex"],
+                "outside_sd_dex": outside_held["sd_dex"],
+                "outside_median_abs_dex": outside_held["median_abs_dex"],
+                "primary_rms_dex_on_shared": primary_held["rms_dex"],
+                "primary_sd_dex_on_shared": primary_held["sd_dex"],
+                "primary_median_abs_dex": primary_held["median_abs_dex"],
+            }
+        return result
+
+    records: list[dict[str, object]] = []
+    for rail in sorted(set(rails)):
+        species_names = sorted(species_by_rail.get(rail, {""})) if include_species else [""]
+        for species in species_names:
+            for primary in primary_engines:
+                candidates: list[tuple[int, str, dict[str, object]]] = []
+                candidate_names = {
+                    comparison
+                    for pair_rail, pair_species, pair_primary, comparison in pair_keys
+                    if (pair_rail, pair_species, pair_primary)
+                    == (rail, species, primary)
+                }
+                for comparison in candidate_names:
+                    pair = (rail, species, primary, comparison)
+                    views = {
+                        name: build_view(
+                            pair,
+                            name,
+                            minimum_report_n if include_species else 1,
+                            rail == Rail.VAPOUR.value,
+                        )
+                        for name, _label in BATTERY_HERO_TEMPERATURE_VIEWS
+                    }
+                    all_view = views["all"]
+                    comparison_record: dict[str, object] = {
+                        "engine": comparison,
+                        "n_shared": all_view["n_shared"],
+                        "outside_rms_dex": all_view["outside_rms_dex"],
+                        "outside_sd_dex": all_view["outside_sd_dex"],
+                        "outside_median_abs_dex": all_view["outside_median_abs_dex"],
+                        "primary_rms_dex_on_shared": all_view["primary_rms_dex_on_shared"],
+                        "primary_sd_dex_on_shared": all_view["primary_sd_dex_on_shared"],
+                        "primary_median_abs_dex_on_shared": all_view["primary_median_abs_dex_on_shared"],
+                        "views": views,
+                    }
+                    if include_species:
+                        comparison_record["minimum_n"] = minimum_report_n
+                    candidates.append((int(all_view["n_shared"]), comparison, comparison_record))
+                candidates.sort(key=lambda item: (-item[0], item[1]))
+                records.append(
+                    {
+                        "rail": rail,
+                        "primary_engine": primary,
+                        **({"species": species} if include_species else {}),
+                        "comparisons": [item[2] for item in candidates],
+                    }
+                )
+    return records
+
+
 _BATTERY_HERO_DECK_SOURCE_RAILS = (
     Rail.VAPOUR.value,
     Rail.REDOX.value,
@@ -15759,68 +16359,260 @@ def _battery_hero_sweet_spot_records(
     component is zero when the declared amount basis is mole fraction.
     """
 
-    sio2_width = Decimal("0.05")
-    temperature_width = Decimal("100")
-    values_by_cell: dict[tuple[str, str, int, int], list[Decimal]] = defaultdict(
-        list
-    )
-    temperature_bins_by_rail: dict[str, set[int]] = defaultdict(set)
-    engines_by_rail: dict[str, set[str]] = defaultdict(set)
-
+    database = sqlite3.connect(":memory:")
+    _battery_hero_create_fingerprint_values(database)
+    pending: list[tuple[object, ...]] = []
     for rail, engine, temperature_raw, composition_raw, dex_raw in samples:
         if not rail or not engine:
             continue
         sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
-        if sio2_fraction is None:
+        bins = _battery_hero_sweet_spot_bin_indices(temperature_raw, sio2_fraction)
+        if bins is None:
             continue
         try:
-            temperature = as_decimal(temperature_raw)
             dex = as_decimal(dex_raw)
         except (TypeError, ValueError, ArithmeticError):
             continue
-        if not temperature.is_finite() or not dex.is_finite():
+        if not dex.is_finite():
             continue
-
-        temperature_bin = math.floor(temperature / temperature_width)
-        sio2_bin = (
-            19
-            if sio2_fraction == 1
-            else math.floor(sio2_fraction / sio2_width)
+        pending.append((rail, engine, bins[0], bins[1], str(dex), str(abs(dex))))
+        if len(pending) >= 5000:
+            database.executemany(
+                "INSERT INTO battery_hero_fingerprint_values "
+                "(rail, engine, temperature_bin, sio2_bin, residual_text, absolute_text) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                pending,
+            )
+            pending.clear()
+    if pending:
+        database.executemany(
+            "INSERT INTO battery_hero_fingerprint_values "
+            "(rail, engine, temperature_bin, sio2_bin, residual_text, absolute_text) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            pending,
         )
-        key = (str(rail), str(engine), temperature_bin, sio2_bin)
-        values_by_cell[key].append(dex)
-        temperature_bins_by_rail[str(rail)].add(temperature_bin)
-        engines_by_rail[str(rail)].add(str(engine))
+    records = _battery_hero_sweet_spot_records_from_database(database)
+    database.close()
+    return records
 
+
+BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K = Decimal(100)
+BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH = Decimal("0.05")
+BATTERY_HERO_FINGERPRINT_BAND_BOUNDARIES = (Decimal("0.5"), Decimal("1.0"))
+
+
+def _battery_hero_fingerprint_band(value: object) -> str:
+    try:
+        median_abs_dex = as_decimal(value)
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise ValueError("fingerprint median |error| must be finite") from exc
+    if not median_abs_dex.is_finite():
+        raise ValueError("fingerprint median |error| must be finite")
+    good_limit, okay_limit = BATTERY_HERO_FINGERPRINT_BAND_BOUNDARIES
+    if median_abs_dex <= good_limit:
+        return "good"
+    if median_abs_dex <= okay_limit:
+        return "okay"
+    return "needs work"
+
+
+def _battery_hero_sweet_spot_bin_indices(
+    temperature_raw: object, sio2_fraction: Decimal | None
+) -> tuple[int, int] | None:
+    """Resolve the owning 100 K × 0.05 SiO₂ fingerprint bins."""
+
+    if sio2_fraction is None:
+        return None
+    try:
+        temperature_bin = _battery_hero_temperature_bin_index(temperature_raw)
+        sio2_fraction = as_decimal(sio2_fraction)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if (
+        temperature_bin is None
+        or not sio2_fraction.is_finite()
+        or sio2_fraction < 0
+        or sio2_fraction > 1
+    ):
+        return None
+    sio2_bin = (
+        19
+        if sio2_fraction == 1
+        else math.floor(sio2_fraction / BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH)
+    )
+    return temperature_bin, sio2_bin
+
+
+def _battery_hero_temperature_bin_index(temperature_raw: object) -> int | None:
+    """Resolve the owning 100 K fingerprint temperature bin."""
+
+    try:
+        temperature = as_decimal(temperature_raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not temperature.is_finite():
+        return None
+    return math.floor(temperature / BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K)
+
+
+def _battery_hero_create_fingerprint_values(database: sqlite3.Connection) -> None:
+    database.execute(
+        """CREATE TABLE battery_hero_fingerprint_values (
+               id INTEGER PRIMARY KEY,
+               rail TEXT NOT NULL,
+               engine TEXT NOT NULL,
+               temperature_bin INTEGER NOT NULL,
+               sio2_bin INTEGER NOT NULL,
+               residual_text TEXT NOT NULL,
+               absolute_text TEXT NOT NULL
+           )"""
+    )
+    database.execute(
+        """CREATE TABLE battery_hero_unknown_sio2_values (
+               id INTEGER PRIMARY KEY,
+               rail TEXT NOT NULL,
+               engine TEXT NOT NULL,
+               temperature_bin INTEGER NOT NULL,
+               residual_text TEXT NOT NULL
+           )"""
+    )
+
+
+def _battery_hero_unknown_sio2_records_from_database(
+    database: sqlite3.Connection,
+) -> list[dict[str, object]]:
+    totals: dict[tuple[str, str, int], tuple[int, Decimal, Decimal]] = {}
+    for rail, engine, temperature_bin, residual_text in database.execute(
+        """SELECT rail, engine, temperature_bin, residual_text
+             FROM battery_hero_unknown_sio2_values
+            ORDER BY rail, engine, temperature_bin, id"""
+    ):
+        key = (str(rail), str(engine), int(temperature_bin))
+        count, total, squares = totals.get(key, (0, Decimal(0), Decimal(0)))
+        residual = Decimal(str(residual_text))
+        totals[key] = (count + 1, total + residual, squares + residual * residual)
+
+    temperature_width = BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K
+    return [
+        {
+            "rail": rail,
+            "engine": engine,
+            "temperature_lower_K": format(Decimal(bin_index) * temperature_width, "f"),
+            "temperature_upper_K": format(
+                (Decimal(bin_index) + 1) * temperature_width, "f"
+            ),
+            "n": count,
+            "sum_residual_dex": str(total),
+            "sum_squared_residual_dex": str(squares),
+            "sio2_unknown": True,
+        }
+        for (rail, engine, bin_index), (count, total, squares) in sorted(totals.items())
+    ]
+
+
+def _battery_hero_sweet_spot_records_from_database(
+    database: sqlite3.Connection,
+) -> list[dict[str, object]]:
+    """Return complete fingerprint grids from staged scorer-owned bins."""
+
+    database.create_collation(
+        "BATTERY_HERO_DECIMAL",
+        lambda left, right: (Decimal(left) > Decimal(right)) - (Decimal(left) < Decimal(right)),
+    )
+    database.execute(
+        "CREATE INDEX battery_hero_fingerprint_group ON "
+        "battery_hero_fingerprint_values(rail, engine, temperature_bin, sio2_bin, id)"
+    )
+    database.execute(
+        "CREATE INDEX battery_hero_fingerprint_median ON "
+        "battery_hero_fingerprint_values(rail, engine, temperature_bin, sio2_bin, absolute_text COLLATE BATTERY_HERO_DECIMAL, id)"
+    )
+    cell_values: dict[tuple[str, str, int, int], tuple[int, Decimal, Decimal]] = {}
+    temperature_bins_by_rail: dict[str, set[int]] = defaultdict(set)
+    engines_by_rail: dict[str, set[str]] = defaultdict(set)
+    for rail, engine, temperature_bin, sio2_bin, residual_text in database.execute(
+        """SELECT rail, engine, temperature_bin, sio2_bin, residual_text
+             FROM battery_hero_fingerprint_values
+            ORDER BY rail, engine, temperature_bin, sio2_bin, id"""
+    ):
+        key = (str(rail), str(engine), int(temperature_bin), int(sio2_bin))
+        count, total, squares = cell_values.get(key, (0, Decimal(0), Decimal(0)))
+        residual = Decimal(str(residual_text))
+        cell_values[key] = (count + 1, total + residual, squares + residual * residual)
+        temperature_bins_by_rail[key[0]].add(key[2])
+        engines_by_rail[key[0]].add(key[1])
+
+    median_values: dict[tuple[str, str, int, int], tuple[Decimal, Decimal]] = {}
+    current_key: tuple[str, str, int, int] | None = None
+    current_index = 0
+    targets: set[int] = set()
+    selected: dict[int, Decimal] = {}
+
+    def save_median(key: tuple[str, str, int, int], values: Mapping[int, Decimal]) -> None:
+        count = cell_values[key][0]
+        lower = values[(count - 1) // 2]
+        upper = values[count // 2]
+        median_values[key] = (lower, upper)
+
+    for rail, engine, temperature_bin, sio2_bin, absolute_text in database.execute(
+        """SELECT rail, engine, temperature_bin, sio2_bin, absolute_text
+             FROM battery_hero_fingerprint_values
+            ORDER BY rail, engine, temperature_bin, sio2_bin,
+                     absolute_text COLLATE BATTERY_HERO_DECIMAL, id"""
+    ):
+        key = (str(rail), str(engine), int(temperature_bin), int(sio2_bin))
+        if key != current_key:
+            if current_key is not None:
+                save_median(current_key, selected)
+            current_key = key
+            current_index = 0
+            count = cell_values[key][0]
+            targets = {(count - 1) // 2, count // 2}
+            selected = {}
+        if current_index in targets:
+            selected[current_index] = Decimal(str(absolute_text))
+        current_index += 1
+    if current_key is not None:
+        save_median(current_key, selected)
+
+    temperature_width = BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K
+    sio2_width = BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH
     records: list[dict[str, object]] = []
     for rail in sorted(temperature_bins_by_rail):
         temperature_bins = temperature_bins_by_rail[rail]
         for engine in sorted(engines_by_rail[rail]):
-            for temperature_bin in range(
-                min(temperature_bins), max(temperature_bins) + 1
-            ):
+            for temperature_bin in range(min(temperature_bins), max(temperature_bins) + 1):
                 temperature_lower = Decimal(temperature_bin) * temperature_width
                 for sio2_bin in range(20):
-                    cell_values = values_by_cell.get(
-                        (rail, engine, temperature_bin, sio2_bin), []
+                    key = (rail, engine, temperature_bin, sio2_bin)
+                    count, total, squares = cell_values.get(
+                        key, (0, Decimal(0), Decimal(0))
+                    )
+                    median_pair = median_values.get(key)
+                    median = (
+                        None
+                        if median_pair is None
+                        else str((median_pair[0] + median_pair[1]) / Decimal(2))
                     )
                     records.append(
                         {
                             "rail": rail,
                             "engine": engine,
-                            "temperature_lower_K": str(temperature_lower),
-                            "temperature_upper_K": str(
-                                temperature_lower + temperature_width
+                            "temperature_lower_K": format(temperature_lower, "f"),
+                            "temperature_upper_K": format(
+                                temperature_lower + temperature_width, "f"
                             ),
-                            "sio2_lower": str(Decimal(sio2_bin) * sio2_width),
-                            "sio2_upper": str(Decimal(sio2_bin + 1) * sio2_width),
-                            "n": len(cell_values),
-                            "color_eligible": len(cell_values) >= 3,
-                            "median_abs_dex": (
-                                None
-                                if not cell_values
-                                else str(_median_abs(cell_values))
+                            "sio2_lower": format(
+                                (Decimal(sio2_bin) * sio2_width).normalize(), "f"
                             ),
+                            "sio2_upper": format(
+                                (Decimal(sio2_bin + 1) * sio2_width).normalize(), "f"
+                            ),
+                            "n": count,
+                            "sum_residual_dex": str(total),
+                            "sum_squared_residual_dex": str(squares),
+                            "color_eligible": count >= 3,
+                            "median_abs_dex": median,
                         }
                     )
     return records

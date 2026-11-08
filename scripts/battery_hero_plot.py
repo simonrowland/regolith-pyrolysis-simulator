@@ -34,6 +34,7 @@ import html
 import json
 import math
 import os
+import random
 import re
 import sqlite3
 import subprocess
@@ -59,6 +60,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.axes import Axes
+from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
@@ -84,18 +86,29 @@ from simulator.feedstock_composition import resolve_feedstock_composition  # noq
 from simulator.battery.score import (  # noqa: E402
     _BATTERY_HERO_DECK_CHART_IDS,
     _BATTERY_HERO_DECK_SOURCE_RAILS,
+    BATTERY_HERO_FINGERPRINT_BAND_BOUNDARIES,
+    BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH,
+    BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K,
+    BATTERY_HERO_MINIMUM_REPORT_N as HERO_MINIMUM_REPORT_N,
+    BATTERY_HERO_TEMPERATURE_FLOOR_K as HERO_TEMPERATURE_FLOOR_K,
+    BATTERY_HERO_TEMPERATURE_VIEWS as HERO_TEMPERATURE_VIEWS,
     _battery_hero_binned_score_records,
+    _battery_hero_metric_records_from_database,
+    _battery_hero_pair_comparison_records_from_database,
     _battery_hero_deck_payload,
     _battery_hero_deck_records,
     _battery_hero_deck_store_observations,
     _battery_hero_facet,
+    _battery_hero_create_metric_rows,
+    _battery_hero_fingerprint_band,
     _battery_hero_minor_foulant_facets,
     _flagged_payload_strata,
     _battery_hero_sio2_mole_fraction,
-    _battery_hero_sweet_spot_records,
-    _median_abs,
-    _paired_engine_rail_comparisons,
-    _rms,
+    _battery_hero_create_fingerprint_values,
+    _battery_hero_sweet_spot_bin_indices,
+    _battery_hero_temperature_bin_index,
+    _battery_hero_unknown_sio2_records_from_database,
+    _battery_hero_sweet_spot_records_from_database,
     _residual_engine_observable,
 )
 
@@ -114,23 +127,10 @@ HERO_AND_DECK_SOURCE_RAILS = frozenset(HERO_RAILS) | frozenset(
 HERO_PRIMARY_ENGINES = ("openimcc", "internal-analytical")
 HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
 HERO_TEMPERATURE_FIELD = "candidate_observation.identity.temperature_K"
-HERO_TEMPERATURE_FLOOR_K = Decimal(1700)
-HERO_MINIMUM_REPORT_N = 5
 HERO_SCORECARD_FONT_SIZE = 3.5
 HERO_SCORECARD_LINE_HEIGHT_IN = 0.085
 HERO_SCORECARD_TABLE_HEIGHT_FRACTION = 0.88
 HERO_SCORECARD_TITLE_HEIGHT_IN = 0.16
-HERO_TEMPERATURE_VIEWS = (
-    ("all", "all"),
-    (
-        "temperature_ge_1700",
-        f"T ≥ {int(HERO_TEMPERATURE_FLOOR_K)} K",
-    ),
-    (
-        "temperature_lt_1700",
-        f"T < {int(HERO_TEMPERATURE_FLOOR_K)} K",
-    ),
-)
 COLLECTION_OBSERVABLES = (
     (Rail.VAPOUR.value, "Vapour pressure"),
     (Rail.MELT_ACTIVITY.value, "Melt activity"),
@@ -139,6 +139,8 @@ COLLECTION_OBSERVABLES = (
     (Rail.RESIDUE_COMPOSITION.value, "Residue composition"),
 )
 COLLECTION_SCORE_RAILS = tuple(rail for rail, _label in COLLECTION_OBSERVABLES)
+COLLECTION_HTML_SAMPLE_LIMIT = 100
+COLLECTION_EXPORT_DPI = 150
 FINGERPRINT_BANDS = (
     ("good", "#1a9641"),
     ("okay", "#f6c90e"),
@@ -242,6 +244,9 @@ class ScorePlotData:
     hero_sweet_spot_cells: Mapping[
         tuple[str, str], tuple[Mapping[str, object], ...]
     ]
+    hero_sio2_unknown_cells: Mapping[
+        tuple[str, str], tuple[Mapping[str, object], ...]
+    ]
     hero_all_numeric_metrics: Mapping[tuple[str, str], Mapping[str, object]]
     element_series: Mapping[tuple[str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
@@ -265,6 +270,33 @@ class ScorePlotData:
     ] = field(default_factory=dict)
     hero_source_disagreement_reasons: tuple[str, ...] = ()
     hero_component_comparisons: tuple[Mapping[str, object], ...] = ()
+    rails_explicit: bool = False
+
+
+class _SQLiteCompositionSio2(Mapping[str, float]):
+    """Look up scorer-computed SiO₂ fractions without retaining every formula."""
+
+    def __init__(self, database: sqlite3.Connection) -> None:
+        self.database = database
+
+    def __getitem__(self, key: str) -> float:
+        row = self.database.execute(
+            "SELECT sio2_fraction FROM composition_sio2 WHERE composition_key = ?",
+            (key,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(key)
+        return float(row[0])
+
+    def __iter__(self) -> Iterator[str]:
+        for (key,) in self.database.execute(
+            "SELECT composition_key FROM composition_sio2 ORDER BY composition_key"
+        ):
+            yield str(key)
+
+    def __len__(self) -> int:
+        row = self.database.execute("SELECT COUNT(*) FROM composition_sio2").fetchone()
+        return 0 if row is None else int(row[0])
 
 
 def _d139_exclusion_counts(
@@ -677,156 +709,22 @@ def _hero_exposure_status(
     return "held_out"
 
 
-def _hero_metric_stats(
-    values: Sequence[Decimal], *, minimum_n: int = 1
-) -> dict[str, object]:
-    count = len(values)
-    if count < minimum_n:
-        return {"n": count, "rms_dex": None, "sd_dex": None, "median_abs_dex": None}
-    # Scorer numeric.value is signed dex = log10(pred / obs).
-    # RMS is sqrt(sum(dex_i**2) / n); reuse the scorer's existing accumulator.
-    rms = _rms(values)
-    # SD is population standard deviation: sqrt(sum((dex_i - mean)**2) / n), ddof=0.
-    mean = sum(values, Decimal(0)) / Decimal(count)
-    variance = sum(((value - mean) ** 2 for value in values), Decimal(0)) / Decimal(count)
-    standard_deviation = variance.sqrt()
-    # Median absolute dex is median(abs(dex_i)); reuse the scorer's existing helper.
-    median_absolute = _median_abs(values)
-    return {
-        "n": count,
-        "rms_dex": None if rms is None else str(rms),
-        "sd_dex": str(standard_deviation),
-        "median_abs_dex": None if median_absolute is None else str(median_absolute),
-    }
-
-
-def _hero_metric_views(
-    items: Iterable[tuple[Mapping[str, object], Decimal]],
-    *,
-    exposure_policy: _HeroExposurePolicy | None = None,
-    minimum_metric_n: int = 1,
-    include_source_disagreement: bool = False,
-) -> dict[str, dict[str, object]]:
-    buckets: dict[str, list[tuple[Mapping[str, object], Decimal]]] = {
-        "all": [],
-        "temperature_ge_1700": [],
-        "temperature_lt_1700": [],
-    }
-    no_temperature_n = 0
-    for row, value in items:
-        buckets["all"].append((row, value))
-        temperature = _hero_metric_temperature(row)
-        if temperature is None:
-            no_temperature_n += 1
-        elif temperature >= HERO_TEMPERATURE_FLOOR_K:
-            buckets["temperature_ge_1700"].append((row, value))
-        else:
-            buckets["temperature_lt_1700"].append((row, value))
-
-    views: dict[str, dict[str, object]] = {}
-    for name, bucket in buckets.items():
-        values = [value for _row, value in bucket]
-        view = _hero_metric_stats(values, minimum_n=minimum_metric_n)
-        view["no_temperature_n"] = no_temperature_n if name == "all" else 0
-        if minimum_metric_n > 1:
-            view["minimum_n"] = minimum_metric_n
-        if include_source_disagreement:
-            flagged = [value for row, value in bucket if _hero_source_disagreement_flagged(row)]
-            unflagged = [value for row, value in bucket if not _hero_source_disagreement_flagged(row)]
-            view["source_disagreement_flagged"] = _hero_metric_stats(
-                flagged, minimum_n=minimum_metric_n
-            )
-            view["unflagged"] = _hero_metric_stats(
-                unflagged, minimum_n=minimum_metric_n
-            )
-        if exposure_policy is not None:
-            exposed_values = [
-                value
-                for row, value in bucket
-                if _hero_exposure_status(row, exposure_policy) == "exposed"
-            ]
-            held_out_values = [
-                value
-                for row, value in bucket
-                if _hero_exposure_status(row, exposure_policy) == "held_out"
-            ]
-            held_out = _hero_metric_stats(
-                held_out_values,
-                minimum_n=exposure_policy.minimum_held_out_n,
-            )
-            held_out["minimum_n"] = exposure_policy.minimum_held_out_n
-            view["exposed_n"] = len(exposed_values)
-            view["held_out"] = held_out
-        views[name] = view
-    return views
-
-
-def _hero_metric_records(
+def _hero_metric_rows_database(
     residuals: Iterable[Mapping[str, object]],
     *,
-    engines: Sequence[str] | None = None,
-    rails: Sequence[str] | None = None,
-    exposure_policy: _HeroExposurePolicy | None = None,
-) -> dict[tuple[str, str], dict[str, object]]:
-    groups: dict[
-        tuple[str, str], list[tuple[Mapping[str, object], Decimal]]
-    ] = defaultdict(list)
+    exposure_policy: _HeroExposurePolicy | None,
+) -> sqlite3.Connection:
+    """Adapt payload rows to the scorer-owned SQLite metric input."""
+
+    database = sqlite3.connect(":memory:")
+    _battery_hero_create_metric_rows(database)
+    pending: list[tuple[object, ...]] = []
     for row in residuals:
         rail = str(row.get("rail") or "")
-        numeric = row.get("numeric")
         engine = _engine_name(row)
+        numeric = row.get("numeric")
         if (
             not rail
-            or not engine
-            or not isinstance(numeric, Mapping)
-            or numeric.get("operation") != "dex"
-            or numeric.get("value") is None
-        ):
-            continue
-        value = _hero_decimal(numeric["value"])
-        if value is not None:
-            groups[(rail, engine)].append((row, value))
-
-    all_engines = set(engines or ()) | {engine for _rail, engine in groups}
-    all_rails = set(rails or ()) | {rail for rail, _engine in groups}
-    records: dict[tuple[str, str], dict[str, object]] = {}
-    for rail in sorted(all_rails):
-        for engine in sorted(all_engines):
-            views = _hero_metric_views(
-                groups.get((rail, engine), ()),
-                exposure_policy=exposure_policy,
-                include_source_disagreement=rail == Rail.VAPOUR.value,
-            )
-            all_view = views["all"]
-            records[(rail, engine)] = {
-                "rail": rail,
-                "engine": engine,
-                "n": all_view["n"],
-                "n_dex": all_view["n"],
-                "rms_dex": all_view["rms_dex"],
-                "sd_dex": all_view["sd_dex"],
-                "median_abs_dex": all_view["median_abs_dex"],
-                "views": views,
-            }
-    return records
-
-
-def _hero_pair_rows(
-    residuals: Iterable[Mapping[str, object]], *, include_species: bool = False
-) -> dict[
-    tuple[str, str, str], dict[str, list[tuple[Decimal, Mapping[str, object]]]]
-]:
-    grouped: dict[
-        tuple[str, str, str], dict[str, list[tuple[Decimal, Mapping[str, object]]]]
-    ] = defaultdict(lambda: defaultdict(list))
-    for row in residuals:
-        rail = str(row.get("rail") or "")
-        reference = str(row.get("reference") or "")
-        numeric = row.get("numeric")
-        engine = _engine_name(row)
-        if (
-            not rail
-            or not reference
             or not engine
             or not isinstance(numeric, Mapping)
             or numeric.get("operation") != "dex"
@@ -836,104 +734,84 @@ def _hero_pair_rows(
         value = _hero_decimal(numeric["value"])
         if value is None:
             continue
-        species = ""
-        if include_species:
-            candidate = row.get("candidate_observation")
-            candidate = candidate if isinstance(candidate, Mapping) else {}
-            identity = candidate.get("identity")
-            identity = identity if isinstance(identity, Mapping) else {}
-            raw_species = identity.get("species")
-            resolved_species = _state_value(raw_species)
-            if resolved_species is None and isinstance(raw_species, Mapping):
-                resolved_species = raw_species
-            species = (
-                str(resolved_species.get("formula") or "unknown")
-                if isinstance(resolved_species, Mapping)
-                else "unknown"
+        temperature = _hero_metric_temperature(row)
+        pending.append(
+            (
+                rail,
+                engine,
+                str(row.get("reference") or ""),
+                _row_formula(row),
+                str(value),
+                None if temperature is None else str(temperature),
+                int(_hero_source_disagreement_flagged(row)),
+                _hero_exposure_status(row, exposure_policy)
+                if exposure_policy is not None
+                else "not_used",
             )
-        grouped[(rail, reference, species)][engine].append((value, row))
-    return grouped
+        )
+        if len(pending) >= 5000:
+            database.executemany(
+                "INSERT INTO hero_rows "
+                "(rail, engine, reference, species, residual_text, temperature_text, "
+                "source_flag, exposure_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                pending,
+            )
+            pending.clear()
+    if pending:
+        database.executemany(
+            "INSERT INTO hero_rows "
+            "(rail, engine, reference, species, residual_text, temperature_text, "
+            "source_flag, exposure_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            pending,
+        )
+    return database
 
 
-def _hero_comparison_metrics(
-    pairs: Sequence[tuple[Mapping[str, object], Decimal, Decimal]],
+def _hero_metric_records(
+    residuals: Iterable[Mapping[str, object]],
     *,
-    exposure_policy: _HeroExposurePolicy | None,
-    minimum_n: int,
-    include_source_disagreement: bool,
-) -> dict[str, object]:
-    primary_items = [(row, primary) for row, primary, _outside in pairs]
-    outside_items = [(row, outside) for row, _primary, outside in pairs]
-    primary_views = _hero_metric_views(
-        primary_items,
-        exposure_policy=exposure_policy,
-        minimum_metric_n=minimum_n,
-        include_source_disagreement=include_source_disagreement,
+    engines: Sequence[str] | None = None,
+    rails: Sequence[str] | None = None,
+    exposure_policy: _HeroExposurePolicy | None = None,
+) -> dict[tuple[str, str], dict[str, object]]:
+    database = _hero_metric_rows_database(
+        residuals, exposure_policy=exposure_policy
     )
-    outside_views = _hero_metric_views(
-        outside_items,
-        exposure_policy=exposure_policy,
-        minimum_metric_n=minimum_n,
-        include_source_disagreement=include_source_disagreement,
-    )
-    shared_views: dict[str, dict[str, object]] = {}
-    for name, primary_view in primary_views.items():
-        outside_view = outside_views[name]
-        view: dict[str, object] = {
-            "n_shared": outside_view["n"],
-            "no_temperature_n": outside_view["no_temperature_n"],
-            "outside_rms_dex": outside_view["rms_dex"],
-            "outside_sd_dex": outside_view["sd_dex"],
-            "outside_median_abs_dex": outside_view["median_abs_dex"],
-            "primary_rms_dex_on_shared": primary_view["rms_dex"],
-            "primary_sd_dex_on_shared": primary_view["sd_dex"],
-            "primary_median_abs_dex_on_shared": primary_view["median_abs_dex"],
-        }
-        if include_source_disagreement:
-            for flag_name in ("source_disagreement_flagged", "unflagged"):
-                primary_flag = primary_view[flag_name]
-                outside_flag = outside_view[flag_name]
-                view[flag_name] = {
-                    "n_shared": outside_flag["n"],
-                    "outside_rms_dex": outside_flag["rms_dex"],
-                    "outside_sd_dex": outside_flag["sd_dex"],
-                    "outside_median_abs_dex": outside_flag["median_abs_dex"],
-                    "primary_rms_dex_on_shared": primary_flag["rms_dex"],
-                    "primary_sd_dex_on_shared": primary_flag["sd_dex"],
-                    "primary_median_abs_dex_on_shared": primary_flag[
-                        "median_abs_dex"
-                    ],
+    try:
+        selected_engines = tuple(
+            sorted(
+                set(engines or ())
+                | {
+                    str(row[0])
+                    for row in database.execute(
+                        "SELECT DISTINCT engine FROM hero_rows"
+                    )
                 }
-        if minimum_n > 1:
-            view["minimum_n"] = minimum_n
-        if exposure_policy is not None:
-            outside_held = outside_view["held_out"]
-            primary_held = primary_view["held_out"]
-            view["exposed_n"] = outside_view["exposed_n"]
-            view["held_out"] = {
-                "n": outside_held["n"],
-                "minimum_n": outside_held["minimum_n"],
-                "outside_rms_dex": outside_held["rms_dex"],
-                "outside_sd_dex": outside_held["sd_dex"],
-                "outside_median_abs_dex": outside_held["median_abs_dex"],
-                "primary_rms_dex_on_shared": primary_held["rms_dex"],
-                "primary_sd_dex_on_shared": primary_held["sd_dex"],
-                "primary_median_abs_dex_on_shared": primary_held["median_abs_dex"],
-            }
-        shared_views[name] = view
-
-    all_primary = primary_views["all"]
-    all_outside = outside_views["all"]
-    return {
-        "n_shared": all_outside["n"],
-        "outside_rms_dex": all_outside["rms_dex"],
-        "outside_sd_dex": all_outside["sd_dex"],
-        "outside_median_abs_dex": all_outside["median_abs_dex"],
-        "primary_rms_dex_on_shared": all_primary["rms_dex"],
-        "primary_sd_dex_on_shared": all_primary["sd_dex"],
-        "primary_median_abs_dex_on_shared": all_primary["median_abs_dex"],
-        "views": shared_views,
-    }
+            )
+        )
+        selected_rails = tuple(
+            sorted(
+                set(rails or ())
+                | {
+                    str(row[0])
+                    for row in database.execute(
+                        "SELECT DISTINCT rail FROM hero_rows"
+                    )
+                }
+            )
+        )
+        return _battery_hero_metric_records_from_database(
+            database,
+            engines=selected_engines,
+            rails=selected_rails,
+            minimum_held_out_n=(
+                exposure_policy.minimum_held_out_n
+                if exposure_policy is not None
+                else None
+            ),
+        )
+    finally:
+        database.close()
 
 
 def _hero_paired_engine_rail_comparisons(
@@ -945,87 +823,25 @@ def _hero_paired_engine_rail_comparisons(
     exposure_policy: _HeroExposurePolicy | None = None,
     include_species: bool = False,
 ) -> list[dict[str, object]]:
-    rows = tuple(residuals)
-    if not include_species:
-        records = _paired_engine_rail_comparisons(
-            rows,
+    database = _hero_metric_rows_database(
+        residuals, exposure_policy=exposure_policy
+    )
+    try:
+        return _battery_hero_pair_comparison_records_from_database(
+            database,
             primary_engines=primary_engines,
             comparison_engines=comparison_engines,
             rails=rails,
+            minimum_held_out_n=(
+                exposure_policy.minimum_held_out_n
+                if exposure_policy is not None
+                else None
+            ),
+            include_species=include_species,
+            minimum_report_n=HERO_MINIMUM_REPORT_N,
         )
-        grouped = _hero_pair_rows(rows)
-        for record in records:
-            rail = str(record["rail"])
-            primary = str(record["primary_engine"])
-            for comparison in record["comparisons"]:
-                engine = str(comparison["engine"])
-                pairs: list[tuple[Mapping[str, object], Decimal, Decimal]] = []
-                for (row_rail, _reference, _species), by_engine in grouped.items():
-                    if row_rail != rail:
-                        continue
-                    primary_values = by_engine.get(primary, ())
-                    outside_values = by_engine.get(engine, ())
-                    if len(primary_values) == 1 and len(outside_values) == 1:
-                        primary_value, primary_row = primary_values[0]
-                        outside_value, _outside_row = outside_values[0]
-                        pairs.append((primary_row, primary_value, outside_value))
-                comparison.update(
-                    _hero_comparison_metrics(
-                        pairs,
-                        exposure_policy=exposure_policy,
-                        minimum_n=1,
-                        include_source_disagreement=rail == Rail.VAPOUR.value,
-                    )
-                )
-        return records
-
-    grouped = _hero_pair_rows(rows, include_species=True)
-    species_by_rail: dict[str, set[str]] = defaultdict(set)
-    for rail, _reference, species in grouped:
-        species_by_rail[rail].add(species)
-    comparison_names = sorted(set(comparison_engines) - set(primary_engines))
-    records: list[dict[str, object]] = []
-    for rail in sorted(set(rails)):
-        for species in sorted(species_by_rail.get(rail, {"unknown"})):
-            for primary in primary_engines:
-                candidates: list[tuple[int, str, dict[str, object]]] = []
-                pairs_by_engine: dict[
-                    str, list[tuple[Mapping[str, object], Decimal, Decimal]]
-                ] = defaultdict(list)
-                for (row_rail, _reference, row_species), by_engine in grouped.items():
-                    if row_rail != rail or row_species != species:
-                        continue
-                    primary_values = by_engine.get(primary, ())
-                    if len(primary_values) != 1:
-                        continue
-                    primary_value, primary_row = primary_values[0]
-                    for engine in comparison_names:
-                        outside_values = by_engine.get(engine, ())
-                        if len(outside_values) == 1:
-                            outside_value, _outside_row = outside_values[0]
-                            pairs_by_engine[engine].append(
-                                (primary_row, primary_value, outside_value)
-                            )
-                for engine, pairs in pairs_by_engine.items():
-                    comparison = _hero_comparison_metrics(
-                        pairs,
-                        exposure_policy=exposure_policy,
-                        minimum_n=HERO_MINIMUM_REPORT_N,
-                        include_source_disagreement=rail == Rail.VAPOUR.value,
-                    )
-                    comparison["engine"] = engine
-                    comparison["minimum_n"] = HERO_MINIMUM_REPORT_N
-                    candidates.append((len(pairs), engine, comparison))
-                candidates.sort(key=lambda item: (-item[0], item[1]))
-                records.append(
-                    {
-                        "rail": rail,
-                        "primary_engine": primary,
-                        "species": species,
-                        "comparisons": [item[2] for item in candidates],
-                    }
-                )
-    return records
+    finally:
+        database.close()
 
 
 def _record_hero_diagnostic(
@@ -1186,58 +1002,6 @@ def abundance_class_table(
     return rows
 
 
-def _hero_deck_rows(
-    score_rows: Sequence[Mapping[str, object]],
-    points: Sequence[Mapping[str, object]],
-) -> tuple[
-    dict[str, list[Mapping[str, object]]],
-    dict[str, list[Mapping[str, object]]],
-]:
-    candidates: dict[
-        tuple[str, str, Decimal], list[Mapping[str, object]]
-    ] = defaultdict(list)
-    for row in score_rows:
-        engine = _engine_name(row)
-        reference = str(row.get("reference") or "")
-        numeric = row.get("numeric")
-        value = (
-            _hero_decimal(numeric.get("value"))
-            if isinstance(numeric, Mapping)
-            else None
-        )
-        if engine and reference and value is not None:
-            candidates[(engine, reference, value)].append(row)
-
-    metric_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
-    comparison_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
-    for chart in _BATTERY_HERO_DECK_CHART_IDS:
-        used: Counter[tuple[str, str, Decimal]] = Counter()
-        chart_points = [point for point in points if point.get("chart") == chart]
-        for point in chart_points:
-            engine = str(point.get("engine") or "")
-            reference = str(point.get("reference") or "")
-            value = _hero_decimal(point.get("residual_dex"))
-            if not engine or not reference or value is None:
-                continue
-            key = (engine, reference, value)
-            matches = candidates.get(key, ())
-            index = used[key]
-            if index >= len(matches):
-                continue
-            used[key] += 1
-            chart_row = {**matches[index], "rail": chart}
-            metric_rows[chart].append(chart_row)
-            comparison_rows[chart].append(chart_row)
-
-    residue = Rail.RESIDUE_COMPOSITION.value
-    metric_rows[residue] = [
-        {**row, "rail": residue}
-        for row in score_rows
-        if str(row.get("rail") or "") == residue
-    ]
-    return metric_rows, comparison_rows
-
-
 def read_scores(
     path: Path,
     *,
@@ -1245,6 +1009,7 @@ def read_scores(
     rails: Sequence[str] | None = None,
     scratch_dir: Path | None = None,
     exposure_policy: _HeroExposurePolicy | None = None,
+    _collection_mode: bool = False,
 ) -> ScorePlotData:
     """Stream the score JSONL and return binned, duplicate-collapsed data."""
 
@@ -1255,11 +1020,7 @@ def read_scores(
     retained_rails = selected | HERO_AND_DECK_SOURCE_RAILS
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
-    comparison_payloads: list[Mapping[str, object]] = []
     source_disagreement_reasons: set[str] = set()
-    deck_score_rows: list[Mapping[str, object]] = []
-    sweet_spot_samples: list[tuple[str, str, object, object, object]] = []
-    hero_composition_sio2: dict[str, float] = {}
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
     hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
@@ -1292,10 +1053,25 @@ def read_scores(
                 observable TEXT NOT NULL
             )"""
         )
+        database.execute(
+            "CREATE TABLE composition_sio2 "
+            "(composition_key TEXT PRIMARY KEY, sio2_fraction REAL NOT NULL)"
+        )
+        _battery_hero_create_metric_rows(database)
+        database.execute(
+            "CREATE TABLE hero_deck_payloads "
+            "(id INTEGER PRIMARY KEY, payload_json TEXT NOT NULL)"
+        )
+        _battery_hero_create_fingerprint_values(database)
 
         pending: list[
             tuple[str, str, str, str, str, float, int, float, str, str, str]
         ] = []
+        hero_rows_pending: list[tuple[object, ...]] = []
+        deck_payloads_pending: list[tuple[str]] = []
+        fingerprint_pending: list[tuple[object, ...]] = []
+        unknown_fingerprint_pending: list[tuple[object, ...]] = []
+        composition_pending: dict[str, float] = {}
         with _open_residual_jsonl(path) as source:
             for line_number, line in enumerate(source, start=1):
                 if not line.strip():
@@ -1380,12 +1156,54 @@ def read_scores(
                         summary.non_dex_rows += 1
                     continue
                 if rail in HERO_AND_DECK_SOURCE_RAILS:
-                    comparison_payloads.append(row)
                     if rail == Rail.VAPOUR.value:
                         source_disagreement_reasons.update(
                             _hero_source_disagreement_reasons(row)
                         )
-                if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
+                    metric_value = _hero_decimal(numeric.get("value"))
+                    if metric_value is not None:
+                        metric_identity = _row_identity(row)
+                        raw_species = (
+                            metric_identity.get("species")
+                            if isinstance(metric_identity, Mapping)
+                            else None
+                        )
+                        species_value = _state_value(raw_species)
+                        if species_value is None and isinstance(raw_species, Mapping):
+                            species_value = raw_species
+                        species = (
+                            str(species_value.get("formula") or "unknown")
+                            if isinstance(species_value, Mapping)
+                            else "unknown"
+                        )
+                        metric_temperature = _hero_metric_temperature(row)
+                        metric_reference = str(row.get("reference") or "")
+                        metric_exposure = (
+                            _hero_exposure_status(row, exposure_policy)
+                            if exposure_policy is not None
+                            else "not_used"
+                        )
+                        hero_rows_pending.append(
+                            (
+                                rail,
+                                engine,
+                                metric_reference,
+                                species,
+                                str(metric_value),
+                                None if metric_temperature is None else str(metric_temperature),
+                                int(_hero_source_disagreement_flagged(row)),
+                                metric_exposure,
+                            )
+                        )
+                        if len(hero_rows_pending) >= 5000:
+                            database.executemany(
+                                "INSERT INTO hero_rows "
+                                "(rail, engine, reference, species, residual_text, temperature_text, "
+                                "source_flag, exposure_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                                hero_rows_pending,
+                            )
+                            hero_rows_pending.clear()
+                if rail in _BATTERY_HERO_DECK_SOURCE_RAILS and not _collection_mode:
                     deck_payload = _battery_hero_deck_payload(row)
                     deck_candidate = deck_payload.get("candidate_observation")
                     deck_candidate = (
@@ -1394,7 +1212,21 @@ def read_scores(
                     source_id = candidate_observation.get("source_id")
                     if source_id:
                         deck_candidate["source_id"] = source_id
-                    deck_score_rows.append(deck_payload)
+                    deck_payloads_pending.append(
+                        (
+                            json.dumps(
+                                deck_payload,
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        )
+                    )
+                    if len(deck_payloads_pending) >= 5000:
+                        database.executemany(
+                            "INSERT INTO hero_deck_payloads (payload_json) VALUES (?)",
+                            deck_payloads_pending,
+                        )
+                        deck_payloads_pending.clear()
 
                 identity = _row_identity(row)
                 if not identity:
@@ -1444,16 +1276,54 @@ def read_scores(
                     composition_raw = _state_value(identity.get("composition"))
                     sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
                     if sio2_fraction is not None:
-                        hero_composition_sio2[composition_key] = float(sio2_fraction)
-                    sweet_spot_samples.append(
-                        (
-                            rail,
-                            engine,
-                            temperature_raw,
-                            composition_raw,
-                            numeric.get("value"),
+                        composition_pending[composition_key] = float(sio2_fraction)
+                        if len(composition_pending) >= 5000:
+                            database.executemany(
+                                "INSERT OR REPLACE INTO composition_sio2 "
+                                "(composition_key, sio2_fraction) VALUES (?, ?)",
+                                composition_pending.items(),
+                            )
+                            composition_pending.clear()
+                        bins = _battery_hero_sweet_spot_bin_indices(
+                            temperature_raw, sio2_fraction
                         )
-                    )
+                        fingerprint_value = _hero_decimal(numeric.get("value"))
+                        if bins is not None and fingerprint_value is not None:
+                            fingerprint_pending.append(
+                                (
+                                    rail,
+                                    engine,
+                                    bins[0],
+                                    bins[1],
+                                    str(fingerprint_value),
+                                    str(abs(fingerprint_value)),
+                                )
+                            )
+                            if len(fingerprint_pending) >= 5000:
+                                database.executemany(
+                                    "INSERT INTO battery_hero_fingerprint_values "
+                                    "(rail, engine, temperature_bin, sio2_bin, residual_text, "
+                                    "absolute_text) VALUES (?, ?, ?, ?, ?, ?)",
+                                    fingerprint_pending,
+                                )
+                                fingerprint_pending.clear()
+                    else:
+                        temperature_bin = _battery_hero_temperature_bin_index(
+                            temperature_raw
+                        )
+                        fingerprint_value = _hero_decimal(numeric.get("value"))
+                        if temperature_bin is not None and fingerprint_value is not None:
+                            unknown_fingerprint_pending.append(
+                                (rail, engine, temperature_bin, str(fingerprint_value))
+                            )
+                            if len(unknown_fingerprint_pending) >= 5000:
+                                database.executemany(
+                                    "INSERT INTO battery_hero_unknown_sio2_values "
+                                    "(rail, engine, temperature_bin, residual_text) "
+                                    "VALUES (?, ?, ?, ?)",
+                                    unknown_fingerprint_pending,
+                                )
+                                unknown_fingerprint_pending.clear()
                 observable = _row_observable(row)
                 pending.append(
                     (
@@ -1482,6 +1352,40 @@ def read_scores(
                 "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 pending,
             )
+        if hero_rows_pending:
+            database.executemany(
+                "INSERT INTO hero_rows "
+                "(rail, engine, reference, species, residual_text, temperature_text, "
+                "source_flag, exposure_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                hero_rows_pending,
+            )
+        if deck_payloads_pending:
+            database.executemany(
+                "INSERT INTO hero_deck_payloads (payload_json) VALUES (?)",
+                deck_payloads_pending,
+            )
+        if fingerprint_pending:
+            database.executemany(
+                "INSERT INTO battery_hero_fingerprint_values "
+                "(rail, engine, temperature_bin, sio2_bin, residual_text, absolute_text) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                fingerprint_pending,
+            )
+        if unknown_fingerprint_pending:
+            database.executemany(
+                "INSERT INTO battery_hero_unknown_sio2_values "
+                "(rail, engine, temperature_bin, residual_text) VALUES (?, ?, ?, ?)",
+                unknown_fingerprint_pending,
+            )
+        if composition_pending:
+            database.executemany(
+                "INSERT OR REPLACE INTO composition_sio2 "
+                "(composition_key, sio2_fraction) VALUES (?, ?)",
+                composition_pending.items(),
+            )
+        database.execute(
+            "CREATE INDEX hero_pair_lookup ON hero_rows(rail, reference, species, engine, id)"
+        )
         database.commit()
         if stamp is None:
             raise ValueError(f"{path}: empty score file")
@@ -1490,26 +1394,125 @@ def read_scores(
             selected_rails=selected_rails,
             hero_rails=HERO_RAILS,
             bin_width_K=bin_width_K,
-            composition_sio2_by_key=hero_composition_sio2,
+            composition_sio2_by_key=_SQLiteCompositionSio2(database),
         )
+        summary_records = binned_records["summaries"]
+        for engine, record in summary_records.items():
+            summaries[engine].unique_points = int(record["unique_points"])
+            summaries[engine].rms_dex = float(record["rms_dex"])
+        series = _bin_points_by_key(binned_records["series"])
+        hero_series = _bin_points_by_key(binned_records["hero_series"])
+        element_series = _bin_points_by_key(binned_records["element_series"])
+        engines = tuple(
+            sorted(summaries, key=lambda name: (name != "openimcc", name.casefold()))
+        )
+        hero_all_numeric_metrics = _battery_hero_metric_records_from_database(
+            database,
+            engines=engines,
+            rails=COLLECTION_SCORE_RAILS,
+            minimum_held_out_n=(
+                exposure_policy.minimum_held_out_n
+                if exposure_policy is not None
+                else None
+            ),
+        )
+        hero_comparisons = {
+            (str(record["rail"]), str(record["primary_engine"])): record
+            for record in _battery_hero_pair_comparison_records_from_database(
+                database,
+                primary_engines=HERO_PRIMARY_ENGINES,
+                comparison_engines=HERO_COMPARISON_ENGINES,
+                rails=COLLECTION_SCORE_RAILS,
+                minimum_held_out_n=(
+                    exposure_policy.minimum_held_out_n
+                    if exposure_policy is not None
+                    else None
+                ),
+            )
+        }
+        hero_openimcc_vaporock_species = tuple(
+            _battery_hero_pair_comparison_records_from_database(
+                database,
+                primary_engines=("openimcc",),
+                comparison_engines=("vaporock",),
+                rails=(Rail.VAPOUR.value,),
+                minimum_held_out_n=(
+                    exposure_policy.minimum_held_out_n
+                    if exposure_policy is not None
+                    else None
+                ),
+                include_species=True,
+                minimum_report_n=HERO_MINIMUM_REPORT_N,
+            )
+        )
+        hero_component_comparisons = tuple(
+            _battery_hero_pair_comparison_records_from_database(
+                database,
+                primary_engines=("openimcc",),
+                comparison_engines=tuple(
+                    engine for engine in engines if engine != "openimcc"
+                ),
+                rails=(Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value),
+                minimum_held_out_n=(
+                    exposure_policy.minimum_held_out_n
+                    if exposure_policy is not None
+                    else None
+                ),
+                include_species=True,
+                minimum_report_n=HERO_MINIMUM_REPORT_N,
+            )
+        )
+        hero_sweet_spot_cells = _battery_hero_sweet_spot_records_from_database(
+            database
+        )
+        hero_sio2_unknown_cells = _battery_hero_unknown_sio2_records_from_database(
+            database
+        )
+
+        if _collection_mode:
+            deck_records = {
+                "points": (),
+                "metrics": {},
+                "comparisons": {},
+                "unavailable_axis_counts": {},
+                "axis_refusals": {},
+                "axis_refusal_details": {},
+            }
+            hero_deck_metrics: dict[tuple[str, str], Mapping[str, object]] = {}
+            hero_deck_comparisons: dict[
+                tuple[str, str], Mapping[str, object]
+            ] = {}
+        else:
+            def deck_payload_rows() -> Iterator[Mapping[str, object]]:
+                for (payload_json,) in database.execute(
+                    "SELECT payload_json FROM hero_deck_payloads ORDER BY id"
+                ):
+                    payload = json.loads(payload_json)
+                    if isinstance(payload, Mapping):
+                        yield payload
+
+            deck_observations = _battery_hero_deck_store_observations(
+                deck_payload_rows()
+            )
+            deck_records = _battery_hero_deck_records(
+                deck_payload_rows(),
+                primary_engines=HERO_PRIMARY_ENGINES,
+                comparison_engines=HERO_COMPARISON_ENGINES,
+                observations=deck_observations,
+            )
+            hero_deck_metrics = {
+                (str(chart), str(engine)): {
+                    **dict(metric),
+                    "views": {"all": dict(metric)},
+                }
+                for (chart, engine), metric in deck_records["metrics"].items()
+            }
+            hero_deck_comparisons = dict(deck_records["comparisons"])
+
         database.close()
 
     if stamp is None:
         raise ValueError(f"{path}: missing battery store stamp")
-    summary_records = binned_records["summaries"]
-    for engine, record in summary_records.items():
-        summaries[engine].unique_points = int(record["unique_points"])
-        summaries[engine].rms_dex = float(record["rms_dex"])
-    series = _bin_points_by_key(binned_records["series"])
-    hero_series = _bin_points_by_key(binned_records["hero_series"])
-    element_series = _bin_points_by_key(binned_records["element_series"])
-    engines = tuple(sorted(summaries, key=lambda name: (name != "openimcc", name.casefold())))
-    hero_all_numeric_metrics = _hero_metric_records(
-        comparison_payloads,
-        engines=engines,
-        rails=COLLECTION_SCORE_RAILS,
-        exposure_policy=exposure_policy,
-    )
     all_temperatures = [
         summary.min_temperature_K
         for summary in summaries.values()
@@ -1526,78 +1529,18 @@ def read_scores(
     else:
         x_limits = (0.0, bin_width_K)
 
-    hero_comparisons = {
-        (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _hero_paired_engine_rail_comparisons(
-            comparison_payloads,
-            primary_engines=HERO_PRIMARY_ENGINES,
-            comparison_engines=HERO_COMPARISON_ENGINES,
-            rails=HERO_RAILS,
-            exposure_policy=exposure_policy,
-        )
-    }
-    hero_openimcc_vaporock_species = tuple(
-        _hero_paired_engine_rail_comparisons(
-            comparison_payloads,
-            primary_engines=("openimcc",),
-            comparison_engines=("vaporock",),
-            rails=(Rail.VAPOUR.value,),
-            exposure_policy=exposure_policy,
-            include_species=True,
-        )
-    )
-    hero_component_comparisons = tuple(
-        _hero_paired_engine_rail_comparisons(
-            comparison_payloads,
-            primary_engines=("openimcc",),
-            comparison_engines=tuple(
-                engine for engine in engines if engine != "openimcc"
-            ),
-            rails=(Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value),
-            exposure_policy=exposure_policy,
-            include_species=True,
-        )
-    )
-    deck_observations = _battery_hero_deck_store_observations(deck_score_rows)
-    deck_records = _battery_hero_deck_records(
-        deck_score_rows,
-        primary_engines=HERO_PRIMARY_ENGINES,
-        comparison_engines=HERO_COMPARISON_ENGINES,
-        observations=deck_observations,
-    )
-    deck_metric_rows, deck_comparison_rows = _hero_deck_rows(
-        deck_score_rows,
-        deck_records["points"],
-    )
-    deck_engines = tuple(sorted({engine for _chart, engine in deck_records["metrics"]}))
-    hero_deck_metrics: dict[tuple[str, str], Mapping[str, object]] = {}
-    hero_deck_comparisons: dict[tuple[str, str], Mapping[str, object]] = {}
-    for chart in _BATTERY_HERO_DECK_CHART_IDS:
-        chart_metrics = _hero_metric_records(
-            deck_metric_rows.get(chart, ()),
-            engines=deck_engines,
-            rails=(chart,),
-            exposure_policy=exposure_policy,
-        )
-        hero_deck_metrics.update(chart_metrics)
-        chart_comparisons = _hero_paired_engine_rail_comparisons(
-            deck_comparison_rows.get(chart, ()),
-            primary_engines=HERO_PRIMARY_ENGINES,
-            comparison_engines=HERO_COMPARISON_ENGINES,
-            rails=(chart,),
-            exposure_policy=exposure_policy,
-        )
-        hero_deck_comparisons.update(
-            {
-                (str(record["rail"]), str(record["primary_engine"])): record
-                for record in chart_comparisons
-            }
-        )
     hero_sweet_spot_groups: dict[
         tuple[str, str], list[Mapping[str, object]]
     ] = defaultdict(list)
-    for cell in _battery_hero_sweet_spot_records(sweet_spot_samples):
+    for cell in hero_sweet_spot_cells:
         hero_sweet_spot_groups[(str(cell["rail"]), str(cell["engine"]))].append(
+            cell
+        )
+    hero_sio2_unknown_groups: dict[
+        tuple[str, str], list[Mapping[str, object]]
+    ] = defaultdict(list)
+    for cell in hero_sio2_unknown_cells:
+        hero_sio2_unknown_groups[(str(cell["rail"]), str(cell["engine"]))].append(
             cell
         )
 
@@ -1617,6 +1560,10 @@ def read_scores(
             key: tuple(cells)
             for key, cells in sorted(hero_sweet_spot_groups.items())
         },
+        hero_sio2_unknown_cells={
+            key: tuple(cells)
+            for key, cells in sorted(hero_sio2_unknown_groups.items())
+        },
         hero_all_numeric_metrics=hero_all_numeric_metrics,
         hero_openimcc_vaporock_species=hero_openimcc_vaporock_species,
         element_series=element_series,
@@ -1634,6 +1581,7 @@ def read_scores(
             sorted(source_disagreement_reasons)
         ),
         hero_component_comparisons=hero_component_comparisons,
+        rails_explicit=rails is not None,
     )
 
 
@@ -1661,79 +1609,15 @@ def _history_fields_from_scores(
     dict[tuple[str, str], Mapping[str, object]],
     tuple[Mapping[str, object], ...],
 ]:
-    rows: list[Mapping[str, object]] = []
-    diagnostics: dict[tuple[str, str], dict[str, object]] = {}
-    engines: set[str] = set()
-    rails: set[str] = {rail.value for rail in Rail}
-    refusal_coverage: Counter[tuple[str, str, str]] = Counter()
-    with _open_residual_jsonl(path) as source:
-        for line in source:
-            if not line.strip():
-                continue
-            row = json.loads(line)
-            if not isinstance(row, Mapping):
-                continue
-            rail = str(row.get("rail") or "")
-            engine = _engine_name(row)
-            if not rail or not engine:
-                continue
-            engines.add(engine)
-            rails.add(rail)
-            status = residual_status_token(row.get("status"))
-            engine_observable = (
-                status is not ResidualStatus.REFUSED
-                or _residual_engine_observable(row)
-            )
-            if status is ResidualStatus.REFUSED:
-                bucket = "refused" if engine_observable else "not_observable"
-                refusal_coverage[(rail, engine, bucket)] += 1
-            if rail in HERO_RAILS:
-                _record_hero_diagnostic(
-                    diagnostics,
-                    row,
-                    rail=rail,
-                    engine=engine,
-                    status=status,
-                    engine_observable=engine_observable,
-                )
-            numeric = row.get("numeric")
-            if rail in HERO_RAILS and (
-                isinstance(numeric, Mapping)
-                and numeric.get("operation") == "dex"
-                and numeric.get("value") is not None
-            ):
-                rows.append(row)
-    comparisons = {
-        (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _hero_paired_engine_rail_comparisons(
-            rows,
-            primary_engines=HERO_PRIMARY_ENGINES,
-            comparison_engines=HERO_COMPARISON_ENGINES,
-            rails=HERO_RAILS,
-            exposure_policy=exposure_policy,
-        )
-    }
-    coverage = [
-        {
-            "rail": rail,
-            "engine": engine,
-            "refused_count": refusal_coverage[(rail, engine, "refused")],
-            "not_observable_count": refusal_coverage[
-                (rail, engine, "not_observable")
-            ],
-        }
-        for rail in sorted(rails)
-        for engine in sorted(engines)
-    ]
-    plotted = read_scores(path, exposure_policy=exposure_policy)
+    plotted = read_scores(path, exposure_policy=exposure_policy, _collection_mode=True)
     metric_records = {
         **plotted.hero_all_numeric_metrics,
         **plotted.hero_deck_metrics,
     }
     return (
-        comparisons,
-        _normalized_hero_diagnostics(diagnostics),
-        coverage,
+        dict(plotted.hero_comparisons),
+        plotted.hero_diagnostics,
+        _refusal_coverage_from_summaries(plotted.summaries),
         metric_records,
         plotted.hero_openimcc_vaporock_species,
     )
@@ -1893,7 +1777,9 @@ def history_record_from_archive(
         streamed_metrics = {}
         streamed_species = ()
     if not streamed_metrics:
-        plotted = read_scores(archive_path, exposure_policy=exposure_policy)
+        plotted = read_scores(
+            archive_path, exposure_policy=exposure_policy, _collection_mode=True
+        )
         streamed_metrics = {
             **plotted.hero_all_numeric_metrics,
             **plotted.hero_deck_metrics,
@@ -2513,17 +2399,6 @@ def _hero_engine_colors(engines: Sequence[str]) -> dict[str, str]:
     }
 
 
-def _fingerprint_band(value: object) -> tuple[str, str]:
-    median_abs_dex = _hero_decimal(value)
-    if median_abs_dex is None:
-        raise ValueError("fingerprint median |error| must be finite")
-    if median_abs_dex <= Decimal("0.5"):
-        return "good", FINGERPRINT_COLOURS["good"]
-    if median_abs_dex <= Decimal("1.0"):
-        return "okay", FINGERPRINT_COLOURS["okay"]
-    return "needs work", FINGERPRINT_COLOURS["needs work"]
-
-
 def _ordered_hero_engines(engines: Sequence[str]) -> tuple[str, ...]:
     return tuple(_hero_engine_colors(engines))
 
@@ -2664,7 +2539,12 @@ def _hero_scorecard_section_height(rows: Sequence[Sequence[str]]) -> float:
 def _draw_hero_scorecard_table(axis: Axes, rows: Sequence[Sequence[str]]) -> None:
     table = axis.table(
         cellText=rows,
-        colLabels=("Engine", "All", "T ≥ 1700 K", "T < 1700 K"),
+        colLabels=(
+            "Engine",
+            "All",
+            f"T ≥ {HERO_TEMPERATURE_FLOOR_K:g} K",
+            f"T < {HERO_TEMPERATURE_FLOOR_K:g} K",
+        ),
         cellLoc="left",
         colLoc="left",
         colWidths=(0.10, 0.30, 0.30, 0.30),
@@ -3166,14 +3046,19 @@ def _draw_hero_sweet_spot(
     *,
     x_limits: tuple[float, float],
     temperature_limits: tuple[float, float],
+    export_dpi: float | None = None,
 ) -> bool:
     """Draw the scorer's temperature × SiO₂ cells as three status bands."""
 
     axis.set_xlim(*x_limits)
     axis.set_ylim(*temperature_limits)
     axis.figure.canvas.draw()
-    x_gap = 2 * (x_limits[1] - x_limits[0]) / max(axis.bbox.width, 1)
-    y_gap = 2 * (temperature_limits[1] - temperature_limits[0]) / max(axis.bbox.height, 1)
+    dpi = float(export_dpi or axis.figure.dpi)
+    position = axis.get_position()
+    axis_width_pixels = position.width * axis.figure.get_figwidth() * dpi
+    axis_height_pixels = position.height * axis.figure.get_figheight() * dpi
+    x_gap = 2 * (x_limits[1] - x_limits[0]) / max(axis_width_pixels, 1)
+    y_gap = 2 * (temperature_limits[1] - temperature_limits[0]) / max(axis_height_pixels, 1)
 
     for cell in cells:
         x_low = _finite_float(cell.get("sio2_lower"))
@@ -3190,7 +3075,10 @@ def _draw_hero_sweet_spot(
         value = _finite_float(cell.get("median_abs_dex"))
         if value is None:
             continue
-        fill = str(cell.get("colour") or _fingerprint_band(value)[1])
+        fill = str(
+            cell.get("colour")
+            or FINGERPRINT_COLOURS[_battery_hero_fingerprint_band(value)]
+        )
         axis.add_patch(
             Rectangle(
                 (x_low + x_gap / 2, y_low + y_gap / 2),
@@ -3416,7 +3304,10 @@ def _hero_summary_payload(
             "temperature_split": {
                 "field": HERO_TEMPERATURE_FIELD,
                 "floor_K": str(HERO_TEMPERATURE_FLOOR_K),
-                "boundary": "1700 K is included in temperature_ge_1700",
+                "boundary": (
+                    f"{HERO_TEMPERATURE_FLOOR_K:g} K is included in "
+                    "temperature_ge_1700"
+                ),
                 "missing_temperature": "all only; counted as no_temperature_n",
             },
             "source_disagreement_split": (
@@ -3492,7 +3383,10 @@ def _hero_deck_summary_payload(data: ScorePlotData) -> dict[str, Any]:
             "temperature_split": {
                 "field": HERO_TEMPERATURE_FIELD,
                 "floor_K": str(HERO_TEMPERATURE_FLOOR_K),
-                "boundary": "1700 K is included in temperature_ge_1700",
+                "boundary": (
+                    f"{HERO_TEMPERATURE_FLOOR_K:g} K is included in "
+                    "temperature_ge_1700"
+                ),
                 "missing_temperature": "all only; counted as no_temperature_n",
             },
             "metrics_by_engine": {
@@ -3562,10 +3456,11 @@ def _collection_row_database(
                 continue
             residual = _finite_float(numeric.get("value"))
             identity = _row_identity(row)
-            temperature = _finite_float(_state_value(identity.get("temperature_K")))
+            temperature_raw = _state_value(identity.get("temperature_K"))
+            temperature = _finite_float(temperature_raw)
             if residual is None or temperature is None:
                 continue
-            temperature_key = _decimal_key(_state_value(identity.get("temperature_K")))
+            temperature_key = _decimal_key(temperature_raw)
             if temperature_key is None:
                 continue
             engine = _engine_name(row)
@@ -3575,11 +3470,10 @@ def _collection_row_database(
             composition = _state_value(identity.get("composition"))
             sio2_decimal = _battery_hero_sio2_mole_fraction(composition)
             sio2 = None if sio2_decimal is None else float(sio2_decimal)
-            sio2_bin = (
-                None
-                if sio2 is None
-                else 19 if sio2 == 1 else math.floor(sio2 / 0.05)
+            fingerprint_bins = _battery_hero_sweet_spot_bin_indices(
+                temperature_raw, sio2_decimal
             )
+            sio2_bin = None if fingerprint_bins is None else fingerprint_bins[1]
             candidate = row.get("candidate_observation")
             candidate = candidate if isinstance(candidate, Mapping) else {}
             source_name = str(
@@ -3658,11 +3552,98 @@ def _collection_row_database(
     database.commit()
 
 
+def _collection_stratified_sample(
+    database: sqlite3.Connection,
+    *,
+    limit: int,
+) -> list[dict[str, object]]:
+    samples: list[dict[str, object]] = []
+    groups = database.execute(
+        """SELECT rail, engine, COUNT(*)
+             FROM collection_unique_rows GROUP BY rail, engine"""
+    )
+    for rail, engine, total in groups:
+        if int(total) <= limit:
+            strata = list(
+                database.execute(
+                    """SELECT temperature_bin, sio2_bin, COUNT(*)
+                         FROM collection_unique_rows
+                        WHERE rail = ? AND engine = ?
+                        GROUP BY temperature_bin, sio2_bin
+                        ORDER BY temperature_bin, sio2_bin""",
+                    (rail, engine),
+                )
+            )
+            quotas = {(temperature, sio2): count for temperature, sio2, count in strata}
+        else:
+            strata = list(
+                database.execute(
+                    """SELECT temperature_bin, sio2_bin, COUNT(*)
+                         FROM collection_unique_rows
+                        WHERE rail = ? AND engine = ?
+                        GROUP BY temperature_bin, sio2_bin""",
+                    (rail, engine),
+                )
+            )
+            strata.sort(
+                key=lambda row: hashlib.sha256(
+                    f"{rail}|{engine}|{row[0]}|{row[1]}".encode()
+                ).digest()
+            )
+            selected = strata[:limit]
+            base, remainder = divmod(limit, len(selected))
+            quotas = {
+                (temperature, sio2): base + int(index < remainder)
+                for index, (temperature, sio2, _count) in enumerate(selected)
+            }
+        for (temperature_bin, sio2_bin), quota in quotas.items():
+            query = database.execute(
+                """SELECT source, reference, temperature_K, sio2, composition,
+                          species, residual_dex, flagged, temperature_bin, sio2_bin
+                     FROM collection_unique_rows
+                    WHERE rail = ? AND engine = ?
+                      AND temperature_bin = ? AND sio2_bin IS ?
+                    ORDER BY temperature_K, reference""",
+                (rail, engine, temperature_bin, sio2_bin),
+            )
+            seed_text = f"{rail}|{engine}|{temperature_bin}|{sio2_bin}"
+            seed = int.from_bytes(hashlib.sha256(seed_text.encode()).digest()[:8], "big")
+            generator = random.Random(seed)
+            reservoir: list[tuple[object, ...]] = []
+            for index, row in enumerate(query):
+                if index < quota:
+                    reservoir.append(row)
+                else:
+                    replacement = generator.randrange(index + 1)
+                    if replacement < quota:
+                        reservoir[replacement] = row
+            samples.extend(
+                {
+                    "rail": rail,
+                    "engine": engine,
+                    "source": row[0],
+                    "reference": row[1],
+                    "temperature_K": row[2],
+                    "sio2": row[3],
+                    "composition": row[4],
+                    "species": row[5],
+                    "residual_dex": row[6],
+                    "flagged": int(row[7]),
+                    "clipped": float(row[6]) < -3 or float(row[6]) > 3,
+                    "temperature_bin": row[8],
+                    "sio2_bin": row[9],
+                }
+                for row in reservoir
+            )
+    return samples
+
+
 def _collection_raw_tables(
     database: sqlite3.Connection,
     data: ScorePlotData,
     *,
     bin_width_K: float,
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
 ) -> dict[str, list[dict[str, object]]]:
     panel_counts: dict[tuple[str, str], dict[str, object]] = {}
     for row in database.execute(
@@ -3792,54 +3773,74 @@ def _collection_raw_tables(
         )
 
     density_counts: Counter[tuple[str, str, int, int, int, int]] = Counter()
-    density_x_bins = 48
-    density_y_bins = 36
+    hex_radius = 1 / 48
+    sqrt_three = math.sqrt(3)
     for rail, engine, temperature, residual, flagged in database.execute(
         """SELECT rail, engine, temperature_K, residual_dex, flagged
              FROM collection_unique_rows"""
     ):
         x_low, x_high = rail_limits[str(rail)]
-        x_bin = min(
-            density_x_bins - 1,
-            max(0, int((float(temperature) - x_low) / (x_high - x_low) * density_x_bins)),
-        )
         value = float(residual)
         clipped = int(value < -3 or value > 3)
         if value < -3:
-            y_bin = -1
+            q, r = 0, -1
         elif value > 3:
-            y_bin = density_y_bins
+            q, r = 0, 1
         else:
-            y_bin = min(
-                density_y_bins - 1,
-                max(0, int((value + 3) / 6 * density_y_bins)),
+            x = (float(temperature) - x_low) / (x_high - x_low)
+            y = (value + 3) / 6
+            fractional_q = (sqrt_three / 3 * x - y / 3) / hex_radius
+            fractional_r = (2 / 3 * y) / hex_radius
+            cube_x = fractional_q
+            cube_z = fractional_r
+            cube_y = -cube_x - cube_z
+            rounded_x, rounded_y, rounded_z = (
+                round(cube_x), round(cube_y), round(cube_z)
             )
+            x_error = abs(rounded_x - cube_x)
+            y_error = abs(rounded_y - cube_y)
+            z_error = abs(rounded_z - cube_z)
+            if x_error > y_error and x_error > z_error:
+                rounded_x = -rounded_y - rounded_z
+            elif y_error > z_error:
+                rounded_y = -rounded_x - rounded_z
+            else:
+                rounded_z = -rounded_x - rounded_y
+            q, r = int(rounded_x), int(rounded_z)
         density_counts[
-            (str(rail), str(engine), x_bin, y_bin, int(flagged), clipped)
+            (str(rail), str(engine), q, r, int(flagged), clipped)
         ] += 1
     density_rows: list[dict[str, object]] = []
-    for (rail, engine, x_bin, y_bin, flagged, clipped), count in sorted(density_counts.items()):
+    for (rail, engine, q, r, flagged, clipped), count in sorted(density_counts.items()):
         x_low, x_high = rail_limits[rail]
-        residual_center = (
-            -3.0 if y_bin == -1
-            else 3.0 if y_bin == density_y_bins
-            else -3 + (y_bin + 0.5) * 6 / density_y_bins
-        )
+        x_center = sqrt_three * hex_radius * (q + r / 2)
+        y_center = 1.5 * hex_radius * r
+        temperature_center = x_low + x_center * (x_high - x_low)
+        residual_center = -3 + y_center * 6
         density_rows.append(
             {
                 "rail": rail,
                 "engine": engine,
-                "x_bin": x_bin,
-                "y_bin": y_bin,
-                "temperature_center_K": x_low + (x_bin + 0.5) * (x_high - x_low) / density_x_bins,
-                "residual_center_dex": residual_center,
+                "x_bin": q,
+                "y_bin": -1 if clipped and r < 0 else 36 if clipped else r,
+                "temperature_center_K": temperature_center,
+                "residual_center_dex": (
+                    -3.0 if clipped and r < 0 else 3.0 if clipped else residual_center
+                ),
                 "flagged": flagged,
                 "clipped": clipped,
                 "row_count": count,
+                "hex_x_radius_K": hex_radius * (x_high - x_low),
+                "hex_y_radius_dex": hex_radius * 6,
             }
         )
 
     points: list[dict[str, object]] = []
+    samples = _collection_stratified_sample(
+        database,
+        limit=COLLECTION_HTML_SAMPLE_LIMIT,
+    )
+    selected_rails = {rail for rail, _label in observables}
     small_panels = {
         (str(row["rail"]), str(row["engine"]))
         for row in panel_rows
@@ -3870,10 +3871,13 @@ def _collection_raw_tables(
                 }
             )
     return {
-        "panels": panel_rows,
-        "temperature_bins": temperature_bins,
-        "density": density_rows,
-        "points": points,
+        "panels": [row for row in panel_rows if row["rail"] in selected_rails],
+        "temperature_bins": [
+            row for row in temperature_bins if row["rail"] in selected_rails
+        ],
+        "density": [row for row in density_rows if row["rail"] in selected_rails],
+        "points": [row for row in points if row["rail"] in selected_rails],
+        "sample": [row for row in samples if row["rail"] in selected_rails],
     }
 
 
@@ -3896,15 +3900,28 @@ _COLLECTION_TABLE_FIELDS = {
     "temperature_density": (
         "rail", "engine", "x_bin", "y_bin", "temperature_center_K",
         "residual_center_dex", "flagged", "clipped", "row_count",
+        "hex_x_radius_K", "hex_y_radius_dex",
     ),
     "temperature_points": (
         "rail", "engine", "source", "reference", "temperature_K", "sio2",
         "composition", "species", "residual_dex", "flagged", "clipped",
     ),
-    "components": ("rail", "component", "engine", "n_shared", "rms_dex"),
+    "temperature_sample": (
+        "rail", "engine", "source", "reference", "temperature_K", "sio2",
+        "composition", "species", "residual_dex", "flagged", "clipped",
+        "temperature_bin", "sio2_bin",
+    ),
+    "components": (
+        "rail", "component", "engine", "shared_with", "n_shared", "rms_dex"
+    ),
     "fingerprints": (
         "rail", "engine", "temperature_lower_K", "temperature_upper_K",
-        "sio2_lower", "sio2_upper", "n", "median_abs_dex", "band", "colour",
+        "sio2_lower", "sio2_upper", "n", "sum_residual_dex",
+        "sum_squared_residual_dex", "median_abs_dex", "band", "colour",
+    ),
+    "window_unknown": (
+        "rail", "engine", "temperature_lower_K", "temperature_upper_K",
+        "n", "sum_residual_dex", "sum_squared_residual_dex",
     ),
     "coverage": (
         "rail", "observable", "engine", "scored_n", "input_missing_n",
@@ -3993,7 +4010,11 @@ def _write_collection_methods(
                 "- Error: `log10(predicted / measured)`, in dex; closer to zero is better.",
                 "- Same-row comparisons include only observations scored once by both engines.",
                 "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
-                "- Temperature views split at 1700 K; 1700 K belongs to the upper view.",
+                f"- Temperature views split at {HERO_TEMPERATURE_FLOOR_K:g} K; "
+                f"{HERO_TEMPERATURE_FLOOR_K:g} K belongs to the upper view.",
+                f"- The interactive temperature and SiO₂ windows snap to {BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K:g} K and {BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH:g} mole-fraction fingerprint bin edges. RMS is exact for those selected bins: sqrt(sum(e²) / n); the page embeds n, sum(e), and sum(e²) for each occupied fingerprint cell.",
+                "- Rows without a resolvable SiO₂ fraction contribute to exact RMS only when the full 0–1 composition range is selected.",
+                f"- Interactive plotted points and tooltips use a stratified sample capped at {COLLECTION_HTML_SAMPLE_LIMIT} rows per rail and engine; static density plots use all scored rows.",
                 "- Exposed rows match the exposure census or exposed-source list. Held-out rows are absent from both and from the pre-cutoff observation IDs; held-out RMS is displayed only when n ≥ 5.",
                 f"- Source disagreement is identified by notice kind `{NoticeKind.SOURCE_DISAGREEMENT.value}` and shown separately from unflagged rows.",
                 "",
@@ -4018,28 +4039,32 @@ def _write_collection_methods(
 def _save_collection_png(figure: Any, path: Path) -> None:
     figure.savefig(
         path,
-        dpi=150,
+        dpi=COLLECTION_EXPORT_DPI,
         bbox_inches="tight",
         metadata={"Software": "battery_hero_plot"},
     )
     plt.close(figure)
 
 
-def _draw_scorecard_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+def _draw_scorecard_png(
+    path: Path,
+    rows: Sequence[Mapping[str, str]],
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
+) -> None:
     colors = _hero_engine_colors(
         tuple({str(row["primary_engine"]) for row in rows} | {str(row["comparison_engine"]) for row in rows})
     ) if rows else {}
     max_rows = max(
         (
             sum(row["rail"] == rail for row in rows)
-            for rail, _label in COLLECTION_OBSERVABLES
+            for rail, _label in observables
         ),
         default=1,
     )
     figure, axes = plt.subplots(
         1,
-        len(COLLECTION_OBSERVABLES),
-        figsize=(18, max(3.8, 0.48 * max_rows + 1.5)),
+        len(observables),
+        figsize=(max(4.2, 3.6 * len(observables)), max(3.8, 0.48 * max_rows + 1.5)),
         squeeze=False,
         sharex=True,
     )
@@ -4051,7 +4076,7 @@ def _draw_scorecard_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
         if value is not None
     ]
     right = max(0.6, max(all_values, default=0.5) * 1.18)
-    for axis, (rail, label) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+    for axis, (rail, label) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
         partners = list(dict.fromkeys(str(row["comparison_engine"]) for row in selected))
         primaries = list(dict.fromkeys(str(row["primary_engine"]) for row in selected))
@@ -4091,9 +4116,9 @@ def _draw_scorecard_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
             high_n = row.get("high_n_shared")
             low_n = row.get("low_n_shared")
             if high_n:
-                counts += f" · ≥1700 {high_n}"
+                counts += f" · ≥{HERO_TEMPERATURE_FLOOR_K:g} {high_n}"
             if low_n:
-                counts += f" · <1700 {low_n}"
+                counts += f" · <{HERO_TEMPERATURE_FLOOR_K:g} {low_n}"
             axis.text(right * 0.995, index, counts, ha="right", va="center", color="#64748b", fontsize=5.3)
         axis.set_title(label, loc="left", fontsize=8)
         axis.set_yticks(range(len(comparisons)))
@@ -4111,8 +4136,14 @@ def _draw_scorecard_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
         for engine, color in colors.items()
     ]
     temp_handles = [
-        Line2D([0], [0], marker="o", linestyle="", color="#334155", alpha=1, label="≥1700 K", markersize=4),
-        Line2D([0], [0], marker="o", linestyle="", color="#334155", alpha=0.38, label="<1700 K", markersize=4),
+        Line2D(
+            [0], [0], marker="o", linestyle="", color="#334155", alpha=1,
+            label=f"≥{HERO_TEMPERATURE_FLOOR_K:g} K", markersize=4
+        ),
+        Line2D(
+            [0], [0], marker="o", linestyle="", color="#334155", alpha=0.38,
+            label=f"<{HERO_TEMPERATURE_FLOOR_K:g} K", markersize=4
+        ),
     ]
     figure.suptitle("Which engine is closest to measurement for each observable?", fontsize=11, y=0.99)
     figure.text(0.5, 0.955, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=7)
@@ -4164,7 +4195,13 @@ def _draw_temperature_png(
         count_label = f"{plotted_n} plotted of {n} scored"
         axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
-        axis.axvline(1700, color="#64748b", linestyle="--", linewidth=0.8, zorder=1)
+        axis.axvline(
+            float(HERO_TEMPERATURE_FLOOR_K),
+            color="#64748b",
+            linestyle="--",
+            linewidth=0.8,
+            zorder=1,
+        )
         selected_bins = [row for row in bin_rows if row["rail"] == rail and row["engine"] == engine]
         if selected_bins:
             x_values = [float(row["temperature_center_K"]) for row in selected_bins]
@@ -4207,17 +4244,31 @@ def _draw_temperature_png(
                     [_lighten_colour(base_colour, 0.55), base_colour],
                 )
                 counts = [int(row["row_count"]) for row in bins]
-                axis.scatter(
-                    [float(row["temperature_center_K"]) for row in bins],
-                    [float(row["residual_center_dex"]) for row in bins],
-                    c=counts,
-                    s=36,
-                    marker="h",
+                polygons = []
+                for row in bins:
+                    center_x = float(row["temperature_center_K"])
+                    center_y = float(row["residual_center_dex"])
+                    radius_x = float(row["hex_x_radius_K"])
+                    radius_y = float(row["hex_y_radius_dex"])
+                    polygons.append(
+                        [
+                            (
+                                center_x + radius_x * math.cos(math.radians(30 + 60 * index)),
+                                center_y + radius_y * math.sin(math.radians(30 + 60 * index)),
+                            )
+                            for index in range(6)
+                        ]
+                    )
+                collection = PolyCollection(
+                    polygons,
                     cmap=ramp,
                     alpha=0.82 if is_flagged else 0.92,
                     linewidths=0,
+                    edgecolors="none",
                     zorder=2 if not is_flagged else 3,
                 )
+                collection.set_array(counts)
+                axis.add_collection(collection)
             for clipped_side, marker, y_bin in (("low", "v", "-1"), ("high", "^", "36")):
                 for is_flagged, alpha in ((False, 0.9), (True, 0.75)):
                     bins = [
@@ -4293,17 +4344,18 @@ def _draw_component_png(
         if any(row["engine"] == engine for row in selected)
     )
     colors = _hero_engine_colors(engines)
-    by_component: dict[str, list[Mapping[str, str]]] = defaultdict(list)
+    by_pair: dict[tuple[str, str], dict[str, Mapping[str, str]]] = defaultdict(dict)
     for row in selected:
-        by_component[row["component"]].append(row)
-    components = sorted(
-        by_component,
-        key=lambda component: (
-            -max(int(row.get("n_shared") or 0) for row in by_component[component]),
-            component,
+        by_pair[(row["component"], row["shared_with"])][row["engine"]] = row
+    pairs = sorted(
+        by_pair,
+        key=lambda pair: (
+            -int(by_pair[pair].get("openimcc", {}).get("n_shared") or 0),
+            pair[0],
+            pair[1],
         ),
     )
-    fig_height = max(3.2, 0.36 * len(components) + 1.4)
+    fig_height = max(3.2, 0.30 * len(pairs) + 1.4)
     figure, axis = plt.subplots(figsize=(11.5, fig_height))
     all_values = [
         float(row["rms_dex"])
@@ -4313,28 +4365,36 @@ def _draw_component_png(
     right = max(0.65, max(all_values, default=0.5) * 1.15)
     axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
     axis.axvline(0, color="#263238", linewidth=1.0, zorder=1)
-    for component_index, component in enumerate(components):
-        component_rows = by_component[component]
-        maximum_n = max((int(row["n_shared"] or 0) for row in component_rows), default=0)
-        for row in component_rows:
-            value = _finite_float(row.get("rms_dex"))
-            if value is None:
-                continue
-            engine = row["engine"]
-            engine_index = engines.index(engine)
-            offset = (engine_index - (len(engines) - 1) / 2) * 0.075
-            axis.scatter(
-                [value], [component_index + offset], marker="o", s=24,
-                color=colors[engine], alpha=0.9, linewidths=0, zorder=3,
-            )
-            axis.text(
-                value, component_index + offset + 0.055,
-                f"n={row['n_shared']}", ha="center", va="bottom",
-                fontsize=4.8, color="#475569",
-            )
-        axis.text(right * 0.995, component_index, f"n={maximum_n}", ha="right", va="center", color="#64748b", fontsize=5.5)
-    axis.set_yticks(range(len(components)))
-    axis.set_yticklabels(components, fontsize=6)
+    for pair_index, pair in enumerate(pairs):
+        pair_rows = by_pair[pair]
+        primary = _finite_float(pair_rows.get("openimcc", {}).get("rms_dex"))
+        partner = _finite_float(pair_rows.get(pair[1], {}).get("rms_dex"))
+        if primary is None or partner is None:
+            continue
+        shared_n = pair_rows["openimcc"]["n_shared"]
+        axis.plot(
+            [primary, partner],
+            [pair_index, pair_index],
+            color="#64748b",
+            linewidth=0.75,
+            zorder=2,
+        )
+        primary_artist = axis.scatter(
+            [primary], [pair_index], marker="o", s=24,
+            color=colors["openimcc"], alpha=0.95, linewidths=0, zorder=3,
+        )
+        primary_artist.set_gid(f"component-pair:{pair[0]}:{pair[1]}:openimcc")
+        partner_artist = axis.scatter(
+            [partner], [pair_index], marker="s", s=22,
+            color=colors[pair[1]], alpha=0.95, linewidths=0, zorder=3,
+        )
+        partner_artist.set_gid(f"component-pair:{pair[0]}:{pair[1]}:{pair[1]}")
+        axis.text(
+            right * 0.995, pair_index, f"n={shared_n}",
+            ha="right", va="center", color="#64748b", fontsize=5.5,
+        )
+    axis.set_yticks(range(len(pairs)))
+    axis.set_yticklabels([f"{component} · {partner}" for component, partner in pairs], fontsize=5.8)
     axis.invert_yaxis()
     axis.set_xlim(0, right)
     axis.set_xlabel("RMS error on rows shared with OpenIMCC (dex)", fontsize=7)
@@ -4369,6 +4429,7 @@ def _draw_fingerprint_png(
         sharex=True,
         sharey=True,
     )
+    figure.subplots_adjust(left=0.07, right=0.99, top=0.87, bottom=0.14, wspace=0.18)
     rail_rows = [row for row in rows if row["rail"] == rail]
     temperatures = [
         _finite_float(row.get(key))
@@ -4398,20 +4459,23 @@ def _draw_fingerprint_png(
             cells,
             x_limits=x_limits,
             temperature_limits=limits,
+            export_dpi=COLLECTION_EXPORT_DPI,
         )
         axis.set_title(engine, loc="left", fontsize=6.5)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
     figure.suptitle(f"Where does {observable.lower()} meet the target?", fontsize=10, y=0.99)
     figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.94), ncol=3, frameon=False, fontsize=6)
-    figure.subplots_adjust(left=0.07, right=0.99, top=0.87, bottom=0.14, wspace=0.18)
     _save_collection_png(figure, path)
 
 
 def _fingerprint_legend_handles() -> list[matplotlib.patches.Patch]:
+    good_limit, okay_limit = BATTERY_HERO_FINGERPRINT_BAND_BOUNDARIES
+    good_label = format(good_limit.normalize(), "f")
+    okay_label = format(okay_limit.normalize(), "f")
     labels = {
-        "good": "within 0.5 dex — good",
-        "okay": "0.5–1 dex — okay",
-        "needs work": "over 1 dex — needs work",
+        "good": f"within {good_label} dex — good",
+        "okay": f"{good_label}–{okay_label} dex — okay",
+        "needs work": f"over {okay_label} dex — needs work",
     }
     return [
         matplotlib.patches.Patch(
@@ -4423,7 +4487,11 @@ def _fingerprint_legend_handles() -> list[matplotlib.patches.Patch]:
     ]
 
 
-def _draw_coverage_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+def _draw_coverage_png(
+    path: Path,
+    rows: Sequence[Mapping[str, str]],
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
+) -> None:
     colors = {
         "scored_n": "#405b74",
         "input_missing_n": "#b9c2cc",
@@ -4439,11 +4507,11 @@ def _draw_coverage_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
         "other_refused_n": "other refused",
     }
     fig, axes = plt.subplots(
-        len(COLLECTION_OBSERVABLES), 1,
-        figsize=(11.5, 2.1 * len(COLLECTION_OBSERVABLES)),
+        len(observables), 1,
+        figsize=(11.5, 2.1 * len(observables)),
         squeeze=False,
     )
-    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+    for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
         y_positions = list(range(len(selected)))
         left = [0] * len(selected)
@@ -4469,20 +4537,35 @@ def _draw_coverage_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
     _save_collection_png(fig, path)
 
 
-def _draw_progress_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+def _draw_progress_png(
+    path: Path,
+    rows: Sequence[Mapping[str, str]],
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
+) -> None:
     engine_names = tuple(
         engine for engine in _HERO_ENGINE_ORDER
         if any(row["engine"] == engine for row in rows)
     )
     colors = _hero_engine_colors(engine_names)
     figure, axes = plt.subplots(
-        len(COLLECTION_OBSERVABLES), 1,
-        figsize=(12, 2.25 * len(COLLECTION_OBSERVABLES)),
+        len(observables), 1,
+        figsize=(12, 2.25 * len(observables)),
         squeeze=False,
         sharey=True,
     )
-    max_rms = max((_finite_float(row.get("rms_dex")) or 0 for row in rows), default=1.0)
-    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+    max_rms = max(
+        [
+            _finite_float(row.get("rms_dex")) or 0
+            for row in rows
+        ]
+        + [
+            _finite_float(row.get("held_out_rms_dex")) or 0
+            for row in rows
+            if int(row.get("held_out_n") or 0) >= HERO_MINIMUM_REPORT_N
+        ]
+        + [1.0]
+    )
+    for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
         axis.axhspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axhline(0, color="#263238", linewidth=0.8)
@@ -4539,15 +4622,19 @@ def _draw_progress_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
     _save_collection_png(figure, path)
 
 
-def _draw_exposure_png(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
+def _draw_exposure_png(
+    path: Path,
+    rows: Sequence[Mapping[str, str]],
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
+) -> None:
     exposure_rows = [row for row in rows if row.get("exposed_n") or row.get("held_out_n")]
     figure, axes = plt.subplots(
-        len(COLLECTION_OBSERVABLES), 1,
-        figsize=(5.0, 7.0),
+        len(observables), 1,
+        figsize=(5.0, max(1.8, 1.4 * len(observables))),
         squeeze=False,
         sharex=True,
     )
-    for axis, (rail, observable) in zip(axes.flat, COLLECTION_OBSERVABLES, strict=True):
+    for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in exposure_rows if row["rail"] == rail]
         y = list(range(len(selected)))
         exposed = [int(row.get("exposed_n") or 0) for row in selected]
@@ -4587,23 +4674,30 @@ def _html_table(rows: Sequence[Mapping[str, str]]) -> str:
 
 def _write_collection_html(
     path: Path,
-    database: sqlite3.Connection,
     *,
     chart_files: Mapping[str, Path],
     table_rows: Mapping[str, Sequence[Mapping[str, str]]],
     engine_names: Sequence[str],
+    observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
 ) -> None:
     def section(
         chart_id: str,
         title: str,
         image_key: str,
         tables: Sequence[tuple[str, Sequence[Mapping[str, str]]]],
+        deferred_tables: Sequence[tuple[str, str, str]] = (),
     ) -> str:
         image_path = chart_files[image_key]
         image = base64.b64encode(image_path.read_bytes()).decode("ascii")
         table_markup = "".join(
             f"<h4>{html.escape(label)}</h4>{_html_table(rows)}"
             for label, rows in tables
+        )
+        table_markup += "".join(
+            f'<h4>{html.escape(label)}</h4><div class="table-wrap" '
+            f'data-deferred-table="{html.escape(table_kind)}" '
+            f'data-rail="{html.escape(rail)}"></div>'
+            for label, table_kind, rail in deferred_tables
         )
         return (
             f'<section class="chart" id="{html.escape(chart_id)}">'
@@ -4632,7 +4726,7 @@ def _write_collection_html(
         )
         output.write('<div class="collection-grid">')
         output.write(section("chart-a", "A · Which engine is closest to measurement?", "chart:A", [("Scorecard", table_rows["scorecard"])]))
-        for rail, label in COLLECTION_OBSERVABLES:
+        for rail, label in observables:
             output.write(
                 section(
                     f"chart-b-{rail}",
@@ -4641,14 +4735,16 @@ def _write_collection_html(
                     (
                         ("Panel counts and clipping", [row for row in table_rows["panels"] if row["rail"] == rail]),
                         ("Binned median and interquartile range", [row for row in table_rows["temperature_bins"] if row["rail"] == rail]),
-                        ("Density cells", [row for row in table_rows["temperature_density"] if row["rail"] == rail]),
-                        ("Scattered or clipped rows", [row for row in table_rows["temperature_points"] if row["rail"] == rail]),
                     ),
+                    (("Stratified sample for the point layer and tooltips", "samples", rail),),
                 )
             )
         for rail, title, label in (
-            (Rail.VAPOUR.value, "Species", "vapour pressure"),
-            (Rail.MELT_ACTIVITY.value, "Oxide", "melt activity"),
+            (rail, "Species", "vapour pressure")
+            if rail == Rail.VAPOUR.value
+            else (rail, "Oxide", "melt activity")
+            for rail in (Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value)
+            if rail in {selected for selected, _label in observables}
         ):
             output.write(
                 section(
@@ -4658,13 +4754,14 @@ def _write_collection_html(
                     (("Shared-row RMS", [row for row in table_rows["components"] if row["rail"] == rail]),),
                 )
             )
-        for rail, label in COLLECTION_OBSERVABLES:
+        for rail, label in observables:
             output.write(
                 section(
                     f"chart-d-{rail}",
                     f"D · Where does {label.lower()} meet the target?",
                     f"chart:D:{rail}",
-                    (("Fingerprint cells", [row for row in table_rows["fingerprints"] if row["rail"] == rail]),),
+                    (),
+                    (("Fingerprint cells", "fingerprints", rail),),
                 )
             )
         output.write(section("chart-e", "E · Can each engine predict the benchmark rows?", "chart:E", [("Coverage", table_rows["coverage"])]))
@@ -4673,7 +4770,7 @@ def _write_collection_html(
         output.write("</div>")
         output.write(
             "<section class=\"interactive\" id=\"application-window\"><h2>Explore your application window</h2>"
-            "<p>Hover a point or fingerprint cell for row source, T, composition, and residual.</p><div class=\"controls\">"
+            f"<p>Points and row tooltips use a stratified sample, capped at {COLLECTION_HTML_SAMPLE_LIMIT} rows per rail and engine. Hover a sampled point or fingerprint cell for row source, T, composition, and residual.</p><p id=\"window-rms\" aria-live=\"polite\">Window RMS uses exact binned sums.</p><div class=\"controls\">"
             "<label>Observable<select id=\"observable-select\"></select></label>"
             "<label>Temperature range (K)<span class=\"range\"><input id=\"temperature-min\" type=\"number\" aria-label=\"Minimum temperature\"><input id=\"temperature-max\" type=\"number\" aria-label=\"Maximum temperature\"></span></label>"
             "<label>SiO₂ range<span class=\"range\"><input id=\"sio2-min\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Minimum SiO2\"><input id=\"sio2-max\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Maximum SiO2\"></span></label>"
@@ -4682,43 +4779,107 @@ def _write_collection_html(
             "<h3>Temperature × SiO₂ fingerprint</h3><canvas id=\"fingerprint-canvas\"></canvas></section>"
         )
         output.write(
+            "<details><summary>Rows with unavailable SiO₂ (included only for the full 0–1 range)</summary>"
+            + _html_table(table_rows["window_unknown"])
+            + "</details>"
+        )
+        output.write(
             "<section class=\"chart\"><h2>All rows by rail, engine, and temperature view</h2>"
             "<details><summary>Show all-rows table</summary>"
             + _html_table(table_rows["all_rows"])
             + "</details></section><div id=\"tooltip\" class=\"tooltip\" role=\"tooltip\"></div>"
         )
-        output.write('<script type="application/json" id="row-data">[')
-        first = True
-        for row in database.execute(
-            """SELECT rail, engine, source, reference, temperature_K, sio2,
-                      composition, species, residual_dex, flagged, temperature_bin, sio2_bin
-                 FROM collection_unique_rows ORDER BY rail, engine, temperature_K, reference"""
-        ):
-            rail, engine, source, reference, temperature, sio2, composition, species, residual, flagged, temperature_bin, sio2_bin = row
-            value = {
-                "rail": rail, "engine": engine, "source": source, "reference": reference,
-                "temperature_K": temperature, "sio2": sio2, "composition": composition,
-                "species": species, "residual_dex": residual, "flagged": int(flagged),
-                "temperature_bin": temperature_bin, "sio2_bin": sio2_bin,
-            }
-            if not first:
-                output.write(",")
-            output.write(json.dumps(value, separators=(",", ":")).replace("<", "\\u003c"))
-            first = False
-        output.write("]</script><script type=\"application/json\" id=\"cell-data\">")
-        output.write(json.dumps(table_rows["fingerprints"], separators=(",", ":")).replace("<", "\\u003c"))
+        output.write('<script type="application/json" id="row-data">')
+        output.write(
+            json.dumps(
+                table_rows["temperature_sample"],
+                separators=(",", ":"),
+            ).replace("<", "\\u003c")
+        )
+        output.write("</script><script type=\"application/json\" id=\"cell-data\">")
+        rail_names = [rail for rail, _label in observables]
+        rail_codes = {rail: index for index, rail in enumerate(rail_names)}
+        engine_codes = {
+            engine: index for index, engine in enumerate(engine_names)
+        }
+
+        def encode_cell(
+            row: Mapping[str, str], *, sio2_unknown: bool = False
+        ) -> list[object]:
+            temperature_bin = int(
+                Decimal(row["temperature_lower_K"])
+                / BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K
+            )
+            sio2_bin = (
+                -1
+                if sio2_unknown
+                else int(
+                    Decimal(row["sio2_lower"])
+                    / BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH
+                )
+            )
+            band_code = {"good": 1, "okay": 2, "needs work": 3}.get(
+                row.get("band", ""), 0
+            )
+            return [
+                rail_codes[row["rail"]],
+                engine_codes[row["engine"]],
+                temperature_bin,
+                sio2_bin,
+                int(row["n"]),
+                row["sum_residual_dex"],
+                row["sum_squared_residual_dex"],
+                row.get("median_abs_dex", ""),
+                band_code,
+                sio2_unknown,
+            ]
+
+        cell_payload = {
+            "rails": rail_names,
+            "engines": list(engine_names),
+            "cells": [
+                *(encode_cell(row) for row in table_rows["fingerprints"]),
+                *(
+                    encode_cell(row, sio2_unknown=True)
+                    for row in table_rows["window_unknown"]
+                ),
+            ],
+        }
+        output.write(
+            json.dumps(cell_payload, separators=(",", ":")).replace(
+                "<", "\\u003c"
+            )
+        )
         output.write("</script><script>\n")
         output.write("const rows=JSON.parse(document.getElementById('row-data').textContent);\n")
-        output.write("const cells=JSON.parse(document.getElementById('cell-data').textContent);\n")
+        output.write("const cellData=JSON.parse(document.getElementById('cell-data').textContent);\n")
+        output.write("const cells=cellData.cells;\n")
         output.write("const PALETTE=")
         output.write(json.dumps(_hero_engine_colors(engine_names)))
         output.write(";const BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'};\n")
-        output.write(_COLLECTION_INTERACTIVE_SCRIPT.replace("__RAILS__", json.dumps([rail for rail, _label in COLLECTION_OBSERVABLES])).replace("__LABELS__", json.dumps(dict(COLLECTION_OBSERVABLES))))
+        output.write(
+            _COLLECTION_INTERACTIVE_SCRIPT
+            .replace("__RAILS__", json.dumps([rail for rail, _label in observables]))
+            .replace("__LABELS__", json.dumps(dict(observables)))
+            .replace(
+                "__TEMPERATURE_BIN_K__",
+                str(BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K),
+            )
+            .replace(
+                "__SIO2_BIN_WIDTH__",
+                str(BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH),
+            )
+            .replace(
+                "__TEMPERATURE_FLOOR_K__",
+                str(HERO_TEMPERATURE_FLOOR_K),
+            )
+        )
         output.write("</script></main></body></html>")
 
 
 _COLLECTION_INTERACTIVE_SCRIPT = r"""
 const rails=__RAILS__,labels=__LABELS__;
+const TEMPERATURE_BIN_K=__TEMPERATURE_BIN_K__,SIO2_BIN_WIDTH=__SIO2_BIN_WIDTH__,TEMPERATURE_FLOOR_K=__TEMPERATURE_FLOOR_K__;
 const railSelect=document.getElementById('observable-select'), engineSelect=document.getElementById('fingerprint-engine');
 const toggles=document.getElementById('engine-toggles'), tMin=document.getElementById('temperature-min'),tMax=document.getElementById('temperature-max');
 const sMin=document.getElementById('sio2-min'),sMax=document.getElementById('sio2-max');
@@ -4732,11 +4893,28 @@ for(const engine of engines){
   label.append(check,swatch,document.createTextNode(engine));toggles.append(label);
 }
 let minTemp=Infinity,maxTemp=-Infinity;
-for(const row of rows){const temp=+row.temperature_K;if(Number.isFinite(temp)){minTemp=Math.min(minTemp,temp);maxTemp=Math.max(maxTemp,temp);}}
+for(const cell of cells){minTemp=Math.min(minTemp,cell[2]*TEMPERATURE_BIN_K);maxTemp=Math.max(maxTemp,(cell[2]+1)*TEMPERATURE_BIN_K);}
 tMin.value=Number.isFinite(minTemp)?Math.floor(minTemp):0;tMax.value=Number.isFinite(maxTemp)?Math.ceil(maxTemp):3000;sMin.value=0;sMax.value=1;
 function enabled(engine){return !!toggles.querySelector('[data-engine-toggle=\"'+CSS.escape(engine)+'\"]')?.checked;}
-function windowValues(){return [+tMin.value,+tMax.value,+sMin.value,+sMax.value];}
+function snap(value,step,round){return round(value/step)*step;}
+function windowValues(){return [snap(+tMin.value,TEMPERATURE_BIN_K,Math.floor),snap(+tMax.value,TEMPERATURE_BIN_K,Math.ceil),snap(+sMin.value,SIO2_BIN_WIDTH,Math.floor),snap(+sMax.value,SIO2_BIN_WIDTH,Math.ceil)];}
+function snapControls(){const [lo,hi,slo,shi]=windowValues();tMin.value=lo;tMax.value=hi;sMin.value=slo.toFixed(2);sMax.value=shi.toFixed(2);}
 function inWindow(row){const [lo,hi,slo,shi]=windowValues();if(+row.temperature_K<lo||+row.temperature_K>hi)return false;return row.sio2==null?(slo<=0&&shi>=1):(+row.sio2>=slo&&+row.sio2<=shi);}
+function updateWindowRms(){
+  const [lo,hi,slo,shi]=windowValues(),rail=railSelect.value,parts=[];
+  for(const engine of engines){if(!enabled(engine))continue;let n=0,squares=0;
+    for(const cell of cells){if(cellData.rails[cell[0]]!==rail||cellData.engines[cell[1]]!==engine)continue;
+      const temperatureLower=cell[2]*TEMPERATURE_BIN_K,temperatureUpper=(cell[2]+1)*TEMPERATURE_BIN_K;
+      if(temperatureLower<lo||temperatureUpper>hi)continue;
+      if(cell[9]){if(slo<=0&&shi>=1){n+=cell[4];squares+=+cell[6];}continue;}
+      const sio2Lower=cell[3]*SIO2_BIN_WIDTH,sio2Upper=(cell[3]+1)*SIO2_BIN_WIDTH;
+      if(sio2Lower<slo||sio2Upper>shi)continue;
+      n+=cell[4];squares+=+cell[6];
+    }
+    parts.push(engine+': '+(n?Math.sqrt(squares/n).toFixed(3)+' dex (n='+n+')':'no scored bins'));
+  }
+  document.getElementById('window-rms').textContent='Exact binned RMS for '+lo+'–'+hi+' K and SiO₂ '+slo.toFixed(2)+'–'+shi.toFixed(2)+': '+(parts.join(' · ')||'no engines selected');
+}
 function size(canvas){const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height};}
 function lighten(hex,amount){const n=parseInt(hex.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return 'rgb('+Math.round(r+(255-r)*amount)+','+Math.round(g+(255-g)*amount)+','+Math.round(b+(255-b)*amount)+')';}
 function plotError(){
@@ -4746,17 +4924,17 @@ function plotError(){
   ctx.fillStyle='rgba(12,163,12,.12)';ctx.fillRect(m.l,y(.5),pw,y(-.5)-y(.5));ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--grid');
   for(let i=0;i<=6;i++){const yy=m.t+i*ph/6;ctx.beginPath();ctx.moveTo(m.l,yy);ctx.lineTo(w-m.r,yy);ctx.stroke();}
   ctx.strokeStyle='#263238';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m.l,y(0));ctx.lineTo(w-m.r,y(0));ctx.stroke();
-  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(1700),m.t);ctx.lineTo(x(1700),h-m.b);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(TEMPERATURE_FLOOR_K),m.t);ctx.lineTo(x(TEMPERATURE_FLOOR_K),h-m.b);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('Temperature (K)',w/2-42,h-8);ctx.save();ctx.translate(14,h/2+38);ctx.rotate(-Math.PI/2);ctx.fillText('Signed error (dex)',0,0);ctx.restore();
   for(const row of rows){if(row.rail!==rail||!enabled(row.engine)||!inWindow(row))continue;const px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=row.flagged?.72:.35;ctx.fillStyle=row.flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
   ctx.globalAlpha=1;errorCanvas._plot={x,y,m,pw,ph,lo,hi,rail};
 }
 function plotMap(){
   const {ctx,w,h}=size(mapCanvas),rail=railSelect.value,engine=engineSelect.value,m={l:54,r:14,t:18,b:36},pw=w-m.l-m.r,ph=h-m.t-m.b;
-  const railCells=cells.filter(c=>c.rail===rail&&c.engine===engine),[tlo,thi,slo,shi]=windowValues();let lo=Infinity,hi=-Infinity;
-  for(const cell of railCells){lo=Math.min(lo,+cell.temperature_lower_K);hi=Math.max(hi,+cell.temperature_upper_K);}if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=0;hi=1;}
+  const railCells=cells.filter(c=>!c[9]&&cellData.rails[c[0]]===rail&&cellData.engines[c[1]]===engine),[tlo,thi,slo,shi]=windowValues();let lo=Infinity,hi=-Infinity;
+  for(const cell of railCells){lo=Math.min(lo,cell[2]*TEMPERATURE_BIN_K);hi=Math.max(hi,(cell[2]+1)*TEMPERATURE_BIN_K);}if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=0;hi=1;}
   ctx.clearRect(0,0,w,h);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--page');ctx.fillRect(0,0,w,h);const x=v=>m.l+(v-slo)/(shi-slo||1)*pw,y=v=>m.t+(hi-v)/(hi-lo||1)*ph;
-  for(const cell of railCells){if(!enabled(engine)||+cell.n<3||!cell.colour)continue;const xl=Math.max(slo,+cell.sio2_lower),xh=Math.min(shi,+cell.sio2_upper),yl=Math.max(tlo,+cell.temperature_lower_K),yh=Math.min(thi,+cell.temperature_upper_K);if(xh<=xl||yh<=yl)continue;ctx.fillStyle=cell.colour;ctx.fillRect(x(xl)+1,y(yh)+1,Math.max(0,x(xh)-x(xl)-2),Math.max(0,y(yl)-y(yh)-2));}
+  for(const cell of railCells){if(!enabled(engine)||cell[4]<3||!cell[8])continue;const xl=Math.max(slo,cell[3]*SIO2_BIN_WIDTH),xh=Math.min(shi,(cell[3]+1)*SIO2_BIN_WIDTH),yl=Math.max(tlo,cell[2]*TEMPERATURE_BIN_K),yh=Math.min(thi,(cell[2]+1)*TEMPERATURE_BIN_K);if(xh<=xl||yh<=yl)continue;ctx.fillStyle=BANDS[['','good','okay','needs work'][cell[8]]];ctx.fillRect(x(xl)+1,y(yh)+1,Math.max(0,x(xh)-x(xl)-2),Math.max(0,y(yl)-y(yh)-2));}
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.strokeRect(m.l,m.t,pw,ph);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('SiO₂ mole fraction',w/2-58,h-8);ctx.save();ctx.translate(14,h/2+30);ctx.rotate(-Math.PI/2);ctx.fillText('Temperature (K)',0,0);ctx.restore();mapCanvas._plot={x,y,m,pw,ph,lo,hi,rail,engine};
 }
 function showTip(event,kind){
@@ -4764,20 +4942,46 @@ function showTip(event,kind){
   if(kind==='map'){
     const [tlo,thi,slo,shi]=windowValues(),sx=slo+(mx-p.m.l)/p.pw*(shi-slo),temp=p.hi-(my-p.m.t)/p.ph*(p.hi-p.lo);
     if(!enabled(p.engine)){tip.style.display='none';return;}
-    cell=cells.find(c=>c.rail===p.rail&&c.engine===p.engine&&+c.n>=3&&sx>=+c.sio2_lower&&sx<+c.sio2_upper&&temp>=+c.temperature_lower_K&&temp<+c.temperature_upper_K&&+c.temperature_lower_K<thi&&+c.temperature_upper_K>tlo);
-    if(cell)row=rows.find(r=>r.rail===p.rail&&r.engine===p.engine&&r.sio2!=null&&+r.sio2>=+cell.sio2_lower&&+r.sio2<+cell.sio2_upper&&+r.temperature_K>=+cell.temperature_lower_K&&+r.temperature_K<+cell.temperature_upper_K&&inWindow(r));
+    cell=cells.find(c=>!c[9]&&cellData.rails[c[0]]===p.rail&&cellData.engines[c[1]]===p.engine&&c[4]>=3&&sx>=c[3]*SIO2_BIN_WIDTH&&sx<(c[3]+1)*SIO2_BIN_WIDTH&&temp>=c[2]*TEMPERATURE_BIN_K&&temp<(c[2]+1)*TEMPERATURE_BIN_K&&(c[2]*TEMPERATURE_BIN_K)<thi&&((c[2]+1)*TEMPERATURE_BIN_K)>tlo);
+    if(cell)row=rows.find(r=>r.rail===p.rail&&r.engine===p.engine&&r.sio2!=null&&+r.sio2>=cell[3]*SIO2_BIN_WIDTH&&+r.sio2<(cell[3]+1)*SIO2_BIN_WIDTH&&+r.temperature_K>=cell[2]*TEMPERATURE_BIN_K&&+r.temperature_K<(cell[2]+1)*TEMPERATURE_BIN_K&&inWindow(r));
   }else{
     for(const r of rows){if(r.rail!==p.rail||!enabled(r.engine)||!inWindow(r))continue;const dx=p.x(+r.temperature_K)-mx,dy=p.y(+r.residual_dex)-my,d=dx*dx+dy*dy;if(d<best){best=d;row=r;}}
     if(best>110)row=null;
   }
   if(!row&&!cell){tip.style.display='none';return;}
   const detail=row?'Row source: '+row.source+' ('+row.reference+')\nT: '+row.temperature_K+' K\nComposition: '+row.composition+'\nResidual: '+row.residual_dex+' dex':'No row in this cell';
-  tip.textContent=cell?'Median |error|: '+cell.median_abs_dex+' dex · n='+cell.n+'\n'+detail:detail;tip.style.display='block';tip.style.left=Math.min(event.clientX+12,innerWidth-350)+'px';tip.style.top=Math.min(event.clientY+12,innerHeight-120)+'px';
+  tip.textContent=cell?'Median |error|: '+cell[7]+' dex · n='+cell[4]+'\n'+detail:detail;tip.style.display='block';tip.style.left=Math.min(event.clientX+12,innerWidth-350)+'px';tip.style.top=Math.min(event.clientY+12,innerHeight-120)+'px';
 }
-for(const control of [railSelect,engineSelect,tMin,tMax,sMin,sMax])control.addEventListener('input',()=>{plotError();plotMap();});
-toggles.addEventListener('change',()=>{plotError();plotMap();});errorCanvas.addEventListener('pointermove',e=>showTip(e,'error'));errorCanvas.addEventListener('pointerleave',()=>tip.style.display='none');mapCanvas.addEventListener('pointermove',e=>showTip(e,'map'));mapCanvas.addEventListener('pointerleave',()=>tip.style.display='none');
-document.getElementById('theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';plotError();plotMap();});
-window.addEventListener('resize',()=>{plotError();plotMap();});plotError();plotMap();
+function deferredRows(kind,rail){
+  if(kind==='samples')return rows.filter(row=>row.rail===rail);
+  const bandNames=['','good','okay','needs work'];
+  return cells.filter(cell=>!cell[9]&&cellData.rails[cell[0]]===rail).map(cell=>({
+    rail:cellData.rails[cell[0]],engine:cellData.engines[cell[1]],
+    temperature_lower_K:String(cell[2]*TEMPERATURE_BIN_K),temperature_upper_K:String((cell[2]+1)*TEMPERATURE_BIN_K),
+    sio2_lower:String(cell[3]*SIO2_BIN_WIDTH),sio2_upper:String((cell[3]+1)*SIO2_BIN_WIDTH),n:cell[4],
+    sum_residual_dex:cell[5],sum_squared_residual_dex:cell[6],median_abs_dex:cell[7],
+    band:bandNames[cell[8]],colour:BANDS[bandNames[cell[8]]]||''
+  }));
+}
+function renderDeferredTable(holder,tableRows){
+  if(!tableRows.length){holder.textContent='No rows.';return;}
+  const columns=Object.keys(tableRows[0]),table=document.createElement('table'),head=document.createElement('thead'),headRow=document.createElement('tr'),body=document.createElement('tbody');
+  for(const column of columns){const cell=document.createElement('th');cell.textContent=column;headRow.append(cell);}head.append(headRow);
+  for(const record of tableRows){const row=document.createElement('tr');for(const column of columns){const cell=document.createElement('td');cell.textContent=record[column]??'';row.append(cell);}body.append(row);}
+  table.append(head,body);holder.replaceChildren(table);
+}
+for(const holder of document.querySelectorAll('[data-deferred-table]')){
+  const details=holder.closest('details');details.addEventListener('toggle',()=>{
+    if(!details.open||holder.dataset.loaded)return;
+    renderDeferredTable(holder,deferredRows(holder.dataset.deferredTable,holder.dataset.rail));holder.dataset.loaded='true';
+  });
+}
+function redraw(){plotError();plotMap();updateWindowRms();}
+for(const control of [railSelect,engineSelect,tMin,tMax,sMin,sMax])control.addEventListener('input',redraw);
+for(const control of [tMin,tMax,sMin,sMax])control.addEventListener('change',()=>{snapControls();redraw();});
+toggles.addEventListener('change',redraw);errorCanvas.addEventListener('pointermove',e=>showTip(e,'error'));errorCanvas.addEventListener('pointerleave',()=>tip.style.display='none');mapCanvas.addEventListener('pointermove',e=>showTip(e,'map'));mapCanvas.addEventListener('pointerleave',()=>tip.style.display='none');
+document.getElementById('theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';redraw();});
+window.addEventListener('resize',redraw);redraw();
 """;
 
 
@@ -4797,6 +5001,23 @@ def render_hero_collection(
 
     if not data.engines:
         raise ValueError("no engines found in score JSONL")
+    if data.rails_explicit:
+        unsupported = sorted(set(data.selected_rails) - set(COLLECTION_SCORE_RAILS))
+        if unsupported:
+            raise ValueError(
+                "collection renderer supports --rail only for: "
+                + ", ".join(COLLECTION_SCORE_RAILS)
+                + f"; unsupported: {', '.join(unsupported)}"
+            )
+        selected_rails = set(data.selected_rails)
+        observables = tuple(
+            item for item in COLLECTION_OBSERVABLES if item[0] in selected_rails
+        )
+    else:
+        observables = COLLECTION_OBSERVABLES
+    if not observables:
+        raise ValueError("collection renderer needs at least one supported rail")
+    observable_rails = {rail for rail, _label in observables}
     render_date = render_date or datetime.now(timezone.utc).date().isoformat()
     output_dir.mkdir(parents=True, exist_ok=True)
     scratch = os.environ.get("TMPDIR")
@@ -4818,29 +5039,60 @@ def render_hero_collection(
             database,
             data,
             bin_width_K=data.bin_width_K,
+            observables=observables,
         )
         history = read_history(history_path)
         annotation_map = dict(annotations or {})
         tables: dict[str, list[dict[str, object]]] = {
-            "scorecard": _scorecard_table_rows(data),
+            "scorecard": [
+                row
+                for row in _scorecard_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
             "panels": raw_tables["panels"],
             "temperature_bins": raw_tables["temperature_bins"],
             "temperature_density": raw_tables["density"],
             "temperature_points": raw_tables["points"],
-            "components": _component_table_rows(data),
-            "fingerprints": _fingerprint_table_rows(data),
-            "coverage": _coverage_table_rows(data),
-            "progress": _history_collection_rows(
-                data,
-                history,
-                simulator_commit=simulator_commit,
-                render_date=render_date,
-                annotations=annotation_map,
-            ),
+            "temperature_sample": raw_tables["sample"],
+            "components": [
+                row
+                for row in _component_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
+            "fingerprints": [
+                row
+                for row in _fingerprint_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
+            "window_unknown": [
+                row
+                for row in _window_unknown_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
+            "coverage": [
+                row
+                for row in _coverage_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
+            "progress": [
+                row
+                for row in _history_collection_rows(
+                    data,
+                    history,
+                    simulator_commit=simulator_commit,
+                    render_date=render_date,
+                    annotations=annotation_map,
+                )
+                if row["rail"] in observable_rails
+            ],
             "exposure": [],
-            "all_rows": _all_rows_table_rows(data),
+            "all_rows": [
+                row
+                for row in _all_rows_table_rows(data)
+                if row["rail"] in observable_rails
+            ],
         }
-        for rail, _label in COLLECTION_OBSERVABLES:
+        for rail, _label in observables:
             for engine in _ordered_hero_engines(data.engines):
                 view = _view_metric(_collection_metric(data, rail, engine), "all")
                 held = view.get("held_out", {})
@@ -4861,10 +5113,10 @@ def render_hero_collection(
         }
         chart_files: dict[str, Path] = {}
         path = output_dir / "battery-hero-A-scorecard.png"
-        _draw_scorecard_png(path, csv_rows["scorecard"])
+        _draw_scorecard_png(path, csv_rows["scorecard"], observables)
         chart_files["chart:A"] = path
         files["chart:A"] = path
-        for rail, _label in COLLECTION_OBSERVABLES:
+        for rail, _label in observables:
             path = output_dir / f"battery-hero-B-{_revision_slug(rail)}.png"
             _draw_temperature_png(
                 path,
@@ -4878,12 +5130,14 @@ def render_hero_collection(
             chart_files[key] = path
             files[key] = path
         for rail in (Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value):
+            if rail not in observable_rails:
+                continue
             path = output_dir / f"battery-hero-C-{_revision_slug(rail)}.png"
             _draw_component_png(path, rail, csv_rows["components"])
             key = f"chart:C:{rail}"
             chart_files[key] = path
             files[key] = path
-        for rail, _label in COLLECTION_OBSERVABLES:
+        for rail, _label in observables:
             path = output_dir / f"battery-hero-D-{_revision_slug(rail)}.png"
             _draw_fingerprint_png(path, rail, csv_rows["fingerprints"], data.engines)
             key = f"chart:D:{rail}"
@@ -4895,7 +5149,7 @@ def render_hero_collection(
             ("chart:G", "battery-hero-G-exposure.png", _draw_exposure_png, csv_rows["exposure"]),
         ):
             path = output_dir / filename
-            draw(path, rows)
+            draw(path, rows, observables)
             chart_files[chart_key] = path
             files[chart_key] = path
         methods_path = _write_collection_methods(
@@ -4908,10 +5162,10 @@ def render_hero_collection(
         html_path = output_dir / "battery-hero.html"
         _write_collection_html(
             html_path,
-            database,
             chart_files=chart_files,
             table_rows=csv_rows,
             engine_names=data.engines,
+            observables=observables,
         )
         files["html"] = html_path
         database.close()
@@ -4927,9 +5181,10 @@ def _collection_metric(
 def _collection_comparison(
     data: ScorePlotData, rail: str, primary_engine: str
 ) -> Mapping[str, object]:
+    comparison = data.hero_comparisons.get((rail, primary_engine))
+    if comparison is not None:
+        return comparison
     chart = "sio_evolution" if rail == Rail.SIO_EVOLUTION.value else rail
-    if rail in HERO_RAILS:
-        return data.hero_comparisons.get((rail, primary_engine), {})
     return data.hero_deck_comparisons.get((chart, primary_engine), {})
 
 
@@ -5026,83 +5281,61 @@ def _scorecard_plot_values(
 
 
 def _component_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
-    grouped: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
+    rows: list[dict[str, object]] = []
     for record in data.hero_component_comparisons:
         rail = str(record.get("rail") or "")
-        species = str(record.get("species") or "unknown")
-        if (
-            record.get("primary_engine") == "openimcc"
-            and rail in {Rail.VAPOUR.value, Rail.MELT_ACTIVITY.value}
-        ):
-            grouped[(rail, species)].append(record)
-    rows: list[dict[str, object]] = []
-    for (rail, component), records in sorted(grouped.items()):
-        comparisons: dict[str, Mapping[str, object]] = {}
-        for record in records:
-            values = record.get("comparisons")
-            if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
-                continue
-            for comparison in values:
-                if not isinstance(comparison, Mapping):
-                    continue
-                engine = str(comparison.get("engine") or "unknown")
-                if int(comparison.get("n_shared") or 0) >= HERO_MINIMUM_REPORT_N:
-                    comparisons[engine] = comparison
-        if not comparisons:
+        component = str(record.get("species") or "unknown")
+        if record.get("primary_engine") != "openimcc" or rail not in {
+            Rail.VAPOUR.value,
+            Rail.MELT_ACTIVITY.value,
+        }:
             continue
-        baseline = max(
-            comparisons.values(), key=lambda comparison: int(comparison.get("n_shared") or 0)
-        )
-        baseline_views = baseline.get("views")
-        baseline_views = baseline_views if isinstance(baseline_views, Mapping) else {}
-        baseline_all = baseline_views.get("all", {})
-        baseline_all = baseline_all if isinstance(baseline_all, Mapping) else {}
-        rows.append(
-            {
-                "rail": rail,
-                "component": component,
-                "engine": "openimcc",
-                "n_shared": baseline_all.get("n_shared", baseline.get("n_shared", 0)),
-                "rms_dex": baseline_all.get("primary_rms_dex_on_shared", baseline.get("primary_rms_dex_on_shared")),
-            }
-        )
-        for engine, comparison in comparisons.items():
+        comparisons = record.get("comparisons")
+        if not isinstance(comparisons, Sequence) or isinstance(comparisons, (str, bytes)):
+            continue
+        for comparison in comparisons:
+            if not isinstance(comparison, Mapping):
+                continue
+            partner = str(comparison.get("engine") or "unknown")
             views = comparison.get("views")
             views = views if isinstance(views, Mapping) else {}
             all_view = views.get("all", {})
             all_view = all_view if isinstance(all_view, Mapping) else {}
-            rows.append(
-                {
-                    "rail": rail,
-                    "component": component,
-                    "engine": engine,
-                    "n_shared": all_view.get("n_shared", comparison.get("n_shared", 0)),
-                    "rms_dex": all_view.get("outside_rms_dex", comparison.get("outside_rms_dex")),
-                }
+            n_shared = all_view.get("n_shared", comparison.get("n_shared", 0))
+            if int(n_shared or 0) < HERO_MINIMUM_REPORT_N:
+                continue
+            rows.extend(
+                (
+                    {
+                        "rail": rail,
+                        "component": component,
+                        "engine": "openimcc",
+                        "shared_with": partner,
+                        "n_shared": n_shared,
+                        "rms_dex": all_view.get(
+                            "primary_rms_dex_on_shared",
+                            comparison.get("primary_rms_dex_on_shared"),
+                        ),
+                    },
+                    {
+                        "rail": rail,
+                        "component": component,
+                        "engine": partner,
+                        "shared_with": partner,
+                        "n_shared": n_shared,
+                        "rms_dex": all_view.get(
+                            "outside_rms_dex", comparison.get("outside_rms_dex")
+                        ),
+                    },
+                )
             )
-    shared_count = Counter(
-        {
-            (str(row["rail"]), str(row["component"])): max(
-                (int(item["n_shared"]) for item in rows if item["rail"] == row["rail"] and item["component"] == row["component"]),
-                default=0,
-            )
-            for row in rows
-        }
-    )
     rows.sort(
         key=lambda row: (
             str(row["rail"]),
-            -shared_count[(str(row["rail"]), str(row["component"]))],
-            str(row["component"]),
-            _HERO_ENGINE_ORDER.index(str(row["engine"])),
-        )
-    )
-    rows.sort(
-        key=lambda row: (
-            row["rail"],
             -int(row["n_shared"] or 0),
-            row["component"],
-            row["engine"],
+            str(row["component"]),
+            str(row["shared_with"]),
+            str(row["engine"]),
         )
     )
     return rows
@@ -5115,12 +5348,15 @@ def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
             continue
         for cell in cells:
             count = int(cell.get("n") or 0)
+            if count == 0:
+                continue
             value = cell.get("median_abs_dex")
-            band, colour = (
-                _fingerprint_band(value)
+            band = (
+                _battery_hero_fingerprint_band(value)
                 if count >= 3 and value is not None
-                else ("", "")
+                else ""
             )
+            colour = FINGERPRINT_COLOURS.get(band, "")
             rows.append(
                 {
                     "rail": rail,
@@ -5130,12 +5366,25 @@ def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
                     "sio2_lower": cell.get("sio2_lower"),
                     "sio2_upper": cell.get("sio2_upper"),
                     "n": count,
+                    "sum_residual_dex": cell.get("sum_residual_dex", ""),
+                    "sum_squared_residual_dex": cell.get(
+                        "sum_squared_residual_dex", ""
+                    ),
                     "median_abs_dex": value,
                     "band": band,
                     "colour": colour,
                 }
             )
     return rows
+
+
+def _window_unknown_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
+    return [
+        dict(cell)
+        for key in sorted(data.hero_sio2_unknown_cells)
+        for cell in data.hero_sio2_unknown_cells[key]
+        if str(cell["rail"]) in COLLECTION_SCORE_RAILS
+    ]
 
 
 def _coverage_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
@@ -5873,7 +6122,8 @@ def render_hero_charts(
             "History: solid=RMS, dashed=median |dex|, dash-dot=SD/paired primary RMS, dotted=outside-engine RMS; n_shared is shown at each point. "
             "Fingerprint fill uses median |dex| traffic-light bands; n<3 cells are blank. "
             f"Temperature split uses measured residual field {HERO_TEMPERATURE_FIELD}; "
-            "1700 K is in the ≥ view and rows without T are all-only with a no T count."
+            f"{HERO_TEMPERATURE_FLOOR_K:g} K is in the ≥ view and rows without T "
+            "are all-only with a no T count."
         )
         if openimcc_score_commit:
             caption += f" OpenIMCC SCORE commit: {openimcc_score_commit}."
@@ -5998,7 +6248,8 @@ def _hero_deck_comparison_caption(
         + "; ".join(entries)
         + " · "
         + f"Temperature split uses measured residual field {HERO_TEMPERATURE_FIELD}; "
-        "1700 K is included in the ≥ view, and rows without T are all-only. "
+        f"{HERO_TEMPERATURE_FLOOR_K:g} K is included in the ≥ view, and rows "
+        "without T are all-only. "
         + metrics_label
     )
 
@@ -6553,6 +6804,15 @@ def render_plots(
     """Write shared-scale species/element tiles and one PNG per engine/view."""
 
     if source_path is not None:
+        if tuple(group_by) != DEFAULT_GROUP_BY:
+            raise ValueError(
+                "group_by/--group-by is unsupported by the collection renderer; "
+                "use its fixed A–G observable views"
+            )
+        if omit_empty_engines is not None:
+            raise ValueError(
+                    "omit_empty_engines/--omit-empty-engines is unsupported by the collection renderer"
+            )
         return render_hero_collection(
             data,
             source_path,
@@ -6852,6 +7112,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         bin_width_K=args.bin_width_k,
         rails=args.rail,
         exposure_policy=exposure_policy,
+        _collection_mode=True,
     )
     if args.append_history:
         if not args.landing_sha:
