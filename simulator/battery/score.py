@@ -10781,6 +10781,10 @@ def _predict_with_engine(
                 sensitivity_dex, abs(math.log10(after / before))
             )
         pressure_pa_text = format(total_pressure_pa, ".17g")
+        # Identity equality is exact. Use the notice's round-trip Decimal in
+        # the prediction identity too; Decimal(str(float)) can spell the same
+        # binary value differently (for example, 0.1 vs 0.10000000000000001).
+        pressure_pa_decimal = Decimal(pressure_pa_text)
         sensitivity_text = format(sensitivity_dex, ".17g")
         pressure_notice = Notice(
             kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
@@ -10802,7 +10806,7 @@ def _predict_with_engine(
         pressures = updated_pressures
         identity = replace(
             identity,
-            total_pressure_Pa=State.of(Decimal(str(total_pressure_pa))),
+            total_pressure_Pa=State.of(pressure_pa_decimal),
         )
     reported: Mapping[str, float]
     coefficient_basis: str | None = None
