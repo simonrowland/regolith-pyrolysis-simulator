@@ -84,6 +84,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
+    _backend_name_for_fidelity,
     _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
@@ -601,6 +602,9 @@ def run(
             config.profile,
             source="<stale-profile>",
         )
+    _backend_name_for_fidelity(
+        resolved_profile, config.fidelity, mode="optimizer_search"
+    )
     active_schema = _schema_with_pinned_paths(
         base_schema,
         resolved_profile,
@@ -1207,6 +1211,9 @@ def run_certify(
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
         resolved_profile = dict(config.profile)
+    _backend_name_for_fidelity(
+        resolved_profile, config.fidelity, mode="optimizer_search"
+    )
     active_schema = _schema_with_pinned_paths(
         base_schema,
         resolved_profile,
