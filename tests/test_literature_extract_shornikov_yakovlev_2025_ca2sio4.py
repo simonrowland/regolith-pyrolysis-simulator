@@ -1,10 +1,12 @@
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from simulator.battery.enums import EvidenceClass, ValueKind
 from simulator.battery.migrate import Migrator
+from simulator.battery.score import _printed_uncertainty_source
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -121,11 +123,23 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
     assert unknown_quantity_ids == OBSERVATION_IDS
     assert all(migrated[observation_id].identity.species.phase.is_unknown for observation_id in kems_ids)
     assert all(migrated[observation_id].identity.species.phase.is_value for observation_id in OBSERVATION_IDS - kems_ids)
+    uncertainty_pins = {
+        "shornikov_yakovlev_2025_mixing_enthalpy": (Decimal("0.20"), "kJ/mol"),
+        "shornikov_yakovlev_2025_mixing_entropy": (Decimal("0.10"), "J/(mol K)"),
+    }
     for observation_id in kems_ids:
         row = migrated[observation_id]
         assert row.evidence.class_.is_value
         assert row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         assert row.value.kind is ValueKind.UNAVAILABLE
+        expected_width, expected_unit = uncertainty_pins[observation_id]
+        assert row.uncertainty.kind.value == "printed"
+        assert _printed_uncertainty_source(row.uncertainty) == (
+            expected_width,
+            "scalar",
+            expected_unit,
+        )
+        assert row.uncertainty.verbatim["confidence_level"] == "not_stated"
         assert "calculation equation" in row.admission.reason
         assert "numerical pressure inputs" in row.admission.reason
         assert row.derivation is not None
