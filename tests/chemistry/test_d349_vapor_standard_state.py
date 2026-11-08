@@ -17,6 +17,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     _activity_for_crystalline_vapor_k,
 )
+from simulator.accounting.completeness import product_class_availability
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
@@ -24,7 +25,10 @@ from simulator.diagnostic_helpers.alphamelts_volatility import (
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.vapour_rail.batch import PressureValue
 from simulator.vapour_rail.batch import FluxEligible
-from simulator.vapour_rail.instrumentation import EffectivePressureSource
+from simulator.vapour_rail.instrumentation import (
+    EffectivePressureSource,
+    serialize_vapour_batch,
+)
 from tests.chemistry.conftest import _build_sim
 
 _D349_VAPOR_ROUTES = ("Mg", "Mg2", "MgO_gas", "Ca", "Ca2", "CaO_gas")
@@ -147,6 +151,56 @@ def _live_gateway_probe(
     effective_source = EffectivePressureSource(
         "d349-live-gateway",
         diagnostic["vapor_pressures_Pa"],
+    )
+    return sim, diagnostic, equilibrium, effective_source
+
+
+def _mars_low_temperature_provider_probe(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    *,
+    temperature_C,
+):
+    sim = _build_sim(
+        "mars_basalt",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"C": 30.0},
+    )
+    sim.melt.p_total_mbar = 10.0
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": sim.atom_ledger.mol_by_account(
+                    "process.cleaned_melt"
+                )
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=temperature_C,
+        pressure_bar=0.01,
+        fO2_log=-9.0,
+        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+    )
+    diagnostic = dict(
+        BuiltinVaporPressureProvider(vapor_pressure_data)
+        .dispatch(request)
+        .diagnostic
+    )
+    equilibrium = SimpleNamespace(
+        temperature_C=temperature_C,
+        pO2_bar=1e-9,
+        fO2_log=-9.0,
+        diagnostics={},
+        activity_coefficients=diagnostic.get("activities", {}),
+        vapor_pressures_Pa=diagnostic.get("vapor_pressures_Pa", {}),
+    )
+    effective_source = EffectivePressureSource(
+        "d354-mars-low-temperature",
+        diagnostic.get("vapor_pressures_Pa", {}),
     )
     return sim, diagnostic, equilibrium, effective_source
 
@@ -1091,6 +1145,89 @@ def test_d349_fe_conversion_reaches_live_gateway_guard_below_1650k(
     )
     assert refused is None
     assert "Fe" in sim._last_vapour_batch_resolve_error["detail"]
+
+
+def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    temperature_K = 478.15
+    sim, diagnostic, equilibrium, effective_source = (
+        _mars_low_temperature_provider_probe(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            temperature_C=temperature_K - 273.15,
+        )
+    )
+
+    assert diagnostic["activities_provider"] == "BuiltinVaporPressureProvider"
+    assert diagnostic["activities_standard_state"]["phase"] == "liquid"
+    assert diagnostic["activities"]["Fe"] > 0.0
+    route = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    conversion = route["activity_standard_state_conversion"]
+    assert conversion["conversion_performed"] is True
+    assert conversion["from_standard_state_phase"] == "liquid"
+    assert conversion["to_standard_state_phase"] == "solid"
+    assert "Fe" in diagnostic["vapor_pressures_Pa"]
+
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+
+    assert batch is not None
+    assert isinstance(batch.channel("Fe").pressure, PressureValue)
+    assert "Fe" in batch.flux_active_species_ids
+
+
+def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim, diagnostic, equilibrium, effective_source = (
+        _mars_low_temperature_provider_probe(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            temperature_C=40.0,
+        )
+    )
+    assert diagnostic["activities"] == {}
+
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=313.15,
+    )
+
+    assert batch is not None
+    report = serialize_vapour_batch(batch)
+    assert report is not None
+    fe_channel = report["channels_by_species"]["Fe"]
+    assert fe_channel["is_refused"] is True
+    snapshot = SimpleNamespace(
+        evap_flux=SimpleNamespace(
+            species_kg_hr={},
+            carrier_authority_by_species={"Fe": fe_channel},
+        )
+    )
+    unavailable = product_class_availability(
+        sim,
+        "Fe",
+        {},
+        has_computed_part=False,
+        snapshots=(snapshot,),
+    )
+    assert unavailable["status"] == "unavailable"
+    assert unavailable["class_total_kg"] is None
 
 
 @pytest.mark.parametrize(
