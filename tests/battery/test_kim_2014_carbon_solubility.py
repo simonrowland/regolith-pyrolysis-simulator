@@ -129,7 +129,7 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert migrated.identity.composition is not None
             assert migrated.identity.composition.is_unknown
             assert migrated.identity.composition.reason.endswith(
-                "is below 95 wt%"
+                "printed oxide wt% map has no positive mass"
             )
             assert migrated.identity.fO2_Pa.is_unknown
 
@@ -137,8 +137,9 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
     prediction = predict_with_engine(Engine.MAGEMIN, phase_row)
     assert prediction.execution.state is ExecutionState.NOT_PROBED
     assert prediction.authority is Authority.REFUSED
-    # The printed phase map omits the Fe balance and fails closure, so identity
-    # remains incomplete and the engine is not probed.
+    # The printed phase map contains elemental metal and carbon only. Green's
+    # oxide admission gate refuses it, so identity stays incomplete and the
+    # engine is not probed.
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
 
     expected_parameters = {

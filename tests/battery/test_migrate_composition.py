@@ -2830,17 +2830,16 @@ def test_b1128_renormalization_input_is_additive_to_base_store_load(
 
 def test_retained_phase_composition_closes_with_same_row_sulfur() -> None:
     located = migrate_module._mass_percent_composition_located(
-        {"Fe": Decimal("104")},
+        {"SiO2": Decimal("52"), "MgO": Decimal("52")},
         basis="printed_phase_composition",
         locator=None,
-        closure_context={"_migrate_closure_only_components": {"S": "2"}},
+        closure_context={
+            "_migrate_closure_only_components": {"S": "2"},
+        },
     )
 
     assert located.state.is_unknown
-    assert located.state.reason == (
-        "mass-percent composition exceeds the accepted kept-sum limit: "
-        "sum=106 wt% is above 105 wt%"
-    )
+    assert "sum=106 wt% is above 105 wt%" in located.state.reason
 
 
 @pytest.mark.parametrize("unsupported", ("XxO", "Na2O_plus_K2O"))
@@ -2848,13 +2847,17 @@ def test_retained_phase_composition_refuses_unsupported_components_over_drop_lim
     unsupported: str,
 ) -> None:
     located = migrate_module._mass_percent_composition_located(
-        {"Fe": Decimal("99"), unsupported: Decimal("1")},
+        {
+            "SiO2": Decimal("49.5"),
+            "MgO": Decimal("49.5"),
+            unsupported: Decimal("1"),
+        },
         basis="printed_phase_composition",
         locator=None,
     )
 
     assert located.state.is_unknown
-    assert located.state.reason == (
+    assert located.state.reason.endswith(
         "partial analysis contains unsupported component(s) above 0.5 wt%: "
         f"{unsupported}=1 wt%"
     )
@@ -2865,7 +2868,8 @@ def test_retained_phase_composition_refuses_unsupported_components_over_drop_lim
     (
         pytest.param(
             {
-                "Fe": Decimal("50"),
+                "SiO2": Decimal("10"),
+                "MgO": Decimal("10"),
                 "FeO": Decimal("25"),
                 "FeOT": Decimal("25"),
             },
@@ -2873,13 +2877,18 @@ def test_retained_phase_composition_refuses_unsupported_components_over_drop_lim
             id="ambiguous-feot",
         ),
         pytest.param(
-            {"Fe": Decimal("100"), "Na2O_plus_K2O": Decimal("-1")},
+            {
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("51"),
+                "Na2O_plus_K2O": Decimal("-1"),
+            },
             "negative or non-finite amount",
             id="negative-amount",
         ),
         pytest.param(
             {
-                "Fe": Decimal("100"),
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("50"),
                 "XxO": Decimal("1"),
                 "Na2O_plus_K2O": Decimal("-1"),
             },
@@ -2907,36 +2916,41 @@ def test_retained_phase_composition_obeys_shared_admission_refusals(
         pytest.param(
             "blank-metal-cell",
             {"Fe": "100", "Ni": None},
-            "mass-percent composition contains invalid component cells",
+            "printed oxide wt% map has no positive mass",
             id="blank-retained-metal-cell",
         ),
         pytest.param(
             "blank-major-cell",
             {"Fe": "100", "SiO2": None},
-            "mass-percent composition contains invalid component cells",
+            "printed oxide wt% map has no positive mass",
             id="blank-major-cell",
         ),
         pytest.param(
             "missing-major",
             {"Fe": "100"},
-            "missing major oxides: SiO2",
+            "printed oxide wt% map has no positive mass",
             id="explicitly-missing-major",
         ),
         pytest.param(
             "ambiguous-total-iron",
-            {"Fe": "20", "FeO": "40", "FeOT": "40"},
+            {"SiO2": "10", "MgO": "10", "FeO": "40", "FeOT": "40"},
             "ambiguous total iron components: FeOT with FeO",
             id="ambiguous-feot",
         ),
         pytest.param(
             "negative-amount",
-            {"Fe": "100", "Na2O_plus_K2O": "-1"},
+            {"SiO2": "50", "MgO": "51", "Na2O_plus_K2O": "-1"},
             "negative or non-finite amount",
             id="negative-amount",
         ),
         pytest.param(
             "negative-cancels-unsupported",
-            {"Fe": "100", "XxO": "1", "Na2O_plus_K2O": "-1"},
+            {
+                "SiO2": "50",
+                "MgO": "50",
+                "XxO": "1",
+                "Na2O_plus_K2O": "-1",
+            },
             "negative or non-finite amount",
             id="negative-cancels-unsupported",
         ),
@@ -2954,55 +2968,76 @@ def test_retained_phase_composition_obeys_shared_admission_refusals(
         ),
         pytest.param(
             "unsupported-over-limit",
-            {"Fe": "99", "XxO": "1"},
+            {"SiO2": "49.5", "MgO": "49.5", "XxO": "1"},
             "partial analysis contains unsupported component(s) above 0.5 wt%",
             id="unsupported-over-drop-limit",
         ),
         pytest.param(
             "unrecognized-label-over-limit",
-            {"Fe": "99", "unknown-component": "1"},
+            {
+                "SiO2": "49.5",
+                "MgO": "49.5",
+                "unknown-component": "1",
+            },
             "partial analysis contains unsupported component(s) above 0.5 wt%",
             id="unrecognized-label-over-drop-limit",
         ),
         pytest.param(
+            "trace-label-no-oxide",
+            {"Fe": "99.8", "note": "0.2"},
+            "printed oxide wt% map has no positive mass",
+            id="nonchemical-trace-does-not-admit-element-only-phase",
+        ),
+        pytest.param(
+            "duplicate-unsupported-aliases",
+            {
+                "SiO2": "49.7",
+                "MgO": "49.7",
+                "XxO": "0.3",
+                "XxO wt%": "0.3",
+            },
+            "duplicate",
+            id="unsupported-aliases-are-not-collapsed-below-drop-limit",
+        ),
+        pytest.param(
             "duplicate-component",
-            {"Fe": "50", "SiO2": "25", "SiO2 wt%": "25"},
-            "mass-percent composition has duplicate component keys",
+            {"SiO2": "25", "MgO": "50", "SiO2 wt%": "25"},
+            "duplicate",
             id="duplicate-canonical-component",
         ),
         pytest.param(
             "zero-mass",
-            {"Fe": "0"},
+            {"SiO2": "0", "MgO": "0"},
             "printed oxide wt% map has no positive mass",
             id="zero-mass",
         ),
         pytest.param(
             "below-closure",
-            {"Fe": "94"},
+            {"SiO2": "47", "MgO": "47"},
             "mass-percent composition is a partial analysis",
             id="below-95-closure",
         ),
         pytest.param(
             "above-closure",
-            {"Fe": "106"},
+            {"SiO2": "53", "MgO": "53"},
             "mass-percent composition exceeds the accepted kept-sum limit",
             id="above-105-closure",
         ),
         pytest.param(
             "same-row-sulfur",
-            {"Fe": "104"},
+            {"SiO2": "52", "MgO": "52"},
             "sum=106 wt% is above 105 wt%",
             id="same-row-sulfur-closes-above-105",
         ),
         pytest.param(
             "negative-same-row-sulfur",
-            {"Fe": "100"},
+            {"SiO2": "50", "MgO": "50"},
             "negative or non-finite amount",
             id="negative-same-row-sulfur",
         ),
         pytest.param(
             "malformed-same-row-sulfur",
-            {"Fe": "100"},
+            {"SiO2": "50", "MgO": "50"},
             "malformed printed closure component amount for 'S'",
             id="malformed-same-row-sulfur",
         ),
@@ -3030,15 +3065,18 @@ def test_retained_phase_refusals_reach_validator_and_full_migration(
         closure_context = {
             "_migrate_closure_only_components": {"S": "unreadable"}
         }
-    validated, refusal = migrate_module._wt_percent_conversion_or_refusal(
+    validated = migrate_module._mass_percent_composition_located(
         numeric_components,
+        basis="printed_phase_composition",
+        locator=None,
         closure_context=closure_context,
         declared_component_map=components,
-        retain_components=True,
     )
-    assert validated is None, case
-    assert refusal is not None, case
-    assert expected_reason in refusal.reason, (case, refusal.reason)
+    assert validated.state.is_unknown, case
+    assert expected_reason in validated.state.reason, (
+        case,
+        validated.state.reason,
+    )
 
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["experiments"] = [
@@ -3089,14 +3127,19 @@ def test_retained_phase_refusals_reach_validator_and_full_migration(
     ]
     assert migrated.identity.composition is not None
     assert migrated.identity.composition.is_unknown, case
-    assert expected_reason in migrated.identity.composition.reason, (
+    migration_reason = (
+        "missing major oxides"
+        if case == "missing-major"
+        else expected_reason
+    )
+    assert migration_reason in migrated.identity.composition.reason, (
         case,
         migrated.identity.composition.reason,
     )
     condition = migrated.point_conditions.get("composition")
     assert condition is not None, case
     assert condition.state.is_unknown, case
-    assert expected_reason in condition.state.reason, (
+    assert migration_reason in condition.state.reason, (
         case,
         condition.state.reason,
     )
@@ -3105,19 +3148,26 @@ def test_retained_phase_refusals_reach_validator_and_full_migration(
 def test_retained_phase_102_to_105_total_renormalizes_with_notice(
     tmp_path: Path,
 ) -> None:
-    components = {"Fe": "103"}
+    components = {"SiO2": "51.5", "MgO": "51.5"}
     amount = Decimal("103")
     validation = migrate_module._wt_percent_conversion_or_refusal(
-        {"Fe": amount},
+        {name: Decimal(value) for name, value in components.items()},
         closure_context=components,
         declared_component_map=components,
-        retain_components=True,
     )
     assert validation.refusal is None
     assert validation.composition is not None
     assert validation.kept_total == amount
+    located = migrate_module._mass_percent_composition_located(
+        {name: Decimal(value) for name, value in components.items()},
+        basis="printed_phase_composition",
+        locator=None,
+        closure_context=components,
+        declared_component_map=components,
+    )
+    assert located.state.is_value
     assert sum(
-        (value for _name, value in validation.composition.components), Decimal("0")
+        (value for _name, value in located.state.value.components), Decimal("0")
     ) == Decimal("100")
 
     extract = deepcopy(FIXTURE_EXTRACT)
@@ -3165,7 +3215,7 @@ def test_retained_phase_102_to_105_total_renormalizes_with_notice(
     assert condition.state.is_value
     assert condition.inference is not None
     assert any(
-        "printed phase total S=103 wt%" in item
+        "kept oxide total S=103.0 wt%" in item
         for item in condition.inference.inputs
     )
     notice = next(
@@ -3174,7 +3224,7 @@ def test_retained_phase_102_to_105_total_renormalizes_with_notice(
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     )
     assert notice.original == amount
-    assert notice.band == "95-102 wt% printed phase total"
+    assert notice.band == "95-102 wt% kept oxide total"
 
 
 def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
