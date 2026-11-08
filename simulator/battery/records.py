@@ -62,6 +62,7 @@ from simulator.battery.enums import (
     StateTag,
     UncertaintyKind,
     ValueKind,
+    VaporizationMode,
 )
 from simulator.battery.polymorph_dictionary import polymorph_matches_formula
 from simulator.state_types import State
@@ -976,6 +977,7 @@ class Apparatus:
 @dataclass(frozen=True)
 class Sample:
     mass_kg: Located[Value] | None = None
+    final_mass_kg: Located[Value] | None = None
     volume_m3: Located[Value] | None = None
     initial_composition: Located[Composition] | None = None
     printed_composition: Located[Mapping[str, Any]] | None = None
@@ -985,11 +987,46 @@ class Sample:
     characterization: Located[str] | None = None
     surface_area_m2: Located[Value] | None = None
     pretreatment: Located[str] | None = None
+    species_loss_fraction: Mapping[str, Located[Value]] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "mass_kg", _located_value(self.mass_kg))
+        object.__setattr__(self, "final_mass_kg", _located_value(self.final_mass_kg))
         object.__setattr__(self, "volume_m3", _located_value(self.volume_m3))
         object.__setattr__(self, "surface_area_m2", _located_value(self.surface_area_m2))
+        if self.species_loss_fraction is not None:
+            object.__setattr__(
+                self,
+                "species_loss_fraction",
+                {
+                    formula: _located_value(value)
+                    for formula, value in self.species_loss_fraction.items()
+                },
+            )
+
+
+def _charge_sequence_validation_errors(
+    charge_id: object, run_index: object
+) -> tuple[tuple[str, str], ...]:
+    errors = []
+    if not isinstance(charge_id, str) or not charge_id.strip():
+        errors.append(("charge_id", "charge_id must be non-empty"))
+    if type(run_index) is not int or run_index < 1:
+        errors.append(("run_index", "run_index must be an integer >= 1"))
+    return tuple(errors)
+
+
+@dataclass(frozen=True)
+class ChargeSequence:
+    charge_id: str
+    run_index: int
+    locator: Locator | None = None
+
+    def __post_init__(self) -> None:
+        errors = _charge_sequence_validation_errors(self.charge_id, self.run_index)
+        if errors:
+            field, detail = errors[0]
+            raise ValueError(f"ChargeSequence.{field}: {detail}")
 
 
 @dataclass(frozen=True)
@@ -1245,6 +1282,8 @@ class Experiment:
     equipment_context_id: str | None = None
     thermal_schedule: ThermalSchedule | None = None
     fe_metal_saturated: Located[bool] | None = None
+    charge_sequence: ChargeSequence | None = None
+    vaporization_statement: Located[VaporizationMode] | None = None
 
     def __post_init__(self) -> None:
         if not self.experiment_id:

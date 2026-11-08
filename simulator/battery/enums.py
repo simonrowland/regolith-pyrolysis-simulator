@@ -471,6 +471,11 @@ class ExperimentKind(StrEnum):
     SYNTHETIC = "synthetic"
 
 
+class VaporizationMode(StrEnum):
+    CONGRUENT = "congruent"
+    INCONGRUENT = "incongruent"
+
+
 class FO2Channel(StrEnum):
     COMMANDED = "commanded"
     INTRINSIC = "intrinsic"

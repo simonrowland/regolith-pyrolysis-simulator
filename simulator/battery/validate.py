@@ -66,6 +66,7 @@ from simulator.battery.enums import (
     SourceRelation,
     UncertaintyKind,
     ValueKind,
+    VaporizationMode,
 )
 from simulator.battery.identity import (
     Identity,
@@ -77,6 +78,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import (
     Bench,
+    ChargeSequence,
     Experiment,
     Located,
     Notice,
@@ -91,6 +93,7 @@ from simulator.battery.records import (
     SweepGasComponent,
     Value,
     Work,
+    _charge_sequence_validation_errors,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
@@ -950,6 +953,108 @@ def validate_experiment(
     context_rows: Mapping[str, Any] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+    final_mass = experiment.sample.final_mass_kg
+    if final_mass is not None and (
+        not isinstance(final_mass, Located)
+        or not isinstance(final_mass.state, State)
+        or (
+            final_mass.state.is_value
+            and not isinstance(final_mass.state.value, Value)
+        )
+    ):
+        issues.append(
+            _issue(
+                f"{path}.sample.final_mass_kg",
+                RefusalReason.INVALID_SOURCE,
+                "requires a Located Value",
+            )
+        )
+    charge_sequence = experiment.charge_sequence
+    if charge_sequence is not None:
+        if not isinstance(charge_sequence, ChargeSequence):
+            issues.append(
+                _issue(
+                    f"{path}.charge_sequence",
+                    RefusalReason.INVALID_SOURCE,
+                    "requires a ChargeSequence record",
+                )
+            )
+        else:
+            for field, detail in _charge_sequence_validation_errors(
+                charge_sequence.charge_id, charge_sequence.run_index
+            ):
+                issues.append(
+                    _issue(
+                        f"{path}.charge_sequence.{field}",
+                        RefusalReason.INVALID_SOURCE,
+                        detail,
+                    )
+                )
+    vaporization_statement = experiment.vaporization_statement
+    if vaporization_statement is not None:
+        if not isinstance(vaporization_statement, Located):
+            issues.append(
+                _issue(
+                    f"{path}.vaporization_statement",
+                    RefusalReason.INVALID_SOURCE,
+                    "requires a Located VaporizationMode value",
+                )
+            )
+        elif (
+            not isinstance(vaporization_statement.state, State)
+            or (
+                vaporization_statement.state.is_value
+                and not isinstance(
+                    vaporization_statement.state.value, VaporizationMode
+                )
+            )
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.vaporization_statement.state.value",
+                    RefusalReason.INVALID_SOURCE,
+                    "must reference a VaporizationMode enum value",
+                )
+            )
+    species_loss_fraction = experiment.sample.species_loss_fraction
+    if species_loss_fraction is not None:
+        if not isinstance(species_loss_fraction, Mapping):
+            issues.append(
+                _issue(
+                    f"{path}.sample.species_loss_fraction",
+                    RefusalReason.INVALID_SOURCE,
+                    "must be a mapping from species formulas to located values",
+                )
+            )
+        else:
+            for formula, located in species_loss_fraction.items():
+                if (
+                    not isinstance(located, Located)
+                    or not isinstance(located.state, State)
+                    or (
+                        located.state.is_value
+                        and not isinstance(located.state.value, Value)
+                    )
+                ):
+                    issues.append(
+                        _issue(
+                            f"{path}.sample.species_loss_fraction[{formula}]",
+                            RefusalReason.INVALID_SOURCE,
+                            "requires a Located Value",
+                        )
+                    )
+                try:
+                    if not isinstance(formula, str) or not formula.strip():
+                        raise ValueError("species formula must be non-empty")
+                    parse_formula(formula)
+                except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+                    issues.append(
+                        _issue(
+                            f"{path}.sample.species_loss_fraction[{formula}]",
+                            RefusalReason.INVALID_SOURCE,
+                            f"invalid species formula: {exc}",
+                        )
+                    )
     if experiment.kind is ExperimentKind.LITERATURE:
         if not experiment.work_id:
             issues.append(

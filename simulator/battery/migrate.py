@@ -121,6 +121,7 @@ from simulator.battery.enums import (
     StateTag,
     UncertaintyKind,
     ValueKind,
+    VaporizationMode,
     ValenceDenominatorKind,
     ValencePrintedForm,
     ValenceValueForm,
@@ -163,6 +164,7 @@ from simulator.battery.records import (
     BenchIdentity,
     BenchReference,
     Composition,
+    ChargeSequence,
     Derivation,
     Evidence,
     Experiment,
@@ -3007,6 +3009,7 @@ def _sample_from_plain(
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
+    final_mass = payload.get("final_mass_kg")
     volume = payload.get("volume_m3")
     form = payload.get("form")
     container = payload.get("container")
@@ -3016,6 +3019,7 @@ def _sample_from_plain(
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
+    species_loss_fraction = payload.get("species_loss_fraction")
     issues = registry_issues if registry_issues is not None else []
 
     def parse_registry_value(field: str, raw: object, parse):
@@ -3057,6 +3061,11 @@ def _sample_from_plain(
             return replace(value, inference=inference)
         return value
 
+    def require_species_loss_mapping(raw: object) -> Mapping[str, Any]:
+        if not isinstance(raw, Mapping):
+            raise ValueError("species_loss_fraction must be a mapping")
+        return raw
+
     printed_located = None
     if printed is not None:
         printed_located = parse_registry_located(
@@ -3077,6 +3086,32 @@ def _sample_from_plain(
                 )
             ),
         )
+    final_mass_located = (
+        None
+        if final_mass is None
+        else parse_registry_located(
+            "final_mass_kg",
+            final_mass,
+            lambda value: _located_from_plain(value, _value_or_point_from_plain),
+        )
+    )
+    species_loss_located = None
+    if species_loss_fraction is not None:
+        species_loss_fraction = parse_registry_value(
+            "species_loss_fraction",
+            species_loss_fraction,
+            require_species_loss_mapping,
+        )
+        species_loss_located = {
+            str(formula): parse_registry_located(
+                f"species_loss_fraction.{formula}",
+                raw,
+                lambda value: _located_from_plain(
+                    value, _value_or_point_from_plain
+                ),
+            )
+            for formula, raw in species_loss_fraction.items()
+        }
     initial_located = (
         None
         if initial is None
@@ -3107,6 +3142,7 @@ def _sample_from_plain(
         mass_kg=None
         if mass is None
         else _located_from_plain(mass, _value_or_point_from_plain),
+        final_mass_kg=final_mass_located,
         volume_m3=None
         if volume is None
         else _located_from_plain(volume, _value_or_point_from_plain),
@@ -3126,6 +3162,7 @@ def _sample_from_plain(
         pretreatment=None
         if pretreatment is None
         else _located_from_plain(pretreatment, str),
+        species_loss_fraction=species_loss_located,
     )
 
 
@@ -3465,6 +3502,7 @@ def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
     assert isinstance(payload, Mapping)
+    experiment_id = str(payload["experiment_id"])
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
@@ -3507,8 +3545,54 @@ def _experiment_from_plain(
                 basis=str(fo2["gas_ratio"]["basis"]),
             ),
         )
+
+    def parse_registry_field(field: str, raw: object, parse):
+        try:
+            return parse(raw)
+        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+            if registry_issues is None:
+                raise
+            registry_issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry value: {exc}",
+                )
+            )
+            return None
+
+    def parse_charge_sequence(raw: object) -> ChargeSequence:
+        if not isinstance(raw, Mapping):
+            raise ValueError("charge_sequence must be a mapping")
+        return ChargeSequence(
+            charge_id=raw.get("charge_id"),
+            run_index=raw.get("run_index"),
+            locator=_locator_from_plain(raw.get("locator")),
+        )
+
+    raw_charge_sequence = payload.get("charge_sequence")
+    charge_sequence = (
+        None
+        if raw_charge_sequence is None
+        else parse_registry_field(
+            "charge_sequence", raw_charge_sequence, parse_charge_sequence
+        )
+    )
+    raw_vaporization_statement = payload.get("vaporization_statement")
+    vaporization_statement = (
+        None
+        if raw_vaporization_statement is None
+        else parse_registry_field(
+            "vaporization_statement",
+            raw_vaporization_statement,
+            lambda raw: _located_from_plain(
+                raw, lambda value: VaporizationMode(str(value))
+            ),
+        )
+    )
+
     return Experiment(
-        experiment_id=str(payload["experiment_id"]),
+        experiment_id=experiment_id,
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
         sample=_sample_from_plain(
@@ -3533,6 +3617,8 @@ def _experiment_from_plain(
         else _located_from_plain(
             payload["fe_metal_saturated"], _boolean_from_plain
         ),
+        charge_sequence=charge_sequence,
+        vaporization_statement=vaporization_statement,
     )
 
 
@@ -16424,8 +16510,16 @@ def _merge_experiment_lab_params(
             )
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
+    species_loss_fraction = dict(existing.sample.species_loss_fraction or {})
+    for formula, located in (sample.species_loss_fraction or {}).items():
+        species_loss_fraction[formula] = _prefer_located(
+            species_loss_fraction.get(formula), located
+        )
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
+        final_mass_kg=_prefer_located(
+            existing.sample.final_mass_kg, sample.final_mass_kg
+        ),
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
         initial_composition=initial_composition,
         printed_composition=printed_composition,
@@ -16443,6 +16537,7 @@ def _merge_experiment_lab_params(
         pretreatment=_prefer_located(
             existing.sample.pretreatment, sample.pretreatment
         ),
+        species_loss_fraction=species_loss_fraction or None,
     )
     return replace(
         existing,

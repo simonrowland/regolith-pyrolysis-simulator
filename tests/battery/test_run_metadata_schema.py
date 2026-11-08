@@ -2,18 +2,29 @@ from __future__ import annotations
 
 import hashlib
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from simulator.battery.enums import RefusalReason
-from simulator.battery.migrate import load_migrated_store, migrate
+from simulator.battery.migrate import load_migrated_store, migrate, to_plain
+from simulator.battery.records import Located, Locator, State, Value
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
 
 
-def _extract_with_experiments(root: Path, experiments: list[dict]) -> Path:
+def _extract_with_experiments(
+    root: Path,
+    experiments: list[dict],
+    *,
+    observation_experiment: str | None = None,
+) -> Path:
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["experiments"] = experiments
+    if observation_experiment is not None:
+        extract["species"]["Na"]["observations"][0]["experiment"] = (
+            observation_experiment
+        )
     return _write_min_tree(root, extract)
 
 
@@ -32,6 +43,15 @@ def _located_token(token: str, *, table: str, page: int) -> dict:
         "state": {"tag": "value", "value": token},
         "locator": {"table": table, "page": page},
     }
+
+
+def _plain_located_point(point: str, *, table: str, page: int) -> dict:
+    return to_plain(
+        Located(
+            State.of(Value.point_of(point)),
+            locator=Locator(table=table, page=page),
+        )
+    )
 
 
 def test_run_metadata_round_trips_from_extract_through_migrated_store(
@@ -60,18 +80,19 @@ def test_run_metadata_round_trips_from_extract_through_migrated_store(
                 "locator": {"table": "1", "page": 2},
             }
         ],
+        observation_experiment="run-2",
     )
 
     migrate(extract, write=True)
     _works, experiments, _observations = load_migrated_store(extract)
     experiment = experiments["10.1234/fixture::experiment::run-2"]
 
-    from simulator.battery.migrate import to_plain
-
-    assert to_plain(experiment.sample.final_mass_kg) == sample["final_mass_kg"]
-    assert to_plain(experiment.sample.species_loss_fraction) == sample[
-        "species_loss_fraction"
-    ]
+    assert to_plain(experiment.sample.final_mass_kg) == _plain_located_point(
+        "0.0008", table="1", page=2
+    )
+    assert to_plain(experiment.sample.species_loss_fraction) == {
+        "Na": _plain_located_point("0.25", table="2", page=3),
+    }
     assert to_plain(experiment.charge_sequence) == {
         "charge_id": "charge-a",
         "run_index": 2,
@@ -100,6 +121,14 @@ def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
                 "unstated", table="1", page=2
             ),
         },
+        {
+            "experiment_id": "unknown-loss-formula",
+            "sample": {
+                "species_loss_fraction": {
+                    "Xx": _located_point("0.25", table="1", page=2),
+                }
+            },
+        },
     ]
     root = _extract_with_experiments(tmp_path, experiments)
 
@@ -122,6 +151,57 @@ def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
         issue.reason is RefusalReason.INVALID_SOURCE
         and issue.path.endswith("vaporization_statement")
         for issue in issues
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("species_loss_fraction[Xx]")
+        for issue in issues
+    )
+
+
+def test_validate_corpus_reports_invalid_run_metadata_as_typed_issues(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.records import ChargeSequence, Located, Locator, State
+    from simulator.battery.validate import validate_corpus
+
+    root = _extract_with_experiments(
+        tmp_path,
+        [{"experiment_id": "run-1", "sample": {}}],
+    )
+    result = migrate(root, write=False)
+    experiment_id = "10.1234/fixture::experiment::run-1"
+    experiment = result.experiments[experiment_id]
+    invalid_sequence = object.__new__(ChargeSequence)
+    object.__setattr__(invalid_sequence, "charge_id", " ")
+    object.__setattr__(invalid_sequence, "run_index", 0)
+    object.__setattr__(invalid_sequence, "locator", None)
+    invalid_experiment = replace(
+        experiment,
+        charge_sequence=invalid_sequence,
+        vaporization_statement=Located(
+            State.of("unstated"), locator=Locator(table="1")
+        ),
+    )
+    experiments = dict(result.experiments)
+    experiments[experiment_id] = invalid_experiment
+
+    report = validate_corpus(result.works, experiments, result.observations)
+
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path == f"experiment[{experiment_id}].charge_sequence.run_index"
+        for issue in report.issues
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path == f"experiment[{experiment_id}].charge_sequence.charge_id"
+        for issue in report.issues
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("vaporization_statement.state.value")
+        for issue in report.issues
     )
 
 
