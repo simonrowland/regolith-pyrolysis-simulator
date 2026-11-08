@@ -2037,6 +2037,8 @@ def _remote_engine_refusal(
 
 
 def _remote_engine_failure_code(exc: BaseException, *, phase: str) -> str:
+    if isinstance(exc, _RemoteEngineProtocolFailure):
+        return exc.failure_disposition
     if isinstance(exc, EngineWorkerTimeout):
         return 'ready_timeout' if exc.phase == 'initialization' else 'call_timeout'
     if isinstance(exc, EngineWorkerRemoteError):
@@ -2050,117 +2052,14 @@ def _remote_engine_failure_code(exc: BaseException, *, phase: str) -> str:
     return 'startup_failure' if phase == 'start' else 'child_crash'
 
 
-class _RemoteEngineLaunch:
-    """PID-report state owned by one wrapper/subprocess launch pair."""
-
-    def __init__(
-        self,
-        receive: Any,
-        sender: Any,
-        startup_deadline: float,
-    ) -> None:
-        self.receive = receive
-        self.sender = sender
-        self.startup_deadline = startup_deadline
-        self.process_group_id: int | None = None
-        self.received = False
-        self.retired = False
-        self.closed = False
-        self.error: str | None = None
-        self.start_failure: BaseException | None = None
-        self.lock = threading.Lock()
-        self.start_thread: int | None = None
-
-    def remote_pgid(
-        self,
-        *,
-        wait_for_report: bool = False,
-        cleanup: bool = False,
-    ) -> int | None:
-        """Read one report and optionally transfer its PGID to cleanup."""
-        with self.lock:
-            if self.closed and not cleanup:
-                return None
-            group_id = self.process_group_id
-            if group_id is not None:
-                if cleanup:
-                    self.process_group_id = None
-                    self.retired = True
-                return group_id
-            if self.received or self.retired:
-                return None
-            wait_s = (
-                max(0.0, self.startup_deadline - time.monotonic())
-                if wait_for_report
-                else 0.0
-            )
-            try:
-                if not self.receive.poll(wait_s):
-                    return None
-                group_id = self.receive.recv()
-            except (EOFError, OSError, ValueError) as exc:
-                self.received = True
-                self.retired = True
-                self.startup_deadline = time.monotonic()
-                self.error = f'could not receive remote process group: {exc}'
-                return None
-            self.received = True
-            self.startup_deadline = time.monotonic()
-            if (
-                isinstance(group_id, bool)
-                or not isinstance(group_id, int)
-                or group_id <= 1
-                or group_id == os.getpgrp()
-            ):
-                self.retired = True
-                self.error = (
-                    f'invalid remote process group report: {group_id!r}'
-                )
-                return None
-            self.process_group_id = group_id
-            if cleanup:
-                self.process_group_id = None
-                self.retired = True
-            return group_id
-
-    def close_admission(self) -> None:
-        with self.lock:
-            self.closed = True
-
-    def is_start_thread(self, thread_id: int) -> bool:
-        with self.lock:
-            return self.start_thread == thread_id
-
-    def finish_start(self, thread_id: int) -> None:
-        with self.lock:
-            if self.start_thread == thread_id:
-                self.start_thread = None
-
-    def close_sender(self) -> None:
-        try:
-            self.sender.close()
-        except (OSError, ValueError):
-            pass
-
-    def record_start_failure(self, failure: BaseException) -> None:
-        with self.lock:
-            self.start_failure = failure
-
-    def take_start_failure(self) -> BaseException | None:
-        with self.lock:
-            failure = self.start_failure
-            self.start_failure = None
-            return failure
-
-
 class StdioRemoteEngineWorker(WarmEngineWorker):
     """Persistent argv-launched NDJSON worker with typed refusal results.
 
     The first stdout line is READY with exactly ``protocol_version``,
-    ``engine_version``, and ``datafile_fingerprint``. Each slot owns one
-    subprocess through the existing WarmEngineWorker lifecycle. Calls accept
-    only observation_id, quantity, and conditions; result values are never
-    cached.
+    ``engine_version``, and ``datafile_fingerprint``. This object owns one
+    subprocess launch for its lifetime; the pool replaces failed instances.
+    Calls accept only observation_id, quantity, and conditions; result values
+    are never cached.
     """
 
     def __init__(
@@ -2181,8 +2080,18 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             raise ValueError('remote worker max_line_bytes must be positive')
         self.max_line_bytes = int(max_line_bytes)
         self._remote_argv = command
-        self._current_remote_launch: _RemoteEngineLaunch | None = None
-        self._remote_thread_state = threading.local()
+        self._remote_pid_receive: Any = None
+        self._remote_pid_sender: Any = None
+        self._remote_process_group_id: int | None = None
+        self._remote_pgid_lock = threading.Lock()
+        self._remote_pgid_read = False
+        self._remote_pgid_closed = False
+        self._remote_pgid_error: str | None = None
+        self._remote_startup_deadline: float | None = None
+        self._remote_started = False
+        self._remote_terminal = False
+        self._remote_start_failure: BaseException | None = None
+        self._remote_call_state = threading.local()
         super().__init__(
             name=name,
             bootstrap=_remote_engine_stdio_bootstrap,
@@ -2192,28 +2101,107 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             call_timeout_s=call_timeout_s,
         )
 
-    def _associate_connection(self, connection: Any) -> None:
-        launch = getattr(self._remote_thread_state, 'launch', None)
-        if launch is None:
-            raise RuntimeError('remote worker process has no launch record')
-        # Spawn pickles Process objects, so keep the lock-bearing record on its
-        # parent-side pipe, which travels with the pair through cleanup.
-        connection._remote_engine_launch = launch
-
     def _process_bootstrap_args(self) -> tuple[Any, ...]:
-        launch = getattr(self._remote_thread_state, 'launch', None)
-        if launch is None:
-            raise RuntimeError('remote worker process has no launch record')
+        sender = self._remote_pid_sender
+        if sender is None:
+            raise RuntimeError('remote worker launch pipe is unavailable')
         return (
             self._remote_argv,
             REMOTE_ENGINE_PROTOCOL_VERSION,
             self.max_line_bytes,
-            launch.sender,
+            sender,
         )
 
+    def _remote_pgid(
+        self,
+        *,
+        wait_for_report: bool = False,
+        cleanup: bool = False,
+    ) -> int | None:
+        """Read the launch PGID once and transfer it to cleanup once."""
+        with self._remote_pgid_lock:
+            if self._remote_pgid_closed and not cleanup:
+                return None
+            group_id = self._remote_process_group_id
+            if group_id is not None:
+                if cleanup:
+                    self._remote_process_group_id = None
+                return group_id
+            if self._remote_pgid_read:
+                return None
+            receive = self._remote_pid_receive
+            deadline = self._remote_startup_deadline
+            if receive is None:
+                return None
+            wait_s = (
+                max(0.0, deadline - time.monotonic())
+                if wait_for_report and deadline is not None
+                else 0.0
+            )
+            try:
+                if not receive.poll(wait_s):
+                    return None
+                group_id = receive.recv()
+            except (EOFError, OSError, ValueError) as exc:
+                self._remote_pgid_read = True
+                self._remote_startup_deadline = time.monotonic()
+                self._remote_pgid_error = (
+                    f'could not receive remote process group: {exc}'
+                )
+                return None
+            self._remote_pgid_read = True
+            # Every later cleanup now sees an expired deadline and never
+            # waits for a second report from the one-shot pipe.
+            self._remote_startup_deadline = time.monotonic()
+            if (
+                isinstance(group_id, bool)
+                or not isinstance(group_id, int)
+                or group_id <= 1
+                or group_id == os.getpgrp()
+            ):
+                self._remote_pgid_error = (
+                    f'invalid remote process group report: {group_id!r}'
+                )
+                return None
+            self._remote_process_group_id = group_id
+            if cleanup:
+                self._remote_process_group_id = None
+            return group_id
+
+    def _record_remote_failure(self, failure: BaseException) -> None:
+        with self._state_lock:
+            self._remote_terminal = True
+            if self._remote_start_failure is None:
+                self._remote_start_failure = failure
+
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
-        call_attempt = getattr(self._remote_thread_state, 'call_attempt', None)
-        self.close()
+        call_attempt = getattr(self._remote_call_state, 'attempt', None)
+        with self._state_lock:
+            if self._remote_terminal or self.disabled:
+                failure = self._remote_start_failure or (
+                    _RemoteEngineProtocolFailure(
+                        'child_crash'
+                        if self._remote_started and not self.disabled
+                        else 'startup_failure',
+                        'remote worker instance is closed or disabled',
+                    )
+                )
+                if call_attempt is not None:
+                    call_attempt['failure'] = failure
+                    return None
+                return None
+            if self._remote_started:
+                failure = _RemoteEngineProtocolFailure(
+                    'child_crash',
+                    'remote worker instances cannot start more than once',
+                )
+                if call_attempt is not None:
+                    self._remote_terminal = True
+                    self._remote_start_failure = failure
+                    call_attempt['failure'] = failure
+                    return None
+                raise RuntimeError(str(failure))
+            self._remote_started = True
         startup_timeout = self.startup_timeout_s
         if timeout_s is not None:
             startup_timeout = min(
@@ -2222,61 +2210,67 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             )
         spawn_context = multiprocessing.get_context('spawn')
         receive, sender = spawn_context.Pipe(duplex=False)
-        start_thread = threading.get_ident()
-        launch = _RemoteEngineLaunch(
-            receive,
-            sender,
-            time.monotonic()
-            + startup_timeout
-            + ENGINE_WORKER_SPAWN_SLACK_S,
+        with self._remote_pgid_lock:
+            if self._remote_pgid_closed:
+                receive.close()
+                sender.close()
+                failure = _RemoteEngineProtocolFailure(
+                    'startup_failure',
+                    'remote worker was closed during startup',
+                )
+                self._record_remote_failure(failure)
+                if call_attempt is not None:
+                    call_attempt['failure'] = failure
+                    return None
+                return None
+            self._remote_pid_receive = receive
+            self._remote_pid_sender = sender
+            self._remote_startup_deadline = (
+                time.monotonic()
+                + startup_timeout
+                + ENGINE_WORKER_SPAWN_SLACK_S
+            )
+        previous_starting = getattr(
+            self._remote_call_state, 'starting', False,
         )
-        launch.start_thread = start_thread
-        with self._state_lock:
-            self._current_remote_launch = launch
-        previous_launch = getattr(self._remote_thread_state, 'launch', None)
-        self._remote_thread_state.launch = launch
+        self._remote_call_state.starting = True
         try:
             ready = super().start(timeout_s=timeout_s)
         except Exception as exc:
-            if call_attempt is None:
-                launch.record_start_failure(exc)
-            else:
+            self._record_remote_failure(exc)
+            if call_attempt is not None:
                 call_attempt['failure'] = exc
+            else:
+                self.close()
             return None
         finally:
-            launch.finish_start(start_thread)
-            launch.close_sender()
-            if previous_launch is None:
-                del self._remote_thread_state.launch
+            if previous_starting:
+                self._remote_call_state.starting = previous_starting
             else:
-                self._remote_thread_state.launch = previous_launch
-        if launch.remote_pgid(wait_for_report=True) is None:
+                del self._remote_call_state.starting
+            try:
+                sender.close()
+            except (OSError, ValueError):
+                pass
+        if self._remote_pgid(wait_for_report=True) is None:
             with self._state_lock:
                 process, connection = self.process, self.connection
-                if (
-                    connection is None
-                    or getattr(connection, '_remote_engine_launch', None)
-                    is not launch
-                ):
-                    process = connection = None
             if process is not None or connection is not None:
                 self._discard_current(
                     diagnostic=False,
                     expected_process=process,
                     expected_connection=connection,
                 )
-            with launch.lock:
-                detail = launch.error
-                if launch.closed:
-                    detail = 'remote worker was closed during startup'
             failure = _RemoteEngineProtocolFailure(
                 'startup_failure',
-                detail or 'remote worker did not report its process group',
+                self._remote_pgid_error
+                or 'remote worker did not report its process group',
             )
-            if call_attempt is None:
-                launch.record_start_failure(failure)
-            else:
+            self._record_remote_failure(failure)
+            if call_attempt is not None:
                 call_attempt['failure'] = failure
+            else:
+                self.close()
             return None
         return ready
 
@@ -2284,12 +2278,10 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self,
         process: Any,
         connection: Any,
-        launch: _RemoteEngineLaunch | None,
     ) -> None:
-        if launch is None:
-            return
-        launch.close_admission()
-        group_id = launch.remote_pgid(
+        with self._remote_pgid_lock:
+            self._remote_pgid_closed = True
+        group_id = self._remote_pgid(
             wait_for_report=process is not None,
             cleanup=True,
         )
@@ -2317,10 +2309,9 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         diagnostic: bool,
         cleanup_group: bool = False,
     ) -> None:
-        launch = getattr(connection, '_remote_engine_launch', None)
-        self._stop_remote_process_tree(
-            process, connection, launch,
-        )
+        with self._state_lock:
+            self._remote_terminal = True
+        self._stop_remote_process_tree(process, connection)
         super()._stop_pair(
             process,
             connection,
@@ -2330,36 +2321,23 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
 
     def request_disable(self) -> None:
         with self._state_lock:
+            self._remote_terminal = True
+            self.disabled = True
             process, connection = self.process, self.connection
-            launch = (
-                getattr(connection, '_remote_engine_launch', None)
-                if connection is not None
-                else self._current_remote_launch
-            )
-        self._stop_remote_process_tree(
-            process, connection, launch,
-        )
+        self._stop_remote_process_tree(process, connection)
         super().request_disable()
 
     def close(self) -> None:
-        start_launch = getattr(self._remote_thread_state, 'launch', None)
-        if (
-            start_launch is not None
-            and start_launch.is_start_thread(threading.get_ident())
-        ):
-            super().close()
+        if getattr(self._remote_call_state, 'starting', False):
+            WarmEngineWorker.close(self)
             return
+        self.request_disable()
+        WarmEngineWorker.close(self)
+
+    @property
+    def replacement_required(self) -> bool:
         with self._state_lock:
-            process, connection = self.process, self.connection
-            launch = (
-                getattr(connection, '_remote_engine_launch', None)
-                if connection is not None
-                else self._current_remote_launch
-            )
-        self._stop_remote_process_tree(
-            process, connection, launch,
-        )
-        super().close()
+            return self._remote_terminal
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         request_id = uuid.uuid4().hex
@@ -2407,27 +2385,31 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 str(exc),
             )
         with self._state_lock:
-            launch = self._current_remote_launch
-        start_failure = (
-            launch.take_start_failure() if launch is not None else None
-        )
-        if start_failure is not None:
+            terminal = self._remote_terminal or self.disabled
+            start_failure = self._remote_start_failure
+        if terminal:
+            failure = start_failure or _RemoteEngineProtocolFailure(
+                'startup_failure',
+                'remote worker instance is closed or disabled',
+            )
             return _remote_engine_refusal(
                 request_id,
                 request['observation_id'],
-                _remote_engine_failure_code(start_failure, phase='start'),
-                str(start_failure),
+                _remote_engine_failure_code(failure, phase='start'),
+                str(failure),
             )
         call_attempt: dict[str, Any] = {}
         previous_attempt = getattr(
-            self._remote_thread_state, 'call_attempt', None,
+            self._remote_call_state, 'attempt', None,
         )
-        self._remote_thread_state.call_attempt = call_attempt
+        self._remote_call_state.attempt = call_attempt
         try:
             return super().call((wire_request, encoded), timeout_s=timeout_s)
         except Exception as exc:
             failure = call_attempt.get('failure') or exc
             phase = 'start' if call_attempt.get('failure') is not None else 'call'
+            self._record_remote_failure(failure)
+            self.close()
             return _remote_engine_refusal(
                 request_id,
                 request['observation_id'],
@@ -2436,9 +2418,9 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             )
         finally:
             if previous_attempt is None:
-                del self._remote_thread_state.call_attempt
+                del self._remote_call_state.attempt
             else:
-                self._remote_thread_state.call_attempt = previous_attempt
+                self._remote_call_state.attempt = previous_attempt
 
 
 class EngineWorkerPool:
@@ -2451,6 +2433,7 @@ class EngineWorkerPool:
         size: int,
     ) -> None:
         self._queue: queue.Queue[Any] = queue.Queue()
+        self._worker_factory = worker_factory
         self._workers = [worker_factory(index) for index in range(max(1, size))]
         self._threads: list[threading.Thread] = []
         self._active_requests: dict[
@@ -2666,9 +2649,26 @@ class EngineWorkerPool:
             ready.put((index, exc))
             return
         ready.put((index, None))
-        self._consume(worker)
+        self._consume(index, worker)
 
-    def _consume(self, worker: WarmEngineWorker) -> None:
+    def _replace_terminal_remote_worker(
+        self,
+        index: int,
+        worker: WarmEngineWorker,
+    ) -> WarmEngineWorker:
+        if (
+            not isinstance(worker, StdioRemoteEngineWorker)
+            or not worker.replacement_required
+        ):
+            return worker
+        with self._lifecycle_lock:
+            if self._closed or self._workers[index] is not worker:
+                return worker
+            replacement = self._worker_factory(index)
+            self._workers[index] = replacement
+            return replacement
+
+    def _consume(self, index: int, worker: WarmEngineWorker) -> None:
         while True:
             item = self._queue.get()
             try:
@@ -2700,12 +2700,18 @@ class EngineWorkerPool:
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
                         worker._end_pool_call(abort_event)
+                    worker = self._replace_terminal_remote_worker(
+                        index, worker,
+                    )
                     future.set_exception(exc)
                 else:
                     call_finished.set()
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
                         worker._end_pool_call(abort_event)
+                    worker = self._replace_terminal_remote_worker(
+                        index, worker,
+                    )
                     future.set_result(result)
             finally:
                 self._queue.task_done()
