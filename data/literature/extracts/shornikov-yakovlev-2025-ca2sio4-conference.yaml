@@ -30,201 +30,21 @@ extraction:
       The text calls the reported mixing enthalpy and entropy calculated; they are KEMS-derived results, not calorimetry.
 review_status: draft
 fidelity_samples:
-  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_enthalpy].values.mixing_enthalpy_kJ_mol_as_published
+  - path: species.Ca2SiO4.context[shornikov_yakovlev_2025_mixing_enthalpy].values.mixing_enthalpy_kJ_mol_as_published
     value: '-34.90'
     locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
-  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_enthalpy].values.uncertainty_kJ_mol_as_published
+  - path: species.Ca2SiO4.context[shornikov_yakovlev_2025_mixing_enthalpy].values.uncertainty_kJ_mol_as_published
     value: '0.20'
     locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
-  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_entropy].values.mixing_entropy_J_mol_K_as_published
+  - path: species.Ca2SiO4.context[shornikov_yakovlev_2025_mixing_entropy].values.mixing_entropy_J_mol_K_as_published
     value: '6.60'
     locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
-  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_entropy].values.uncertainty_J_mol_K_as_published
+  - path: species.Ca2SiO4.context[shornikov_yakovlev_2025_mixing_entropy].values.uncertainty_J_mol_K_as_published
     value: '0.10'
     locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
 species:
   Ca2SiO4:
     observations:
-      - observation_id: shornikov_yakovlev_2025_mixing_enthalpy
-        type: gibbs_table
-        locator:
-          page: 3
-          pdf_page_index: 2
-          published_page: 266
-          paragraph: Calculated enthalpy and entropy
-        phase: unknown
-        regime: knudsen_effusion_mass_spectrometry
-        T_range_K: ['1762', '2269']
-        units: kJ/mol as printed
-        uncertainty:
-          value: '0.20'
-          unit: kJ/mol
-          confidence_level: not_stated
-          note: Printed ±0.20 kJ/mol; confidence level not stated.
-        point_conditions:
-          temperature_K:
-            state:
-              tag: value
-              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
-            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_formula_stoichiometry
-                amount_basis: mol_inventory
-                components:
-                  - [CaO, '2']
-                  - [SiO2, '1']
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
-          total_pressure_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
-          fO2_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
-        derivation:
-          relation: >-
-            The abstract states that the mixing energy, enthalpy, and entropy were calculated; no calculation relation
-            is printed in these proceedings.
-          output_unit: kJ/mol
-          method:
-            state:
-              tag: value
-              value: >-
-                The partial pressures of the vapor species over Ca2SiO4 were obtained by the Knudsen mass spectrometric
-                effusion method at 1762–2269 K. The mixing energy, as well as the enthalpy and entropy of calcium
-                orthosilicate equal to –34.90±0.20 kJ/mol and 6.60±0.10 J/(mol×K) were calculated.
-            locator: {page: 4, pdf_page_index: 3, published_page: 267, section: Abstract}
-          raw_inputs:
-            state: {tag: value, value: not_printed}
-            locator:
-              page: 2
-              pdf_page_index: 1
-              published_page: 265
-              figure: '2'
-              note: >-
-                The pressure-versus-temperature inputs appear as curves; numerical pressure inputs and the calculation
-                relation for the mixing enthalpy are not printed.
-        values:
-          quantity: Ca2SiO4_mixing_enthalpy_as_printed
-          method_class: model_derived
-          admission_status: typed_refusal
-          reason: >-
-            The paper reports this as calculated but prints no calculation equation or numerical pressure inputs for
-            the enthalpy derivation; the result remains unavailable under the model-derived provenance requirements.
-          schema_gap: >-
-            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
-            Quantity.DELTA_FH is formation enthalpy, Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar enthalpy,
-            and Quantity.ENTHALPY_OF_FUSION is fusion enthalpy; none means integral mixing enthalpy, and
-            QUANTITY_ALIASES has no exact mixing-enthalpy token. Because TYPE_QUANTITY infers delta_fG for
-            gibbs_table when quantity is absent, the descriptive non-token quantity prevents that near-miss.
-            The proceedings do not state a phase for these results; phase remains unknown rather than being inferred
-            from the phase diagram.
-          schema_gap_symbols:
-            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
-            - simulator/battery/enums.py::Quantity.DELTA_FH
-            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
-            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
-            - simulator/battery/migrate.py::QUANTITY_ALIASES
-            - simulator/battery/migrate.py::TYPE_QUANTITY
-          mixing_enthalpy_kJ_mol_as_published: '-34.90'
-          uncertainty_kJ_mol_as_published: '0.20'
-          value_as_printed: '−34.90 ± 0.20 kJ/mol'
-          temperature_range_as_printed: 1762–2269 K
-          method_as_printed: >-
-            The abstract states that the partial pressures were obtained by Knudsen mass spectrometric effusion at
-            1762–2269 K and that the mixing energy, enthalpy, and entropy were calculated (p.267).
-          reference_state_as_printed: not stated in this conference text
-      - observation_id: shornikov_yakovlev_2025_mixing_entropy
-        type: gibbs_table
-        locator:
-          page: 3
-          pdf_page_index: 2
-          published_page: 266
-          paragraph: Calculated enthalpy and entropy
-        phase: unknown
-        regime: knudsen_effusion_mass_spectrometry
-        T_range_K: ['1762', '2269']
-        units: J/(mol K) as printed
-        uncertainty:
-          value: '0.10'
-          unit: J/(mol K)
-          confidence_level: not_stated
-          note: Printed ±0.10 J/(mol K); confidence level not stated.
-        point_conditions:
-          temperature_K:
-            state:
-              tag: value
-              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
-            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_formula_stoichiometry
-                amount_basis: mol_inventory
-                components:
-                  - [CaO, '2']
-                  - [SiO2, '1']
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
-          total_pressure_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
-          fO2_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
-        derivation:
-          relation: >-
-            The abstract states that the mixing energy, enthalpy, and entropy were calculated; no calculation relation
-            is printed in these proceedings.
-          output_unit: J/(mol K)
-          method:
-            state:
-              tag: value
-              value: >-
-                The partial pressures of the vapor species over Ca2SiO4 were obtained by the Knudsen mass spectrometric
-                effusion method at 1762–2269 K. The mixing energy, as well as the enthalpy and entropy of calcium
-                orthosilicate equal to –34.90±0.20 kJ/mol and 6.60±0.10 J/(mol×K) were calculated.
-            locator: {page: 4, pdf_page_index: 3, published_page: 267, section: Abstract}
-          raw_inputs:
-            state: {tag: value, value: not_printed}
-            locator:
-              page: 2
-              pdf_page_index: 1
-              published_page: 265
-              figure: '2'
-              note: >-
-                The pressure-versus-temperature inputs appear as curves; numerical pressure inputs and the calculation
-                relation for the mixing entropy are not printed.
-        values:
-          quantity: Ca2SiO4_mixing_entropy_as_printed
-          method_class: model_derived
-          admission_status: typed_refusal
-          reason: >-
-            The paper reports this as calculated but prints no calculation equation or numerical pressure inputs for
-            the entropy derivation; the result remains unavailable under the model-derived provenance requirements.
-          schema_gap: >-
-            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
-            Quantity.S is entropy, not entropy of mixing, and Quantity.ENTROPY_OF_FUSION is fusion entropy; neither
-            means integral mixing entropy, and QUANTITY_ALIASES has no exact mixing-entropy token. Because
-            TYPE_QUANTITY infers delta_fG for gibbs_table when quantity is absent, the descriptive non-token quantity
-            prevents that near-miss. The proceedings do not state a phase for these results; phase remains unknown
-            rather than being inferred from the phase diagram.
-          schema_gap_symbols:
-            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
-            - simulator/battery/enums.py::Quantity.S
-            - simulator/battery/enums.py::Quantity.ENTROPY_OF_FUSION
-            - simulator/battery/migrate.py::QUANTITY_ALIASES
-            - simulator/battery/migrate.py::TYPE_QUANTITY
-          mixing_entropy_J_mol_K_as_published: '6.60'
-          uncertainty_J_mol_K_as_published: '0.10'
-          value_as_printed: '6.60 ± 0.10 J/(mol K)'
-          temperature_range_as_printed: 1762–2269 K
-          method_as_printed: >-
-            The abstract states that the partial pressures were obtained by Knudsen mass spectrometric effusion at
-            1762–2269 K and that the mixing energy, enthalpy, and entropy were calculated (p.267).
-          reference_state_as_printed: not stated in this conference text
       - observation_id: shornikov_yakovlev_2025_prior_mixing_enthalpy_range
         type: gibbs_table
         locator:
@@ -232,7 +52,7 @@ species:
           pdf_page_index: 0
           published_page: 264
           paragraph: Review of prior thermodynamic data
-        phase: cr
+        phase: unknown
         units: kJ/mol as printed
         point_conditions:
           temperature_K:
@@ -280,7 +100,7 @@ species:
           pdf_page_index: 0
           published_page: 264
           paragraph: Review of prior thermodynamic data
-        phase: cr
+        phase: unknown
         units: J/(mol K) as printed
         point_conditions:
           temperature_K:
@@ -358,3 +178,163 @@ species:
         values:
           difference_from_Barin_1995_kJ_mol_as_printed: approximately 1.5
           comparison_as_printed: The determined mixing-energy values exceed Barin (1995) thermochemical calculations by approximately 1.5 kJ/mol.
+      - observation_id: shornikov_yakovlev_2025_mixing_enthalpy
+        type: thermodynamic_example
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 266
+          paragraph: Calculated enthalpy and entropy
+        phase: unknown
+        regime: knudsen_effusion_mass_spectrometry
+        T_range_K: ['1762', '2269']
+        units: kJ/mol as printed
+        uncertainty:
+          value: '0.20'
+          unit: kJ/mol
+          confidence_level: not_stated
+          note: Printed ±0.20 kJ/mol; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
+            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+        derivation:
+          relation: >-
+            The abstract states that the mixing energy, enthalpy, and entropy were calculated; no calculation relation
+            is printed in these proceedings.
+          output_unit: kJ/mol
+          method:
+            state:
+              tag: value
+              value: >-
+                The partial pressures of the vapor species over Ca2SiO4 were obtained by the Knudsen mass spectrometric
+                effusion method at 1762–2269 K. The mixing energy, as well as the enthalpy and entropy of calcium
+                orthosilicate equal to –34.90±0.20 kJ/mol and 6.60±0.10 J/(mol×K) were calculated.
+            locator: {page: 4, pdf_page_index: 3, published_page: 267, section: Abstract}
+        values:
+          quantity: Ca2SiO4_mixing_enthalpy_as_printed
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: >-
+            The conference calls this result calculated but reports neither its calculation equation nor numerical
+            pressure inputs. It is therefore retained as unscored context rather than a model-derived observation.
+          schema_gap: >-
+            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
+            Quantity.DELTA_FH is formation enthalpy, Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar enthalpy,
+            and Quantity.ENTHALPY_OF_FUSION is fusion enthalpy; none means integral mixing enthalpy, and
+            QUANTITY_ALIASES has no exact mixing-enthalpy token. Because TYPE_QUANTITY infers delta_fG for
+            gibbs_table when quantity is absent, the descriptive non-token quantity prevents that near-miss.
+            The proceedings do not state a phase for these results; phase remains unknown rather than being inferred
+            from the phase diagram.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.DELTA_FH
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+          mixing_enthalpy_kJ_mol_as_published: '-34.90'
+          uncertainty_kJ_mol_as_published: '0.20'
+          value_as_printed: '−34.90 ± 0.20 kJ/mol'
+          temperature_range_as_printed: 1762–2269 K
+          method_as_printed: >-
+            The abstract states that the partial pressures were obtained by Knudsen mass spectrometric effusion at
+            1762–2269 K and that the mixing energy, enthalpy, and entropy were calculated (p.267).
+          reference_state_as_printed: not stated in this conference text
+      - observation_id: shornikov_yakovlev_2025_mixing_entropy
+        type: thermodynamic_example
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 266
+          paragraph: Calculated enthalpy and entropy
+        phase: unknown
+        regime: knudsen_effusion_mass_spectrometry
+        T_range_K: ['1762', '2269']
+        units: J/(mol K) as printed
+        uncertainty:
+          value: '0.10'
+          unit: J/(mol K)
+          confidence_level: not_stated
+          note: Printed ±0.10 J/(mol K); confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
+            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+        derivation:
+          relation: >-
+            The abstract states that the mixing energy, enthalpy, and entropy were calculated; no calculation relation
+            is printed in these proceedings.
+          output_unit: J/(mol K)
+          method:
+            state:
+              tag: value
+              value: >-
+                The partial pressures of the vapor species over Ca2SiO4 were obtained by the Knudsen mass spectrometric
+                effusion method at 1762–2269 K. The mixing energy, as well as the enthalpy and entropy of calcium
+                orthosilicate equal to –34.90±0.20 kJ/mol and 6.60±0.10 J/(mol×K) were calculated.
+            locator: {page: 4, pdf_page_index: 3, published_page: 267, section: Abstract}
+        values:
+          quantity: Ca2SiO4_mixing_entropy_as_printed
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: >-
+            The conference calls this result calculated but reports neither its calculation equation nor numerical
+            pressure inputs. It is therefore retained as unscored context rather than a model-derived observation.
+          schema_gap: >-
+            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
+            Quantity.S is entropy, not entropy of mixing, and Quantity.ENTROPY_OF_FUSION is fusion entropy; neither
+            means integral mixing entropy, and QUANTITY_ALIASES has no exact mixing-entropy token. Because
+            TYPE_QUANTITY infers delta_fG for gibbs_table when quantity is absent, the descriptive non-token quantity
+            prevents that near-miss. The proceedings do not state a phase for these results; phase remains unknown
+            rather than being inferred from the phase diagram.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.S
+            - simulator/battery/enums.py::Quantity.ENTROPY_OF_FUSION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+          mixing_entropy_J_mol_K_as_published: '6.60'
+          uncertainty_J_mol_K_as_published: '0.10'
+          value_as_printed: '6.60 ± 0.10 J/(mol K)'
+          temperature_range_as_printed: 1762–2269 K
+          method_as_printed: >-
+            The abstract states that the partial pressures were obtained by Knudsen mass spectrometric effusion at
+            1762–2269 K and that the mixing energy, enthalpy, and entropy were calculated (p.267).
+          reference_state_as_printed: not stated in this conference text
