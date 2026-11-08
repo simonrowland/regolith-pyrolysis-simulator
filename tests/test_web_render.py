@@ -535,6 +535,33 @@ def test_ceramic_rump_panel_renders_partial_class_exclusion():
     assert "includes estimated transport for SiO" in content
 
 
+def test_ceramic_rump_panel_renders_available_omission_state_and_reason():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "ceramic_rump_panel": {
+                "status": "match",
+                "match": {"label": "ceramic A"},
+                "availability_flag": {
+                    "status": "available",
+                    "state": "evaluated_below_reporting_floor",
+                    "reason": "vapor pressure was computed below its reporting floor",
+                },
+            },
+        },
+    )
+    content = rendered["text"]["ceramic-rump-content"]
+
+    assert "status available" in content
+    assert "state evaluated_below_reporting_floor" in content
+    assert (
+        "reason vapor pressure was computed below its reporting floor"
+        in content
+    )
+
+
 def test_ceramic_rump_panel_renders_estimate_without_availability_status():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     rendered = _render_advisory_dom(

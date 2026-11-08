@@ -9,7 +9,10 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.cost_energy import is_unavailable_quantity
 from simulator.cost_ledger import build_cost_rollup_diagnostic
-from simulator.accounting.completeness import product_class_availability
+from simulator.accounting.completeness import (
+    product_class_availability,
+    product_class_target_species,
+)
 from simulator.optimize.objective import (
     _metric_value,
     _silica_objective_evidence,
@@ -92,8 +95,7 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
     assert products["oxygen"]["class_total_kg"] == 1.0
     assert products["oxygen"]["status"] == "partial"
     assert (
-        products["oxygen"]["excluded"]
-        == products["oxygen"]["availability_flag"]["excluded"]
+        products["oxygen"]["excluded"] == products["oxygen"]["flag"]["excluded"]
     )
     assert products["oxygen"]["partition_kg"] == {"stored": 1.0, "total": 1.0}
     metals_partition = products["metals_plus_O2"]["O2_partition_kg"]
@@ -102,8 +104,31 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
         assert products[bucket]["status"] == "partial"
         assert (
             "EvaporationFluxConfigurationError"
-            in products[bucket]["availability_flag"]["reason"]
+            in products[bucket]["flag"]["reason"]
         )
+        expected_refusal = product_class_availability(
+            two_hour_run,
+            product_class_target_species(bucket),
+            {"class_total_kg": products[bucket]["class_total_kg"]},
+            has_computed_part=True,
+        )
+        assert products[bucket]["flag"] == expected_refusal["flag"]
+        assert "availability_flag" not in products[bucket]
+
+
+def test_study_summary_retains_partial_transport_refusal_reason(two_hour_run):
+    from simulator.optimize.study import _summary_products_payload
+
+    products = classify_products(two_hour_run)
+    summary = _summary_products_payload(
+        SimpleNamespace(
+            product_summary={"product_classes": products},
+            trace_summary={},
+        )
+    )
+
+    assert summary is not None
+    assert "EvaporationFluxConfigurationError" in summary["glass_status_reason"]
 
 
 def test_unqualified_stage3_capture_stays_numeric_with_partial_class(

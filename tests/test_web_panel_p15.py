@@ -1104,6 +1104,44 @@ def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
     assert "includes estimated transport for SiO" in stage
 
 
+def test_p15_qualified_silica_renders_available_omission_notice() -> None:
+    stages = _stage_purity()
+    stages["stage_3_sio_zone"] = {
+        "label": "SiO Zone",
+        "designated_species_kg": {"SiO": 4.5},
+        "coproduct_species_kg": {},
+        "impurity_species_kg": {},
+        "designated_kg": 4.5,
+        "impurity_kg": 0.0,
+        "total_kg": 4.5,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    classification = _flagged_silica_product_classification()
+    silica = classification["pure_silica_glass"]
+    silica.pop("flag")
+    silica["availability_flag"] = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "vapor pressure was computed below its reporting floor",
+    }
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": stages,
+            "product_classification": classification,
+        },
+    }
+
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert "sec-p15-stage--product" in stage
+    assert "qualified silica product" in stage
+    assert "flagged silica product" not in stage
+    assert "state: evaluated_below_reporting_floor" in stage
+    assert "reason: vapor pressure was computed below its reporting floor" in stage
+
+
 def test_empty_stage_indeterminate_renders_as_no_material() -> None:
     stage = _stage_card(
         _run_panel({
