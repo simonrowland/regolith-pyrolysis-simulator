@@ -7857,11 +7857,11 @@
           "species_id": "Ti",
           "pressure": {
             "kind": "value",
-            "pa": 3.576665568105833e-17
+            "pa": 3.2311623317527167e-17
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 3.576665568105833e-17
+            "pa": 3.2311623317527167e-17
           },
           "flux": {
             "kind": "eligible",
@@ -7879,7 +7879,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_union_flux_eligible": true,
+          "is_union_flux_eligible": false,
           "extra": {
             "origin": "catalog",
             "alpha_authority_status": "analytical_upper_bound",
@@ -7893,7 +7893,15 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ti",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "channel_state": "evaluated_below_reporting_floor",
+            "below_reporting_threshold_omission": {
+              "species": "Ti",
+              "reporting_threshold_Pa": 1e-15,
+              "computed_pressure_Pa": 3.2311623317527167e-17,
+              "field": "P_eq_liquid_oxide_standard_reaction",
+              "pressure_rail": "liquid_oxide_standard_reaction"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ti",
@@ -7932,7 +7940,7 @@
             }
           },
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "TiO": {
           "species_id": "TiO",

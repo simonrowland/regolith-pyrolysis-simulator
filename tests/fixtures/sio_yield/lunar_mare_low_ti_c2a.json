@@ -6353,7 +6353,18 @@
             "source_activity_origin": "pure_component_unit",
             "out_of_range": false,
             "acquisition_flag": null,
-            "status": null
+            "status": null,
+            "notices": [
+              {
+                "type": "typed_notice",
+                "kind": "liquid_model_below_liquidus",
+                "temperature_K": 1638.15,
+                "liquidus_T_C": 1370.3125,
+                "solidus_T_C": 918.75,
+                "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+                "authority": "extrapolated"
+              }
+            ]
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -8909,11 +8920,11 @@
           "species_id": "Ti",
           "pressure": {
             "kind": "value",
-            "pa": 1.4708070151941997e-16
+            "pa": 1.3287281503621196e-16
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 1.4708070151941997e-16
+            "pa": 1.3287281503621196e-16
           },
           "flux": {
             "kind": "eligible",
@@ -8931,7 +8942,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_union_flux_eligible": true,
+          "is_union_flux_eligible": false,
           "extra": {
             "origin": "catalog",
             "alpha_authority_status": "analytical_upper_bound",
@@ -8945,7 +8956,15 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ti",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "channel_state": "evaluated_below_reporting_floor",
+            "below_reporting_threshold_omission": {
+              "species": "Ti",
+              "reporting_threshold_Pa": 1e-15,
+              "computed_pressure_Pa": 1.3287281503621196e-16,
+              "field": "P_eq_liquid_oxide_standard_reaction",
+              "pressure_rail": "liquid_oxide_standard_reaction"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ti",
@@ -8984,7 +9003,7 @@
             }
           },
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "TiO": {
           "species_id": "TiO",
