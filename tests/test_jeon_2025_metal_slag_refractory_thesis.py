@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -7,10 +8,14 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.battery.migrate as migration_module
+from simulator.battery.enums import Quantity, UncertaintyKind
+from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.test_migrate import _migrate_real_extract
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/jeon-2025-metal-slag-refractory-thesis.yaml"
+SOURCE_ID = "jeon-2025-metal-slag-refractory-thesis"
 RENDER_PINS = (
     ("jeonthesis_t8_s1_olivine_eds_mgo", "MgO", 61.1, 57),
     ("jeonthesis_t8_s19_zincite_epma_zno", "ZnO", 96.7, 57),
@@ -42,6 +47,13 @@ def _assert_render_pins(document: dict, pins=RENDER_PINS) -> None:
         assert row["locator"]["page"] == page
         assert row["locator"]["pdf_page_index"] == page - 1
         assert row["locator"]["published_page"] == page - 12
+
+
+def _assert_olivine_eds_uncertainty(observation) -> None:
+    assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+    assert observation.uncertainty.verbatim["value"] == "0.9"
+    assert observation.uncertainty.verbatim["units"] == "mol%"
+    assert observation.uncertainty.verbatim["confidence_level"] == "not_stated"
 
 
 def test_table8_render_pins_reject_mutated_grid_and_extract_cells() -> None:
@@ -95,6 +107,92 @@ def test_thesis_only_table8_migrates_all_components_and_duplicate_tables_stay_co
         "jeon-lindberg-2023-mg-ca-zn-oxide-equilibria",
         "jeon-lindberg-2025-mgo-refractory-slag-interface",
     }
+
+
+def test_table8_uncertainties_migrate_with_width_confidence_and_stable_ids(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    document = _document()
+    source_rows = _rows(document)
+    uncertain_rows = {
+        observation_id: row
+        for observation_id, (_species, row) in source_rows.items()
+        if "uncertainty" in row
+    }
+    assert len(uncertain_rows) == 282
+    for row in uncertain_rows.values():
+        assert "points" not in row["values"]
+        assert "±" in row["values"]["value_as_published"]
+        assert row["uncertainty"]["units"] == "mol%"
+        assert row["uncertainty"]["confidence_level"] == "not_stated"
+        Decimal(row["uncertainty"]["value"])
+
+    olivine_id = "jeonthesis_t8_s1_olivine_eds_mgo"
+    olivine = uncertain_rows[olivine_id]
+    assert olivine["values"]["value"] == 61.1
+    assert olivine["values"]["value_as_published"] == "61.1 ± 0.9"
+    assert olivine["uncertainty"] == {
+        "value": "0.9",
+        "units": "mol%",
+        "confidence_level": "not_stated",
+        "note": "Printed ± 0.9.",
+    }
+
+    # The independent phase-role gate currently queues these rows before they
+    # reach the uncertainty converter. Bypass only that unrelated gate here so
+    # this focused migration pins the extract-to-record uncertainty mapping.
+    monkeypatch.setattr(
+        migration_module,
+        "_phase_row_rejection",
+        lambda _values, _obs: None,
+    )
+    result = _migrate_real_extract(
+        tmp_path / "before-mutation", EXTRACT.name, extract_doc=document
+    )
+    migrated = {
+        observation_id.rsplit("::", 1)[-1]: observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(f"{SOURCE_ID}::")
+    }
+    assert set(migrated) == set(source_rows)
+    counts = Counter(
+        (
+            observation.uncertainty.kind.value,
+            (observation.uncertainty.verbatim or {}).get("confidence_level"),
+            (observation.uncertainty.verbatim or {}).get("value") is not None,
+        )
+        for observation in migrated.values()
+    )
+    assert counts == Counter(
+        {("printed", "not_stated", True): 282, ("none", None, False): 48}
+    )
+    _assert_olivine_eds_uncertainty(migrated[olivine_id])
+
+    resolution = _printed_uncertainty_band(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        migrated[olivine_id].uncertainty,
+        Decimal("61.1"),
+        source_observation=migrated[olivine_id],
+    )
+    assert resolution.band is None
+    assert resolution.refusal is not None
+    assert resolution.refusal["reason"] == "printed_uncertainty_unit_unmapped"
+
+    mutated_document = deepcopy(document)
+    mutated = _rows(mutated_document)[olivine_id][1]
+    mutated["values"]["value_as_published"] = "61.1 ± 0.8"
+    mutated["uncertainty"]["value"] = "0.8"
+    mutated["uncertainty"]["note"] = "Printed ± 0.8."
+    mutated_result = _migrate_real_extract(
+        tmp_path / "mutated-width", EXTRACT.name, extract_doc=mutated_document
+    )
+    assert set(mutated_result.observations) == set(result.observations)
+    mutated_observation = mutated_result.observations[
+        f"{SOURCE_ID}::{olivine_id}"
+    ]
+    assert mutated_observation.uncertainty.verbatim["value"] == "0.8"
+    with pytest.raises(AssertionError):
+        _assert_olivine_eds_uncertainty(mutated_observation)
 
 
 def test_all_thesis_figures_are_deferred_records_without_numeric_points() -> None:
