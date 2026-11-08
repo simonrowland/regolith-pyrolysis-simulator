@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
+import hashlib
 import re
 
 import pytest
@@ -230,6 +231,10 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     assert not migrator.result.validation.hard_issues
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 538
+    observation_ids = "\n".join(sorted(migrator.result.observations)) + "\n"
+    assert hashlib.sha256(observation_ids.encode()).hexdigest() == (
+        "cfdbbefdc9735b6d97f1fd175b0734e181494c485d147837ed0c85be15ebe35f"
+    )
 
     expected_by_quantity = {
         Quantity.RESIDUE_COMPONENT_COMPOSITION: {
