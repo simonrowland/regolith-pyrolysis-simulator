@@ -684,15 +684,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 bucket['class_total_kg'] = availability['class_total_kg']
             bucket['status'] = availability['status']
             bucket['excluded'] = availability['excluded']
-            if isinstance(bucket.get('flag'), Mapping):
-                bucket['availability_flag'] = availability['flag']
-            else:
-                bucket['flag'] = availability['flag']
             if availability['status'] == 'unavailable':
                 for key in quantities:
                     bucket[key] = None
                 for key in species_maps:
                     bucket[key] = {}
+        if availability['flag'] is not None:
+            if isinstance(bucket.get('flag'), Mapping):
+                bucket['availability_flag'] = availability['flag']
+            else:
+                bucket['flag'] = availability['flag']
     if result['oxygen']['class_total_kg'] is None:
         for name, key in (
             ('oxygen', 'partition_kg'),
@@ -1421,11 +1422,12 @@ def build_product_story(
                 estimated_contributions
             )
         rump_flag = rump.get('availability_flag') or rump.get('flag')
+        if isinstance(rump_flag, Mapping):
+            story['terminal_residue']['availability_flag'] = dict(rump_flag)
         if (
             isinstance(rump_flag, Mapping)
             and rump_flag.get('status') in {'partial', 'unavailable'}
         ):
-            story['terminal_residue']['availability_flag'] = dict(rump_flag)
             story['terminal_residue']['status'] = rump_flag.get('status')
             story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
             for field, source_field in (

@@ -366,6 +366,12 @@ def test_available_product_omission_flag_reaches_cost_rows(monkeypatch):
 
     row_key = "terminal.product:Fe"
     assert flagged["product_costs"][row_key]["flag"] == omission_flag
+    assert flagged["product_costs"][row_key].get("status") == baseline[
+        "product_costs"
+    ][row_key].get("status")
+    assert flagged["product_costs"][row_key].get("excluded") == baseline[
+        "product_costs"
+    ][row_key].get("excluded")
     assert flagged["product_costs"][row_key]["accumulated_cost"] == baseline[
         "product_costs"
     ][row_key]["accumulated_cost"]

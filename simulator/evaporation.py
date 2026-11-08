@@ -1126,8 +1126,9 @@ class EvaporationMixin:
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
                         'every requested vapour channel is non-debiting '
-                        '(upper_bound / zero / dormant / refused); '
-                        'species refusals are flagged and do not abort the run'
+                        '(upper_bound / zero / dormant / refused / '
+                        'below_reporting_floor); channel evidence is retained '
+                        'without aborting the run'
                     ),
                     'batch_channel_states': channel_states,
                     'evaporation_flux_kg_hr': {},

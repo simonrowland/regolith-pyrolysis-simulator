@@ -2550,13 +2550,13 @@ def _completion_payload(sim):
                 estimated_contributions
             )
         rump_status = rump_class.get('status')
+        availability_flag = (
+            rump_class.get('availability_flag') or rump_class.get('flag')
+        )
+        if isinstance(availability_flag, Mapping):
+            ceramic_panel['availability_flag'] = dict(availability_flag)
         if rump_status in {'partial', 'unavailable'}:
             ceramic_panel['product_class_status'] = rump_status
-            availability_flag = (
-                rump_class.get('availability_flag') or rump_class.get('flag')
-            )
-            if isinstance(availability_flag, Mapping):
-                ceramic_panel['availability_flag'] = dict(availability_flag)
             ceramic_panel['excluded'] = list(rump_class.get('excluded', ()))
     payload = {
         'total_hours': sim.melt.hour,

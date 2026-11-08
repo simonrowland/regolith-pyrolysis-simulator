@@ -160,22 +160,29 @@ def test_available_product_omission_flag_reaches_classification(
     two_hour_run,
     monkeypatch,
 ):
-    baseline = classify_products(two_hour_run)
     omission_flag = {
         "status": "available",
         "state": "evaluated_below_reporting_floor",
         "reason": "provider computed pressure was below its reporting floor",
     }
 
-    monkeypatch.setattr(
-        "simulator.three_product_report.product_class_availability",
-        lambda *_args, **_kwargs: {
+    def availability(flag):
+        return lambda *_args, **_kwargs: {
             "class_total_kg": 0.0,
             "status": "available",
             "excluded": [],
             "estimated_contributions": [],
-            "flag": omission_flag,
-        },
+            "flag": flag,
+        }
+
+    monkeypatch.setattr(
+        "simulator.three_product_report.product_class_availability",
+        availability(None),
+    )
+    baseline = classify_products(two_hour_run)
+    monkeypatch.setattr(
+        "simulator.three_product_report.product_class_availability",
+        availability(omission_flag),
     )
     products = classify_products(two_hour_run)
 
@@ -189,7 +196,7 @@ def test_available_product_omission_flag_reaches_classification(
         "captured_volatiles",
     ):
         bucket = products[name]
-        assert bucket["status"] == "available"
+        assert bucket.get("status") == baseline[name].get("status")
         assert bucket.get("availability_flag", bucket.get("flag")) == omission_flag
         assert bucket["class_total_kg"] == baseline[name]["class_total_kg"]
 

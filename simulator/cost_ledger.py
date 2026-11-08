@@ -1012,6 +1012,7 @@ def _build_cost_rollup_diagnostic(
         if product_availability["status"] != "available":
             entry["status"] = product_availability["status"]
             entry["excluded"] = product_availability["excluded"]
+        if product_availability["flag"] is not None:
             entry["flag"] = product_availability["flag"]
     if pumping_reason is not None:
         product_costs = _mark_product_costs_incomplete(product_costs, pumping_reason)

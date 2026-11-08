@@ -63,6 +63,7 @@ VAPOUR_BATCH_NON_DEBITING_CHANNEL_STATES = frozenset({
     "upper_bound",
     "dormant_by_epoch",
     "refusal",
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
 })
 _VAPOUR_CARRIER_AUTHORITY_SEVERITY: Mapping[str, int] = MappingProxyType({
     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE: 0,
