@@ -122,15 +122,10 @@ MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
+MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
+MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
-MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
-    MRE_INVALID_CONTROL_REFUSAL,
-    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-    MRE_RAW_MARGIN_REFUSAL,
-    MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
-})
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
@@ -363,19 +358,9 @@ def _faraday_reduced_extent(
 
 
 class MREElectrolysisRefusal(RuntimeError):
-    """Typed terminal refusal for a classified MRE physics limitation.
+    """Base typed refusal for invalid run-level MRE inputs."""
 
-    Constructed for the classified reasons in
-    ``MRE_TERMINAL_PHYSICS_REFUSAL_REASONS``. ``core.step`` uses
-    ``terminal_refusal`` to restore the attempted hour instead of poisoning
-    a simulator that already committed an earlier transition during that
-    hour. Invalid temperature, activity, oxide, or fugacity inputs retain
-    their ValueError/TypeError behavior. Invalid MRE controls use the
-    MREElectrolysisInvalidInput subclass so RuntimeError and ValueError
-    handlers both retain their contract.
-    """
-
-    terminal_refusal = True
+    terminal_refusal = False
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         self.reason = str(reason)
@@ -385,6 +370,8 @@ class MREElectrolysisRefusal(RuntimeError):
 
 class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
     """Typed invalid-control refusal caught as both RuntimeError and ValueError."""
+
+    terminal_refusal = True
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         super().__init__(reason, diagnostic)
@@ -399,10 +386,6 @@ class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
         self.args = (
             f"{self.reason}: {detail}" if detail else self.reason,
         )
-
-
-class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
-    """Typed terminal refusal for an uncertified MRE current partition."""
 
 
 def _require_finite_real(

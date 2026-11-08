@@ -1740,10 +1740,14 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
-            MREElectrolysisRefusal,
-            MRECurrentPartitionRefusal,
+            MREElectrolysisInvalidInput,
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            MRE_INVALID_CONTROL_REFUSAL,
+            MRE_INVALID_GAS_FUGACITY_REFUSAL,
+            MRE_INVALID_TARGET_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-            MRE_TERMINAL_PHYSICS_REFUSAL_REASONS,
+            MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
+            MRE_RAW_MARGIN_REFUSAL,
         )
         from simulator.mre_reproduction import (
             MREReproductionInterval,
@@ -1897,6 +1901,9 @@ class ExtractionMixin:
             else None
         )
         if c5_ellingham_ladder_diagnostic:
+            notices = diagnostic.get('notices')
+            if notices:
+                c5_ellingham_ladder_diagnostic['notices'] = list(notices)
             diagnostic['mre_ellingham_ladder_diagnostic'] = (
                 c5_ellingham_ladder_diagnostic
             )
@@ -1931,71 +1938,104 @@ class ExtractionMixin:
 
         proposal = kernel_result.transition
         if proposal is None and getattr(kernel_result, 'status', '') == 'refused':
-            refusal_record = {
-                'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
-                'hour': int(self.melt.hour),
-                'campaign_hour': int(self.melt.campaign_hour),
-                'campaign': self.melt.campaign.name,
-                'temperature_C': float(self.melt.temperature_C),
-                'voltage_V': float(voltage_V),
-                'current_A': float(current_A),
-                'diagnostic': diagnostic,
-            }
-            self._last_mre_refusal_diagnostic = refusal_record
-            if not hasattr(self, '_mre_refusal_history'):
-                self._mre_refusal_history = []
-            self._mre_refusal_history.append(refusal_record)
-            self._chem_no_op_dispatch_count += 1
-            self._mre_metals_this_hr = {}
-            self._mre_voltage_V = 0.0
-            self._mre_current_A = 0.0
-            self._mre_effective_current_A = 0.0
-            self._mre_energy_this_hr = 0.0
-            self.melt.mre_voltage_V = 0.0
-            if is_plant:
-                self.melt.mre_declared_rung_V = float(
-                    mre_replay_state_before_dispatch['melt_declared_rung_V'])
-            self.melt.mre_current_A = 0.0
-            if is_plant:
-                self._mre_hold_hours = int(
-                    mre_replay_state_before_dispatch['hold_hours'])
-                self._mre_voltage_step_idx = int(
-                    mre_replay_state_before_dispatch['voltage_step_idx'])
-                self._mre_rung_ever_effective = bool(
-                    mre_replay_state_before_dispatch['rung_ever_effective'])
-                self._mre_c5_sequence_complete_key = (
-                    mre_replay_state_before_dispatch['sequence_complete_key'])
-                self.melt.mre_c5_on_final_rung = bool(
-                    mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
-                self.melt.mre_c5_ladder_complete = bool(
-                    mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
-            restore_state = (
-                mre_replay_state_before_dispatch
-                if is_plant
-                else mre_diagnostic_state_before_step
-            )
-            self._mre_uncertified_yield = dict(
-                restore_state['uncertified_yield'])
-            self._mre_ellingham_ladder_diagnostic = dict(
-                restore_state['ellingham_ladder_diagnostic'])
-            self._mre_effective_voltage_margin_V_by_oxide = dict(
-                restore_state['effective_voltage_margin_by_oxide'])
-            self._mre_effective_voltage_margin_temperature_C = (
-                restore_state['effective_voltage_margin_temperature_C']
-            )
             reason = str(
                 diagnostic.get('reason_refused', 'electrolysis_step_refused')
             )
-            if reason not in MRE_TERMINAL_PHYSICS_REFUSAL_REASONS:
+            invalid_controls = diagnostic.get('invalid_controls')
+            invalid_run_input = (
+                reason in (
+                    MRE_INVALID_CONTROL_REFUSAL,
+                    MRE_INVALID_TARGET_REFUSAL,
+                    MRE_INVALID_GAS_FUGACITY_REFUSAL,
+                )
+                or (
+                    reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+                    and bool(invalid_controls)
+                )
+            )
+            step_refusal = reason in (
+                MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+                MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
+                MRE_RAW_MARGIN_REFUSAL,
+            )
+            if invalid_run_input:
+                refusal_record = {
+                    'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
+                    'hour': int(self.melt.hour),
+                    'campaign_hour': int(self.melt.campaign_hour),
+                    'campaign': self.melt.campaign.name,
+                    'temperature_C': float(self.melt.temperature_C),
+                    'voltage_V': float(voltage_V),
+                    'current_A': float(current_A),
+                    'diagnostic': diagnostic,
+                }
+                self._last_mre_refusal_diagnostic = refusal_record
+                if not hasattr(self, '_mre_refusal_history'):
+                    self._mre_refusal_history = []
+                self._mre_refusal_history.append(refusal_record)
+                self._chem_no_op_dispatch_count += 1
+                self._mre_metals_this_hr = {}
+                self._mre_voltage_V = 0.0
+                self._mre_current_A = 0.0
+                self._mre_effective_current_A = 0.0
+                self._mre_energy_this_hr = 0.0
+                self.melt.mre_voltage_V = 0.0
+                if is_plant:
+                    self.melt.mre_declared_rung_V = float(
+                        mre_replay_state_before_dispatch['melt_declared_rung_V'])
+                self.melt.mre_current_A = 0.0
+                if is_plant:
+                    self._mre_hold_hours = int(
+                        mre_replay_state_before_dispatch['hold_hours'])
+                    self._mre_voltage_step_idx = int(
+                        mre_replay_state_before_dispatch['voltage_step_idx'])
+                    self._mre_rung_ever_effective = bool(
+                        mre_replay_state_before_dispatch['rung_ever_effective'])
+                    self._mre_c5_sequence_complete_key = (
+                        mre_replay_state_before_dispatch['sequence_complete_key'])
+                    self.melt.mre_c5_on_final_rung = bool(
+                        mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
+                    self.melt.mre_c5_ladder_complete = bool(
+                        mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
+                restore_state = (
+                    mre_replay_state_before_dispatch
+                    if is_plant
+                    else mre_diagnostic_state_before_step
+                )
+                self._mre_uncertified_yield = dict(
+                    restore_state['uncertified_yield'])
+                self._mre_ellingham_ladder_diagnostic = dict(
+                    restore_state['ellingham_ladder_diagnostic'])
+                self._mre_effective_voltage_margin_V_by_oxide = dict(
+                    restore_state['effective_voltage_margin_by_oxide'])
+                self._mre_effective_voltage_margin_temperature_C = (
+                    restore_state['effective_voltage_margin_temperature_C']
+                )
+                raise MREElectrolysisInvalidInput(reason, refusal_record)
+            if not step_refusal:
                 raise RuntimeError(
                     f'unclassified ELECTROLYSIS_STEP refusal: {reason}'
                 )
-            refusal_type = (
-                MRECurrentPartitionRefusal
-                if reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL
-                else MREElectrolysisRefusal
-            )
-            raise refusal_type(reason, refusal_record)
+            notices = list(diagnostic.get('notices', ()) or ())
+            if not notices:
+                notices = [{
+                    'kind': 'mre_step_refusal',
+                    'reason': reason,
+                }]
+                diagnostic['notices'] = notices
+            step_outcome = {'status': 'refused', 'reason': reason}
+            diagnostic['step_outcome'] = step_outcome
+            if c5_ellingham_ladder_diagnostic:
+                c5_ellingham_ladder_diagnostic['notices'] = notices
+                c5_ellingham_ladder_diagnostic['step_outcome'] = step_outcome
+                diagnostic['mre_ellingham_ladder_diagnostic'] = (
+                    c5_ellingham_ladder_diagnostic
+                )
+                self._mre_ellingham_ladder_diagnostic = dict(
+                    c5_ellingham_ladder_diagnostic
+                )
+            result['energy_kWh'] = 0.0
         energy_kWh = result.get('energy_kWh')
         if energy_kWh is None:
             raise RuntimeError('ELECTROLYSIS_STEP missing computed energy_kWh')

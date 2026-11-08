@@ -112,8 +112,6 @@ MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
-MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
-MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
 MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
@@ -294,6 +292,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
             MRE_INVALID_CONTROL_REFUSAL,
+            MRE_INVALID_TARGET_REFUSAL,
+            MRE_INVALID_GAS_FUGACITY_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
@@ -712,6 +712,21 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_raw_margin_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_RAW_MARGIN_REFUSAL
+                notices = list(diagnostic.get("notices", ()) or ())
+                for oxide, refusal in diagnostic[
+                    "mre_raw_margin_refused_targets"
+                ].items():
+                    notices.append({
+                        "kind": "mre_raw_margin_veto",
+                        "reason": MRE_RAW_MARGIN_REFUSAL,
+                        "oxide": oxide,
+                        "temperature_C": T_C,
+                        "applied_voltage_V": voltage_V,
+                        "raw_requirement_V": refusal["raw_requirement_V"],
+                        "raw_margin_V": refusal["raw_margin_V"],
+                        "reference_status": refusal["voltage_status"],
+                    })
+                diagnostic["notices"] = notices
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL

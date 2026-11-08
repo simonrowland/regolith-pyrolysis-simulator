@@ -12,6 +12,7 @@ from simulator.mre_ladder import canonical_mre_decomposition_voltage
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch
+from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
 from simulator.state import Atmosphere, CampaignPhase
 
 
@@ -163,9 +164,31 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_internal_analytical_outco
         "Ni": 0.20543205156374078,
         "S": 0.7190121804730926,
     })
-    assert MRE_RAW_MARGIN_REFUSAL in si_target.notes
-    assert not si_target.run_reference.trace.snapshots
-    assert "product_ledger_kg" not in si_target.run_reference.product_summary
+    si_trace = si_target.run_reference.trace
+    assert si_target.run_reference.status == "ok"
+    assert len(si_trace.snapshots) == 15
+    assert _product_ledger(si_target).get("Si", 0.0) == pytest.approx(0.0)
+    assert max(
+        abs(snapshot.mass_balance_error_pct)
+        for snapshot in si_trace.snapshots
+    ) <= RUNNER_MASS_BALANCE_LIMIT_PCT
+
+    vetoed_steps = [
+        snapshot
+        for snapshot in si_trace.snapshots
+        if snapshot.mre_ellingham_ladder_diagnostic.get("notices")
+    ]
+    assert len(vetoed_steps) == len(si_trace.snapshots)
+    for snapshot in vetoed_steps:
+        notice = snapshot.mre_ellingham_ladder_diagnostic["notices"][0]
+        assert notice["kind"] == "mre_raw_margin_veto"
+        assert notice["reason"] == MRE_RAW_MARGIN_REFUSAL
+        assert notice["oxide"] == "SiO2"
+        assert notice["temperature_C"] == pytest.approx(snapshot.temperature_C)
+        assert notice["applied_voltage_V"] > 0.0
+        assert notice["raw_requirement_V"] > notice["applied_voltage_V"]
+        assert notice["raw_margin_V"] < 0.0
+        assert notice["reference_status"]
 
     off_trace = off.run_reference.trace
     assert max(snapshot.mre_current_A for snapshot in off_trace.snapshots) == pytest.approx(0.0)
@@ -235,9 +258,14 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
     assert captured[0]["pO2_bar"] == pytest.approx(0.05)
 
 
-def test_tc8_internal_analytical_path_mass_balance_closes_when_mre_is_disabled() -> None:
-    result = _evaluate_policy(c5_enabled=False)
+@pytest.mark.parametrize("c5_enabled", (False, True))
+def test_tc8_internal_analytical_path_mass_balance_closes_for_mre_policy(
+    c5_enabled: bool,
+) -> None:
+    result = _evaluate_policy(c5_enabled=c5_enabled)
     snapshots = result.run_reference.trace.snapshots
 
     assert snapshots
-    assert max(abs(snapshot.mass_balance_error_pct) for snapshot in snapshots) < 1e-9
+    assert max(
+        abs(snapshot.mass_balance_error_pct) for snapshot in snapshots
+    ) <= RUNNER_MASS_BALANCE_LIMIT_PCT

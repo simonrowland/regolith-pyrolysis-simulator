@@ -630,7 +630,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
-def test_mre_refused_partition_fails_loud_without_energy_or_products():
+def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
     sim = _sim(
         {
             "mixed": {
@@ -666,8 +666,7 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
         sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
     )
 
-    with pytest.raises(RuntimeError, match=MRE_MULTI_OXIDE_PARTITION_REFUSAL):
-        sim._step_mre()
+    sim._step_mre()
 
     assert sim._chem_no_op_dispatch_count == no_op_before + 1
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
@@ -682,25 +681,20 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
     assert sim.product_ledger() == {}
     assert sim._mre_metals_this_hr == {}
     assert sim._mre_energy_this_hr == pytest.approx(0.0)
-    assert sim._mre_voltage_V == pytest.approx(0.0)
-    assert sim._mre_current_A == pytest.approx(0.0)
+    assert sim._mre_voltage_V == pytest.approx(2.0)
     assert sim._mre_effective_current_A == pytest.approx(0.0)
-    assert sim.melt.mre_voltage_V == pytest.approx(0.0)
+    assert sim.melt.mre_voltage_V == pytest.approx(2.0)
     assert sim.melt.mre_current_A == pytest.approx(0.0)
 
-    refusal = sim._last_mre_refusal_diagnostic
-    assert refusal["intent"] == ChemistryIntent.ELECTROLYSIS_STEP.name
-    assert refusal["hour"] == 42
-    assert refusal["campaign_hour"] == 7
-    assert refusal["campaign"] == CampaignPhase.C5.name
-    assert refusal["temperature_C"] == pytest.approx(1600.0)
-    assert refusal["voltage_V"] == pytest.approx(2.0)
-    assert refusal["current_A"] == pytest.approx(1000.0)
-    assert refusal["diagnostic"]["reason_refused"] == (
-        MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    )
-    assert "energy_kWh" not in refusal["diagnostic"]
-    assert sim._mre_refusal_history == [refusal]
+    step_outcome = sim._mre_ellingham_ladder_diagnostic["step_outcome"]
+    assert step_outcome == {
+        "status": "refused",
+        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    }
+    assert sim._mre_ellingham_ladder_diagnostic["notices"][0] == {
+        "kind": "mre_step_refusal",
+        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    }
 
 
 def test_condensed_species_projection_does_not_double_count_across_stages():
