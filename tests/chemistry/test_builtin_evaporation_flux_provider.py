@@ -2028,3 +2028,17 @@ def test_provider_canonical_path_is_idempotent_under_clamp():
     assert _w3_dispatch_with_stir({"axial": 4.0})[
         "axial_stir_applied"
     ] == pytest.approx(4.0)
+
+
+@pytest.mark.xdist_group("serial")
+def test_condensation_direction_zero_has_species_pressure_diagnostic():
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_partials_Pa={"Na": 150.0},
+    )
+
+    assert result.status == "ok"
+    zero = result.diagnostic["species_physical_zeros"]["Na"]
+    assert zero["reason"] == "condensation_direction"
+    assert zero["P_eq_Pa"] == pytest.approx(100.0)
+    assert zero["P_bulk_Pa"] == pytest.approx(150.0)

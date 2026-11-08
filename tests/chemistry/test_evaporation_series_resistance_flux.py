@@ -11,6 +11,7 @@ from engines.builtin.evaporation_flux import (
     EvaporationFluxConfigurationError,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import (
@@ -444,3 +445,77 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
     assert result.diagnostic["alpha_used_by_species"]["Cr"] == pytest.approx(0.9)
     assert "missing_alpha" not in result.diagnostic
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
+
+
+def test_constant_temperature_multihour_sweep_closure_does_not_alternate():
+    species_masses = {
+        species: resolve_species_formula(species, {}).molar_mass_kg_per_mol()
+        for species in ("Cr", "CrO", "Fe", "SiO", "Na", "K", "Mg")
+    }
+    for species, molar_mass in species_masses.items():
+        hourly_fluxes = []
+        for hour in range(8):
+            # Exercise the old map's alternating reset/suppression inputs;
+            # the same-hour well-mixed closure must determine P_bulk instead.
+            stale_bulk_pa = 0.0 if hour % 2 == 0 else 160.0
+            result = _evap(
+                species=species,
+                P_eq_pa=80.0,
+                P_bulk_pa=stale_bulk_pa,
+                T_surface_K=1800.0,
+                T_gas_K=1800.0,
+                molar_mass_kg_mol=molar_mass,
+                alpha_i=0.13,
+                knudsen_number=math.inf,
+                gas_resistance_enabled=False,
+                sweep_flow_m3_s=0.8021726202727705,
+                melt_surface_area_m2=0.2,
+            )
+            hourly_fluxes.append(result.flux_kg_s_m2)
+
+        assert all(value > 0.0 for value in hourly_fluxes), species
+        for left, right in zip(hourly_fluxes, hourly_fluxes[1:]):
+            assert max(left, right) / min(left, right) <= 1.01, species
+
+
+def test_sweep_closure_beta_matches_hand_value_and_pressure_balance():
+    result = _evap(
+        P_bulk_pa=0.0,
+        T_surface_K=1800.0,
+        T_gas_K=1800.0,
+        knudsen_number=math.inf,
+        gas_resistance_enabled=False,
+        sweep_flow_m3_s=0.8021726202727705,
+        melt_surface_area_m2=0.2,
+    )
+    diagnostic = result.as_diagnostic()
+
+    assert diagnostic["beta"] == pytest.approx(0.125, rel=1e-10)
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(80.0 / 1.125, rel=1e-10)
+
+
+def test_infinite_sweep_limit_matches_zero_bulk_flux_and_bounds_outflow():
+    vacuum = _evap(
+        P_bulk_pa=0.0,
+        knudsen_number=math.inf,
+        gas_resistance_enabled=False,
+    )
+    swept = _evap(
+        P_bulk_pa=75.0,
+        T_gas_K=1800.0,
+        knudsen_number=math.inf,
+        gas_resistance_enabled=False,
+        sweep_flow_m3_s=1.0e30,
+        melt_surface_area_m2=0.2,
+    )
+
+    assert swept.flux_kg_s_m2 == pytest.approx(vacuum.flux_kg_s_m2, rel=1e-12)
+    molar_outflow_mol_s = (
+        swept.flux_kg_s_m2 * 0.2 / _K_BASE["molar_mass_kg_mol"]
+    )
+    max_saturated_outflow_mol_s = (
+        1.0e30
+        * _K_BASE["P_eq_pa"]
+        / (GAS_CONSTANT_J_MOL_K * _K_BASE["T_gas_K"])
+    )
+    assert molar_outflow_mol_s <= max_saturated_outflow_mol_s
