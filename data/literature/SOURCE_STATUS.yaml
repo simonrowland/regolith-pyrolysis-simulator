@@ -8,10 +8,10 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2322
+  sources: 2323
   by_stage:
     unknown: 317
-    in_progress: 261
+    in_progress: 262
     inbox: 1260
     ingested_complete: 130
     located: 209
@@ -39,7 +39,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 330
+      count: 331
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -198,6 +198,7 @@ anti_loss:
       - leuthold-2023-basalt-partition-fo2
       - li-2005-na-al-phosphate-fe-activities
       - li-kato-kobayashi-2021-cr-solubility
+      - liu-2006-scss-anhydrous-silicate-thesis
       - liu-2023-chromium-oxide-activity
       - liu-2024-cao-al2o3-vox-phase
       - liu-li-2025-se-te-sulfide-silicate
@@ -20969,6 +20970,16 @@ sources:
     - raw/little-nd-ionization/SOURCE.md
     - raw/little-nd-ionization/little-nd-ionization.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: liu-2006-scss-anhydrous-silicate-thesis
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/liu-2006-scss-anhydrous-silicate-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null

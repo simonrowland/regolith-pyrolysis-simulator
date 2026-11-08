@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 787
-  extracts: 785
+  sources: 788
+  extracts: 786
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 785
+  extracts_without_pdf: 786
   alias_groups_needing_resolution: 84
 gaps:
   pdfs_without_extract: []
@@ -390,6 +390,7 @@ gaps:
   - lh87-sno-g
   - li-2005-na-al-phosphate-fe-activities
   - li-kato-kobayashi-2021-cr-solubility
+  - liu-2006-scss-anhydrous-silicate-thesis
   - liu-2023-chromium-oxide-activity
   - liu-2024-cao-al2o3-vox-phase
   - liu-li-2025-se-te-sulfide-silicate
@@ -23098,6 +23099,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: liu-2006-scss-anhydrous-silicate-thesis
+  aliases: []
+  citation: Liu, Y. (2006). Sulfur concentration at sulfide saturation in anhydrous silicate melts at
+    crustal conditions. M.Sc. thesis, McGill University. Library and Archives Canada LAC TC-QMM-98753.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/liu-2006-scss-anhydrous-silicate-thesis.yaml
+    review_status: draft
+    rows: 312
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/liu-2006-scss-anhydrous-silicate-thesis/liu-2006-scss-anhydrous-silicate-thesis.pdf
+      present: true
+      sha256: e70df8d4c5a49b28431bc7a67d88ded50e19f899347fb23cfdfcb3b60fd372a9
+      matches_simulator: null
+    sidecar:
+      path: raw/liu-2006-scss-anhydrous-silicate-thesis/sidecar.yaml
+      present: true
+    text:
+      path: text/liu-2006-scss-anhydrous-silicate-thesis
+      exists: true
+      file_count: 115
+    tables:
+      path: tables/liu-2006-scss-anhydrous-silicate-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/liu-2006-scss-anhydrous-silicate-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/liu-2006-scss-anhydrous-silicate-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
 - source_id: liu-2023-chromium-oxide-activity
   aliases: []
   citation: Liu, B., Li, Z. and Kobayashi, Y. (2023), Activity of chromium oxide in calcium silicate bearing

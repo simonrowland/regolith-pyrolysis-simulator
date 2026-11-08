@@ -1,0 +1,473 @@
+source_id: liu-2006-scss-anhydrous-silicate-thesis
+input_order:
+- MinerU table blocks and markdown
+- pdftotext-layout.txt
+- rendered PDF pages for all scanned tables and flagged cells
+column_mapping:
+- table: '1'
+  pages:
+  - 58
+  rows: 11
+  columns:
+  - column: 1
+    header: Oxide (wt.%)
+    role: oxide_component_row_label
+  - column: 2
+    header: Etna Basalt
+    quantity: equilibrium_phase_composition
+    species: oxide from row label
+    phase: starting silicate material
+    unit: wt.%
+    method_class: measured_direct
+  - column: 3
+    header: AT-41 Basalt
+    quantity: equilibrium_phase_composition
+    species: oxide from row label
+    phase: starting silicate material
+    unit: wt.%
+    method_class: measured_direct
+  - column: 4
+    header: AG7-1 Andesite
+    quantity: equilibrium_phase_composition
+    species: oxide from row label
+    phase: starting silicate material
+    unit: wt.%
+    method_class: measured_direct
+  - column: 5
+    header: AT-150 Dacite
+    quantity: equilibrium_phase_composition
+    species: oxide from row label
+    phase: starting silicate material
+    unit: wt.%
+    method_class: measured_direct
+  - column: 6
+    header: LCO Rhyolite
+    quantity: equilibrium_phase_composition
+    species: oxide from row label
+    phase: starting silicate material
+    unit: wt.%
+    method_class: measured_direct
+  condition_rule: Starting silicate material composition joins to Table 3 runs by the printed starting-material
+    heading; Table 3 charge also includes pyrrhotite.
+- table: '2'
+  pages:
+  - 59
+  rows: 1
+  columns:
+  - column: 1
+    header: No.
+    role: sample_label_or_summary
+  - column: 2
+    header: O
+    role: starting_pyrrhotite_context
+  - column: 3
+    header: Fe
+    role: starting_pyrrhotite_context
+  - column: 4
+    header: S
+    role: starting_pyrrhotite_context
+  - column: 5
+    header: Ni
+    role: starting_pyrrhotite_context
+  - column: 6
+    header: Pt
+    role: starting_pyrrhotite_context
+  - column: 7
+    header: Cu
+    role: starting_pyrrhotite_context
+  - column: 8
+    header: Total
+    role: sample_label_or_summary
+  - column: 9
+    header: No.
+    role: sample_label_or_summary
+  disposition: Starting pyrrhotite assay retained in located context, not a run-product analysis; Table 3 charge
+    amount is only approximate.
+- table: '3'
+  pages:
+  - 60
+  - 61
+  - 62
+  rows: 45
+  columns:
+  - column: 1
+    header: Run
+    role: run_id
+  - column: 2
+    header: starting material
+    role: starting_composition_label
+  - column: 3
+    header: T (K)
+    quantity: temperature
+    unit: K
+  - column: 4
+    header: P (GPa)
+    quantity: total_pressure
+    unit: GPa
+  - column: 5
+    header: Duration (h)
+    quantity: duration
+    unit: h
+  - column: 6
+    header: log fO2
+    quantity: log_fO2
+    unit: log10(bar)
+  - column: 7
+    header: capsules
+    role: capsule_as_printed
+  condition_rule: Table 3 values join by run ID; multi-stage yn19/yn20 conditions retain the sequence in the row
+    and use the final hold for point identity.
+- table: '4'
+  pages:
+  - 63
+  - 64
+  - 65
+  rows: 47
+  typed_author_rows: 21
+  columns:
+  - column: 2
+    header: SiO2
+    quantity: equilibrium_phase_composition
+    species: SiO2
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 3
+    header: TiO2
+    quantity: equilibrium_phase_composition
+    species: TiO2
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 4
+    header: Al2O3
+    quantity: equilibrium_phase_composition
+    species: Al2O3
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 5
+    header: FeO
+    quantity: equilibrium_phase_composition
+    species: FeO
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 6
+    header: MnO
+    quantity: equilibrium_phase_composition
+    species: MnO
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 7
+    header: MgO
+    quantity: equilibrium_phase_composition
+    species: MgO
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 8
+    header: CaO
+    quantity: equilibrium_phase_composition
+    species: CaO
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 9
+    header: Na2O
+    quantity: equilibrium_phase_composition
+    species: Na2O
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 10
+    header: K2O
+    quantity: equilibrium_phase_composition
+    species: K2O
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 11
+    header: P2O5
+    quantity: equilibrium_phase_composition
+    species: P2O5
+    phase: glass
+    unit: wt.%
+    method_class: measured_direct
+  - column: 12
+    header: S
+    quantity: equilibrium_phase_composition
+    species: S
+    phase: glass
+    unit: ppm
+    method_class: measured_direct
+  condition_rule: Each Table 4 glass composition is row-local; temperature, nominal pressure and absolute log fO2
+    join from Table 3 by run. yn38 has no Table 3 conditions; yn64 starting composition remains unknown because
+    Tables 3 and 4 conflict. For yn73, MnO and P2O5 are <d.l.>, so the full numeric composition is unavailable and
+    the identity composition remains explicitly unknown.
+- table: '5'
+  pages:
+  - 66
+  rows: 10
+  columns:
+  - column: 2
+    header: O
+    quantity: equilibrium_phase_composition
+    species: O
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  - column: 3
+    header: Fe
+    quantity: equilibrium_phase_composition
+    species: Fe
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  - column: 4
+    header: S
+    quantity: equilibrium_phase_composition
+    species: S
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  - column: 5
+    header: Ni
+    quantity: equilibrium_phase_composition
+    species: Ni
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  - column: 6
+    header: Pt
+    quantity: equilibrium_phase_composition
+    species: Pt
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  - column: 7
+    header: Cu
+    quantity: equilibrium_phase_composition
+    species: Cu
+    phase: cr
+    phase_role: matte
+    unit: wt.%
+    method_class: measured_direct
+  condition_rule: Temperature, pressure and absolute log fO2 join from Table 3 by run. Pt is printed <d.l. in all
+    ten Table 5 rows, so the shared sulfide composition identity is unknown and no complete mole fractions are inferred;
+    each Pt result is retained as unavailable below detection. yn49 has no printed Table 3 conditions.
+- table: '6'
+  pages:
+  - 67
+  rows: 6
+  columns:
+  - column: 1
+    header: Model
+    role: model_name
+  - column: 2
+    header: A
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 3
+    header: B
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 4
+    header: C
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 5
+    header: D
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 6
+    header: E
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 7
+    header: F
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 8
+    header: r2
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  - column: 9
+    header: X2
+    evidence_class: model_derived
+    model: Liu 2006 fit named by row
+    status: typed_refused_no_exact_coefficient_quantity
+  disposition: fitted coefficient, uncertainty, and fit-statistic rows retained in located context.
+- table: Appendix I
+  pages:
+  - 83
+  rows: 77
+  retained_context_rows: 76
+  columns:
+  - column: 1
+    header: ln S (ppm)
+    quantity: log_sulfur_concentration_ppm_appendix_i
+    own_rows: measured_reduced
+    literature_rows: quoted_attributed
+    collaborator_rows: quoted_attributed
+  - column: 2
+    header: 10000/T
+    role: predictor_as_printed
+  - column: 3
+    header: ln MFM
+    role: predictor_as_printed
+  - column: 4
+    header: ln fO2
+    role: predictor_as_printed
+  - column: 5
+    header: P/T
+    role: predictor_as_printed
+  - column: 6
+    header: ln fS2
+    role: predictor_as_printed
+  - column: 7
+    header: Model 1
+    evidence_class: model_derived
+    model: Liu 2006 Model 1
+    status: typed_refused_log_quantity_schema_gap
+  - column: 9
+    header: Model 2
+    evidence_class: model_derived
+    model: Liu 2006 Model 2
+    status: typed_refused_log_quantity_schema_gap
+  - column: 11
+    header: Model 3
+    evidence_class: model_derived
+    model: Liu 2006 Model 3
+    status: typed_refused_log_quantity_schema_gap
+  - column: 13
+    header: Model 4
+    evidence_class: model_derived
+    model: Liu 2006 Model 4
+    status: typed_refused_log_quantity_schema_gap
+  - column: 8
+    header: dev.1
+    evidence_class: model_derived
+    model: Liu 2006 Model 1 deviation
+    status: typed_refused_log_quantity_schema_gap
+  - column: 10
+    header: dev.2
+    evidence_class: model_derived
+    model: Liu 2006 Model 2 deviation
+    status: typed_refused_log_quantity_schema_gap
+  - column: 12
+    header: dev.3
+    evidence_class: model_derived
+    model: Liu 2006 Model 3 deviation
+    status: typed_refused_log_quantity_schema_gap
+  - column: 14
+    header: dev.4
+    evidence_class: model_derived
+    model: Liu 2006 Model 4 deviation
+    status: typed_refused_log_quantity_schema_gap
+  - column: 15
+    header: Source
+    role: source_attribution_as_printed
+  condition_rule: Typed own Appendix observations join T/P/fO2 and composition only from their printed Table 3/Table
+    4 rows; for yn38, Table 3 is absent, ln fO2 is directly printed in natural-log bar form and converted to Pa
+    for identity, while reciprocal 10000/T and ratio P/T remain as printed predictors and are not promoted to unprinted
+    T or P.
+  disposition: All 76 sample rows are retained as located context. Liu rows are measured_reduced, colleague-contributed
+    rows are attributed to Naji-Tom Samaha, literature rows are quoted_attributed with citations, and model outputs
+    are named model_derived refusals.
+  render_verified: Every printed source row and model value checked on page 83; all 76 sample rows have distinct
+    row locators, cited literature inputs retain their original citations, and all model outputs are named.
+tables:
+- page: 58
+  table: '1'
+  printed_title: Compositions of the starting materials
+  content_list_table: p058-t01
+  printed_rows: 11
+  disposition: context_and_experiment_initial_compositions
+  render_verified: All printed oxide values, totals, and starting-material column assignments checked against page
+    58 render.
+- page: 59
+  table: '2'
+  printed_title: Composition of the starting pyrrhotite in weight percent
+  content_list_table: p059-t02
+  printed_rows: 1
+  disposition: starting_sulfide_context
+  render_verified: All numeric cells, parenthetical 1-sigma widths, below-detection cell, and row/column assignments
+    checked against page 59 render.
+- page: 60
+  table: '3'
+  printed_title: Experimental conditions, continued on pages 61–62
+  content_list_table: p060-t03
+  printed_rows: 45
+  retained_author_rows: 20
+  disposition: author_conditions_and_collaborator_rows_audited
+  render_verified: Author run rows and their printed columns checked against pages 60–61; the shared fO2, capsule
+    and reversal notes are on page 62; the yn64 starting-material conflict with its AT-41 section is retained and
+    not resolved by inference.
+- page: 63
+  table: '4'
+  printed_title: Silicate melt compositions, continued on pages 64–65
+  content_list_table: p063-t06
+  printed_rows: 47
+  retained_author_rows: 21
+  disposition: measured_glass_composition
+  render_verified: All 21 yn rows and their 11 composition values, plus total, MFM and number of analyses, checked
+    against pages 63–64 render; the 1-sigma note is on page 65; collaborator rows excluded from typed measurements.
+- page: 66
+  table: '5'
+  printed_title: Sulfide melt compositions
+  content_list_table: p066-t09
+  printed_rows: 10
+  disposition: selected_sulfide_bleb_composition
+  render_verified: All ten selected rows, six analytes, printed uncertainties, totals, analysis counts, below-detection
+    cells, and 1-sigma note checked against page 66 render.
+- page: 67
+  table: '6'
+  printed_title: Fitting results for models to predict sulfur concentration at sulfide saturation
+  content_list_table: p067-t10
+  printed_rows: 6
+  disposition: model_fit_context_refused
+  render_verified: All six model rows, coefficient uncertainties, fit statistics, and column assignments checked
+    against page 67 render.
+- page: 83
+  table: Appendix I
+  printed_title: Data used in the modeling process
+  content_list_table: p083-t11
+  printed_rows: 77
+  retained_context_rows: 76
+  disposition: all_76_sample_rows_context_with_attributed_inputs_and_model_outputs
+  render_verified: All 76 sample rows, all 15 columns, the final average row, source labels, signs, and row/column
+    assignments checked against page 83 render.
+schema_gap: Appendix I ln S (ppm), model predictions, and model deviations have no exact logarithmic sulfur-concentration
+  quantity token, so own ln S rows are quantity-unknown and model values remain located typed refusals in context.
+  The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES set accepts concentration_series as a type
+  but does not define a logarithmic concentration quantity; simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY
+  have no exact token or safe inference for ln(ppm); simulator/battery/enums.py::Quantity has no log-concentration
+  quantity. These are not ordinary phase amounts admitted by PHASE_BASIS_TOKENS; glass is a valid phase role, but
+  does not change the logarithmic quantity. Existing equilibrium-phase-composition extracts such as data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  use component_amount for non-log phase amounts, which is not an exact match.
+machine_read_qa: 'mineru_table_qa numeric agreement: Table 1 0.898, Table 2 1.000, Table 3 0.874, Table 4 0.436,
+  Table 5 0.986, Table 6 0.985, Appendix I 0.502. Every stored numeric cell was checked on its page render; flagged
+  Table 5 uncertainty spellings were crop-checked at 300 dpi.'
+appendix_condition_note: Appendix I ln fO2 for yn38 is a natural logarithm in bar. On shared run yn40 it matches
+  ln(10) times the Table 3 log10(bar) value; identity fO2_Pa is converted using exp(ln fO2) × 100000 Pa/bar. The
+  Appendix 10000/T and P/T predictors are retained as printed and not converted into a T or P condition.
+compare_resolution: 'mineru_table_draft.py compare reports 50 matched and 250 mismatch among 300 numeric values,
+  with no no-match, locator-error or unverifiable rows. All 250 are Table 4 glass and Appendix I own log-S cells:
+  their values match the machine table cells, but the comparer phase filter tools/mineru_table_draft.py::_phase_matches_column
+  rejects the valid phase token glass. Table 5 matched values include the rendered resolutions of 2.22(0.82) and
+  0.056 (35). The committed compare output is accompanied by the full render-cell audit; no phase or value was altered
+  to satisfy the comparer.'
