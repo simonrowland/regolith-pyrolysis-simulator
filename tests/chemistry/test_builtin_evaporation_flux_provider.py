@@ -52,9 +52,10 @@ from simulator.evaporation import (
     viscous_p_bulk_out_of_domain_diagnostic,
 )
 from simulator.state import (
-    MOLAR_MASS,
+    Atmosphere,
     CampaignPhase,
     DecisionType,
+    MOLAR_MASS,
 )
 from tests.chemistry.conftest import _build_sim
 
@@ -2042,3 +2043,61 @@ def test_condensation_direction_zero_has_species_pressure_diagnostic():
     assert zero["reason"] == "condensation_direction"
     assert zero["P_eq_Pa"] == pytest.approx(100.0)
     assert zero["P_bulk_Pa"] == pytest.approx(150.0)
+
+
+@pytest.mark.xdist_group("serial")
+def test_pressure_held_unspecified_sweep_uses_stable_upper_flux_bracket(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1670.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 1.0
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.001
+    equilibrium = sim._get_equilibrium()
+
+    hourly_rates = []
+    for hour in (133, 134, 135):
+        sim.melt.hour = hour
+        flux = sim._calculate_evaporation(equilibrium)
+        diagnostic = sim._last_evaporation_flux_diagnostic
+        bounds = [
+            notice
+            for notice in diagnostic.get("notices", [])
+            if notice.get("kind") == "sweep_flow_unspecified"
+        ]
+        assert bounds
+        assert all(notice["authority"] == "upper_bound" for notice in bounds)
+        assert all(notice["selected_bound"] == "upper" for notice in bounds)
+        assert all(
+            "upper_bound_kg_hr" in notice
+            and "lower_bound_kg_hr" in notice
+            and "sum_P_eq_Pa" in notice
+            and "P_total_Pa" in notice
+            for notice in bounds
+        )
+        bound_summary = diagnostic["pressure_held_sweep_bounds"]
+        assert bound_summary["P_total_Pa"] == pytest.approx(100.0)
+        if bound_summary["sum_P_eq_Pa"] <= bound_summary["P_total_Pa"]:
+            assert bound_summary["lower_bound_converged"] is True
+            assert bound_summary["lower_bound_iterations"] == 0
+            assert all(notice["lower_bound_kg_hr"] == 0.0 for notice in bounds)
+        assert all(
+            notice["upper_bound_kg_hr"]
+            == pytest.approx(flux.species_kg_hr.get(notice["species"], 0.0))
+            for notice in bounds
+        )
+        hourly_rates.append(dict(flux.species_kg_hr))
+
+    species = set().union(*(rates.keys() for rates in hourly_rates))
+    assert species
+    for species_id in species:
+        rates = [rates.get(species_id, 0.0) for rates in hourly_rates]
+        if max(rates) > 0.0:
+            assert min(rates) > 0.0, species_id
+            assert max(rates) / min(rates) <= 1.01, species_id
