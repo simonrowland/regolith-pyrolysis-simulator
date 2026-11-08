@@ -1659,6 +1659,58 @@ def authority_allowed(quantity: Quantity | None, authority: Authority | None) ->
     return False
 
 
+def _knudsen_effective_pressure_bar(
+    engine: Engine,
+    physical_pressure_bar: float,
+    backend: Any,
+) -> tuple[float | None, str]:
+    """Resolve the pressure each Knudsen prediction pass actually evaluates."""
+
+    if engine is Engine.VAPOROCK:
+        return None, "engine_does_not_accept_total_pressure"
+    pressure_bar = float(physical_pressure_bar)
+    if engine is Engine.ALPHAMELTS:
+        transport = str(getattr(backend, "_mode", "") or "").strip().lower()
+        if transport not in {"subprocess", "python_api"}:
+            return None, "alphamelts_transport_unavailable"
+        from simulator.alphamelts_reference_pressure import (
+            alphamelts_condensed_phase_pressure_bar,
+        )
+
+        # Reuse the adapter's subprocess reference mapping. Python API calls
+        # retain physical pressure at the adapter, then the backend applies
+        # P_eval=max(P_input, P_min) in bar before calling PetThermoTools.
+        effective_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+            pressure_bar,
+            transport=transport,
+        )
+        if transport == "python_api":
+            from simulator.melt_backend.alphamelts import (
+                ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
+            )
+
+            effective_pressure_bar = max(
+                effective_pressure_bar,
+                ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
+            )
+            return float(effective_pressure_bar), (
+                "alphamelts Python API floor 1e-6 bar"
+            )
+        return float(effective_pressure_bar), (
+            "alphamelts subprocess reference 1 bar"
+        )
+    if engine is Engine.THERMOENGINE:
+        from simulator.melt_backend.thermoengine import (
+            THERMOENGINE_MIN_PRESSURE_BAR,
+        )
+
+        # ThermoEngine applies the same max(P_input, P_min) policy in bar.
+        return max(pressure_bar, THERMOENGINE_MIN_PRESSURE_BAR), (
+            "ThermoEngine floor 1e-6 bar"
+        )
+    return None, "engine_has_no_total_pressure_policy"
+
+
 def _origin_under_compilations(origin: str | None) -> bool:
     """True when the store path (relative) lives under a compilations-* payload."""
 
@@ -5797,7 +5849,9 @@ def _knudsen_total_pressure_details(
             r"(?:^|; )total_pressure_Pa=([^;]+); "
             r"sensitivity_status=([^;]+); sensitivity_reason=([^;]+); "
             r"(?:oxygen_balance_pressure_response=([^;]+); )?"
-            r"sensitivity_dex=([^;]+)$",
+            r"sensitivity_dex=([^;]+)"
+            r"(?:; effective_seed_pressure_bar=[^;]+; "
+            r"effective_derived_pressure_bar=[^;]+)?$",
             notice.reason,
         )
         if match is None:
@@ -10103,6 +10157,7 @@ def _predict_with_engine(
         )
     )
     pressure_bar: float | None = None
+    knudsen_seed_pressure_bar: float | None = None
     if activity_payload is None:
         if derive_knudsen_total_pressure:
             # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
@@ -10114,6 +10169,7 @@ def _predict_with_engine(
             # Seed at the top of the ruled interval, then update once from
             # the equilibrium partial-pressure sum below.
             pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
+            knudsen_seed_pressure_bar = pressure_bar
         else:
             pressure_bar, pressure_notice, pressure_invalid = (
                 total_pressure_bar_for_score(identity, quantity)
@@ -10984,10 +11040,26 @@ def _predict_with_engine(
                 call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
                 result_notices=notices,
             )
-        sensitivity_status = "measured"
-        sensitivity_reason = "engine_consumes_total_pressure"
+        sensitivity_status = "not_evaluated"
+        sensitivity_reason = ""
         oxygen_balance_pressure_response = None
         sensitivity_dex: float | None = None
+        if knudsen_seed_pressure_bar is None or pressure_bar is None:
+            effective_seed_pressure_bar = None
+            seed_pressure_policy = "seed_pressure_unavailable"
+            effective_derived_pressure_bar = None
+            derived_pressure_policy = "derived_pressure_unavailable"
+        else:
+            effective_seed_pressure_bar, seed_pressure_policy = (
+                _knudsen_effective_pressure_bar(
+                    engine, knudsen_seed_pressure_bar, handle.backend
+                )
+            )
+            effective_derived_pressure_bar, derived_pressure_policy = (
+                _knudsen_effective_pressure_bar(
+                    engine, pressure_bar, handle.backend
+                )
+            )
         if engine is Engine.VAPOROCK:
             # With an ideal vapour and condensed-phase activities unaffected
             # by P_total across 1e-10–1e-3 bar, p_i(T, fO2) is independent of
@@ -11000,7 +11072,33 @@ def _predict_with_engine(
                 oxygen_balance_pressure_response = (
                     "no_op_engine_ignores_total_pressure"
                 )
+        elif (
+            effective_seed_pressure_bar is None
+            or effective_derived_pressure_bar is None
+        ):
+            sensitivity_status = "not_evaluated"
+            unknown_policy = (
+                seed_pressure_policy
+                if effective_seed_pressure_bar is None
+                else derived_pressure_policy
+            )
+            sensitivity_reason = f"effective_pressure_unavailable: {unknown_policy}"
+        elif effective_seed_pressure_bar == effective_derived_pressure_bar:
+            # Equal evaluation pressures cannot measure P_total sensitivity,
+            # even when the backend accepted both different physical inputs.
+            sensitivity_status = "not_evaluated"
+            sensitivity_reason = (
+                "effective_pressure_identical: " + seed_pressure_policy
+            )
+            if solve_oxygen_balance_at_current_pressure is not None:
+                oxygen_balance_pressure_response = (
+                    "no_op_effective_pressure_identical"
+                )
         else:
+            sensitivity_status = "measured"
+            sensitivity_reason = (
+                "effective_pressure_differs: " + seed_pressure_policy
+            )
             sensitivity_dex = math.inf
             before = initial_target[1]
             after = updated_target[1]
@@ -11027,6 +11125,16 @@ def _predict_with_engine(
             if sensitivity_dex is None
             else format(sensitivity_dex, ".17g")
         )
+        effective_seed_pressure_text = (
+            "null"
+            if effective_seed_pressure_bar is None
+            else format(effective_seed_pressure_bar, ".15g")
+        )
+        effective_derived_pressure_text = (
+            "null"
+            if effective_derived_pressure_bar is None
+            else format(effective_derived_pressure_bar, ".15g")
+        )
         oxygen_balance_response_text = (
             ""
             if oxygen_balance_pressure_response is None
@@ -11045,7 +11153,10 @@ def _predict_with_engine(
                 f"sensitivity_status={sensitivity_status}; "
                 f"sensitivity_reason={sensitivity_reason}; "
                 f"{oxygen_balance_response_text}"
-                f"sensitivity_dex={sensitivity_text}"
+                f"sensitivity_dex={sensitivity_text}; "
+                f"effective_seed_pressure_bar={effective_seed_pressure_text}; "
+                "effective_derived_pressure_bar="
+                f"{effective_derived_pressure_text}"
             ),
             origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
         )
