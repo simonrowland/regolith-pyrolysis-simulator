@@ -527,12 +527,12 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
 @pytest.mark.parametrize(
-    'startup_timeout_s', (8.0, 3.0),
+    'expire_startup_after_close', (False, True),
     ids=('before-startup-expiry', 'after-startup-expiry'),
 )
 def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
     remote_worker_factory, monkeypatch, tmp_path, inherit,
-    startup_timeout_s,
+    expire_startup_after_close,
 ):
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
@@ -553,12 +553,14 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
 
     def factory(_index):
         if not created:
-            worker = remote_worker_factory('crash-first', str(crash_marker))
+            worker = remote_worker_factory(
+                'crash-first', str(crash_marker), startup_timeout_s=15.0,
+            )
         else:
             worker = remote_worker_factory(
                 'startup-subtree-notify', str(worker_pid_file),
                 str(grandchild_pid_file), str(os.getpid()),
-                startup_timeout_s=startup_timeout_s,
+                startup_timeout_s=15.0,
             )
             _track_remote_pgid_reaper_completion(worker, reaper_finished)
             original_args = worker._process_bootstrap_args
@@ -576,10 +578,10 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
     pids: tuple[int, ...] = ()
     wrapper = None
     try:
-        first = pool.submit(_request()).result(timeout=10.0)
+        first = pool.submit(_request()).result(timeout=20.0)
         assert first['code'] == 'child_crash'
         replacement_call = pool.submit(_request())
-        assert report_wait_receive.poll(5.0)
+        assert report_wait_receive.poll(15.0)
         report_wait_receive.recv()
         report_wait_sender.close()
         release_report_receiver.close()
@@ -588,6 +590,10 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         wrapper = created[1].process
         assert wrapper is not None
+        if expire_startup_after_close:
+            # Make the startup deadline expire while the PGID report remains
+            # held by the explicit pipe rendezvous below.
+            created[1]._remote_startup_deadline = time.monotonic() + 0.05
         close_started = time.monotonic()
         close_error = None
         try:
@@ -598,7 +604,7 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         assert replacement_call.done()
 
         wrapper_alive_after_startup_expiry = False
-        if startup_timeout_s == 3.0:
+        if expire_startup_after_close:
             startup_deadline = created[1]._remote_startup_deadline
             assert startup_deadline is not None
             remaining = startup_deadline - time.monotonic()
@@ -629,7 +635,7 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         )
         _assert_pids_gone(pids)
         assert report_was_sent
-        if startup_timeout_s == 3.0:
+        if expire_startup_after_close:
             assert wrapper_alive_after_startup_expiry
         assert created[1]._remote_process_group_id is None
         _assert_caller_group_unchanged(caller_group)
@@ -1438,16 +1444,19 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
 @pytest.mark.parametrize(
-    'pid_before_close, pgid_before_close, startup_expired_before_close',
+    'pid_before_close, pgid_before_close, startup_expired_before_close, '
+    'pending_sweep_resume_after_reaper_release',
     (
-        (False, False, False),
-        (False, False, True),
-        (False, True, False),
-        (False, True, True),
-        (True, False, False),
-        (True, False, True),
-        (True, True, False),
-        (True, True, True),
+        (False, False, False, None),
+        (False, False, True, None),
+        (False, True, False, None),
+        (False, True, True, None),
+        (True, False, False, None),
+        (True, False, True, None),
+        (True, True, False, None),
+        (True, True, True, None),
+        (False, False, False, False),
+        (False, False, False, True),
     ),
     ids=(
         'pid-after-close-pgid-after-close-expiry-after-close',
@@ -1458,6 +1467,8 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         'pid-before-close-pgid-after-close-expiry-before-close',
         'pid-before-close-pgid-before-close-expiry-after-close',
         'pid-before-close-pgid-before-close-expiry-before-close',
+        'pid-after-close-pgid-after-close-expiry-after-close-sweep-before-reaper-release',
+        'pid-after-close-pgid-after-close-expiry-after-close-sweep-after-reaper-release',
     ),
 )
 def test_close_orders_publication_and_reaper_before_releasing_records(
@@ -1468,8 +1479,10 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     pid_before_close,
     pgid_before_close,
     startup_expired_before_close,
+    pending_sweep_resume_after_reaper_release,
 ):
     from multiprocessing.context import SpawnProcess
+    import simulator.engine_pool as pool_module
 
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
@@ -1499,11 +1512,14 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     startup_pgid_claimed = threading.Event()
     reaper_waiting_for_pid = threading.Event()
     reaper_finished = threading.Event()
+    pending_pid_observed = threading.Event()
+    release_pending_sweep = threading.Event()
     start_results: list[object] = []
     cleanup_claims: list[int | None] = []
     cleanup_claims_lock = threading.Lock()
     released_process_records: list[Any] = []
     start_thread: threading.Thread | None = None
+    pending_sweep_thread: threading.Thread | None = None
     pids: tuple[int, ...] = ()
     wrapper_process = None
 
@@ -1523,6 +1539,8 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     original_process_start = SpawnProcess.start
     original_remote_pgid = worker._remote_pgid
     original_reap = worker._reap_remote_process_group
+    original_process_pid = pool_module._process_pid
+    original_stop_remote = worker._stop_remote_process_tree
     original_release = getattr(worker, '_release_process_records', None)
     original_finish_capture = getattr(
         worker, '_finish_native_output_capture', None,
@@ -1596,6 +1614,32 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         finally:
             reaper_finished.set()
 
+    def gated_process_pid(process):
+        pid = original_process_pid(process)
+        if (
+            threading.current_thread().name == 'remote pending sweep'
+            and process is wrapper_process
+            and pid is None
+        ):
+            pending_pid_observed.set()
+            if not release_pending_sweep.wait(timeout=30.0):
+                raise TimeoutError('test did not release pending sweep')
+        return pid
+
+    def defer_remote_stop_for_pending_sweep(
+        process,
+        connection,
+        *,
+        cleanup_deadline=None,
+    ):
+        if threading.current_thread().name == 'remote pending sweep':
+            return True
+        return original_stop_remote(
+            process,
+            connection,
+            cleanup_deadline=cleanup_deadline,
+        )
+
     def record_release(process, *, process_start_failed=False):
         had_pending = process in worker._pending_reap
         capture = worker._native_output_capture
@@ -1624,6 +1668,13 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     monkeypatch.setattr(SpawnProcess, 'start', tracked_process_start)
     monkeypatch.setattr(worker, '_remote_pgid', record_remote_pgid)
     monkeypatch.setattr(worker, '_reap_remote_process_group', record_reaper)
+    if pending_sweep_resume_after_reaper_release is not None:
+        monkeypatch.setattr(pool_module, '_process_pid', gated_process_pid)
+        monkeypatch.setattr(
+            worker,
+            '_stop_remote_process_tree',
+            defer_remote_stop_for_pending_sweep,
+        )
     if original_release is not None:
         monkeypatch.setattr(worker, '_release_process_records', record_release)
     elif original_finish_capture is not None:
@@ -1648,6 +1699,14 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         assert wrapper.pid is None
         if inherit:
             assert os.getpgrp() == caller_group
+
+        if pending_sweep_resume_after_reaper_release is not None:
+            pending_sweep_thread = threading.Thread(
+                target=worker.disable,
+                name='remote pending sweep',
+            )
+            pending_sweep_thread.start()
+            assert pending_pid_observed.wait(timeout=30.0)
 
         # Process.start has created the wrapper but remains inside the gated
         # Popen return, so neither the PID nor the PGID ordering is inferred
@@ -1676,6 +1735,13 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         close_elapsed = time.monotonic() - close_started
         assert close_elapsed <= 0.75
 
+        if pending_sweep_resume_after_reaper_release is False:
+            assert not reaper_finished.is_set()
+            release_pending_sweep.set()
+            assert pending_sweep_thread is not None
+            pending_sweep_thread.join(timeout=30.0)
+            assert not pending_sweep_thread.is_alive()
+
         if not startup_expired_before_close:
             worker._remote_startup_deadline = time.monotonic() - 1.0
         if not pgid_before_close:
@@ -1700,6 +1766,13 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         assert len(start_results) == 1
         if worker._remote_pgid_reaper_started:
             assert reaper_finished.wait(timeout=30.0)
+        if pending_sweep_resume_after_reaper_release is True:
+            assert reaper_finished.is_set()
+            release_pending_sweep.set()
+            assert pending_sweep_thread is not None
+            pending_sweep_thread.join(timeout=30.0)
+            assert not pending_sweep_thread.is_alive()
+            assert worker._pending_reap == []
 
         # The cleanup-claim assertion is made only after its actual owner has
         # finished, avoiding a race with background PGID publication.
@@ -1713,6 +1786,9 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         assert not wrapper.is_alive()
         assert worker._pending_reap == []
         assert worker._native_output_capture is None
+        record_owners = getattr(worker, '_process_record_owners', None)
+        if record_owners is not None:
+            assert record_owners[wrapper] == 'released'
         assert released_process_records == [wrapper]
         if not pid_before_close:
             refusal = worker.call(_request())
@@ -1721,6 +1797,9 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         _assert_pids_gone(pids)
         _assert_caller_group_unchanged(caller_group)
     finally:
+        release_pending_sweep.set()
+        if pending_sweep_thread is not None:
+            pending_sweep_thread.join(timeout=30.0)
         pgid_visible.set()
         release_report_sender.close()
         release_publication.set()

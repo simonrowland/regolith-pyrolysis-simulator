@@ -697,6 +697,11 @@ class WarmEngineWorker:
         self.disabled = False
         self._state_lock = threading.Lock()
         self._pending_reap: list[Any] = []
+        # Weak keys retain terminal state only while a cleanup path can still
+        # hold the Process object, without accumulating completed restarts.
+        self._process_record_owners: weakref.WeakKeyDictionary[Any, str] = (
+            weakref.WeakKeyDictionary()
+        )
         self._native_output_capture: tuple[
             Any, Any, Any | None, threading.Thread
         ] | None = None
@@ -799,9 +804,11 @@ class WarmEngineWorker:
         synchronous closer owns cleanup through its close deadline; if that
         deadline arrives first, the PGID reaper owns the pending launch and
         capture. Startup expiry only bounds the synchronous wait; it releases
-        neither record. The owner kills the remote group, waits for PID
-        publication (or a settled start failure), then stops/reaps the wrapper
-        and calls this method. Reaper exit is allowed only after that release.
+        neither record. Each launch has one owner under the state lock:
+        pending, transferred to the PGID reaper, or released. The owner kills
+        the remote group, waits for PID publication (or a settled start
+        failure), then stops/reaps the wrapper and calls this method. Reaper
+        exit is allowed only after that release.
         Normal startup transfers the pending-launch record to self.process
         when the PID is published; close/start-failure cleanup releases any
         remaining records here. The state lock makes this the single,
@@ -817,9 +824,16 @@ class WarmEngineWorker:
             return False
         with self._state_lock:
             had_pending_reap = process in self._pending_reap
-            if had_pending_reap:
-                self._pending_reap.remove(process)
+            owner = self._process_record_owners.get(process)
+            if owner not in ('pending', 'transferred'):
+                return False
             capture = self._native_output_capture
+            self._process_record_owners[process] = 'released'
+            if had_pending_reap:
+                self._pending_reap = [
+                    candidate for candidate in self._pending_reap
+                    if candidate is not process
+                ]
             if capture is not None and capture[0] is process:
                 self._native_output_capture = None
             else:
@@ -835,7 +849,7 @@ class WarmEngineWorker:
             # it resumes when the sink unblocks and closes its own read fd.
             if thread.ident is not None:
                 thread.join(timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S)
-        return had_pending_reap or capture is not None
+        return True
 
     def _receive_frame_with_deadline(
         self,
@@ -1111,6 +1125,7 @@ class WarmEngineWorker:
             self.connection = parent
             self.ready_payload = None
             self._native_output_capture = native_output_capture
+            self._process_record_owners[process] = 'pending'
             if process not in self._pending_reap:
                 self._pending_reap.append(process)
         with self._state_lock:
@@ -1646,7 +1661,11 @@ class WarmEngineWorker:
             self.process = None
             self.connection = None
             self.ready_payload = None
-            if process is not None and process not in self._pending_reap:
+            if (
+                process is not None
+                and self._process_record_owners.get(process) == 'pending'
+                and process not in self._pending_reap
+            ):
                 self._pending_reap.append(process)
         if active_reader:
             self._stop_pair(
@@ -1670,7 +1689,11 @@ class WarmEngineWorker:
     def _reap_pending(self, *, timeout_s: float) -> bool:
         deadline = time.monotonic() + max(0.0, float(timeout_s))
         with self._state_lock:
-            processes = tuple(dict.fromkeys(self._pending_reap))
+            processes = tuple(
+                process
+                for process in dict.fromkeys(self._pending_reap)
+                if self._process_record_owners.get(process) == 'pending'
+            )
             self._pending_reap.clear()
         remaining_processes = []
         for process in processes:
@@ -1691,8 +1714,15 @@ class WarmEngineWorker:
                 self._release_process_records(process)
         if remaining_processes:
             with self._state_lock:
-                self._pending_reap.extend(remaining_processes)
-            return False
+                pending_remaining = False
+                for process in remaining_processes:
+                    if (
+                        self._process_record_owners.get(process) == 'pending'
+                        and process not in self._pending_reap
+                    ):
+                        self._pending_reap.append(process)
+                        pending_remaining = True
+            return not pending_remaining
         return True
 
     def disable(self) -> None:
@@ -2428,13 +2458,21 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self,
         process: Any,
         connection: Any,
-    ) -> None:
+    ) -> bool:
         with self._state_lock:
+            if self._process_record_owners.get(process) != 'pending':
+                return False
+            self._process_record_owners[process] = 'transferred'
+            self._pending_reap = [
+                candidate for candidate in self._pending_reap
+                if candidate is not process
+            ]
             if self.process is process:
                 self.process = None
             if self.connection is connection:
                 self.connection = None
             self.ready_payload = None
+            return True
 
     def _kill_remote_process_group(self, group_id: int) -> None:
         try:
@@ -2447,15 +2485,6 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         process: Any,
         connection: Any,
     ) -> bool:
-        with self._state_lock:
-            if process is None:
-                process = self.process
-                if process is None and self._pending_reap:
-                    process = self._pending_reap[0]
-            if connection is None:
-                connection = self.connection
-        if process is None:
-            return False
         with self._remote_pgid_reaper_lock:
             if self._remote_pgid_reaper_started:
                 return True
@@ -2464,7 +2493,30 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 or self._remote_startup_deadline is None
             ):
                 return False
+            with self._state_lock:
+                if process is None:
+                    process = self.process
+                    if process is None:
+                        process = next(
+                            (
+                                candidate
+                                for candidate, owner
+                                in self._process_record_owners.items()
+                                if owner == 'pending'
+                            ),
+                            None,
+                        )
+                if connection is None:
+                    connection = self.connection
+            if process is None:
+                return False
             self._remote_pgid_reaper_started = True
+            if not self._transfer_remote_pair_to_reaper(
+                process,
+                connection,
+            ):
+                self._remote_pgid_reaper_started = False
+                return False
             reaper = threading.Thread(
                 target=self._reap_remote_process_group,
                 args=(process, connection),
@@ -2475,8 +2527,19 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 reaper.start()
             except RuntimeError:
                 self._remote_pgid_reaper_started = False
+                with self._state_lock:
+                    if (
+                        self._process_record_owners.get(process)
+                        == 'transferred'
+                    ):
+                        self._process_record_owners[process] = 'pending'
+                        if process not in self._pending_reap:
+                            self._pending_reap.append(process)
+                        if self.process is None:
+                            self.process = process
+                        if self.connection is None:
+                            self.connection = connection
                 return False
-        self._transfer_remote_pair_to_reaper(process, connection)
         return True
 
     def _reap_remote_process_group(
