@@ -2394,16 +2394,17 @@ def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
         ):
             return SimpleNamespace(pressure_pa=100.0 * float(source_activity))
 
+    state = VapourResolveState(
+        temperature_K=1300.0,
+        source_reaction_activities={"Fe": 0.25},
+        source_reaction_activity_provider="test_fe_provider",
+        source_reaction_activity_evidence_refs={"Fe": "test:fe-value"},
+        source_reaction_activity_provenance={},
+    )
     batch = resolve_vapour_batch(
         rules=(rule,),
         ledger_snapshot={"process.cleaned_melt": {"FeO": 1.0}},
-        state=VapourResolveState(
-            temperature_K=1300.0,
-            source_reaction_activities={"Fe": 0.25},
-            source_reaction_activity_provider="test_fe_provider",
-            source_reaction_activity_evidence_refs={"Fe": "test:fe-value"},
-            source_reaction_activity_provenance={},
-        ),
+        state=state,
         catalog_species={
             "Fe": SimpleNamespace(
                 species_id="Fe",
