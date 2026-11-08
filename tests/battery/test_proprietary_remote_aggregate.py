@@ -340,6 +340,7 @@ def test_optimizer_pool_refuses_before_result_store_initialization(
             output_root=tmp_path / "pool-run-must-not-start",
             results_store=store,
         )
+    assert not (tmp_path / "pool-run-must-not-start").exists()
 
 
 def test_cold_single_request_refuses_before_evaluator_or_result_file(
@@ -378,6 +379,18 @@ def test_cold_single_request_refuses_before_evaluator_or_result_file(
     assert evaluator_calls == []
     assert not output_root.exists()
     assert not (output_root / "eval-000000" / ".supervised-result.pickle").exists()
+
+    monkeypatch.setattr(
+        pool.tempfile,
+        "mkdtemp",
+        lambda **_kwargs: pytest.fail("proprietary profile created an output root"),
+    )
+    with pytest.raises(ProprietaryEngineRefusal):
+        pool.evaluate_request_supervised(
+            ({}, "test-feedstock", "high"),
+            profile=profile,
+            evaluate_fn=fake_evaluate,
+        )
 
 
 def test_cold_fidelity_batch_refuses_before_starting_workers(monkeypatch) -> None:

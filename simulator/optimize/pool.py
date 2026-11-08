@@ -171,6 +171,13 @@ def _evaluate_batch(
     """
     if not requests:
         return (), engine_worker_pool if retain_engine_worker_pool else None
+    normalized_requests = tuple(_normalize_request(request) for request in requests)
+    for request in normalized_requests:
+        _backend_name_for_fidelity(
+            _request_profile(request, profile),
+            request.fidelity,
+            mode="optimizer_search",
+        )
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-pool-")
     )
@@ -181,10 +188,8 @@ def _evaluate_batch(
             constraints=constraints,
             schema=schema,
         )
-        for index, request in enumerate(requests)
+        for index, request in enumerate(normalized_requests)
     )
-    for task in tasks:
-        _task_backend_name(task)
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     if results_store is not None:
         results_store.initialize()
@@ -320,15 +325,19 @@ def evaluate_request_supervised(
 ) -> ScoredResult:
     """Evaluate one request in a killable child process with a wall deadline."""
 
+    normalized = _normalize_request(request)
+    active_profile = _request_profile(normalized, profile)
+    _backend_name_for_fidelity(
+        active_profile, normalized.fidelity, mode="optimizer_search"
+    )
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-supervised-")
     )
     task = replace(
-        _task_from_request(0, request, profile=profile, output_root=root),
+        _task_from_request(0, normalized, profile=profile, output_root=root),
         constraints=constraints,
         schema=schema,
     )
-    _task_backend_name(task)
     root.mkdir(parents=True, exist_ok=True)
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     outcome = _evaluate_task_supervised(
@@ -1005,9 +1014,7 @@ def _task_from_request(
     output_root: Path,
 ) -> _PoolTask:
     normalized = _normalize_request(request)
-    active_profile = normalized.profile if normalized.profile is not None else profile
-    if active_profile is None:
-        raise ValueError("pool evaluation requires a profile")
+    active_profile = _request_profile(normalized, profile)
     output_dir = (
         Path(normalized.output_dir)
         if normalized.output_dir is not None
@@ -1038,6 +1045,15 @@ def _normalize_request(request: PoolEvaluationRequest | tuple[Any, ...]) -> Pool
         patch, feedstock_id, fidelity, candidate_id = request
         return PoolEvaluationRequest(patch, feedstock_id, fidelity, candidate_id=candidate_id)
     raise ValueError("pool requests must be PoolEvaluationRequest or (patch, feedstock, fidelity)")
+
+
+def _request_profile(
+    request: PoolEvaluationRequest, profile: Mapping[str, Any] | None
+) -> Mapping[str, Any]:
+    active_profile = request.profile if request.profile is not None else profile
+    if active_profile is None:
+        raise ValueError("pool evaluation requires a profile")
+    return active_profile
 
 
 def _normalize_patch(patch: RecipePatch | Mapping[str, Any]) -> RecipePatch:
