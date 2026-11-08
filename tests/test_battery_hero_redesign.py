@@ -1230,6 +1230,9 @@ def test_hero_chart_header_legends_and_panel_titles_do_not_overlap(
 def test_scorecard_row_band_groups_temperature_pairs_and_counts(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    from matplotlib.collections import PathCollection
+    from matplotlib.transforms import Affine2D, Bbox
+
     figures = _capture_collection_figures(monkeypatch)
     rows = []
     partners = (
@@ -1291,8 +1294,6 @@ def test_scorecard_row_band_groups_temperature_pairs_and_counts(
         assert label.get_position()[1] < pair_positions[0]
         assert count.get_position()[1] > pair_positions[1]
 
-    from matplotlib.collections import PathCollection
-
     row_texts_by_axis = []
     count_texts_by_axis = []
     for panel in figure.axes:
@@ -1300,12 +1301,34 @@ def test_scorecard_row_band_groups_temperature_pairs_and_counts(
         count_texts = [
             text for text in panel.texts if text.get_text().startswith("n=")
         ]
-        marker_boxes = [
-            collection.get_window_extent(renderer)
-            for collection in panel.collections
-            if isinstance(collection, PathCollection)
-            and len(collection.get_offsets())
-        ]
+        marker_boxes = []
+        for collection in panel.collections:
+            if (
+                not isinstance(collection, PathCollection)
+                or not len(collection.get_offsets())
+            ):
+                continue
+            marker_box = collection.get_window_extent(renderer)
+            if all(math.isfinite(value) for value in marker_box.extents):
+                marker_boxes.append(marker_box)
+                continue
+            # Matplotlib returns an invalid extent for PathCollection. Use its
+            # renderer-resolved size transform and data-to-display offsets.
+            path_box = collection.get_paths()[0].get_extents(
+                Affine2D(collection.get_transforms()[0])
+            )
+            stroke = renderer.points_to_pixels(collection.get_linewidths()[0]) / 2
+            for center_x, center_y in collection.get_offset_transform().transform(
+                collection.get_offsets()
+            ):
+                marker_boxes.append(
+                    Bbox.from_extents(
+                        center_x + path_box.x0 - stroke,
+                        center_y + path_box.y0 - stroke,
+                        center_x + path_box.x1 + stroke,
+                        center_y + path_box.y1 + stroke,
+                    )
+                )
         for text in row_texts + count_texts:
             text_box = text.get_window_extent(renderer)
             assert all(
