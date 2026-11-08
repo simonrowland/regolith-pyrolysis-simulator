@@ -10,6 +10,7 @@ from __future__ import annotations
 import atexit
 import faulthandler
 import hashlib
+import json
 import logging
 import math
 import multiprocessing
@@ -18,15 +19,18 @@ import os
 import re
 import signal
 import queue
+import selectors
 import socket
+import subprocess
 import sys
 import threading
 import time
 import traceback
+import uuid
 import weakref
 from concurrent.futures import Future
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional, Sequence
 
 ENGINE_WORKER_CANCEL_POLL_S = 0.05
 ENGINE_WORKER_WATCHDOG_GRACE_S = 0.25
@@ -260,6 +264,30 @@ def _process_pid(process: Any) -> int | None:
     if pid is None:
         return None
     return int(pid)
+
+
+def _signal_worker_process(process: Any, signum: int) -> None:
+    pid = _process_pid(process)
+    if pid is None:
+        return
+    if os.environ.get(INHERIT_PROCESS_GROUP_ENV) != '1':
+        try:
+            os.killpg(pid, signum)
+            if signum != signal.SIGKILL:
+                return
+            if not process.is_alive():
+                return
+        except (AttributeError, OSError):
+            pass
+    try:
+        if signum == signal.SIGTERM:
+            process.terminate()
+        elif signum == signal.SIGKILL:
+            process.kill()
+        else:
+            os.kill(pid, signum)
+    except (AttributeError, OSError):
+        pass
 
 
 def _pool_ready_wait_s(workers: list[Any] | tuple[Any, ...]) -> float:
@@ -949,6 +977,13 @@ class WarmEngineWorker:
                     + ENGINE_WORKER_CANCEL_POLL_S
                 )
 
+    def _associate_connection(self, connection: Any) -> None:
+        """Associate subclass-owned state with a process pair's pipe."""
+
+    def _process_bootstrap_args(self) -> tuple[Any, ...]:
+        """Return arguments owned by the next process launch."""
+        return self._bootstrap_args
+
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
         self.close()
@@ -985,7 +1020,7 @@ class WarmEngineWorker:
                 child,
                 self._bootstrap,
                 self._handler,
-                self._bootstrap_args,
+                self._process_bootstrap_args(),
                 str(self.diagnostic_log_path) if self.diagnostic_log_path else None,
                 self.diagnostic_signal,
             )
@@ -996,6 +1031,7 @@ class WarmEngineWorker:
                 args=process_args,
                 daemon=self.daemon,
             )
+            self._associate_connection(parent)
         except BaseException:
             if native_output_writer is not None:
                 native_output_writer.close()
@@ -1454,7 +1490,7 @@ class WarmEngineWorker:
     ) -> None:
         with self._state_lock:
             if (
-                expected_process is not None
+                (expected_process is not None or expected_connection is not None)
                 and (
                     self.process is not expected_process
                     or self.connection is not expected_connection
@@ -1520,16 +1556,10 @@ class WarmEngineWorker:
                 if cleanup_group or (
                     process is not None and process.is_alive()
                 ):
-                    try:
-                        os.killpg(pid, signal.SIGKILL)
-                        process.join(timeout=0.1)
-                    except (AttributeError, OSError):
-                        pass
+                    _signal_worker_process(process, signal.SIGKILL)
+                    process.join(timeout=0.1)
                 if process is not None and process.is_alive():
-                    try:
-                        process.kill()
-                    except OSError:
-                        pass
+                    _signal_worker_process(process, signal.SIGKILL)
                 if process is not None:
                     process.join(timeout=1.0)
         finally:
@@ -1575,21 +1605,12 @@ class WarmEngineWorker:
             if process is not None and process_pid is not None:
                 process.join(timeout=1.0)
                 if process.is_alive():
-                    try:
-                        os.killpg(process_pid, signal.SIGTERM)
-                    except (AttributeError, OSError):
-                        process.terminate()
+                    _signal_worker_process(process, signal.SIGTERM)
                     process.join(timeout=1.0)
                 if process.is_alive():
-                    try:
-                        os.killpg(process_pid, signal.SIGKILL)
-                    except (AttributeError, OSError):
-                        process.kill()
+                    _signal_worker_process(process, signal.SIGKILL)
                     process.join(timeout=1.0)
-                try:
-                    os.killpg(process_pid, signal.SIGKILL)
-                except (AttributeError, OSError):
-                    pass
+                _signal_worker_process(process, signal.SIGKILL)
             self._finish_native_output_capture(process)
         self._reap_pending(timeout_s=1.0)
 
@@ -1623,13 +1644,7 @@ class WarmEngineWorker:
         if process is not None:
             pid = _process_pid(process)
             if pid is not None:
-                try:
-                    os.killpg(pid, signal.SIGKILL)
-                except (AttributeError, OSError, ProcessLookupError):
-                    try:
-                        process.kill()
-                    except (AttributeError, OSError, ProcessLookupError):
-                        pass
+                _signal_worker_process(process, signal.SIGKILL)
                 self._close_native_output_writer(process)
 
     def _reap_pending(self, *, timeout_s: float) -> bool:
@@ -1669,6 +1684,745 @@ class WarmEngineWorker:
 EngineWorkerTransport = WarmEngineWorker
 
 
+REMOTE_ENGINE_PROTOCOL_VERSION = 1
+REMOTE_ENGINE_MAX_LINE_BYTES = 64 * 1024
+_REMOTE_ENGINE_STDERR_BYTES = 64 * 1024
+_REMOTE_ENGINE_ERROR_DETAIL_CHARS = 1024
+_REMOTE_ENGINE_CLOSE_WAIT_S = 0.2
+
+
+class _RemoteEngineProtocolFailure(RuntimeError):
+    def __init__(self, code: str, detail: str):
+        self.failure_disposition = code
+        super().__init__(str(detail)[:_REMOTE_ENGINE_ERROR_DETAIL_CHARS])
+
+
+def _encode_remote_engine_line(
+    value: Mapping[str, Any],
+    max_line_bytes: int,
+) -> bytes:
+    try:
+        line = json.dumps(
+            value,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(',', ':'),
+        ).encode('utf-8') + b'\n'
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise _RemoteEngineProtocolFailure(
+            'invalid_request', f'request is not JSON-safe: {exc}',
+        ) from exc
+    if len(line) > max_line_bytes:
+        raise _RemoteEngineProtocolFailure(
+            'line_too_large',
+            f'request line exceeds {max_line_bytes} bytes',
+        )
+    return line
+
+
+def _unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError(f'duplicate JSON field {key!r}')
+        value[key] = item
+    return value
+
+
+class _RemoteEngineStdioProcess:
+    """One framed stdio process; stderr is drained and retained with a cap."""
+
+    def __init__(self, process: subprocess.Popen[bytes], max_line_bytes: int):
+        self.process = process
+        self.max_line_bytes = max_line_bytes
+        self.ready: dict[str, Any] = {}
+        self._stderr_lock = threading.Lock()
+        self._stderr = bytearray()
+        self._stderr_thread = threading.Thread(
+            target=self._drain_stderr,
+            name='remote-engine-stderr',
+            daemon=True,
+        )
+        self._stderr_thread.start()
+
+    def _drain_stderr(self) -> None:
+        stream = self.process.stderr
+        if stream is None:
+            return
+        try:
+            while True:
+                chunk = stream.read(4096)
+                if not chunk:
+                    return
+                with self._stderr_lock:
+                    room = _REMOTE_ENGINE_STDERR_BYTES - len(self._stderr)
+                    if room > 0:
+                        self._stderr.extend(chunk[:room])
+        except (OSError, ValueError):
+            return
+
+    def _closed_stream_failure(self) -> _RemoteEngineProtocolFailure:
+        try:
+            returncode = self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        except subprocess.TimeoutExpired:
+            returncode = None
+        with self._stderr_lock:
+            stderr = bytes(self._stderr).decode('utf-8', errors='replace').strip()
+        detail = 'remote worker closed stdout before a complete response'
+        if stderr:
+            detail = f'{detail}; stderr: {stderr[-_REMOTE_ENGINE_ERROR_DETAIL_CHARS:]}'
+        if returncode not in (None, 0):
+            return _RemoteEngineProtocolFailure(
+                'child_crash',
+                f'remote worker exited with status {returncode}; {detail}',
+            )
+        return _RemoteEngineProtocolFailure('eof', detail)
+
+    def read_json_line(self) -> dict[str, Any]:
+        stream = self.process.stdout
+        if stream is None:
+            raise _RemoteEngineProtocolFailure(
+                'startup_failure', 'remote worker stdout is unavailable',
+            )
+        pending = bytearray()
+        with selectors.DefaultSelector() as selector:
+            selector.register(stream, selectors.EVENT_READ)
+            while True:
+                selector.select()
+                chunk = os.read(
+                    stream.fileno(),
+                    min(4096, self.max_line_bytes + 1 - len(pending)),
+                )
+                if not chunk:
+                    raise self._closed_stream_failure()
+                newline = chunk.find(b'\n')
+                if newline >= 0:
+                    if len(pending) + newline + 1 > self.max_line_bytes:
+                        raise _RemoteEngineProtocolFailure(
+                            'line_too_large',
+                            f'remote line exceeds {self.max_line_bytes} bytes',
+                        )
+                    if newline + 1 != len(chunk):
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_response',
+                            'remote worker wrote more than one response line',
+                        )
+                    raw = bytes(pending) + chunk[:newline]
+                    try:
+                        value = json.loads(
+                            raw.decode('utf-8'),
+                            object_pairs_hook=_unique_json_object,
+                        )
+                    except (
+                        UnicodeDecodeError,
+                        json.JSONDecodeError,
+                        ValueError,
+                    ) as exc:
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_json', f'invalid remote JSON line: {exc}',
+                        ) from exc
+                    if not isinstance(value, dict):
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_response',
+                            'remote response must be a JSON object',
+                        )
+                    return value
+                if len(pending) + len(chunk) > self.max_line_bytes:
+                    raise _RemoteEngineProtocolFailure(
+                        'line_too_large',
+                        f'remote line exceeds {self.max_line_bytes} bytes',
+                    )
+                pending.extend(chunk)
+
+    def write_line(self, line: bytes) -> None:
+        stream = self.process.stdin
+        if stream is None:
+            raise self._closed_stream_failure()
+        view = memoryview(line)
+        try:
+            while view:
+                written = os.write(stream.fileno(), view)
+                if written <= 0:
+                    raise self._closed_stream_failure()
+                view = view[written:]
+        except (BrokenPipeError, OSError) as exc:
+            raise self._closed_stream_failure() from exc
+
+    def close(self) -> None:
+        stream = self.process.stdin
+        if stream is not None:
+            try:
+                stream.close()
+            except OSError:
+                pass
+        try:
+            self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        except subprocess.TimeoutExpired:
+            pass
+        try:
+            os.killpg(self.process.pid, signal.SIGKILL)
+        except OSError:
+            pass
+        if self.process.poll() is None:
+            try:
+                self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait()
+        self._stderr_thread.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        for stream in (self.process.stdout, self.process.stderr):
+            if stream is not None:
+                try:
+                    stream.close()
+                except (OSError, ValueError):
+                    pass
+
+
+def _remote_engine_stdio_bootstrap(
+    argv: tuple[str, ...],
+    protocol_version: int,
+    max_line_bytes: int,
+    pgid_sender: Any,
+) -> tuple[_RemoteEngineStdioProcess, dict[str, Any]]:
+    try:
+        process = subprocess.Popen(
+            argv,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=0,
+            close_fds=True,
+            shell=False,
+            start_new_session=True,
+        )
+    except (OSError, ValueError) as exc:
+        raise _RemoteEngineProtocolFailure(
+            'startup_failure', f'could not launch remote worker: {exc}',
+        ) from exc
+    try:
+        pgid_sender.send(process.pid)
+    except (BrokenPipeError, EOFError, OSError) as exc:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except OSError:
+            pass
+        process.wait()
+        raise _RemoteEngineProtocolFailure(
+            'startup_failure', f'could not report remote process group: {exc}',
+        ) from exc
+    finally:
+        pgid_sender.close()
+    client = _RemoteEngineStdioProcess(process, max_line_bytes)
+    try:
+        ready = client.read_json_line()
+        expected = {
+            'protocol_version', 'engine_version', 'datafile_fingerprint',
+        }
+        if set(ready) != expected:
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response', 'READY fields do not match the protocol',
+            )
+        ready_version = ready['protocol_version']
+        if (
+            isinstance(ready_version, bool)
+            or not isinstance(ready_version, int)
+            or ready_version != protocol_version
+        ):
+            raise _RemoteEngineProtocolFailure(
+                'protocol_version_mismatch',
+                f'expected protocol {protocol_version}, got '
+                f'{ready["protocol_version"]!r}',
+            )
+        if any(
+            not isinstance(ready[key], str)
+            for key in ('engine_version', 'datafile_fingerprint')
+        ):
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response', 'READY identity fields must be strings',
+            )
+        client.ready = ready
+        return client, ready
+    except _RemoteEngineProtocolFailure as exc:
+        client.close()
+        if exc.failure_disposition in ('eof', 'child_crash'):
+            raise _RemoteEngineProtocolFailure(
+                'startup_failure', f'remote worker failed before READY: {exc}',
+            ) from exc
+        raise
+    except BaseException:
+        client.close()
+        raise
+
+
+def _remote_engine_stdio_handler(
+    client: _RemoteEngineStdioProcess,
+    call: tuple[dict[str, Any], bytes],
+    _errlog: Any,
+) -> dict[str, Any]:
+    request, line = call
+    client.write_line(line)
+    response = client.read_json_line()
+    if response.get('request_id') != request['request_id'] or response.get(
+        'observation_id'
+    ) != request['observation_id']:
+        raise _RemoteEngineProtocolFailure(
+            'wrong_id', 'remote response ids do not match the request',
+        )
+    status = response.get('status')
+    if status == 'refused':
+        code = response.get('code')
+        detail = response.get('detail')
+        if set(response) != {
+            'request_id', 'observation_id', 'status', 'code', 'detail',
+        } or not isinstance(code, str) or not code or not isinstance(detail, str):
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response',
+                'refused response fields do not match the protocol',
+            )
+        return response
+    if status != 'produced' or set(response) != {
+        'request_id', 'observation_id', 'status', 'quantity', 'scalar', 'unit',
+        'engine_version', 'datafile_fingerprint',
+    }:
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'produced response fields do not match the protocol',
+        )
+    if response['quantity'] != request['quantity']:
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'response quantity does not match the request',
+        )
+    if any(
+        not isinstance(response[key], str)
+        for key in ('unit', 'engine_version', 'datafile_fingerprint')
+    ):
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'produced identity and unit fields must be strings',
+        )
+    if (
+        response['engine_version'] != client.ready['engine_version']
+        or response['datafile_fingerprint'] != client.ready['datafile_fingerprint']
+    ):
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'response identity differs from READY',
+        )
+    scalar = response['scalar']
+    if isinstance(scalar, bool) or not isinstance(scalar, (int, float)):
+        raise _RemoteEngineProtocolFailure(
+            'invalid_scalar', 'produced scalar must be one JSON number',
+        )
+    try:
+        finite = math.isfinite(float(scalar))
+    except (OverflowError, ValueError):
+        finite = False
+    if not finite:
+        raise _RemoteEngineProtocolFailure(
+            'non_finite_value', 'produced scalar must be finite',
+        )
+    return response
+
+
+def _remote_engine_refusal(
+    request_id: str,
+    observation_id: str,
+    code: str,
+    detail: str,
+) -> dict[str, str]:
+    return {
+        'request_id': request_id,
+        'observation_id': observation_id,
+        'status': 'refused',
+        'code': code,
+        'detail': str(detail)[:_REMOTE_ENGINE_ERROR_DETAIL_CHARS],
+    }
+
+
+def _remote_engine_failure_code(exc: BaseException, *, phase: str) -> str:
+    if isinstance(exc, _RemoteEngineProtocolFailure):
+        return exc.failure_disposition
+    if isinstance(exc, EngineWorkerTimeout):
+        return 'ready_timeout' if exc.phase == 'initialization' else 'call_timeout'
+    if isinstance(exc, EngineWorkerRemoteError):
+        if exc.failure_disposition:
+            return exc.failure_disposition
+        return 'startup_failure' if phase == 'start' else 'child_crash'
+    if isinstance(exc, EngineWorkerDied):
+        return 'startup_failure' if exc.phase in ('start', 'restart') else 'child_crash'
+    if isinstance(exc, EngineWorkerUnavailable):
+        return 'startup_failure' if phase == 'start' else 'child_crash'
+    return 'startup_failure' if phase == 'start' else 'child_crash'
+
+
+class StdioRemoteEngineWorker(WarmEngineWorker):
+    """Persistent argv-launched NDJSON worker with typed refusal results.
+
+    The first stdout line is READY with exactly ``protocol_version``,
+    ``engine_version``, and ``datafile_fingerprint``. This object owns one
+    subprocess launch for its lifetime; the pool replaces failed instances.
+    Calls accept only observation_id, quantity, and conditions; result values
+    are never cached.
+    """
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        argv: Sequence[str],
+        startup_timeout_s: float = 30.0,
+        call_timeout_s: float = 60.0,
+        max_line_bytes: int = REMOTE_ENGINE_MAX_LINE_BYTES,
+    ) -> None:
+        command = tuple(argv)
+        if not command or not command[0] or any(
+            not isinstance(part, str) for part in command
+        ):
+            raise ValueError('remote worker argv must be a nonempty string sequence')
+        if isinstance(max_line_bytes, bool) or int(max_line_bytes) < 1:
+            raise ValueError('remote worker max_line_bytes must be positive')
+        self.max_line_bytes = int(max_line_bytes)
+        self._remote_argv = command
+        self._remote_pid_receive: Any = None
+        self._remote_pid_sender: Any = None
+        self._remote_process_group_id: int | None = None
+        self._remote_pgid_lock = threading.Lock()
+        self._remote_pgid_read = False
+        self._remote_pgid_closed = False
+        self._remote_pgid_error: str | None = None
+        self._remote_startup_deadline: float | None = None
+        self._remote_started = False
+        self._remote_terminal = False
+        self._remote_start_failure: BaseException | None = None
+        self._remote_call_state = threading.local()
+        super().__init__(
+            name=name,
+            bootstrap=_remote_engine_stdio_bootstrap,
+            handler=_remote_engine_stdio_handler,
+            bootstrap_args=(),
+            startup_timeout_s=startup_timeout_s,
+            call_timeout_s=call_timeout_s,
+        )
+
+    def _process_bootstrap_args(self) -> tuple[Any, ...]:
+        sender = self._remote_pid_sender
+        if sender is None:
+            raise RuntimeError('remote worker launch pipe is unavailable')
+        return (
+            self._remote_argv,
+            REMOTE_ENGINE_PROTOCOL_VERSION,
+            self.max_line_bytes,
+            sender,
+        )
+
+    def _remote_pgid(
+        self,
+        *,
+        wait_for_report: bool = False,
+        cleanup: bool = False,
+    ) -> int | None:
+        """Read the launch PGID once and transfer it to cleanup once."""
+        with self._remote_pgid_lock:
+            if self._remote_pgid_closed and not cleanup:
+                return None
+            group_id = self._remote_process_group_id
+            if group_id is not None:
+                if cleanup:
+                    self._remote_process_group_id = None
+                return group_id
+            if self._remote_pgid_read:
+                return None
+            receive = self._remote_pid_receive
+            deadline = self._remote_startup_deadline
+            if receive is None:
+                return None
+            wait_s = (
+                max(0.0, deadline - time.monotonic())
+                if wait_for_report and deadline is not None
+                else 0.0
+            )
+            try:
+                if not receive.poll(wait_s):
+                    return None
+                group_id = receive.recv()
+            except (EOFError, OSError, ValueError) as exc:
+                self._remote_pgid_read = True
+                self._remote_startup_deadline = time.monotonic()
+                self._remote_pgid_error = (
+                    f'could not receive remote process group: {exc}'
+                )
+                return None
+            self._remote_pgid_read = True
+            # Every later cleanup now sees an expired deadline and never
+            # waits for a second report from the one-shot pipe.
+            self._remote_startup_deadline = time.monotonic()
+            if (
+                isinstance(group_id, bool)
+                or not isinstance(group_id, int)
+                or group_id <= 1
+                or group_id == os.getpgrp()
+            ):
+                self._remote_pgid_error = (
+                    f'invalid remote process group report: {group_id!r}'
+                )
+                return None
+            self._remote_process_group_id = group_id
+            if cleanup:
+                self._remote_process_group_id = None
+            return group_id
+
+    def _record_remote_failure(self, failure: BaseException) -> None:
+        with self._state_lock:
+            self._remote_terminal = True
+            if self._remote_start_failure is None:
+                self._remote_start_failure = failure
+
+    def start(self, *, timeout_s: Optional[float] = None) -> Any:
+        call_attempt = getattr(self._remote_call_state, 'attempt', None)
+        with self._state_lock:
+            if self._remote_terminal or self.disabled:
+                failure = self._remote_start_failure or (
+                    _RemoteEngineProtocolFailure(
+                        'child_crash'
+                        if self._remote_started and not self.disabled
+                        else 'startup_failure',
+                        'remote worker instance is closed or disabled',
+                    )
+                )
+                if call_attempt is not None:
+                    call_attempt['failure'] = failure
+                    return None
+                return None
+            if self._remote_started:
+                failure = _RemoteEngineProtocolFailure(
+                    'child_crash',
+                    'remote worker instances cannot start more than once',
+                )
+                if call_attempt is not None:
+                    self._remote_terminal = True
+                    self._remote_start_failure = failure
+                    call_attempt['failure'] = failure
+                    return None
+                raise RuntimeError(str(failure))
+            self._remote_started = True
+        startup_timeout = self.startup_timeout_s
+        if timeout_s is not None:
+            startup_timeout = min(
+                startup_timeout,
+                max(0.001, float(timeout_s)),
+            )
+        spawn_context = multiprocessing.get_context('spawn')
+        receive, sender = spawn_context.Pipe(duplex=False)
+        with self._remote_pgid_lock:
+            if self._remote_pgid_closed:
+                receive.close()
+                sender.close()
+                failure = _RemoteEngineProtocolFailure(
+                    'startup_failure',
+                    'remote worker was closed during startup',
+                )
+                self._record_remote_failure(failure)
+                if call_attempt is not None:
+                    call_attempt['failure'] = failure
+                    return None
+                return None
+            self._remote_pid_receive = receive
+            self._remote_pid_sender = sender
+            self._remote_startup_deadline = (
+                time.monotonic()
+                + startup_timeout
+                + ENGINE_WORKER_SPAWN_SLACK_S
+            )
+        previous_starting = getattr(
+            self._remote_call_state, 'starting', False,
+        )
+        self._remote_call_state.starting = True
+        try:
+            ready = super().start(timeout_s=timeout_s)
+        except Exception as exc:
+            self._record_remote_failure(exc)
+            if call_attempt is not None:
+                call_attempt['failure'] = exc
+            else:
+                self.close()
+            return None
+        finally:
+            if previous_starting:
+                self._remote_call_state.starting = previous_starting
+            else:
+                del self._remote_call_state.starting
+            try:
+                sender.close()
+            except (OSError, ValueError):
+                pass
+        if self._remote_pgid(wait_for_report=True) is None:
+            with self._state_lock:
+                process, connection = self.process, self.connection
+            if process is not None or connection is not None:
+                self._discard_current(
+                    diagnostic=False,
+                    expected_process=process,
+                    expected_connection=connection,
+                )
+            failure = _RemoteEngineProtocolFailure(
+                'startup_failure',
+                self._remote_pgid_error
+                or 'remote worker did not report its process group',
+            )
+            self._record_remote_failure(failure)
+            if call_attempt is not None:
+                call_attempt['failure'] = failure
+            else:
+                self.close()
+            return None
+        return ready
+
+    def _stop_remote_process_tree(
+        self,
+        process: Any,
+        connection: Any,
+    ) -> None:
+        with self._remote_pgid_lock:
+            self._remote_pgid_closed = True
+        group_id = self._remote_pgid(
+            wait_for_report=process is not None,
+            cleanup=True,
+        )
+        if group_id is not None:
+            try:
+                os.killpg(group_id, signal.SIGKILL)
+            except OSError:
+                pass
+        if (
+            process is not None
+            and process.is_alive()
+            and connection is not None
+        ):
+            try:
+                connection.send(None)
+            except (BrokenPipeError, EOFError, OSError):
+                pass
+            process.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+
+    def _stop_pair(
+        self,
+        process: Any,
+        connection: Any,
+        *,
+        diagnostic: bool,
+        cleanup_group: bool = False,
+    ) -> None:
+        with self._state_lock:
+            self._remote_terminal = True
+        self._stop_remote_process_tree(process, connection)
+        super()._stop_pair(
+            process,
+            connection,
+            diagnostic=diagnostic,
+            cleanup_group=cleanup_group,
+        )
+
+    def request_disable(self) -> None:
+        with self._state_lock:
+            self._remote_terminal = True
+            self.disabled = True
+            process, connection = self.process, self.connection
+        self._stop_remote_process_tree(process, connection)
+        super().request_disable()
+
+    def close(self) -> None:
+        if getattr(self._remote_call_state, 'starting', False):
+            WarmEngineWorker.close(self)
+            return
+        self.request_disable()
+        WarmEngineWorker.close(self)
+
+    @property
+    def replacement_required(self) -> bool:
+        with self._state_lock:
+            return self._remote_terminal
+
+    def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
+        request_id = uuid.uuid4().hex
+        observation_id = ''
+        if isinstance(request, Mapping):
+            raw_observation_id = request.get('observation_id')
+            if isinstance(raw_observation_id, str):
+                observation_id = raw_observation_id
+        expected = {'observation_id', 'quantity', 'conditions'}
+        if not isinstance(request, Mapping) or set(request) != expected:
+            return _remote_engine_refusal(
+                request_id, observation_id, 'invalid_request',
+                'call requires observation_id, quantity, and conditions',
+            )
+        if (
+            not isinstance(request['observation_id'], str)
+            or not request['observation_id']
+            or not isinstance(request['quantity'], str)
+            or not request['quantity']
+            or not isinstance(request['conditions'], Mapping)
+        ):
+            return _remote_engine_refusal(
+                request_id, observation_id, 'invalid_request',
+                'request identity, quantity, and conditions have invalid types',
+            )
+        wire_request = {
+            'request_id': request_id,
+            'observation_id': request['observation_id'],
+            'quantity': request['quantity'],
+            'conditions': request['conditions'],
+        }
+        try:
+            encoded = _encode_remote_engine_line(
+                {
+                    'protocol_version': REMOTE_ENGINE_PROTOCOL_VERSION,
+                    **wire_request,
+                },
+                self.max_line_bytes,
+            )
+        except _RemoteEngineProtocolFailure as exc:
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                exc.failure_disposition,
+                str(exc),
+            )
+        with self._state_lock:
+            terminal = self._remote_terminal or self.disabled
+            start_failure = self._remote_start_failure
+        if terminal:
+            failure = start_failure or _RemoteEngineProtocolFailure(
+                'startup_failure',
+                'remote worker instance is closed or disabled',
+            )
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                _remote_engine_failure_code(failure, phase='start'),
+                str(failure),
+            )
+        call_attempt: dict[str, Any] = {}
+        previous_attempt = getattr(
+            self._remote_call_state, 'attempt', None,
+        )
+        self._remote_call_state.attempt = call_attempt
+        try:
+            return super().call((wire_request, encoded), timeout_s=timeout_s)
+        except Exception as exc:
+            failure = call_attempt.get('failure') or exc
+            phase = 'start' if call_attempt.get('failure') is not None else 'call'
+            self._record_remote_failure(failure)
+            self.close()
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                _remote_engine_failure_code(failure, phase=phase),
+                str(failure),
+            )
+        finally:
+            if previous_attempt is None:
+                del self._remote_call_state.attempt
+            else:
+                self._remote_call_state.attempt = previous_attempt
+
+
 class EngineWorkerPool:
     """Queue-fed work-stealing pool of independent warm engine transports."""
 
@@ -1679,6 +2433,7 @@ class EngineWorkerPool:
         size: int,
     ) -> None:
         self._queue: queue.Queue[Any] = queue.Queue()
+        self._worker_factory = worker_factory
         self._workers = [worker_factory(index) for index in range(max(1, size))]
         self._threads: list[threading.Thread] = []
         self._active_requests: dict[
@@ -1894,9 +2649,26 @@ class EngineWorkerPool:
             ready.put((index, exc))
             return
         ready.put((index, None))
-        self._consume(worker)
+        self._consume(index, worker)
 
-    def _consume(self, worker: WarmEngineWorker) -> None:
+    def _replace_terminal_remote_worker(
+        self,
+        index: int,
+        worker: WarmEngineWorker,
+    ) -> WarmEngineWorker:
+        if (
+            not isinstance(worker, StdioRemoteEngineWorker)
+            or not worker.replacement_required
+        ):
+            return worker
+        with self._lifecycle_lock:
+            if self._closed or self._workers[index] is not worker:
+                return worker
+            replacement = self._worker_factory(index)
+            self._workers[index] = replacement
+            return replacement
+
+    def _consume(self, index: int, worker: WarmEngineWorker) -> None:
         while True:
             item = self._queue.get()
             try:
@@ -1928,6 +2700,9 @@ class EngineWorkerPool:
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
                         worker._end_pool_call(abort_event)
+                    worker = self._replace_terminal_remote_worker(
+                        index, worker,
+                    )
                     future.set_exception(exc)
                     del exc
                 else:
@@ -1935,6 +2710,9 @@ class EngineWorkerPool:
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
                         worker._end_pool_call(abort_event)
+                    worker = self._replace_terminal_remote_worker(
+                        index, worker,
+                    )
                     future.set_result(result)
                     del result
             finally:
