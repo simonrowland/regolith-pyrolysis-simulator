@@ -4341,25 +4341,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
-            retain_fe_activity_channel = (
-                parent_oxide == "FeO"
-                and source_activity_value is not None
+            has_positive_source_activity = (
+                source_activity_value is not None
                 and source_activity_value > 0.0
             )
-            # Fe's declared liquid activity and its d-349 conversion to the
-            # selected FeO K standard have already been computed above. The
-            # reporting floor used to drop both the pressure and that
-            # provenance, so the batch refused a real activity as a missing
-            # channel contract. Retain its positive pressure for prediction;
-            # the existing FeO/K conversion remains the sole numeric path.
-            if _publishes_vapor_pressure(
+            publish_pressure = _publishes_vapor_pressure(
                 P_eq_Pa,
-                retain_subthreshold=(
-                    retain_high_t_openimcc_carriers
-                    or retain_fe_activity_channel
-                ),
-            ):
+                retain_subthreshold=retain_high_t_openimcc_carriers,
+            )
+            # The reporting floor projects pressure values only: sub-floor Pa
+            # stays out of vapor_pressures_Pa, with the omission record as its
+            # explicit proof. A positive activity has already passed through
+            # the selected K route, so retain that route's conversion evidence
+            # even when its pressure is omitted; the batch can then mark the
+            # channel evaluated-below-floor without making it flux-active.
+            if publish_pressure:
                 vapor_pressures[species] = P_eq_Pa
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    species,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail=pressure_rail,
+                )
+
+            if publish_pressure or has_positive_source_activity:
                 ellingham_limit = ellingham_extrapolations.get(species)
                 fit_extrapolated = (
                     ellingham_limit is not None
@@ -4417,7 +4424,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     source_label = (
                         f"{source_label}:reconstructed_vapor_pressure_segment"
                     )
-                vapor_pressure_sources[species] = source_label
+                if publish_pressure:
+                    vapor_pressure_sources[species] = source_label
                 provenance: dict[str, Any] = {
                     "pressure_kind": _runtime_pressure_kind(
                         sp_data,
@@ -4513,21 +4521,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         vapor_pressure_provenance[species][
                             "vapor_activity_for_crystalline_K_standard_state_id"
                         ] = target_standard_state_id
-                if coefficient_block == COEFF_BLOCK_ANTOINE:
+                if publish_pressure and coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
                         sp_data,
                         self._pseudo_vapor_pressure_warning_seen,
                         stacklevel=2,
                     )
-            else:
-                _record_reporting_threshold_omission(
-                    below_reporting_threshold_omissions,
-                    species,
-                    P_eq_Pa,
-                    field="P_eq_Pa",
-                    pressure_rail=pressure_rail,
-                )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
