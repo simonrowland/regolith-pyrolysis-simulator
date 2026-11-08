@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 89827
-records out (observations): 180983
-works: 773
-experiments: 6893
-queue size: 121451
+rows in: 90257
+records out (observations): 182248
+works: 779
+experiments: 6903
+queue size: 123143
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 771
+index sources: 777
 hard issues: 1685
 
 ## Unavailable input work census
@@ -197,20 +197,20 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 770 (mismatch) |
-| doi_works | 56 | 417 (mismatch) |
-| no_doi_works | 91 | 356 (mismatch) |
-| admission_statuses | 374 | 30810 (mismatch) |
+| citations | 147 | 776 (mismatch) |
+| doi_works | 56 | 419 (mismatch) |
+| no_doi_works | 91 | 360 (mismatch) |
+| admission_statuses | 374 | 31179 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1359 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1921 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 639 (mismatch) |
-| formulas | 1625 | 22030 (mismatch) |
+| formulas | 1625 | 22042 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15891 (mismatch) |
+| absent_admissions | 3511 | 15952 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2958 (mismatch) |
+| range_only_T | 3125 | 3011 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -228,6 +228,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `mixed_quoted_literature_and_model_derived` | 6 |
 | `measured_direct_regression` | 3 |
 | `measured_or_compiled_characterization` | 3 |
+| `not_applicable` | 3 |
 | `measured_derived` | 2 |
 | `measured_direct_from_residue_compositions` | 2 |
 | `measured_direct_with_author_calculated_capacity` | 2 |
@@ -245,7 +246,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 177
+degradations: 180
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
@@ -258,6 +259,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `MgO·2TiO2` | 15 |
 | `MgO·SiO2` | 15 |
 | `hexagonal` | 4 |
+| `nepheline` | 3 |
 | `enstatite` | 2 |
 
 ## Per source
@@ -19071,6 +19073,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 70 | 210 |
+| `data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml` | 43 | 308 | 264 |
+| `data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml` | 54 | 616 | 357 |
 | `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` | 8 | 27 | 35 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 2 | 2 |
 | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` | 219 | 219 | 0 |
@@ -19144,6 +19148,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
 | `data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml` | 22 | 22 | 65 |
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 95 |
+| `data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml` | 13 | 21 | 19 |
 | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` | 0 | 0 | 1 |
@@ -19432,6 +19437,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/metsoc-2024-6224.yaml` | 5 | 5 | 20 |
 | `data/literature/extracts/miao-li-yan-2023-fe-v-spinel-gibbs.yaml` | 39 | 39 | 3 |
 | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` | 111 | 111 | 186 |
+| `data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` | 3 | 6 | 27 |
 | `data/literature/extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml` | 72 | 72 | 0 |
 | `data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml` | 0 | 0 | 1 |
@@ -19514,6 +19520,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/rb86-capobianco-navrotsky-1982.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/rb86-neuvonen-1952.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/rb86-stebbins-carmichael-1984.yaml` | 45 | 45 | 132 |
+| `data/literature/extracts/rb86-stebbins-etal-1984.yaml` | 275 | 275 | 919 |
 | `data/literature/extracts/rb86-takahashi-yoshio-1970.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ref-032-al.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-032-bi.yaml` | 1 | 1 | 5 |
@@ -19872,8 +19880,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 297956
+advisory issues: 298930
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 297956 |
+| `identity_incomplete` | 298930 |

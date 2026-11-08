@@ -129,6 +129,7 @@ def test_kernel_ok_empty_note_on_diagnostic_surface() -> None:
             oxygen_reservoir=None,
             melt_fO2_log=None,
         ),
+        liquid_feo_domain_at=lambda _T_K: None,
         setpoints={},
         vapor_pressures={},
         _allow_fallback_vapor=False,

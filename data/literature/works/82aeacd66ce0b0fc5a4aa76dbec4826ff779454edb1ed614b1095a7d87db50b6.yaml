@@ -1,0 +1,488 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  citation: Stebbins, J. F. and Carmichael, I. S. E. (1984), The heat of fusion of fayalite, American Mineralogist 69, 292–297.
+  source_ids:
+  - rb86-stebbins-carmichael-1984
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:rb86-stebbins-carmichael-1984
+      role: pdf
+      path: raw/rb86-stebbins-carmichael-1984/rb86-stebbins-carmichael-1984.pdf
+      sha256:
+        tag: value
+        value: 049acd9f0417fa7d8a23980ab93c21683a34a373bd8a01f76a1f2b210eee871d
+    - asset_id: pdftotext:rb86-stebbins-carmichael-1984
+      role: pdftotext
+      path: text/rb86-stebbins-carmichael-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:rb86-stebbins-carmichael-1984
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_fusion_enthalpy_calculation
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '12'
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_incongruent_fusion_1490k_1bar
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: The source states 1 bar; expressed in Pa for the identity axis.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: No sweep-gas condition is printed for the fusion calculation.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '11'
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+context:
+- observation_id: sc1984_capsule_iron_loss_and_c1_liquid_correction
+  type: iron_loss_correction_context
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    section: Run products
+  units: '% by weight as printed'
+  values:
+    c1_capsule_wall: At least 15% Fe at silicate contact, falling to near zero by 0.1 mm into platinum.
+    c1_required_iron_loss: 1–2% as FeO from sample.
+    c2_plating: Iron plating remained intact; iron precipitated on the capsule wall during melting could not be distinguished
+      from original plating.
+    c1_liquid_fe2o3_before_quench: about 3.7 ± 1 wt.% Fe2O3; also stored as a measured-reduced liquid composition observation.
+    cp_composition_corrections: The adjustment to equilibrium peritectic liquid Cp is 0.18%; correction to pure Fe2SiO4 liquid
+      Cp is 0.34%; both are much less than experimental Cp error of about 3.5% and were ignored.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_capsule_iron_loss_and_c1_liquid_correction
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_capsules_and_calorimetry_method
+  type: experimental_method_context
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    section: Calorimetry
+  units: as printed
+  values:
+    method_as_printed: Diphenyl ether drop calorimeter; reference temperature 300 K; Pt-40%Rh wire-wound furnace.
+    sample_mass_as_printed: about 2 g
+    capsules_as_printed: Capsules made from 0.25 mm Pt–10%Rh sheet and tubing; argon filled and arc sealed. C-2 interior plated
+      with about 0.03 mm iron.
+    calibration_as_printed: NBS 720 sapphire standard run once for every one or two sample drops.
+    capsule_mass_change_as_printed: Neither capsule showed weight changes greater than a few tenths of a milligram.
+    source_note: The capsule material is recorded here as printed; the argon fill is not promoted to a total-pressure condition.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_capsules_and_calorimetry_method
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_congruent_fusion_correction_and_result
+  type: fusion_result_context
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    equation: '12'
+    section: Heat of fusion calculations
+  units: kJ mol−1 and J mol−1 as printed
+  values:
+    reaction12_as_printed: Fe2SiO4(solid) = Fe2SiO4(liquid)
+    reaction13_as_printed: 0.025Fe°(sol) + 0.025Fe3O4(liq) = 0.10FeO(liq)
+    estimated_reaction_enthalpy_as_printed: 0.025 × 35 kJ mol−1 ≈ 900 J mol−1
+    hypothetical_congruent_fusion_as_printed: 89.3 ± 1.1 kJ mol−1
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_congruent_fusion_correction_and_result
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_erratum_laihunite_reference_only
+  type: erratum_context
+  locator:
+    published_page: 1198
+    section: Erratum
+    url: https://msaweb.org/AmMin/AM69/AM69_1198.pdf
+  units: bibliographic correction
+  values:
+    correction_as_printed: Erratum at American Mineralogist 69:1198 corrects the laihunite reference only, identifying G.
+      Y. Chao (1978), American Mineralogist 63, 424–425.
+    data_or_formula_change: none
+    verification: The erratum has no change to Table 1, Table 2, or any thermodynamic value or equation.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_erratum_laihunite_reference_only
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_figure1_candidate_not_extracted
+  type: figure_read_candidate
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    figure: '1'
+  units: not transcribed
+  values:
+    candidate: Additional relative-enthalpy points and the plotted fits shown in Figure 1.
+    reason_not_extracted: This wave excludes values read only from figures; Table 1 and printed equations are retained.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_figure1_candidate_not_extracted
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_incongruent_fusion_equations_and_result
+  type: fusion_result_context
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+  units: kJ mol−1 and J mol−1 as printed
+  values:
+    incongruent_fit_eq10_as_printed: ΔH_inc = 67.689T + 4.404 × 10−3 T² − 3.889 × 10^6 T−1 − 8.237 × 10−6 T³ + 7770 J mol−1
+    eq10_temperature_range: not stated
+    simplified_fit_eq11_as_printed: ΔH_inc = 119.91 T − 3.1167 × 10−2 T² − 21057 J mol−1
+    eq11_temperature_range_as_printed: 900–1900 K
+    incongruent_fusion_as_printed: 88.4 ± 1.1 kJ mol−1 at the 1 bar peritectic temperature of 1490 K.
+    error_definition: Error bracket is twice the standard error calculated from calorimetry uncertainty and an assumed 50%
+      uncertainty in peritectic liquid ferric content; quench phase-ratio uncertainty is probably smaller.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_incongruent_fusion_equations_and_result
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_inherited_solid_enthalpy_and_quench_mixture_correction
+  type: inherited_input_context
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    equation: '8'
+    section: Heat of fusion calculations
+  units: J mol−1 and J g−1 as printed
+  values:
+    attribution: Robie, Finch, and Hemingway (1982), inherited high-temperature fayalite solid enthalpy equation based on
+      Orr (1953) drop calorimetry and 5–383 K adiabatic heat capacity.
+    equation8_as_printed: H_T − H_300 = 123.80T + 3.1167 × 10−2 T² − 36771 J mol−1
+    accuracy_and_range_as_printed: Within 200 J mol−1 between 900 and 1900 K.
+    glass_correction_as_printed: If non-fayalite mixture were primarily glass, computed fusion heat could be too low by 10–15%;
+      careful microscopy found no glass and authors estimate less than 2% of sample.
+    laihunite_caveat: If the interstitial mix contained a high proportion of laihunite, precise correction could not be made
+      because thermochemical data were unavailable; the erratum changes only the laihunite reference, not measured values
+      or equations.
+    equation9_as_printed: Fe3O4(sol) + Fe°(sol) + 2SiO2(sol) = 2Fe2SiO4(sol); ΔH = −121.0 J per g magnetite, attributed to
+      Robie et al. (1979).
+    c2_magnetite_mixture_estimate: C-2 indicates 0.0946 g Fe3O4 per g sample; assuming interstitial residuum is magnetite
+      plus tridymite gives H_300^fay − H_300^mix = −11.45 J per g sample, about 2.5% of ΔH_inc.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_inherited_solid_enthalpy_and_quench_mixture_correction
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table1_fit_note
+  type: author_fit_context
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    row: runs 210–220 fit note
+    table_row_number: 17
+    table_column_number: 1
+    column: fit equation and uncertainties
+  units: J g−1 and J g−1 K−1 as printed
+  values:
+    equation_as_printed: 'runs 210–220: ΔH = 1.1960 T − 255.86 J g−1'
+    fit_uncertainty_as_printed: σ_H = 9.2 J g−1; σ_Cp = 0.045 J g−1 K−1
+    temperature_range_status: No fit temperature interval is printed; the note names runs 210–220.
+    standalone_liquid_Cp: No standalone liquid Cp is printed. The slope is retained only as a coefficient; no Cp was calculated
+      from it.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table1_fit_note
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table1_reading_census_and_reference
+  type: table_reading_census
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+  units: K and J g−1 as printed
+  values:
+    printed_reading_count: 20
+    stored_crystalline_reading_count: 8
+    stored_liquid_reading_count: 11
+    excluded_partly_molten_reading_count: 1
+    excluded_reading:
+      run: 229³
+      T_K: '1441'
+      relative_enthalpy_J_g-1: '1446.2'
+    reference_temperature_K: 300
+    reference_as_printed: Table 1 caption defines ΔH = H_T − H_300 K; the Calorimetry section states a reference temperature
+      of 300 K.
+    task_prompt_reference_discrepancy: The task wording says H(T)−H(400 K), but the paper's Table 1 and text print 300 K.
+      The extraction preserves the source's 300 K frame.
+    reading_note: Table 1 run numbers indicate measurement order; run 294 is the printed identifier and is retained unchanged.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table1_reading_census_and_reference
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table1_run229_partly_molten_excluded
+  type: excluded_table_reading
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    row: run 229³
+    table_row_number: 16
+    table_column_number: 3
+    column: ΔH
+  units: T in K; ΔH in J g−1
+  values:
+    sample_as_printed: C-1, Pt-10%Rh capsule
+    run_number_as_printed: 229³
+    temperature_K_as_printed: '1441'
+    relative_enthalpy_as_printed: '1446.2'
+    reference_temperature_K: 300
+    exclusion_reason: Superscript 3 says partly molten; the value falls between crystalline and liquid curves and is excluded
+      from the requested crystalline and fully liquid observation sets.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table1_run229_partly_molten_excluded
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table2_c2_postquench_liquid_and_iron_loss
+  type: quench_correction_context
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    section: Results and discussion
+  units: '% by weight as printed'
+  values:
+    c2_iron_loss_as_feo: about 0.5 ± 0.5%
+    c2_metal_in_bulk_analysis: about 1.5% Fe°
+    equilibrium_peritectic_liquid_fe2o3_from_iron_loss_only: 0–2 wt.%
+    quench_disproportionation: Each mole of metallic Fe formed during quench generated one mole of ferric iron; Eq. (3) is
+      2Fe2SiO4(liq) = Fe°(sol) + Fe2O3(liq) + FeO(liq) + 2SiO2(liq).
+    liquid_equilibrium_fe2o3: Table 2 footnote 7 calculates 2.1 wt.% Fe2O3 for the liquid in equilibrium with metallic iron
+      at 1520 K, assuming the metal formed during quench.
+    other_run: For Orr (1953), some fayalite apparently remained unmelted and nucleated during cooling; the paper says that
+      liquid did not apparently disproportionate on quench and cites 2.3% Fe2O3 from Bowen and Schairer.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table2_c2_postquench_liquid_and_iron_loss
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table2_method_and_precision
+  type: chemical_analysis_method_context
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    section: Analysis of samples after experiments
+  units: '% and stated relative precision'
+  values:
+    total_iron_method: Total iron determined by ammoniacal thioglycolic acid and reported as FeO.
+    ferrous_iron_methods: Colorimetric Wilson (1960) includes metallic iron as FeO; titrimetric Wilson (1955) responds differently.
+      Sensitivity was calibrated using samples with known metal amounts.
+    reduction_note: Combination of the three analyses yields ferrous, ferric, and metallic iron. Fe2O3 is calculated from
+      FeO and FeOtot; Fe° is calculated from FeOtot and two FeO analyses except zeros determined from absence of magnetic
+      material.
+    method_precision_as_printed: Total iron ±0.5% of amount present; Fe2O3 ±20%; Fe° ±50%. Errors for Fe2O3 and Fe° are larger
+      because values are calculated from small differences between large numbers.
+    confidence_level: not stated
+    post_quench_state: The analysis is of quenched bulk sample and excludes metal precipitated onto or dissolved in capsule
+      walls.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table2_method_and_precision
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
+- observation_id: sc1984_table2_theoretical_fayalite_reference
+  type: reference_composition_context
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    row: theoretical fayalite
+  units: '% by weight'
+  values:
+    SiO2_as_printed: '29.5'
+    FeO_as_printed: '70.5'
+    scope_note: Reference composition column, not an experimental run or whole-sample measurement row.
+  context_id: rb86-stebbins-carmichael-1984::context::sc1984_table2_theoretical_fayalite_reference
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  source_id: rb86-stebbins-carmichael-1984
+  species: Fe2SiO4
