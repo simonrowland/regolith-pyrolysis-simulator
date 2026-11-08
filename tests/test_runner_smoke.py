@@ -2090,7 +2090,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # to tip e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74
         # (a byte-hash change, not a numeric delta).
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "c15f0878fb124b07a2bf35f12a7b1d3d318c153fe98278cb573f5d10be9e01d"
+            "c15f0878fb124b07a2bf35f12a7b1d3d318c153fe98278cb573f5d10be9e01d4"
         )
 
 
