@@ -20,8 +20,12 @@ from simulator.condensation import (
     _chapman_enskog_d_ab_m2_s,
     _series_resistance_deposition_flux_mol_m2_s,
 )
-from simulator.state import MAX_STIR_FACTOR
+from simulator.state import MAX_STIR_FACTOR, EvaporationFlux, MeltState
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
+from simulator.overhead import (
+    OverheadGasModel,
+    _solve_same_hour_headspace_closure,
+)
 
 
 _K_BASE = {
@@ -447,75 +451,129 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
 
 
-def test_constant_temperature_multihour_sweep_closure_does_not_alternate():
-    species_masses = {
-        species: resolve_species_formula(species, {}).molar_mass_kg_per_mol()
-        for species in ("Cr", "CrO", "Fe", "SiO", "Na", "K", "Mg")
-    }
-    for species, molar_mass in species_masses.items():
+def _self_pumped_case(species, *, pipe_diameter_m=0.12):
+    molar_mass = resolve_species_formula(species, {}).molar_mass_kg_per_mol()
+    area_m2 = 0.2
+    model = OverheadGasModel({"enabled": True})
+    model.pipe_diameter_m = pipe_diameter_m
+    model.pipe_length_m = 1.0
+    melt = MeltState()
+    melt.temperature_C = 1526.85
+    melt.p_total_mbar = 100.0
+
+    def project_partials(rates_kg_hr):
+        candidate = EvaporationFlux(species_kg_hr=dict(rates_kg_hr))
+        candidate.update_totals()
+        transport = model.estimate_transport_state(candidate, melt)
+        return model.species_partial_pressures(
+            candidate,
+            transport["vapor_pressure_mbar"],
+            model.species_formula_registry,
+        )
+
+    def flux_at_partials(partials_mbar):
+        series = _evap(
+            species=species,
+            P_eq_pa=80.0,
+            P_bulk_pa=100.0 * float(partials_mbar.get(species, 0.0)),
+            T_surface_K=1800.0,
+            T_gas_K=1800.0,
+            molar_mass_kg_mol=molar_mass,
+            alpha_i=0.13,
+            knudsen_number=math.inf,
+            gas_resistance_enabled=False,
+        )
+        return {species: series.flux_kg_s_m2 * area_m2 * 3600.0}
+
+    vacuum = flux_at_partials({})
+    return model, melt, area_m2, vacuum, project_partials, flux_at_partials
+
+
+def _solve_self_pumped_case(species, *, pipe_diameter_m=0.12):
+    model, melt, area_m2, vacuum, project, flux_at = _self_pumped_case(
+        species, pipe_diameter_m=pipe_diameter_m
+    )
+    result = _solve_same_hour_headspace_closure(
+        vacuum,
+        flux_at,
+        project,
+    )
+    return model, melt, area_m2, result
+
+
+def test_constant_temperature_multihour_closure_does_not_alternate():
+    for species in ("Cr", "CrO", "Fe", "SiO", "Na", "K", "Mg"):
         hourly_fluxes = []
         for hour in range(8):
-            # Exercise the old map's alternating reset/suppression inputs;
-            # the same-hour well-mixed closure must determine P_bulk instead.
-            stale_bulk_pa = 0.0 if hour % 2 == 0 else 160.0
-            result = _evap(
-                species=species,
-                P_eq_pa=80.0,
-                P_bulk_pa=stale_bulk_pa,
-                T_surface_K=1800.0,
-                T_gas_K=1800.0,
-                molar_mass_kg_mol=molar_mass,
-                alpha_i=0.13,
-                knudsen_number=math.inf,
-                gas_resistance_enabled=False,
-                sweep_flow_m3_s=0.8021726202727705,
-                melt_surface_area_m2=0.2,
+            # Stale end-of-hour pressures alternate deliberately; each hour
+            # supplies the corresponding extreme initial rate, while the
+            # fixed point closes against its own evolved-rate projection.
+            _model, _melt, _area_m2, vacuum, project, flux_at = _self_pumped_case(
+                species
             )
-            hourly_fluxes.append(result.flux_kg_s_m2)
+            stale_bulk_mbar = 0.0 if hour % 2 == 0 else 1.6
+            result = _solve_same_hour_headspace_closure(
+                vacuum if stale_bulk_mbar == 0.0 else flux_at({species: stale_bulk_mbar}),
+                flux_at,
+                project,
+            )
+            hourly_fluxes.append(result.rates_kg_hr[species])
 
         assert all(value > 0.0 for value in hourly_fluxes), species
         for left, right in zip(hourly_fluxes, hourly_fluxes[1:]):
             assert max(left, right) / min(left, right) <= 1.01, species
 
 
-def test_sweep_closure_beta_matches_hand_value_and_pressure_balance():
-    result = _evap(
-        P_bulk_pa=0.0,
-        T_surface_K=1800.0,
-        T_gas_K=1800.0,
-        knudsen_number=math.inf,
-        gas_resistance_enabled=False,
-        sweep_flow_m3_s=0.8021726202727705,
-        melt_surface_area_m2=0.2,
-    )
-    diagnostic = result.as_diagnostic()
+def test_projected_pressure_carries_the_converged_evolved_rate():
+    model, melt, _area_m2, result = _solve_self_pumped_case("K")
 
-    assert diagnostic["beta"] == pytest.approx(0.125, rel=1e-10)
-    assert diagnostic["P_bulk_Pa"] == pytest.approx(80.0 / 1.125, rel=1e-10)
-
-
-def test_infinite_sweep_limit_matches_zero_bulk_flux_and_bounds_outflow():
-    vacuum = _evap(
-        P_bulk_pa=0.0,
-        knudsen_number=math.inf,
-        gas_resistance_enabled=False,
-    )
-    swept = _evap(
-        P_bulk_pa=75.0,
-        T_gas_K=1800.0,
-        knudsen_number=math.inf,
-        gas_resistance_enabled=False,
-        sweep_flow_m3_s=1.0e30,
-        melt_surface_area_m2=0.2,
+    candidate = EvaporationFlux(species_kg_hr=result.rates_kg_hr)
+    candidate.update_totals()
+    transport = model.estimate_transport_state(candidate, melt)
+    projected = model.species_partial_pressures(
+        candidate,
+        transport["vapor_pressure_mbar"],
+        model.species_formula_registry,
     )
 
-    assert swept.flux_kg_s_m2 == pytest.approx(vacuum.flux_kg_s_m2, rel=1e-12)
-    molar_outflow_mol_s = (
-        swept.flux_kg_s_m2 * 0.2 / _K_BASE["molar_mass_kg_mol"]
+    assert result.converged
+    assert result.iterations > 0
+    assert result.partial_pressures_mbar["K"] == pytest.approx(
+        projected["K"], rel=1e-9
     )
-    max_saturated_outflow_mol_s = (
-        1.0e30
-        * _K_BASE["P_eq_pa"]
-        / (GAS_CONSTANT_J_MOL_K * _K_BASE["T_gas_K"])
+    assert result.partial_pressures_mbar["K"] < 0.8
+
+    # For the same mixture and throughput, Poiseuille inversion gives
+    # P ∝ d^-2 (flow ∝ d^4 P^2); doubling pipe diameter quarters pressure.
+    wider = OverheadGasModel({"enabled": True})
+    wider.pipe_diameter_m = 2.0 * model.pipe_diameter_m
+    wider.pipe_length_m = model.pipe_length_m
+    wider_transport = wider.estimate_transport_state(candidate, melt)
+    assert wider_transport["vapor_pressure_mbar"] == pytest.approx(
+        transport["vapor_pressure_mbar"] / 4.0, rel=1e-9
     )
-    assert molar_outflow_mol_s <= max_saturated_outflow_mol_s
+
+
+def test_pipe_geometry_limits_recover_vacuum_and_suppress_closed_line_flux():
+    species = "K"
+    _model, _melt, _area_m2, vacuum, _project, _flux_at = _self_pumped_case(
+        species
+    )
+    _open_model, _open_melt, _open_area, open_result = _solve_self_pumped_case(
+        species, pipe_diameter_m=1.2e6
+    )
+    closed_model, closed_melt, _closed_area, closed_result = _solve_self_pumped_case(
+        species, pipe_diameter_m=1.2e-5
+    )
+
+    assert open_result.converged
+    assert open_result.rates_kg_hr[species] == pytest.approx(
+        vacuum[species], rel=1e-9
+    )
+    assert closed_result.rates_kg_hr[species] < vacuum[species] * 1e-8
+    closed_candidate = EvaporationFlux(species_kg_hr=closed_result.rates_kg_hr)
+    closed_candidate.update_totals()
+    closed_pressure = closed_model.estimate_transport_state(
+        closed_candidate, closed_melt
+    )["vapor_pressure_mbar"]
+    assert closed_pressure >= 80.0 / 100.0
