@@ -2183,10 +2183,10 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         super().request_disable()
 
     def close(self) -> None:
-        try:
-            super().close()
-        finally:
-            self._remote_process_group_id = None
+        with self._state_lock:
+            process, connection = self.process, self.connection
+        self._stop_remote_process_tree(process, connection)
+        super().close()
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         request_id = uuid.uuid4().hex

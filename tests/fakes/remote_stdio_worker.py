@@ -59,6 +59,11 @@ for line in sys.stdin:
             os._exit(23)
     if mode in ('subtree-timeout', 'subtree-close'):
         spawn_descendant(sys.argv[2], sys.argv[3])
+    if mode == 'subtree-idle-first':
+        marker = Path(sys.argv[2])
+        if not marker.exists():
+            spawn_descendant(sys.argv[3], sys.argv[4])
+            marker.write_text('spawned once', encoding='utf-8')
     if mode == 'stderr-noise':
         sys.stderr.write('fake worker diagnostic\n' * 30000)
         sys.stderr.flush()

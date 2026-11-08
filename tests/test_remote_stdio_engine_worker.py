@@ -69,6 +69,27 @@ def _kill_pids(pids: tuple[int, ...]) -> None:
             pass
 
 
+def _set_process_group_mode(monkeypatch, inherit: bool) -> None:
+    variable = 'REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP'
+    if inherit:
+        monkeypatch.setenv(variable, '1')
+    else:
+        monkeypatch.delenv(variable, raising=False)
+
+
+def _kill_wrapper(worker: StdioRemoteEngineWorker) -> None:
+    process = worker.process
+    assert process is not None
+    process.kill()
+    process.join(timeout=1.0)
+    assert not process.is_alive()
+
+
+def _assert_caller_group_unchanged(group_id: int) -> None:
+    assert os.getpgrp() == group_id
+    os.kill(os.getpid(), 0)
+
+
 def test_ready_and_produced_reply(remote_worker_factory):
     worker = remote_worker_factory('produced')
 
@@ -263,6 +284,72 @@ def test_inherited_group_replacement_kills_old_worker_subtree(
         assert first['code'] == 'child_crash'
         assert second['status'] == 'produced'
         _assert_pids_gone(pids)
+    finally:
+        worker.close()
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_close_after_wrapper_death_kills_remote_subtree(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'subtree-close', str(worker_pid_file), str(grandchild_pid_file),
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        result = worker.call(_request())
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+        if inherit:
+            assert os.getpgid(wrapper.pid) == caller_group
+
+        _kill_wrapper(worker)
+        worker.close()
+
+        assert result['status'] == 'produced'
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        worker.close()
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_replacement_after_wrapper_death_kills_remote_subtree(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    marker = tmp_path / 'remote-subtree-started.txt'
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'subtree-idle-first', str(marker), str(worker_pid_file),
+        str(grandchild_pid_file),
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        first = worker.call(_request())
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+        if inherit:
+            assert os.getpgid(wrapper.pid) == caller_group
+
+        _kill_wrapper(worker)
+        replacement = worker.call(_request())
+
+        assert first['status'] == 'produced'
+        assert replacement['status'] == 'produced'
+        assert worker.start_count == 2
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
     finally:
         worker.close()
         _kill_pids(pids)
