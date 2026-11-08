@@ -2,91 +2,10 @@ source_id: namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solub
 source:
   citation: Namur et al. (2016), Earth and Planetary Science Letters 448, 102–114
 extraction:
-  method: MinerU table draft reconciled with pdftotext and rendered table pages
+  method: >-
+    MinerU table drafts reconciled with pdftotext and rendered table pages;
+    the fO2 method is located at Equation (2), section 2.2, PDF page 3 / published page 104.
   date: '2026-11-07'
   worker: w1107sx-nm16
-cell_audit: namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.cells.csv
-tables:
-  - page: 3
-    published_page: 104
-    printed_table: '1'
-    draft_table_key: p003-t01
-    body_rows: 12 across three sections
-    disposition: context_only
-    row_groups:
-      - section: MESSENGER ratios and calculated oxide compositions
-        rows: 3
-        stored: NVP, High-Mg IcP-HCT, EH
-      - section: synthetic silicate starting compositions
-        rows: 3
-        stored: NVP, High-Mg IcP-HCT, EH
-      - section: silicate-metal-sulfide mixture ratios
-        rows: 6
-        stored: A, B, C, D, E, F
-    audit: >-
-      64 numeric body cells (78 numeric tokens) and 11 printed dash cells;
-      14 uncertainty-bearing cells retain each value and ± width together.
-      MinerU/pdftotext numeric agreement was 1.000. Full table layout and
-      flagged formula/letter cells were checked against the PDF page render.
-  - page: 7
-    published_page: 108
-    printed_table: '2'
-    draft_table_key: p007-t02
-    body_rows: 7 coefficient rows plus 5 fit-quality statistics
-    disposition: context_model_typed_unavailable
-    audit: >-
-      26 numeric body cells plus numeric thresholds of 10% and 5% in the
-      table footnotes. MinerU/pdftotext numeric agreement was 1.000. The
-      negative coefficient signs, powers of ten, row labels, 1σ column, and
-      fit-statistic alignment were checked against the PDF page render.
-supplement_status:
-  dataset_1: absent from the held corpus raw directory and the read-only supporting-files directory
-  dataset_2: absent from the held corpus raw directory and the read-only supporting-files directory
-  result: >-
-    The held postprint refers to Supplementary Dataset 1 for run-specific
-    mixtures, added Si metal, experimental conditions and method details, and
-    Supplementary Dataset 2 for run-level phase analyses including glass S.
-    No run IDs, run-specific conditions, or tabulated glass/metal/sulfide
-    compositions can be transcribed from the held main text.
-figure_read_candidates:
-  - figure: '3a'
-    page: 5
-    published_page: 106
-    candidate: Measured silicate-glass sulfur content at sulfide saturation versus delta-IW, with error bars.
-    disposition: figure-only values not extracted
-  - figure: '3b'
-    page: 5
-    published_page: 106
-    candidate: Metal and sulfide melt composition points.
-    disposition: figure-only values not extracted
-  - figure: '5'
-    page: 7
-    published_page: 108
-    candidate: Fitted versus observed SCSS model comparison and regression diagnostics.
-    disposition: figure-only values not extracted
-method_and_phase_notes:
-  fO2: >-
-    The authors calculate fO2 using SiMet + O2 = SiO2Sil (Equation 2, PDF page
-    4 / published page 105) and refer to the Appendix for details. Run-specific
-    values and Si analyses are absent with Supplementary Dataset 1.
-  quench: >-
-    The paper describes quenched silicate melt, but does not state whether
-    sulfur composition is preserved or altered on quenching. No glass result
-    rows are present in the held main-text tables, so no per-run quench status
-    can be attached.
-  conditions: >-
-    Table 1 is a starting-material table and Table 2 is a fitted-model table;
-    neither contains per-run T, P, fO2, duration, capsule, or final phase
-    compositions. The main-text prose ranges are not promoted to run rows.
-schema_gap:
-  fitted_coefficients: >-
-    Table 2 coefficients are preserved as typed-unavailable context with their
-    equation and printed 1σ widths. OBSERVATION_TYPES names the sulfur measured
-    series but not model-fit coefficients; TYPE_QUANTITY does not infer a
-    sulfur-series quantity; QUANTITY_ALIASES and Quantity have no exact SCSS
-    regression-coefficient token. interaction_parameter would be a false
-    interpretation. Symbols: tools/validate_literature_extracts.py::OBSERVATION_TYPES,
-    simulator/battery/migrate.py::TYPE_QUANTITY,
-    simulator/battery/migrate.py::QUANTITY_ALIASES,
-    simulator/battery/enums.py::Quantity.
-store_expectation: '+1 work; +3 context records; +0 scored observations; no battery-store regeneration committed'
+review_status: draft
+tables: []

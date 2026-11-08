@@ -72,11 +72,96 @@ def _assert_cell_audit() -> None:
     assert {cell["verification"] for cell in cells} == {"(b) render"}
 
 
+def _context_cells(document: dict) -> dict[tuple[str, str, str, str, str], str]:
+    rows = _context(document)
+    table1 = rows["namur2016_table1_starting_compositions"]["values"]["table_1"]
+    cells: dict[tuple[str, str, str, str, str], str] = {}
+
+    def add_cell(
+        page: str,
+        table: str,
+        section: str,
+        row: str,
+        column: str,
+        value: str,
+    ) -> None:
+        key = (page, table, section, row, column)
+        assert key not in cells
+        cells[key] = value
+
+    for section in (
+        "messenger_data",
+        "synthetic_silicate_compositions",
+        "silicate_metal_sulfide_mixture_ratios",
+    ):
+        for row_key, row in table1[section]["rows"].items():
+            row_label = str(row.get("printed_label", row_key))
+            for column, value in row.items():
+                if column != "printed_label":
+                    add_cell("3", "1", section, row_label, column, value)
+
+    table2 = rows["namur2016_table2_scss_regression"]["values"]
+    for coefficient in table2["coefficients"].values():
+        row_label = coefficient["coefficient_label_as_printed"]
+        add_cell(
+            "7", "2", "SCSS_regression", row_label, "value",
+            coefficient["value_as_printed"],
+        )
+        add_cell(
+            "7", "2", "SCSS_regression", row_label, "1_sigma",
+            coefficient["one_sigma_as_printed"],
+        )
+        add_cell(
+            "7", "2", "SCSS_regression", row_label, "p_value",
+            coefficient["p_value_as_printed"],
+        )
+    for row_label, value in table2["fit_quality"].items():
+        add_cell("7", "2", "fit_quality", row_label, "value", value)
+
+    thresholds = table2["table_footnote_thresholds"]
+    add_cell("7", "2", "table_footnote", "b", "significance_threshold", thresholds["b"])
+    add_cell(
+        "7", "2", "table_footnote", "c",
+        "regression_significance_threshold", thresholds["c"],
+    )
+    return cells
+
+
+def _assert_context_cells_match_audit(document: dict) -> None:
+    with CELL_AUDIT.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    audited = {
+        (
+            cell["page"],
+            cell["table"],
+            cell["section"],
+            cell["row"],
+            cell["column"],
+        ): cell["value_as_printed"]
+        for cell in rows
+    }
+
+    assert len(rows) == len(audited) == 103
+    assert _context_cells(document) == audited
+
+
 def test_rendered_tables_are_pinned_and_migration_retains_context_only_rows():
     document = _document()
     assert validate_extract_file(EXTRACT, check_fidelity_match=True) == []
     _assert_render_pins(document)
     _assert_cell_audit()
+    _assert_context_cells_match_audit(document)
+
+    method = _context(document)["namur2016_fO2_estimation_method"]["locator"]
+    assert (
+        method["page"],
+        method["published_page"],
+        method["section"],
+    ) == (
+        3,
+        104,
+        "2.2 Experiments, analytical methods and oxygen fugacity",
+    )
 
     mutated_value = deepcopy(document)
     _context(mutated_value)["namur2016_table1_starting_compositions"]["values"]["table_1"]["messenger_data"]["rows"]["NVP"]["Mg_Si"] = "0.310 ± 0.13"
@@ -87,6 +172,13 @@ def test_rendered_tables_are_pinned_and_migration_retains_context_only_rows():
     del _context(mutated_count)["namur2016_table1_starting_compositions"]["values"]["table_1"]["synthetic_silicate_compositions"]["rows"]["EH"]
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated_count)
+
+    mutated_context_cell = deepcopy(document)
+    _context(mutated_context_cell)["namur2016_table1_starting_compositions"][
+        "values"
+    ]["table_1"]["synthetic_silicate_compositions"]["rows"]["NVP"]["TiO2"] = "0.41"
+    with pytest.raises(AssertionError):
+        _assert_context_cells_match_audit(mutated_context_cell)
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)

@@ -78,10 +78,8 @@ species:
                   Al2O3: '–'
                   MgO: '–'
                   CaO: '–'
-              footnote_a: Calculated using elemental ratios from MESSENGER (Weider et al., 2012).
             synthetic_silicate_compositions:
               units_as_published: not stated in the table
-              note: Mixture of oxides and carbonates; minor-element source assignments follow footnote b.
               rows:
                 NVP:
                   SiO2: '58.59'
@@ -117,10 +115,6 @@ species:
                   K2O: '0.20'
                   NiO: '0.10'
                   Cr2O3: '0.10'
-              footnote_b: >-
-                K2O and Na2O calculated from Peplowski et al. (2012, 2014);
-                TiO2 and MnO contents based on Weider et al. (2014). EH
-                composition from Berthet et al. (2009).
             silicate_metal_sulfide_mixture_ratios:
               units_as_published: not stated in the table
               rows:
@@ -154,9 +148,6 @@ species:
                   FeS: '0.35'
                   Fe: '0.05'
                   S: '0.05'
-              footnote_c: >-
-                Experiment-specific silicate–metal mixtures and Si metal added
-                to the starting material are referred to Supplementary Dataset 1.
       - observation_id: namur2016_table2_scss_regression
         type: fitted_scss_regression_coefficients_and_statistics
         locator:
@@ -187,15 +178,9 @@ species:
             T is in K, P is in bar, fO2 is in bar, and X_i are oxide mole
             fractions recalculated to 100% on a sulfur-free basis.
           coefficient_uncertainty: 1σ as labeled in Table 2.
-          table_footnotes:
-            a: Standard deviation of each coefficient.
-            b: >-
-              P-values test parameter significance; only parameters significant
-              at the 10% significance level were retained.
-            c: >-
-              r² is the coefficient of determination. F and p-value test the
-              significance of the linear regression at the 5% significance
-              level. n is the number of observations.
+          table_footnote_thresholds:
+            b: '10%'
+            c: '5%'
           coefficients:
             a:
               coefficient_label_as_printed: a
@@ -247,10 +232,10 @@ species:
       - observation_id: namur2016_fO2_estimation_method
         type: oxygen_fugacity_calculation_method
         locator:
-          page: 4
-          published_page: 105
+          page: 3
+          published_page: 104
           equation: '2'
-          section: 3.1 Phase assemblages and microstructures
+          section: 2.2 Experiments, analytical methods and oxygen fugacity
           note: Authors calculate fO2 from Si in metal and SiO2 in silicate.
         units: not applicable; located calculation method
         values:
