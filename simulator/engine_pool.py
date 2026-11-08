@@ -2148,12 +2148,10 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self,
         *,
         timeout_s: float = 0.0,
-        closing: bool = False,
+        cleanup: bool = False,
     ) -> int | None:
         with self._remote_pgid_lock:
-            if closing:
-                self._remote_pgid_closed = True
-            elif self._remote_pgid_closed:
+            if self._remote_pgid_closed and not cleanup:
                 return None
             if self._remote_process_group_id is not None:
                 return self._remote_process_group_id
@@ -2186,15 +2184,18 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         *,
         closing: bool = False,
     ) -> None:
+        if closing:
+            with self._remote_pgid_lock:
+                self._remote_pgid_closed = True
         timeout_s = 0.0
-        if process is not None and process.is_alive():
+        if process is not None and _process_pid(process) is not None:
             timeout_s = max(
                 0.0,
                 self._remote_startup_deadline - time.monotonic(),
             )
         group_id = self._remote_pgid(
             timeout_s=timeout_s,
-            closing=closing,
+            cleanup=True,
         )
         if group_id is not None:
             try:

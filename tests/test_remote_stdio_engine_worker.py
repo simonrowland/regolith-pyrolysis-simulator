@@ -106,6 +106,39 @@ def test_ready_and_produced_reply(remote_worker_factory):
     assert result['scalar'] == 2.5
 
 
+def test_close_before_start_is_idempotent_and_call_restarts(remote_worker_factory):
+    worker = remote_worker_factory('produced')
+
+    worker.close()
+    worker.close()
+    result = worker.call(_request())
+
+    assert result['status'] == 'produced'
+    assert worker.start_count == 1
+    worker.close()
+    ready = worker.start()
+
+    assert ready == worker.ready_payload
+    assert worker.call(_request())['status'] == 'produced'
+    assert worker.start_count == 2
+
+
+def test_explicit_start_replaces_a_ready_worker(remote_worker_factory):
+    worker = remote_worker_factory('produced')
+    worker.call(_request())
+    previous_process = worker.process
+    assert previous_process is not None
+
+    ready = worker.start()
+
+    assert ready == worker.ready_payload
+    previous_process.join(timeout=1.0)
+    assert previous_process.exitcode is not None
+    assert not previous_process.is_alive()
+    assert worker.call(_request())['status'] == 'produced'
+    assert worker.start_count == 2
+
+
 def test_refused_reply_is_returned(remote_worker_factory):
     result = remote_worker_factory('refused').call(_request())
 
@@ -201,6 +234,64 @@ def test_call_timeout_kills_the_child(remote_worker_factory, tmp_path):
         pytest.fail(f'remote child {child_pid} remained after call timeout')
 
 
+def test_timed_out_worker_is_replaced_for_the_next_request(
+    remote_worker_factory, tmp_path,
+):
+    marker = tmp_path / 'timed-out-once.txt'
+    pid_file = tmp_path / 'timed-out-worker.pid'
+    worker = remote_worker_factory(
+        'timeout-first', str(marker), str(pid_file), call_timeout_s=0.15,
+    )
+
+    first = worker.call(_request())
+    second = worker.call(_request())
+
+    assert first['code'] == 'call_timeout'
+    assert second['status'] == 'produced'
+    assert worker.start_count == 2
+    _assert_pids_gone((int(pid_file.read_text(encoding='utf-8')),))
+
+
+def test_explicit_start_during_in_call_replaces_the_running_worker(
+    remote_worker_factory, tmp_path,
+):
+    marker = tmp_path / 'timed-out-once.txt'
+    pid_file = tmp_path / 'in-call-worker.pid'
+    worker = remote_worker_factory(
+        'timeout-first', str(marker), str(pid_file), call_timeout_s=3.0,
+    )
+    call_results: list[dict[str, object]] = []
+    call_thread = threading.Thread(
+        target=lambda: call_results.append(worker.call(_request())),
+        name='remote restart in-call',
+    )
+    call_thread.start()
+    try:
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline and not pid_file.exists():
+            time.sleep(0.01)
+        assert pid_file.exists()
+        previous_process = worker.process
+        assert previous_process is not None
+
+        ready = worker.start()
+        call_thread.join(timeout=5.0)
+
+        assert ready == worker.ready_payload
+        assert not call_thread.is_alive()
+        assert len(call_results) == 1
+        assert call_results[0]['status'] == 'refused'
+        previous_process.join(timeout=1.0)
+        assert previous_process.exitcode is not None
+        assert not previous_process.is_alive()
+        assert worker.call(_request())['status'] == 'produced'
+        assert worker.start_count == 2
+        _assert_pids_gone((int(pid_file.read_text(encoding='utf-8')),))
+    finally:
+        worker.close()
+        call_thread.join(timeout=1.0)
+
+
 def test_crashed_worker_is_replaced_for_the_next_request(
     remote_worker_factory, tmp_path,
 ):
@@ -262,6 +353,56 @@ def test_inherited_group_close_kills_worker_and_grandchild(
         _assert_pids_gone(pids)
     finally:
         worker.close()
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_close_during_in_call_kills_remote_subtree(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'subtree-timeout', str(worker_pid_file), str(grandchild_pid_file),
+        call_timeout_s=3.0,
+    )
+    call_results: list[dict[str, object]] = []
+    call_thread: threading.Thread | None = None
+    pids: tuple[int, ...] = ()
+    try:
+        call_thread = threading.Thread(
+            target=lambda: call_results.append(worker.call(_request())),
+            name='remote in-call',
+        )
+        call_thread.start()
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline and not (
+            worker_pid_file.exists() and grandchild_pid_file.exists()
+        ):
+            time.sleep(0.01)
+        assert worker_pid_file.exists() and grandchild_pid_file.exists()
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+
+        worker.close()
+        call_thread.join(timeout=5.0)
+
+        assert not call_thread.is_alive()
+        assert len(call_results) == 1
+        assert call_results[0]['status'] == 'refused'
+        assert 'scalar' not in call_results[0]
+        wrapper.join(timeout=1.0)
+        assert wrapper.exitcode is not None
+        assert not wrapper.is_alive()
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        worker.close()
+        if call_thread is not None:
+            call_thread.join(timeout=1.0)
         _kill_pids(pids)
 
 
@@ -376,17 +517,17 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
     pids: tuple[int, ...] = ()
     original_remote_pgid = worker._remote_pgid
 
-    def pause_start_pgid_read(*, timeout_s=0.0, closing=False):
+    def pause_start_pgid_read(*, timeout_s=0.0, cleanup=False):
         if (
             threading.current_thread().name == 'remote cold start'
-            and not closing
+            and not cleanup
         ):
             pgid_read_started.set()
             if not release_pgid_read.wait(timeout=5.0):
                 raise TimeoutError('test did not release startup PGID read')
         return original_remote_pgid(
             timeout_s=timeout_s,
-            closing=closing,
+            cleanup=cleanup,
         )
 
     monkeypatch.setattr(worker, '_remote_pgid', pause_start_pgid_read)
@@ -420,4 +561,116 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         worker.close()
         if start_thread is not None:
             start_thread.join(timeout=1.0)
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_close_before_popen_publication_claims_late_remote_pgid(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    from multiprocessing.context import SpawnProcess
+
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'startup-subtree-hold', str(worker_pid_file), str(grandchild_pid_file),
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+    spawn_created = threading.Event()
+    release_publication = threading.Event()
+    pgid_visible = threading.Event()
+    start_results: list[object] = []
+    cleanup_claims: list[int | None] = []
+    start_thread: threading.Thread | None = None
+    pids: tuple[int, ...] = ()
+
+    class DelayedPgidReceive:
+        def __init__(self, connection):
+            self.connection = connection
+
+        def poll(self, timeout=0.0):
+            if not pgid_visible.wait(timeout=max(0.0, timeout)):
+                return False
+            return self.connection.poll(0.0)
+
+        def recv(self):
+            return self.connection.recv()
+
+    original_popen = SpawnProcess._Popen
+    original_remote_pgid = worker._remote_pgid
+
+    def record_remote_pgid(*, timeout_s=0.0, cleanup=False):
+        group_id = original_remote_pgid(
+            timeout_s=timeout_s,
+            cleanup=cleanup,
+        )
+        if cleanup:
+            cleanup_claims.append(group_id)
+        return group_id
+
+    def gated_popen(process_obj):
+        popen = original_popen(process_obj)
+        spawn_created.set()
+        release_publication.wait(timeout=30.0)
+        return popen
+
+    monkeypatch.setattr(SpawnProcess, '_Popen', staticmethod(gated_popen))
+    monkeypatch.setattr(worker, '_remote_pgid', record_remote_pgid)
+    try:
+        start_thread = threading.Thread(
+            target=lambda: start_results.append(worker.start()),
+            name='remote spawn publication',
+        )
+        start_thread.start()
+        assert spawn_created.wait(timeout=30.0)
+
+        deadline = time.monotonic() + 10.0
+        while time.monotonic() < deadline and not (
+            worker_pid_file.exists() and grandchild_pid_file.exists()
+        ):
+            time.sleep(0.01)
+        assert worker_pid_file.exists() and grandchild_pid_file.exists()
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+        assert wrapper.pid is None
+        if inherit:
+            assert os.getpgrp() == caller_group
+
+        worker._remote_pid_receive = DelayedPgidReceive(
+            worker._remote_pid_receive,
+        )
+        worker.close()
+
+        # The OS wrapper exists, but Process.start has not published its Popen
+        # object. Cleanup could not yet observe the delayed PGID report.
+        assert wrapper.pid is None
+        for pid in pids:
+            os.kill(pid, 0)
+        pgid_visible.set()
+        release_publication.set()
+        start_thread.join(timeout=5.0)
+
+        assert not start_thread.is_alive()
+        assert start_results == [None]
+        assert any(group_id is not None for group_id in cleanup_claims)
+        wrapper.join(timeout=1.0)
+        assert wrapper.exitcode is not None
+        assert not wrapper.is_alive()
+        refusal = worker.call(_request())
+        assert refusal['status'] == 'refused'
+        assert refusal['code'] == 'startup_failure'
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        pgid_visible.set()
+        release_publication.set()
+        worker.close()
+        if start_thread is not None:
+            start_thread.join(timeout=1.0)
+        if not pids and worker_pid_file.exists() and grandchild_pid_file.exists():
+            pids = _read_pids(worker_pid_file, grandchild_pid_file)
         _kill_pids(pids)

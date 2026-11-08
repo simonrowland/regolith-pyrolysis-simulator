@@ -35,7 +35,7 @@ if mode == 'startup-failure':
     raise SystemExit(17)
 if mode == 'ready-timeout':
     time.sleep(10)
-if mode == 'startup-subtree':
+if mode in ('startup-subtree', 'startup-subtree-hold'):
     spawn_descendant(sys.argv[2], sys.argv[3])
 
 send({
@@ -66,6 +66,12 @@ for line in sys.stdin:
         if not marker.exists():
             spawn_descendant(sys.argv[3], sys.argv[4])
             marker.write_text('spawned once', encoding='utf-8')
+    if mode == 'timeout-first':
+        marker = Path(sys.argv[2])
+        if not marker.exists():
+            marker.write_text('timed out once', encoding='utf-8')
+            Path(sys.argv[3]).write_text(str(os.getpid()), encoding='utf-8')
+            time.sleep(10)
     if mode == 'stderr-noise':
         sys.stderr.write('fake worker diagnostic\n' * 30000)
         sys.stderr.flush()
@@ -113,3 +119,6 @@ for line in sys.stdin:
     elif mode == 'extra-field':
         response['series'] = [2.5]
     send(response)
+
+if mode == 'startup-subtree-hold':
+    time.sleep(60)
