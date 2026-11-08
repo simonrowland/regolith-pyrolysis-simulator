@@ -1744,4 +1744,3 @@ def test_temperature_chart_omits_unexplained_association_floor(
         if hasattr(artist, "get_text")
     )
     assert "association data floor" not in text
-
