@@ -970,6 +970,82 @@ def test_scorer_long_decimal_median_and_iqr_match_pre_r3_outputs() -> None:
         assert (None if iqr is None else str(iqr)) == expected_iqr
 
 
+def test_renderer_quartiles_use_scorer_decimal_percentile_helper(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    archive = tmp_path / "quartile-renderer.tgz"
+    _fixture_archive(archive)
+    data = hero_plot.read_scores(archive)
+    database = sqlite3.connect(":memory:")
+    database.create_collation(
+        "hero_decimal",
+        lambda left, right: (Decimal(left) > Decimal(right))
+        - (Decimal(left) < Decimal(right)),
+    )
+    database.execute(
+        """CREATE TABLE collection_unique_rows (
+               rail TEXT NOT NULL,
+               engine TEXT NOT NULL,
+               temperature_bin INTEGER NOT NULL,
+               residual_dex TEXT COLLATE hero_decimal NOT NULL,
+               temperature_K REAL NOT NULL,
+               flagged INTEGER NOT NULL,
+               source TEXT NOT NULL,
+               reference TEXT NOT NULL,
+               sio2 REAL NOT NULL,
+               composition TEXT NOT NULL,
+               species TEXT NOT NULL,
+               sio2_bin INTEGER NOT NULL,
+               temperature_key TEXT NOT NULL
+           )"""
+    )
+    values = tuple(
+        Decimal(value)
+        for value in (
+            "0.100000000000000000000000000001",
+            "0.200000000000000000000000000003",
+            "0.300000000000000000000000000007",
+            "0.900000000000000000000000000009",
+        )
+    )
+    database.executemany(
+        """INSERT INTO collection_unique_rows VALUES (
+               'vapour', 'openimcc', 15, ?, ?, 0, ?, ?, 0.4, '{}', 'SiO', 8, ?
+           )""",
+        [
+            (str(value), 1500 + index, f"source-{index}", f"reference-{index}", str(1500 + index))
+            for index, value in enumerate(values)
+        ],
+    )
+    scorer_percentiles = battery_score._battery_hero_ordered_percentiles_from_samples
+    helper_calls: list[tuple[int, dict[int, Decimal], tuple[float, ...]]] = []
+
+    def record_percentiles(
+        count: int,
+        samples: dict[int, Decimal],
+        percentiles: tuple[float, ...],
+    ) -> tuple[Decimal, ...]:
+        helper_calls.append((count, dict(samples), tuple(percentiles)))
+        return scorer_percentiles(count, samples, percentiles)
+
+    monkeypatch.setattr(
+        hero_plot, "_battery_hero_ordered_percentiles_from_samples", record_percentiles
+    )
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=data.bin_width_K
+    )
+    database.close()
+
+    expected = scorer_percentiles(4, dict(enumerate(values)), (0.25, 0.5, 0.75))
+    assert helper_calls == [(4, dict(enumerate(values)), (0.25, 0.5, 0.75))]
+    row = next(
+        row for row in tables["temperature_bins"] if row["engine"] == "openimcc"
+    )
+    assert tuple(row[field] for field in ("q1_dex", "median_dex", "q3_dex")) == tuple(
+        float(value) for value in expected
+    )
+
+
 def test_clipped_hexbin_rows_keep_temperature_and_count_all_rows(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -1095,6 +1171,49 @@ def test_collection_sample_uses_scorer_temperature_bin_at_custom_chart_width(
     sample = next(row for row in tables["sample"] if row["engine"] == "openimcc")
     assert sample["temperature_bin"] == 31
     assert sample["fingerprint_temperature_bin"] == 15
+
+
+def test_html_temperature_window_filters_sample_after_csv_round_trip(
+    tmp_path: Path,
+) -> None:
+    archive = tmp_path / "html-window-sample.tgz"
+    _many_row_archive(archive, 1200)
+    data = hero_plot.read_scores(archive)
+    files = hero_plot.render_hero_collection(
+        data,
+        archive,
+        tmp_path / "collection",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-07",
+    )
+    page = files["html"].read_text(encoding="utf-8")
+    sample_rows = json.loads(
+        page.split('id="row-data">', 1)[1].split("</script>", 1)[0]
+    )
+    outside_row = next(
+        row for row in sample_rows if float(row["temperature_K"]) >= 1600
+    )
+    assert "fingerprint_temperature_bin" in outside_row
+
+    start = page.index("function resolveBinIndex")
+    end = page.index("\nfunction updateWindowRms()", start)
+    node_script = "\n".join(
+        (
+            "const TEMPERATURE_BIN_K=100,SIO2_BIN_WIDTH=0.05;",
+            "const tMin={value:'1500'},tMax={value:'1600'},sMin={value:'0'},sMax={value:'1'};",
+            page[start:end],
+            f"const row=JSON.parse({json.dumps(json.dumps(outside_row, separators=(',', ':')))});",
+            "console.log(JSON.stringify(inWindow(row)));",
+        )
+    )
+    result = subprocess.run(
+        ["node", "-e", node_script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) is False
 
 
 def test_interactive_fingerprint_palette_uses_one_python_definition(
