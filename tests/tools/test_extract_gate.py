@@ -6,6 +6,7 @@ import subprocess
 import sys
 from copy import deepcopy
 from contextlib import nullcontext
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -14,6 +15,7 @@ import yaml
 
 import simulator.battery.extract_gate as gate
 from simulator.battery import score
+from simulator.battery.enums import Phase
 from simulator.battery.extract_gate import evaluate_extract
 from simulator.yaml_cache import load_cached_safe_yaml, yaml_mapping_source_issues
 from tools import validate_literature_extracts as validator
@@ -109,13 +111,14 @@ def _migrate_real_extract(path: Path, doc: dict, monkeypatch):
     return report, migrators[0].result
 
 
-def _direct_scorer_readiness(result):
-    from simulator.battery.generators.bench import activity_request_for_engine
-    from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
-
+def _direct_scorer_readiness(context):
     counts = {}
     row_status = {}
-    for observation in result.observations.values():
+    class PredictorReached(Exception):
+        def __init__(self, request):
+            self.request = request
+
+    for observation in context.observations.values():
         quantity = gate.quantity_token(observation.identity)
         formula = (
             observation.identity.species.formula
@@ -126,34 +129,65 @@ def _direct_scorer_readiness(result):
         name = f"{'none' if rail is None else rail.value}:" + (
             "quantity_unknown" if quantity is None else quantity.value
         )
-        experiment = result.experiments.get(observation.experiment_id)
         for engine in score.SCORE_ENGINE_SET:
-            if quantity not in score.MELT_ACTIVITY_QUANTITIES:
+            if quantity is not None and rail is None:
                 status = "not_computable"
-            elif engine.value not in MELT_ACTIVITY_ENGINES:
-                status = "not_applicable"
-            elif experiment is None:
-                status = "not_ready"
             else:
-                converted = score.fusion_comparison_reference(
-                    observation, engine=engine
-                )
-                if score._fusion_comparison_input_gap(converted, engine) is not None:
-                    status = "not_ready"
-                else:
-                    generated = activity_request_for_engine(
-                        experiment, converted, engine.value
+                def predictor_spy(requested_engine, reference, **kwargs):
+                    request = None
+                    if quantity in score.MELT_ACTIVITY_QUANTITIES:
+                        from simulator.battery.generators.bench import (
+                            activity_request_for_engine,
+                        )
+
+                        experiment = context.experiments.get(reference.experiment_id)
+                        if experiment is not None:
+                            request = activity_request_for_engine(
+                                experiment,
+                                reference,
+                                requested_engine.value,
+                                **(
+                                    {"fo2_mode": kwargs["fo2_mode"]}
+                                    if "fo2_mode" in kwargs
+                                    else {}
+                                ),
+                            )
+                    raise PredictorReached(request)
+
+                try:
+                    residual, _candidate = score.compile_residual(
+                        observation,
+                        engine,
+                        context=context,
+                        comparison_ids={observation.observation_id},
+                        predict=predictor_spy,
                     )
-                    if generated is None:
-                        status = "not_applicable"
-                    elif generated.payload is not None:
-                        status = "ready"
+                except PredictorReached as reached:
+                    if quantity in score.MELT_ACTIVITY_QUANTITIES:
+                        if reached.request is None:
+                            status = "not_applicable"
+                        elif reached.request.payload is None:
+                            status = "not_ready"
+                        else:
+                            status = "ready"
                     else:
-                        status = "not_ready"
+                        status = "ready"
+                else:
+                    assert residual.refusal is not None
+                    status = "not_ready"
             totals = counts.setdefault((name, engine.value), [0, 0, 0, 0])
             totals[{"ready": 0, "not_ready": 1, "not_computable": 2, "not_applicable": 3}[status]] += 1
             row_status[(observation.observation_id, engine.value)] = status
     return {key: tuple(totals) for key, totals in counts.items()}, row_status
+
+
+def _score_context(result):
+    return score.ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        benches=result.benches,
+    )
 
 
 def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutation(
@@ -168,7 +202,8 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
         path = REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml"
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         report, result = _migrate_real_extract(path, doc, monkeypatch)
-        expected, _rows = _direct_scorer_readiness(result)
+        context = _score_context(result)
+        expected, direct_rows = _direct_scorer_readiness(context)
         actual = {
             (row.observable, row.engine): (
                 row.ready,
@@ -201,6 +236,17 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
                 for row in report.engine_readiness
                 if row.observable == "melt_activity:activity"
             } == expected_activity
+            assert all(
+                len(row.details) == 16
+                and all(
+                    detail.input_path == "identity.reference_state"
+                    and detail.source_status == "recorded_value_unresolved"
+                    for detail in row.details
+                )
+                for row in report.engine_readiness
+                if row.observable == "melt_activity:activity"
+                and row.engine in {"alphamelts", "thermoengine"}
+            )
             for quantity_name, count in {
                 "ion_intensity": 30,
                 "ion_intensity_ratio": 15,
@@ -235,7 +281,11 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
                     for row in report.engine_readiness
                     if row.observable.endswith(f":{quantity_name}")
                 } == {
-                    engine.value: (0, 0, count, 0)
+                    engine.value: (
+                        (0, count, 0, 0)
+                        if quantity_name == "quantity_unknown"
+                        else (0, 0, count, 0)
+                    )
                     for engine in score.SCORE_ENGINE_SET
                 }
             unknown_quantity_groups = [
@@ -245,17 +295,27 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
             ]
             assert all(
                 len(row.details) == 167
-                and all(detail.input_path == "identity.quantity" for detail in row.details)
+                and all(
+                    detail.input_path == "identity.quantity"
+                    and detail.reason == "quantity_unknown"
+                    and detail.source_status == "recorded_value_unresolved"
+                    for detail in row.details
+                )
                 for row in unknown_quantity_groups
             )
             assert not any(
                 finding.check == "engine-supported-quantity-unknown"
                 for finding in report.findings
             )
-        results[source_id] = (path, doc, result)
+        results[source_id] = (path, doc, result, context, direct_rows)
 
-    kambayashi_path, kambayashi_doc, kambayashi_result = results[source_ids[0]]
-    _, baseline_rows = _direct_scorer_readiness(kambayashi_result)
+    (
+        _kambayashi_path,
+        kambayashi_doc,
+        kambayashi_result,
+        baseline_context,
+        baseline_rows,
+    ) = results[source_ids[0]]
     absent_pressure_row = next(
         row
         for _container, row in gate.migrate.iter_extract_observations(kambayashi_doc)
@@ -291,7 +351,6 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
     changed_report, changed_result = _migrate_real_extract(
         mutated_path, mutated, monkeypatch
     )
-    _, changed_rows = _direct_scorer_readiness(changed_result)
     temperature_details = [
         detail
         for group in changed_report.engine_readiness
@@ -299,7 +358,6 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
         if detail.input_path == "identity.temperature_K"
         and detail.source_status == "unrecorded"
         and baseline_rows.get((detail.observation_id, detail.engine)) == "ready"
-        and changed_rows.get((detail.observation_id, detail.engine)) == "not_ready"
     ]
     assert temperature_details
     row_id, engine = (
@@ -312,8 +370,100 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
         if row.get("observation_id") == row_id.split("::", 1)[-1]
     )
     assert raw_row.get("point_conditions", {}).get("temperature_K")
-    assert baseline_rows[(row_id, engine)] == "ready"
-    assert changed_rows[(row_id, engine)] == "not_ready"
+    original_single = replace(
+        baseline_context,
+        observations={row_id: kambayashi_result.observations[row_id]},
+    )
+    mutated_context = _score_context(changed_result)
+    changed_single = replace(
+        mutated_context,
+        observations={row_id: changed_result.observations[row_id]},
+    )
+    _, original_row_status = _direct_scorer_readiness(original_single)
+    _, changed_row_status = _direct_scorer_readiness(changed_single)
+    assert original_row_status[(row_id, engine)] == "ready"
+    assert changed_row_status[(row_id, engine)] == "not_ready"
+
+    migrated_row = kambayashi_result.observations[row_id]
+    crystalline_identity = replace(
+        migrated_row.identity,
+        species=replace(migrated_row.identity.species, phase=Phase.CR),
+    )
+    crystalline_row = replace(migrated_row, identity=crystalline_identity)
+    crystalline_context = replace(
+        baseline_context,
+        observations={row_id: crystalline_row},
+    )
+    crystalline_report = gate._observable_readiness(
+        kambayashi_doc, crystalline_context
+    )
+    _, crystalline_direct_rows = _direct_scorer_readiness(crystalline_context)
+    assert all(
+        crystalline_direct_rows[(row_id, engine.value)] == "not_ready"
+        for engine in score.SCORE_ENGINE_SET
+    )
+    assert all(
+        (row.ready, row.not_ready, row.not_computable, row.not_applicable)
+        == (0, 1, 0, 0)
+        for row in crystalline_report
+    )
+    assert all(
+        detail.input_path == "identity.species.phase"
+        and detail.reason.endswith("sample_phase_not_melt_activity_observable")
+        for row in crystalline_report
+        for detail in row.details
+    )
+
+
+def test_crystalline_activity_readiness_matches_compile_residual_predictor_spy():
+    from tests.battery.test_score import _oxide_activity_at_sample_phase
+
+    experiment, observation = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        observation_id="extract-gate-crystalline-sample",
+    )
+    context = score.ScoreContext(
+        works={},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+    )
+    doc = {
+        "source_id": observation.source_id,
+        "species": {
+            "Al2O3": {
+                "observations": [
+                    {
+                        "observation_id": observation.observation_id,
+                        "phase": "cr",
+                        "quantity": "activity",
+                    }
+                ]
+            }
+        },
+    }
+
+    expected, direct_rows = _direct_scorer_readiness(context)
+    report = gate._observable_readiness(doc, context)
+    actual = {
+        (row.observable, row.engine): (
+            row.ready,
+            row.not_ready,
+            row.not_computable,
+            row.not_applicable,
+        )
+        for row in report
+    }
+    assert actual == expected
+    assert all(
+        direct_rows[(observation.observation_id, engine.value)] == "not_ready"
+        for engine in score.SCORE_ENGINE_SET
+    )
+    assert all(
+        detail.input_path == "identity.species.phase"
+        and detail.reason.endswith("sample_phase_not_melt_activity_observable")
+        for row in report
+        for detail in row.details
+    )
 
 
 def test_source_absence_is_bound_to_exact_geometry_field_and_scope():
