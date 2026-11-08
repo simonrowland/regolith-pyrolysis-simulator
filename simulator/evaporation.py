@@ -57,6 +57,7 @@ from simulator.vapour_rail.instrumentation import (
     CONTROL_SHADOW_EQUAL_KEY,
     EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
     EffectivePressureSource,
+    VAPOUR_BATCH_NON_DEBITING_CHANNEL_STATES,
     compatibility_pressure_read_context,
     compare_live_shadow_to_batch_flux,
     finite_live_pressure_map,
@@ -1113,18 +1114,11 @@ class EvaporationMixin:
             # Species refusals stay local to those channels. If nothing in the
             # batch can debit, they are flagged and contribute zero flux; the
             # run-level resolution refusal above still fails closed.
-            _typed_non_debit = frozenset(
-                {
-                    'zero_by_physics',
-                    'upper_bound',
-                    'dormant_by_epoch',
-                    'refusal',
-                }
-            )
             if (
                 channel_states
                 and all(
-                    state in _typed_non_debit for state in channel_states.values()
+                    state in VAPOUR_BATCH_NON_DEBITING_CHANNEL_STATES
+                    for state in channel_states.values()
                 )
             ):
                 self._last_evaporation_flux_diagnostic = {
