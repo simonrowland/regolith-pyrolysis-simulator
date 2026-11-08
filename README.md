@@ -218,6 +218,14 @@ the melt by the end of the run:
 | Ti | 0.001 | 0.999 |
 | Al | 0.000 | 1.000 |
 
+⚠ **Flagged: the Na, K, Mg, Fe, Si and Cr fractions carry a known model artefact (b-1146).** Through
+the mid-run campaigns (roughly hours 57–144), the evaporation flux of these species alternates
+between full rate and exactly zero from one hour to the next. The cause is a one-hour lag in the
+headspace pressure. Where the sweep gas cannot carry the full-rate flux, the hour-to-hour average
+overstates evaporation. So these fractions may be too high, by an amount not yet known per species.
+Separately, CrO evaporation is recorded as zero on this commit, which understates Cr. Fixes are in
+progress, and this table will be refreshed from a fresh run once they land.
+
 **Refractory terminal ceramic (the rump).** This is a product, not a loss: 0.348 kg of the 1 kg charge.
 It is the `refractory_ceramic_rump` class in `product_classification`. Its composition is Al₂O₃
 39.8 wt%, CaO 32.4, MgO 21.4, TiO₂ 4.4, Cr₂O₃ 0.8, MnO 0.5 and P₂O₅ 0.3, with traces including the REEs.
@@ -237,6 +245,8 @@ figures as provisional until the train design is finished.
   Ca stays in the rump for the same reason.
 - O₂ is counted at the source, not captured.
 - The condenser train design is in progress, so capture figures are not reported in the headline (see above).
+- The Na, K, Mg, Fe, Si and Cr fractions are flagged for the alternating-hour flux artefact and the
+  missing CrO evaporation described under the table.
 - This README table is hand-copied until the nightly hero golden exists.
 
 ### What this run does NOT yet show
