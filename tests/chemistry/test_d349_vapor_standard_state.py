@@ -26,6 +26,9 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
 )
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    vapor_pressure_omission_proof,
+)
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.vapour_rail.batch import FluxEligible, PressureValue, VapourBatch
 from simulator.vapour_rail.instrumentation import (
@@ -265,6 +268,10 @@ def _assert_d354_omission_reaches_batch_and_accounting(
     species,
 ):
     omission = diagnostic["below_reporting_threshold_omissions"][species]
+    assert vapor_pressure_omission_proof(omission) == (
+        omission["reporting_threshold_Pa"],
+        omission["computed_pressure_Pa"],
+    )
     channel = batch.channel(species)
     assert channel.extra["channel_state"] == "evaluated_below_reporting_floor"
     assert channel.extra["below_reporting_threshold_omission"] == omission
