@@ -554,10 +554,10 @@ def test_ceramic_rump_panel_renders_available_omission_state_and_reason():
     )
     content = rendered["text"]["ceramic-rump-content"]
 
-    assert "status available" in content
-    assert "state evaluated_below_reporting_floor" in content
+    assert "status: available" in content
+    assert "state: evaluated_below_reporting_floor" in content
     assert (
-        "reason vapor pressure was computed below its reporting floor"
+        "reason: vapor pressure was computed below its reporting floor"
         in content
     )
 
