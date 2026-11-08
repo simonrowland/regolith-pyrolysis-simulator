@@ -6435,6 +6435,13 @@ def test_petthermotools_activity_coefficients_are_multiplied_by_mole_fraction():
         result.diagnostics['diagnostic_activity_source']
         == 'activity_coefficients_times_oxide_mole_fraction'
     )
+    assert result.diagnostics['activities_standard_state'] == {
+        'convention': 'raoultian_pure_endmember',
+        'phase': 'liquid',
+        'reference_pressure_bar': 1.0,
+        'reference_temperature_K': None,
+        'component_basis': 'raoultian_pure_endmember',
+    }
 
 
 def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():

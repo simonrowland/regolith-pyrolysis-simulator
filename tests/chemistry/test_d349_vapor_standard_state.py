@@ -1717,18 +1717,37 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             expected_pressures[species], rel=1e-10, abs=0
         )
 
+    diagnostic_input = {
+        "pO2_bar": 1.0,
+        "source_reaction_fO2_bar": 1.0,
+        "source_reaction_fO2_log10": 0.0,
+        "source_reaction_activity_pressure_bar": 1.0,
+        "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
+        "source_reaction_composition_wt_pct": dict(composition_wt_pct),
+    }
+    if activities:
+        activity_diagnostics, _ = backend._activity_diagnostic_payload(activities)
+        diagnostic_input.update(activity_diagnostics)
+        diagnostic_input.update(
+            {
+                "diagnostic_activity_source": "melt_oxide_activities",
+                "activities_standard_state": {
+                    "convention": "raoultian_pure_endmember",
+                    "phase": "liquid",
+                    "reference_pressure_bar": 1.0,
+                    "reference_temperature_K": None,
+                    "component_basis": "raoultian_pure_endmember",
+                },
+            }
+        )
     diagnostics = backend._vapor_pressure_diagnostics(
-        {
-            "pO2_bar": 1.0,
-            "source_reaction_fO2_bar": 1.0,
-            "source_reaction_fO2_log10": 0.0,
-            "source_reaction_activity_pressure_bar": 1.0,
-            "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
-            "source_reaction_composition_wt_pct": dict(composition_wt_pct),
-        },
+        diagnostic_input,
         projection,
         "alphamelts_fallback",
     )
+    if activities:
+        assert diagnostics["activities"]["Na2O"] == activities["Na2O"]
+        assert diagnostics["activities_standard_state"]["phase"] == "liquid"
     sim._last_vapor_pressure_diagnostic = diagnostics
     sim._last_vapor_pressures_source = backend._vapor_pressure_source_map(
         projection,
