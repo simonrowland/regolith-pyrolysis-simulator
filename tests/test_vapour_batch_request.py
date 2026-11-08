@@ -2218,15 +2218,23 @@ def test_pre_rg_missing_activity_declaration_fails_closed_for_claimed_channel() 
         )
 
 
-def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None:
+def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None:
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     )
 
+    standard_state = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase="liquid",
+        reference_pressure_bar=1.0,
+        component_basis="raoultian_pure_endmember",
+        identity_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        component_id="MgO",
+    )
     declaration = ActivityInputDeclaration(
         component_id="MgO",
-        standard_state=_TEST_ACTIVITY_STANDARD_STATE,
+        standard_state=standard_state,
         activity_model="provider_reported_thermodynamic_activity",
         require_assemblage_match=False,
     )
@@ -2245,6 +2253,16 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
         has_route=True,
         has_formula=True,
         source_reaction_activity=declaration,
+        evidence=MappingProxyType({
+            "vapor_activity_source_standard_state_id": (
+                MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+            ),
+            "vapor_activity_source_standard_state_phase": "liquid",
+            "vapor_k_standard_state_id": (
+                MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+            ),
+            "vapor_k_standard_state_phase": "solid",
+        }),
     )
 
     class Evaluator:
@@ -2262,9 +2280,7 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
         source_reaction_activities={"Mg": 0.25},
         source_reaction_activity_provider="builtin-vapor-pressure",
         source_reaction_activity_evidence_refs={"Mg": "test:d349"},
-        source_reaction_activity_standard_states={
-            "Mg": _TEST_ACTIVITY_STANDARD_STATE
-        },
+        source_reaction_activity_standard_states={"Mg": standard_state},
         source_reaction_activity_provenance={
             "Mg": {
                 "melt_oxide_activity_reference_state": (
@@ -2279,22 +2295,39 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
         },
     )
 
-    with pytest.raises(VapourRequestConstructionError):
-        resolve_vapour_batch(
-            rules=(rule,),
-            ledger_snapshot={"process.cleaned_melt": {"MgO": 1.0}},
-            state=state,
-            catalog_species={
-                "Mg": SimpleNamespace(
-                    species_id="Mg",
-                    evaluator=Evaluator(),
-                    vaporisation_coefficients=SimpleNamespace(
-                        evaporation_alpha={"value": 1.0}
-                    ),
-                )
-            },
-            flux_activation_context=_pre_rg_activation_context("Mg"),
-        )
+    from simulator.chemistry.melt_activity import _activity_for_crystalline_vapor_k
+
+    expected_activity, _, _ = _activity_for_crystalline_vapor_k(
+        "MgO",
+        0.25,
+        1773.15,
+        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="solid",
+    )
+    batch = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"MgO": 1.0}},
+        state=state,
+        catalog_species={
+            "Mg": SimpleNamespace(
+                species_id="Mg",
+                evaluator=Evaluator(),
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            )
+        },
+        flux_activation_context=_pre_rg_activation_context("Mg"),
+    )
+    answer = batch.channel("Mg")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(expected_activity)
+    assert not any(
+        notice.get("kind") == "fe_channel_reference_state_predict_and_flag"
+        for notice in answer.extra.get("notices", ())
+    )
 
 
 def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
