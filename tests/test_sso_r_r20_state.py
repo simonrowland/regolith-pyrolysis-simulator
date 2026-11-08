@@ -3266,7 +3266,7 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
 
 
-def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:
+def test_native_fe_partition_closes_against_same_hour_headspace() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 10.0
@@ -3274,12 +3274,31 @@ def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -
     sim.overhead.composition = {"Fe": 0.001}
 
     diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    closure = diagnostic["same_hour_headspace_closure"]
+    projected = EvaporationFlux(
+        species_kg_hr=dict(closure["rates_kg_hr"])
+    )
+    projected.update_totals()
+    transport = sim.overhead_model.estimate_transport_state(
+        projected,
+        sim.melt,
+        p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
+    )
+    partials = sim.overhead_model.species_partial_pressures(
+        projected,
+        transport["vapor_pressure_mbar"],
+        sim.species_formula_registry,
+    )
 
-    assert diagnostic["P_bulk_Pa"] == pytest.approx(400.0)
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(partials.get("Fe", 0.0) * 100.0)
+    assert diagnostic["P_bulk_Pa"] != pytest.approx(400.0)
 
     sim._melt_headspace_composition_mbar = {"O2": 10.0}
-    diagnostic = sim._native_fe_partition_diagnostic(1.0)
-    assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
+    repeated = sim._native_fe_partition_diagnostic(1.0)
+    assert repeated["P_bulk_Pa"] == pytest.approx(diagnostic["P_bulk_Pa"])
+    assert repeated["native_fe_vapor_mol"] == pytest.approx(
+        diagnostic["native_fe_vapor_mol"]
+    )
 
 
 def test_native_fe_saturation_uses_upstream_total_pressure(
@@ -3339,7 +3358,7 @@ def test_native_fe_saturation_refuses_invalid_ferric_fraction() -> None:
             )
 
 
-def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
+def test_c7_transport_closes_against_same_hour_headspace() -> None:
     sim = _make_sim()
     cfg = dict(sim._c7_campaign_config())
     cfg.update(
@@ -3356,8 +3375,38 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
         cfg,
         ca_per_extent=3.0,
     )
+    closure = diagnostic["same_hour_headspace_closure"]
+    projected = EvaporationFlux(
+        species_kg_hr=dict(closure["rates_kg_hr"])
+    )
+    projected.update_totals()
+    transport = sim.overhead_model.estimate_transport_state(
+        projected,
+        sim.melt,
+        p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
+    )
+    partials = sim.overhead_model.species_partial_pressures(
+        projected,
+        transport["vapor_pressure_mbar"],
+        sim.species_formula_registry,
+    )
 
-    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)
+    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(
+        partials.get("Ca", 0.0) * 100.0
+    )
+    assert diagnostic["c7_ca_p_bulk_pa"] != pytest.approx(300.0)
+
+    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    _extent, repeated = sim._c7_transport_extent_mol(
+        cfg,
+        ca_per_extent=3.0,
+    )
+    assert repeated["c7_ca_p_bulk_pa"] == pytest.approx(
+        diagnostic["c7_ca_p_bulk_pa"]
+    )
+    assert repeated["transport_ca_mol"] == pytest.approx(
+        diagnostic["transport_ca_mol"]
+    )
 
 
 def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:
