@@ -13877,27 +13877,44 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def _score_store_with_decisions(
+@dataclass(frozen=True)
+class _PreparedScoreRun:
+    context: ScoreContext
+    engine_set: tuple[Engine, ...]
+    refs: tuple[Observation, ...]
+    fusion_diagnostic_ids: frozenset[str]
+    comparison_ids: frozenset[str]
+    observations: Mapping[str, Observation]
+    origins: Mapping[str, str]
+    live_context: ScoreContext
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]]
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]]
+    ratchet_missing: bool
+    source_bands: Mapping[str, DecisionBand]
+    source_band_reasons: Mapping[str, str]
+    kems_partial_pressure_band: DecisionBand | None
+    series_point_counts: Mapping[str, int]
+
+
+def _prepare_score_run(
     context: ScoreContext,
     *,
-    engines: Sequence[Engine] | None = None,
-    rail: Rail | None = None,
-    work_id: str | None = None,
-    limit: int | None = None,
-    include_diagnostics: bool = True,
-    measured_only: bool = False,
-    predict: Callable[..., EnginePrediction] | None = None,
-    handles: Mapping[str, object] | None = None,
-    _stream: _ResidualJsonlStream | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    engines: Sequence[Engine] | None,
+    rail: Rail | None,
+    work_id: str | None,
+    limit: int | None,
+    include_diagnostics: bool,
+    measured_only: bool,
+) -> _PreparedScoreRun:
+    """Build the shared candidate and index inputs for one score run."""
+
     engine_set = (
         _validated_score_engines(tuple(engines))
         if engines is not None
         else SCORE_ENGINE_SET
     )
-    provided_handles = dict(handles or {})
-    resolved_handles = dict(provided_handles)
-    refs = list(comparison_candidates(context))
+    comparison_observations = comparison_candidates(context)
+    refs = list(comparison_observations)
     fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
@@ -13937,7 +13954,11 @@ def _score_store_with_decisions(
     if rail is not None:
         kept: list[Observation] = []
         for obs in refs:
-            quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
+            quantity = (
+                quantity_token(obs.identity)
+                if isinstance(obs.identity, Identity)
+                else None
+            )
             formula = (
                 obs.identity.species.formula
                 if isinstance(obs.identity, Identity)
@@ -13950,33 +13971,16 @@ def _score_store_with_decisions(
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
-    from simulator.battery.compilation_tier import (
-        _compilation_series_point_count,
-        _iter_compilation_series_cells,
-        is_compilation_evidence,
-    )
 
-    comparison_ids = {o.observation_id for o in comparison_candidates(context)}
-    residuals: list[Residual] | None = [] if _stream is None else None
-    candidates: dict[str, Observation] = {}
-    # Snapshot. Engine candidates are returned separately and are not
-    # lineage inputs. The work-input index is this snapshot.
+    from simulator.battery.compilation_tier import _compilation_series_point_count
+    from simulator.battery.validate import build_printed_thermo_index
+
     observations = dict(context.observations)
     origins = context.origins
     live_context = replace(context, observations=observations, origins=origins)
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    empirical_ids = comparison_ids
-    started = time.monotonic()
-    last_progress = started
-    done = 0
-    total = sum(
-        _compilation_series_point_count(obs, origins.get(obs.observation_id))
-        for obs in refs
-    ) * max(len(engine_set), 1)
-    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
-
     table_index = build_printed_thermo_index(observations)
     ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
         context.root
@@ -13987,6 +13991,82 @@ def _score_store_with_decisions(
     kems_partial_pressure_band = derive_kems_partial_pressure_band(
         observations, context.experiments, benches=context.benches
     )
+    series_point_counts = {
+        obs.observation_id: _compilation_series_point_count(
+            obs, origins.get(obs.observation_id)
+        )
+        for obs in refs
+    }
+    return _PreparedScoreRun(
+        context=context,
+        engine_set=tuple(engine_set),
+        refs=tuple(refs),
+        fusion_diagnostic_ids=frozenset(fusion_diagnostic_ids),
+        comparison_ids=frozenset(o.observation_id for o in comparison_observations),
+        observations=observations,
+        origins=origins,
+        live_context=live_context,
+        point_observations_by_experiment=point_observations_by_experiment,
+        table_index=table_index,
+        ratchet_missing=ratchet_missing,
+        source_bands=source_bands,
+        source_band_reasons=source_band_reasons,
+        kems_partial_pressure_band=kems_partial_pressure_band,
+        series_point_counts=series_point_counts,
+    )
+
+
+def _score_store_with_decisions(
+    context: ScoreContext,
+    *,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    measured_only: bool = False,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+    _stream: _ResidualJsonlStream | None = None,
+) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    prepared = _prepare_score_run(
+        context,
+        engines=engines,
+        rail=rail,
+        work_id=work_id,
+        limit=limit,
+        include_diagnostics=include_diagnostics,
+        measured_only=measured_only,
+    )
+    engine_set = prepared.engine_set
+    refs = prepared.refs
+    fusion_diagnostic_ids = prepared.fusion_diagnostic_ids
+    comparison_ids = prepared.comparison_ids
+    observations = prepared.observations
+    origins = prepared.origins
+    live_context = prepared.live_context
+    point_observations_by_experiment = prepared.point_observations_by_experiment
+    table_index = prepared.table_index
+    ratchet_missing = prepared.ratchet_missing
+    source_bands = prepared.source_bands
+    source_band_reasons = prepared.source_band_reasons
+    kems_partial_pressure_band = prepared.kems_partial_pressure_band
+    provided_handles = dict(handles or {})
+    resolved_handles = dict(provided_handles)
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        is_compilation_evidence,
+    )
+
+    residuals: list[Residual] | None = [] if _stream is None else None
+    candidates: dict[str, Observation] = {}
+    empirical_ids = comparison_ids
+    started = time.monotonic()
+    last_progress = started
+    done = 0
+    total = sum(prepared.series_point_counts.values()) * max(len(engine_set), 1)
+    from simulator.battery.validate import bound_work_inputs
+
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
