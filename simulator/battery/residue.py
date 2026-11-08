@@ -25,6 +25,9 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    vapor_pressure_omission_proof,
+)
 
 
 _SECONDS_PER_HOUR = 3_600.0
@@ -1192,26 +1195,6 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     return numeric
 
 
-def _omission_proof(record: object) -> tuple[float, float] | None:
-    """Return threshold and computed pressure when the record is a real proof."""
-
-    if not isinstance(record, Mapping):
-        return None
-    try:
-        threshold_pa = float(record.get("reporting_threshold_Pa"))
-        computed_pa = float(record.get("computed_pressure_Pa"))
-    except (TypeError, ValueError):
-        return None
-    if (
-        not math.isfinite(threshold_pa)
-        or not math.isfinite(computed_pa)
-        or computed_pa < 0.0
-        or computed_pa > threshold_pa
-    ):
-        return None
-    return threshold_pa, computed_pa
-
-
 def _translate_recorded_pressure_omissions(
     pressures: dict[str, float],
     response: object,
@@ -1242,7 +1225,7 @@ def _translate_recorded_pressure_omissions(
     )
 
     for key, record in omissions.items():
-        proof = _omission_proof(record)
+        proof = vapor_pressure_omission_proof(record)
         if proof is None or not isinstance(record, Mapping):
             continue
         if str(record.get("species")) != str(key):
