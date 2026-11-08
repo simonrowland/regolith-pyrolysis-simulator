@@ -4710,7 +4710,8 @@ def fusion_comparison_reference(
                 reason=(
                     "MELTS liquid-endmember reference differs from the JANAF "
                     f"liquid reference; applied shift is approximate; {gap}; "
-                    "source=docs-private/research/2026-10-02-melts-vs-janaf-liquid/findings.md"
+                    "source=tests/battery/test_score.py::"
+                    "test_melts_liquid_reference_gap_is_attached_to_fusion_shift"
                 ),
                 origin=reference.observation_id,
                 band="MELTS/JANAF liquid reference gap",

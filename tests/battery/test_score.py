@@ -15323,7 +15323,8 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
         item.kind is NoticeKind.DERIVATION_USES_COMPILATION
         and "applied shift is approximate" in item.reason
         and bound in item.reason
-        and "2026-10-02-melts-vs-janaf-liquid/findings.md" in item.reason
+        and "source=tests/battery/test_score.py::"
+        "test_melts_liquid_reference_gap_is_attached_to_fusion_shift" in item.reason
         for item in converted.notices
     )
 

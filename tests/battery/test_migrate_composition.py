@@ -3319,6 +3319,95 @@ def test_retained_phase_102_to_105_total_renormalizes_with_notice(
     assert notice.band == "95-102 wt% printed phase total"
 
 
+@pytest.mark.parametrize(
+    ("trace_name", "case_id"),
+    (("XxO", "unrecognized-oxide"), ("note", "unrecognized-label")),
+)
+def test_retained_elemental_trace_keeps_projection_notice_after_load(
+    tmp_path: Path,
+    trace_name: str,
+    case_id: str,
+) -> None:
+    components = {"Fe": "99.8", trace_name: "0.2"}
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "retained-elemental-trace",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": components},
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.update(
+        {
+            "observation_id": "retained-elemental-trace",
+            "experiment": "retained-elemental-trace",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    observation["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "50",
+    }
+
+    result = migrate(
+        _write_min_tree(tmp_path / case_id, extract),
+        write=False,
+    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+    migrated = result.observations[
+        "fixture-source::retained-elemental-trace"
+    ]
+    assert migrated.identity.composition is not None
+    assert migrated.identity.composition.is_value
+    assert migrated.identity.composition.value.as_map() == {
+        "Fe": Decimal("99.8")
+    }
+    condition = migrated.point_conditions["composition"]
+    assert condition.state.is_value
+    assert condition.inference is not None
+    assert any(
+        item
+        == "projected trace components omitted from engine composition: "
+        f"{trace_name}=0.2 wt%"
+        for item in condition.inference.inputs
+    )
+    assert "projected trace mass fraction: 0.002" in condition.inference.inputs
+    projection_notices = [
+        notice
+        for notice in migrated.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert len(projection_notices) == 1
+    assert projection_notices[0].dropped == (trace_name,)
+    assert projection_notices[0].dropped_mass_fraction == Decimal("0.002")
+
+    loaded = migrate_module._point_condition_from_plain(
+        to_plain(condition), key="composition"
+    )
+    assert loaded.state == condition.state
+    assert loaded.locator == condition.locator
+    assert loaded.inference == condition.inference
+    loaded_notice = migrate_module._composition_projection_notice(
+        loaded,
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        origin="loaded-retained-elemental-trace",
+    )
+    assert loaded_notice is not None
+    assert loaded_notice.dropped == (trace_name,)
+    assert loaded_notice.dropped_mass_fraction == Decimal("0.002")
+
+
 def test_taniguchi_407_composition_load_preserves_elemental_component() -> None:
     extract_path = (
         REPO_ROOT

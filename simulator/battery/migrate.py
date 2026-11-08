@@ -2391,7 +2391,13 @@ def _composition_located_from_plain(
                 locator=locator,
             )
         if component_vocabulary == "elemental":
-            derivation = serialized_inference
+            derivation = _mass_percent_composition_derivation(
+                wt,
+                locator,
+                closure_result=closure_result,
+                component_vocabulary="elemental",
+                base_derivation=serialized_inference,
+            )
         else:
             accepted_wt = _oxide_mass_percent_components(wt)
             derivation = _mass_percent_composition_derivation(
@@ -5624,26 +5630,62 @@ def _mass_percent_composition_derivation(
     locator: Locator | None,
     *,
     closure_result: _MassPercentClosureResult,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
+    base_derivation: Derivation | None = None,
     source_note: object = None,
     admitted: bool = True,
-) -> Derivation:
-    derivation = wt_pct_to_mole_fraction_derivation(
-        wt, locator, source_note=source_note
-    )
+) -> Derivation | None:
+    if base_derivation is not None:
+        derivation = base_derivation
+    elif component_vocabulary == "elemental":
+        derivation = None
+    else:
+        derivation = wt_pct_to_mole_fraction_derivation(
+            wt, locator, source_note=source_note
+        )
     if not admitted:
         return derivation
     kept_total = closure_result.kept_total
-    if (
+    renormalized = (
         kept_total is not None
         and _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total
         <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
-    ):
+    )
+    if component_vocabulary == "elemental":
+        if derivation is None and renormalized:
+            derivation = Derivation(
+                relation="mass_percent_renormalization",
+                inputs=(),
+                parameters=(),
+                output_unit="wt_percent",
+            )
+        if derivation is not None and renormalized:
+            renormalization_input = (
+                "renormalized to 100 wt% from printed phase total "
+                f"S={kept_total} wt% (d-336 item 2)"
+            )
+            derivation = replace(
+                derivation,
+                relation=(
+                    "mass_percent_renormalization"
+                    if derivation.relation == "as_published"
+                    else derivation.relation
+                ),
+                inputs=tuple(
+                    dict.fromkeys((*derivation.inputs, renormalization_input))
+                ),
+            )
+    elif derivation is not None and renormalized:
         derivation = replace(
             derivation,
-            inputs=(
-                *derivation.inputs,
-                f"renormalized to 100 wt% from kept oxide total S={kept_total} wt% "
-                "(d-336 item 2)",
+            inputs=tuple(
+                dict.fromkeys(
+                    (
+                        *derivation.inputs,
+                        "renormalized to 100 wt% from kept oxide total "
+                        f"S={kept_total} wt% (d-336 item 2)",
+                    )
+                )
             ),
         )
     dropped = dict(closure_result.dropped_components)
@@ -5660,14 +5702,25 @@ def _mass_percent_composition_derivation(
             # Projection is dropped mass divided by the full printed analysis
             # total: 0.435 / 99.935 = 0.004353 for the Taniguchi-like map.
             dropped_mass_fraction = dropped_mass / printed_total
+            if derivation is None:
+                derivation = Derivation(
+                    relation="as_published",
+                    inputs=(),
+                    parameters=(),
+                    output_unit="mass_percent",
+                )
             derivation = replace(
                 derivation,
-                inputs=(
-                    *derivation.inputs,
-                    "projected trace components omitted from engine composition: "
-                    + detail,
-                    "projected trace mass fraction: "
-                    + str(dropped_mass_fraction),
+                inputs=tuple(
+                    dict.fromkeys(
+                        (
+                            *derivation.inputs,
+                            "projected trace components omitted from engine composition: "
+                            + detail,
+                            "projected trace mass fraction: "
+                            + str(dropped_mass_fraction),
+                        )
+                    )
                 ),
             )
     return derivation
@@ -7337,22 +7390,12 @@ def _mass_percent_composition_located(
     inference = None
     if state.is_value:
         if component_vocabulary == "elemental":
-            kept_total = closure_result.kept_total
-            assert kept_total is not None
-            if (
-                _MASS_PERCENT_RENORMALIZE_ABOVE
-                < kept_total
-                <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
-            ):
-                inference = Derivation(
-                    relation="mass_percent_renormalization",
-                    inputs=(
-                        "renormalized to 100 wt% from printed phase total "
-                        f"S={kept_total} wt% (d-336 item 2)",
-                    ),
-                    parameters=(),
-                    output_unit="wt_percent",
-                )
+            inference = _mass_percent_composition_derivation(
+                wt,
+                locator,
+                closure_result=closure_result,
+                component_vocabulary="elemental",
+            )
         else:
             inference = _mass_percent_composition_derivation(
                 _oxide_mass_percent_components(wt),
@@ -28327,6 +28370,16 @@ class Migrator:
             refusal.closure_refusal
             for refusal in point_composition_refusal_classifications
         )
+        missing_major_for_initial_charge = (
+            _missing_major_oxide_names(raw_item, point_declared_component_map)
+            if (
+                point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+                and composition_unknown_reason(point_composition_refusal)
+                == "mass-percent composition contains invalid component cells"
+            )
+            else ()
+        )
+        preserve_initial_charge_identity = bool(missing_major_for_initial_charge)
         if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
@@ -28380,6 +28433,14 @@ class Migrator:
                         and ident_kwargs["composition"].is_value
                     )
                 )
+            )
+            and not (
+                preserve_initial_charge_identity
+                and isinstance(ident_kwargs.get("composition"), State)
+                and ident_kwargs["composition"].is_value
+                and isinstance(ident_kwargs["composition"].value, Composition)
+                and ident_kwargs["composition"].value.proxy_flag
+                == INITIAL_CHARGE_ONLY_PROXY_FLAG
             )
             and not (
                 point_mass_closure_refused
@@ -29308,6 +29369,14 @@ class Migrator:
                         identity, total_pressure_Pa=State.of(pressure_pa)
                     )
         if point_composition_refusal:
+            composition_reason = composition_unknown_reason(
+                point_composition_refusal
+            )
+            if missing_major_for_initial_charge:
+                composition_reason = (
+                    "missing major oxides: "
+                    + ", ".join(missing_major_for_initial_charge)
+                )
             child_printed_map = _source_printed_composition_values(
                 point_oxide_map, raw_item
             )
@@ -29350,9 +29419,7 @@ class Migrator:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": Located(
-                    State.unknown(
-                        composition_unknown_reason(point_composition_refusal)
-                    ),
+                    State.unknown(composition_reason),
                     locator=point_locator,
                 ),
             }
