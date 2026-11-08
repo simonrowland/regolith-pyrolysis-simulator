@@ -1137,15 +1137,14 @@ class ThermoEngineTransport:
         if config_version is not None:
             native_identity = config_version
         else:
-            module_path = getattr(thermoengine, '__file__', 'unknown')
             native_identity = (
                 f'thermoengine MELTS {melts_version} '
-                f'(liq_mod {liq_model}; {module_path})'
+                f'(liq_mod {liq_model})'
             )
             warn_legacy_once(
                 'thermoengine',
                 'engines.local.toml absent; using legacy ThermoEngine '
-                'path-based identity for cache comparison',
+                'release identity for cache comparison',
             )
         self.engine_version = _thermoengine_cache_identity(native_identity)
         return True

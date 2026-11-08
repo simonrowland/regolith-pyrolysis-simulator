@@ -9,6 +9,7 @@ import subprocess
 import sys
 import warnings
 from pathlib import Path
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -168,6 +169,115 @@ def test_config_absent_fallback_uses_binary_digest(
         "binary SHA-256 identity" in str(item.message)
         for item in caught
     )
+
+
+def test_magemin_fallback_uses_release_and_binary_digest_without_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import magemin as magemin_module
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    binary_path = tmp_path / "MAGEMin"
+    binary_path.write_bytes(b"fake-MAGEMin-build")
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "missing-engines.local.toml",
+    )
+
+    reported_version = "MAGEMin 1.9.6"
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        "run",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 0, stdout=reported_version, stderr=""
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._binary_path = binary_path
+    backend._database = "ig"
+
+    version = backend.get_engine_version()
+
+    expected = engine_local_config._cache_version_for_binary(
+        "magemin", binary_path, reported_version
+    )
+    assert expected is not None
+    assert version == expected
+    assert "digest=sha256:" in version
+    assert str(tmp_path) not in version
+
+    def fail_probe(*_args, **_kwargs):
+        raise OSError("probe unavailable")
+
+    monkeypatch.setattr(magemin_module.subprocess, "run", fail_probe)
+    fallback = backend.get_engine_version()
+    expected_fallback = engine_local_config._cache_version_for_binary(
+        "magemin", binary_path, "MAGEMin"
+    )
+    assert fallback == expected_fallback
+    assert "digest=sha256:" in fallback
+    assert str(tmp_path) not in fallback
+
+
+def test_thermoengine_fallback_version_omits_module_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import thermoengine as transport_module
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "missing-engines.local.toml",
+    )
+    monkeypatch.setattr(
+        transport_module, "_load_thermoengine_phaseobjc_library", lambda: None
+    )
+    fake_thermoengine = ModuleType("thermoengine")
+    fake_thermoengine.__file__ = str(tmp_path / "private" / "thermoengine.py")
+    fake_thermoengine.chem = object()
+    fake_thermoengine.equilibrate = SimpleNamespace(
+        MELTSmodel=lambda **_kwargs: None
+    )
+    fake_thermoengine.model = SimpleNamespace(
+        Database=lambda **_kwargs: SimpleNamespace(
+            get_phase=lambda _name: object()
+        )
+    )
+    monkeypatch.setitem(sys.modules, "thermoengine", fake_thermoengine)
+
+    transport = object.__new__(transport_module.ThermoEngineTransport)
+    transport._model_name = "MELTSv1.0.2"
+    transport._initialize_in_process()
+    backend = object.__new__(ThermoEngineBackend)
+    backend._thermoengine_transport = transport
+    backend._engine_version = transport.engine_version
+
+    version = backend.get_engine_version()
+
+    assert version == (
+        "thermoengine MELTS 1.0.2 (liq_mod v1.0) "
+        "(adapter=regolith-thermoengine-v2)"
+    )
+    assert str(tmp_path) not in version
+
+
+def test_vaporock_engine_version_emitter_is_directly_exercised() -> None:
+    from simulator.melt_backend.vaporock import VapoRockBackend
+
+    backend = object.__new__(VapoRockBackend)
+    assert backend.get_engine_version() == "unavailable"
+
+
+def test_openimcc_engine_version_emitter_is_directly_exercised() -> None:
+    from simulator.melt_backend.openimcc_bridge import OpenImccMeltBackend
+
+    backend = object.__new__(OpenImccMeltBackend)
+    backend._pack = SimpleNamespace(model_id="OpenIMCC", version="1.2.3")
+    assert backend.get_engine_version() == "OpenIMCC 1.2.3"
 
 
 def test_warn_legacy_once_respects_always_filter() -> None:
