@@ -284,7 +284,7 @@ def test_knudsen_total_pressure_sensitivity_above_row_band_refuses(
 
     residual, _candidate = compile_residual(
         reference,
-        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
         context=context,
         prediction=prediction,
         derived_band=DecisionBand(
