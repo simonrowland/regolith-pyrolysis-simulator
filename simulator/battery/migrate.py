@@ -7210,6 +7210,8 @@ def _mass_percent_composition_located(
         # those retained metals as dropped components.
         source_map = declared_component_map or wt
         raw_components: dict[str, Decimal] = {}
+        unsupported_components: dict[str, Decimal] = {}
+        seen_names: set[str] = set()
         contains_element = False
         direct_refusal: str | None = None
         for raw_name, raw_amount in source_map.items():
@@ -7227,24 +7229,44 @@ def _mass_percent_composition_located(
                     f"mass-percent composition has unsupported component {name!r}"
                 )
                 break
-            if name in raw_components:
+            if name in seen_names:
                 direct_refusal = "mass-percent composition has duplicate component keys"
                 break
-            raw_components[name] = amount
-            contains_element = (
-                contains_element or name in ATOMIC_WEIGHTS_G_PER_MOL
+            seen_names.add(name)
+            recognized = (
+                name in _COMPOSITION_COMPONENTS
+                or _kume_formula_unit_oxide(name) is not None
+                or _metallic_element_symbol(name) is not None
             )
+            if recognized:
+                raw_components[name] = amount
+                contains_element = (
+                    contains_element or _metallic_element_symbol(name) is not None
+                )
+            else:
+                unsupported_components[name] = amount
         if contains_element and raw_components:
-            total = _mass_percent_kept_total(
-                raw_components,
-                closure_context=closure_context,
-                retain_components=True,
-            )
-            direct_refusal = direct_refusal or _percent_composition_closure_error(
-                raw_components,
-                "mass",
-                mass_kept_total=total,
-            )
+            unsupported_mass = sum(unsupported_components.values(), Decimal("0"))
+            if unsupported_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+                details = ", ".join(
+                    f"{name}={amount} wt%"
+                    for name, amount in unsupported_components.items()
+                )
+                direct_refusal = (
+                    "partial analysis contains unsupported component(s) above "
+                    f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}"
+                )
+            if direct_refusal is None:
+                total = _mass_percent_kept_total(
+                    raw_components,
+                    closure_context=closure_context,
+                    retain_components=True,
+                )
+                direct_refusal = _percent_composition_closure_error(
+                    raw_components,
+                    "mass",
+                    mass_kept_total=total,
+                )
             if direct_refusal is not None:
                 state = State.unknown(direct_refusal)
             else:

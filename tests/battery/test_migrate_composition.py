@@ -2843,6 +2843,23 @@ def test_retained_phase_composition_closes_with_same_row_sulfur() -> None:
     )
 
 
+@pytest.mark.parametrize("unsupported", ("XxO", "Na2O_plus_K2O"))
+def test_retained_phase_composition_refuses_unsupported_components_over_drop_limit(
+    unsupported: str,
+) -> None:
+    located = migrate_module._mass_percent_composition_located(
+        {"Fe": Decimal("99"), unsupported: Decimal("1")},
+        basis="printed_phase_composition",
+        locator=None,
+    )
+
+    assert located.state.is_unknown
+    assert located.state.reason == (
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        f"{unsupported}=1 wt%"
+    )
+
+
 def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
     extract_path = (
         REPO_ROOT
