@@ -49,12 +49,15 @@ def _worker_fixture() -> ScoreContext:
     )
 
 
-def _score_rows_and_summary(context: ScoreContext, path: Path, workers: int) -> tuple[bytes, bytes]:
+def _score_rows_and_summary(
+    context: ScoreContext, path: Path, workers: int | None
+) -> tuple[bytes, bytes]:
+    options = {} if workers is None else {"workers": workers}
     written, metadata = _score_store_to_jsonl(
         context,
         path,
         engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
-        workers=workers,
+        **options,
     )
     assert written > 0
     partial_path = path.with_name(path.name + ".partial")
@@ -72,7 +75,7 @@ def _score_rows_and_summary(context: ScoreContext, path: Path, workers: int) -> 
 
 def test_serial_scoring_fixture_has_stable_canonical_rows(tmp_path: Path) -> None:
     rows, _summary = _score_rows_and_summary(
-        _worker_fixture(), tmp_path / "serial.jsonl", workers=1
+        _worker_fixture(), tmp_path / "serial.jsonl", workers=None
     )
     canonical_rows = b"\n".join(rows.splitlines()[1:])
     assert hashlib.sha256(canonical_rows).hexdigest() == (
