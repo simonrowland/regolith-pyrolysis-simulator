@@ -125,6 +125,13 @@ def _assert_traced_kg(rendered: str, field: str, amount: float, *, state: str | 
     )
 
 
+def _assert_unavailable_kg(rendered: str, field: str) -> None:
+    field_state, inner = _field(rendered, field)
+    assert field_state == "unavailable", f"{field} state {field_state} != unavailable"
+    assert "unavailable" in inner
+    assert "title=" not in inner
+
+
 def _state_chips(fragment: str) -> list[str]:
     return re.findall(r'data-p11-state-chip="([^"]+)"', fragment)
 
@@ -412,7 +419,6 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     block, classification = _mars()
     html = _render(_wrapped(block))
     metals = classification["metals_plus_O2"]
-    silica = classification["pure_silica_glass"]
     mixed = classification["industrial_mixed_glass"]
     rump = classification["refractory_ceramic_rump"]
     volatiles = classification["captured_volatiles"]
@@ -428,20 +434,12 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
         metals_card, "class_total_kg", metals["class_total_kg"], state="qualified-product"
     )
     _assert_traced_kg(metals_card, "O2_kg", metals["O2_kg"], state="qualified-product")
-    _assert_traced_kg(
-        silica_card,
-        "class_total_kg",
-        silica["class_total_kg"],
-        state="flagged-unqualified-capture",
-    )
-    _assert_traced_kg(
-        silica_card,
-        "stage_3_capture_kg",
-        silica["stage_3_capture_kg"],
-        state="flagged-unqualified-capture",
-    )
+    # d-349 now exports refused silica carrier evidence as null with an
+    # unavailable producer flag; P11 must not turn that null into a kg value.
+    _assert_unavailable_kg(silica_card, "class_total_kg")
+    _assert_unavailable_kg(silica_card, "stage_3_capture_kg")
     chips = _assert_exclusive_silica_chips(silica_card)
-    assert chips == ["flagged capture · not a product"]
+    assert chips == []
     assert "qualified silica product" not in silica_card
     _assert_traced_kg(
         mixed_card,
@@ -470,12 +468,8 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     assert "sec-p11-card--rump" in html
     assert "physical floor" in block["markdown"] or "by physics" in block["markdown"]
     assert "by physics" in rump_card
-    _assert_traced_kg(
-        volatiles_card,
-        "class_total_kg",
-        volatiles["class_total_kg"],
-        state="qualified-product",
-    )
+    # d-349's carrier refusals leave the captured-volatile total explicitly unavailable.
+    _assert_unavailable_kg(volatiles_card, "class_total_kg")
     # This fixture's CO is classified as terminal.offgas/offgas_vented by
     # yield_disposition, not as captured-volatiles product. The older fixture
     # predated that accounting distinction.
@@ -484,7 +478,7 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     assert offgas_co["destination"] == "offgas_vented"
     assert offgas_co["terminal_kg"] > 0.0
     assert "not a product" in block["markdown"]
-    assert "flagged capture · not a product" in silica_card
+    assert "flagged capture · not a product" not in silica_card
     assert "early-tap" in mixed_card
     assert not re.search(r">PURE<", html)
     assert "INDETERMINATE" not in html
@@ -502,7 +496,8 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     _assert_traced_kg(attack_card, "stage_3_capture_kg", 10.0)
     assert 'title="13 kg"' not in attack_card
     assert 'title="13.0 kg"' not in attack_card
-    assert _assert_exclusive_silica_chips(attack_card) == ["qualified silica product"]
+    # The synthetic positive total retains d-349's producer availability flag.
+    assert _assert_exclusive_silica_chips(attack_card) == ["flagged silica product"]
 
 
 def test_p11_absent_block_sample_is_not_emitted() -> None:
@@ -554,12 +549,14 @@ def test_p11_unqualified_silica_consume_only_no_derived_third_number() -> None:
     derived = 4.5 - 1.0
 
     _assert_traced_kg(silica_card, "stage_3_capture_kg", 4.5)
-    _assert_traced_kg(silica_card, "class_total_kg", 1.0, state="qualified-product")
+    # The producer flag is unavailable Si evidence, not b-1129's FeO liquidus
+    # diagnostic; a synthetic positive total that keeps the flag stays flagged.
+    _assert_traced_kg(silica_card, "class_total_kg", 1.0, state="flagged-product")
     _assert_traced_kg(silica_card, "stage_3_kg_by_species.SiO", 4.5)
     assert f'title="{_js_num(derived)} kg"' not in html
     assert "unqualified_capture_kg" not in html
     assert "4.5−1" not in html and "4.5-1" not in html and "4.5 - 1" not in html
-    assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]
+    assert _assert_exclusive_silica_chips(silica_card) == ["flagged silica product"]
     assert 'title="5.5 kg"' not in html
 
 
@@ -673,7 +670,7 @@ def test_p11_missing_stage_3_capture_is_unavailable_with_reason() -> None:
 
 
 def test_p11_does_not_read_p15_unwrapped_path() -> None:
-    block, classification = _mars()
+    block, _ = _mars()
     block["pure_silica_glass"] = {
         "stage_3_capture_kg": 99.0,
         "class_total_kg": 88.0,
@@ -681,10 +678,11 @@ def test_p11_does_not_read_p15_unwrapped_path() -> None:
     }
     html = _render(_wrapped(block))
     silica_card = _card(html, "silica")
-    real = classification["pure_silica_glass"]
 
-    _assert_traced_kg(silica_card, "class_total_kg", real["class_total_kg"])
-    _assert_traced_kg(silica_card, "stage_3_capture_kg", real["stage_3_capture_kg"])
+    # d-349 records unavailable producer values explicitly; the unwrapped P15
+    # copy must not replace either unavailable P11 quantity with a number.
+    _assert_unavailable_kg(silica_card, "class_total_kg")
+    _assert_unavailable_kg(silica_card, "stage_3_capture_kg")
     assert 'title="99 kg"' not in silica_card
     assert 'title="88 kg"' not in silica_card
     assert 'title="99.0 kg"' not in silica_card
@@ -708,7 +706,7 @@ def test_p11_unwrapped_only_block_is_not_sufficient() -> None:
     assert "qualified silica product" not in html
 
     # Merge-after-classificationPresent must also fail this test (F6).
-    block, classification = _mars()
+    block, _ = _mars()
     block["pure_silica_glass"] = {
         "stage_3_capture_kg": 99.0,
         "class_total_kg": 88.0,
@@ -716,9 +714,10 @@ def test_p11_unwrapped_only_block_is_not_sufficient() -> None:
     }
     present_html = _render(_wrapped(block))
     silica_card = _card(present_html, "silica")
-    real = classification["pure_silica_glass"]
-    _assert_traced_kg(silica_card, "class_total_kg", real["class_total_kg"])
-    _assert_traced_kg(silica_card, "stage_3_capture_kg", real["stage_3_capture_kg"])
+    # d-349 emits the authoritative P11 quantities as unavailable; the
+    # unwrapped P15 copy must not replace them with fabricated values.
+    _assert_unavailable_kg(silica_card, "class_total_kg")
+    _assert_unavailable_kg(silica_card, "stage_3_capture_kg")
     assert 'title="88 kg"' not in silica_card
     assert 'title="99 kg"' not in silica_card
     assert 'title="88.0 kg"' not in silica_card
@@ -760,7 +759,9 @@ def test_p11_ci_runner_captured_volatiles_trace_emitted_species() -> None:
     volatiles_card = _card(html, "volatiles")
     rump = classification["refractory_ceramic_rump"]
 
-    _assert_traced_kg(volatiles_card, "class_total_kg", volatiles["class_total_kg"])
+    # The d-349 vapor-batch refusal metadata leaves this class total explicitly
+    # unavailable; rendering JSON null as a kilogram value would hide that state.
+    _assert_unavailable_kg(volatiles_card, "class_total_kg")
     # H2O is also a terminal.offgas/offgas_vented stream in this fixture; the
     # product card must not present it as a captured volatile.
     assert "H2O" not in volatiles["kg_by_species"]
@@ -843,7 +844,9 @@ process.stdout.write(JSON.stringify(ids));
 def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
     mars_block, _ = _mars()
     mars_card = _card(_render(_wrapped(mars_block)), "silica")
-    assert _assert_exclusive_silica_chips(mars_card) == ["flagged capture · not a product"]
+    # The d-349 Mars row has unavailable capture and no explicit non-product
+    # capture marker, so P11 emits no route chip for it.
+    assert _assert_exclusive_silica_chips(mars_card) == []
 
     lunar_block, lunar_cls = _lunar()
     lunar_silica = lunar_cls["pure_silica_glass"]
@@ -879,9 +882,11 @@ def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
 
 def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
     source = PANEL.read_text(encoding="utf-8")
+    # The regenerated d-349 fixture carries a producer flag, so its positive
+    # synthetic class mass takes the flagged-product route.
     mutant = source.replace(
-        'return chip("qualified silica product");',
-        'return chip("qualified silica product") + flagChip("flagged capture · not a product");',
+        'return flagChip("flagged silica product");',
+        'return flagChip("flagged silica product") + flagChip("flagged capture · not a product");',
         1,
     )
     assert mutant != source
@@ -890,7 +895,7 @@ def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
     html = _render(_wrapped(block), panel_source=mutant)
     silica_card = _card(html, "silica")
     chips = _state_chips(silica_card)
-    assert "qualified silica product" in chips
+    assert "flagged silica product" in chips
     assert "flagged capture · not a product" in chips
     assert len(chips) >= 2
 
@@ -943,7 +948,8 @@ def test_p11_indeterminate_classification_kg_is_no_material() -> None:
     assert state == "indeterminate"
     assert "no material" in inner
     assert "title=" not in inner
-    assert _assert_exclusive_silica_chips(silica_card) == ["flagged capture · not a product"]
+    # The unavailable d-349 row has no explicit non-product capture marker.
+    assert _assert_exclusive_silica_chips(silica_card) == []
     assert "qualified silica product" not in silica_card
 
     classification["pure_silica_glass"]["class_total_kg"] = "INDETERMINATE"
@@ -951,7 +957,7 @@ def test_p11_indeterminate_classification_kg_is_no_material() -> None:
     string_state, string_inner = _field(string_card, "class_total_kg")
     assert string_state == "indeterminate"
     assert "no material" in string_inner
-    assert _assert_exclusive_silica_chips(string_card) == ["flagged capture · not a product"]
+    assert _assert_exclusive_silica_chips(string_card) == []
 
 
 def test_p11_rump_class_total_is_not_hardcoded_floor_gloss() -> None:

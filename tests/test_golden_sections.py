@@ -84,7 +84,13 @@ def test_runner_section_layout_matches_pinned_expectations(generated_runner_sect
     # Fe stratification records: the t-1579 hot face raises Stage-1 train Fe
     # from 0.3653496257 to 3.5411372009 kg while bottom-pool Fe goes from
     # 0.6609858418 kg to absent, so those late Fe-pool records no longer emit.
-    # Thus 532 - 10 + 1 = 523 sections. Mars and CI each add the trap section.
+    # Thus lunar 532 - 10 + 1 = 523 sections. The d-349 crystalline Fe-vapor
+    # guard now refuses channels without converted source/K provenance; the
+    # prior green runner stored that Fe status under per-hour condensation.
+    # The refusal is retained at vapour_batch.refusals_by_species, so the
+    # regenerated Mars and CI runs no longer emit those per-hour sections for
+    # hours 0-5 and 0-9 respectively: 286 - 6 = 280 and 284 - 10 = 274.
+    # Mars and CI each still add the stage_4b_k_trap section.
     for scenario, (_, directory) in generated_runner_sections.items():
         files = read_sections(directory)
         # Content pins certify the historical migration, not future golden values.
