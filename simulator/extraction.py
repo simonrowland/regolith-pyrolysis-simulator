@@ -3789,7 +3789,7 @@ class ExtractionMixin:
         self._last_c7_ca_silent_zero_notes = {
             'silent_zero_notes': [dict(n) for n in _c7_sz_notes],
         }
-        p_bulk_pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Ca'))
+        p_bulk_pa = 0.0
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(
             (getattr(self, 'setpoints', {}) or {})
@@ -3805,52 +3805,143 @@ class ExtractionMixin:
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
+        closure = None
+        active_ca_transport = (
+            cf7_ca_shell_route_active
+            and C7_MIN_TOTAL_PRESSURE_MBAR
+            <= p_total_mbar
+            <= C7_MAX_TOTAL_PRESSURE_MBAR
+        )
+        if active_ca_transport:
+            from simulator.overhead import _solve_same_hour_headspace_closure
+            from simulator.transport_regime import continuum_validity_refuses
+
+            melt_resistance = bool(
+                series_config.get('melt_resistance_enabled', False)
+            )
+            gas_resistance = bool_feature_flag(
+                series_config, 'gas_resistance_enabled', True
+            )
+            radial_stir = self._c7_float(cfg.get('radial_stir_factor'), 1.0)
+            melt_renewal_base = self._c7_float(
+                series_config.get('melt_surface_renewal_base_kg_s_m2_pa'),
+                0.0,
+            )
+            melt_renewal_source = str(
+                series_config.get(
+                    'melt_surface_renewal_source',
+                    'disabled:missing-species-state-dependent-'
+                    'melt-transfer-inputs',
+                )
+            )
+
+            def series_flux_at(bulk_Pa, total_pressure_Pa):
+                try:
+                    return _series_resistance_evaporation_flux_kg_m2_s(
+                        species='Ca',
+                        P_eq_pa=p_sat_pa,
+                        P_bulk_pa=bulk_Pa,
+                        T_surface_K=hold_temp_K,
+                        molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
+                        alpha_i=ca_alpha,
+                        knudsen_number=None,
+                        pipe_diameter_m=pipe_diameter_m,
+                        overhead_pressure_pa=total_pressure_Pa,
+                        axial_stir_factor=requested_stir,
+                        radial_stir_factor=radial_stir,
+                        cold_skull_envelope={
+                            'frozen_skull_stir_ceiling': max(
+                                0.0, cold_skull_safe
+                            )
+                        },
+                        carrier_gas=carrier_gas,
+                        T_gas_K=gas_temperature_K,
+                        melt_resistance_enabled=melt_resistance,
+                        gas_resistance_enabled=gas_resistance,
+                        melt_surface_renewal_base_kg_s_m2_pa=(
+                            melt_renewal_base
+                        ),
+                        melt_surface_renewal_source=melt_renewal_source,
+                    )
+                except EvaporationFluxConfigurationError as exc:
+                    raise evaporation_flux_refusal_from_configuration_error(
+                        exc
+                    ) from exc
+
+            def ca_rate_at_partials(partials_mbar):
+                projected_bulk_Pa = max(
+                    0.0, float(partials_mbar.get('Ca', 0.0)) * 100.0
+                )
+                total_pressure_Pa = max(
+                    p_total_mbar * 100.0,
+                    sum(
+                        max(0.0, float(value))
+                        for value in partials_mbar.values()
+                    ) * 100.0,
+                )
+                candidate = series_flux_at(
+                    projected_bulk_Pa, total_pressure_Pa
+                )
+                domain = viscous_p_bulk_out_of_domain_diagnostic(
+                    knudsen_number=float(candidate.knudsen_number),
+                    overhead_pressure_pa=total_pressure_Pa,
+                    pipe_diameter_m=pipe_diameter_m,
+                    gas_temperature_K=gas_temperature_K,
+                    carrier_gas=str(carrier_gas),
+                    campaign_name='C7_CA_ALUMINOTHERMIC',
+                    asking_site='extraction.c7_ca_transport',
+                )
+                if continuum_validity_refuses(domain):
+                    return {'Ca': 0.0}
+                return {
+                    'Ca': max(0.0, float(candidate.flux_kg_s_m2))
+                    * area_m2 * 3600.0
+                }
+
+            def ca_partials_at_rates(rates_kg_hr):
+                candidate = EvaporationFlux(
+                    species_kg_hr={
+                        'Ca': max(0.0, float(rates_kg_hr.get('Ca', 0.0)))
+                    }
+                )
+                candidate.update_totals()
+                transport = self.overhead_model.estimate_transport_state(
+                    candidate,
+                    self.melt,
+                    p_downstream_bar=self._headspace_downstream_pressure_bar(
+                        None
+                    ),
+                )
+                return self.overhead_model.species_partial_pressures(
+                    candidate,
+                    transport['vapor_pressure_mbar'],
+                    self.species_formula_registry,
+                )
+
+            seed = series_flux_at(0.0, p_total_mbar * 100.0)
+            closure = _solve_same_hour_headspace_closure(
+                {
+                    'Ca': max(0.0, float(seed.flux_kg_s_m2))
+                    * area_m2 * 3600.0
+                },
+                ca_rate_at_partials,
+                ca_partials_at_rates,
+            )
+            p_bulk_pa = max(
+                0.0,
+                float(closure.partial_pressures_mbar.get('Ca', 0.0)) * 100.0,
+            )
+            overhead_pressure_pa = max(
+                p_total_mbar * 100.0,
+                sum(
+                    max(0.0, float(value))
+                    for value in closure.partial_pressures_mbar.values()
+                ) * 100.0,
+            )
         if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
         ):
-            try:
-                series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-                    species='Ca',
-                    P_eq_pa=p_sat_pa,
-                    P_bulk_pa=p_bulk_pa,
-                    T_surface_K=hold_temp_K,
-                    molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
-                    alpha_i=ca_alpha,
-                    knudsen_number=None,
-                    pipe_diameter_m=pipe_diameter_m,
-                    overhead_pressure_pa=overhead_pressure_pa,
-                    axial_stir_factor=requested_stir,
-                    radial_stir_factor=self._c7_float(
-                        cfg.get('radial_stir_factor'), 1.0),
-                    cold_skull_envelope={
-                        'frozen_skull_stir_ceiling': max(0.0, cold_skull_safe)
-                    },
-                    carrier_gas=carrier_gas,
-                    T_gas_K=gas_temperature_K,
-                    melt_resistance_enabled=bool(
-                        series_config.get('melt_resistance_enabled', False)
-                    ),
-                    gas_resistance_enabled=bool_feature_flag(
-                        series_config, 'gas_resistance_enabled', True
-                    ),
-                    melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
-                        series_config.get(
-                            'melt_surface_renewal_base_kg_s_m2_pa'
-                        ),
-                        0.0,
-                    ),
-                    melt_surface_renewal_source=str(
-                        series_config.get(
-                            'melt_surface_renewal_source',
-                            'disabled:missing-species-state-dependent-'
-                            'melt-transfer-inputs',
-                        )
-                    ),
-                )
-            except EvaporationFluxConfigurationError as exc:
-                raise evaporation_flux_refusal_from_configuration_error(
-                    exc
-                ) from exc
+            series_flux = series_flux_at(p_bulk_pa, overhead_pressure_pa)
             # Kn-domain validity for viscous P_bulk applies here too: the
             # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
             # at typical hold T / D, so the same transport-model validity
@@ -3888,6 +3979,12 @@ class ExtractionMixin:
         if continuum_validity_refuses(domain_diag):
             # C7-specific diagnostic-limited suppression; not provider parity.
             flux_kg_s_m2 = 0.0
+        elif closure is not None and not closure.converged and area_m2 > 0.0:
+            flux_kg_s_m2 = max(
+                0.0,
+                float(closure.rates_kg_hr.get('Ca', 0.0))
+                / (area_m2 * 3600.0),
+            )
         ca_transport_mol = (
             flux_kg_s_m2
             * area_m2
@@ -3969,6 +4066,45 @@ class ExtractionMixin:
             'c7_transport_refusal': transport_refusal,
             'c7_knob_saturation': saturation,
         }
+        if closure is not None:
+            closure_record = {
+                'iterations': closure.iterations,
+                'converged': closure.converged,
+                'rates_kg_hr': dict(closure.rates_kg_hr),
+                'partial_pressures_Pa': {
+                    species: max(0.0, float(value)) * 100.0
+                    for species, value in closure.partial_pressures_mbar.items()
+                },
+            }
+            diagnostic['same_hour_headspace_closure'] = closure_record
+            iterations_by_hour = getattr(
+                self,
+                '_same_hour_headspace_closure_iterations_by_hour',
+                None,
+            )
+            if isinstance(iterations_by_hour, dict):
+                iterations_by_hour.setdefault(
+                    int(getattr(self.melt, 'hour', 0)), {}
+                )['c7_ca'] = int(closure.iterations)
+            if not closure.converged:
+                diagnostic['notices'] = [{
+                    'type': 'typed_notice',
+                    'kind': 'same_hour_headspace_closure_nonconvergence',
+                    'source': 'c7_ca',
+                    'iterations': closure.iterations,
+                    'authority': 'extrapolated',
+                }]
+        if active_ca_transport and p_bulk_pa >= p_sat_pa:
+            diagnostic['species_physical_zeros'] = {
+                'Ca': {
+                    'type': 'typed_notice',
+                    'kind': 'evaporation_condensation_direction_physical_zero',
+                    'species': 'Ca',
+                    'reason': 'condensation_direction',
+                    'P_eq_Pa': p_sat_pa,
+                    'P_bulk_Pa': p_bulk_pa,
+                }
+            }
         if _c7_sz_notes:
             # SC-50 read surface: flows into _last_c7_diagnostic via the
             # caller's transport_diag splice.

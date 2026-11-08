@@ -902,6 +902,7 @@ def _solid_host_bakeout_result(
 
     priced: list[dict[str, Any]] = []
     unavailable: list[dict[str, str]] = []
+    species_physical_zeros: dict[str, dict[str, Any]] = {}
     host_remaining: dict[str, float] = {}
     unsourced_alpha: list[str] = []
 
@@ -1018,6 +1019,15 @@ def _solid_host_bakeout_result(
                 "reason": "missing_vapour_batch_flux_pressures_Pa",
             })
             continue
+        if p_bulk >= p_eq:
+            species_physical_zeros[driver] = {
+                "type": "typed_notice",
+                "kind": "evaporation_condensation_direction_physical_zero",
+                "species": driver,
+                "reason": "condensation_direction",
+                "P_eq_Pa": p_eq,
+                "P_bulk_Pa": p_bulk,
+            }
         series = _series_resistance_evaporation_flux_kg_m2_s(
             driver,
             p_eq,
@@ -1139,7 +1149,7 @@ def _solid_host_bakeout_result(
             _add_amount(release_mol_h, species, released / dt_hr)
             _add_amount(released_kg_h, species, released / dt_hr * mass)
 
-    return _done(
+    result = _done(
         "ok",
         None,
         hk_demand_mol_by_species=demand_mol,
@@ -1160,6 +1170,9 @@ def _solid_host_bakeout_result(
         max_throughput_kg_hr=throughput,
         dt_hr=dt_hr,
     )
+    if species_physical_zeros:
+        result.diagnostic["species_physical_zeros"] = species_physical_zeros
+    return result
 
 
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
@@ -1618,6 +1631,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
         flux_uncertainty_pct: dict[str, float] = {}
+        species_physical_zeros: dict[str, dict[str, Any]] = {}
         series_flux_diagnostics: dict[
             str, dict[str, float | str | bool | None]
         ] = {}
@@ -1669,9 +1683,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 if uses_gas_resistance
                 else 0.0
             )
-            delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
-            if delta_p_Pa <= 0:
+            if P_bulk_Pa >= P_eq_Pa:
+                species_physical_zeros[species] = {
+                    'type': 'typed_notice',
+                    'kind': 'evaporation_condensation_direction_physical_zero',
+                    'species': species,
+                    'reason': 'condensation_direction',
+                    'P_eq_Pa': P_eq_Pa,
+                    'P_bulk_Pa': P_bulk_Pa,
+                }
                 continue
+            delta_p_Pa = P_eq_Pa - P_bulk_Pa
             alpha_is_unmeasured = _alpha_is_unmeasured(
                 species, alpha_by_species
             )
@@ -1862,6 +1884,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if species_physical_zeros:
+            diagnostic['species_physical_zeros'] = species_physical_zeros
         if below_threshold_flux_kg_hr:
             diagnostic["below_threshold_evaporation_flux"] = {
                 "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,

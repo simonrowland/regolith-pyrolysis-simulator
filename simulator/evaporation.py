@@ -758,13 +758,6 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
-    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
-        """Return upstream melt-headspace backpressure for evaporation."""
-
-        melt_headspace_partials_mbar = getattr(
-            self, '_melt_headspace_composition_mbar', {}) or {}
-        return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
-
     def _resolve_evaporation_batch_flux_state(
         self,
         equilibrium: Any,
@@ -1215,21 +1208,20 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's upstream melt-headspace/duct partials as
-        # backpressure. ``overhead.composition`` is the physically distinct
-        # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # The ordinary path starts from zero partials and closes against the
+        # current hour's evolved-rate projection below. An explicit override
+        # is supplied by that coupled solve or the finite-capacity shadow.
+        # ``overhead.composition`` is the distinct post-condensation report,
+        # so near-total capture must not erase source-side P_bulk. Gas pO2 has
+        # already been applied once upstream in the equilibrium vapor
+        # pressures consumed here.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
                 for species, value in overhead_partials_override_Pa.items()
             }
             if overhead_partials_override_Pa is not None
-            else {
-                species: self._evaporation_bulk_partial_pressure_pa(species)
-                for species in vapor_pressures
-            }
+            else {str(species): 0.0 for species in vapor_pressures}
         )
         for species in vapor_pressures:
             overhead_partials_Pa.setdefault(species, 0.0)
@@ -1254,11 +1246,143 @@ class EvaporationMixin:
                 vapour_batch_flux_overlay=flux_overlay_report,
             )
         )
-        kernel_result = self._dispatch_only(
-            ChemistryIntent.EVAPORATION_FLUX,
-            control_inputs=control_inputs,
-        )
+        closure_record = None
+        closure_last_iterate = False
+        if overhead_partials_override_Pa is None:
+            from simulator.overhead import _solve_same_hour_headspace_closure
+
+            def dispatch_at_partials(partials_Pa):
+                iteration_controls = dict(control_inputs)
+                iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
+                iteration_controls['overhead_pressure_pa'] = (
+                    self._evaporation_overhead_total_pressure_Pa(partials_Pa)
+                )
+                return self._dispatch_only(
+                    ChemistryIntent.EVAPORATION_FLUX,
+                    control_inputs=iteration_controls,
+                )
+
+            vacuum_partials_Pa = {
+                str(species): 0.0 for species in vapor_pressures
+            }
+            seed_result = dispatch_at_partials(vacuum_partials_Pa)
+            if str(seed_result.status) != 'ok':
+                kernel_result = seed_result
+            else:
+                def rates_from_result(result):
+                    rates = {
+                        str(species): max(0.0, float(rate))
+                        for species, rate in dict(
+                            (result.diagnostic or {}).get(
+                                'evaporation_flux_kg_hr', {}
+                            ) or {}
+                        ).items()
+                    }
+                    liquid_factor = (
+                        self._freeze_gate_liquid_fraction_factor(
+                            gate_authority=gate_authority,
+                        )
+                        if self._freeze_gate_enabled()
+                        else 1.0
+                    )
+                    rates = {
+                        species: rate * liquid_factor
+                        for species, rate in rates.items()
+                    }
+                    residual_capacity_mol = getattr(
+                        self,
+                        '_native_fe_vapor_residual_capacity_mol_this_hr',
+                        None,
+                    )
+                    if residual_capacity_mol is not None and 'Fe' in rates:
+                        fe_molar_mass = float(
+                            molar_masses_kg_mol.get('Fe', 0.0) or 0.0
+                        )
+                        rates['Fe'] = min(
+                            rates['Fe'],
+                            max(0.0, float(residual_capacity_mol))
+                            * fe_molar_mass,
+                        )
+                    return rates
+
+                def rates_at_partials(partials_mbar):
+                    partials_Pa = {
+                        str(species): max(0.0, float(pressure)) * 100.0
+                        for species, pressure in partials_mbar.items()
+                    }
+                    return rates_from_result(
+                        dispatch_at_partials(partials_Pa)
+                    )
+
+                def partials_at_rates(rates_kg_hr):
+                    candidate = EvaporationFlux(
+                        species_kg_hr=dict(rates_kg_hr)
+                    )
+                    candidate.update_totals()
+                    transport = self.overhead_model.estimate_transport_state(
+                        candidate,
+                        self.melt,
+                        p_downstream_bar=(
+                            self._headspace_downstream_pressure_bar(None)
+                        ),
+                    )
+                    return self.overhead_model.species_partial_pressures(
+                        candidate,
+                        transport['vapor_pressure_mbar'],
+                        self.species_formula_registry,
+                    )
+
+                # Seed from the same postprocessed map as later iterates so
+                # freeze-gate scaling and the native-Fe residual cap are not
+                # applied only after the first pressure projection.
+                seed_rates = rates_from_result(seed_result)
+                closure = _solve_same_hour_headspace_closure(
+                    seed_rates,
+                    rates_at_partials,
+                    partials_at_rates,
+                )
+                final_partials_Pa = {
+                    str(species): max(0.0, float(pressure)) * 100.0
+                    for species, pressure in (
+                        closure.partial_pressures_mbar.items()
+                    )
+                }
+                kernel_result = dispatch_at_partials(final_partials_Pa)
+                closure_record = {
+                    'iterations': closure.iterations,
+                    'converged': closure.converged,
+                    'rates_kg_hr': dict(closure.rates_kg_hr),
+                    'partial_pressures_Pa': final_partials_Pa,
+                }
+        else:
+            kernel_result = self._dispatch_only(
+                ChemistryIntent.EVAPORATION_FLUX,
+                control_inputs=control_inputs,
+            )
         diagnostic = dict(kernel_result.diagnostic or {})
+        if closure_record is not None:
+            diagnostic['same_hour_headspace_closure'] = closure_record
+            iterations_by_hour = getattr(
+                self, '_same_hour_headspace_closure_iterations_by_hour', None
+            )
+            if isinstance(iterations_by_hour, dict):
+                hour = int(getattr(self.melt, 'hour', 0))
+                iterations_by_hour.setdefault(hour, {})[
+                    'ordinary_evaporation'
+                ] = int(closure_record['iterations'])
+            if not closure_record['converged']:
+                if str(kernel_result.status) == 'ok':
+                    diagnostic['evaporation_flux_kg_hr'] = dict(
+                        closure_record['rates_kg_hr']
+                    )
+                    closure_last_iterate = True
+                diagnostic.setdefault('notices', []).append({
+                    'type': 'typed_notice',
+                    'kind': 'same_hour_headspace_closure_nonconvergence',
+                    'source': 'ordinary_evaporation',
+                    'iterations': closure_record['iterations'],
+                    'authority': 'extrapolated',
+                })
         if batch_report is not None:
             diagnostic[CONTROL_BATCH_REPORT_KEY] = batch_report
         diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
@@ -1402,7 +1526,9 @@ class EvaporationMixin:
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
-            if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
+            if closure_last_iterate:
+                liquid_fraction_factor = 1.0
+            elif gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
                 liquid_fraction_factor = (
                     self._freeze_gate_liquid_fraction_factor()
                 )
@@ -1451,7 +1577,9 @@ class EvaporationMixin:
                         ),
                         'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
                     }
-            if gated_rate_kg_hr > 1e-12:
+            if gated_rate_kg_hr > 1e-12 or (
+                closure_last_iterate and gated_rate_kg_hr > 0.0
+            ):
                 flux.species_kg_hr[species] = gated_rate_kg_hr
                 alpha_authority_status = alpha_authority_statuses.get(species)
                 if alpha_authority_status is not None:

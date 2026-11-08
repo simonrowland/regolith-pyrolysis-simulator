@@ -1419,6 +1419,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
+        self._same_hour_headspace_closure_iterations_by_hour: Dict[
+            int, Dict[str, int]
+        ] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
         self._silent_zero_notes: list = []
@@ -1830,6 +1833,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.campaign_mgr.last_c0_exit = None
         self.campaign_mgr.c0_first_melt_backstop = False
         self._last_native_fe_partition_diagnostic = {}
+        self._same_hour_headspace_closure_iterations_by_hour.setdefault(
+            int(getattr(self.melt, 'hour', 0)), {}
+        )
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
         self._last_melt_redox_liquidus_gate_diagnostic = {}
@@ -8190,14 +8196,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
         )
         pressure_source = 'melt.p_total_mbar'
-        if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = sum(
-                max(0.0, float(value))
-                for value in self._melt_headspace_composition_mbar.values()
-            )
-            pressure_source = '_melt_headspace_composition_mbar'
         overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
-        P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
+        P_bulk_Pa = 0.0
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
         )
@@ -8223,34 +8223,113 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
-        try:
-            series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-                species='Fe',
-                P_eq_pa=P_reference_Pa,
-                P_bulk_pa=P_bulk_Pa,
-                T_surface_K=T_K,
-                molar_mass_kg_mol=molar_mass_kg_mol,
-                alpha_i=alpha,
-                pipe_diameter_m=pipe_diameter_m,
-                overhead_pressure_pa=overhead_pressure_pa,
-                axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
-                radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
-                carrier_gas=carrier_gas,
-                T_gas_K=gas_temperature_K,
-                melt_resistance_enabled=melt_resistance_enabled,
-                gas_resistance_enabled=gas_resistance_enabled,
-                melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
-                melt_surface_renewal_source=melt_surface_renewal_source,
+        from simulator.overhead import _solve_same_hour_headspace_closure
+        from simulator.transport_regime import continuum_validity_refuses
+
+        def series_flux_at(P_bulk_Pa: float, pressure_Pa: float):
+            try:
+                return _series_resistance_evaporation_flux_kg_m2_s(
+                    species='Fe',
+                    P_eq_pa=P_reference_Pa,
+                    P_bulk_pa=P_bulk_Pa,
+                    T_surface_K=T_K,
+                    molar_mass_kg_mol=molar_mass_kg_mol,
+                    alpha_i=alpha,
+                    pipe_diameter_m=pipe_diameter_m,
+                    overhead_pressure_pa=pressure_Pa,
+                    axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+                    radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+                    carrier_gas=carrier_gas,
+                    T_gas_K=gas_temperature_K,
+                    melt_resistance_enabled=melt_resistance_enabled,
+                    gas_resistance_enabled=gas_resistance_enabled,
+                    melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
+                    melt_surface_renewal_source=melt_surface_renewal_source,
+                )
+            except EvaporationFluxConfigurationError as exc:
+                raise evaporation_flux_refusal_from_configuration_error(exc) from exc
+
+        def native_rate_at_partials(partials_mbar):
+            projected_bulk_Pa = max(
+                0.0, float(partials_mbar.get('Fe', 0.0)) * 100.0
             )
-        except EvaporationFluxConfigurationError as exc:
-            raise evaporation_flux_refusal_from_configuration_error(exc) from exc
+            projected_total_Pa = max(
+                overhead_pressure_mbar * 100.0,
+                sum(max(0.0, float(value)) for value in partials_mbar.values())
+                * 100.0,
+            )
+            candidate_flux = series_flux_at(
+                projected_bulk_Pa, projected_total_Pa
+            )
+            candidate_domain = viscous_p_bulk_out_of_domain_diagnostic(
+                knudsen_number=float(candidate_flux.knudsen_number),
+                overhead_pressure_pa=projected_total_Pa,
+                pipe_diameter_m=pipe_diameter_m,
+                gas_temperature_K=gas_temperature_K,
+                carrier_gas=str(carrier_gas),
+                campaign_name=str(
+                    getattr(getattr(self.melt, 'campaign', None), 'name', '')
+                    or ''
+                ) or None,
+                asking_site='core.native_fe_vapor_partition',
+            )
+            if continuum_validity_refuses(candidate_domain):
+                return {'Fe': 0.0}
+            candidate_rate = (
+                max(0.0, float(candidate_flux.flux_kg_s_m2))
+                * max(0.0, float(self.melt.melt_surface_area_m2))
+                * 3600.0
+            )
+            candidate_rate = min(
+                candidate_rate,
+                native_fe_available_mol * molar_mass_kg_mol,
+            )
+            return {'Fe': candidate_rate}
+
+        def native_partials_at_rates(rates_kg_hr):
+            candidate = EvaporationFlux(
+                species_kg_hr={'Fe': max(0.0, float(rates_kg_hr.get('Fe', 0.0)))}
+            )
+            candidate.update_totals()
+            transport = self.overhead_model.estimate_transport_state(
+                candidate,
+                self.melt,
+                p_downstream_bar=self._headspace_downstream_pressure_bar(None),
+            )
+            return self.overhead_model.species_partial_pressures(
+                candidate,
+                transport['vapor_pressure_mbar'],
+                self.species_formula_registry,
+            )
+
+        vacuum_flux = series_flux_at(0.0, overhead_pressure_pa)
+        vacuum_rate = min(
+            max(0.0, float(vacuum_flux.flux_kg_s_m2))
+            * max(0.0, float(self.melt.melt_surface_area_m2))
+            * 3600.0,
+            native_fe_available_mol * molar_mass_kg_mol,
+        )
+        closure = _solve_same_hour_headspace_closure(
+            {'Fe': vacuum_rate},
+            native_rate_at_partials,
+            native_partials_at_rates,
+        )
+        P_bulk_Pa = max(
+            0.0, float(closure.partial_pressures_mbar.get('Fe', 0.0)) * 100.0
+        )
+        overhead_pressure_pa = max(
+            overhead_pressure_mbar * 100.0,
+            sum(
+                max(0.0, float(value))
+                for value in closure.partial_pressures_mbar.values()
+            ) * 100.0,
+        )
+        series_flux = series_flux_at(P_bulk_Pa, overhead_pressure_pa)
         # Transitional Kn domain: this bounded native-Fe projection suppresses
         # capacity under its diagnostic-limited policy when continuum transport
         # is load-bearing (pyrolysis). Stage 0 bakeout marks and keeps the
         # computed HKL capacity. The authoritative EVAPORATION_FLUX provider
         # refuses the pyrolysis case; t-379 lifts this suppression.
-        from simulator.transport_regime import continuum_validity_refuses
-
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
@@ -8262,15 +8341,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ) or None,
             asking_site='core.native_fe_vapor_partition',
         )
+        closure_record = {
+            'iterations': closure.iterations,
+            'converged': closure.converged,
+            'rates_kg_hr': dict(closure.rates_kg_hr),
+            'partial_pressures_Pa': {
+                species: max(0.0, float(value)) * 100.0
+                for species, value in closure.partial_pressures_mbar.items()
+            },
+        }
+        iterations_by_hour = getattr(
+            self, '_same_hour_headspace_closure_iterations_by_hour', None
+        )
+        if isinstance(iterations_by_hour, dict):
+            iterations_by_hour.setdefault(
+                int(getattr(self.melt, 'hour', 0)), {}
+            )['native_fe'] = int(closure.iterations)
         _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
         if continuum_validity_refuses(domain_diag):
             _flux_kg_s_m2 = 0.0
-        capacity_kg_hr = max(
-            0.0,
-            _flux_kg_s_m2
-            * max(0.0, float(self.melt.melt_surface_area_m2))
-            * 3600.0,
-        )
+        if not closure.converged and not continuum_validity_refuses(domain_diag):
+            capacity_kg_hr = max(
+                0.0, float(closure.rates_kg_hr.get('Fe', 0.0))
+            )
+        else:
+            capacity_kg_hr = max(
+                0.0,
+                _flux_kg_s_m2
+                * max(0.0, float(self.melt.melt_surface_area_m2))
+                * 3600.0,
+            )
         capacity_mol_hr = capacity_kg_hr / molar_mass_kg_mol
         vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
         tap_mol = native_fe_available_mol - vapor_mol
@@ -8341,7 +8441,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 temperature_K=T_K,
             ),
             'series_resistance': series_diag,
+            'same_hour_headspace_closure': closure_record,
         }
+        if P_reference_Pa > 0.0 and P_bulk_Pa >= P_reference_Pa:
+            diagnostic['species_physical_zeros'] = {
+                'Fe': {
+                    'type': 'typed_notice',
+                    'kind': 'evaporation_condensation_direction_physical_zero',
+                    'species': 'Fe',
+                    'reason': 'condensation_direction',
+                    'P_eq_Pa': P_reference_Pa,
+                    'P_bulk_Pa': P_bulk_Pa,
+                }
+            }
+        if not closure.converged:
+            diagnostic['notices'] = [{
+                'type': 'typed_notice',
+                'kind': 'same_hour_headspace_closure_nonconvergence',
+                'source': 'native_fe',
+                'iterations': closure.iterations,
+                'authority': 'extrapolated',
+            }]
         if domain_diag is not None:
             diagnostic.update(
                 {
@@ -13974,6 +14094,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         solid_host_area_m2: Any = None,
         alpha: Mapping[str, Any] | None = None,
         commit_release: bool = True,
+        record_result: bool = True,
     ) -> Dict[str, Any]:
         """Price C0 subsolidus hosts and commit only an admitted extent.
 
@@ -14198,7 +14319,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 if key in provider_diagnostic:
                     diagnostic[key] = provider_diagnostic[key]
-        return self._record_subsolidus_bakeout(diagnostic)
+        if record_result:
+            return self._record_subsolidus_bakeout(diagnostic)
+        return diagnostic
 
     def _c0_pipe_capacity_kg_hr(
         self,
@@ -15731,6 +15854,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
         self._last_native_fe_partition_diagnostic = {}
+        self._same_hour_headspace_closure_iterations_by_hour[
+            int(getattr(self.melt, 'hour', 0))
+        ] = {}
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
@@ -15857,9 +15983,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 capacity, cold_train = self._cold_train_capacity_policy()
                 if isinstance(capacity, FiniteCapacity):
                     assert cold_train is not None
+                    # solve_capacity_shadow is already a same-hour finite-
+                    # volume solve: every Picard pass prices current flux at
+                    # candidate partials, then projects pressure from
+                    # pre-hour holdup + current source over dt - current bleed.
+                    # The live path re-prices at that returned pressure and
+                    # asserts parity below. C0 solid-host release is outside
+                    # this shadow and gets an explicit notice where bakeout is
+                    # applied.
                     capacity_result = (
                         self._compute_capacity_coupling_shadow(equilibrium)
                     )
+                    if capacity_result is not None and hasattr(
+                        capacity_result, 'iterations'
+                    ):
+                        self._same_hour_headspace_closure_iterations_by_hour[
+                            int(getattr(self.melt, 'hour', 0))
+                        ]['finite_capacity'] = int(capacity_result.iterations)
                     if isinstance(capacity_result, CapacityShadowRefusal):
                         raise CapacityCouplingRefusalError(capacity_result)
             if capacity_result is not None:
@@ -15917,14 +16057,177 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
-        # Hertz-Knudsen reads the headspace persisted last step. A same-step
-        # ordinary-only provisional would replace that combined basis.
-        bakeout_diag = self._apply_c0_bakeout(
-            liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
-            headspace_mbar=None,
-            admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
-            commit_release=False,
+        # In C0 with solid hosts, close ordinary evaporation and bakeout
+        # together against one same-hour evolved stream below. The persisted
+        # end-of-hour map remains for equilibrium O2 and diagnostic consumers.
+        liquid_fraction = getattr(equilibrium, "liquid_fraction", None)
+        from simulator.subsolidus_bakeout import (
+            BAKEOUT_HOST_IDENTITY,
+            SALT_FEED_ACCOUNT,
+            first_melt_backstop,
         )
+        first_melt = first_melt_backstop(liquid_fraction)
+        bakeout_inventory = self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)
+        has_bakeout_hosts = any(
+            float(bakeout_inventory.get(species, 0.0) or 0.0) > 0.0
+            for species in BAKEOUT_HOST_IDENTITY
+        )
+        solve_bakeout_closure = (
+            self.melt.campaign == CampaignPhase.C0
+            and has_bakeout_hosts
+            and capacity_result is None
+            and not (first_melt and not self._subsolidus_handed_off)
+        )
+        bakeout_closure = None
+        if solve_bakeout_closure:
+            from simulator.overhead import _solve_same_hour_headspace_closure
+
+            def rates_at_bakeout_partials(partials_mbar):
+                partials_Pa = {
+                    str(species): max(0.0, float(value)) * 100.0
+                    for species, value in partials_mbar.items()
+                }
+                current_ordinary = self._calculate_evaporation(
+                    equilibrium,
+                    overhead_partials_override_Pa=partials_Pa,
+                )
+                current_ordinary = self._apply_analytic_evaporation_depletion(
+                    current_ordinary
+                )
+                candidate_bakeout = self._apply_c0_bakeout(
+                    liquid_fraction=liquid_fraction,
+                    headspace_mbar=partials_mbar,
+                    admitted_gas_kg_hr=dict(current_ordinary.species_kg_hr),
+                    commit_release=False,
+                    record_result=False,
+                )
+                pump_scale = candidate_bakeout.get('pump_scale')
+                if (
+                    candidate_bakeout.get('provider_status') == 'ok'
+                    and isinstance(pump_scale, (int, float))
+                    and not isinstance(pump_scale, bool)
+                    and math.isfinite(float(pump_scale))
+                ):
+                    current_ordinary.species_kg_hr = {
+                        species: rate * float(pump_scale)
+                        for species, rate in current_ordinary.species_kg_hr.items()
+                        if rate * float(pump_scale) > 1.0e-15
+                    }
+                    current_ordinary.update_totals()
+                combined_rates = dict(current_ordinary.species_kg_hr)
+                for species, rate in dict(
+                    candidate_bakeout.get('released_kg_hr_by_species') or {}
+                ).items():
+                    number = max(0.0, float(rate))
+                    if number > 0.0:
+                        combined_rates[str(species)] = (
+                            combined_rates.get(str(species), 0.0) + number
+                        )
+                combined = EvaporationFlux(species_kg_hr=combined_rates)
+                combined.update_totals()
+                demand = float(combined.total_kg_hr)
+                if demand > 0.0:
+                    capacity = self._c0_pipe_capacity_kg_hr(combined)
+                    scale = self._c0_capacity_scale(demand, capacity)
+                    if scale < 1.0:
+                        combined_rates = {
+                            species: rate * scale
+                            for species, rate in combined_rates.items()
+                            if rate * scale > 1.0e-15
+                        }
+                return combined_rates
+
+            def partials_at_bakeout_rates(rates_kg_hr):
+                candidate = EvaporationFlux(
+                    species_kg_hr=dict(rates_kg_hr)
+                )
+                candidate.update_totals()
+                transport = self.overhead_model.estimate_transport_state(
+                    candidate,
+                    self.melt,
+                    p_downstream_bar=self._headspace_downstream_pressure_bar(
+                        None
+                    ),
+                )
+                return self.overhead_model.species_partial_pressures(
+                    candidate,
+                    transport['vapor_pressure_mbar'],
+                    self.species_formula_registry,
+                )
+
+            initial_rates = dict(evap_flux.species_kg_hr)
+            bakeout_closure = _solve_same_hour_headspace_closure(
+                initial_rates,
+                rates_at_bakeout_partials,
+                partials_at_bakeout_rates,
+            )
+            same_hour_partials_mbar = dict(
+                bakeout_closure.partial_pressures_mbar
+            )
+            same_hour_partials_Pa = {
+                str(species): max(0.0, float(value)) * 100.0
+                for species, value in same_hour_partials_mbar.items()
+            }
+            evap_flux = self._calculate_evaporation(
+                equilibrium,
+                overhead_partials_override_Pa=same_hour_partials_Pa,
+            )
+            evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
+            bakeout_diag = self._apply_c0_bakeout(
+                liquid_fraction=liquid_fraction,
+                headspace_mbar=same_hour_partials_mbar,
+                admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
+                commit_release=False,
+            )
+            closure_record = {
+                'iterations': bakeout_closure.iterations,
+                'converged': bakeout_closure.converged,
+                'rates_kg_hr': dict(bakeout_closure.rates_kg_hr),
+                'partial_pressures_Pa': same_hour_partials_Pa,
+            }
+            bakeout_diag['same_hour_headspace_closure'] = closure_record
+            evaporation_diagnostic = getattr(
+                self, '_last_evaporation_flux_diagnostic', None
+            )
+            if isinstance(evaporation_diagnostic, dict):
+                evaporation_diagnostic[
+                    'same_hour_headspace_closure'
+                ] = closure_record
+            self._same_hour_headspace_closure_iterations_by_hour.setdefault(
+                int(getattr(self.melt, 'hour', 0)), {}
+            ).update({
+                'ordinary_evaporation': int(bakeout_closure.iterations),
+                'solid_host_bakeout': int(bakeout_closure.iterations),
+            })
+            if not bakeout_closure.converged:
+                notice = {
+                    'type': 'typed_notice',
+                    'kind': 'same_hour_headspace_closure_nonconvergence',
+                    'source': 'solid_host_bakeout',
+                    'iterations': bakeout_closure.iterations,
+                    'authority': 'extrapolated',
+                }
+                bakeout_diag.setdefault('notices', []).append(notice)
+                if isinstance(evaporation_diagnostic, dict):
+                    evaporation_diagnostic.setdefault('notices', []).append(
+                        notice
+                    )
+        else:
+            bakeout_diag = self._apply_c0_bakeout(
+                liquid_fraction=liquid_fraction,
+                headspace_mbar=None,
+                admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
+                commit_release=False,
+            )
+            if self.melt.campaign == CampaignPhase.C0 and capacity_result is not None:
+                bakeout_notice = {
+                    'type': 'typed_notice',
+                    'kind': 'same_hour_headspace_closure_not_applied',
+                    'source': 'solid_host_bakeout',
+                    'reason': 'finite_capacity_shadow_does_not_include_solid_host_source',
+                    'authority': 'extrapolated',
+                }
+                bakeout_diag.setdefault('notices', []).append(bakeout_notice)
         if bakeout_diag.get("provider_status") == "ok":
             joint_scale = bakeout_diag.get("pump_scale")
             if (

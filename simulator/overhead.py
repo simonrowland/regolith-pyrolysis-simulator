@@ -101,6 +101,201 @@ DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas 
 COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
 
 
+@dataclass(frozen=True)
+class SameHourHeadspaceClosureResult:
+    rates_kg_hr: Mapping[str, float]
+    partial_pressures_mbar: Mapping[str, float]
+    iterations: int
+    converged: bool
+
+
+def _solve_same_hour_headspace_closure(
+    initial_rates_kg_hr: Mapping[str, float],
+    rates_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
+    partials_at_rates: Callable[[Mapping[str, float]], Mapping[str, float]],
+) -> SameHourHeadspaceClosureResult:
+    """Close source rates against the pressure projected from those rates.
+
+    The premise is a self-pumped Poiseuille headspace: candidate evolved-gas
+    rates determine the pipe pressure through ``estimate_transport_state``,
+    and mole fractions determine species partials through
+    ``species_partial_pressures``. The fixed point is
+    ``j_i = series_flux_i(P_eq,i - P_bulk,i(j)) * A * 3600``. Each rate falls
+    as its own backpressure rises, while greater total throughput raises the
+    projected pressure. A damped pass estimates a negative local fixed-point
+    slope per species to avoid full-rate/zero oscillation; if that stalls, a
+    bracketed scalar solve finds each species rate
+    while holding the other current rates fixed, then repeats across species.
+    The bracket is valid because raising one species rate raises its projected
+    partial pressure, so its series flux decreases. The series-resistance
+    terms have units Pa m² s kg⁻¹, so Pa divided by resistance gives kg m⁻²
+    s⁻¹, then area and 3600 s/hr give kg/hr.
+    With pipe conductance tending to infinity, projected vapor pressure and
+    ``P_bulk`` tend to zero and rates tend to the zero-backpressure flux. As
+    conductance tends to zero, any positive rate requires unbounded pressure;
+    backpressure reaches equilibrium pressure and the net flux tends to zero.
+
+    The one-hour source map is evaluated from the current candidate each pass;
+    no previous-hour headspace value enters this solve.
+    """
+    rates = {
+        str(species): max(0.0, float(rate))
+        for species, rate in initial_rates_kg_hr.items()
+    }
+    species_names = set(rates)
+    evaluations = 0
+
+    def evaluate(candidate_rates):
+        nonlocal evaluations
+        partials = {
+            str(species): max(0.0, float(pressure))
+            for species, pressure in partials_at_rates(candidate_rates).items()
+        }
+        evaluated = {
+            str(species): max(0.0, float(rate))
+            for species, rate in rates_at_partials(partials).items()
+        }
+        evaluations += 1
+        species_names.update(evaluated)
+        return partials, {
+            species: evaluated.get(species, 0.0)
+            for species in species_names
+        }
+
+    def rates_close(left, right):
+        return all(
+            abs(left[species] - right[species])
+            <= 1.0e-9
+            * max(abs(left[species]), abs(right[species]), 1.0e-300)
+            for species in species_names
+        )
+
+    def result(candidate_rates, partials, *, converged):
+        return SameHourHeadspaceClosureResult(
+            rates_kg_hr=dict(candidate_rates),
+            partial_pressures_mbar=dict(partials),
+            iterations=evaluations,
+            converged=converged,
+        )
+
+    # For a locally linear scalar map F, lambda=1/(1-F') removes the error in
+    # one step. Cap the secant estimate at 0.5 so nonlinear coupled maps stay
+    # damped. Positive slopes use 0.5 because they do not explain the observed
+    # full-rate/zero oscillation.
+    last_partials = {}
+    previous_rates = None
+    previous_evaluated = None
+    for _ in range(128):
+        rates = {species: rates.get(species, 0.0) for species in species_names}
+        last_partials, evaluated = evaluate(rates)
+        rates = {species: rates.get(species, 0.0) for species in species_names}
+        if rates_close(rates, evaluated):
+            return result(evaluated, last_partials, converged=True)
+        next_rates = {}
+        for species in species_names:
+            relaxation = 0.5
+            if previous_rates is not None and previous_evaluated is not None:
+                rate_delta = rates[species] - previous_rates.get(species, 0.0)
+                flux_delta = evaluated[species] - previous_evaluated.get(
+                    species, 0.0
+                )
+                if rate_delta != 0.0:
+                    slope = flux_delta / rate_delta
+                    if math.isfinite(slope) and slope < 0.0:
+                        relaxation = min(0.5, 1.0 / (1.0 - slope))
+            next_rates[species] = rates[species] + relaxation * (
+                evaluated[species] - rates[species]
+            )
+        previous_rates = rates
+        previous_evaluated = evaluated
+        rates = next_rates
+
+    # A steep decreasing map can make Picard oscillate even when its fixed
+    # point is unique. Solve the scalar residual for each species inside a
+    # guaranteed nonnegative bracket, holding other rates at their current
+    # values, and sweep until the coupled vector residual also closes.
+    evaluation_cap = 2000
+    for _ in range(50):
+        for species in sorted(species_names):
+            if evaluations >= evaluation_cap:
+                break
+            zero_candidate = dict(rates)
+            zero_candidate[species] = 0.0
+            _zero_partials, zero_fluxes = evaluate(zero_candidate)
+            rates = {name: rates.get(name, 0.0) for name in species_names}
+            zero_flux = zero_fluxes.get(species, 0.0)
+            if zero_flux <= 0.0:
+                rates[species] = 0.0
+                continue
+
+            low = 0.0
+            low_residual = zero_flux
+            high = max(rates.get(species, 0.0), zero_flux)
+            high_candidate = dict(rates)
+            high_candidate[species] = high
+            _high_partials, high_fluxes = evaluate(high_candidate)
+            high_residual = high_fluxes.get(species, 0.0) - high
+            if high_residual > 0.0:
+                # The zero-backpressure output is an upper bound for this
+                # species under the monotone source map; leave the last
+                # iterate for the typed nonconvergence path if that premise
+                # is violated by a caller.
+                continue
+            if high_residual == 0.0:
+                rates[species] = high
+                continue
+
+            root = 0.5 * (low + high)
+            for _root_iteration in range(64):
+                if evaluations >= evaluation_cap:
+                    break
+                width = high - low
+                secant = low + width * low_residual / (
+                    low_residual - high_residual
+                )
+                # False-position can pin one endpoint on a strongly curved
+                # residual. Keep its speed where it is useful, but force
+                # bracket contraction when the secant step gets too close to
+                # either edge.
+                if secant <= low + 0.1 * width or secant >= high - 0.1 * width:
+                    secant = 0.5 * (low + high)
+                root = secant
+                candidate = dict(rates)
+                candidate[species] = root
+                _candidate_partials, candidate_fluxes = evaluate(candidate)
+                residual = candidate_fluxes.get(species, 0.0) - root
+                if abs(residual) <= 1.0e-9 * max(
+                    abs(candidate_fluxes.get(species, 0.0)), abs(root), 1.0e-300
+                ):
+                    break
+                if residual > 0.0:
+                    low, low_residual = root, residual
+                else:
+                    high, high_residual = root, residual
+                if high - low <= 1.0e-9 * max(abs(low), abs(high), 1.0e-300):
+                    root = 0.5 * (low + high)
+                    break
+            rates[species] = max(0.0, root)
+
+        rates = {species: rates.get(species, 0.0) for species in species_names}
+        last_partials, evaluated = evaluate(rates)
+        if rates_close(rates, evaluated):
+            return result(rates, last_partials, converged=True)
+        if evaluations >= evaluation_cap:
+            break
+
+    final_partials = {
+        str(species): max(0.0, float(pressure))
+        for species, pressure in partials_at_rates(rates).items()
+    }
+    return SameHourHeadspaceClosureResult(
+        rates_kg_hr=dict(rates),
+        partial_pressures_mbar=final_partials,
+        iterations=evaluations,
+        converged=False,
+    )
+
+
 def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
     """Return the provisional N₂-like dynamic viscosity at temperature T_K."""
     return 1.8e-5 * (T_K / 300.0) ** 0.7
