@@ -2045,15 +2045,15 @@ class ExtractionMixin:
                 diagnostic['notices'] = notices
             step_outcome = {'status': 'refused', 'reason': reason}
             diagnostic['step_outcome'] = step_outcome
-            if c5_ellingham_ladder_diagnostic:
-                c5_ellingham_ladder_diagnostic['notices'] = notices
-                c5_ellingham_ladder_diagnostic['step_outcome'] = step_outcome
-                diagnostic['mre_ellingham_ladder_diagnostic'] = (
-                    c5_ellingham_ladder_diagnostic
-                )
-                self._mre_ellingham_ladder_diagnostic = dict(
-                    c5_ellingham_ladder_diagnostic
-                )
+            per_step_diagnostic = c5_ellingham_ladder_diagnostic
+            per_step_diagnostic['notices'] = notices
+            per_step_diagnostic['step_outcome'] = step_outcome
+            diagnostic['mre_ellingham_ladder_diagnostic'] = (
+                per_step_diagnostic
+            )
+            self._mre_ellingham_ladder_diagnostic = dict(
+                per_step_diagnostic
+            )
             result['energy_kWh'] = 0.0
         energy_kWh = result.get('energy_kWh')
         if energy_kWh is None:

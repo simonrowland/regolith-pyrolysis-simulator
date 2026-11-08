@@ -44,7 +44,11 @@ from simulator.state import (
     CampaignPhase,
     MeltState,
 )
-from web.events import _completion_payload
+from web.events import (
+    _browser_socket_payload,
+    _completion_payload,
+    _per_hour_summary_entry,
+)
 
 
 def _sim(feedstocks, setpoints=None):
@@ -630,7 +634,10 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
-def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
+@pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
+    campaign,
+):
     sim = _sim(
         {
             "mixed": {
@@ -646,7 +653,7 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
     )
     sim.load_batch("mixed", mass_kg=1000.0)
     _enable_c5_mre(sim, target_species="", max_voltage_V=2.0)
-    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.campaign = campaign
     sim.melt.temperature_C = 1600.0
     sim.melt.hour = 42
     sim.melt.campaign_hour = 7
@@ -668,6 +675,25 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
 
     sim._step_mre()
 
+    from simulator.runner import build_per_hour_summary
+
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    runner_summary = build_per_hour_summary(sim, sim._make_snapshot())
+    assert runner_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    web_summary = _browser_socket_payload("per_hour_summary", runner_summary)
+    assert web_summary == _per_hour_summary_entry(runner_summary)
+    assert web_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    tick_projection = _browser_socket_payload(
+        "simulation_tick",
+        {"per_hour_summary_delta": runner_summary},
+    )
+    assert (
+        tick_projection["per_hour_summary_delta"][
+            "mre_ellingham_ladder_diagnostic"
+        ]
+        == diagnostic
+    )
+
     assert sim._chem_no_op_dispatch_count == no_op_before + 1
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
         melt_before
@@ -686,12 +712,12 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
     assert sim.melt.mre_voltage_V == pytest.approx(2.0)
     assert sim.melt.mre_current_A == pytest.approx(0.0)
 
-    step_outcome = sim._mre_ellingham_ladder_diagnostic["step_outcome"]
+    step_outcome = diagnostic["step_outcome"]
     assert step_outcome == {
         "status": "refused",
         "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     }
-    assert sim._mre_ellingham_ladder_diagnostic["notices"][0] == {
+    assert diagnostic["notices"][0] == {
         "kind": "mre_step_refusal",
         "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     }
