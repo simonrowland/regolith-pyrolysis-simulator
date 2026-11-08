@@ -1155,6 +1155,52 @@ def test_missing_openimcc_and_the_seam_block_release():
     )
 
 
+def test_c0_bakeout_preserves_provider_species_physical_zeros(monkeypatch):
+    sim = _load({
+        "label": "troilite only",
+        "composition_wt_pct": {"SiO2": 90.0, "FeS_troilite": 10.0},
+    })
+    _arm_c0(sim)
+    remaining = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"]
+    physical_zeros = {
+        "Fe": {
+            "type": "typed_notice",
+            "kind": "evaporation_condensation_direction_physical_zero",
+            "species": "Fe",
+            "reason": "condensation_direction",
+            "P_eq_Pa": 12.0,
+            "P_bulk_Pa": 15.0,
+        }
+    }
+
+    def _supported(**_kwargs):
+        return [_troilite_reaction(
+            host_remaining_mol=remaining,
+            extent_bound_mol_rxn=remaining,
+            equilibrium_gas_partial_pressures_Pa={"S2": 12.0},
+        )]
+
+    monkeypatch.setattr(
+        sim,
+        "_dispatch_only",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="ok",
+            diagnostic={
+                "accepted_extent_mol_by_reaction": {},
+                "species_physical_zeros": physical_zeros,
+            },
+        ),
+    )
+
+    diagnostic = sim._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: _supported,
+        seam_refusal_for=lambda _species, _temperature_K: None,
+    )
+
+    assert diagnostic["species_physical_zeros"] == physical_zeros
+
+
 def test_disagreeing_driver_pressures_are_not_collapsed():
     stoich = _sulfate_reaction()["stoichiometry"]
     magnesium = [

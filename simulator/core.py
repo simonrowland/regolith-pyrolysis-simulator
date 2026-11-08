@@ -14335,6 +14335,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "release_mol_hr_by_species",
                 "accepted_extent_mol_by_reaction",
                 "pump_scale",
+                "species_physical_zeros",
             ):
                 if key in provider_diagnostic:
                     diagnostic[key] = provider_diagnostic[key]
