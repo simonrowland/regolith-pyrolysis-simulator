@@ -55,6 +55,10 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor, _json_safe
+from simulator.reduced_real_determinism import (
+    GATE_CURVE_NOTICE_KEYS,
+    copy_gate_curve_notices,
+)
 from simulator.state import (
     CampaignPhase,
     HourSnapshot,
@@ -2923,6 +2927,63 @@ def test_runner_completed_run_records_serialization_failure(
         "section": section,
         "exception_type": "LookupError",
         "reason": "report serialization unavailable",
+    }
+
+
+@pytest.mark.parametrize("held", [False, True], ids=("non-held", "held"))
+def test_runner_c3_na_hold_adjustment_metadata_projects_held_curve_notices(
+    monkeypatch,
+    held,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        additives_kg={"Na": 30.0},
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "held-gate-notice-metadata-test",
+        },
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A_staged"
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.campaign_mgr._active_c3_na_scoped_overrides = {
+        "inject_target_C": 1250.0,
+        "bakeout_target_C": 1250.0,
+        "ramp_rate": 600.0,
+        "staged_duration_h": 3.0,
+    }
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    curve = {
+        "source": "test:held-c3-na-window",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1100.0,
+        "path": ((1000.0, 0.0), (1100.0, 1.0)),
+    }
+    if held:
+        curve.update({
+            notice_key: {"qualification": "held_last_good_curve"}
+            for notice_key in GATE_CURVE_NOTICE_KEYS
+        })
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_liquidus_gate_curve",
+        lambda: curve,
+    )
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+    payload = run._run_session(session)
+
+    assert payload["run_metadata"]["c3_na_hold_adjustment"][
+        "liquid_fraction_curve"
+    ] == {
+        "source": curve["source"],
+        "solidus_T_C": curve["solidus_T_C"],
+        "liquidus_T_C": curve["liquidus_T_C"],
+        "path": [list(point) for point in curve["path"]],
+        **copy_gate_curve_notices(curve),
     }
 
 

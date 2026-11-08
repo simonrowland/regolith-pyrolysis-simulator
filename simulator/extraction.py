@@ -2304,6 +2304,7 @@ class ExtractionMixin:
         )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.evaporation import EvaporationFluxRefusal
+        from simulator.reduced_real_determinism import copy_gate_curve_notices
 
         configured_temperature_C = float(
             self.campaign_mgr.get_temp_target(
@@ -2479,6 +2480,7 @@ class ExtractionMixin:
                     'solidus_T_C': curve.get('solidus_T_C'),
                     'liquidus_T_C': curve.get('liquidus_T_C'),
                     'path': list(curve.get('path') or ()),
+                    **copy_gate_curve_notices(curve),
                 },
             }
             self._last_c3_na_hold_adjustment = diagnostic
@@ -2603,6 +2605,7 @@ class ExtractionMixin:
                 'solidus_T_C': curve.get('solidus_T_C'),
                 'liquidus_T_C': curve.get('liquidus_T_C'),
                 'path': list(curve.get('path') or ()),
+                **copy_gate_curve_notices(curve),
             },
             'objective': 'Fe_produced_kg',
             'candidate_rule': 'solved boundaries plus curve sample knots',

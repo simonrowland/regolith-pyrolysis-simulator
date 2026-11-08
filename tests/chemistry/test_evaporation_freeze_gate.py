@@ -47,9 +47,11 @@ from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
 )
 from simulator.reduced_real_determinism import (
+    GATE_CURVE_NOTICE_KEYS,
     GateCurveProviderOutcome,
     PT0DeterminismStore,
     canonical_json_bytes,
+    copy_gate_curve_notices,
     gate_curve_memo_record,
     gate_curve_memo_producer_configuration,
     uncacheable_replay_disposition,
@@ -2108,7 +2110,7 @@ def test_stable_refusal_held_curve_is_flagged_but_not_memoized(
 
 
 def _held_redox_gate_curve_for_notice_projection_test():
-    return {
+    curve = {
         'source': 'test_held_gate_curve',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1500.0,
@@ -2118,6 +2120,15 @@ def _held_redox_gate_curve_for_notice_projection_test():
             'qualification': 'held_last_good_curve',
         },
     }
+    curve.update({
+        notice_key: {'qualification': 'held_last_good_curve'}
+        for notice_key in GATE_CURVE_NOTICE_KEYS
+    })
+    curve['gate_provider_refusal'] = {
+        'status': 'out_of_domain',
+        'qualification': 'held_last_good_curve',
+    }
+    return curve
 
 
 def test_held_gate_notice_reaches_redox_liquid_fraction_snapshot(
@@ -2165,6 +2176,37 @@ def test_held_gate_notice_reaches_fe_redox_respeciation_authority(
     assert diagnostic['gate_authority']['gate_provider_refusal'][
         'qualification'
     ] == 'held_last_good_curve'
+
+
+def test_held_gate_notices_reach_redox_regime_diagnostic_without_other_changes(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
+    )
+    held_curve = _held_redox_gate_curve_for_notice_projection_test()
+    non_held_curve = {
+        key: value
+        for key, value in held_curve.items()
+        if key not in copy_gate_curve_notices(held_curve)
+    }
+    temperature_K = 1600.0 + 273.15
+
+    non_held_result = sim._melt_redox_temperature_shift_is_liquid(
+        temperature_K,
+        gate_authority=non_held_curve,
+    )
+    non_held_diagnostic = deepcopy(sim._last_melt_regime_diagnostic)
+    held_result = sim._melt_redox_temperature_shift_is_liquid(
+        temperature_K,
+        gate_authority=held_curve,
+    )
+
+    assert held_result == non_held_result
+    assert sim._last_melt_regime_diagnostic == {
+        **non_held_diagnostic,
+        **copy_gate_curve_notices(held_curve),
+    }
 
 
 def _lunar_composition_projected_diagnostic(sim):

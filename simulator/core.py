@@ -5659,6 +5659,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'redox_temperature_shift_threshold_T_C': threshold_T_C,
             'liquidus_source': curve.get('source', 'liquidus_solidus'),
         })
+        from simulator.reduced_real_determinism import copy_gate_curve_notices
+
+        regime_diagnostic.update(copy_gate_curve_notices(curve))
         # Intentional telemetry for the t-125 uncertainty stack; its consumer
         # lands after the predicate-unification work.
         self._last_melt_regime_diagnostic = regime_diagnostic

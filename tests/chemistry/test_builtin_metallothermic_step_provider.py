@@ -76,6 +76,10 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.reduced_real_determinism import (
+    GATE_CURVE_NOTICE_KEYS,
+    copy_gate_curve_notices,
+)
 from simulator.state import (
     MOLAR_MASS,
     CampaignPhase,
@@ -1183,6 +1187,13 @@ def _prepare_stranded_staged_na_hold(sim, *, configured_temperature_C=1250.0):
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
 
 
+def _held_gate_curve_notices():
+    return {
+        notice_key: {"qualification": "held_last_good_curve"}
+        for notice_key in GATE_CURVE_NOTICE_KEYS
+    }
+
+
 def _install_melt_redox_liquidus_curve_record(sim, monkeypatch, curve):
     from simulator.reduced_real_determinism import (
         GateCurveProviderOutcome,
@@ -1253,11 +1264,13 @@ def _assert_selected_na_fe_yield_argmax(
     return selected
 
 
+@pytest.mark.parametrize("held", [False, True], ids=("non-held", "held"))
 def test_staged_na_fe_hold_recomputes_stranded_temperature_by_fe_yield_sweep(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    held,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -1273,6 +1286,8 @@ def test_staged_na_fe_hold_recomputes_stranded_temperature_by_fe_yield_sweep(
         "liquidus_T_C": 1100.0,
         "path": ((1000.0, 0.0), (1100.0, 1.0)),
     }
+    if held:
+        curve.update(_held_gate_curve_notices())
     monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
 
     sim._recompute_staged_na_fe_hold_setpoint()
@@ -1281,7 +1296,13 @@ def test_staged_na_fe_hold_recomputes_stranded_temperature_by_fe_yield_sweep(
     assert diagnostic["status"] == "applied"
     assert diagnostic["configured_temperature_C"] == pytest.approx(1250.0)
     assert diagnostic["selected_Fe_produced_kg"] > 0.0
-    assert diagnostic["liquid_fraction_curve"]["source"] == curve["source"]
+    assert diagnostic["liquid_fraction_curve"] == {
+        "source": curve["source"],
+        "solidus_T_C": curve["solidus_T_C"],
+        "liquidus_T_C": curve["liquidus_T_C"],
+        "path": list(curve["path"]),
+        **copy_gate_curve_notices(curve),
+    }
     assert diagnostic["rows"]
     selected_row = _assert_selected_na_fe_yield_argmax(
         diagnostic,
@@ -1405,11 +1426,13 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
     assert selected["liquid_fraction"] > 0.0
 
 
+@pytest.mark.parametrize("held", [False, True], ids=("non-held", "held"))
 def test_staged_na_fe_hold_refuses_non_monotone_liquid_fraction_island(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    held,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -1431,6 +1454,8 @@ def test_staged_na_fe_hold_refuses_non_monotone_liquid_fraction_island(
             (1250.0, 1.0),
         ),
     }
+    if held:
+        curve.update(_held_gate_curve_notices())
     monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
 
     sim._recompute_staged_na_fe_hold_setpoint()
@@ -1440,7 +1465,13 @@ def test_staged_na_fe_hold_refuses_non_monotone_liquid_fraction_island(
     assert diagnostic["reason"] == (
         "lf_curve_non_monotone_window_unresolved"
     )
-    assert diagnostic["liquid_fraction_curve"]["source"] == curve["source"]
+    assert diagnostic["liquid_fraction_curve"] == {
+        "source": curve["source"],
+        "solidus_T_C": curve["solidus_T_C"],
+        "liquidus_T_C": curve["liquidus_T_C"],
+        "path": list(curve["path"]),
+        **copy_gate_curve_notices(curve),
+    }
     assert sim._interpolate_freeze_gate_curve(
         curve,
         diagnostic["monotonicity_validation_window_T_max_C"],
