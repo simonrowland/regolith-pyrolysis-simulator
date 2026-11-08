@@ -2091,8 +2091,10 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # (a byte-hash change, not a numeric delta). Merging green 9450ca26a adds
         # b-1129's below-liquidus FeO notice to the serialized hours; the hours
         # still equal the regenerated fixture above, so this too is notice-only.
+        # Final b-1119 tree (d-354): the hours carry the evaluated-below-floor channel
+        # state and provenance; they still equal the regenerated fixture above.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "9aa35ce72b96a42ba3f22907340c77b01264ce460ff736d6acefb878840a70af"
+            "cd00e64c70c4444041214a3e5ba1b2054094defca8cb53f337a52dcd136b395f"
         )
 
 
