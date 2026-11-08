@@ -119,9 +119,10 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # ledger d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db
         # -> 2f67bcbdcc10496d7d6a9ab68a4590dff8da07639cf3634ddff837e1b9e9e01f.
         # Lunar full runs diverge between laptop and studio-3, so these are the
-        # obtained Studio-3 digests.
-        "flux_maps_sha256": "a685d2f743f4868645ce36e5b29a28dc81a85628556ee13144c66945f80a3f4c",
-        "ledger_sha256": "2f67bcbdcc10496d7d6a9ab68a4590dff8da07639cf3634ddff837e1b9e9e01f",
+        # obtained Studio-3 digests. re-pinned 2026-11-08 at bb77e4654
+        # (rpp-ctrl, s3 gate engine set; fixtures regenerated at fd54f096e).
+        "flux_maps_sha256": "6343cef5e128aa81773f7f5e6788a9c1bf00d28881eb35738d031516befcede4",
+        "ledger_sha256": "497f7212b7a9c840546b5f79b2b80c15326b53bd640bc191cc6709e29f60a914",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -2089,7 +2090,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # to tip e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74
         # (a byte-hash change, not a numeric delta).
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74"
+            "c15f0878fb124b07a2bf35f12a7b1d3d318c153fe98278cb573f5d10be9e01d"
         )
 
 
