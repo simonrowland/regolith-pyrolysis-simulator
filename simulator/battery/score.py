@@ -10082,7 +10082,7 @@ def _predict_with_engine(
     knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
     total_pressure_state = identity.total_pressure_Pa
     derive_knudsen_total_pressure = (
-        engine in {Engine.ALPHAMELTS, Engine.VAPOROCK}
+        engine in {Engine.ALPHAMELTS, Engine.VAPOROCK, Engine.THERMOENGINE}
         and quantity is Quantity.P_PARTIAL
         and knudsen_vapour
         and (
