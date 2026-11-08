@@ -25,6 +25,10 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.state import MOLAR_MASS
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
+    vapor_pressure_omission_proof,
+)
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_MISSING,
     VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
@@ -278,8 +282,10 @@ def evaporation_quantity_unavailabilities(
 ) -> list[dict[str, Any]]:
     """Return unavailable carrier contributions that overlap a quantity."""
 
-    unavailable, _estimated = _evaporation_quantity_authority_contributions(
-        sim, target_species, snapshots=snapshots
+    unavailable, _estimated, _omitted = (
+        _evaporation_quantity_authority_contributions(
+            sim, target_species, snapshots=snapshots
+        )
     )
     return unavailable
 
@@ -289,11 +295,16 @@ def _evaporation_quantity_authority_contributions(
     target_species: str | tuple[str, ...] | None,
     *,
     snapshots: Any = None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Separate withheld carrier mass from positive status-bearing flux."""
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    dict[str, dict[str, Any]],
+]:
+    """Separate withheld, estimated, and below-floor carrier evidence."""
 
     unavailable_by_species: dict[str, dict[str, Any]] = {}
     estimated_by_species_account: dict[tuple[str, str], dict[str, Any]] = {}
+    omitted_by_species: dict[str, dict[str, Any]] = {}
 
     def record_unavailable(
         species: Any,
@@ -440,6 +451,21 @@ def _evaporation_quantity_authority_contributions(
                     continue
                 extra = record.get("extra")
                 extra = extra if isinstance(extra, Mapping) else {}
+                omission = extra.get("below_reporting_threshold_omission")
+                if (
+                    extra.get("channel_state")
+                    == VAPOR_PRESSURE_OMISSION_CHANNEL_STATE
+                    and not record.get("is_refused", False)
+                    and isinstance(omission, Mapping)
+                    and str(omission.get("species")) == str(species)
+                ):
+                    proof = vapor_pressure_omission_proof(omission)
+                    if proof is not None:
+                        threshold_pa, computed_pa = proof
+                        proof_record = dict(omission)
+                        proof_record["reporting_threshold_Pa"] = threshold_pa
+                        proof_record["computed_pressure_Pa"] = computed_pa
+                        omitted_by_species.setdefault(str(species), proof_record)
                 policy = record.get("policy") or extra.get("policy")
                 if policy == "fail_loud_missing_transport_parameters":
                     record_missing_transport(species, record)
@@ -550,7 +576,12 @@ def _evaporation_quantity_authority_contributions(
         )
         if matches_target(species, "")
     ]
-    return unavailable, estimates
+    omissions = {
+        species: proof
+        for species, proof in sorted(omitted_by_species.items())
+        if matches_target(species, "")
+    }
+    return unavailable, estimates, omissions
 
 
 def product_class_availability(
@@ -561,8 +592,8 @@ def product_class_availability(
     has_computed_part: bool,
     snapshots: Any = None,
 ) -> dict[str, Any]:
-    """Return computed mass with unavailable and estimated carrier evidence."""
-    refusals, estimated_contributions = (
+    """Return computed mass with refusal, estimate, and omission evidence."""
+    refusals, estimated_contributions, omitted_contributions = (
         _evaporation_quantity_authority_contributions(
             sim, target_species, snapshots=snapshots
         )
@@ -603,6 +634,20 @@ def product_class_availability(
         else "partial" if has_computed_part
         else "unavailable"
     )
+    omission_flag = (
+        {
+            "status": "available",
+            "state": VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
+            "authority": "provider_computed",
+            "reason": (
+                "vapor pressure was computed but omitted at or below the "
+                "reporting floor"
+            ),
+            "omissions_by_species": omitted_contributions,
+        }
+        if status == "available" and omitted_contributions
+        else None
+    )
     return {
         "class_total_kg": (
             total_kg if has_computed_part or not refusals else None
@@ -612,7 +657,7 @@ def product_class_availability(
         "estimated_contributions": estimated_contributions,
         "reason": "; ".join(item["reason"] for item in excluded),
         "flag": (
-            None if status == "available" else {
+            omission_flag if status == "available" else {
                 **{
                     key: value
                     for key, value in (refusals[0] if refusals else {}).items()

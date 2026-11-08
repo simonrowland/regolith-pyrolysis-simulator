@@ -23,6 +23,9 @@ from contextvars import ContextVar
 from types import MappingProxyType
 from typing import Any, Iterator
 
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
+)
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
     FluxDiagnosticUpperBound,
@@ -738,6 +741,11 @@ def _channel_flux_gate_state(answer: VapourAnswer) -> str:
 
     pressure = answer.pressure
     flux = answer.flux
+    if (
+        answer.extra.get("channel_state")
+        == VAPOR_PRESSURE_OMISSION_CHANNEL_STATE
+    ):
+        return VAPOR_PRESSURE_OMISSION_CHANNEL_STATE
     if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
         return "dormant_by_epoch"
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):

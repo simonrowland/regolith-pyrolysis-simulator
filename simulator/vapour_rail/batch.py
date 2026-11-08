@@ -16,6 +16,9 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
+)
 from simulator.vapour_rail.activity import SourceReactionActivity
 
 
@@ -184,6 +187,11 @@ class VapourAnswer:
 
     @property
     def is_flux_active(self) -> bool:
+        if (
+            self.extra.get("channel_state")
+            == VAPOR_PRESSURE_OMISSION_CHANNEL_STATE
+        ):
+            return False
         return isinstance(self.flux, FluxEligible) and isinstance(
             self.pressure, PressureValue
         )

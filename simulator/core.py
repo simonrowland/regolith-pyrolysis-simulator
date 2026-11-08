@@ -2374,6 +2374,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
         liquid_feo_domain: Any = None,
+        source_pressure_omissions: Mapping[str, Mapping[str, Any]] | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2440,6 +2441,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_activity_engine_inputs or {}
             ),
             "liquid_feo_domain": liquid_feo_domain,
+            "source_pressure_omissions": {
+                str(species_id): dict(record)
+                for species_id, record in dict(
+                    source_pressure_omissions or {}
+                ).items()
+                if isinstance(record, Mapping)
+            },
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,

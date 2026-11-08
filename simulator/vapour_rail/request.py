@@ -49,6 +49,10 @@ from simulator.chemistry.melt_activity import (
     single_cation_mole_fractions,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.diagnostic_helpers.vapor_pressure_omission import (
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
+    vapor_pressure_omission_proof,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityRefusalCode,
@@ -345,6 +349,11 @@ class VapourResolveState:
     # Liquid-state fact for the FeO shadow. Not vapour request identity:
     # omitted from as_mapping so it cannot enter _state_fingerprint.
     liquid_feo_domain: Any = None
+    # Provider diagnostic proof is channel evidence, not evaluator state or
+    # request identity, so as_mapping intentionally omits it.
+    source_pressure_omissions: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):
@@ -394,6 +403,19 @@ class VapourResolveState:
             MappingProxyType(dict(self.melt_activity_engine_inputs)),
         )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
+        object.__setattr__(
+            self,
+            "source_pressure_omissions",
+            MappingProxyType(
+                {
+                    str(species_id): MappingProxyType(dict(record))
+                    for species_id, record in dict(
+                        self.source_pressure_omissions
+                    ).items()
+                    if isinstance(record, Mapping)
+                }
+            ),
+        )
 
     def as_mapping(self) -> dict[str, Any]:
         return {
@@ -3047,6 +3069,36 @@ def resolve_vapour_batch(
             f"missing={sorted(requested - frozenset(answers))}, "
             f"extra={sorted(frozenset(answers) - requested)}"
         )
+
+    if state is not None:
+        for species_id, record in state.source_pressure_omissions.items():
+            if species_id not in answers or answers[species_id].is_refused:
+                continue
+            if str(record.get("species")) != species_id:
+                continue
+            try:
+                activity = float(
+                    state.source_reaction_activities.get(species_id)
+                )
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(activity) or activity <= 0.0:
+                continue
+            proof = vapor_pressure_omission_proof(record)
+            if proof is None:
+                continue
+            _threshold_pa, computed_pa = proof
+            answer = answers[species_id]
+            extra = dict(answer.extra)
+            extra["channel_state"] = VAPOR_PRESSURE_OMISSION_CHANNEL_STATE
+            extra["below_reporting_threshold_omission"] = dict(record)
+            omitted_pressure = PressureValue(computed_pa)
+            answers[species_id] = replace(
+                answer,
+                pressure=omitted_pressure,
+                selected_runtime_pressure=omitted_pressure,
+                extra=MappingProxyType(extra),
+            )
 
     union_eligible = frozenset(
         species_id

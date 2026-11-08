@@ -3757,6 +3757,14 @@ class EvaporationMixin:
             liquid_feo_domain = (
                 domain_at(float(temperature_K)) if callable(domain_at) else None
             )
+            source_pressure_omissions_raw = vapor_pressure_diagnostic.get(
+                "below_reporting_threshold_omissions"
+            )
+            source_pressure_omissions = (
+                dict(source_pressure_omissions_raw)
+                if isinstance(source_pressure_omissions_raw, Mapping)
+                else {}
+            )
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3817,6 +3825,7 @@ class EvaporationMixin:
                     self, "_melt_activity_engine_inputs", {}
                 ),
                 liquid_feo_domain=liquid_feo_domain,
+                source_pressure_omissions=source_pressure_omissions,
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

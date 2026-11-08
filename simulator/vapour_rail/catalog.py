@@ -1793,6 +1793,9 @@ class VapourRailCatalog:
                 source_reaction_activity_provenance=(
                     state.get("source_reaction_activity_provenance") or {}
                 ),
+                source_pressure_omissions=(
+                    state.get("source_pressure_omissions") or {}
+                ),
                 source_reaction_activity_results=(
                     state.get("source_reaction_activity_results") or {}
                 ),
@@ -1840,6 +1843,7 @@ class VapourRailCatalog:
                         "source_reaction_activity_evidence_refs",
                         "source_reaction_activity_standard_states",
                         "source_reaction_activity_provenance",
+                        "source_pressure_omissions",
                         "source_reaction_activity_results",
                         "source_reaction_fO2_bar",
                         "source_reaction_fO2_log10",

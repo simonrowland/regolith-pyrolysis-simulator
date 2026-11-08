@@ -6,6 +6,9 @@ import math
 from collections.abc import Mapping
 
 
+VAPOR_PRESSURE_OMISSION_CHANNEL_STATE = "evaluated_below_reporting_floor"
+
+
 def vapor_pressure_omission_proof(
     record: object,
 ) -> tuple[float, float] | None:
