@@ -472,6 +472,50 @@ def test_partial_metal_objective_evidence_keeps_exclusions_and_lower_bound() -> 
     assert evidence["total_basis"] == "lower_bound"
 
 
+def test_unavailable_oxygen_product_objective_preserves_typed_null(monkeypatch) -> None:
+    excluded = [{
+        "species": "Fe",
+        "account": "process.cleaned_melt",
+        "reason": "Fe activity unavailable",
+    }]
+    availability_flag = {
+        "status": "unavailable",
+        "authority": "unavailable",
+        "reason": excluded[0]["reason"],
+        "excluded": excluded,
+    }
+    monkeypatch.setattr(
+        objective_module,
+        "classify_products",
+        lambda sim, *, early_tap_mode=False: {
+            "metals_plus_O2": {
+                "O2_kg": None,
+                "class_total_kg": None,
+                "metals_total_kg": 1.0,
+                "status": "unavailable",
+                "availability_flag": availability_flag,
+                "excluded": excluded,
+            }
+        },
+    )
+    profile = {
+        "objectives": [
+            {"metric": "O2_kg", "sense": "maximize", "units": "kg"}
+        ]
+    }
+
+    objectives = compute_objectives(
+        profile,
+        SimpleNamespace(product_ledger=lambda: {}),
+    )
+
+    assert objectives.values[0].value is None
+    assert objectives.as_mapping()["O2_kg"] is None
+    assert objectives.evidence["O2_kg"]["value_status"] == "unavailable"
+    assert objectives.evidence["O2_kg"]["availability_flag"] == availability_flag
+    assert objectives.evidence["O2_kg"]["excluded"] == excluded
+
+
 def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
     from simulator.three_product_report import classify_products
 
