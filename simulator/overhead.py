@@ -252,13 +252,13 @@ def _solve_same_hour_headspace_closure(
 
     # Species share the projected total pressure and mole fractions, so
     # independently solving each scalar rate can require many outer sweeps.
-    # Use the already-required SciPy dependency to solve that coupled residual
-    # as a bounded vector system before spending the remaining budget on the
-    # scalar fallback. Every residual evaluation goes through ``evaluate`` so
-    # finite-difference probes and the final projected map share one cap.
+    # Use the already-required SciPy dependency to solve the coupled residual
+    # before spending the remaining budget on the safeguarded scalar fallback.
+    # Every residual evaluation goes through ``evaluate`` and candidate rates
+    # are projected onto the nonnegative domain.
     # Dimensionless rate variables keep trace species' finite-difference steps
     # relative to their own source scale instead of the dominant species.
-    from scipy.optimize import least_squares
+    from scipy.optimize import root
 
     coupled_species = tuple(sorted(species_names))
     coupled_scales = {}
@@ -297,19 +297,17 @@ def _solve_same_hour_headspace_closure(
         ]
 
     try:
-        coupled_solution = least_squares(
+        coupled_solution = root(
             coupled_residual,
             [
                 rates.get(species, 0.0) / coupled_scales[species]
                 for species in coupled_species
             ],
-            bounds=(0.0, math.inf),
-            x_scale=1.0,
-            diff_step=1.0e-4,
-            ftol=1.0e-12,
-            xtol=1.0e-12,
-            gtol=1.0e-12,
-            max_nfev=min(512, max(1, evaluation_cap - evaluations)),
+            method='hybr',
+            options={
+                'xtol': 1.0e-12,
+                'maxfev': min(512, max(1, evaluation_cap - evaluations)),
+            },
         )
         # The optimizer's final residual call may be a finite-difference
         # probe. Project its returned candidate explicitly so convergence is

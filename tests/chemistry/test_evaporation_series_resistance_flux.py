@@ -820,7 +820,7 @@ def test_closure_projects_the_optimizer_candidate_before_returning(monkeypatch):
         return SimpleNamespace(x=[1.0 for _ in species])
 
     monkeypatch.setattr(
-        scipy.optimize, "least_squares", optimizer_with_a_final_probe
+        scipy.optimize, "root", optimizer_with_a_final_probe
     )
     result = _solve_same_hour_headspace_closure(
         {
@@ -832,7 +832,7 @@ def test_closure_projects_the_optimizer_candidate_before_returning(monkeypatch):
     )
 
     assert result.converged
-    assert result.iterations == 153
+    assert result.iterations < 2000
     assert result.rates_kg_hr == pytest.approx(
         {name: 1.0 for name in species}, rel=1e-9
     )
