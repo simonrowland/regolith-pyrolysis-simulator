@@ -604,12 +604,15 @@ class EquilibriumMixin:
                 if oxide in MOLAR_MASS and float(wt_pct) > 0.0
             }
         cation_mol_fraction = single_cation_mole_fractions(melt_account_mol)
+        domain_at = getattr(self, "liquid_feo_domain_at", None)
+        liquid_domain = domain_at(T_K) if callable(domain_at) else None
         feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
             comp_wt=comp_wt,
             fO2_log=intrinsic_fO2_log,
             T_K=T_K,
             pressure_bar=feo_activity_pressure_bar,
             floor_bar=vacuum_floor_bar,
+            liquid_domain=liquid_domain,
         )
 
         # ================================================================

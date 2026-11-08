@@ -10,6 +10,7 @@ import yaml
 
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.fe_redox import (
+    LiquidFeODomain,
     kress91_ferrous_feo_activity,
     kress91_furnace_activity_pressure_bar,
 )
@@ -22,7 +23,11 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
     StandardStateIdentity,
 )
-from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from simulator.vapour_rail.batch import FluxActivationContext
+from simulator.vapour_rail.catalog import (
+    VapourRailCatalog,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.melt_activity_resolver import (
     MELT_ACTIVITY_SHADOW_RECORD_LIMIT,
     PROVEN_EMPTY_COMPONENT,
@@ -42,7 +47,7 @@ from simulator.vapour_rail.melt_activity_resolver import (
     ownerless_nonzero_reservoir_ids,
     validate_tier_b_candidate,
 )
-from simulator.vapour_rail.request import VapourResolveState
+from simulator.vapour_rail.request import VapourResolveState, _state_fingerprint
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
 
@@ -1136,3 +1141,109 @@ def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None
     assert result.standard_state != result.target_standard_state
     assert result.derivation["pressure_bar"] == pressure_bar
     assert result.derivation["target_conversion_status"] == "mu0_target_pending"
+    assert "notices" not in result.derivation["redox_receipt"]
+
+
+def test_fe_shadow_below_liquidus_keeps_the_liquid_number_and_the_notice() -> None:
+    composition = {
+        "SiO2": 50.0,
+        "Al2O3": 15.0,
+        "FeO": 12.0,
+        "MgO": 10.0,
+        "CaO": 10.0,
+        "Na2O": 2.0,
+        "K2O": 1.0,
+    }
+    pressure_bar = 3.0e-8
+    intrinsic_log10 = -8.0
+    temperature_K = 1673.15
+    domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=temperature_K,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    state = VapourResolveState(
+        temperature_K=temperature_K,
+        total_pressure_Pa=100_000.0,
+        source_reaction_activities={"Fe": 0.1},
+        source_reaction_fO2_log10=intrinsic_log10,
+        source_reaction_activity_pressure_bar=pressure_bar,
+        source_reaction_redox_model_id="REF-001-kress-carmichael-1991",
+        source_reaction_composition_wt_pct=composition,
+        liquid_feo_domain=domain,
+    )
+    shadow = build_shadow_for_vapour_batch(
+        rules=(),
+        ledger_snapshot={"process.cleaned_melt": {"FeO": 1.0}},
+        state=state,
+    )
+    result = shadow.results_by_component["FeO"]
+    expected = kress91_ferrous_feo_activity(
+        comp_wt=composition,
+        fO2_log=intrinsic_log10,
+        T_K=temperature_K,
+        pressure_bar=pressure_bar,
+    )
+
+    assert result.value == expected
+    assert result.derivation["redox_receipt"]["notices"] == [
+        {
+            "type": "typed_notice",
+            "kind": "liquid_model_below_liquidus",
+            "temperature_K": temperature_K,
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+            "source": "gate_liquid_fraction",
+            "authority": "extrapolated",
+        }
+    ]
+    plain = VapourResolveState(
+        temperature_K=temperature_K,
+        total_pressure_Pa=100_000.0,
+        source_reaction_activities={"Fe": 0.1},
+        source_reaction_fO2_log10=intrinsic_log10,
+        source_reaction_activity_pressure_bar=pressure_bar,
+        source_reaction_redox_model_id="REF-001-kress-carmichael-1991",
+        source_reaction_composition_wt_pct=composition,
+    )
+    assert state.as_mapping() == plain.as_mapping()
+    assert _state_fingerprint(state) == _state_fingerprint(plain)
+
+
+def test_catalog_keeps_liquid_feo_domain_out_of_vapour_identity(monkeypatch) -> None:
+    captured: dict[str, VapourResolveState] = {}
+
+    def _capture(**kwargs):
+        captured["state"] = kwargs["state"]
+        return None
+
+    monkeypatch.setattr(
+        "simulator.vapour_rail.request.resolve_vapour_batch",
+        _capture,
+    )
+    domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=1673.15,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    catalog = VapourRailCatalog(species={}, legacy_projection={})
+    catalog.resolve_batch(
+        {},
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "liquid_feo_domain": domain,
+        },
+        flux_activation_context=FluxActivationContext(epoch="pre_rg_legacy_live"),
+    )
+    resolved = captured["state"]
+    plain = VapourResolveState(temperature_K=1673.15, process_phase="hot_train")
+
+    assert resolved.liquid_feo_domain is domain
+    assert dict(resolved.extras) == {}
+    assert "liquid_feo_domain" not in resolved.as_mapping()
+    assert _state_fingerprint(resolved) == _state_fingerprint(plain)

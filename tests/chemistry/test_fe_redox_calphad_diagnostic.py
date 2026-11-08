@@ -9,6 +9,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
+    LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
@@ -209,6 +210,191 @@ def test_builtin_vapor_pressure_consumes_calphad_feo_authority_below_iw(
     assert diagnostic["diagnostic_only"] is False
     assert diagnostic["consumed_by_behavior"] is True
     assert diagnostic["authority_unchanged"] is False
+    assert "notices" not in diagnostic
+
+
+def _below_liquidus_domain(temperature_K: float) -> LiquidFeODomain:
+    return LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=temperature_K,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+
+
+def _expected_below_liquidus_notice(domain: LiquidFeODomain) -> dict[str, object]:
+    return {
+        "type": "typed_notice",
+        "kind": "liquid_model_below_liquidus",
+        "temperature_K": domain.temperature_K,
+        "liquidus_T_C": domain.liquidus_T_C,
+        "solidus_T_C": domain.solidus_T_C,
+        "source": domain.source,
+        "authority": "extrapolated",
+    }
+
+
+def test_liquid_feo_below_liquidus_carries_notice_and_keeps_the_liquid_number():
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+    domain = _below_liquidus_domain(_T_K)
+    plain = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    guarded = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+        liquid_domain=domain,
+    )
+
+    assert guarded["notices"] == [_expected_below_liquidus_notice(domain)]
+    assert {key: value for key, value in guarded.items() if key != "notices"} == plain
+    assert guarded["a_FeO_authoritative"] == plain["a_FeO_authoritative"]
+    assert kress91_ferrous_feo_activity(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+        liquid_domain=domain,
+    ) == kress91_ferrous_feo_activity(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    assert "gamma_FeO" in guarded
+
+
+def test_liquid_feo_at_or_above_liquidus_is_byte_identical():
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+    plain = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    liquid = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=_T_K,
+        liquidus_T_C=1200.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    guarded = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+        liquid_domain=liquid,
+    )
+
+    assert guarded == plain
+    assert json.dumps(guarded, sort_keys=True, allow_nan=False) == json.dumps(
+        plain, sort_keys=True, allow_nan=False
+    )
+    assert "notices" not in guarded
+
+
+def test_omitted_liquid_domain_does_not_mean_below_liquidus():
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+    kwargs = {
+        "comp_wt": _BASALTIC_FE_MELT_WT,
+        "fO2_log": fO2_log,
+        "T_K": _T_K,
+        "pressure_bar": 1e-6,
+    }
+    assert calphad_ferrous_feo_activity_diagnostic(**kwargs) == (
+        calphad_ferrous_feo_activity_diagnostic(**kwargs, liquid_domain=None)
+    )
+
+
+def test_no_feot_path_does_not_attach_a_liquidus_notice():
+    diagnostic = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt={"SiO2": 100.0},
+        fO2_log=-8.0,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+        liquid_domain=_below_liquidus_domain(_T_K),
+    )
+
+    assert diagnostic["reason"] == "no_FeOt_melt_component"
+    assert "gamma_FeO" not in diagnostic
+    assert "notices" not in diagnostic
+
+
+def test_builtin_vapor_pressure_flags_liquid_feo_below_liquidus(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+    domain = _below_liquidus_domain(_T_K)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": _moles_from_wt_pct(_BASALTIC_FE_MELT_WT)
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=_T_K - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=fO2_log,
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": fO2_log,
+            "liquid_feo_domain": domain,
+        },
+    )
+
+    result = provider.dispatch(request)
+    expected_authority = kress91_ferrous_feo_activity(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+
+    assert result.diagnostic["activities"]["Fe"] == pytest.approx(
+        expected_authority
+    )
+    assert result.diagnostic["a_FeO_calphad"]["notices"] == [
+        _expected_below_liquidus_notice(domain)
+    ]
+    assert result.diagnostic["a_FeO_calphad"]["a_FeO_authoritative"] == (
+        pytest.approx(expected_authority)
+    )
+
+
+def test_builtin_vapor_pressure_refuses_a_mistyped_liquid_domain(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": _moles_from_wt_pct(_BASALTIC_FE_MELT_WT)
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=_T_K - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=fO2_log,
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": fO2_log,
+            "liquid_feo_domain": {"below_liquidus": True},
+        },
+    )
+
+    with pytest.raises(TypeError, match="liquid_feo_domain must be LiquidFeODomain"):
+        provider.dispatch(request)
 
 
 def test_feo_activity_uses_kress91_authority_above_iw_plus_one():

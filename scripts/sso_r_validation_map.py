@@ -11,7 +11,6 @@ import subprocess
 import sys
 import warnings
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -28,12 +27,15 @@ from simulator.core import (
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.sso_r_owner_surface import (
     OWNER_CERTIFICATION_ASSERTION,
+    OWNER_RECIPE_DOSE_FRACTION,
     OWNER_RECIPE_GAS_COVER_MODE,
     OWNER_RECIPE_PN2_MBAR,
     OWNER_RECIPE_PO2_MBAR,
     OWNER_RECIPE_STAGE_NAME,
     OWNER_RECIPE_T_C,
     OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
+    certification_reachability_reason,
+    owner_certification_row,
 )
 from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
@@ -882,103 +884,12 @@ def _nondecreasing(values: list[float], *, tolerance: float = 1.0e-12) -> bool:
     return all(values[i + 1] + tolerance >= values[i] for i in range(len(values) - 1))
 
 
-class CertificationReason(str, Enum):
-    LIVE_RECIPE_REACHABILITY_PROBE_MISSING = (
-        "live recipe reachability probe missing"
-    )
-    LIVE_RECIPE_UNREACHABLE = "live recipe unreachable"
-    LIVE_RECIPE_IDENTITY_MISMATCH = "live recipe stage/gas identity mismatch"
-
-
-def _same_identity_number(actual: Any, expected: Any) -> bool:
-    try:
-        actual_number = float(actual)
-        expected_number = float(expected)
-    except (TypeError, ValueError, OverflowError):
-        return False
-    return (
-        math.isfinite(actual_number)
-        and math.isfinite(expected_number)
-        and actual_number == expected_number
-    )
-
-
-def _certification_reachability_reason(
-    live_owner_probe: Mapping[str, Any] | None,
-    owner_row: Mapping[str, Any] | None,
-) -> CertificationReason | None:
-    if live_owner_probe is None:
-        return CertificationReason.LIVE_RECIPE_REACHABILITY_PROBE_MISSING
-    if live_owner_probe.get("recipe_reachable") is not True:
-        return CertificationReason.LIVE_RECIPE_UNREACHABLE
-    if owner_row is None:
-        return CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
-
-    matches_owner_row = (
-        live_owner_probe.get("recipe_stage_name") == OWNER_RECIPE_STAGE_NAME
-        and live_owner_probe.get("recipe_gas_cover_mode")
-        == OWNER_RECIPE_GAS_COVER_MODE
-        and _same_identity_number(owner_row.get("temperature_C"), OWNER_RECIPE_T_C)
-        and _same_identity_number(
-            owner_row.get("requested_pO2_mbar"), OWNER_RECIPE_PO2_MBAR
-        )
-        and _same_identity_number(
-            owner_row.get("requested_pN2_mbar"), OWNER_RECIPE_PN2_MBAR
-        )
-        and _same_identity_number(
-            owner_row.get("dose_fraction_of_full_FeO_equiv"), 1.0
-        )
-        and _same_identity_number(
-            live_owner_probe.get("temperature_C"), owner_row.get("temperature_C")
-        )
-        and _same_identity_number(
-            live_owner_probe.get("recipe_pO2_mbar"),
-            owner_row.get("requested_pO2_mbar"),
-        )
-        and _same_identity_number(
-            live_owner_probe.get("recipe_pN2_mbar"),
-            owner_row.get("requested_pN2_mbar"),
-        )
-        and _same_identity_number(
-            live_owner_probe.get("recipe_p_total_mbar"),
-            owner_row.get("total_pressure_mbar"),
-        )
-        and _same_identity_number(
-            owner_row.get("total_pressure_mbar"), OWNER_RECIPE_TOTAL_PRESSURE_MBAR
-        )
-    )
-    if not matches_owner_row:
-        return CertificationReason.LIVE_RECIPE_IDENTITY_MISMATCH
-    return None
-
-
-def _owner_certification_row(
-    rows: Iterable[Mapping[str, Any]],
-) -> Mapping[str, Any] | None:
-    return next(
-        (
-            row for row in rows
-            if float(row["temperature_C"]) == OWNER_RECIPE_T_C
-            and math.isclose(
-                float(row["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR
-            )
-            and math.isclose(
-                float(row["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR
-            )
-            and math.isclose(
-                float(row["dose_fraction_of_full_FeO_equiv"]), 1.0
-            )
-        ),
-        None,
-    )
-
-
 def _certification_pass(
     assertions_by_name: Mapping[str, Mapping[str, Any]],
     live_owner_probe: Mapping[str, Any] | None = None,
     owner_row: Mapping[str, Any] | None = None,
 ) -> bool:
-    if _certification_reachability_reason(live_owner_probe, owner_row) is not None:
+    if certification_reachability_reason(live_owner_probe, owner_row) is not None:
         return False
     owner = assertions_by_name.get(OWNER_CERTIFICATION_ASSERTION, {})
     parity = assertions_by_name.get(MAP_LIVE_PARITY_ASSERTION, {})
@@ -1230,7 +1141,7 @@ def evaluate_assertions(
         ),
     )
 
-    owner_row = _owner_certification_row(rows)
+    owner_row = owner_certification_row(rows)
     map_live_semantics_parity_pass = False
     map_live_detail = "owner row missing"
     if owner_row is not None:
@@ -1277,7 +1188,7 @@ def evaluate_assertions(
         map_live_detail,
     )
     assertions_by_name = {a["name"]: a for a in assertions}
-    certification_reachability_reason = _certification_reachability_reason(
+    certification_reason = certification_reachability_reason(
         live_owner_probe,
         owner_row,
     )
@@ -1303,8 +1214,8 @@ def evaluate_assertions(
             f"first_passing_T_C={first_T}; window under PN2 sweep transport "
             f"semantics; live parity={'confirmed' if map_live_semantics_parity_pass else 'missing'}"
             + (
-                f"; certification_blocker={certification_reachability_reason.value}"
-                if certification_reachability_reason is not None
+                f"; certification_blocker={certification_reason.value}"
+                if certification_reason is not None
                 else ""
             )
         ),
@@ -1453,23 +1364,27 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
     grid_scope_label = str(payload["grid_scope"])
     owner_rows = [
         r for r in rows
-        if r["temperature_C"] in (1650.0, 1700.0)
-        and math.isclose(r["requested_pO2_mbar"], 1.0e-6)
+        if r["temperature_C"] in (OWNER_RECIPE_T_C, 1700.0)
+        and math.isclose(r["requested_pO2_mbar"], OWNER_RECIPE_PO2_MBAR)
         and r["requested_pN2_mbar"] in PN2_MBAR
-        and math.isclose(r["dose_fraction_of_full_FeO_equiv"], 1.0)
+        and math.isclose(
+            r["dose_fraction_of_full_FeO_equiv"], OWNER_RECIPE_DOSE_FRACTION
+        )
     ]
     pO2_slice = [
         r for r in rows
-        if r["temperature_C"] in (1600.0, 1650.0, 1700.0)
-        and math.isclose(r["requested_pN2_mbar"], 10.0)
-        and math.isclose(r["dose_fraction_of_full_FeO_equiv"], 1.0)
+        if r["temperature_C"] in (1600.0, OWNER_RECIPE_T_C, 1700.0)
+        and math.isclose(r["requested_pN2_mbar"], OWNER_RECIPE_PN2_MBAR)
+        and math.isclose(
+            r["dose_fraction_of_full_FeO_equiv"], OWNER_RECIPE_DOSE_FRACTION
+        )
         and r["requested_pO2_mbar"] in PO2_MBAR
     ]
     dose_thresholds: list[list[Any]] = []
     for gas in gas_grid():
         matching = [
             r for r in rows
-            if r["temperature_C"] == 1650.0
+            if r["temperature_C"] == OWNER_RECIPE_T_C
             and math.isclose(r["requested_pO2_mbar"], gas.pO2_mbar)
             and math.isclose(r["requested_pN2_mbar"], gas.pN2_mbar)
         ]
@@ -1520,7 +1435,7 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
         if _certification_pass(
             assertions_by_name,
             payload.get("live_owner_probe"),
-            _owner_certification_row(rows),
+            owner_certification_row(rows),
         )
         else "current_physics_blocker"
     )
@@ -1651,25 +1566,25 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
 
 def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     rows = list(payload["rows"])
-
-    def find_row(T: float, pO2: float, pN2: float, dose: float) -> dict[str, Any]:
-        for row in rows:
-            if (
-                math.isclose(float(row["temperature_C"]), T)
-                and math.isclose(float(row["requested_pO2_mbar"]), pO2)
-                and math.isclose(float(row["requested_pN2_mbar"]), pN2)
-                and math.isclose(float(row["dose_fraction_of_full_FeO_equiv"]), dose)
-            ):
-                return row
-        raise KeyError((T, pO2, pN2, dose))
-
-    owner = find_row(1650.0, 1.0e-6, 10.0, 1.0)
+    owner = owner_certification_row(rows)
+    if owner is None:
+        raise KeyError((
+            OWNER_RECIPE_T_C,
+            OWNER_RECIPE_PO2_MBAR,
+            OWNER_RECIPE_PN2_MBAR,
+            OWNER_RECIPE_DOSE_FRACTION,
+        ))
     pO2_slice = sorted(
         [
             row for row in rows
-            if math.isclose(float(row["temperature_C"]), 1650.0)
-            and math.isclose(float(row["requested_pN2_mbar"]), 10.0)
-            and math.isclose(float(row["dose_fraction_of_full_FeO_equiv"]), 1.0)
+            if math.isclose(float(row["temperature_C"]), OWNER_RECIPE_T_C)
+            and math.isclose(
+                float(row["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR
+            )
+            and math.isclose(
+                float(row["dose_fraction_of_full_FeO_equiv"]),
+                OWNER_RECIPE_DOSE_FRACTION,
+            )
             and float(row["requested_pO2_mbar"]) > 0.0
         ],
         key=lambda row: row["requested_pO2_mbar"],
@@ -1677,18 +1592,27 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     dose_slice = sorted(
         [
             row for row in rows
-            if math.isclose(float(row["temperature_C"]), 1650.0)
-            and math.isclose(float(row["requested_pO2_mbar"]), 1.0e-6)
-            and math.isclose(float(row["requested_pN2_mbar"]), 10.0)
+            if math.isclose(float(row["temperature_C"]), OWNER_RECIPE_T_C)
+            and math.isclose(
+                float(row["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR
+            )
+            and math.isclose(
+                float(row["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR
+            )
         ],
         key=lambda row: row["dose_fraction_of_full_FeO_equiv"],
     )
     pn2_slice = sorted(
         [
             row for row in rows
-            if math.isclose(float(row["temperature_C"]), 1650.0)
-            and math.isclose(float(row["requested_pO2_mbar"]), 1.0e-6)
-            and math.isclose(float(row["dose_fraction_of_full_FeO_equiv"]), 1.0)
+            if math.isclose(float(row["temperature_C"]), OWNER_RECIPE_T_C)
+            and math.isclose(
+                float(row["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR
+            )
+            and math.isclose(
+                float(row["dose_fraction_of_full_FeO_equiv"]),
+                OWNER_RECIPE_DOSE_FRACTION,
+            )
             and float(row["requested_pN2_mbar"]) > 0.0
         ],
         key=lambda row: row["requested_pN2_mbar"],
@@ -1707,10 +1631,10 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "grid_row_count": payload["grid"]["row_count"],
         "manual_fO2_anchors": payload["manual_fO2_anchors"],
         "owner_pn2_row": {
-            "temperature_C": 1650.0,
-            "pO2_mbar": 1.0e-6,
-            "pN2_mbar": 10.0,
-            "dose_fraction": 1.0,
+            "temperature_C": OWNER_RECIPE_T_C,
+            "pO2_mbar": OWNER_RECIPE_PO2_MBAR,
+            "pN2_mbar": OWNER_RECIPE_PN2_MBAR,
+            "dose_fraction": OWNER_RECIPE_DOSE_FRACTION,
             "native_fe_pool_mol": owner["native_fe_pool_mol"],
             "native_fe_tap_mol": owner["native_fe_tap_mol"],
             "native_fe_vapor_mol": owner["native_fe_vapor_mol"],

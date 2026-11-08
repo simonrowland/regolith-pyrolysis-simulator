@@ -408,9 +408,164 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     assert seen["po2_bar"] is None
     assert seen["cell_material"] is None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
+
+
+@pytest.mark.parametrize("missing_input", ("composition", "temperature"))
+def test_knudsen_effusion_balance_requires_composition_and_temperature(
+    missing_input: str,
+) -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    observation, experiment = _kems_partial(cell_material=None)
+    identity = observation.identity
+    assert identity.composition is not None and identity.composition.is_value
+    composition = identity.composition.value
+    temperature = (
+        float(identity.temperature_K.value)
+        if identity.temperature_K is not None and identity.temperature_K.is_value
+        else None
+    )
+    if missing_input == "composition":
+        observation = replace(
+            observation,
+            identity=replace(
+                identity,
+                composition=State.unknown("no melt composition"),
+            ),
+        )
+        composition = None
+    else:
+        temperature = None
+
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.PT,)),
+        observation,
+        composition=composition,
+        temperature_K=temperature,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert resolved is None
+
+
+def test_unprinted_knudsen_fo2_prefers_effusion_to_kress_composition_inversion() -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    observation, experiment = _kems_partial(cell_material=None)
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("FeO", Decimal("0.2")),
+            ("Fe2O3", Decimal("0.2")),
+            ("SiO2", Decimal("0.6")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(observation.identity, composition=State.of(composition))
+    observation = replace(observation, identity=identity)
+    temperature = float(identity.temperature_K.value)
+
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.PT,)),
+        observation,
+        composition=composition,
+        temperature_K=temperature,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert resolved is not None
+    assert resolved.closure
+    assert resolved.route == "effusion_oxygen_balance"
+
+
+def test_printed_knudsen_buffer_precedes_effusion_balance() -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+    from simulator.battery.waypoints import Waypoint, WaypointAuthority, WaypointResult
+
+    observation, experiment = _kems_partial(cell_material=None)
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("FeO", Decimal("0.2")),
+            ("Fe2O3", Decimal("0.2")),
+            ("SiO2", Decimal("0.6")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(observation.identity, composition=State.of(composition))
+    observation = replace(observation, identity=identity)
+    printed_buffer = Waypoint(
+        name="oxygen_condition",
+        value=Value.point_of(Decimal("-12")),
+        route="buffer_relation",
+        authority=WaypointAuthority.DERIVED,
+        inputs=("experiment.fO2_control.buffer",),
+    )
+    oxygen = WaypointResult(
+        name="oxygen_condition",
+        selected=printed_buffer,
+        routes=(printed_buffer,),
+    )
+
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.PT,)),
+        observation,
+        composition=composition,
+        temperature_K=float(identity.temperature_K.value),
+        oxygen=oxygen,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert resolved is not None
+    assert not resolved.closure
+    assert resolved.route == "buffer_relation"
+
+
+def test_knudsen_effusion_balance_uses_hertz_knudsen_flux_weighting() -> None:
+    from openimcc import oxygen_balance_from_pressure_model, oxygen_balance_species_metadata
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_cell_oxygen_balance,
+    )
+
+    species = oxygen_balance_species_metadata({"SiO": "SiO2", "O2": None})
+    root_logp = -5.0
+    target_p_sio_bar = 1e-3
+    # SiO2(l) -> SiO(g) + 1/2 O2(g). Its gas O balance is
+    # 2 J_O2 = J_SiO; J_i ∝ p_i/sqrt(M_i T), so pO2/pSiO is
+    # 0.5*sqrt(M_O2/M_SiO), not the pressure-balance value 0.5.
+    expected_ratio = 0.5 * (
+        species["O2"].molar_mass / species["SiO"].molar_mass
+    ) ** 0.5
+
+    def pressure_model(pO2_bar: float) -> dict[str, float]:
+        delta_logp = math.log10(pO2_bar) - root_logp
+        return {
+            "SiO": target_p_sio_bar * 10.0 ** (-0.5 * delta_logp),
+            "O2": target_p_sio_bar * expected_ratio * 10.0**delta_logp,
+        }
+
+    pO2_bar, pressures, _balance, _cell_fraction, _cell_info = (
+        _solve_cell_oxygen_balance(
+            pressure_model,
+            species,
+            temperature_K=2000.0,
+            cell_material=None,
+            oxygen_balance_from_pressure_model=oxygen_balance_from_pressure_model,
+        )
+    )
+
+    assert pO2_bar == pytest.approx(10.0**root_logp, rel=1e-10)
+    assert pressures["O2"] / pressures["SiO"] == pytest.approx(expected_ratio)
+    assert pressures["O2"] / pressures["SiO"] != pytest.approx(0.5)
 
 
 @pytest.mark.parametrize(
@@ -441,38 +596,46 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
     assert seen["po2_bar"] is None
     assert seen["cell_material"] == cell_material
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
 
 
 @pytest.mark.parametrize(
-    ("engine", "materials", "reason"),
+    "materials",
     (
-        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
-        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
-        (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
+        None,
+        (CellMaterial.AL2O3,),
+        (CellMaterial.PT, CellMaterial.AL2O3),
+        (CellMaterial.OTHER,),
     ),
 )
-def test_noninert_knudsen_cell_refuses_oxygen_balance(
-    engine: Engine,
-    materials: tuple[CellMaterial, ...],
-    reason: str,
+def test_unmodelled_knudsen_cell_uses_flagged_melt_effusion_balance(
+    materials: tuple[CellMaterial, ...] | None,
     monkeypatch,
 ) -> None:
-    opened = _no_engine(monkeypatch)
+    seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        engine,
+        Engine.OPENIMCC,
         observation,
         experiment=experiment,
         bench=_cell_material_bench(materials),
         isolated=False,
     )
 
-    assert opened == []
-    assert prediction.refusal_detail["reason"] == reason
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["cell_material"] is None
+    assert prediction.refusal_detail.get("refusal_reason") == "census_stop"
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "cell oxygen balance not modelled" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -505,17 +668,15 @@ def test_unmodelled_reactive_knudsen_cell_predicts_with_notice(
 
     assert prediction.refusal_detail.get("reason") != "reactive_cell_oxygen_reservoir"
     assert any(
-        "reactive cell: oxygen balance of the cell not modelled" in notice.reason
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "reactive cell: oxygen balance of the cell not modelled" in notice.reason
         for notice in prediction.notices
     )
-    # Without printed fo2, p_partial still needs an oxygen input or omission.
-    assert prediction.refusal_detail.get("reason") in {None, "missing_fO2"} or (
-        seen.get("mode") in {PO2_NOT_AN_INPUT, PO2_COMMANDED}
-    )
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
 
 
-def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> None:
-    opened = _no_engine(monkeypatch)
+def test_platinum_alloy_prose_stays_untyped_and_uses_flagged_melt_balance(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
     bench = replace(
         _cell_material_bench(None),
@@ -530,8 +691,13 @@ def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> 
         isolated=False,
     )
 
-    assert opened == []
-    assert prediction.refusal_detail["reason"] == "cell_material_unknown"
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["cell_material"] is None
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and "cell oxygen balance not modelled" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(monkeypatch) -> None:
@@ -578,7 +744,10 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
 
@@ -673,7 +842,14 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     obs = F.observation("no-p", "exp", ident, Decimal("0.2"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
     assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
-    assert seen["mode"] == PO2_COMMANDED
+    assert seen["mode"] == PO2_NOT_AN_INPUT
+    assert seen["po2_bar"] is None
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "melt has no multivalent element" in notice.reason
+        and "oxygen is not an input and was omitted" in notice.reason
+        for notice in prediction.notices
+    )
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "does not carry total_pressure_Pa" in notice.reason
@@ -759,7 +935,10 @@ def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
 
     assert prediction.value is not None
     assert any(
-        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
         for notice in prediction.notices
     )
     solved_notice = next(

@@ -1863,8 +1863,14 @@ def test_stolyarova_typed_w_cell_scores_at_source_oxygen_and_flags_uncalibrated_
                     if notice.origin == "source oxygen selection"
                 ]
                 assert len(fallback) == 1
-                prefix = "model assumption: vapour-only zero-storage closure; source_oxygen_fallback="
+                # 215472441 deliberately renamed the fallback as a predict-and-flag
+                # substitution; source_oxygen.py keeps the INPUT_OMITTED kind.
+                prefix = (
+                    "predict-and-flag substitution: congruent vapour-only "
+                    "zero-storage closure; source_oxygen_fallback="
+                )
                 assert fallback[0].reason.startswith(prefix)
+                assert fallback[0].kind is NoticeKind.INPUT_OMITTED
                 assert SourceOxygenFallbackReason(fallback[0].reason.removeprefix(prefix))
     assert linked_seen > 0 and closure_seen > 0 and anchor_seen > 0
     assert all(
