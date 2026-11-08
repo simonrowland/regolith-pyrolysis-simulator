@@ -164,7 +164,9 @@ def _measured_report(payload: Mapping[str, object]) -> str:
     return "\n".join(lines)
 
 
-def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
+def _run_measured_headline(
+    root: Path, engines: tuple, context=None, *, workers: int = 1
+) -> int:
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
     print("loading measured-tier score context", flush=True)
@@ -177,10 +179,15 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
     }
     handles: dict[str, object] = {}
     openimcc_handle = None
+    close_engine_handle = None
     try:
         if any(engine.value == "openimcc" for engine in engines):
-            from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                close_battery_engine_handle,
+                open_battery_engine,
+            )
 
+            close_engine_handle = close_battery_engine_handle
             openimcc_install = _openimcc_install_identity()
             print(
                 "openimcc install: "
@@ -195,6 +202,13 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
                 getattr(openimcc_handle, "identity", {}) or {}
             )
             engine_identities["openimcc"]["installation"] = openimcc_install
+        score_handles = handles
+        if workers > 1:
+            if openimcc_handle is not None:
+                assert close_engine_handle is not None
+                close_engine_handle(openimcc_handle)
+                openimcc_handle = None
+            score_handles = {}
         written, metadata = _score_store_to_jsonl(
             context,
             residuals_path,
@@ -202,7 +216,8 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
             root=root,
             include_diagnostics=False,
             measured_only=True,
-            handles=handles,
+            handles=score_handles,
+            workers=workers,
         )
         residuals = _ResidualJsonlRows(
             residuals_partial,
@@ -256,11 +271,8 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
         os.replace(residuals_partial, residuals_path)
         return 0
     finally:
-        if openimcc_handle is not None:
-            backend = getattr(openimcc_handle, "backend", None)
-            close = getattr(backend, "close", None)
-            if callable(close):
-                close()
+        if openimcc_handle is not None and close_engine_handle is not None:
+            close_engine_handle(openimcc_handle)
 
 
 def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
@@ -385,6 +397,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--work", default=None, help="restrict to one work_id or source_id")
     parser.add_argument("--limit", type=int, default=None, help="max observations")
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="spawn this many scorer processes (default: 1)",
+    )
+    parser.add_argument(
         "--studio",
         action="store_true",
         help="dispatch MELTS engines (alphamelts/thermoengine/magemin) to Studio 1",
@@ -411,6 +429,8 @@ def main(argv: list[str] | None = None) -> int:
         help="accept current source-derived decision-band minima into the ratchet file",
     )
     args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error("--workers must be at least 1")
 
     if args.update_band_ratchet:
         context = load_score_context(args.root)
@@ -422,7 +442,7 @@ def main(argv: list[str] | None = None) -> int:
     rail = None if args.rail is None else canonicalize_rail(args.rail)
 
     if args.measured_headline:
-        return _run_measured_headline(args.root, engines)
+        return _run_measured_headline(args.root, engines, workers=args.workers)
 
     if args.write_pins:
         payload = migrate_pin_records(args.root)
@@ -514,6 +534,8 @@ def main(argv: list[str] | None = None) -> int:
             extra.extend(["--work", args.work])
         if args.limit is not None:
             extra.extend(["--limit", str(args.limit)])
+        if args.workers > 1:
+            extra.extend(["--workers", str(args.workers)])
         studio_hostname, studio_comparisons_path = _run_studio(melts, extra)
         engines = tuple(laptop)
 
@@ -526,6 +548,7 @@ def main(argv: list[str] | None = None) -> int:
         rail=rail,
         work_id=args.work,
         limit=args.limit,
+        workers=args.workers,
     )
     partial_path = residuals_path.with_name(residuals_path.name + ".partial")
     payloads = _ResidualJsonlRows(
