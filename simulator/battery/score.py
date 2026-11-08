@@ -3086,7 +3086,9 @@ def _resolve_condensed_element_reference(
         and uncertainty.kind in {UncertaintyKind.NONE, UncertaintyKind.PRINTED}
     ):
         uncertainty = _standard_pressure_ambiguity_uncertainty(
-            temperature_K, uncertainty
+            temperature_K,
+            uncertainty,
+            observation_id=reference.observation_id,
         )
     provenance = dict(reference.provenance or {})
     if basis.extrapolated_elements:

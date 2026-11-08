@@ -1203,7 +1203,10 @@ def _hold_reason_notice(
 
 
 def _standard_pressure_ambiguity_uncertainty(
-    temperature_K: Decimal, uncertainty: Uncertainty
+    temperature_K: Decimal,
+    uncertainty: Uncertainty,
+    *,
+    observation_id: str,
 ) -> Uncertainty:
     """Attach the row's bounded 1 bar/1 atm width without changing its value."""
 
@@ -1233,8 +1236,13 @@ def _standard_pressure_ambiguity_uncertainty(
         basis="kJ/mol",
         derivation=Derivation(
             relation=_STANDARD_PRESSURE_AMBIGUITY_RELATION,
-            inputs=(),
-            parameters=(),
+            inputs=(
+                f"observation[{observation_id}].point_conditions.temperature_K",
+            ),
+            parameters=(
+                ("p_bar_Pa", Located(State.of(PA_PER_BAR_DEC))),
+                ("p_atm_Pa", Located(State.of(PA_PER_ATM_DEC))),
+            ),
             output_unit="kJ/mol",
         ),
     )
@@ -27322,7 +27330,7 @@ class Migrator:
                         "requires a positive row values.T_K"
                     )
                 uncertainty = _standard_pressure_ambiguity_uncertainty(
-                    row_temperature_K, uncertainty
+                    row_temperature_K, uncertainty, observation_id=obs_id
                 )
         identity, point_conditions, observation_notices = (
             _initial_charge_only_missing_composition(

@@ -33,7 +33,11 @@ from simulator.battery.identity import (
     standard_pressure_delta_g_kJ_per_mol,
     quantity_token,
 )
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import (
+    Migrator,
+    observation_from_plain,
+    to_plain,
+)
 from simulator.battery.records import Execution, phase_token
 from simulator.battery.score import (
     ENGINE_CHANNELS,
@@ -261,6 +265,52 @@ def _migrate_extract_document(document: dict, path: Path):
     migrator._migrate_extract(path)
     migrator.finalize()
     return migrator.result
+
+
+def test_standard_pressure_uncertainty_derivation_roundtrips_temperature_input(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    result = _migrate_extract_document(document, tmp_path / EXTRACT.name)
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.uncertainty.derivation is not None
+        and row.uncertainty.derivation.relation
+        == "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+    ]
+
+    assert len(rows) == 12
+    for row in rows:
+        derivation = row.uncertainty.derivation
+        assert derivation is not None
+        assert derivation.inputs == (
+            f"observation[{row.observation_id}].point_conditions.temperature_K",
+        )
+        parameters = dict(derivation.parameters)
+        assert parameters["p_bar_Pa"].state.value == PA_PER_BAR_DEC
+        assert parameters["p_atm_Pa"].state.value == PA_PER_ATM_DEC
+        temperature = row.identity.temperature_K.value
+        temperature_condition = row.point_conditions["temperature_K"]
+        assert temperature_condition.locator is not None
+        assert temperature_condition.state.is_value
+        condition_value = temperature_condition.state.value
+        assert getattr(condition_value, "point", condition_value) == temperature
+        assert row.uncertainty.value == abs(
+            standard_pressure_delta_g_kJ_per_mol(
+                Decimal("1"), temperature, PA_PER_BAR_DEC, PA_PER_ATM_DEC
+            )
+        )
+
+    serialized = to_plain(rows[0])
+    assert isinstance(serialized, dict)
+    restored = observation_from_plain(serialized)
+    assert restored.uncertainty == rows[0].uncertainty
+
+    mutated = deepcopy(serialized)
+    mutated["uncertainty"]["derivation"]["inputs"] = []
+    with pytest.raises(ValueError, match="Derivation.inputs is required"):
+        observation_from_plain(mutated)
 
 
 def _migrate_condensed_reference_sources(tmp_path: Path):
