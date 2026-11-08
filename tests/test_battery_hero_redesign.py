@@ -88,7 +88,7 @@ def _fixture_archive(path: Path) -> None:
         archive.addfile(member, io.BytesIO(residuals))
 
 
-def _many_row_archive(path: Path, count: int) -> None:
+def _many_row_archive(path: Path, count: int, *, refused_count: int = 0) -> None:
     rows = [{"kind": "battery_store_stamp", "revision": "memory-fixture"}]
     rows.extend(
         _residual(
@@ -100,6 +100,19 @@ def _many_row_archive(path: Path, count: int) -> None:
         )
         for index in range(count)
     )
+    for index in range(refused_count):
+        sio2 = 0.3 + index / 10000
+        row = _residual(
+            "openimcc", "vapour", f"refused-memory-{index}", 1500, 0.1
+        )
+        row["status"] = "refused"
+        row["numeric"] = None
+        row["refusal"] = {"reason": "identity_incomplete"}
+        row["execution"] = {"call_evidence": True}
+        row["candidate_observation"]["identity"]["composition"]["value"][
+            "components"
+        ] = [["SiO2", f"{sio2:.4f}"], ["FeO", f"{1 - sio2:.4f}"]]
+        rows.append(row)
     residuals = "".join(json.dumps(row) + "\n" for row in rows).encode()
     with tarfile.open(path, "w:gz") as archive:
         member = tarfile.TarInfo("data/battery/residuals.jsonl")
@@ -448,21 +461,26 @@ def test_html_uses_a_stratified_sample_and_exact_window_aggregates(tmp_path: Pat
     assert int(cell["n"]) == 100
     assert math.isclose(float(cell["sum_residual_dex"]), 0.0)
     assert math.isclose(float(cell["sum_squared_residual_dex"]), 2.0)
-    assert "snap" in files["methods"].read_text(encoding="utf-8").lower()
+    methods = files["methods"].read_text(encoding="utf-8")
+    assert "snap" in methods.lower()
     assert "exact" in files["methods"].read_text(encoding="utf-8").lower()
+    assert "Number.EPSILON" in methods
+    assert "nearest integer index" in methods
     assert files["html"].stat().st_size <= 8 * 1024 * 1024
 
 
 def test_read_scores_peak_memory_is_bounded_for_many_scored_rows(tmp_path: Path) -> None:
     archive = tmp_path / "memory.tgz"
-    _many_row_archive(archive, 20_000)
+    _many_row_archive(archive, 20_000, refused_count=1_000)
 
     tracemalloc.start()
-    hero_plot.read_scores(archive, _collection_mode=True)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
     _current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     assert peak < 40 * 1024 * 1024
+    assert data.hero_refusal_totals[("vapour", "openimcc", "identity_incomplete")] == 1000
+    assert not data.hero_refusals
 
 
 def test_component_rows_pair_openimcc_with_each_partners_shared_rows(tmp_path: Path) -> None:
@@ -905,6 +923,53 @@ def test_r2_metric_and_temperature_quantile_outputs_are_bit_identical(
     )
 
 
+def test_scorer_long_decimal_median_and_iqr_match_pre_r3_outputs() -> None:
+    # Expected strings were emitted by the production _median/_iqr functions
+    # from tree 37ce21876, before the r3 percentile refactor.
+    cases = (
+        (
+            (
+                "0.123456789012345678901234567890",
+                "0.223456789012345678901234567890",
+                "0.823456789012345678901234567890",
+                "0.923456789012345678901234567890",
+            ),
+            "0.523456789012345678901234568",
+            "0.6500000000000000000000000000",
+        ),
+        (
+            (
+                "0.1",
+                "0.1234567890123456789012345678",
+                "0.9234567890123456789012345678",
+            ),
+            "0.1234567890123456789012345678",
+            "0.4117283945061728394506172839",
+        ),
+        (
+            ("0.12345678901234567890123456789",),
+            "0.12345678901234567890123456789",
+            None,
+        ),
+        (
+            (
+                "1.000000000000000000000000000001",
+                "1.000000000000000000000000000003",
+                "1.000000000000000000000000000009",
+                "1.000000000000000000000000000021",
+                "1.000000000000000000000000000055",
+            ),
+            "1.000000000000000000000000000009",
+            "0E-27",
+        ),
+    )
+    for inputs, expected_median, expected_iqr in cases:
+        values = [Decimal(value) for value in inputs]
+        assert str(battery_score._median(values)) == expected_median
+        iqr = battery_score._iqr(values)
+        assert (None if iqr is None else str(iqr)) == expected_iqr
+
+
 def test_clipped_hexbin_rows_keep_temperature_and_count_all_rows(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -976,7 +1041,7 @@ def test_window_filters_use_snapped_half_open_bin_indices() -> None:
     script = hero_plot._COLLECTION_INTERACTIVE_SCRIPT
     assert "function resolveBinIndex" in script
     assert "function windowIndices" in script
-    assert "row.temperature_bin<tlo||row.temperature_bin>=thi" in script
+    assert "row.fingerprint_temperature_bin<tlo||row.fingerprint_temperature_bin>=thi" in script
     assert "cell[2]<tlo||cell[2]>=thi" in script
     assert "cell[3]<slo||cell[3]>=shi" in script
 
@@ -988,7 +1053,7 @@ def test_window_filters_use_snapped_half_open_bin_indices() -> None:
             "const TEMPERATURE_BIN_K=100,SIO2_BIN_WIDTH=0.05;",
             "const tMin={value:'1500'},tMax={value:'1600'},sMin={value:'0.15'},sMax={value:'0.30'};",
             browser_functions,
-            "console.log(JSON.stringify({edges:[resolveBinIndex(0.15,0.05,'lower'),resolveBinIndex(0.30,0.05,'lower'),resolveBinIndex(0.60,0.05,'upper')],window:windowIndices(),inside:inWindow({temperature_bin:15,sio2_bin:3}),upperSiO2:inWindow({temperature_bin:15,sio2_bin:6}),upperTemperature:inWindow({temperature_bin:16,sio2_bin:3})}));",
+            "console.log(JSON.stringify({edges:[resolveBinIndex(0.15,0.05,'lower'),resolveBinIndex(0.30,0.05,'lower'),resolveBinIndex(0.60,0.05,'upper')],window:windowIndices(),inside:inWindow({temperature_bin:31,fingerprint_temperature_bin:15,sio2_bin:3}),upperSiO2:inWindow({temperature_bin:31,fingerprint_temperature_bin:15,sio2_bin:6}),upperTemperature:inWindow({temperature_bin:32,fingerprint_temperature_bin:16,sio2_bin:3})}));",
         )
     )
     result = subprocess.run(
@@ -1004,6 +1069,32 @@ def test_window_filters_use_snapped_half_open_bin_indices() -> None:
         "upperSiO2": False,
         "upperTemperature": False,
     }
+
+
+def test_collection_sample_uses_scorer_temperature_bin_at_custom_chart_width(
+    tmp_path: Path,
+) -> None:
+    archive = tmp_path / "custom-bin-width.tgz"
+    _write_archive(
+        archive,
+        [
+            {"kind": "battery_store_stamp", "revision": "custom-bin-width"},
+            _residual("openimcc", "vapour", "1550-K", 1550, 0.1),
+        ],
+    )
+    data = hero_plot.read_scores(
+        archive, bin_width_K=50, _collection_mode=True
+    )
+    database = sqlite3.connect(":memory:")
+    hero_plot._collection_row_database(archive, database, bin_width_K=50)
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=50
+    )
+    database.close()
+
+    sample = next(row for row in tables["sample"] if row["engine"] == "openimcc")
+    assert sample["temperature_bin"] == 31
+    assert sample["fingerprint_temperature_bin"] == 15
 
 
 def test_interactive_fingerprint_palette_uses_one_python_definition(
@@ -1140,24 +1231,38 @@ def test_scorecard_row_band_groups_temperature_pairs_and_counts(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     figures = _capture_collection_figures(monkeypatch)
-    row = {
-        "rail": "vapour",
-        "primary_engine": "openimcc",
-        "comparison_engine": "vaporock",
-        "n_shared": "10",
-        "high_n_shared": "6",
-        "high_primary_rms_dex": "0.2",
-        "high_comparison_rms_dex": "0.3",
-        "low_n_shared": "4",
-        "low_primary_rms_dex": "0.4",
-        "low_comparison_rms_dex": "0.5",
-    }
+    rows = []
+    partners = (
+        "vaporock",
+        "thermoengine",
+        "alphamelts",
+        "magemin",
+        "internal-analytical",
+    )
+    for rail, _label in hero_plot.COLLECTION_OBSERVABLES:
+        for index, partner in enumerate(partners):
+            rows.append(
+                {
+                    "rail": rail,
+                    "primary_engine": "openimcc",
+                    "comparison_engine": partner,
+                    "n_shared": "10",
+                    "high_n_shared": "6",
+                    "high_primary_rms_dex": str(0.2 + index / 100),
+                    "high_comparison_rms_dex": str(0.3 + index / 100),
+                    "low_n_shared": "4",
+                    "low_primary_rms_dex": str(0.4 + index / 100),
+                    "low_comparison_rms_dex": str(0.5 + index / 100),
+                }
+            )
 
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", [row])
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", rows)
 
     figure = figures[-1]
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
     axis = figure.axes[0]
-    labels = [text for text in axis.texts if text.get_text() == "openimcc vs vaporock"]
+    labels = [text for text in axis.texts if " vs " in text.get_text()]
     counts = [text for text in axis.texts if text.get_text().startswith("n=10")]
     pair_lines = [
         line
@@ -1167,16 +1272,90 @@ def test_scorecard_row_band_groups_temperature_pairs_and_counts(
         and line.get_xdata()[0] != line.get_xdata()[1]
         and line.get_ydata()[0] != 0
     ]
-    assert len(labels) == 1
-    assert len(counts) == 1
-    assert len(pair_lines) == 2
-    row_center = 0
-    pair_positions = sorted(float(line.get_ydata()[0]) for line in pair_lines)
-    assert pair_positions[0] < row_center < pair_positions[1]
-    assert abs(pair_positions[0] - row_center) < 0.2
-    assert abs(pair_positions[1] - row_center) < 0.2
-    assert labels[0].get_position()[1] < pair_positions[0]
-    assert counts[0].get_position()[1] > pair_positions[1]
+    assert len(labels) == 5
+    assert len(counts) == 5
+    assert len(pair_lines) == 10
+    assert any("internal-analytical" in text.get_text() for text in labels)
+    for row_index in range(5):
+        pair_positions = sorted(
+            float(line.get_ydata()[0])
+            for line in pair_lines
+            if round(float(line.get_ydata()[0])) == row_index
+        )
+        label = next(
+            text for text in labels
+            if text.get_text().endswith(partners[row_index])
+        )
+        count = counts[row_index]
+        assert len(pair_positions) == 2
+        assert label.get_position()[1] < pair_positions[0]
+        assert count.get_position()[1] > pair_positions[1]
+
+    from matplotlib.collections import PathCollection
+
+    row_texts_by_axis = []
+    count_texts_by_axis = []
+    for panel in figure.axes:
+        row_texts = [text for text in panel.texts if " vs " in text.get_text()]
+        count_texts = [
+            text for text in panel.texts if text.get_text().startswith("n=")
+        ]
+        marker_boxes = [
+            collection.get_window_extent(renderer)
+            for collection in panel.collections
+            if isinstance(collection, PathCollection)
+            and len(collection.get_offsets())
+        ]
+        for text in row_texts + count_texts:
+            text_box = text.get_window_extent(renderer)
+            assert all(
+                not text_box.overlaps(marker_box)
+                for marker_box in marker_boxes
+            ), f"{text.get_text()} overlaps a comparison marker"
+        row_texts_by_axis.append(row_texts)
+        count_texts_by_axis.append(count_texts)
+    for index in range(len(figure.axes) - 1):
+        left_panel_counts = count_texts_by_axis[index]
+        right_panel_labels = row_texts_by_axis[index + 1]
+        for count in left_panel_counts:
+            for label in right_panel_labels:
+                assert not count.get_window_extent(renderer).overlaps(
+                    label.get_window_extent(renderer)
+                ), "neighboring panel count overlaps a long comparison label"
+
+
+def test_empty_temperature_panel_does_not_draw_zero_line_through_message(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "empty-b.png",
+        "vapour",
+        [
+            {
+                "rail": "vapour",
+                "engine": "magemin",
+                "n": "0",
+                "plotted_n": "0",
+                "rms_dex": "",
+                "flagged_n": "0",
+                "clipped_low_n": "0",
+                "clipped_high_n": "0",
+                "temperature_min_K": "",
+                "temperature_max_K": "",
+            }
+        ],
+        [],
+        [],
+        [],
+    )
+    axis = figures[-1].axes[0]
+    assert any(text.get_text() == "no scored rows" for text in axis.texts)
+    assert not any(
+        len(line.get_ydata())
+        and all(float(value) == 0 for value in line.get_ydata())
+        for line in axis.lines
+    )
 
 
 def test_empty_collection_panels_explain_missing_rows(
@@ -1283,6 +1462,38 @@ def test_fingerprint_and_html_engine_order_use_one_definition(
     hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", [], tuple(reversed(ENGINE_ORDER)))
     assert [axis.get_title(loc="left") for axis in figures[-1].axes] == list(ENGINE_ORDER)
 
+    archive = tmp_path / "engine-order.tgz"
+    _fixture_archive(archive)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+    comparison_records = [
+        {
+            "engine": engine,
+            "n_shared": count,
+            "views": {"all": {"n_shared": count}},
+        }
+        for engine, count in (
+            ("alphamelts", 50),
+            ("magemin", 40),
+            ("internal-analytical", 30),
+            ("thermoengine", 20),
+            ("vaporock", 10),
+        )
+    ]
+    data = replace(
+        data,
+        hero_comparisons={
+            ("vapour", "openimcc"): {"comparisons": comparison_records}
+        },
+    )
+    scorecard_rows = hero_plot._scorecard_table_rows(data)
+    assert [
+        row["comparison_engine"]
+        for row in scorecard_rows
+        if row["rail"] == "vapour"
+    ] == [
+        engine for engine in ENGINE_ORDER if engine != "openimcc"
+    ]
+
     chart = tmp_path / "chart.png"
     chart.write_bytes(b"png")
     charts = {
@@ -1312,6 +1523,8 @@ def test_fingerprint_and_html_engine_order_use_one_definition(
 def test_progress_uses_shared_dates_and_marks_current_candidate_not_green(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    from matplotlib.colors import to_hex
+
     archive = tmp_path / "candidate.tgz"
     _fixture_archive(archive)
     data = hero_plot.read_scores(archive, _collection_mode=True)
@@ -1334,11 +1547,26 @@ def test_progress_uses_shared_dates_and_marks_current_candidate_not_green(
     assert "candidate (not green)" in [
         text.get_text() for text in figure.legends[0].get_texts()
     ]
-    assert any(
-        collection.get_label() == "candidate (not green)"
+    candidate_artists = [
+        collection
         for axis in axes
         for collection in axis.collections
-    )
+        if collection.get_label().startswith("candidate:")
+    ]
+    assert {artist.get_label().split(":", 1)[1] for artist in candidate_artists} == {
+        "openimcc",
+        "vaporock",
+    }
+    for artist in candidate_artists:
+        engine = artist.get_label().split(":", 1)[1]
+        assert to_hex(artist.get_facecolors()[0]) == hero_plot._HERO_ENGINE_COLORS[engine]
+        assert to_hex(artist.get_edgecolors()[0]) == "#263238"
+
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    legend_bottom = figure.legends[0].get_window_extent(renderer).y0
+    first_panel_top = axes[0].get_window_extent(renderer).y1
+    assert legend_bottom - first_panel_top < figure.dpi * 0.35
 
 
 def test_temperature_chart_omits_unexplained_association_floor(
