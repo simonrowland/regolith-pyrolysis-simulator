@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -41,6 +42,31 @@ def _request() -> dict[str, object]:
         'quantity': 'vapour_pressure',
         'conditions': {'T_K': 1800.0, 'P_bar': 1.0},
     }
+
+
+def _read_pids(*paths: Path) -> tuple[int, ...]:
+    return tuple(int(path.read_text(encoding='utf-8')) for path in paths)
+
+
+def _assert_pids_gone(pids: tuple[int, ...]) -> None:
+    for pid in pids:
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.02)
+        else:
+            pytest.fail(f'remote process {pid} remained after cleanup')
+
+
+def _kill_pids(pids: tuple[int, ...]) -> None:
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
 
 
 def test_ready_and_produced_reply(remote_worker_factory):
@@ -171,3 +197,72 @@ def test_protocol_version_mismatch_is_typed(remote_worker_factory):
     result = remote_worker_factory('version-mismatch').call(_request())
 
     assert result['code'] == 'protocol_version_mismatch'
+
+
+def test_inherited_group_timeout_kills_worker_and_grandchild(
+    remote_worker_factory, monkeypatch, tmp_path,
+):
+    monkeypatch.setenv('REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP', '1')
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'subtree-timeout', str(worker_pid_file), str(grandchild_pid_file),
+        call_timeout_s=0.15,
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        result = worker.call(_request())
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+
+        assert result['code'] == 'call_timeout'
+        _assert_pids_gone(pids)
+    finally:
+        worker.close()
+        _kill_pids(pids)
+
+
+def test_inherited_group_close_kills_worker_and_grandchild(
+    remote_worker_factory, monkeypatch, tmp_path,
+):
+    monkeypatch.setenv('REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP', '1')
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'subtree-close', str(worker_pid_file), str(grandchild_pid_file),
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        result = worker.call(_request())
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        worker.close()
+
+        assert result['status'] == 'produced'
+        _assert_pids_gone(pids)
+    finally:
+        worker.close()
+        _kill_pids(pids)
+
+
+def test_inherited_group_replacement_kills_old_worker_subtree(
+    remote_worker_factory, monkeypatch, tmp_path,
+):
+    monkeypatch.setenv('REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP', '1')
+    marker = tmp_path / 'crashed-once.txt'
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    worker = remote_worker_factory(
+        'crash-subtree-first', str(marker), str(worker_pid_file),
+        str(grandchild_pid_file),
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        first = worker.call(_request())
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        second = worker.call(_request())
+
+        assert first['code'] == 'child_crash'
+        assert second['status'] == 'produced'
+        _assert_pids_gone(pids)
+    finally:
+        worker.close()
+        _kill_pids(pids)

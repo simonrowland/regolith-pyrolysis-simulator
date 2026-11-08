@@ -266,6 +266,30 @@ def _process_pid(process: Any) -> int | None:
     return int(pid)
 
 
+def _signal_worker_process(process: Any, signum: int) -> None:
+    pid = _process_pid(process)
+    if pid is None:
+        return
+    if os.environ.get(INHERIT_PROCESS_GROUP_ENV) != '1':
+        try:
+            os.killpg(pid, signum)
+            if signum != signal.SIGKILL:
+                return
+            if not process.is_alive():
+                return
+        except (AttributeError, OSError):
+            pass
+    try:
+        if signum == signal.SIGTERM:
+            process.terminate()
+        elif signum == signal.SIGKILL:
+            process.kill()
+        else:
+            os.kill(pid, signum)
+    except (AttributeError, OSError):
+        pass
+
+
 def _pool_ready_wait_s(workers: list[Any] | tuple[Any, ...]) -> float:
     # Premise: constructor first-start on each slot thread, concurrent.
     # start() order before _start_and_consume can ready.put:
@@ -1524,16 +1548,10 @@ class WarmEngineWorker:
                 if cleanup_group or (
                     process is not None and process.is_alive()
                 ):
-                    try:
-                        os.killpg(pid, signal.SIGKILL)
-                        process.join(timeout=0.1)
-                    except (AttributeError, OSError):
-                        pass
+                    _signal_worker_process(process, signal.SIGKILL)
+                    process.join(timeout=0.1)
                 if process is not None and process.is_alive():
-                    try:
-                        process.kill()
-                    except OSError:
-                        pass
+                    _signal_worker_process(process, signal.SIGKILL)
                 if process is not None:
                     process.join(timeout=1.0)
         finally:
@@ -1579,21 +1597,12 @@ class WarmEngineWorker:
             if process is not None and process_pid is not None:
                 process.join(timeout=1.0)
                 if process.is_alive():
-                    try:
-                        os.killpg(process_pid, signal.SIGTERM)
-                    except (AttributeError, OSError):
-                        process.terminate()
+                    _signal_worker_process(process, signal.SIGTERM)
                     process.join(timeout=1.0)
                 if process.is_alive():
-                    try:
-                        os.killpg(process_pid, signal.SIGKILL)
-                    except (AttributeError, OSError):
-                        process.kill()
+                    _signal_worker_process(process, signal.SIGKILL)
                     process.join(timeout=1.0)
-                try:
-                    os.killpg(process_pid, signal.SIGKILL)
-                except (AttributeError, OSError):
-                    pass
+                _signal_worker_process(process, signal.SIGKILL)
             self._finish_native_output_capture(process)
         self._reap_pending(timeout_s=1.0)
 
@@ -1627,13 +1636,7 @@ class WarmEngineWorker:
         if process is not None:
             pid = _process_pid(process)
             if pid is not None:
-                try:
-                    os.killpg(pid, signal.SIGKILL)
-                except (AttributeError, OSError, ProcessLookupError):
-                    try:
-                        process.kill()
-                    except (AttributeError, OSError, ProcessLookupError):
-                        pass
+                _signal_worker_process(process, signal.SIGKILL)
                 self._close_native_output_writer(process)
 
     def _reap_pending(self, *, timeout_s: float) -> bool:
@@ -1844,17 +1847,16 @@ class _RemoteEngineStdioProcess:
         try:
             self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
         except subprocess.TimeoutExpired:
-            try:
-                self.process.terminate()
-            except OSError:
-                pass
+            pass
+        try:
+            os.killpg(self.process.pid, signal.SIGKILL)
+        except OSError:
+            pass
+        if self.process.poll() is None:
             try:
                 self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
             except subprocess.TimeoutExpired:
-                try:
-                    self.process.kill()
-                except OSError:
-                    pass
+                self.process.kill()
                 self.process.wait()
         self._stderr_thread.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
         for stream in (self.process.stdout, self.process.stderr):
@@ -1869,6 +1871,7 @@ def _remote_engine_stdio_bootstrap(
     argv: tuple[str, ...],
     protocol_version: int,
     max_line_bytes: int,
+    pgid_sender: Any,
 ) -> tuple[_RemoteEngineStdioProcess, dict[str, Any]]:
     try:
         process = subprocess.Popen(
@@ -1879,11 +1882,25 @@ def _remote_engine_stdio_bootstrap(
             bufsize=0,
             close_fds=True,
             shell=False,
+            start_new_session=True,
         )
     except (OSError, ValueError) as exc:
         raise _RemoteEngineProtocolFailure(
             'startup_failure', f'could not launch remote worker: {exc}',
         ) from exc
+    try:
+        pgid_sender.send(process.pid)
+    except (BrokenPipeError, EOFError, OSError) as exc:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except OSError:
+            pass
+        process.wait()
+        raise _RemoteEngineProtocolFailure(
+            'startup_failure', f'could not report remote process group: {exc}',
+        ) from exc
+    finally:
+        pgid_sender.close()
     client = _RemoteEngineStdioProcess(process, max_line_bytes)
     try:
         ready = client.read_json_line()
@@ -2050,6 +2067,11 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             raise ValueError('remote worker max_line_bytes must be positive')
         self.max_line_bytes = int(max_line_bytes)
         self._pending_start_failure: BaseException | None = None
+        spawn_context = multiprocessing.get_context('spawn')
+        self._remote_pid_receive, self._remote_pid_sender = spawn_context.Pipe(
+            duplex=False,
+        )
+        self._remote_process_group_id: int | None = None
         super().__init__(
             name=name,
             bootstrap=_remote_engine_stdio_bootstrap,
@@ -2058,6 +2080,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 command,
                 REMOTE_ENGINE_PROTOCOL_VERSION,
                 self.max_line_bytes,
+                self._remote_pid_sender,
             ),
             startup_timeout_s=startup_timeout_s,
             call_timeout_s=call_timeout_s,
@@ -2069,8 +2092,101 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         except Exception as exc:
             self._pending_start_failure = exc
             return None
+        if not self._remote_pid_receive.poll(0.1):
+            process, connection = self.process, self.connection
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
+            self._pending_start_failure = _RemoteEngineProtocolFailure(
+                'startup_failure', 'remote worker did not report its process group',
+            )
+            return None
+        try:
+            self._remote_process_group_id = int(
+                self._remote_pid_receive.recv()
+            )
+        except (EOFError, OSError, TypeError, ValueError) as exc:
+            process, connection = self.process, self.connection
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
+            self._pending_start_failure = _RemoteEngineProtocolFailure(
+                'startup_failure', f'invalid remote process group report: {exc}',
+            )
+            return None
         self._pending_start_failure = None
         return ready
+
+    def _stop_remote_process_tree(
+        self,
+        process: Any,
+        connection: Any,
+    ) -> None:
+        groups = []
+        if self._remote_process_group_id is not None:
+            groups.append(self._remote_process_group_id)
+            self._remote_process_group_id = None
+        receiver = self._remote_pid_receive
+        deadline = time.monotonic() + (0.1 if process is not None else 0.0)
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining > 0.0 and not receiver.poll(remaining):
+                break
+            if not receiver.poll():
+                break
+            try:
+                groups.append(int(receiver.recv()))
+            except (EOFError, OSError, TypeError, ValueError):
+                break
+        for group_id in dict.fromkeys(groups):
+            if group_id <= 1 or group_id == os.getpgrp():
+                continue
+            try:
+                os.killpg(group_id, signal.SIGKILL)
+            except OSError:
+                pass
+        if (
+            process is not None
+            and process.is_alive()
+            and connection is not None
+        ):
+            try:
+                connection.send(None)
+            except (BrokenPipeError, EOFError, OSError):
+                pass
+            process.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+
+    def _stop_pair(
+        self,
+        process: Any,
+        connection: Any,
+        *,
+        diagnostic: bool,
+        cleanup_group: bool = False,
+    ) -> None:
+        self._stop_remote_process_tree(process, connection)
+        super()._stop_pair(
+            process,
+            connection,
+            diagnostic=diagnostic,
+            cleanup_group=cleanup_group,
+        )
+
+    def request_disable(self) -> None:
+        with self._state_lock:
+            process, connection = self.process, self.connection
+        self._stop_remote_process_tree(process, connection)
+        super().request_disable()
+
+    def close(self) -> None:
+        try:
+            super().close()
+        finally:
+            self._remote_process_group_id = None
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         request_id = uuid.uuid4().hex

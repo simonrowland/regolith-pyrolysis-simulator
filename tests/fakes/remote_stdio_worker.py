@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -15,6 +16,17 @@ mode = sys.argv[1]
 def send(value: object) -> None:
     sys.stdout.write(json.dumps(value, allow_nan=True, separators=(',', ':')) + '\n')
     sys.stdout.flush()
+
+
+def spawn_descendant(parent_pid_file: str, child_pid_file: str) -> None:
+    child = subprocess.Popen(
+        [sys.executable, '-c', 'import time; time.sleep(60)'],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    Path(parent_pid_file).write_text(str(os.getpid()), encoding='utf-8')
+    Path(child_pid_file).write_text(str(child.pid), encoding='utf-8')
 
 
 if mode == 'startup-failure':
@@ -39,10 +51,18 @@ for line in sys.stdin:
         if not marker.exists():
             marker.write_text('crashed once', encoding='utf-8')
             os._exit(23)
+    if mode == 'crash-subtree-first':
+        marker = Path(sys.argv[2])
+        if not marker.exists():
+            spawn_descendant(sys.argv[3], sys.argv[4])
+            marker.write_text('crashed once', encoding='utf-8')
+            os._exit(23)
+    if mode in ('subtree-timeout', 'subtree-close'):
+        spawn_descendant(sys.argv[2], sys.argv[3])
     if mode == 'stderr-noise':
         sys.stderr.write('fake worker diagnostic\n' * 30000)
         sys.stderr.flush()
-    if mode == 'call-timeout':
+    if mode in ('call-timeout', 'subtree-timeout'):
         Path(sys.argv[2]).write_text(str(os.getpid()), encoding='utf-8')
         time.sleep(10)
     if mode == 'malformed':
