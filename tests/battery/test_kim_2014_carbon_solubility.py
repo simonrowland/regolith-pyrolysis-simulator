@@ -8,7 +8,6 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
-    AmountBasis,
     Authority,
     Engine,
     EvidenceClass,
@@ -128,27 +127,19 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert _condition_amount(migrated, "temperature_K") == Decimal(row["T_K"])
             assert _condition_amount(migrated, "gas_mix") == "Ar"
             assert migrated.identity.composition is not None
-            assert migrated.identity.composition.is_value
-            composition = migrated.identity.composition.value
-            assert composition.basis == "printed_phase_composition"
-            assert composition.amount_basis is AmountBasis.MASS_PERCENT
-            assert dict(composition.components) == {
-                component: Decimal(value) for component, value in expected_values.items()
-            }
-            assert "Fe" not in dict(composition.components)
+            assert migrated.identity.composition.is_unknown
+            assert migrated.identity.composition.reason.endswith(
+                "is below 95 wt%"
+            )
             assert migrated.identity.fO2_Pa.is_unknown
-            assert migrated.notices == ()
 
     phase_row = migrated_by_id[source_rows["t1-r02"][0]["observation_id"]]
     prediction = predict_with_engine(Engine.MAGEMIN, phase_row)
-    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
     assert prediction.authority is Authority.REFUSED
-    # Phase is the token "l". The V/Mo/Ni map is not printed as this run's
-    # analysed glass, so the basis gate refuses the mass-percent identity.
-    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
-    assert prediction.refusal_detail["detail"] == (
-        "printed mass-percent phase identity cannot be read as moles"
-    )
+    # The printed phase map omits the Fe balance and fails closure, so identity
+    # remains incomplete and the engine is not probed.
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
 
     expected_parameters = {
         "kim2014_table3_epsilon_C^V": (Decimal("-1.94"), "0.018"),

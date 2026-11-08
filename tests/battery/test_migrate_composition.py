@@ -2828,6 +2828,21 @@ def test_b1128_renormalization_input_is_additive_to_base_store_load(
     )
 
 
+def test_retained_phase_composition_closes_with_same_row_sulfur() -> None:
+    located = migrate_module._mass_percent_composition_located(
+        {"Fe": Decimal("104")},
+        basis="printed_phase_composition",
+        locator=None,
+        closure_context={"_migrate_closure_only_components": {"S": "2"}},
+    )
+
+    assert located.state.is_unknown
+    assert located.state.reason == (
+        "mass-percent composition exceeds the accepted kept-sum limit: "
+        "sum=106 wt% is above 105 wt%"
+    )
+
+
 def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
     extract_path = (
         REPO_ROOT

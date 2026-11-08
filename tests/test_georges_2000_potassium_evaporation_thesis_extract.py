@@ -193,7 +193,14 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
         for row in composition_rows
         if row.identity.composition is None or not row.identity.composition.is_value
     ]
-    assert missing_composition == []
+    assert missing_composition == [
+        f"{SID}::georges_2000_annex_iii_r051_{formula.casefold()}"
+        for formula in (*COMPONENTS, "K2O_ion_probe")
+    ]
+    for observation_id in missing_composition:
+        row = next(row for row in composition_rows if row.observation_id == observation_id)
+        assert row.identity.composition.is_unknown
+        assert "kept sum=93.61 wt% is below 95 wt%" in row.identity.composition.reason
 
     migrated_by_id = {row.observation_id: row for row in observations}
     for row_ids, expected_wt_pct in (
@@ -252,6 +259,8 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
     ion_selection_rows = {
         row.observation_id.rsplit("::", 1)[1].split("_")[4]
         for row in composition_rows
+        if row.identity.composition is not None
+        and row.identity.composition.is_value
         if row.identity.composition.value.analysis_selection_rule
         == ANNEX_III_ION_SELECTION_RULE
     }

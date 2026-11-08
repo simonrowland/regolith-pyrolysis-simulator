@@ -344,12 +344,8 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
 
     from simulator.battery import migrate as migrate_module
 
-    # CrO, CaF2, and MoO2 are integer formulas whose mapped canonical key is
-    # the printed spelling. The integer fallback stores that same key when
-    # the map entry is absent, so deleting those entries does not change the
-    # stored identity and cannot catch an alias. CrO1.5 is the alias: its
-    # canonical key is Cr2O3, and without the map entry the fractional
-    # formula is refused instead of stored raw.
+    # Removing CrO1.5 makes it an unknown dropped component. The green 0.5 wt%
+    # limit refuses rows above that amount and admits rows at or below it.
     removed = {
         name: migrate_module._COMPOSITION_COMPONENTS.pop(name)
         for name in ("CrO1.5",)
@@ -366,16 +362,31 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
             and o.admission.status.value == "admitted"
         ]
         assert len(observations) == 24
-        assert all(o.identity.composition.is_unknown for o in observations)
-        assert all(
-            o.identity.composition.reason.startswith(
-                "printed oxide wt% map has unsupported numeric component(s): "
+        fractional = [o for o in observations if o.identity.species.formula == "CrO1.5"]
+        integer = [o for o in observations if o.identity.species.formula == "CrO"]
+        assert len(fractional) == len(integer) == 12
+        document = _document()
+        raw_amount_by_id = {
+            observation["observation_id"]: Decimal(
+                str(observation["values"]["points"][0]["composition_wt_pct"]["CrO1.5"])
             )
-            and any(
-                component in o.identity.composition.reason
-                for component in ("CrO", "CrO1.5")
-            )
-            for o in observations
-        )
+            for formula in ("CrO1.5", "CrO")
+            for observation in document["species"][formula]["observations"]
+        }
+        for observation in observations:
+            source_id = observation.observation_id.rsplit("::", 2)[-2]
+            raw_amount = raw_amount_by_id[source_id]
+            composition = observation.identity.composition
+            if raw_amount > Decimal("0.5"):
+                assert composition.is_unknown, (
+                    observation.observation_id,
+                    raw_amount,
+                    composition,
+                )
+                assert (
+                    f"CrO1.5={raw_amount} wt%" in composition.reason
+                )
+            else:
+                assert composition.is_value
     finally:
         migrate_module._COMPOSITION_COMPONENTS.update(removed)

@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import csv
 from copy import deepcopy
+from decimal import Decimal
 from io import StringIO
 from pathlib import Path
 
 import pytest
 import yaml
 
+from simulator.battery.enums import AmountBasis, NoticeKind
 from simulator.battery.migrate import Migrator
 
 
@@ -207,12 +209,34 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
-    # Table rows print phase_label slag or metal. They do not print that the
-    # oxide map is this run's analysed glass, so provenance stays unset.
-    assert all(row.identity.composition is not None and row.identity.composition.is_value for row in observations)
+    # Below-95 phase assays remain refused under the shared closure gate.
+    # The A-1 metal assay closes at 102.9 wt% and is normalized with notice.
+    by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in observations}
+    assert all(row.identity.composition is not None for row in observations)
+    a1_slag = by_id["henao_2001_t1_A-1_slag_Ni"]
+    assert a1_slag.identity.composition.is_unknown
+    assert a1_slag.identity.composition.reason.endswith(
+        "kept sum=80.10 wt% is below 95 wt%"
+    )
+    a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
+    assert a1_metal.identity.composition.is_value
+    composition = a1_metal.identity.composition.value
+    assert composition.amount_basis is AmountBasis.MASS_PERCENT
+    assert sum(dict(composition.components).values()).quantize(Decimal("0.000001")) == 100
+    assert composition.input_provenance is None
+    renormalization = next(
+        notice
+        for notice in a1_metal.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "printed phase mass-percent total=102.9 wt%" in notice.reason
+    )
+    assert renormalization.original == Decimal("102.9")
+    assert len([row for row in observations if row.identity.composition.is_value]) == 114
+    assert len([row for row in observations if row.identity.composition.is_unknown]) == 317
     assert all(
         row.identity.composition.value.input_provenance is None
         for row in observations
+        if row.identity.composition.is_value
     )
     assert all(row.locator and row.locator.page and row.locator.published_page for row in observations)
     migrated_contexts = [
