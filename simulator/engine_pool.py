@@ -2084,6 +2084,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self._remote_pid_sender: Any = None
         self._remote_process_group_id: int | None = None
         self._remote_pgid_lock = threading.Lock()
+        self._remote_pgid_reaper_lock = threading.Lock()
         self._remote_pgid_read = False
         self._remote_pgid_closed = False
         self._remote_pgid_error: str | None = None
@@ -2114,15 +2115,64 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             sender,
         )
 
+    def _remote_pgid_wait_deadline(
+        self,
+        cleanup_deadline: float | None,
+        *,
+        background_reaper: bool = False,
+    ) -> float | None:
+        deadline = self._remote_startup_deadline
+        if background_reaper:
+            return deadline
+        with self._state_lock:
+            active_cleanup_deadline = self._remote_cleanup_deadline
+        for candidate in (cleanup_deadline, active_cleanup_deadline):
+            if candidate is not None:
+                candidate -= (
+                    _REMOTE_ENGINE_CLOSE_WAIT_S
+                    + ENGINE_WORKER_CANCEL_POLL_S
+                )
+                deadline = (
+                    candidate if deadline is None else min(deadline, candidate)
+                )
+        return deadline
+
+    def _acquire_remote_pgid_lock(
+        self,
+        *,
+        cleanup_deadline: float | None,
+        background_reaper: bool = False,
+    ) -> bool:
+        while True:
+            deadline = self._remote_pgid_wait_deadline(
+                cleanup_deadline,
+                background_reaper=background_reaper,
+            )
+            if deadline is None:
+                return self._remote_pgid_lock.acquire(blocking=False)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0.0:
+                return self._remote_pgid_lock.acquire(blocking=False)
+            if self._remote_pgid_lock.acquire(
+                timeout=min(remaining, ENGINE_WORKER_CANCEL_POLL_S)
+            ):
+                return True
+
     def _remote_pgid(
         self,
         *,
         wait_for_report: bool = False,
         cleanup: bool = False,
         cleanup_deadline: float | None = None,
+        background_reaper: bool = False,
     ) -> int | None:
         """Read the launch PGID once and transfer it to cleanup once."""
-        with self._remote_pgid_lock:
+        if not self._acquire_remote_pgid_lock(
+            cleanup_deadline=cleanup_deadline,
+            background_reaper=background_reaper,
+        ):
+            return None
+        try:
             if self._remote_pgid_closed and not cleanup:
                 return None
             group_id = self._remote_process_group_id
@@ -2133,23 +2183,19 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             if self._remote_pgid_read:
                 return None
             receive = self._remote_pid_receive
-            deadline = self._remote_startup_deadline
             if receive is None:
                 return None
             try:
-                if wait_for_report and deadline is not None:
-                    if cleanup_deadline is not None:
-                        deadline = min(deadline, cleanup_deadline)
+                if wait_for_report:
                     while True:
-                        if not cleanup:
-                            with self._state_lock:
-                                active_cleanup_deadline = (
-                                    self._remote_cleanup_deadline
-                                )
-                            if active_cleanup_deadline is not None:
-                                deadline = min(
-                                    deadline, active_cleanup_deadline,
-                                )
+                        deadline = self._remote_pgid_wait_deadline(
+                            cleanup_deadline,
+                            background_reaper=background_reaper,
+                        )
+                        if deadline is None:
+                            if receive.poll(0.0):
+                                break
+                            return None
                         wait_s = deadline - time.monotonic()
                         if wait_s <= 0.0:
                             if receive.poll(0.0):
@@ -2187,6 +2233,8 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             if cleanup:
                 self._remote_process_group_id = None
             return group_id
+        finally:
+            self._remote_pgid_lock.release()
 
     def _record_remote_failure(self, failure: BaseException) -> None:
         with self._state_lock:
@@ -2300,28 +2348,26 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         connection: Any,
         *,
         cleanup_deadline: float | None = None,
-    ) -> None:
-        with self._remote_pgid_lock:
-            self._remote_pgid_closed = True
+    ) -> bool:
         if cleanup_deadline is None:
             with self._state_lock:
                 cleanup_deadline = self._remote_cleanup_deadline
-        wait_deadline = cleanup_deadline
-        if wait_deadline is not None:
-            # Leave one close wait and one cancellation poll for wrapper reap.
-            wait_deadline -= (
-                _REMOTE_ENGINE_CLOSE_WAIT_S
-                + ENGINE_WORKER_CANCEL_POLL_S
-            )
+        if self._acquire_remote_pgid_lock(
+            cleanup_deadline=cleanup_deadline,
+        ):
+            try:
+                self._remote_pgid_closed = True
+            finally:
+                self._remote_pgid_lock.release()
         group_id = self._remote_pgid(
             wait_for_report=process is not None,
             cleanup=True,
-            cleanup_deadline=wait_deadline,
+            cleanup_deadline=cleanup_deadline,
         )
         if group_id is not None:
             self._kill_remote_process_group(group_id)
-        else:
-            self._start_remote_pgid_reaper()
+        elif self._start_remote_pgid_reaper(process, connection):
+            return True
         if (
             process is not None
             and process.is_alive()
@@ -2332,12 +2378,33 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             except (BrokenPipeError, EOFError, OSError):
                 pass
             join_timeout = _REMOTE_ENGINE_CLOSE_WAIT_S
-            if cleanup_deadline is not None:
+            join_deadline = self._remote_pgid_wait_deadline(
+                cleanup_deadline,
+            )
+            if join_deadline is not None:
                 join_timeout = min(
                     join_timeout,
-                    max(0.0, cleanup_deadline - time.monotonic()),
+                    max(0.0, join_deadline - time.monotonic()),
                 )
             process.join(timeout=join_timeout)
+        return False
+
+    def _transfer_remote_pair_to_reaper(
+        self,
+        process: Any,
+        connection: Any,
+    ) -> None:
+        with self._state_lock:
+            if self.process is process:
+                self.process = None
+            if self.connection is connection:
+                self.connection = None
+            if process is not None:
+                try:
+                    self._pending_reap.remove(process)
+                except ValueError:
+                    pass
+            self.ready_payload = None
 
     def _kill_remote_process_group(self, group_id: int) -> None:
         try:
@@ -2345,30 +2412,53 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         except OSError:
             pass
 
-    def _start_remote_pgid_reaper(self) -> None:
-        with self._remote_pgid_lock:
-            deadline = self._remote_startup_deadline
+    def _start_remote_pgid_reaper(
+        self,
+        process: Any,
+        connection: Any,
+    ) -> bool:
+        with self._remote_pgid_reaper_lock:
+            if self._remote_pgid_reaper_started:
+                return True
             if (
-                self._remote_pgid_reaper_started
-                or self._remote_pgid_read
-                or self._remote_pid_receive is None
-                or deadline is None
+                self._remote_pid_receive is None
+                or self._remote_startup_deadline is None
             ):
-                return
+                return False
             self._remote_pgid_reaper_started = True
-        threading.Thread(
-            target=self._reap_remote_process_group,
-            name=f'{self.name} remote PGID reaper',
-            daemon=True,
-        ).start()
+            reaper = threading.Thread(
+                target=self._reap_remote_process_group,
+                args=(process, connection),
+                name=f'{self.name} remote PGID reaper',
+                daemon=True,
+            )
+            try:
+                reaper.start()
+            except RuntimeError:
+                self._remote_pgid_reaper_started = False
+                return False
+        self._transfer_remote_pair_to_reaper(process, connection)
+        return True
 
-    def _reap_remote_process_group(self) -> None:
+    def _reap_remote_process_group(
+        self,
+        process: Any,
+        connection: Any,
+    ) -> None:
         group_id = self._remote_pgid(
             wait_for_report=True,
             cleanup=True,
+            background_reaper=True,
         )
         if group_id is not None:
             self._kill_remote_process_group(group_id)
+        WarmEngineWorker._stop_pair(
+            self,
+            process,
+            connection,
+            diagnostic=False,
+            cleanup_group=True,
+        )
 
     def _stop_pair(
         self,
@@ -2380,7 +2470,8 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
     ) -> None:
         with self._state_lock:
             self._remote_terminal = True
-        self._stop_remote_process_tree(process, connection)
+        if self._stop_remote_process_tree(process, connection):
+            return
         super()._stop_pair(
             process,
             connection,
@@ -2393,7 +2484,8 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             self._remote_terminal = True
             self.disabled = True
             process, connection = self.process, self.connection
-        self._stop_remote_process_tree(process, connection)
+        if self._stop_remote_process_tree(process, connection):
+            return
         super().request_disable()
 
     def _request_disable_with_cleanup_deadline(
@@ -2411,9 +2503,13 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
 
     def close(self) -> None:
         if getattr(self._remote_call_state, 'starting', False):
+            if self._remote_pgid_reaper_started:
+                return
             WarmEngineWorker.close(self)
             return
         self.request_disable()
+        if self._remote_pgid_reaper_started:
+            return
         WarmEngineWorker.close(self)
 
     @property
