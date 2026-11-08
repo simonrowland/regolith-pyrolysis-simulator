@@ -572,41 +572,13 @@ def charge_moles_by_species(
     ):
         source_map = printed.state.value
         is_mass_percent, refusal = _printed_mass_percent_map_refusal(
-            source_map, {}, reject_dropped_components=False
+            source_map, {}, reject_dropped_components=True
         )
         raw = (
             None
             if is_mass_percent and refusal is not None
             else _printed_composition_map(source_map)
         )
-        if raw is None and is_mass_percent and refusal is None:
-            pairs = _printed_component_pairs(source_map)
-            parsed = _parse_component_amounts(pairs) if pairs is not None else None
-            unsupported = (
-                []
-                if parsed is None
-                else [
-                    species
-                    for species, _amount in parsed
-                    if not _is_engine_oxide_component(species)
-                ]
-            )
-            if parsed is not None and unsupported and all(
-                species == "Cl" for species in unsupported
-            ):
-                # The full composition stays refused for unsupported Cl, but
-                # known oxide charge remains at its printed fraction of the
-                # whole sample instead of disappearing with the engine map.
-                raw = {
-                    species: amount
-                    for species, amount in parsed
-                    if _is_engine_oxide_component(species)
-                }
-                dropped.extend(
-                    species
-                    for species, amount in parsed
-                    if amount > 0 and species == "Cl"
-                )
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():

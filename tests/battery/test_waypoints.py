@@ -1292,7 +1292,7 @@ def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
-def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_charge() -> None:
+def test_blank_printed_major_refuses_unparameterized_derived_initial_and_charge() -> None:
     from simulator.battery.records import Derivation
 
     base = factories.kems_experiment()
@@ -1322,7 +1322,9 @@ def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_c
     assert waypoint.selected is None
     assert waypoint.absence is not None
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert set(charge) == {"MgO"}
+    # The source composition is a refused partial analysis, so no component
+    # from that same composition can route into a charge waypoint.
+    assert not charge
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:
