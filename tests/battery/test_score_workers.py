@@ -1,0 +1,127 @@
+from __future__ import annotations
+
+from decimal import Decimal
+import hashlib
+from pathlib import Path
+
+from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
+from simulator.battery.score import (
+    _ResidualJsonlRows,
+    ScoreContext,
+    _score_store_to_jsonl,
+    _write_headline_summary_from_accumulator_json,
+    derive_store_stamp,
+)
+from tests.battery import factories as F
+
+
+def _worker_fixture() -> ScoreContext:
+    work = F.work()
+    experiments = {
+        experiment_id: F.tabulation_experiment(
+            experiment_id=experiment_id,
+            work_id=work.work_id,
+        )
+        for experiment_id in (f"worker-exp-{index:02d}" for index in range(30))
+    }
+    observations = {}
+    origins = {}
+    for experiment_id in experiments:
+        for point in range(2):
+            observation_id = f"{experiment_id}-point-{point}"
+            observation = F.observation(
+                observation_id,
+                experiment_id,
+                F.psat_identity("Na", T_K=Decimal(1100 + point)),
+                Decimal(1000 + point),
+                evidence=EvidenceClass.MEASURED_DIRECT,
+                admission=AdmissionStatus.ADMITTED,
+                source_id=work.work_id,
+            )
+            observations[observation_id] = observation
+            origins[observation_id] = "gibbs_battery_residual_ledger.yaml"
+    return ScoreContext(
+        works={work.work_id: work},
+        experiments=experiments,
+        observations=observations,
+        origins=origins,
+        extract_review={},
+    )
+
+
+def _score_rows_and_summary(context: ScoreContext, path: Path, workers: int) -> tuple[bytes, bytes]:
+    written, metadata = _score_store_to_jsonl(
+        context,
+        path,
+        engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
+        workers=workers,
+    )
+    assert written > 0
+    partial_path = path.with_name(path.name + ".partial")
+    rows = _ResidualJsonlRows(partial_path, metadata=metadata)
+    assert sum(1 for _ in rows) == written
+    summary_path = path.with_suffix(".summary.json")
+    assert metadata.aggregate is not None
+    _write_headline_summary_from_accumulator_json(
+        metadata.aggregate,
+        summary_path,
+        store_stamp=derive_store_stamp(),
+    )
+    return partial_path.read_bytes(), summary_path.read_bytes()
+
+
+def test_serial_scoring_fixture_has_stable_canonical_rows(tmp_path: Path) -> None:
+    rows, _summary = _score_rows_and_summary(
+        _worker_fixture(), tmp_path / "serial.jsonl", workers=1
+    )
+    canonical_rows = b"\n".join(rows.splitlines()[1:])
+    assert hashlib.sha256(canonical_rows).hexdigest() == (
+        "d0be8fc51724d79f41e6df08c43f628c7d3de860ba9f6bfff89423a264c94de3"
+    )
+
+
+def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> None:
+    context = _worker_fixture()
+    serial_rows, serial_summary = _score_rows_and_summary(
+        context, tmp_path / "serial.jsonl", workers=1
+    )
+    parallel_rows, parallel_summary = _score_rows_and_summary(
+        context, tmp_path / "parallel.jsonl", workers=3
+    )
+    assert parallel_rows == serial_rows
+    assert parallel_summary == serial_summary
+
+
+def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
+    from simulator.battery.score import _partition_score_refs
+
+    work = F.work()
+    series = tuple(
+        F.observation(
+            f"series-{point}",
+            "series-experiment",
+            F.psat_identity("Na"),
+            Decimal(1000 + point),
+            source_id=work.work_id,
+        )
+        for point in range(2)
+    )
+    sossi = tuple(
+        F.observation(
+            f"sossi-{run}",
+            f"sossi::{run}",
+            F.psat_identity("Mn"),
+            Decimal(1000),
+            source_id="kems-012-sossi-2019",
+        )
+        for run in range(43)
+    )
+    refs = (*series, *sossi)
+    chunks = _partition_score_refs(refs, workers=3)
+    owner_by_id = {
+        observation.observation_id: index
+        for index, chunk in enumerate(chunks)
+        for observation in chunk
+    }
+    assert len({owner_by_id[point.observation_id] for point in series}) == 1
+    assert len({owner_by_id[point.observation_id] for point in sossi}) == 1
