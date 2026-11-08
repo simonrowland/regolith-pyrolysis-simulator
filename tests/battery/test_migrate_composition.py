@@ -2860,6 +2860,47 @@ def test_retained_phase_composition_refuses_unsupported_components_over_drop_lim
     )
 
 
+@pytest.mark.parametrize(
+    ("components", "reason"),
+    (
+        pytest.param(
+            {
+                "Fe": Decimal("50"),
+                "FeO": Decimal("25"),
+                "FeOT": Decimal("25"),
+            },
+            "ambiguous total iron components: FeOT with FeO",
+            id="ambiguous-feot",
+        ),
+        pytest.param(
+            {"Fe": Decimal("100"), "Na2O_plus_K2O": Decimal("-1")},
+            "negative or non-finite amount",
+            id="negative-amount",
+        ),
+        pytest.param(
+            {
+                "Fe": Decimal("100"),
+                "XxO": Decimal("1"),
+                "Na2O_plus_K2O": Decimal("-1"),
+            },
+            "negative or non-finite amount",
+            id="negative-cancels-unsupported",
+        ),
+    ),
+)
+def test_retained_phase_composition_obeys_shared_admission_refusals(
+    components: dict[str, Decimal], reason: str
+) -> None:
+    located = migrate_module._mass_percent_composition_located(
+        components,
+        basis="printed_phase_composition",
+        locator=None,
+    )
+
+    assert located.state.is_unknown
+    assert reason in located.state.reason
+
+
 def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
     extract_path = (
         REPO_ROOT
