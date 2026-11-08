@@ -1170,7 +1170,8 @@ def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
     assert conversion["conversion_performed"] is True
     assert conversion["from_standard_state_phase"] == "liquid"
     assert conversion["to_standard_state_phase"] == "solid"
-    assert "Fe" in diagnostic["vapor_pressures_Pa"]
+    assert "Fe" not in diagnostic["vapor_pressures_Pa"]
+    assert "Fe" in diagnostic["below_reporting_threshold_omissions"]
 
     batch = _resolve_live_gateway_batch(
         sim,
@@ -1181,8 +1182,51 @@ def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
     )
 
     assert batch is not None
-    assert isinstance(batch.channel("Fe").pressure, PressureValue)
-    assert "Fe" in batch.flux_active_species_ids
+    report = serialize_vapour_batch(batch)
+    assert report is not None
+    assert report["channels_by_species"]["Fe"]["is_refused"] is False
+    assert "Fe" not in batch.flux_active_species_ids
+
+
+def test_d354_mars_low_temperature_ca_conversion_survives_reporting_floor(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    temperature_K = 478.15
+    sim, diagnostic, equilibrium, effective_source = (
+        _mars_low_temperature_provider_probe(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            temperature_C=temperature_K - 273.15,
+        )
+    )
+
+    assert diagnostic["activities"]["Ca"] > 0.0
+    route = diagnostic["vapor_pressure_numerator_provenance"]["Ca"]
+    conversion = route["activity_standard_state_conversion"]
+    assert conversion["conversion_performed"] is True
+    assert conversion["from_standard_state_id"] == "Ca-028"
+    assert conversion["from_standard_state_phase"] == "liquid"
+    assert conversion["to_standard_state_id"] == "Ca-029"
+    assert conversion["to_standard_state_phase"] == "solid"
+    assert "Ca" not in diagnostic["vapor_pressures_Pa"]
+    assert "Ca" in diagnostic["below_reporting_threshold_omissions"]
+
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+
+    assert batch is not None
+    report = serialize_vapour_batch(batch)
+    assert report is not None
+    assert report["channels_by_species"]["Ca"]["is_refused"] is False
+    assert "Ca" not in batch.flux_active_species_ids
 
 
 def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
@@ -1195,17 +1239,26 @@ def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
             vapor_pressure_data,
             feedstocks_data,
             setpoints_data,
-            temperature_C=40.0,
+            temperature_C=478.15 - 273.15,
         )
     )
-    assert diagnostic["activities"] == {}
+    diagnostic["activities"].pop("Fe", None)
+    diagnostic["vapor_pressure_numerator_provenance"].pop("Fe", None)
+    diagnostic["vapor_pressures_Pa"].pop("Fe", None)
+    equilibrium.activity_coefficients = diagnostic["activities"]
+    equilibrium.vapor_pressures_Pa = diagnostic["vapor_pressures_Pa"]
+    effective_source = EffectivePressureSource(
+        "d354-mars-no-fe-activity",
+        diagnostic["vapor_pressures_Pa"],
+    )
+    assert "Fe" not in diagnostic["activities"]
 
     batch = _resolve_live_gateway_batch(
         sim,
         diagnostic,
         equilibrium,
         effective_source,
-        temperature_K=313.15,
+        temperature_K=478.15,
     )
 
     assert batch is not None
