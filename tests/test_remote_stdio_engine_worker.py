@@ -73,6 +73,18 @@ def _blocked_remote_bootstrap_with_late_pgid(
     )
 
 
+def _track_remote_pgid_reaper_completion(worker, finished):
+    reap_remote_process_group = worker._reap_remote_process_group
+
+    def record_reaper_completion(process, connection):
+        try:
+            reap_remote_process_group(process, connection)
+        finally:
+            finished.set()
+
+    worker._reap_remote_process_group = record_reaper_completion
+
+
 @pytest.fixture
 def remote_worker_factory():
     workers: list[StdioRemoteEngineWorker] = []
@@ -329,6 +341,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
     report_wait_receive, report_wait_sender = context.Pipe(duplex=False)
     release_report_receiver, release_report_sender = context.Pipe(duplex=False)
     report_sent_receive, report_sent_sender = context.Pipe(duplex=False)
+    reaper_finished = threading.Event()
     crash_marker = tmp_path / 'crash-first.marker'
     created: list[StdioRemoteEngineWorker] = []
 
@@ -337,6 +350,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
             worker = remote_worker_factory('crash-first', str(crash_marker))
         else:
             worker = remote_worker_factory('produced', startup_timeout_s=8.0)
+            _track_remote_pgid_reaper_completion(worker, reaper_finished)
             original_args = worker._process_bootstrap_args
             worker._bootstrap = _blocked_remote_bootstrap_with_late_pgid
             worker._process_bootstrap_args = lambda: (
@@ -382,6 +396,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
         release_report_sender.send(None)
         assert report_sent_receive.poll(5.0)
         report_sent_receive.recv()
+        assert reaper_finished.wait(timeout=5.0)
         wrapper.join(timeout=10.0)
         assert not wrapper.is_alive()
     finally:
@@ -419,12 +434,14 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
     )
     crash_marker = tmp_path / 'crash-first.marker'
     created: list[StdioRemoteEngineWorker] = []
+    reaper_finished = threading.Event()
 
     def factory(_index):
         if not created:
             worker = remote_worker_factory('crash-first', str(crash_marker))
         else:
             worker = remote_worker_factory('produced', startup_timeout_s=8.0)
+            _track_remote_pgid_reaper_completion(worker, reaper_finished)
             original_args = worker._process_bootstrap_args
             worker._bootstrap = _blocked_remote_bootstrap
             worker._process_bootstrap_args = lambda: (
@@ -486,6 +503,7 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
         release_bootstrap_sender.send(None)
         cleanup_thread.join(timeout=1.0)
         assert not cleanup_thread.is_alive()
+        assert reaper_finished.wait(timeout=5.0)
         wrapper.join(timeout=10.0)
         assert not wrapper.is_alive()
     finally:
@@ -506,8 +524,13 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
 
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+@pytest.mark.parametrize(
+    'startup_timeout_s', (8.0, 3.0),
+    ids=('before-startup-expiry', 'after-startup-expiry'),
+)
 def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
     remote_worker_factory, monkeypatch, tmp_path, inherit,
+    startup_timeout_s,
 ):
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
@@ -522,6 +545,7 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         signal.SIGUSR1,
         lambda *_args: descendants_started.set(),
     )
+    reaper_finished = threading.Event()
     crash_marker = tmp_path / 'crash-first.marker'
     created: list[StdioRemoteEngineWorker] = []
 
@@ -532,8 +556,9 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
             worker = remote_worker_factory(
                 'startup-subtree-notify', str(worker_pid_file),
                 str(grandchild_pid_file), str(os.getpid()),
-                startup_timeout_s=8.0,
+                startup_timeout_s=startup_timeout_s,
             )
+            _track_remote_pgid_reaper_completion(worker, reaper_finished)
             original_args = worker._process_bootstrap_args
             worker._bootstrap = _blocked_pgid_report_bootstrap
             worker._process_bootstrap_args = lambda: (
@@ -562,16 +587,48 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         wrapper = created[1].process
         assert wrapper is not None
         close_started = time.monotonic()
-        pool.close(cancel_pending=True, timeout_s=3.0)
-        assert time.monotonic() - close_started <= 3.2
+        close_error = None
+        try:
+            pool.close(cancel_pending=True, timeout_s=3.0)
+        except EngineWorkerTimeout as exc:
+            close_error = exc
+        assert time.monotonic() - close_started <= 3.2, close_error
         assert replacement_call.done()
 
-        release_report_sender.send(None)
-        assert report_sent_receive.poll(5.0)
-        report_sent_receive.recv()
-        _assert_pids_gone(pids)
+        wrapper_alive_after_startup_expiry = False
+        if startup_timeout_s == 3.0:
+            startup_deadline = created[1]._remote_startup_deadline
+            assert startup_deadline is not None
+            remaining = startup_deadline - time.monotonic()
+            if remaining > 0.0:
+                threading.Event().wait(remaining + 0.05)
+            assert startup_deadline <= time.monotonic()
+            wrapper.join(timeout=0.25)
+            wrapper_alive_after_startup_expiry = wrapper.is_alive()
+
+        try:
+            release_report_sender.send(None)
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+        report_was_sent = report_sent_receive.poll(5.0)
+        if report_was_sent:
+            try:
+                report_sent_receive.recv()
+            except EOFError:
+                report_was_sent = False
+        assert reaper_finished.wait(timeout=5.0)
         wrapper.join(timeout=3.0)
-        assert not wrapper.is_alive()
+        assert not wrapper.is_alive(), (
+            f'report_was_sent={report_was_sent}, '
+            f'group={created[1]._remote_process_group_id}, '
+            f'error={created[1]._remote_pgid_error}, '
+            f'reaper_started={created[1]._remote_pgid_reaper_started}, '
+            f'reapers={[thread.name for thread in threading.enumerate() if "PGID reaper" in thread.name]}'
+        )
+        _assert_pids_gone(pids)
+        assert report_was_sent
+        if startup_timeout_s == 3.0:
+            assert wrapper_alive_after_startup_expiry
         assert created[1]._remote_process_group_id is None
         _assert_caller_group_unchanged(caller_group)
     finally:

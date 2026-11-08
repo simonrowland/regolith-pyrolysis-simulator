@@ -2123,7 +2123,11 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
     ) -> float | None:
         deadline = self._remote_startup_deadline
         if background_reaper:
-            return deadline
+            # The synchronous caller is bounded by startup/cleanup deadlines.
+            # The reaper owns the launch after that caller returns and must
+            # keep the wrapper alive until it reports the group or closes its
+            # one-shot pipe, otherwise an unpublished detached group is lost.
+            return None
         with self._state_lock:
             active_cleanup_deadline = self._remote_cleanup_deadline
         for candidate in (cleanup_deadline, active_cleanup_deadline):
@@ -2149,7 +2153,13 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 background_reaper=background_reaper,
             )
             if deadline is None:
-                return self._remote_pgid_lock.acquire(blocking=False)
+                if not background_reaper:
+                    return self._remote_pgid_lock.acquire(blocking=False)
+                if self._remote_pgid_lock.acquire(
+                    timeout=ENGINE_WORKER_CANCEL_POLL_S
+                ):
+                    return True
+                continue
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
                 return self._remote_pgid_lock.acquire(blocking=False)
@@ -2195,7 +2205,10 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                         if deadline is None:
                             if receive.poll(0.0):
                                 break
-                            return None
+                            if not background_reaper:
+                                return None
+                            receive.poll(ENGINE_WORKER_CANCEL_POLL_S)
+                            continue
                         wait_s = deadline - time.monotonic()
                         if wait_s <= 0.0:
                             if receive.poll(0.0):
