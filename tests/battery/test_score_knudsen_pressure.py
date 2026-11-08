@@ -476,7 +476,7 @@ def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
     pressure_calls: list[tuple[float, str, float | None]] = []
     oxygen_balance_calls: list[float] = []
     prediction, _calls = _mock_knudsen_prediction(
-        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
         experiment,
         reference,
         monkeypatch,
@@ -495,7 +495,7 @@ def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
     )
     residual, _candidate = compile_residual(
         reference,
-        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
         context=context,
         prediction=prediction,
         derived_band=DecisionBand(
