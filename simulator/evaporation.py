@@ -1249,7 +1249,7 @@ class EvaporationMixin:
         )
         closure_record = None
         pressure_held_bounds_record = None
-        closure_last_iterate = False
+        closure_rates_include_liquid_fraction = False
         if overhead_partials_override_Pa is None:
             from simulator.overhead import _solve_same_hour_headspace_closure
 
@@ -1387,7 +1387,7 @@ class EvaporationMixin:
                         selected_partials_Pa = {
                             str(species): 0.0 for species in vapor_pressures
                         }
-                    else:
+                    elif PRESSURE_HELD_FLUX_BOUND == 'lower':
                         selected_rates = lower_rates
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
@@ -1395,6 +1395,25 @@ class EvaporationMixin:
                                 lower_closure.partial_pressures_mbar.items()
                             )
                         }
+                    elif PRESSURE_HELD_FLUX_BOUND == 'mid':
+                        selected_rates = {
+                            species: (
+                                upper_rates.get(species, 0.0)
+                                + lower_rates.get(species, 0.0)
+                            ) / 2.0
+                            for species in set(upper_rates) | set(lower_rates)
+                        }
+                        selected_partials_Pa = {
+                            str(species): max(0.0, float(pressure)) * 50.0
+                            for species, pressure in (
+                                lower_closure.partial_pressures_mbar.items()
+                            )
+                        }
+                    else:
+                        raise ValueError(
+                            'PRESSURE_HELD_FLUX_BOUND must be upper, lower, or mid'
+                        )
+                    closure_rates_include_liquid_fraction = True
                     equilibrium_pressure_sum_Pa = math.fsum(
                         max(0.0, float(pressure))
                         for pressure in vapor_pressures.values()
@@ -1477,7 +1496,7 @@ class EvaporationMixin:
                     diagnostic['evaporation_flux_kg_hr'] = dict(
                         closure_record['rates_kg_hr']
                     )
-                    closure_last_iterate = True
+                    closure_rates_include_liquid_fraction = True
                 diagnostic.setdefault('notices', []).append({
                     'type': 'typed_notice',
                     'kind': 'same_hour_headspace_closure_nonconvergence',
@@ -1652,7 +1671,7 @@ class EvaporationMixin:
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
-            if closure_last_iterate:
+            if closure_rates_include_liquid_fraction:
                 liquid_fraction_factor = 1.0
             elif gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
                 liquid_fraction_factor = (
@@ -1704,7 +1723,7 @@ class EvaporationMixin:
                         'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
                     }
             if gated_rate_kg_hr > 1e-12 or (
-                closure_last_iterate and gated_rate_kg_hr > 0.0
+                closure_rates_include_liquid_fraction and gated_rate_kg_hr > 0.0
             ):
                 flux.species_kg_hr[species] = gated_rate_kg_hr
                 alpha_authority_status = alpha_authority_statuses.get(species)

@@ -20,12 +20,14 @@ from simulator.condensation import (
     _chapman_enskog_d_ab_m2_s,
     _series_resistance_deposition_flux_mol_m2_s,
 )
-from simulator.state import MAX_STIR_FACTOR, EvaporationFlux, MeltState
+import simulator.evaporation as evaporation_module
+from simulator.state import Atmosphere, MAX_STIR_FACTOR, EvaporationFlux, MeltState
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 from simulator.overhead import (
     OverheadGasModel,
     _solve_same_hour_headspace_closure,
 )
+from tests.chemistry.conftest import _build_sim
 
 
 _K_BASE = {
@@ -597,3 +599,96 @@ def test_closed_line_subboiling_root_is_recognized_without_iteration():
     assert result.converged
     assert result.iterations == 0
     assert result.rates_kg_hr == {"A": 0.0, "B": 0.0}
+
+
+def _pressure_held_sim(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    *,
+    gate_factor=1.0,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1670.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 1.0
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.001
+    sim._freeze_gate_enabled = lambda: gate_factor != 1.0
+    sim._freeze_gate_liquid_fraction_factor = lambda **_kwargs: gate_factor
+    return sim
+
+
+def test_pressure_held_liquid_fraction_is_applied_once(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _pressure_held_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        gate_factor=0.5,
+    )
+
+    flux = sim._calculate_evaporation(sim._get_equilibrium())
+    bounds = sim._last_evaporation_flux_diagnostic[
+        "pressure_held_sweep_bounds"
+    ]
+
+    for species in ("Al", "AlO"):
+        assert flux.species_kg_hr[species] == pytest.approx(
+            bounds["upper_rates_kg_hr"][species], rel=1e-12
+        )
+
+
+@pytest.mark.parametrize("selected_bound", ("upper", "lower", "mid"))
+def test_pressure_held_bound_selection_matches_value_and_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    selected_bound,
+):
+    monkeypatch.setattr(
+        evaporation_module,
+        "PRESSURE_HELD_FLUX_BOUND",
+        selected_bound,
+    )
+    sim = _pressure_held_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    flux = sim._calculate_evaporation(sim._get_equilibrium())
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    bounds = diagnostic["pressure_held_sweep_bounds"]
+    notices = [
+        notice
+        for notice in diagnostic["notices"]
+        if notice.get("kind") == "sweep_flow_unspecified"
+    ]
+
+    assert notices
+    assert all(
+        notice["authority"] == f"{selected_bound}_bound"
+        and notice["selected_bound"] == selected_bound
+        for notice in notices
+    )
+    species = set(bounds["upper_rates_kg_hr"]) | set(
+        bounds["lower_rates_kg_hr"]
+    )
+    for species_id in species:
+        upper = bounds["upper_rates_kg_hr"].get(species_id, 0.0)
+        lower = bounds["lower_rates_kg_hr"].get(species_id, 0.0)
+        expected = {
+            "upper": upper,
+            "lower": lower,
+            "mid": (upper + lower) / 2.0,
+        }[selected_bound]
+        assert flux.species_kg_hr.get(species_id, 0.0) == pytest.approx(
+            expected, rel=1e-12, abs=1e-15
+        )
