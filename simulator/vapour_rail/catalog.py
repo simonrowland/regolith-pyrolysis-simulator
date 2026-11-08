@@ -1820,6 +1820,7 @@ class VapourRailCatalog:
                 melt_activity_engine_inputs=(
                     state.get("melt_activity_engine_inputs") or {}
                 ),
+                liquid_feo_domain=state.get("liquid_feo_domain"),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -1846,6 +1847,7 @@ class VapourRailCatalog:
                         "melt_activity_shadow_enabled",
                         "imcc_activity_shadow_enabled",
                         "melt_activity_engine_inputs",
+                        "liquid_feo_domain",
                     }
                 },
             )

@@ -34,6 +34,29 @@ notes:
     The separately stated K2Si2O5 liquid equation relative to glass at
     298.15 K is H-H298 = 65.800e-3 T - 29.564 over 1318-1600 K (<0.1%).
   locator: {pdf_page_index: 20, page: 21, published_page: 17}
+schema_gaps:
+  - observation_id: bey80_k2si2o5_oxide_formation_h_table10
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: bey80_k2si2o5_oxide_formation_g_table10
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: bey80_k2si2o5_oxide_formation_h_table12
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: bey80_k2si2o5_oxide_formation_g_table12
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: bey80_k2sio3_oxide_formation_h_table8
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: bey80_k2sio3_oxide_formation_g_table8
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: bey80_k2si2o5_reference_glass_S_table6
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_800
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_850
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
+  - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_900
+    reason: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy."
 species:
   K2Si2O5:
     observations:
@@ -174,6 +197,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -184,6 +208,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -195,6 +220,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -206,6 +232,7 @@ species:
       phase: cr
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
@@ -218,6 +245,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -228,6 +256,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -240,6 +269,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -252,6 +282,7 @@ species:
       phase: glass
       units: kcal/mole
       values:
+        reference_temperature_K: 298.15
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
@@ -429,7 +460,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, series: *bey80_t6}
+      values: {method_class: model_derived, quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "0"}
     - observation_id: bey80_k2si2o5_reference_glass_H_table6
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -453,7 +484,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_800}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "46.34"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_800
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -477,7 +508,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_850}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "49.65"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_850
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -501,7 +532,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_900}
+      values: {method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", quantity_as_printed: "S°(T)−S°(298.15 K)", reference_state_as_printed: "entropy increment from 298.15 K", schema_gap: "No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.", value_as_printed: "52.82"}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_900
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -544,29 +575,33 @@ species:
       phase: cr
       units: kcal/mole
       values:
-        quantity: delta_fH
+        quantity_as_printed: "K2O(c) + 2SiO2(quartz) = K2Si2O5(c)"
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
         method_class: quoted_attributed
         reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)'
         attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
-        series: &bey80_t10 [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -78.3, delta_fG: -78.8, log10_Kf: 20.12}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}]
+        series_as_printed: &bey80_t10 [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -78.3, delta_fG: -78.8, log10_Kf: 20.12}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}]
     - observation_id: bey80_k2si2o5_oxide_formation_g_table10
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '10', row: K2Si2O5 crystal from oxides, column: Gr}
       phase: cr
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series: &bey80_t10g [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}], attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
+      values: {quantity_as_printed: "K2O(c) + 2SiO2(quartz) = K2Si2O5(c)", reference_state_as_printed: formation from simple oxides, schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.", method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series_as_printed: &bey80_t10g [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}], attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '10', row: K2Si2O5 crystal from oxides, column: Gr}
       phase: cr
       units: kcal/mole
       values:
-        quantity: delta_fG
+        quantity_as_printed: "K2O(c) + 2SiO2(quartz) = K2Si2O5(c)"
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
         method_class: quoted_attributed
         reaction: "K2O(c) + 2SiO2(quartz) = K2Si2O5(c)"
         attribution: "Calculated in this investigation; Table 13 lists the auxiliary data."
         T_K: 867
-        delta_fG: -78.8
+        value_as_printed: '-78.8'
         reason: "probable source misprint: Table 10 prints -78.8 kcal/mol at 867 K; neighboring values and the printed equilibrium constant support -79.8 but the printed value is retained."
     - observation_id: bey80_k2si2o5_oxide_formation_k_table10
       type: gibbs_table
@@ -608,17 +643,19 @@ species:
       phase: glass
       units: kcal/mole
       values:
-        quantity: delta_fH
+        quantity_as_printed: "K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)"
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
         method_class: quoted_attributed
         reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)'
         attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
-        series: &bey80_t12 [{T_K: 298.15, delta_fH: -73.1, delta_fG: -60.3, log10_Kf: 44.20}, {T_K: 300, delta_fH: -73.1, delta_fG: -60.2, log10_Kf: 43.86}, {T_K: 400, delta_fH: -73.1, delta_fG: -55.9, log10_Kf: 30.54}, {T_K: 500, delta_fH: -73.1, delta_fG: -51.6, log10_Kf: 22.55}, {T_K: 600, delta_fH: -73.2, delta_fG: -47.3, log10_Kf: 17.23}, {T_K: 700, delta_fH: -73.3, delta_fG: -43.0, log10_Kf: 13.43}, {T_K: 800, delta_fH: -73.5, delta_fG: -38.6, log10_Kf: 10.55}, {T_K: 847, delta_fH: -73.7, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 847, delta_fH: -74.1, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 900, delta_fH: -74.1, delta_fG: -34.2, log10_Kf: 8.30}]
+        series_as_printed: &bey80_t12 [{T_K: 298.15, delta_fH: -73.1, delta_fG: -60.3, log10_Kf: 44.20}, {T_K: 300, delta_fH: -73.1, delta_fG: -60.2, log10_Kf: 43.86}, {T_K: 400, delta_fH: -73.1, delta_fG: -55.9, log10_Kf: 30.54}, {T_K: 500, delta_fH: -73.1, delta_fG: -51.6, log10_Kf: 22.55}, {T_K: 600, delta_fH: -73.2, delta_fG: -47.3, log10_Kf: 17.23}, {T_K: 700, delta_fH: -73.3, delta_fG: -43.0, log10_Kf: 13.43}, {T_K: 800, delta_fH: -73.5, delta_fG: -38.6, log10_Kf: 10.55}, {T_K: 847, delta_fH: -73.7, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 847, delta_fH: -74.1, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 900, delta_fH: -74.1, delta_fG: -34.2, log10_Kf: 8.30}]
     - observation_id: bey80_k2si2o5_oxide_formation_g_table12
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '12', row: K2Si2O5 glass from oxides, column: Gr}
       phase: glass
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series: *bey80_t12, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
+      values: {quantity_as_printed: "K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)", reference_state_as_printed: formation from simple oxides, schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.", method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series_as_printed: *bey80_t12, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2si2o5_oxide_formation_k_table12
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '12', row: K2Si2O5 glass from oxides, column: Log Kr}
@@ -788,17 +825,19 @@ species:
       phase: cr
       units: kcal/mole
       values:
-        quantity: delta_fH
+        quantity_as_printed: "K2O(c) + SiO2(quartz) = K2SiO3(c)"
+        reference_state_as_printed: formation from simple oxides
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
         method_class: quoted_attributed
         reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)'
         attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
-        series: &bey80_t8 [{T_K: 298.15, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.75}, {T_K: 300, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.45}, {T_K: 400, delta_fH: -65.9, delta_fG: -66.7, log10_Kf: 36.44}, {T_K: 500, delta_fH: -66.0, delta_fG: -66.9, log10_Kf: 29.24}, {T_K: 600, delta_fH: -66.1, delta_fG: -67.0, log10_Kf: 24.40}, {T_K: 700, delta_fH: -66.2, delta_fG: -67.2, log10_Kf: 20.98}, {T_K: 800, delta_fH: -66.4, delta_fG: -67.3, log10_Kf: 18.39}, {T_K: 847, delta_fH: -66.5, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 847, delta_fH: -66.7, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 900, delta_fH: -66.7, delta_fG: -67.4, log10_Kf: 16.37}, {T_K: 1000, delta_fH: -66.6, delta_fG: -67.5, log10_Kf: 14.75}, {T_K: 1100, delta_fH: -66.5, delta_fG: -67.5, log10_Kf: 13.41}, {T_K: 1154, delta_fH: -66.4, delta_fG: -67.6, log10_Kf: 12.80}]
+        series_as_printed: &bey80_t8 [{T_K: 298.15, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.75}, {T_K: 300, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.45}, {T_K: 400, delta_fH: -65.9, delta_fG: -66.7, log10_Kf: 36.44}, {T_K: 500, delta_fH: -66.0, delta_fG: -66.9, log10_Kf: 29.24}, {T_K: 600, delta_fH: -66.1, delta_fG: -67.0, log10_Kf: 24.40}, {T_K: 700, delta_fH: -66.2, delta_fG: -67.2, log10_Kf: 20.98}, {T_K: 800, delta_fH: -66.4, delta_fG: -67.3, log10_Kf: 18.39}, {T_K: 847, delta_fH: -66.5, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 847, delta_fH: -66.7, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 900, delta_fH: -66.7, delta_fG: -67.4, log10_Kf: 16.37}, {T_K: 1000, delta_fH: -66.6, delta_fG: -67.5, log10_Kf: 14.75}, {T_K: 1100, delta_fH: -66.5, delta_fG: -67.5, log10_Kf: 13.41}, {T_K: 1154, delta_fH: -66.4, delta_fG: -67.6, log10_Kf: 12.80}]
     - observation_id: bey80_k2sio3_oxide_formation_g_table8
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '8', row: K2SiO3 from oxides, column: Gr}
       phase: cr
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series: *bey80_t8, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
+      values: {quantity_as_printed: "K2O(c) + SiO2(quartz) = K2SiO3(c)", reference_state_as_printed: formation from simple oxides, schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.", method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series_as_printed: *bey80_t8, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2sio3_oxide_formation_k_table8
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '8', row: K2SiO3 from oxides, column: Log Kr}

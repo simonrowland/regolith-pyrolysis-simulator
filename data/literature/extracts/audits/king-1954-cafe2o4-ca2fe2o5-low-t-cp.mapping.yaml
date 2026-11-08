@@ -1,0 +1,28 @@
+source_id: king-1954-cafe2o4-ca2fe2o5-low-t-cp
+tables:
+- table: I
+  page: 5849
+  species: CaFe2O4
+  quantity: cp
+  columns:
+    T: T_K
+    Cp: value
+  phase: cr
+  method_class: measured_direct
+  per_basis: mol_species
+- table: I
+  page: 5849
+  species: Ca2Fe2O5
+  quantity: cp
+  columns:
+    T: T_K
+    Cp: value
+  phase: cr
+  method_class: measured_direct
+  per_basis: mol_species
+- table: II
+  page: 5850
+  species: CaFe2O4 and Ca2Fe2O5
+  quantity: S
+  method_class: measured_reduced
+  per_basis: mol_species

@@ -750,6 +750,25 @@ _FE2_O3_MOLAR_MASS = 159.6882
 _FE2O3_ROUNDOFF_WT_TOLERANCE = 1.0e-12
 
 
+def _thermoengine_repair_notice(
+    site: str,
+    *,
+    field: str,
+    item: str,
+    action: str,
+    reason: str,
+    replacement: str | None = None,
+) -> str:
+    notice = (
+        f'{site}:alphamelts_thermoengine_repaired '
+        f'producer=ThermoEngine field={field} item={item!r} '
+        f'action={action} reason={reason}'
+    )
+    if replacement is not None:
+        notice += f' replacement={replacement}'
+    return notice
+
+
 _MODEL_TO_THERMOENGINE = {
     'MELTSv1.0.2': ('1.0.2', 'v1.0'),
     'MELTSv1.1.0': ('1.1.0', 'v1.1'),
@@ -1540,6 +1559,7 @@ print('ok')
         solved_fO2_log: Optional[float] = None
         solved_fO2_reason: Optional[str] = None
         fO2_solve_count = 1
+        repair_notices: list[str] = []
         if fO2_log is None:
             _thermoengine_native_call(
                 lambda: melts.set_bulk_composition(bulk_wt)
@@ -1559,6 +1579,7 @@ print('ok')
                 pressure_mpa=pressure_mpa,
                 bulk_wt=bulk_wt,
                 target_fO2_log=float(fO2_log),
+                repair_notices=repair_notices,
             )
         if not runs:
             return ThermoEnginePayload(
@@ -1588,6 +1609,7 @@ print('ok')
                     root,
                     temperature_C=float(temperature_C),
                     pressure_bar=float(pressure_bar),
+                    repair_notices=repair_notices,
                 )
             except ThermoEngineFO2UndefinedError:
                 solved_fO2_reason = 'undefined_zero_ferric_liquid'
@@ -1770,25 +1792,34 @@ print('ok')
         # the bulk-fallback only fires when a liquid phase IS reported
         # but the composition API returned an incomplete payload, and
         # the situation surfaces as a warning so it is auditable.
-        extra_warnings: tuple[str, ...] = ()
+        extra_warnings: list[str] = []
         if liquid_phase:
             liquid_comp = self._finite_mapping(
                 _thermoengine_native_call(
                     lambda: melts.get_composition_of_phase(
                         root, liquid_phase, 'oxide_wt'
                     )
-                )
+                ),
+                source=f'{liquid_phase}.oxide_wt',
+                repair_notices=repair_notices,
             )
             if not liquid_comp:
                 liquid_comp = dict(bulk_wt)
-                extra_warnings = (
+                extra_warnings.extend((
                     'ThermoEngine reported liquid phase '
                     f'{liquid_phase!r} but composition_of_phase returned '
                     'an empty payload; falling back to bulk composition.',
-                )
-            # Preserve invalid native fractions so the activity adapter can
-            # return a typed refusal instead of silently dropping or clamping
-            # them through _finite_mapping.
+                    _thermoengine_repair_notice(
+                        'SR06',
+                        field='liquid_composition_wt_pct',
+                        item=liquid_phase,
+                        action='substituted',
+                        reason='empty_reported_liquid_composition',
+                        replacement='bulk_composition',
+                    ),
+                ))
+            # Preserve the component payload unchanged so the activity adapter
+            # retains its existing failure classification for invalid values.
             liquid_components = dict(
                 _thermoengine_native_call(
                     lambda: melts.get_composition_of_phase(
@@ -1812,6 +1843,7 @@ print('ok')
                 pressure_bar=float(pressure_bar),
                 component_mole_fraction=liquid_components,
                 comp_wt=liquid_comp,
+                repair_notices=repair_notices,
             )
             fe_redox_split = self._fe_redox_split(liquid_comp)
         else:
@@ -1852,7 +1884,7 @@ print('ok')
             # MELTSmodel returns convergence status but exposes no iteration
             # count in its public result or XML tree.
             solver_iterations=None,
-            warnings=tuple(warnings) + extra_warnings + (
+            warnings=tuple(warnings) + tuple(dict.fromkeys(repair_notices)) + tuple(extra_warnings) + (
                 f'ThermoEngine status: {status_text}',
             ),
         )
@@ -1972,6 +2004,7 @@ print('ok')
         pressure_mpa: float,
         bulk_wt: Mapping[str, float],
         target_fO2_log: float,
+        repair_notices: list[str] | None = None,
     ) -> tuple[Any, Any, float, int]:
         if not math.isfinite(target_fO2_log):
             raise ThermoEngineOutOfDomainError(
@@ -2041,6 +2074,7 @@ print('ok')
                 root,
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
+                repair_notices=repair_notices,
             )
             return model, result, solved
 
@@ -2218,6 +2252,7 @@ print('ok')
         *,
         temperature_C: float,
         pressure_bar: float,
+        repair_notices: list[str] | None = None,
     ) -> float:
         if self._database is None or self._chem is None:
             raise ImportError('ThermoEngine redox model not initialized')
@@ -2236,7 +2271,9 @@ print('ok')
                 lambda: melts.get_composition_of_phase(
                     root, liquid_phase, 'oxide_wt'
                 )
-            )
+            ),
+            source=f'{liquid_phase}.oxide_wt',
+            repair_notices=repair_notices,
         )
         liquid_fe2o3 = float(liquid.get('Fe2O3', 0.0) or 0.0)
         if liquid_fe2o3 < -_FE2O3_ROUNDOFF_WT_TOLERANCE:
@@ -2289,6 +2326,7 @@ print('ok')
         pressure_bar: float,
         component_mole_fraction: Mapping[str, float],
         comp_wt: Mapping[str, float],
+        repair_notices: list[str] | None = None,
     ) -> dict[str, float]:
         liq_phase = self._liq_phase
         if liq_phase is None:
@@ -2323,7 +2361,20 @@ print('ok')
                 'ThermoEngine liquid endmember fraction total is not finite'
             )
         if total <= 0.0:
-            mol = self._endmember_moles_from_wt(comp_wt, endmember_names)
+            mol = self._endmember_moles_from_wt(
+                comp_wt,
+                endmember_names,
+                repair_notices=repair_notices,
+            )
+            if repair_notices is not None:
+                repair_notices.append(_thermoengine_repair_notice(
+                    'SR07',
+                    field='component_mole_fraction',
+                    item='liquid_endmember_vector',
+                    action='substituted',
+                    reason='empty_or_nonpositive_vector',
+                    replacement='wt_derived_endmember_moles',
+                ))
             if any(not math.isfinite(value) for value in mol):
                 raise ThermoEngineNonFiniteField(
                     'ThermoEngine liquid endmember fractions are not finite'
@@ -2355,6 +2406,14 @@ print('ok')
         activities: dict[str, float] = {}
         for idx, name in enumerate(endmember_names):
             if idx >= len(mu_values):
+                if repair_notices is not None:
+                    repair_notices.append(_thermoengine_repair_notice(
+                        'SR09',
+                        field='chemical_potentials',
+                        item=name,
+                        action='omitted',
+                        reason='missing_endmember_entry',
+                    ))
                 continue
             pure = [0.0 for _ in endmember_names]
             pure[idx] = 1.0
@@ -2367,6 +2426,14 @@ print('ok')
                 dtype=float,
             ).reshape(-1)
             if len(mu0_values) == 0:
+                if repair_notices is not None:
+                    repair_notices.append(_thermoengine_repair_notice(
+                        'SR09',
+                        field='pure_state_chemical_potential',
+                        item=name,
+                        action='omitted',
+                        reason='empty_pure_state_value',
+                    ))
                 continue
             try:
                 # For a MELTS liquid component, mu_i - mu_i^0 = RT ln(a_i):
@@ -2390,18 +2457,40 @@ print('ok')
                 continue
             if activity > 0.0 and math.isfinite(activity):
                 activities[name] = activity
+            elif repair_notices is not None:
+                repair_notices.append(_thermoengine_repair_notice(
+                    'SR09',
+                    field='activity',
+                    item=name,
+                    action='omitted',
+                    reason=(
+                        'nonfinite_computed_activity'
+                        if not math.isfinite(activity)
+                        else 'nonpositive_computed_activity'
+                    ),
+                ))
         return activities
 
     def _endmember_moles_from_wt(
         self,
         comp_wt: Mapping[str, float],
         endmember_names: tuple[str, ...],
+        repair_notices: list[str] | None = None,
     ) -> list[float]:
         mol: list[float] = []
         for name in endmember_names:
             wt = float(comp_wt.get(name, 0.0) or 0.0)
             if wt <= 0.0:
                 mol.append(0.0)
+                if wt < 0.0 and repair_notices is not None:
+                    repair_notices.append(_thermoengine_repair_notice(
+                        'SR08',
+                        field='liquid_composition_wt_pct',
+                        item=name,
+                        action='clamped',
+                        reason='negative_component',
+                        replacement='0.0',
+                    ))
                 continue
             try:
                 molar_mass_g_per_mol = (
@@ -2464,7 +2553,13 @@ print('ok')
                 return phase
         return None
 
-    def _finite_mapping(self, values: Mapping[str, Any]) -> dict[str, float]:
+    def _finite_mapping(
+        self,
+        values: Mapping[str, Any],
+        *,
+        source: str = 'liquid_composition',
+        repair_notices: list[str] | None = None,
+    ) -> dict[str, float]:
         result: dict[str, float] = {}
         for key, value in dict(values or {}).items():
             try:
@@ -2473,6 +2568,14 @@ print('ok')
                 continue
             if math.isfinite(number):
                 result[str(key)] = number
+            elif repair_notices is not None:
+                repair_notices.append(_thermoengine_repair_notice(
+                    'SR05',
+                    field=source,
+                    item=str(key),
+                    action='dropped',
+                    reason='nonfinite_component',
+                ))
         return result
 
     def _strict_finite_mapping(

@@ -1,0 +1,67 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/bf00381840
+  citation: Stebbins, J. F., Carmichael, I. S. E. & Moret, L. K. (1984), “Heat capacities and entropies of silicate liquids
+    and glasses”, Contributions to Mineralogy and Petrology 86, 131–148.
+  source_ids:
+  - rb86-stebbins-etal-1984
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:rb86-stebbins-etal-1984
+      role: pdf
+      path: raw/rb86-stebbins-etal-1984/rb86-stebbins-etal-1984.pdf
+      sha256:
+        tag: value
+        value: 121eb7d51dd31dc49430264ac73eaaa7b317065996fdf97e633ca227b6c78492
+    - asset_id: pdftotext:rb86-stebbins-etal-1984
+      role: pdftotext
+      path: text/rb86-stebbins-etal-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:rb86-stebbins-etal-1984
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/bf00381840
+experiments:
+- experiment_id: 10.1007/bf00381840::rb86-stebbins-etal-1984
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/bf00381840
+  locator:
+    page: 5
+    published_page: 135
+    pdf_page_index: 4
+    table: '2'
+    note: row=2; table_row_number=2; column=2; table_column_number=2; row_label=21; column_header=a

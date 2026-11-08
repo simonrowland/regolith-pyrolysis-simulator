@@ -40,6 +40,9 @@ experiments:
     note: Eight compositions; the paper says the conditions match the melt study cited as [3].
   method: knudsen_effusion
   method_as_printed: The initial data were the results of mass spectrometric study by the Knudsen effusion method involving evaporation of samples from molybdenum chambers in the temperature range 1676–2327 K.
+schema_gaps:
+  - observation_id: shornikov_2002_mullite_delta_fH
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
 species:
   Al6Si2O13:
     observations:
@@ -78,7 +81,10 @@ species:
             note: Equations (4) and (5) supply the Gibbs energies. The grid is not printed.
               Equation (6) is the least-squares result on published page 84.
       values:
-        quantity: delta_fH
+        quantity_as_printed: "enthalpy of formation of mullite from oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: measured_reduced
         value_as_printed: 12.9 ± 0.8
         value: '12.9'

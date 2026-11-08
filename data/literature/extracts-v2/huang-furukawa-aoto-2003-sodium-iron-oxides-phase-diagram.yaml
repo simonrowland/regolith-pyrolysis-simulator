@@ -1,0 +1,1683 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.yaml
+observations:
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_delta_fG
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na3FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1068.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Huang, Furukawa and Aoto Part I [13]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=4
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=4
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=4
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_delta_fH
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na3FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1162.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=4
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation enthalpy at 298.; row=2; column=4
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=4
+  derived_from:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_delta_fG
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_entropy
+  derivation:
+    relation: Authors' equation (3) thermodynamic treatment of the Table 1 Gibbs energy and entropy estimates.
+    inputs:
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_delta_fG
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_entropy
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: The authors apply equation (3), ΔfH°(298) = ΔfG°(298) + T ΔfS°(298), to estimate the formation enthalpy.
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: 2.2.3
+        equation: '3'
+    references: []
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na3FeO3_table1_entropy
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na3FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '172'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=4
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard entropy at 298.; row=3; column=4
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=4
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_delta_fG
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na4FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1107.52'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bhat and Borgstedt [9]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=3
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=3
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=3
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_delta_fH
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na4FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1206.13'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298, calculated by the authors using equation (3).; row=2; column=3
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation enthalpy at 298, calculated by the authors using equation (3).; row=2; column=3
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298, calculated by the authors using equation (3).; row=2; column=3
+  derived_from:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_delta_fG
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_entropy
+  derivation:
+    relation: Formation enthalpy calculated from formation Gibbs energy and formation entropy with equation (3).
+    inputs:
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_delta_fG
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_entropy
+    parameters: []
+    output_unit: kJ/mol
+    method:
+      state:
+        tag: value
+        value: Equation (3), ΔfH°(298) = ΔfG°(298) + T ΔfS°(298).
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: 2.2.2
+        equation: '3'
+    references: []
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na4FeO3_table1_entropy
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na4FeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '208.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Lindemer et al. [3]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=3
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard entropy at 298.; row=3; column=3
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=3
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_delta_fG
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na5FeO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1462.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=5
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=5
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=5
+  derived_from:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_delta_fH
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_entropy
+  derivation:
+    relation: Authors' formation Gibbs energy function evaluated at the printed 298 K table reference.
+    inputs:
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_delta_fH
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_entropy
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_delta_fH
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na5FeO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1596'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Lindemer et al. [3]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=5
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation enthalpy at 298.; row=2; column=5
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=5
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na5FeO4_table1_entropy
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na5FeO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '246.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Lindemer et al. [3]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=5
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard entropy at 298.; row=3; column=5
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=5
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_delta_fG
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na8Fe2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2524.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=6
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=6
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=6
+  derived_from:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_delta_fH
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_entropy
+  derivation:
+    relation: Authors' formation Gibbs energy function evaluated at the printed 298 K table reference.
+    inputs:
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_delta_fH
+    - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_entropy
+    parameters: []
+    output_unit: kJ/mol
+    method:
+      state:
+        tag: value
+        value: The source states that the formation value was calculated by equation (2).
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: 2.2.5
+        equation: '2'
+    references: []
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_delta_fH
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na8Fe2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2746'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stuve et al. [14]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=6
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation enthalpy at 298.; row=2; column=6
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=6
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_Na8Fe2O7_table1_entropy
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na8Fe2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '438.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Lindemer et al. [3]
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=6
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard entropy at 298.; row=3; column=6
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=6
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_NaFeO2_table1_delta_fG
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-639.98'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SGTE assessment, as stated in section 2.2.1
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=2
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=2
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation Gibbs energy at 298.; row=1; column=2
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_NaFeO2_table1_delta_fH
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-698.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SGTE assessment, as stated in section 2.2.1
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=2
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation enthalpy at 298.; row=2; column=2
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard formation enthalpy at 298.; row=2; column=2
+- observation_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::huang2003p2_NaFeO2_table1_entropy
+  experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '88.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SGTE assessment, as stated in section 2.2.1
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-11-05'
+      evidence:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=2
+  notices: []
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard entropy at 298.; row=3; column=2
+  read_from: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 68
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1, standard entropy at 298.; row=3; column=2

@@ -1,0 +1,339 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans1960.28.986
+  citation: Yamaguchi, S., Kaneko, Y. and Iguchi, Y. (1987). Activity Measurements of Na2O in Na2O-Fe2O3 System by EMF Method
+    Using Sodium Beta Alumina as a Solid Electrolyte. Transactions of the Japan Institute of Metals, 28(12), 986–993.
+  source_ids:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      role: pdf
+      path: raw/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.pdf
+      sha256:
+        tag: value
+        value: c016f6239437b67d054f258036525abf7c15f9c8901fcd230b07f7501f805262
+    - asset_id: pdftotext:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      role: pdftotext
+      path: text/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans1960.28.986
+experiments:
+- experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans1960.28.986
+  locator:
+    page: 6
+    published_page: 991
+    table: '3'
+    note: row=N3F5 + F, <1405 K
+context:
+- observation_id: yki1987_attributed_auxiliary_values
+  type: comparison_data
+  units: as printed
+  locator:
+    page: 7
+    published_page: 992
+    section: III.3 Comparison with previous reports
+  values:
+    attributed_values:
+    - attribution: Dai, Seetharaman and Staffansson [1]
+      value_as_printed: No numerical fit printed here
+      note: Authors discuss their earlier activity and Gibbs-energy work qualitatively.
+    - attribution: Thery [4]
+      value_as_printed: 1033 K transition
+      phases_as_printed: Na3Fe5O9 to Fe2O3 + Na2Fe2O4
+      note: Prior interpretation discussed by the authors.
+    - attribution: Lin and Elliott [9]
+      value_as_printed: Na2O activity in Na2O-WO3 used to determine sodium tungstate reference activity
+      note: No numeric value printed here.
+    - attribution: Neudorf and Elliott [10]
+      value_as_printed: Na2O activity and thermodynamic properties in Na2O-SiO2
+      note: No numeric value printed here.
+    figure_only_candidates: Figs. 2–5 contain plotted EMF, activity, and mixing Gibbs values; numerical points were not extracted.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_attributed_auxiliary_values
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_body_literal_conflict
+  type: source_note
+  units: text
+  locator:
+    page: 7
+    published_page: 992
+    section: III.2 Estimation of thermochemical properties
+  values:
+    alternate_formula_as_printed: Na3Fe5O5
+    note: Body text uses Na3Fe5O5 once where surrounding text uses Na3Fe5O9; not interpreted as another phase.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_body_literal_conflict
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_equations_standard_state
+  type: method
+  units: as printed
+  locator:
+    page: 2
+    published_page: 987
+    section: II.1 Concentration cell
+    equations: 1–3
+  values:
+    cell_scheme_as_printed: Na2O(aNa2O) Sample (Na2O + Fe2O3), Pt/O2(g,pO2) | Na+ beta-alumina | Na2O(a*Na2O) Reference (5Na2O
+      + 21Fe2O3), O2(g,p*O2), Pt
+    cell_reaction_as_printed: 2 F E = R T ln(aNa2O/a*Na2O) − (1/2) R T ln(pO2/p*O2)
+    equal_oxygen_pressure_relation_as_printed: 2 F E = R T ln(aNa2O/a*Na2O)
+    carbonate_calibration_cell_as_printed: 5Na2O + 21Fe2O3 | Na+ beta-alumina | Na2CO3 (pure, liquid/solid), Pt/CO2(pCO2x),
+      O2(pO2x)
+    carbonate_reaction_as_printed: Na2O(sol. or liq.) + CO2(gas) = Na2CO3(sol. or liq.) (A)
+    standard_state_sentence_as_printed: The standard state of Na2O activity was taken as pure solid Na2O below the melting
+      point of Na2O (1405 K) and pure liquid Na2O above the melting point.
+    standard_state: Pure solid Na2O below 1405 K; pure liquid Na2O above 1405 K.
+    calibration_reference_as_printed: JANAF thermochemical tables (1971), formation free energies for Na2O, CO2, and Na2CO3.
+    total_pressure:
+      state:
+        tag: unknown
+        reason: not_published_as_total_pressure
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_equations_standard_state
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_gibbs_reduction_equations
+  type: method
+  units: as printed
+  locator:
+    page: 6
+    published_page: 991
+    section: III.2 Estimation of thermochemical properties
+    equations: 4–6
+  values:
+    activity_fit_equation_as_printed: log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T
+    na3fe5o9_reaction_as_printed: 3Na2O(s) + 5Fe2O3(s) = 2Na3Fe5O9 (B)
+    na3fe5o9_reduction_as_printed: ΔG°(B) = 2ΔG°(Na3Fe5O9) = 3RT ln aNa2O(F/N3F5) (4)
+    na2fe2o4_reaction_as_printed: 2Na3Fe5O9 + 2Na2O(s,l) = 5Na2Fe2O4 (C); Na2O(s,l) + Fe2O3 = Na2Fe2O4 (α,β,γ) (D)
+    na2fe2o4_reduction_as_printed: ΔG°(C) = 2RT ln aNa2O(N3F5/NF) (5); ΔG°(Na2Fe2O4) = 1/5[ΔG°(B) + 2RT ln aNa2O(NF/N3F5)]
+      (6)
+    equation6_gibbs_identity_as_printed: ΔG°(Na2Fe2O4) = 1/5[ΔG°(B) + ΔG°(C)] (6)
+    equation6_ratio_conflict: Eq. (6) prints NF/N3F5, while Eq. (5) and Table 3 identify N3F5/NF; preserved without inversion.
+    assumptions_as_printed: aFe2O3(solid hematite) is standard state; aNa3Fe5O9=1; Na3Fe5O9 assumed stoichiometric.
+    standard_free_energy_calculation_limit: Below 1405 K because Na2O activity over the liquid phase was unknown.
+    uncertainty_as_printed: Statistical terms only; confidence level not stated; systematic/reference errors excluded.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_gibbs_reduction_equations
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_nafeo2_formula_registration
+  type: source_note
+  units: formula
+  locator:
+    page: 6
+    published_page: 991
+    table: '4'
+  values:
+    formula_as_published: Na2Fe2O4
+    canonical_species: NaFeO2
+    formula_basis_note: Na2Fe2O4 has empirical formula NaFeO2; no coefficient, value, or energy normalization is applied.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_nafeo2_formula_registration
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: NaFeO2
+- observation_id: yki1987_schema_gap
+  type: schema_audit
+  units: not applicable
+  locator:
+    page: 4
+    published_page: 989
+    table: '2'
+  values:
+    candidate_quantity: electromotive_force
+    schema_gap: simulator/battery/enums.py::Quantity contains no exact EMF quantity, and simulator/battery/migrate.py::QUANTITY_ALIASES
+      contains no alias. The source's eight EMF fit rows therefore remain typed located context.
+    similar_existing_data: kim-2004-na2o-float-glass-emf
+    fit_expression_gap: 'The exact quantity tokens are present: simulator/battery/enums.py::Quantity.ACTIVITY and Quantity.DELTA_FG;
+      simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY resolve the declared activity and gibbs_table types,
+      and ::PHASE_MAP resolves cr. The unsupported form is the printed coefficient-only fit: simulator/battery/migrate.py::select_declared_source
+      does not evaluate it into point observations. Existing coefficient-only fits such as data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+      retain typed refusals.'
+    quantity_unknown_rows: all eight Gibbs fits; reaction-(B) and reaction-(D) energies have no exact reaction-extent quantity
+      token.
+    reaction_extent_gap: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/migrate.py::QUANTITY_ALIASES
+      plus ::TYPE_QUANTITY provide no exact reaction-extent Gibbs-energy quantity. Keep the printed reaction-(B) and reaction-(D)
+      energies quantity-unknown rather than mapping them to per-formula delta_fG.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_schema_gap
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_table1_cell_assemblages
+  type: phase_assemblage_table
+  units: phase labels and formula amounts as printed
+  locator:
+    page: 3
+    published_page: 988
+    table: '1'
+  values:
+    printed_count: 5
+    rows:
+    - cell: '0'
+      sample: 5Na2O + 21Fe2O3
+      sample_phases: Fe2O3 + Na3Fe5O9
+      reference: Na2CO3
+    - cell: '6'
+      sample: 10Na2O + 13Fe2O3
+      sample_phases: Na3Fe5O9 + Na2Fe2O4
+      reference: 5Na2O + 21Fe2O3
+      reference_phases: Fe2O3 + Na3Fe5O9
+    - cell: '9'
+      sample: 10Na2O + 13Fe2O3
+      sample_phases: Na3Fe5O9 + Na2Fe2O4
+      reference: 5Na2O + 21Fe2O3
+    - cell: '10'
+      sample: 3Na2O + 7Fe2O3
+      sample_phases: Fe2O3 + Na3Fe5O9
+      reference: 5Na2O + 21Fe2O3
+    - cell: '11'
+      sample: 32Na2O + 68Fe2O3
+      sample_phases: Fe2O3 + Na3Fe5O9
+      reference: 5Na2O + 21Fe2O3
+    note: Five cell identities including paired repeats and controls, not five independent runs.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_table1_cell_assemblages
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_table1_phase_transition_rows
+  type: phase_transition_report
+  units: K
+  locator:
+    page: 5
+    published_page: 990
+    figure: '3'
+    section: III.1 EMF measurement
+  values:
+    present_work_phase_boundaries_as_printed:
+    - α↔β Na2Fe2O4 at 1033 K
+    - β↔γ Na2Fe2O4 at 1278 K
+    - incongruent reaction at 1430 K
+    prior_attribution: Thery [4] reports Na3Fe5O9 decomposition to Fe2O3 + Na2Fe2O4 at 1033 K; the authors report DTA/XRD
+      did not detect that decomposition in their sample.
+    other_printed_boundaries: Table 2/3 use 1053 K; abstract/Table 4 use 1047 K. Preserved separately.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_table1_phase_transition_rows
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O
+- observation_id: yki1987_table2_emf_fits
+  type: electrochemical_measurement_input
+  units: mV and mV/K
+  locator:
+    page: 4
+    published_page: 989
+    table: '2'
+  values:
+    quantity: electromotive_force_fit_mV
+    printed_rows:
+    - cell: No. 0
+      T_range_as_printed: <1123 K
+      A_mV: '-747.8'
+      dA_mV: '1.3'
+      B_mV_per_K: '0.702'
+      dB_mV_per_K: '0.007'
+    - cell: No. 0
+      T_range_as_printed: 1123<T<1405 K
+      A_mV: '-542.5'
+      dA_mV: '2.0'
+      B_mV_per_K: '0.519'
+      dB_mV_per_K: '0.006'
+    - cell: No. 0
+      T_range_as_printed: '>1405 K'
+      A_mV: '-1512.0'
+      dA_mV: '2.0'
+      B_mV_per_K: '1.212'
+      dB_mV_per_K: '0.030'
+    - cell: No. 6 and 9
+      T_range_as_printed: <1053 K
+      A_mV: '71.79'
+      dA_mV: '1.60'
+      B_mV_per_K: '-0.040'
+      dB_mV_per_K: '0.009'
+    - cell: No. 6 and 9
+      T_range_as_printed: 1053<T<1278 K
+      A_mV: '38.59'
+      dA_mV: '1.11'
+      B_mV_per_K: '-0.006'
+      dB_mV_per_K: '0.006'
+    - cell: No. 6 and 9
+      T_range_as_printed: 1278<T<1405 K
+      A_mV: '175.85'
+      dA_mV: '1.48'
+      B_mV_per_K: '-0.115'
+      dB_mV_per_K: '0.006'
+    - cell: No. 6 and 9
+      T_range_as_printed: 1405<T<1428 K
+      A_mV: '212.66'
+      dA_mV: '1.42'
+      B_mV_per_K: '-0.141'
+      dB_mV_per_K: '0.123'
+    - cell: No. 6 and 9
+      T_range_as_printed: '>1428 K'
+      A_mV: '-1799.1'
+      dA_mV: '5.3'
+      B_mV_per_K: '1.265'
+      dB_mV_per_K: '0.057'
+    fit_as_printed: E/mV = (A ± dA) + (B ± dB) × T/K
+    raw_inputs_by_cell:
+    - cell: No. 0
+      state: not_printed
+      locator:
+        page: 4
+        published_page: 989
+        figure: '2'
+    - cell: No. 6 and 9
+      state: not_printed
+      locator:
+        page: 5
+        published_page: 990
+        figure: '3'
+    schema_gap: No exact EMF quantity exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+      The fitted EMF coefficients are retained as located context, not mislabeled as activity.
+    conditions: Cell 0 reference gases are reported as pCO2=80 kPa and pO2=20 kPa (0.8 and 0.2 atm); measured gas-sensor EMF
+      was 5 ± 3 mV at 1150 K. Cells 6, 9, 10, and 11 used purified air. No total pressure or numerical pO2 is reported for
+      the experimental cells. Table 2 combines cells 6 and 9; cells 10 and 11 are thermal-EMF controls. The EMF stability
+      criterion was within 1 mV for 1 hour, not a per-run uncertainty.
+  context_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::context::yki1987_table2_emf_fits
+  work_id: 10.2320/matertrans1960.28.986
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  species: Na2O

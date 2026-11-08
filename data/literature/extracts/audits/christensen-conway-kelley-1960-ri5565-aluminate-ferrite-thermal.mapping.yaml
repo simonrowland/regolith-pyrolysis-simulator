@@ -1,0 +1,45 @@
+source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+source:
+  citation: Christensen, Conway, and Kelley (1960), USBM RI 5565
+extraction:
+  method: Render-verified transcription of the NaFeO2 measured and smooth heat-content tables
+  date: '2026-11-05'
+  worker: w1105fe-ri5565
+review_status: draft
+tables:
+  - page: 12
+    table_index: 8
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    unit: cal/mol
+    phase: cr
+    per: mol_species
+    published_page: 5
+    temperature: {column: 1, unit: K}
+    values:
+      - {column: 2, species: NaFeO2, quantity: H_minus_H298, unit: cal/mol}
+      - {column: 4, species: NaFeO2, quantity: H_minus_H298, unit: cal/mol}
+  - page: 13
+    table_index: 9
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    unit: cal/mol
+    phase: cr
+    per: mol_species
+    published_page: 6
+    temperature: {column: 1, unit: K}
+    values:
+      - {column: 2, species: NaFeO2, quantity: H_minus_H298, unit: cal/mol}
+      - {column: 3, species: NaFeO2, quantity: S, unit: cal/mol/K}
+  - page: 13
+    table_index: 9
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    unit: cal/mol
+    phase: cr
+    per: mol_species
+    published_page: 6
+    temperature: {column: 4, unit: K}
+    values:
+      - {column: 5, species: NaFeO2, quantity: H_minus_H298, unit: cal/mol}
+      - {column: 6, species: NaFeO2, quantity: S, unit: cal/mol/K}

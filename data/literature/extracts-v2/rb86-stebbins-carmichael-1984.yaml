@@ -1,0 +1,4581 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/rb86-stebbins-carmichael-1984.yaml
+observations:
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1615'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '3.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1'
+      unit: '% Fe2O3'
+      verbatim: ±1 wt.%
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+        section: Heat of fusion calculations
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 4
+    published_page: 295
+    pdf_page_index: 3
+    paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+    section: Heat of fusion calculations
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1615'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        section: Run products
+        note: C-1 was quenched from 1615 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+        section: Heat of fusion calculations
+        note: No fO2 is printed for the C-1 run.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+        section: Heat of fusion calculations
+        note: No total pressure is printed for the C-1 run.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+        section: Heat of fusion calculations
+        note: Only the Fe2O3 component of the pre-quench liquid is estimated; the full liquid composition is not printed.
+    temperature_K:
+      state:
+        tag: value
+        value: '1615'
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        paragraph: C-1 iron loss and pre-quench liquid Fe2O3
+        section: Heat of fusion calculations
+  derivation:
+    relation: Authors infer the C-1 liquid ferric content from total-iron loss measured in C-1 before quench.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        section: Run products
+        note: The capsule-wall iron concentration is described spatially and integrated to an estimated 1–2% iron loss as
+          FeO; the underlying spatial measurements and integration are not tabulated.
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_equation6_liquid_enthalpy_fit
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_liquid_enthalpy_fit_coefficients_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_liquid_enthalpy_fit_coefficients_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        section: Heat of fusion calculations
+        equation: '6'
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 4
+    published_page: 295
+    pdf_page_index: 3
+    section: Heat of fusion calculations
+    equation: '6'
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        section: Heat of fusion calculations
+        equation: '6'
+        note: No fit temperature interval is printed for Eq. (6).
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        section: Heat of fusion calculations
+        equation: '6'
+        note: No run fO2 is printed.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 295
+        pdf_page_index: 3
+        section: Heat of fusion calculations
+        equation: '6'
+        note: A complete liquid composition is not printed for the Eq. (6) line.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_liquid_fit_coefficients
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run238_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run241_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run242_enthalpy_increment
+  derivation:
+    relation: Equation (6) uses the liquid heat-capacity slope from the C-1 data and constrains relative enthalpy to the C-2
+      result at 1520 K.
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_liquid_fit_coefficients
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run238_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run241_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c2_run242_enthalpy_increment
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_hypothetical_congruent_fusion
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_fusion_enthalpy_calculation
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '89.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.1'
+      unit: kJ mol−1
+      verbatim: ±1.1 kJ mol−1
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        paragraph: hypothetical congruent melting enthalpy
+        section: Heat of fusion calculations
+        equation: '12'
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    paragraph: hypothetical congruent melting enthalpy
+    section: Heat of fusion calculations
+    equation: '12'
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        paragraph: hypothetical congruent melting enthalpy
+        section: Heat of fusion calculations
+        equation: '12'
+        note: No temperature is explicitly attached to the hypothetical congruent result.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        paragraph: hypothetical congruent melting enthalpy
+        section: Heat of fusion calculations
+        equation: '12'
+        note: No fO2 is printed for the hypothetical congruent calculation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        paragraph: hypothetical congruent melting enthalpy
+        section: Heat of fusion calculations
+        equation: '12'
+        note: The hypothetical reaction is stoichiometric fayalite; no measured liquid composition is printed for this result.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_incongruent_fusion_1490k_1bar
+  derivation:
+    relation: The authors add the estimated reaction (13) correction to the incongruent enthalpy to obtain the hypothetical
+      congruent value.
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_incongruent_fusion_1490k_1bar
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_incongruent_fusion_1490k_1bar
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_incongruent_fusion_1490k_1bar
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'incongruent_fusion_enthalpy_to_peritectic_liquid_and_Fe_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1490'
+    composition:
+      tag: unknown
+      reason: not_published
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'incongruent_fusion_enthalpy_to_peritectic_liquid_and_Fe_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.1'
+      unit: kJ mol−1
+      verbatim: ±1.1 kJ mol−1
+      confidence_level: not_stated
+      basis: The authors state that the error bracket is twice the standard error and includes an assumed 50% uncertainty
+        in liquid ferric content.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: The printed reaction produces a multicomponent peritectic liquid plus metallic Fe. The heat_of_fusion identity
+      represents pure same-formula solid-to-liquid fusion and would misidentify this reaction; no exact reaction-bearing identity
+      is available.
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '11'
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1490'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: The source states 1 bar; 1 bar = 100000 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: No fO2 is printed for the fusion calculation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: The reaction stoichiometry and approximate Fe2O3 content are printed, but no complete liquid composition is
+          given.
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_equation6_liquid_enthalpy_fit
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+  - rb86-stebbins-carmichael-1984::sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+  derivation:
+    relation: Equations (7)–(11) correct the measured liquid-plus-metal enthalpy relative to the fayalite and quench-product
+      mixture; Eq. (11) is evaluated at 1490 K.
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_equation6_liquid_enthalpy_fit
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+    - rb86-stebbins-carmichael-1984::sc1984_c1_pre_quench_liquid_fe2o3_from_iron_loss
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_liquid_fit_coefficients
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_liquid_enthalpy_fit_coefficients_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_liquid_enthalpy_fit_coefficients_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=runs 210–220 fit note; table_row_number=17; table_column_number=1; column=fit equation and uncertainties
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=runs 210–220 fit note; table_row_number=17; table_column_number=1; column=fit equation and uncertainties
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No temperature interval is printed for this fit note.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The complete C-1 liquid composition is not printed for the fit interval.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run210_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run211_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run213_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run215_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run218_enthalpy_increment
+  - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run219_enthalpy_increment
+  derivation:
+    relation: Authors' fit to their C-1 liquid drop-calorimetry measurements for runs 210–220.
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run210_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run211_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run213_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run215_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run218_enthalpy_increment
+    - rb86-stebbins-carmichael-1984::sc1984_table1_c1_run219_enthalpy_increment
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run198_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1352'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 198; table_row_number=8; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 198; table_row_number=8; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1352'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1352'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 198; table_row_number=8; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run199_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1351'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 199; table_row_number=9; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 199; table_row_number=9; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1351'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1351'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 199; table_row_number=9; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run202_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1351'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 202; table_row_number=10; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 202; table_row_number=10; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1351'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1351'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 202; table_row_number=10; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run205_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '985'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 205; table_row_number=12; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 205; table_row_number=12; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '985'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '985'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 205; table_row_number=12; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run208_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '985'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 208; table_row_number=13; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 208; table_row_number=13; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '985'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '985'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 208; table_row_number=13; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run210_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1521'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 210; table_row_number=8; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 210; table_row_number=8; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1521'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1521'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 210; table_row_number=8; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run211_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1521'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 211; table_row_number=9; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 211; table_row_number=9; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1521'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1521'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 211; table_row_number=9; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run213_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1521'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 213; table_row_number=10; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 213; table_row_number=10; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1521'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1521'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 213; table_row_number=10; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run215_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1617'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 215; table_row_number=11; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 215; table_row_number=11; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1617'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1617'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 215; table_row_number=11; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run218_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1615'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 218; table_row_number=12; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 218; table_row_number=12; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1615'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1615'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 218; table_row_number=12; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run219_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1705'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 219; table_row_number=14; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 219; table_row_number=14; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1705'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1705'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 219; table_row_number=14; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run221_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1704'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 221; table_row_number=15; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 221; table_row_number=15; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1704'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1704'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 221; table_row_number=15; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run223_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1350'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 223; table_row_number=14; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 223; table_row_number=14; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1350'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 223; table_row_number=14; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run226_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1350'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 226; table_row_number=15; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 226; table_row_number=15; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1350'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 226; table_row_number=15; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run230_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1615'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 230; table_row_number=16; table_column_number=6; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 230; table_row_number=16; table_column_number=6; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1615'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1615'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 230; table_row_number=16; table_column_number=6; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run294_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '985'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 294; table_row_number=11; table_column_number=3; column=ΔH; phase=solid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 294; table_row_number=11; table_column_number=3; column=ΔH; phase=solid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '985'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '985'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 294; table_row_number=11; table_column_number=3; column=ΔH; phase=solid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run238_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1520'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 238; table_row_number=3; table_column_number=3; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 238; table_row_number=3; table_column_number=3; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1520'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1520'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 238; table_row_number=3; table_column_number=3; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run241_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1520'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 241; table_row_number=4; table_column_number=3; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 241; table_row_number=4; table_column_number=3; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1520'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1520'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 241; table_row_number=4; table_column_number=3; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run242_enthalpy_increment
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1524'
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_increment_H_T_minus_H_300K_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 242; table_row_number=5; table_column_number=3; column=ΔH; phase=liquid
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    note: row=run 242; table_row_number=5; table_column_number=3; column=ΔH; phase=liquid
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: The starting fayalite is described as stoichiometric, but the run-specific high-temperature liquid composition
+          is not printed as a complete composition.
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1524'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+    temperature_K:
+      state:
+        tag: value
+        value: '1524'
+      locator:
+        page: 2
+        published_page: 293
+        pdf_page_index: 1
+        table: '1'
+        note: row=run 242; table_row_number=5; table_column_number=3; column=ΔH; phase=liquid
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_fe2o3_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3; table_row_number=7; table_column_number=3; column=C-1 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe2O3; table_row_number=7; table_column_number=3; column=C-1 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+  derivation:
+    relation: Fe2O3 is calculated from FeO and FeOtot (Table 2 footnote 5).
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_femetallic_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class not_applicable
+    original_method_class: not_applicable
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe°; table_row_number=5; table_column_number=3; column=C-1 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe°; table_row_number=5; table_column_number=3; column=C-1 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeO; table_row_number=6; table_column_number=3; column=C-1 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeO; table_row_number=6; table_column_number=3; column=C-1 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeOtot; table_row_number=4; table_column_number=3; column=C-1 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeOtot; table_row_number=4; table_column_number=3; column=C-1 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_sio2_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class not_applicable
+    original_method_class: not_applicable
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=SiO2; table_row_number=3; table_column_number=3; column=C-1 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=SiO2; table_row_number=3; table_column_number=3; column=C-1 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_fe2o3_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3; table_row_number=7; table_column_number=2; column=C-1 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe2O3; table_row_number=7; table_column_number=2; column=C-1 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feo_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feotot_bulk_analysis
+  derivation:
+    relation: Fe2O3 is calculated from FeO and FeOtot (Table 2 footnote 5).
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feo_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feotot_bulk_analysis
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_femetallic_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe°; table_row_number=5; table_column_number=2; column=C-1 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe°; table_row_number=5; table_column_number=2; column=C-1 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feo_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeO; table_row_number=6; table_column_number=2; column=C-1 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeO; table_row_number=6; table_column_number=2; column=C-1 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feotot_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeOtot; table_row_number=4; table_column_number=2; column=C-1 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeOtot; table_row_number=4; table_column_number=2; column=C-1 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_sio2_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class not_applicable
+    original_method_class: not_applicable
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=SiO2; table_row_number=3; table_column_number=2; column=C-1 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=SiO2; table_row_number=3; table_column_number=2; column=C-1 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3; table_row_number=7; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe2O3; table_row_number=7; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+  derivation:
+    relation: Table 2 footnote 5 calculates Fe2O3 from FeO and FeOtot. The p. 293 chemical methods distinguish metallic iron
+      as well; the C-2 balance includes printed FeO 62.3 wt.%, FeOtot 70.1 wt.% as FeO, and Fe° 1.5 wt.%. The rounded inputs
+      reproduce about 6.52 wt.% Fe2O3, consistent with the printed 6.5 wt.% value.
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe°; table_row_number=5; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe°; table_row_number=5; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+  derivation:
+    relation: C-2 post-run Fe° is calculated from total iron and two ferrous-iron analyses (Table 2 footnote 3).
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeO; table_row_number=6; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeO; table_row_number=6; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derivation:
+    relation: The published C-2 post-calorimetry FeO composition is reduced from the total-iron assay and the colorimetric
+      and titrimetric ferrous-iron assays, which were calibrated for metallic Fe. The underlying chemical assay readings are
+      not separately tabulated.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The individual chemical assay readings are not separately printed; 62.3 wt.% is the published C-2 post-calorimetry
+          FeO composition.
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeOtot; table_row_number=4; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeOtot; table_row_number=4; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_sio2_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=SiO2; table_row_number=3; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=SiO2; table_row_number=3; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_equilibrium_liquid_fe2o3
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1520'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '2.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3(liq) calculated liquid composition; table_row_number=8; table_column_number=5; column=C-2 after calorimetry
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe2O3(liq) calculated liquid composition; table_row_number=8; table_column_number=5; column=C-2 after calorimetry
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1520'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No fO2 is printed for the C-2 run.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No total pressure is printed for the C-2 run.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: Only Fe2O3 in the liquid is calculated; the complete liquid composition is not printed.
+    temperature_K:
+      state:
+        tag: value
+        value: '1520'
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3(liq) calculated liquid composition; table_row_number=8; table_column_number=5; column=C-2 after calorimetry
+  derived_from:
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+  - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+  derivation:
+    relation: 'Eq. (3): subtract the mole fraction of metallic Fe formed during quench from the mole fraction of Fe2O3 in
+      the quenched sample; Table 2 footnote 7 reports the resulting liquid composition.'
+    inputs:
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
+    - rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_fe2o3_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe2O3; table_row_number=7; table_column_number=4; column=C-2 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe2O3; table_row_number=7; table_column_number=4; column=C-2 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derivation:
+    relation: C-2 starting-material Fe2O3 is calculated by comparison with 100% total; the underlying probe totals are not
+      tabulated (Table 2 footnote 1).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The electron-microprobe input totals used in this reduction are not separately printed.
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_femetallic_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=Fe°; table_row_number=5; table_column_number=4; column=C-2 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=Fe°; table_row_number=5; table_column_number=4; column=C-2 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_feo_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeO; table_row_number=6; table_column_number=4; column=C-2 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeO; table_row_number=6; table_column_number=4; column=C-2 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+  derivation:
+    relation: C-2 starting-material FeO is a reduced electron-microprobe composition; the underlying probe totals are not
+      tabulated (Table 2 footnote 1).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The electron-microprobe input totals used in this reduction are not separately printed.
+    references: []
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_feotot_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=FeOtot; table_row_number=4; table_column_number=4; column=C-2 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=FeOtot; table_row_number=4; table_column_number=4; column=C-2 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.
+- observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_sio2_bulk_analysis
+  experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'whole_sample_chemical_analysis_as_printed'
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: not_published
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'whole_sample_chemical_analysis_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1106cp-sc84
+      date: '2026-11-06'
+      evidence:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: row=SiO2; table_row_number=3; table_column_number=4; column=C-2 starting material
+  notices: []
+  source_id: rb86-stebbins-carmichael-1984
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
+    note: row=SiO2; table_row_number=3; table_column_number=4; column=C-2 starting material
+  read_from: pdf:rb86-stebbins-carmichael-1984
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: No run fO2 is printed for this calorimetry observation.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The whole analyzed sample is the subject of these analyte measurements; a separate complete phase composition
+          at the analytical measurement condition is not stated.
+    T_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 294
+        pdf_page_index: 2
+        table: '2'
+        note: The chemical-analysis measurement temperature is not printed.

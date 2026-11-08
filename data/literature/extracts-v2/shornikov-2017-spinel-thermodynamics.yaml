@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -20,54 +20,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1863'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-21.15'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -83,14 +55,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -154,8 +121,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -168,54 +135,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1950'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-22.07'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -231,14 +170,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -301,8 +235,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -315,54 +249,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2004'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-22.32'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -378,14 +284,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -449,8 +350,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -463,54 +364,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2050'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-22.41'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -528,14 +401,9 @@ observations:
     attribution: Figure 2 series 16. The least-squares constants of this series are the Table 1 this-work cells. This point
       is not that fit.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -607,8 +475,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -621,54 +489,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2102'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-22.7'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -684,14 +524,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -753,8 +588,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -767,54 +602,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2160'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-22.92'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -830,14 +637,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -899,8 +701,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -913,54 +715,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2210'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-23.47'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -976,14 +750,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -1050,8 +819,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -1064,54 +833,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2252'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-23.39'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1127,14 +868,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -1199,8 +935,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -1213,54 +949,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '2302'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-23.61'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1276,14 +984,9 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fG
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 3
@@ -3562,8 +3265,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -3575,54 +3278,23 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '43.79'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -3641,14 +3313,9 @@ observations:
       of equations (16) and (17), reduced by equation (19). The sentence does not print a temperature or a range for this
       constant.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 6
@@ -3857,8 +3524,8 @@ observations:
   experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgAl2O4
       phase:
@@ -3871,54 +3538,26 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1851, 2298]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
+      tag: value
+      value:
+        basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+        components:
+        - - MgO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
   value:
-    kind: point
-    point: '-12.02'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -3936,14 +3575,9 @@ observations:
     attribution: Table 1 this-work row. Least squares of this paper's ΔG_T for crystalline spinel, equation (19), assumed
       constant over the printed range. Per 1 mol of compound.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2017-spinel-thermodynamics
   locator:
     page: 2
