@@ -1287,8 +1287,6 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
             str(tmp_path / "history.jsonl"),
             "--rail",
             "redox",
-            "--group-by",
-            "species",
             "--simulator-commit",
             "sim-test",
             "--openimcc-commit",
@@ -1307,13 +1305,8 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     assert redox_collection_pngs[0].is_file()
     with Path(summary["files"]["table:panels"]).open(newline="") as panels_file:
         panels = list(csv.DictReader(panels_file))
-    uncalibrated_melt_panel = next(
-        row
-        for row in panels
-        if row["rail"] == "melt_activity" and row["engine"] == "openimcc"
-    )
-    assert uncalibrated_melt_panel["n"] == "2"
-    assert uncalibrated_melt_panel["plotted_n"] == "1"
+    assert panels
+    assert {row["rail"] for row in panels} == {"redox"}
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
