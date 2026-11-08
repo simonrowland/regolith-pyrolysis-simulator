@@ -1,0 +1,43 @@
+source_id: greig-1927-immiscibility-part2
+source:
+  citation: J. W. Greig, “Immiscibility in Silicate Melts. Part II,” American Journal of Science, 5th series, 13 (74), 133–154 (1927).
+  doi: 10.2475/ajs.s5-13.74.133
+  year: 1927
+extraction:
+  method: Manual transcription from MinerU HTML tables and Markdown; Tesseract OCR provides the independent second read, and renders settle disagreements and confirm row/column layout.
+  date: '2026-11-08'
+  worker: w1108gr-gr27b
+  provenance_path: tables/greig-1927-immiscibility-part2/
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    unit: wt%
+    phase: glass
+    evidence_class: measured_direct
+    rows: [5, 6, 7]
+    value_pairs:
+      - species_column: 2
+        value_column: 3
+      - species_column: 2
+        value_column: 4
+  - page: 21
+    table_index: 4
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    unit: wt%
+    phase: glass
+    evidence_class: measured_direct
+    rows: [1, 2, 3, 4]
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+      - species_column: 3
+        value_column: 4
+      - species_column: 5
+        value_column: 6
+      - species_column: 7
+        value_column: 8
