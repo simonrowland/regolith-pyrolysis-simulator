@@ -9,6 +9,7 @@ import re
 import pytest
 import yaml
 
+from tools import extract_merge as em
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +49,49 @@ def _all_observations(document: dict) -> list[dict]:
         for species in document["species"].values()
         for row in species.get("observations", [])
     ]
+
+
+def _assert_table3_species_ownership(document: dict) -> None:
+    expected_counts = {
+        "S": 27,
+        "SiO2": 27,
+        "TiO2": 27,
+        "Al2O3": 27,
+        "FeO": 27,
+        "MnO": 27,
+        "MgO": 27,
+        "CaO": 27,
+        "Na2O": 27,
+        "K2O": 27,
+        "P2O5": 27,
+        "H2O": 26,
+    }
+    merged = em.build_by_species([document], source_priority={})
+    actual_counts = Counter()
+    for species_name, body in merged["species"].items():
+        for row in body.get("observations", []):
+            if not row.get("observation_id", "").startswith("fortin_2014_table3_"):
+                continue
+            values = row.get("values", {})
+            assert values.get("formula") == species_name, (
+                f"species container {species_name} does not match formula "
+                f"{values.get('formula')} for {row.get('observation_id')}"
+            )
+            actual_counts[species_name] += 1
+    assert actual_counts == expected_counts
+
+
+def test_table3_species_containers_match_formulas_and_printed_row_counts() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_table3_species_ownership(document)
+
+    mutated = deepcopy(document)
+    mg_rows = mutated["species"]["MgO"]["observations"]
+    moved = next(row for row in mg_rows if row.get("observation_id", "").startswith("fortin_2014_table3_"))
+    mg_rows.remove(moved)
+    mutated["species"]["MnO"]["observations"].append(moved)
+    with pytest.raises(AssertionError, match="species container MnO does not match formula MgO"):
+        _assert_table3_species_ownership(mutated)
 
 
 def _assert_render_pins(document: dict) -> None:
@@ -238,7 +282,7 @@ def test_printed_rows_identity_supersession_uncertainty_and_migration() -> None:
     assert len(migrated) == 688
     assert len(result.experiments) == 28
     assert Counter(row.value.kind.value for row in migrated) == Counter({"point": 665, "unavailable": 23})
-    assert Counter(row.uncertainty.kind.value for row in migrated) == Counter({"printed": 670, "none": 18})
+    assert Counter(row.uncertainty.kind.value for row in migrated) == Counter({"printed": 308, "none": 380})
     uncertainty_confidence = Counter(
         (
             row.uncertainty.verbatim.get("confidence_level")
@@ -251,9 +295,14 @@ def test_printed_rows_identity_supersession_uncertainty_and_migration() -> None:
     )
     assert uncertainty_confidence == Counter({
         "one_sigma": 307,
-        "confidence_level_not_stated": 362,
         "not_stated": 1,
     })
+    assert all(
+        isinstance(row.uncertainty.verbatim, dict)
+        and row.uncertainty.verbatim.get("confidence_level")
+        for row in migrated
+        if row.uncertainty.kind.value == "printed"
+    )
 
     by_id = {row.observation_id.split("::", 1)[1]: row for row in migrated}
     for row in superseding_rows:
