@@ -73,6 +73,9 @@ def _series_resistance_reference_flux(
 ) -> dict:
     """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
 
+    Call after the production calculation: its same-hour closure supplies the
+    source partial pressures used by this parity calculation.
+
     NOTE (2026-06-29 review): this calls the SAME production helper
     ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
     that consume it validate CALLER WIRING -- that ``_calculate_evaporation``
@@ -82,6 +85,14 @@ def _series_resistance_reference_flux(
     double-count guard, stir saturation, and vacuum gas-film limit) are pinned
     independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
+
+    diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    closure = diagnostic.get("same_hour_headspace_closure")
+    assert isinstance(closure, dict), "reference requires the same-hour closure"
+    same_hour_partials_Pa = closure.get("partial_pressures_Pa")
+    assert isinstance(same_hour_partials_Pa, dict), (
+        "same-hour closure must expose projected source partial pressures"
+    )
 
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
@@ -123,7 +134,7 @@ def _series_resistance_reference_flux(
             series_config.get("gas_resistance_enabled", True)
         )
         P_ambient_Pa = (
-            sim._evaporation_bulk_partial_pressure_pa(species)
+            max(0.0, float(same_hour_partials_Pa.get(species, 0.0) or 0.0))
             if gas_resistance_enabled
             else 0.0
         )
@@ -1046,8 +1057,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
 
@@ -1188,10 +1199,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
+        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114

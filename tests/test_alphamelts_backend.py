@@ -6636,12 +6636,6 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
             lambda equilibrium, temperature_K, effective_pressure_source: vapour_batch
         ),
     )
-    # Bind the production helper (simulator/evaporation.py:138) so this
-    # stand-in follows the real backpressure path without copying its logic.
-    sim._evaporation_bulk_partial_pressure_pa = types.MethodType(
-        PyrolysisSimulator._evaporation_bulk_partial_pressure_pa,
-        sim,
-    )
     sim._resolve_evaporation_batch_flux_state = types.MethodType(
         PyrolysisSimulator._resolve_evaporation_batch_flux_state,
         sim,

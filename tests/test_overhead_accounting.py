@@ -1826,10 +1826,6 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     assert sim.record.snapshots[-1].melt_headspace_composition_mbar == pytest.approx(
         sim._melt_headspace_composition_mbar
     )
-    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"] * 100.0
-    )
-
     seen = {}
 
     def _capture_dispatch(_intent, *, control_inputs, redox_state=None):
