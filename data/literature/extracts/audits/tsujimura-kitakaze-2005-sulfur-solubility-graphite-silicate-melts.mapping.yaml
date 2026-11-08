@@ -1,0 +1,112 @@
+source_id: tsujimura-kitakaze-2005-sulfur-solubility-graphite-silicate-melts
+verification_summary:
+  table_1: 25 printed rows; 130 numeric tokens; pdftotext transcription checked cell-by-cell against physical PDF
+    page 2 at 600 dpi because MinerU emitted no table block.
+  table_2: 31 printed rows; MinerU/pdftotext digit agreement 1.000; row/column assignment checked against physical
+    PDF page 3 at 600 dpi. The full audit splits each mean and parenthesized 1-sigma uncertainty token.
+  table_3: 7 printed rows; MinerU/pdftotext digits reconciled; row/column assignment checked against physical PDF
+    page 4 at 600 dpi. The two standard shifts were render-verified because MinerU classified them as header cells.
+  audit_numeric_token_count: 618
+  audit_total_records: 706
+table_mappings:
+- printed_table: '1'
+  pdf_page: 2
+  published_page: 56
+  caption: Starting silicate composition (wt%).
+  printed_row_count: 25
+  storage: One context row preserves every nonblank starting-silicate oxide as printed, plus an explicit blank-column
+    list. Not treated as measured quenched-glass composition.
+  columns:
+  - column: SiO2
+    destination: starting_composition_wt_pct_as_published
+  - column: TiO2
+    destination: starting_composition_wt_pct_as_published
+  - column: Al2O3
+    destination: starting_composition_wt_pct_as_published
+  - column: FeO(t)
+    destination: starting_composition_wt_pct_as_published
+  - column: MnO
+    destination: starting_composition_wt_pct_as_published
+  - column: MgO
+    destination: starting_composition_wt_pct_as_published
+  - column: CaO
+    destination: starting_composition_wt_pct_as_published
+  - column: Na2O
+    destination: starting_composition_wt_pct_as_published
+  - column: K2O
+    destination: starting_composition_wt_pct_as_published
+  - column: P2O5
+    destination: starting_composition_wt_pct_as_published
+- printed_table: '2'
+  pdf_page: 3
+  published_page: 57
+  caption: Summary of analyzed major and sulfur content in the glass (mol %).
+  printed_row_count: 31
+  observation_type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  phase: glass
+  basis: mole_fraction
+  method_class: measured_direct
+  columns:
+  - column: 2
+    header: 'Run #'
+    destination: run_id_as_published
+  glass_component_columns:
+  - column: 4
+    header: SiO2
+    species: SiO2
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 5
+    header: TiO2
+    species: TiO2
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 6
+    header: Al2O3
+    species: Al2O3
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 7
+    header: FeO (t)
+    species: FeO
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 8
+    header: MnO
+    species: MnO
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 9
+    header: MgO
+    species: MgO
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 10
+    header: CaO
+    species: CaO
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 11
+    header: Na2O
+    species: Na2O
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  - column: 12
+    header: K2O
+    species: K2O
+    destination: component_amount with unit %; uncertainty from parenthesized 1σ
+  n_column:
+    column: 3
+    header: n
+    destination: n_as_published
+  sulfur_column:
+    column: 13
+    header: S (ppm)
+    destination: measured sulfur with parenthesized 1σ
+  blank_cells: Unpopulated Table 2 cells remain absent from measured component points and glass composition maps.
+- printed_table: '3'
+  pdf_page: 4
+  published_page: 58
+  caption: Analyzed sulfur and S peak positions in the standards and selected samples.
+  printed_row_count: 7
+  shift_quantity: s_k_alpha_wavelength_shift
+  shift_method_class: measured_reduced
+  shift_status: 'typed-refused schema gap: no exact quantity token for a wavelength peak-position shift.'
+  schema_gap_symbols:
+  - simulator/battery/enums.py::Quantity
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
