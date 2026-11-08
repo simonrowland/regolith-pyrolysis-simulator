@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from tools import extract_merge as em
+from tools.validate_literature_extracts import check_all_fidelity_samples_match
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,6 +111,7 @@ def _assert_render_pins(document: dict) -> None:
         assert row["locator"]["column"] == column
 
     appendix_pins = (
+        ("appendixi", "GS-13", "2800", 83, "Appendix I", "S ppm"),
         ("appendixi", "MAF-45", "1265", 83, "Appendix I", "S ppm"),
         ("appendixii", "B-16", "1210", 92, "Appendix II", "S ppm"),
         ("appendixiii", "MP15X", "126", 93, "Appendix III", "S ppm"),
@@ -117,6 +119,7 @@ def _assert_render_pins(document: dict) -> None:
     for appendix, sample, value, page, table, column in appendix_pins:
         row = _appendix_row(document, appendix, sample)
         assert str(row["values"]["value"]) == value
+        assert row["values"]["value_as_published"] == value
         assert row["locator"]["page"] == page
         assert row["locator"]["table"] == table
         assert row["locator"]["row"].startswith(sample)
@@ -126,11 +129,19 @@ def _assert_render_pins(document: dict) -> None:
 def test_render_fidelity_pins_and_mutation_check() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_render_pins(document)
+    assert [sample["value"] for sample in document["fidelity_samples"]] == [
+        "874", "47.7", "2800", "1210", "126",
+    ]
+    assert check_all_fidelity_samples_match(document, label=SOURCE_ID) == []
 
     mutated = deepcopy(document)
     _table3_row(mutated, "S", "MAF-1")["values"]["value"] = "875"
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+    mutated["fidelity_samples"][0]["path"] = (
+        "species.S.observations[fortin_2014_table3_s].values.points[0].value"
+    )
+    assert check_all_fidelity_samples_match(mutated, label=SOURCE_ID)
 
 
 def test_appendix_iii_attribution_tokenization_matches_rendered_rows() -> None:
@@ -220,7 +231,7 @@ def test_printed_rows_identity_supersession_uncertainty_and_migration() -> None:
         assert len(rows) == expected
         assert all("point_conditions" in row and "point_conditions" not in row["values"] for row in rows)
 
-    # The dash-only dissolved-water cell is not promoted to a numeric observation.
+    # MAF-29's dissolved-water cell is printed as n/a, not a numeric observation.
     assert not any(
         row.get("values", {}).get("sample_id_as_published") == "MAF-29"
         for row in _all_observations(document)

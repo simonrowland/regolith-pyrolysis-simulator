@@ -39,7 +39,7 @@ The source reports that sulfur was over 97% sulphide even in the most hydrous ex
 
 ## Review fix: species ownership and printed detection limits
 
-The machine-text generator's block replacements now stop at the next observation, species heading, or context heading. Rebuilding preserves the separate MgO, CaO, and H2O species containers. The source Table 3 counts are 27 rows each for S, SiO2, TiO2, Al2O3, FeO, MnO, MgO, CaO, Na2O, K2O, and P2O5, and 26 H2O rows (MAF-29 is a printed dash). The focused regression checks each row's formula through `tools/extract_merge.py::build_by_species` and mutates a row to prove the check fails.
+The machine-text generator's block replacements now stop at the next observation, species heading, or context heading. Rebuilding preserves the separate MgO, CaO, and H2O species containers. The source Table 3 counts are 27 rows each for S, SiO2, TiO2, Al2O3, FeO, MnO, MgO, CaO, Na2O, K2O, and P2O5, and 26 H2O rows (the MAF-29 water cell is `n/a` (not analysed)). The focused regression checks each row's formula through `tools/extract_merge.py::build_by_species` and mutates a row to prove the check fails.
 
 The Etna K2O and LCO P2O5 Table 1 cells now preserve the printed `<d.l.` literal without a closing angle bracket. The cells CSV was regenerated from the corrected source text. The Table 1 render check is recorded above.
 
