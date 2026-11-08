@@ -4341,9 +4341,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
+            retain_fe_activity_channel = (
+                parent_oxide == "FeO"
+                and source_activity_value is not None
+                and source_activity_value > 0.0
+            )
+            # Fe's declared liquid activity and its d-349 conversion to the
+            # selected FeO K standard have already been computed above. The
+            # reporting floor used to drop both the pressure and that
+            # provenance, so the batch refused a real activity as a missing
+            # channel contract. Retain its positive pressure for prediction;
+            # the existing FeO/K conversion remains the sole numeric path.
             if _publishes_vapor_pressure(
                 P_eq_Pa,
-                retain_subthreshold=retain_high_t_openimcc_carriers,
+                retain_subthreshold=(
+                    retain_high_t_openimcc_carriers
+                    or retain_fe_activity_channel
+                ),
             ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
