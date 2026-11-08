@@ -4681,8 +4681,14 @@ def _convert_uncertainty_width(
     source_unit: str,
     *,
     source_observation: Observation | None = None,
-) -> tuple[Decimal | None, str | None]:
+    reference: Decimal | None = None,
+    metric_operation: MetricOperation | None = None,
+) -> tuple[Decimal | None, str | None, str | None]:
     unit = re.sub(r"\s+", "", source_unit).casefold()
+    unit = unit.replace("−", "-").replace("‰", "permil")
+    unit = unit.replace("asprinted", "").replace("aspublished", "")
+    unit = unit.replace("confidencelevelnotstated", "")
+    unit = unit.replace("overalltemperatureaccuracy", "").strip(";,.:")
     expected = QUANTITY_UNITS[quantity]
     if quantity in {
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
@@ -4700,23 +4706,31 @@ def _convert_uncertainty_width(
             if isinstance(subtype_state, State) and subtype_state.is_value
             else None
         )
-        # These quantities have no quantity-wide unit: QUANTITY_UNITS says
-        # subtype_defined, while the component's declared scale lives in
-        # identity.subtype (wt_percent / oxide_wt_percent or mole_percent).
-        # Therefore preserve a printed width only when its unit names that
-        # same scale; wt% cannot be assigned to a mole_fraction observation.
-        # A series point inherits its unit from the parent column and carries
-        # that parent id; its subtype supplies the same explicit scale. Sanity:
-        # a 0.17 wt% width stays 0.17 mass_percent, never 0.0017.
-        mass_percent_subtypes = {"wt_percent", "oxide_wt_percent", "mass_percent"}
-        mole_percent_subtypes = {"mole_percent", "mol_percent"}
-        declared_scale = (
-            "mass_percent"
-            if subtype in mass_percent_subtypes
-            else "mole_percent"
-            if subtype in mole_percent_subtypes
-            else None
-        )
+        # These quantities have no quantity-wide unit: the component scale
+        # comes from identity.subtype. A width may change numerical scale only
+        # within its printed mass or mole basis; mass and mole fractions need
+        # composition data to convert between them.
+        declared_scale = {
+            "wt_percent": "mass_percent",
+            "oxide_wt_percent": "mass_percent",
+            "mass_percent": "mass_percent",
+            "mole_percent": "mole_percent",
+            "mol_percent": "mole_percent",
+            "mole_fraction": "mole_fraction",
+            "ppm_mass": "ppm_mass",
+            "element_ppm_by_mass": "element_ppm_by_mass",
+            "mass_fraction": "mass_fraction",
+        }.get(subtype)
+        if declared_scale is None and isinstance(subtype, str):
+            compact_subtype = re.sub(r"\s+", "", subtype).casefold()
+            if re.search(r"(?:wt|weight|mass)(?:\.|_)?%", compact_subtype):
+                declared_scale = "mass_percent"
+            elif re.search(r"(?:mol|mole)(?:\.|_)?%", compact_subtype):
+                declared_scale = "mole_percent"
+            elif re.search(r"(?:^|[^a-z])ppm$", subtype, re.IGNORECASE):
+                # A free-text subtype that explicitly ends in ppm declares
+                # the point scale. Keep ppm; do not assume a mass basis.
+                declared_scale = "ppm"
         mass_percent_units = {
             "wt%", "wt.%", "wt_percent", "mass%", "masspercent",
             "mass_percent", "mass-percent",
@@ -4725,15 +4739,105 @@ def _convert_uncertainty_width(
             "mol%", "mol.%", "molpct", "mole%", "molepercent",
             "mole_percent", "mole-percent",
         }
-        if unit in mass_percent_units | mole_percent_units:
-            source_scale = (
-                "mass_percent"
-                if unit in mass_percent_units
-                else "mole_percent"
-            )
-            if declared_scale != source_scale:
-                return None, expected
-            return width, source_scale
+        ppm_units = {"ppm", "ppmcr", "ppm_mass", "massppm", "ppmbymass"}
+        mass_fraction_units = {"massfraction", "mass_fraction", "massfractionbymass"}
+        mole_fraction_units = {"molefraction", "mole_fraction", "molfraction"}
+        if unit in mass_percent_units or unit.startswith(
+            ("wt%", "wt.%", "mass%", "masspercent")
+        ):
+            if declared_scale == "mass_percent":
+                # Premise: value subtype and width both declare mass percent.
+                # Algebra: d(wt%) = d(wt%). Unit check: both are mass/mass ×100.
+                # Sanity: 0.03 wt% remains 0.03 wt%.
+                return width, "mass_percent", None
+            if declared_scale in {"ppm_mass", "element_ppm_by_mass"}:
+                # Premise: ppm by mass and wt% are both mass fractions.
+                # Algebra: ppm = mass_fraction × 10^6 and wt% = mass_fraction × 100,
+                # so ppm = wt% × 10^4. Unit check: 100 × (mass / mass) × 10^4
+                # is mass parts per million. Sanity: 0.0027 wt% = 27 ppm.
+                return width * Decimal("10000"), declared_scale, None
+            if declared_scale == "mass_fraction":
+                # Premise: wt% is one hundredth mass fraction. Algebra: divide
+                # the printed width by 100. Unit check: % / 100 = mass/mass.
+                # Sanity: 0.17 wt% = 0.0017 mass fraction.
+                return width / Decimal(100), "mass_fraction", None
+            return None, expected, "printed_uncertainty_basis_mismatch"
+        if unit in mole_percent_units or unit.startswith(
+            ("mol%", "mol.%", "mole%", "molepercent")
+        ):
+            if declared_scale == "mole_percent":
+                # Premise: value subtype and width both declare mole percent.
+                # Algebra: d(mol%) = d(mol%). Unit check: both are mol/mol ×100.
+                # Sanity: 0.17 mol% remains 0.17 mol%.
+                return width, "mole_percent", None
+            if declared_scale == "mole_fraction":
+                # Premise: mol% and mole fraction count the same component
+                # amount on a mole basis. Algebra: x = mol% / 100. Unit check:
+                # mol/mol is dimensionless. Sanity: 0.17 mol% = 0.0017 mole fraction.
+                return width / Decimal(100), "mole_fraction", None
+            return None, expected, "printed_uncertainty_basis_mismatch"
+        if unit in ppm_units:
+            if declared_scale == "ppm":
+                # Premise: both the free-text value subtype and printed width
+                # explicitly use ppm. Algebra: d(ppm) = d(ppm). Unit check:
+                # point and width share the same declared scale. Sanity:
+                # 39 ppm remains a 39 ppm width.
+                return width, "ppm", None
+            if declared_scale in {"ppm_mass", "element_ppm_by_mass"}:
+                # Premise: printed ppm and the component value are both mass
+                # fractions. Algebra: 1 ppm = 10^-6 mass fraction; a DEX ticket
+                # uses width/value, so 27 ppm / 452 ppm = 0.0597. Unit check:
+                # mass fraction cancels. Sanity: 27 ppm = 27e-6 mass fraction.
+                return width, declared_scale, None
+            if declared_scale == "mass_percent":
+                # Premise: ppm and wt% share mass-fraction dimension. Algebra:
+                # wt% = ppm / 10^4. Unit check: ppm/10^4 = mass fraction × 100.
+                # Sanity: 27 ppm = 0.0027 wt%.
+                return width / Decimal("10000"), "mass_percent", None
+            if declared_scale == "mass_fraction":
+                # Premise: ppm is one part in 10^6 by mass. Algebra: mass
+                # fraction = ppm / 10^6. Unit check: parts/parts is dimensionless.
+                # Sanity: 4.1 ppm = 4.1e-6 mass fraction.
+                return width / Decimal("1000000"), "mass_fraction", None
+            return None, expected, "printed_uncertainty_basis_mismatch"
+        if unit in mass_fraction_units:
+            if declared_scale == "mass_fraction":
+                # Premise: point and width both use mass fraction. Algebra:
+                # d(mass/mass) = d(mass/mass). Unit check: ratios are
+                # dimensionless. Sanity: 0.0000041 remains 0.0000041.
+                return width, "mass_fraction", None
+            if declared_scale == "mass_percent":
+                # Premise: mass fraction and wt% differ only by ×100. Algebra:
+                # wt% = mass_fraction × 100. Unit check: fraction × 100 = %.
+                # Sanity: 0.0017 mass fraction = 0.17 wt%.
+                return width * Decimal(100), "mass_percent", None
+            if declared_scale in {"ppm_mass", "element_ppm_by_mass"}:
+                # Premise: mass fraction and mass ppm describe one component
+                # amount. Algebra: ppm = mass_fraction × 10^6. Unit check:
+                # mass/mass × parts per million. Sanity: 0.0000041 = 4.1 ppm.
+                return width * Decimal("1000000"), declared_scale, None
+            return None, expected, "printed_uncertainty_basis_mismatch"
+        if unit in mole_fraction_units:
+            if declared_scale == "mole_fraction":
+                # Premise: point and width both use mole fraction. Algebra:
+                # d(x) = d(x). Unit check: both are mol/mol. Sanity: 0.0017
+                # remains a 0.0017 mole-fraction width.
+                return width, "mole_fraction", None
+            if declared_scale == "mole_percent":
+                # Premise: mol% is a mole fraction multiplied by 100. Algebra:
+                # mol% = x × 100. Unit check: mol/mol × 100 = mol%. Sanity:
+                # 0.0017 mole fraction = 0.17 mol%.
+                return width * Decimal(100), "mole_percent", None
+            return None, expected, "printed_uncertainty_basis_mismatch"
+        if unit == "dimensionless" and declared_scale in {
+            "mass_fraction", "mole_fraction"
+        }:
+            # Premise: the observation subtype declares the point's fraction
+            # basis, and its printed dimensionless width is recorded on that
+            # same point scale. Algebra: d(x) = d(x). Unit check: both are
+            # mass/mass or mol/mol. Sanity: Khedim's 0.015 at.% width is
+            # 0.00015 mole fraction, unchanged from the stored dimensionless value.
+            return width, declared_scale, None
         raw_uncertainty = (
             None
             if source_observation is None
@@ -4750,30 +4854,148 @@ def _convert_uncertainty_width(
             and inherited_series_width
             and declared_scale is not None
         ):
-            return width, declared_scale
-        if unit in {"%", "percent", "percentage"}:
-            return None, expected
-    if unit in {expected.casefold(), "1", "fraction", "relative"}:
-        return width, "fraction" if unit in {"fraction", "relative"} else expected
-    if unit in {"%", "percent", "percentage"}:
-        return width / Decimal(100), "fraction"
+            return width, declared_scale, None
+    if quantity is Quantity.VALENCE_RATIO and "fraction" in unit:
+        # Premise: these source labels identify absolute widths of the same
+        # redox fraction represented by the valence-ratio point. Algebra:
+        # d(Fe3+/sumFe) and d(Cr2+/sumCr) stay unchanged. Unit check: both
+        # numerator and denominator are element amounts. Sanity: a 0.015
+        # Cr2+/sumCr width remains a 0.015 fraction width.
+        return width, expected, None
+    if unit == expected.casefold():
+        return width, expected, None
+    if unit == "1":
+        if expected in {"dimensionless", "subtype_defined"}:
+            return width, expected, None
+        return None, expected, "printed_uncertainty_dimension_mismatch"
+    if unit == "fraction":
+        return width, "fraction", None
+    if unit in {"relative", "%", "percent", "percentage"}:
+        if metric_operation not in {
+            MetricOperation.ABSOLUTE,
+            MetricOperation.RELATIVE,
+            MetricOperation.DEX,
+        }:
+            return None, expected, "printed_relative_uncertainty_requires_metric_context"
+        if reference is None or not reference.is_finite() or reference == 0:
+            return None, expected, "printed_relative_uncertainty_requires_nonzero_point_value"
+        fraction = width if unit == "relative" else width / Decimal(100)
+        # Premise: relative widths are a fraction of the printed point x.
+        # Algebra: d_abs = |x| × r, or |x| × p/100 for percent; the scorer
+        # then applies its absolute, relative, or DEX transform. Unit check:
+        # fraction × quantity = quantity. Sanity: 10% of 0.2 is 0.02, and
+        # 2% of 726 K is 14.52 K.
+        return abs(reference) * fraction, expected, None
     if unit == "dex":
-        return width, "dex"
+        if metric_operation is MetricOperation.DEX:
+            # Premise: dex is the scorer's log10-ratio scale. Algebra:
+            # dlog10(X) stays dlog10(X). Unit check: log ratio is dimensionless.
+            # Sanity: a 0.1 dex width remains 0.1 dex.
+            return width, "dex", None
+        return None, expected, "printed_uncertainty_dimension_mismatch"
+    if quantity is Quantity.ISOTOPE_DELTA and unit in {"permil", "perthousand"}:
+        # Premise: isotope delta widths are differences on the per-mil scale.
+        # Algebra: d(‰) = d(per mil). Unit check: both are ‰. Sanity: 0.08‰
+        # stays a 0.08 per-mil width.
+        return width, "per_mil", None
+    if quantity is Quantity.TRANSITION_TEMPERATURE and unit in {
+        "c", "°c", "degc", "k", "kelvin"
+    }:
+        # Premise: a width is a temperature difference, not an absolute point.
+        # Algebra: dT_K = dT_C because the 273.15 offset cancels. Unit check:
+        # K and °C increments have equal magnitude. Sanity: 2 K = 2 °C.
+        return width, expected, None
+    if quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT} and unit in {
+        "log10activity", "log10", "dex"
+    }:
+        if metric_operation is MetricOperation.DEX:
+            # Premise: a log10 activity width is already a log-ratio width.
+            # Algebra: dlog10(X) remains dlog10(X). Unit check: dex is
+            # dimensionless. Sanity: 0.1 log10 activity = 0.1 dex.
+            return width, "dex", None
+        return None, expected, "printed_uncertainty_dimension_mismatch"
+    if (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and unit == "dimensionlessactivity"
+    ):
+        return width, expected, None
+    if quantity in {Quantity.LOG10_KF, Quantity.LOG10_K_STAR} and unit in {
+        "log10", "log10dimensionless", "log10_dimensionless"
+    }:
+        # Premise: these stored values are already log10 quantities.
+        # Algebra: d(log10 K) is the printed width unchanged. Unit check:
+        # log10 of a dimensionless K is dimensionless. Sanity: 0.03 log10 K
+        # stays a 0.03 width.
+        return width, expected, None
+    dimension_mismatch_units = {
+        "k", "kelvin", "c", "°c", "degc", "permil", "perthousand",
+        "kj/mol", "kj/mole", "j/mol", "j/mole", "j/mol/k", "j/molk",
+        "j/mol-k", "cal/mol/k", "kcal/mol/k", "kg/m3", "kgm-3", "kgm^-3",
+        "ppm", "ppmcr", "ppm_mass", "pa", "kpa", "gpa", "mpa", "kbar",
+        "kilobar", "bar", "atm", "atmosphere", "atmospheres", "torr",
+        "mmhg", "mbar", "millibar", "mass_fraction", "mole_fraction",
+        "massfraction", "massfractionbymass", "molefraction", "molfraction",
+        "dex", "dimensionlessactivity",
+    }
+    dimension_mismatch_prefixes = (
+        "wt%", "wt.%", "mass%", "masspercent", "mol%", "mol.%", "mole%",
+        "molepercent", "log10activity", "log10", "log10dimensionless",
+    )
     if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE, Quantity.FUGACITY}:
         converted, _ = convert_pressure_to_pa(width, source_unit)
-        return converted, expected
-    if quantity is Quantity.TRANSITION_TEMPERATURE and unit in {"c", "°c", "degc", "kelvin", "k"}:
-        return width, expected  # temperature increments have the same K and °C size
+        if converted is None:
+            reason = (
+                "printed_uncertainty_dimension_mismatch"
+                if unit in dimension_mismatch_units
+                or unit.startswith(dimension_mismatch_prefixes)
+                else "printed_uncertainty_unit_unmapped"
+            )
+            return None, expected, reason
+        return converted, expected, None
     if quantity is Quantity.MASS_LOSS_AREAL_DENSITY:
         converted, _ = convert_areal_mass_to_kg_per_m2(width, source_unit)
-        return converted, expected
+        if converted is None:
+            reason = (
+                "printed_uncertainty_dimension_mismatch"
+                if unit in dimension_mismatch_units
+                or unit.startswith(dimension_mismatch_prefixes)
+                else "printed_uncertainty_unit_unmapped"
+            )
+            return None, expected, reason
+        return converted, expected, None
+    if quantity is Quantity.DENSITY and unit in {"kg/m3", "kgm-3", "kgm^-3"}:
+        # Premise: kg/m³ is already the scorer's density scale.
+        # Algebra: 1 kg/m³ = 1 kg/m³. Unit check: mass / volume on both sides.
+        # Sanity: a 0.5 kg/m³ width remains 0.5 kg/m³.
+        return width, expected, None
     if quantity in {
-        Quantity.DELTA_FG, Quantity.DELTA_FH, Quantity.H_MINUS_H298,
-        Quantity.CP, Quantity.S,
+        Quantity.DELTA_FG,
+        Quantity.DELTA_FH,
+        Quantity.H_MINUS_H298,
+        Quantity.ENTHALPY_OF_FUSION,
+        Quantity.ENTROPY_OF_FUSION,
+        Quantity.PARTIAL_MOLAR_ENTHALPY,
+        Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
+        Quantity.ENTHALPY_OF_VAPORIZATION_3RD_LAW,
+        Quantity.CP,
+        Quantity.S,
     }:
+        # Premise: the existing quantity-aware converter normalizes printed
+        # energy/heat or entropy widths only within their own dimension.
+        # Algebra: 1 kJ/mol = 1000 J/mol; J/(mol K) is unchanged for entropy.
+        # Unit check: energy/mol and energy/(mol K) stay distinct. Sanity:
+        # 0.5 kJ/mol = 500 J/mol; 0.7 J/(mol K) remains 0.7 J/(mol K).
         converted = _convert_compilation_amount(width, quantity, source_unit)
-        return (None, expected) if converted is None else (converted[0], expected)
-    return None, expected
+        if converted is None:
+            if unit in dimension_mismatch_units or unit.startswith(
+                dimension_mismatch_prefixes
+            ):
+                return None, expected, "printed_uncertainty_dimension_mismatch"
+            return None, expected, "printed_uncertainty_unit_unmapped"
+        return converted[0], expected, None
+    if unit in dimension_mismatch_units or unit.startswith(dimension_mismatch_prefixes):
+        return None, expected, "printed_uncertainty_dimension_mismatch"
+    return None, expected, "printed_uncertainty_unit_unmapped"
 
 
 def _metric_uncertainty_width(
@@ -4959,16 +5181,18 @@ def _printed_uncertainty_band(
         width = (upper - lower) / Decimal(2)
     else:
         width = source_value
-    converted, converted_unit = _convert_uncertainty_width(
+    converted, converted_unit, conversion_refusal = _convert_uncertainty_width(
         quantity,
         width,
         source_unit,
         source_observation=source_observation,
+        reference=reference,
+        metric_operation=operation,
     )
     if converted is None:
         return _PrintedBandResolution(
             refusal={
-                "reason": "printed_uncertainty_unit_unmapped",
+                "reason": conversion_refusal or "printed_uncertainty_unit_unmapped",
                 "quantity": quantity.value,
                 "source_unit": source_unit,
                 "original": raw_text,

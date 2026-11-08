@@ -1624,7 +1624,7 @@ def test_composition_printed_width_rejects_a_declared_basis_mismatch() -> None:
 
     assert resolved.band is None
     assert resolved.refusal == {
-        "reason": "printed_uncertainty_unit_unmapped",
+        "reason": "printed_uncertainty_basis_mismatch",
         "quantity": quantity.value,
         "source_unit": "wt%",
         "original": score_mod._uncertainty_original(uncertainty),
@@ -1637,6 +1637,397 @@ def test_composition_printed_width_rejects_a_declared_basis_mismatch() -> None:
         derived_band=derived,
         operation=MetricOperation.DEX,
     ) is None
+
+
+def _printed_width_observation(source_id: str, token: str):
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    root = Path(__file__).resolve().parents[2]
+    path = root / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    document = load_yaml(path)
+    rows = sorted(
+        (
+            observation_from_plain(raw)
+            for raw in document.get("observations", ())
+            if token in str(raw.get("observation_id", ""))
+            and raw.get("uncertainty", {}).get("kind") == UncertaintyKind.PRINTED.value
+        ),
+        key=lambda observation: observation.observation_id,
+    )
+    assert rows, (source_id, token)
+    return rows[0]
+
+
+def _resolve_migrated_printed_width(observation):
+    quantity = quantity_token(observation.identity)
+    assert quantity is not None
+    reference = score_mod.point_magnitude(observation.value)
+    assert reference is not None
+    return score_mod._printed_uncertainty_band(
+        quantity,
+        observation.uncertainty,
+        reference,
+        source_observation=observation,
+    )
+
+
+def test_migrated_abdeyazdan_mol_percent_width_uses_mole_fraction_scale() -> None:
+    observation = _printed_width_observation(
+        "abdeyazdan-2026-na-sn-si-phase-thermodynamics",
+        "abdeyazdan_2026_t1_run01_NaSi9_r_glass_sio2",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.0008120781327114640082588038280")
+
+
+def test_migrated_evans_weight_percent_width_resolves_on_printed_scale() -> None:
+    observation = _printed_width_observation(
+        "evans-2009-sulfur-mn-ni-w-xanes",
+        "evans_2009",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.03")
+    assert resolved.band.unit == "mass_percent"
+
+
+def test_migrated_hanson_jones_ppm_width_matches_free_text_ppm_subtype() -> None:
+    observation = _printed_width_observation(
+        "hanson-jones-1998-am-cr-partitioning-olivine-liquid",
+        "hj98_t4_glass_cr_by_fugacity",
+    )
+    assert observation.identity.subtype.is_value
+    assert observation.identity.subtype.value.endswith("ppm")
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("39")
+
+
+def test_migrated_hanson_jones_ppm_width_converts_to_mass_fraction() -> None:
+    observation = _printed_width_observation(
+        "hanson-jones-1998-am-cr-partitioning-olivine-liquid",
+        "hj98_t4_glass_cr_by_fugacity",
+    )
+    mass_fraction_observation = replace(
+        observation,
+        identity=replace(observation.identity, subtype=State.of("mass_fraction")),
+    )
+
+    width, unit, refusal = score_mod._convert_uncertainty_width(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Decimal("4.1"),
+        "ppm",
+        source_observation=mass_fraction_observation,
+    )
+
+    assert refusal is None
+    assert width == Decimal("0.0000041")
+    assert unit == "mass_fraction"
+
+
+def test_migrated_zhang_per_mil_width_stays_on_isotope_delta_scale() -> None:
+    observation = _printed_width_observation(
+        "zhang-2024-alkali-evaporation-ti-thesis",
+        "h=69d00776b8c8",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.024")
+
+
+def test_migrated_baborak_kelvin_width_is_a_temperature_difference() -> None:
+    observation = _printed_width_observation(
+        "baborak-2023-alkali-silicate-levitation-evaporation",
+        "baborak_2023_ls2_tg_table1",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("5")
+
+
+def test_migrated_kohsaka_kilojoule_width_stays_in_scorer_unit() -> None:
+    observation = _printed_width_observation(
+        "kohsaka-1979-na2o-sio2-emf",
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r02_c04",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("10.5")
+    assert resolved.band.unit == "kJ_per_declared_mol_basis"
+
+
+def test_migrated_kohsaka_joule_width_converts_to_kilojoules() -> None:
+    observation = _printed_width_observation(
+        "kohsaka-1979-na2o-sio2-emf",
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r02_c04",
+    )
+
+    width, unit, refusal = score_mod._convert_uncertainty_width(
+        Quantity.PARTIAL_MOLAR_ENTHALPY,
+        Decimal("10500"),
+        "J/mol",
+        source_observation=observation,
+    )
+
+    assert refusal is None
+    assert width == Decimal("10.5")
+    assert unit == "kJ_per_declared_mol_basis"
+
+
+def test_migrated_shornikov_log10_activity_width_is_dex() -> None:
+    observation = _printed_width_observation(
+        "shornikov-2003-silica-catitanoate-melts",
+        "shornikov_2003_fig1_catio3_xm0_13",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.unit == "dimensionless"
+    assert resolved.band.value == Decimal("0.06")
+
+
+def test_migrated_khedim_dimensionless_width_uses_declared_mole_fraction() -> None:
+    observation = _printed_width_observation(
+        "khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility",
+        "khedim_2010_binary_t1125_r01_c01",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+
+
+def test_migrated_berry_oneill_fraction_width_stays_on_valence_ratio_scale() -> None:
+    observation = _printed_width_observation(
+        "berry-oneill-2004-chromium-xanes",
+        "berry_2004_table3_ad_en_r01",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.unit == "dimensionless"
+
+
+def test_migrated_sugawara_entropy_width_stays_in_joules_per_mole_kelvin() -> None:
+    observation = _printed_width_observation(
+        "sugawara-akaogi-2003-ni-co-fusion",
+        "suga03_t4_fe2sio4_1_entropy_fusion",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.7")
+
+
+def test_migrated_ehrt_density_width_stays_in_kilograms_per_cubic_metre() -> None:
+    observation = _printed_width_observation(
+        "ehrt-2008-sn-redox-aluminosilicate",
+        "ehrt2008_density_ABS",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.00390625")
+
+
+def test_migrated_sossi_log10_k_star_width_stays_log10() -> None:
+    observation = _printed_width_observation(
+        "kems-012-sossi-2019",
+        "sossi_2019_k_logKstar_table3",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+
+
+def test_migrated_shilov_dimensionless_activity_width_resolves() -> None:
+    observation = _printed_width_observation(
+        "shilov-2026-sro-la2o3-kems",
+        "shilov_2026",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+
+
+def test_printed_kelvin_width_on_pressure_is_a_typed_mismatch() -> None:
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "2", "units": "K"},
+    )
+    observation = replace(
+        F.observation(
+            "pressure-width-kelvin-mismatch",
+            "fixture-experiment",
+            _partial_identity(),
+            Decimal("1000"),
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        uncertainty,
+        Decimal("1000"),
+        source_observation=observation,
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal is not None
+    assert resolved.refusal["reason"] == "printed_uncertainty_dimension_mismatch"
+
+
+def test_printed_percent_width_uses_point_only_for_absolute_metric() -> None:
+    source_observation = _printed_width_observation(
+        "baborak-2023-alkali-silicate-levitation-evaporation",
+        "baborak_2023_ls2_tg_table1",
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "2", "units": "%"},
+    )
+    observation = replace(source_observation, uncertainty=uncertainty)
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.TRANSITION_TEMPERATURE,
+        uncertainty,
+        Decimal("726"),
+        source_observation=observation,
+    )
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("14.52")
+
+
+def test_printed_percent_width_uses_point_for_dex_metric() -> None:
+    source_observation = _printed_width_observation(
+        "shornikov-2003-silica-catitanoate-melts",
+        "shornikov_2003_fig1_catio3_xm0_13",
+    )
+    reference = score_mod.point_magnitude(source_observation.value)
+    assert reference is not None
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "10", "units": "%"},
+    )
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty,
+        reference,
+        source_observation=source_observation,
+    )
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert abs(resolved.band.value - Decimal("0.045757490560675")) < Decimal("1e-12")
+
+
+def test_printed_relative_width_uses_point_for_dex_metric() -> None:
+    source_observation = _printed_width_observation(
+        "shornikov-2003-silica-catitanoate-melts",
+        "shornikov_2003_fig1_catio3_xm0_13",
+    )
+    reference = score_mod.point_magnitude(source_observation.value)
+    assert reference is not None
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "0.1", "units": "relative"},
+    )
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty,
+        reference,
+        source_observation=source_observation,
+    )
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert abs(resolved.band.value - Decimal("0.045757490560675")) < Decimal("1e-12")
+
+
+def test_printed_percent_width_without_point_value_is_a_typed_refusal() -> None:
+    source_observation = _printed_width_observation(
+        "baborak-2023-alkali-silicate-levitation-evaporation",
+        "baborak_2023_ls2_tg_table1",
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "2", "units": "%"},
+    )
+    observation = replace(source_observation, uncertainty=uncertainty)
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.TRANSITION_TEMPERATURE,
+        uncertainty,
+        Decimal(0),
+        source_observation=observation,
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal is not None
+    assert resolved.refusal["reason"] == (
+        "printed_relative_uncertainty_requires_nonzero_point_value"
+    )
+
+
+def test_printed_relative_width_without_point_value_is_a_typed_refusal() -> None:
+    source_observation = _printed_width_observation(
+        "baborak-2023-alkali-silicate-levitation-evaporation",
+        "baborak_2023_ls2_tg_table1",
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"sigma": "0.02", "units": "relative"},
+    )
+    observation = replace(source_observation, uncertainty=uncertainty)
+
+    resolved = score_mod._printed_uncertainty_band(
+        Quantity.TRANSITION_TEMPERATURE,
+        uncertainty,
+        Decimal(0),
+        source_observation=observation,
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal is not None
+    assert resolved.refusal["reason"] == (
+        "printed_relative_uncertainty_requires_nonzero_point_value"
+    )
 
 
 def test_inherited_residue_width_uses_its_oxide_weight_percent_subtype() -> None:

@@ -929,14 +929,11 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
 @pytest.mark.parametrize("units", ("atm", "Pa"))
 @pytest.mark.parametrize("qualified", (False, True), ids=("local-id", "qualified-id"))
 def test_migrated_printed_fo2_source_is_excluded_by_scorer(tmp_path, monkeypatch, units, qualified):
-    """Real migrated rows/provenance, with complete synthetic KEMS apparatus.
-
-    Ca's typed width comes from its preserved published percent envelope.
-    """
+    """Real migrated rows/provenance, with complete synthetic KEMS apparatus."""
     import yaml
 
     from simulator.battery.migrate import convert_pressure_to_pa
-    from simulator.battery.score import ScoreContext, _convert_uncertainty_width, _has_printed_fo2, _printed_fo2_names_observation
+    from simulator.battery.score import ScoreContext, _has_printed_fo2, _printed_fo2_names_observation
     from tests.battery.factories import kems_experiment, migrate_one_extract
 
     root = Path(__file__).resolve().parents[2]
@@ -966,11 +963,15 @@ def test_migrated_printed_fo2_source_is_excluded_by_scorer(tmp_path, monkeypatch
     migrated = migrate_one_extract(root, fixture).result
     assert not migrated.registry_issues
     sample_row = migrated.observations[f"{source_id}::{sample['observation_id']}"]
-    printed_width = sample_row.uncertainty.verbatim["relative_error_percent"]
-    width, basis = _convert_uncertainty_width(
-        Quantity.P_PARTIAL, Decimal(str(printed_width["bound_value"])), printed_width["units"],
+    relative_error = sample_row.uncertainty.verbatim["relative_error_percent"]
+    sample_row = replace(
+        sample_row,
+        uncertainty=replace(
+            sample_row.uncertainty,
+            value=Decimal(str(relative_error["bound_value"])),
+            basis=relative_error["units"],
+        ),
     )
-    sample_row = replace(sample_row, uncertainty=replace(sample_row.uncertainty, value=width, basis=basis))
     prerequisites = kems_experiment()
     context = ScoreContext(
         works=migrated.works,
