@@ -17,6 +17,10 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
     _activity_for_crystalline_vapor_k,
 )
+from simulator.fe_redox import (
+    LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
+    LiquidFeODomain,
+)
 from simulator.accounting.completeness import product_class_availability
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
@@ -161,6 +165,7 @@ def _mars_low_temperature_provider_probe(
     setpoints_data,
     *,
     temperature_C,
+    liquid_feo_domain=None,
 ):
     sim = _build_sim(
         "mars_basalt",
@@ -183,7 +188,15 @@ def _mars_low_temperature_provider_probe(
         temperature_C=temperature_C,
         pressure_bar=0.01,
         fO2_log=-9.0,
-        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": -9.0,
+            **(
+                {"liquid_feo_domain": liquid_feo_domain}
+                if liquid_feo_domain is not None
+                else {}
+            ),
+        },
     )
     diagnostic = dict(
         BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -1243,6 +1256,71 @@ def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
         report,
         "Fe",
     )
+
+
+def test_d354_mars_subfloor_fe_row_carries_only_below_liquidus_notice(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    temperature_K = 478.15
+    below_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=temperature_K,
+        liquidus_T_C=1200.0,
+        solidus_T_C=1050.0,
+        source="mars_basalt_liquidus_fixture",
+    )
+    sim, diagnostic, equilibrium, effective_source = (
+        _mars_low_temperature_provider_probe(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            temperature_C=temperature_K - 273.15,
+            liquid_feo_domain=below_domain,
+        )
+    )
+
+    fe_row = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    assert diagnostic["a_FeO_calphad"]["notices"][0]["kind"] == (
+        LIQUID_MODEL_BELOW_LIQUIDUS_KIND
+    )
+    assert "Fe" in diagnostic["below_reporting_threshold_omissions"]
+    assert fe_row["notices"] == diagnostic["a_FeO_calphad"]["notices"]
+
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+    assert batch is not None
+    fe_channel = batch.channel("Fe")
+    assert fe_channel.extra["channel_state"] == "evaluated_below_reporting_floor"
+    assert fe_channel.extra["notices"][0]["kind"] == (
+        LIQUID_MODEL_BELOW_LIQUIDUS_KIND
+    )
+
+    above_temperature_K = 1773.15
+    above_domain = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=above_temperature_K,
+        liquidus_T_C=1400.0,
+        solidus_T_C=1000.0,
+        source="mars_basalt_liquidus_fixture",
+    )
+    _, above_diagnostic, _, _ = _mars_low_temperature_provider_probe(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        temperature_C=above_temperature_K - 273.15,
+        liquid_feo_domain=above_domain,
+    )
+    above_fe_row = above_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Fe"]
+    assert "notices" not in above_fe_row
 
 
 def test_d354_mars_low_temperature_ca_conversion_survives_reporting_floor(
