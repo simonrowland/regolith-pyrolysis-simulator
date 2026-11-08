@@ -168,6 +168,27 @@ def test_alphamelts_activity_diagnostic_antoine_reference_pins(
         )
 
 
+def test_alphamelts_diagnostic_crystalline_k_pressures_are_pinned(
+    vapor_pressure_data,
+):
+    result = _analytical_vapor_pressures_from_activities(
+        vapor_pressure_data=vapor_pressure_data,
+        temperature_C=1600.0,
+        pO2_bar=1e-9,
+        melt_oxide_activities={"CaO": 0.3, "MgO": 0.4, "Na2O": 0.2},
+        composition_wt_pct={"CaO": 40.0, "MgO": 50.0, "Na2O": 10.0},
+    )
+
+    assert (
+        result["species"]["CaO_gas"]["P_eq_Pa"].hex()
+        == "0x1.3507f03a468dap-25"
+    )
+    assert (
+        result["species"]["MgO_gas"]["P_eq_Pa"].hex()
+        == "0x1.89a4929018608p-12"
+    )
+
+
 def test_species_rail_antoine_evaluator_pins_real_rows(vapor_pressure_data):
     rows = (
         ("Na", 1000.0, "0x1.160a226c438ffp+14"),
