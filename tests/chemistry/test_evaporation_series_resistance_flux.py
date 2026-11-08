@@ -788,3 +788,53 @@ def test_native_fe_closure_uses_pressure_held_zero_boundary(
     assert sim._same_hour_headspace_closure_iterations_by_hour[
         sim.melt.hour
     ]["native_fe"] == 0
+
+
+@pytest.mark.parametrize("pressure_held", (False, True))
+def test_step_persists_the_selected_same_hour_source_map(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    pressure_held,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1670.0
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._apply_native_fe_saturation_split = lambda **_kwargs: None
+    sim._update_temperature = lambda: None
+    if pressure_held:
+        sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+        sim.melt.p_total_mbar = 1.0
+        sim._overhead_headspace_config["downstream_pressure_bar"] = 0.001
+    else:
+        sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+        sim.melt.p_total_mbar = 0.01
+        sim._overhead_headspace_config["downstream_pressure_bar"] = 0.0
+        sim.overhead_model.pipe_diameter_m = 1.2
+        sim.melt.melt_surface_area_m2 = 100.0
+
+    snapshot = sim.step()
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    closure = diagnostic["same_hour_headspace_closure"]
+    expected_source_map_mbar = {
+        species: pressure / 100.0
+        for species, pressure in closure["partial_pressures_Pa"].items()
+    }
+
+    assert snapshot.melt_headspace_composition_mbar == pytest.approx(
+        expected_source_map_mbar
+    )
+    if pressure_held:
+        assert closure["partial_pressures_Pa"]
+        assert all(
+            pressure == 0.0
+            for pressure in closure["partial_pressures_Pa"].values()
+        )
+        assert "lower_bound_partial_pressures_Pa" in diagnostic[
+            "pressure_held_sweep_bounds"
+        ]

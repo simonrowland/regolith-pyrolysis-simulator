@@ -1374,15 +1374,18 @@ class EvaporationMixin:
                     # The closed-line projection below pins P_total for any
                     # positive candidate; at zero it returns an empty mixture,
                     # so the solver receives the explicit boiling boundary.
+                    upper_flux = self._apply_analytic_evaporation_depletion(
+                        EvaporationFlux(species_kg_hr=dict(seed_rates))
+                    )
+                    upper_rates = dict(upper_flux.species_kg_hr)
                     lower_closure = _solve_same_hour_headspace_closure(
-                        seed_rates,
+                        upper_rates,
                         rates_at_partials,
                         partials_at_rates,
                         closed_line_equilibrium_pressures_Pa=vapor_pressures,
                         closed_line_total_pressure_Pa=pressure_held_total_Pa,
                     )
                     lower_rates = dict(lower_closure.rates_kg_hr)
-                    upper_rates = dict(seed_rates)
                     if PRESSURE_HELD_FLUX_BOUND == 'upper':
                         selected_rates = upper_rates
                         selected_partials_Pa = {
@@ -1405,9 +1408,9 @@ class EvaporationMixin:
                             for species in set(upper_rates) | set(lower_rates)
                         }
                         selected_partials_Pa = {
-                            str(species): max(0.0, float(pressure)) * 50.0
+                            str(species): max(0.0, float(pressure)) * 100.0
                             for species, pressure in (
-                                lower_closure.partial_pressures_mbar.items()
+                                partials_at_rates(selected_rates).items()
                             )
                         }
                     else:
@@ -1415,6 +1418,10 @@ class EvaporationMixin:
                             'PRESSURE_HELD_FLUX_BOUND must be upper, lower, or mid'
                         )
                     closure_rates_include_liquid_fraction = True
+                    selected_bound_converged = (
+                        PRESSURE_HELD_FLUX_BOUND == 'upper'
+                        or lower_closure.converged
+                    )
                     equilibrium_pressure_sum_Pa = math.fsum(
                         max(0.0, float(pressure))
                         for pressure in vapor_pressures.values()
@@ -1455,7 +1462,7 @@ class EvaporationMixin:
                     kernel_result = seed_result
                     closure_record = {
                         'iterations': lower_closure.iterations,
-                        'converged': lower_closure.converged,
+                        'converged': selected_bound_converged,
                         'rates_kg_hr': selected_rates,
                         'partial_pressures_Pa': selected_partials_Pa,
                         'pressure_held_sweep_bounds': True,
@@ -1503,6 +1510,7 @@ class EvaporationMixin:
                     diagnostic['evaporation_flux_kg_hr'] = dict(
                         closure_record['rates_kg_hr']
                     )
+                    diagnostic['evaporation_flux_rates_are_admitted'] = True
                     closure_rates_include_liquid_fraction = True
                 diagnostic.setdefault('notices', []).append({
                     'type': 'typed_notice',
@@ -1515,6 +1523,7 @@ class EvaporationMixin:
             diagnostic['evaporation_flux_kg_hr'] = dict(
                 closure_record['rates_kg_hr']
             )
+            diagnostic['evaporation_flux_rates_are_admitted'] = True
             diagnostic['pressure_held_sweep_bounds'] = {
                 key: value
                 for key, value in pressure_held_bounds_record.items()

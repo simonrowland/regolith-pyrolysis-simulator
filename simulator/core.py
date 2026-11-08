@@ -16075,9 +16075,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux.update_totals()
             else:
                 evap_flux = self._calculate_evaporation(equilibrium)
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
-                )
+                evaporation_diagnostic = getattr(
+                    self, '_last_evaporation_flux_diagnostic', {}
+                ) or {}
+                # Nonconverged and pressure-held fallbacks return the admitted
+                # fixed-point rates directly; applying depletion here again
+                # would price one stream and transport another.
+                if (
+                    evaporation_diagnostic.get(
+                        'evaporation_flux_rates_are_admitted'
+                    ) is not True
+                ):
+                    evap_flux = self._apply_analytic_evaporation_depletion(
+                        evap_flux
+                    )
         # In C0 with solid hosts, close ordinary evaporation and bakeout
         # together against one same-hour evolved stream below. The persisted
         # end-of-hour map remains for equilibrium O2 and diagnostic consumers.
@@ -16402,7 +16413,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ).get('same_hour_headspace_closure')
         if (
             isinstance(same_hour_closure, Mapping)
-            and same_hour_closure.get('converged') is True
             and isinstance(
                 same_hour_closure.get('partial_pressures_Pa'), Mapping
             )
