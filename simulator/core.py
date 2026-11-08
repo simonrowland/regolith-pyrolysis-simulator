@@ -15853,6 +15853,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_condensed_by_stage_species_delta = {}
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
+        self._last_evaporation_flux_diagnostic = {}
         self._last_native_fe_partition_diagnostic = {}
         self._same_hour_headspace_closure_iterations_by_hour[
             int(getattr(self.melt, 'hour', 0))
@@ -16376,6 +16377,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.species_formula_registry,
             )
         )
+        same_hour_closure = dict(
+            getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
+        ).get('same_hour_headspace_closure')
+        if (
+            isinstance(same_hour_closure, Mapping)
+            and same_hour_closure.get('converged') is True
+            and isinstance(
+                same_hour_closure.get('partial_pressures_Pa'), Mapping
+            )
+        ):
+            self._melt_headspace_composition_mbar = {
+                str(species): max(0.0, float(pressure)) / 100.0
+                for species, pressure in (
+                    same_hour_closure['partial_pressures_Pa'].items()
+                )
+            }
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0

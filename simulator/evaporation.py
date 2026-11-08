@@ -1312,9 +1312,13 @@ class EvaporationMixin:
                         str(species): max(0.0, float(pressure)) * 100.0
                         for species, pressure in partials_mbar.items()
                     }
-                    return rates_from_result(
+                    rates = rates_from_result(
                         dispatch_at_partials(partials_Pa)
                     )
+                    admitted_flux = self._apply_analytic_evaporation_depletion(
+                        EvaporationFlux(species_kg_hr=rates)
+                    )
+                    return dict(admitted_flux.species_kg_hr)
 
                 def partials_at_rates(rates_kg_hr):
                     candidate = EvaporationFlux(
@@ -1441,6 +1445,12 @@ class EvaporationMixin:
                         'P_total_Pa': pressure_held_total_Pa,
                         'upper_rates_kg_hr': upper_rates,
                         'lower_rates_kg_hr': lower_rates,
+                        'lower_bound_partial_pressures_Pa': {
+                            str(species): max(0.0, float(pressure)) * 100.0
+                            for species, pressure in (
+                                lower_closure.partial_pressures_mbar.items()
+                            )
+                        },
                         'lower_bound_converged': lower_closure.converged,
                         'lower_bound_iterations': lower_closure.iterations,
                         'notices': sweep_notices,

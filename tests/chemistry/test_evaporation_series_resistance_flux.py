@@ -21,7 +21,13 @@ from simulator.condensation import (
     _series_resistance_deposition_flux_mol_m2_s,
 )
 import simulator.evaporation as evaporation_module
-from simulator.state import Atmosphere, MAX_STIR_FACTOR, EvaporationFlux, MeltState
+from simulator.state import (
+    Atmosphere,
+    CampaignPhase,
+    MAX_STIR_FACTOR,
+    EvaporationFlux,
+    MeltState,
+)
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 from simulator.overhead import (
     OverheadGasModel,
@@ -691,4 +697,45 @@ def test_pressure_held_bound_selection_matches_value_and_authority(
         }[selected_bound]
         assert flux.species_kg_hr.get(species_id, 0.0) == pytest.approx(
             expected, rel=1e-12, abs=1e-15
+        )
+
+
+def test_pumped_closure_prices_the_admitted_depleted_stream(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1670.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.p_total_mbar = 0.01
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.0
+    sim.overhead_model.pipe_diameter_m = 1.2
+    sim.melt.melt_surface_area_m2 = 100.0
+
+    raw_flux = sim._calculate_evaporation(sim._get_equilibrium())
+    closure = sim._last_evaporation_flux_diagnostic[
+        "same_hour_headspace_closure"
+    ]
+    admitted_flux = sim._apply_analytic_evaporation_depletion(raw_flux)
+    transport = sim.overhead_model.estimate_transport_state(
+        admitted_flux,
+        sim.melt,
+        p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
+    )
+    admitted_partials_mbar = sim.overhead_model.species_partial_pressures(
+        admitted_flux,
+        transport["vapor_pressure_mbar"],
+        sim.species_formula_registry,
+    )
+
+    assert closure["converged"]
+    for species in ("Na", "Fe"):
+        assert closure["partial_pressures_Pa"][species] == pytest.approx(
+            admitted_partials_mbar[species] * 100.0,
+            rel=1e-9,
         )
