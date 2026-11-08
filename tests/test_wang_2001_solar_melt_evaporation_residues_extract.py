@@ -3,14 +3,14 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
 from decimal import Decimal
-from pathlib import Path
 import hashlib
+from pathlib import Path
 import re
 
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -114,7 +114,7 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
                 for row in extract["species"][formula]["observations"]
                 if row["observation_id"] == f"wang_2001_table1_{formula.lower()}_residue_concentration"
             )
-            value_field, error_field = "residue_ppm", "uncertainty_ppm"
+            value_field, error_field = "residue_ppm", "sigma"
         elif group == "AGG":
             points = next(row["values"]["rows_as_printed"] for row in extract["species"]["SiO2"]["context"] if row["observation_id"] == "wang_2001_table1_ln2o3_aggregate_no_formula")
             value_field, error_field = "SigmaLn2O3_wt_pct", "standard_error_wt_pct"
@@ -129,6 +129,13 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
             assert point[value_field] == expected_value, (label, sample)
             if error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
+                if group == "REE":
+                    if expected_error is None:
+                        assert "value_as_published" not in point, (label, sample)
+                    else:
+                        assert point["value_as_published"] == (
+                            f"{expected_value} ± {expected_error}"
+                        ), (label, sample)
             else:
                 assert point.get("standard_errors", {}).get(formula) == expected_error, (label, sample)
 
@@ -220,7 +227,11 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
             value, error = split_value_and_error(raw_cell)
             point = points[sample]
             assert point["isotope_delta_isotope_delta"] == value, (ratio, sample)
-            assert point.get("uncertainty_permil") == error, (ratio, sample)
+            assert point.get("sigma") == error, (ratio, sample)
+            if error is None:
+                assert "value_as_published" not in point, (ratio, sample)
+            else:
+                assert point["value_as_published"] == f"{value} ± {error}", (ratio, sample)
             assert point["VF_wt_pct"] == TABLE4_EVAP[index]
 
 
@@ -231,6 +242,36 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     assert not migrator.result.validation.hard_issues
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 538
+    la_sc12 = next(
+        row
+        for row in observations
+        if row.identity.species.formula == "La"
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.value.point == Decimal("80.3")
+    )
+    assert la_sc12.uncertainty.kind is UncertaintyKind.PRINTED
+    assert la_sc12.uncertainty.verbatim["sigma"] == "4.1"
+    assert la_sc12.uncertainty.verbatim["confidence_level"] == "one_sigma"
+
+    mg_sc12 = next(
+        row
+        for row in observations
+        if row.identity.species.formula == "Mg"
+        and row.identity.quantity.value is Quantity.ISOTOPE_DELTA
+        and row.value.point == Decimal("-1.6")
+    )
+    assert mg_sc12.uncertainty.kind is UncertaintyKind.PRINTED
+    assert mg_sc12.uncertainty.verbatim["sigma"] == "0.2"
+    assert mg_sc12.uncertainty.verbatim["confidence_level"] == "one_sigma"
+
+    migrated_widths = [
+        row
+        for row in observations
+        if row.uncertainty.kind is UncertaintyKind.PRINTED
+        and isinstance(row.uncertainty.verbatim, dict)
+        and "sigma" in row.uncertainty.verbatim
+    ]
+    assert len(migrated_widths) == 251
     observation_ids = "\n".join(sorted(migrator.result.observations)) + "\n"
     assert hashlib.sha256(observation_ids.encode()).hexdigest() == (
         "cfdbbefdc9735b6d97f1fd175b0734e181494c485d147837ed0c85be15ebe35f"

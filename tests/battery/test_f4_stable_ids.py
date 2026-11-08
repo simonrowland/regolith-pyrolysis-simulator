@@ -147,3 +147,37 @@ def test_series_row_extra_uses_sample_and_content_fingerprint() -> None:
         series_point_id("parent", temperature=2173.15, extra=eb),
     }
     assert len(ids) == 2
+
+
+def test_series_row_extra_preserves_uncertainty_representation_ids() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    legacy_ppm = {
+        "sample": "SC12",
+        "T_C": "1400",
+        "residue_ppm": "80.3",
+        "uncertainty_ppm": "4.1",
+    }
+    envelope_ppm = {
+        "sample": "SC12",
+        "T_C": "1400",
+        "residue_ppm": "80.3",
+        "value_as_published": "80.3 ± 4.1",
+        "sigma": "4.1",
+    }
+    legacy_permil = {
+        "sample_as_printed": "SC12",
+        "T_C": "1400",
+        "isotope_delta_isotope_delta": "-1.6",
+        "uncertainty_permil": "0.2",
+    }
+    envelope_permil = {
+        "sample_as_printed": "SC12",
+        "T_C": "1400",
+        "isotope_delta_isotope_delta": "-1.6",
+        "value_as_published": "-1.6 ± 0.2",
+        "sigma": "0.2",
+    }
+
+    assert series_row_extra(envelope_ppm) == series_row_extra(legacy_ppm)
+    assert series_row_extra(envelope_permil) == series_row_extra(legacy_permil)

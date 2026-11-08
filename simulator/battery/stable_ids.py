@@ -110,6 +110,19 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
     if not include_locator:
         skip.add("locator")
     residual = {k: raw_item[k] for k in raw_item if k not in skip}
+    # Moving a row's printed uncertainty into the supported sigma envelope
+    # must not rename its observation. Reconstruct the legacy hash payload for
+    # these two value/error pairs while leaving the serialized row untouched.
+    if "sigma" in residual and "value_as_published" in residual:
+        for value_field, legacy_error_field in (
+            ("residue_ppm", "uncertainty_ppm"),
+            ("isotope_delta_isotope_delta", "uncertainty_permil"),
+        ):
+            if value_field in residual and legacy_error_field not in residual:
+                residual.pop("sigma")
+                residual.pop("value_as_published")
+                residual[legacy_error_field] = raw_item["sigma"]
+                break
     if residual:
         blob = json.dumps(residual, sort_keys=True, default=str, separators=(",", ":"))
         digest = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
