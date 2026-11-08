@@ -22,6 +22,12 @@ extraction:
   provenance_path: raw/kems-137-bischof-2023/kems-137-bischof-2023.pdf
 review_status: draft
 fidelity_samples:
+- path: species.Ga.observations[bischof_2023_ga_psat_s1_1low_polytherm].values.points[0].p_Pa
+  value: 4.04e-05
+  locator: {page: 2, table: S1, row: 1, note: 'Rendered Supplement Table S1, Ga partial pressure'}
+- path: species.In.observations[bischof_2023_in_psat_s1_1low_polytherm].values.points[5].p_Pa
+  value: 0.000123
+  locator: {page: 2, table: S1, row: 6, note: 'Rendered Supplement Table S1, In partial pressure'}
 - species: Ga
   observable: activity_coefficient
   observation_id: bischof_2023_gao15_gamma_preferred_1700k
@@ -250,6 +256,10 @@ experiments:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.0000791'}}
       locator: {page: 5, table: '2', note: 'Printed initial weight 79.1 mg; unit conversion only'}
+    form:
+      state: {tag: value, value: condensed_liquid}
+      locator: {page: 1, section: Abstract, quote: 'equilibrium partial pressures above the silicate liquid'}
+    form_as_published: silicate liquid
     printed_composition:
       state: {tag: value, value: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 1_low; total 99.90; trace additions excluded from oxide columns'}
@@ -746,7 +756,7 @@ species:
       type: activity_coefficient
       locator:
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
         note: supplement 1_low polytherm
       T_range_K:
       - 1586.4
@@ -1600,8 +1610,9 @@ species:
       experiment: an-di-1-low
       type: psat_series
       locator:
+        page: 2
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -1613,6 +1624,24 @@ species:
         quantity: partial_pressure
         gas_species: Ga(g)
         method_class: measured_kems
+        initial_charge_as_published:
+          role: initial_charge_only
+          locator: {page: 4, section: '2.1 Sample preparation', note: nominal An-Di base and sesquioxide spikes}
+          nominal_base_wt_pct:
+            SiO2: '50.34'
+            Al2O3: '15.40'
+            MgO: '10.80'
+            CaO: '23.46'
+          spike_additions_ppm:
+            Ga: '1000'
+            In: '1000'
+            Tl: '1000'
+          spike_basis: elemental ppm; added as sesquioxides, as printed
+          mixed_basis_refusal: The full initial charge combines oxide wt% and elemental ppm and has no exact mixed-basis bulk composition token.
+          measured_start_trace_ppm:
+            locator: {page: 16, table: '7', row: '1_low Start'}
+            Ga: '720 ± 12'
+            In: '47 ± 9'
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         composition_role: &bischof_table6_1_low_start
@@ -1622,36 +1651,179 @@ species:
         points:
         - T_K: 1586.4
           p_Pa: 4.04e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1586.4'}}
+              locator: {page: 2, table: 'S1', row: 1}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66"}
+              locator: {page: 2, table: 'S1', row: 1}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.66
         - T_K: 1598.0
           p_Pa: 4.37e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1598.0'}}
+              locator: {page: 2, table: 'S1', row: 2}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62"}
+              locator: {page: 2, table: 'S1', row: 2}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.62
         - T_K: 1608.6
           p_Pa: 4.49e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1608.6'}}
+              locator: {page: 2, table: 'S1', row: 3}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61"}
+              locator: {page: 2, table: 'S1', row: 3}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.61
         - T_K: 1619.2
           p_Pa: 5.16e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1619.2'}}
+              locator: {page: 2, table: 'S1', row: 4}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 4}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1630.8
           p_Pa: 6.45e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1630.8'}}
+              locator: {page: 2, table: 'S1', row: 5}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 5}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1642.5
           p_Pa: 0.00011
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1642.5'}}
+              locator: {page: 2, table: 'S1', row: 6}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 6}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1653.0
           p_Pa: 9.98e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1653.0'}}
+              locator: {page: 2, table: 'S1', row: 7}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 7}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1664.7
           p_Pa: 0.000145
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1664.7'}}
+              locator: {page: 2, table: 'S1', row: 8}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 8}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1674.2
           p_Pa: 0.000166
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1674.2'}}
+              locator: {page: 2, table: 'S1', row: 9}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 9}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1684.8
           p_Pa: 0.000207
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1684.8'}}
+              locator: {page: 2, table: 'S1', row: 10}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              locator: {page: 2, table: 'S1', row: 10}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
         - T_K: 1695.4
           p_Pa: 0.000273
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1695.4'}}
+              locator: {page: 2, table: 'S1', row: 11}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              locator: {page: 2, table: 'S1', row: 11}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
@@ -2513,7 +2685,7 @@ species:
       type: activity_coefficient
       locator:
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -3385,8 +3557,9 @@ species:
       experiment: an-di-1-low
       type: psat_series
       locator:
+        page: 2
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -3398,42 +3571,203 @@ species:
         quantity: partial_pressure
         gas_species: In(g)
         method_class: measured_kems
+        initial_charge_as_published:
+          role: initial_charge_only
+          locator: {page: 4, section: '2.1 Sample preparation', note: nominal An-Di base and sesquioxide spikes}
+          nominal_base_wt_pct:
+            SiO2: '50.34'
+            Al2O3: '15.40'
+            MgO: '10.80'
+            CaO: '23.46'
+          spike_additions_ppm:
+            Ga: '1000'
+            In: '1000'
+            Tl: '1000'
+          spike_basis: elemental ppm; added as sesquioxides, as printed
+          mixed_basis_refusal: The full initial charge combines oxide wt% and elemental ppm and has no exact mixed-basis bulk composition token.
+          measured_start_trace_ppm:
+            locator: {page: 16, table: '7', row: '1_low Start'}
+            Ga: '720 ± 12'
+            In: '47 ± 9'
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         composition_role: *bischof_table6_1_low_start
         points:
         - T_K: 1586.4
           p_Pa: 6.69e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1586.4'}}
+              locator: {page: 2, table: 'S1', row: 1}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66"}
+              locator: {page: 2, table: 'S1', row: 1}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.66
         - T_K: 1598.0
           p_Pa: 7.25e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1598.0'}}
+              locator: {page: 2, table: 'S1', row: 2}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62"}
+              locator: {page: 2, table: 'S1', row: 2}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.62
         - T_K: 1608.6
           p_Pa: 9.76e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1608.6'}}
+              locator: {page: 2, table: 'S1', row: 3}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61"}
+              locator: {page: 2, table: 'S1', row: 3}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.61
         - T_K: 1619.2
           p_Pa: 8.9e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1619.2'}}
+              locator: {page: 2, table: 'S1', row: 4}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 4}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1630.8
           p_Pa: 0.000117
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1630.8'}}
+              locator: {page: 2, table: 'S1', row: 5}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 5}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1642.5
           p_Pa: 0.000123
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1642.5'}}
+              locator: {page: 2, table: 'S1', row: 6}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              locator: {page: 2, table: 'S1', row: 6}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1653.0
           p_Pa: 0.000146
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1653.0'}}
+              locator: {page: 2, table: 'S1', row: 7}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 7}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1664.7
           p_Pa: 0.00016
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1664.7'}}
+              locator: {page: 2, table: 'S1', row: 8}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 8}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1674.2
           p_Pa: 0.000197
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1674.2'}}
+              locator: {page: 2, table: 'S1', row: 9}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              locator: {page: 2, table: 'S1', row: 9}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1684.8
           p_Pa: 0.000207
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1684.8'}}
+              locator: {page: 2, table: 'S1', row: 10}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              locator: {page: 2, table: 'S1', row: 10}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
         - T_K: 1695.4
           p_Pa: 0.000234
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1695.4'}}
+              locator: {page: 2, table: 'S1', row: 11}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              locator: {page: 2, table: 'S1', row: 11}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_in2o3_henrian_log10_gamma_model
