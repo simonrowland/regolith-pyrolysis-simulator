@@ -142,15 +142,12 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
         assert row.uncertainty.verbatim["confidence_level"] == "not_stated"
         assert "calculation equation" in row.admission.reason
         assert "numerical pressure inputs" in row.admission.reason
-        assert row.derivation is not None
-        assert row.derivation.method is not None
-        assert row.derivation.method.locator is not None
-        assert row.derivation.method.locator.published_page == 267
+        assert row.derivation is None
+        source_derivation = rows[observation_id]["derivation"]
+        assert "raw_inputs" not in source_derivation
+        assert source_derivation["method"]["locator"]["published_page"] == 267
 
     expected_hard_issue_details = {
-        "derivation.raw_inputs": "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
-        "derivation.method": "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-        "derivation.references": "model_derived raw_inputs method requires named compiled references",
         "derived_from": "derived observation requires derived_from",
     }
     for observation_id in kems_ids:
@@ -159,7 +156,7 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
             for issue in result.validation.hard_issues
             if f"::{observation_id}]" in issue.path
         ]
-        assert len(row_issues) == 4
+        assert len(row_issues) == 1
         assert {
             (issue.path.rsplit("].", 1)[-1], issue.detail) for issue in row_issues
         } == set(expected_hard_issue_details.items())
@@ -183,7 +180,7 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
 
     print(
         "isolated migration:",
-        f"obs={len(migrated)} hard={len(result.validation.hard_issues)} (missing printed derivation inputs/references)",
+        f"obs={len(migrated)} hard={len(result.validation.hard_issues)} (typed refusals without a raw_inputs declaration)",
         f"unavailable={sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values())}",
         f"context={len(context_ids)}",
     )
