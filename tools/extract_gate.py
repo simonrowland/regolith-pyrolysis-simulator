@@ -169,6 +169,19 @@ def _run_one(
         f"{reason}={count}" for reason, count in report.refusal_reasons.items()
     ) or "none"
     print(f"MIGRATION refusal reasons: {refusals}")
+    for readiness in report.engine_readiness:
+        print(
+            f"ENGINE-READINESS {readiness.observable}: "
+            f"ready={readiness.ready} not_ready={readiness.not_ready}"
+        )
+        for detail in readiness.details:
+            input_path = detail.input_path or "none"
+            print(
+                f"ENGINE-READINESS-ROW {readiness.observable} "
+                f"{detail.observation_id} engine={detail.engine} "
+                f"missing={input_path} source={detail.source_status} "
+                f"reason={detail.reason}"
+            )
     for table in report.tables:
         print(
             f"TABLE {table.table}: {table.percent:.1f}% "

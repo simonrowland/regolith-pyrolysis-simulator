@@ -13,9 +13,10 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from simulator.battery import migrate
+from simulator.battery import score
 from simulator.battery.enums import Quantity
 from simulator.battery.identity import quantity_token
 from simulator.battery.score import parse_species_formula
@@ -69,6 +70,24 @@ class TableCoverage:
         return min(100.0, 100.0 * self.extract_values / self.numeric_cells)
 
 
+@dataclass(frozen=True)
+class ReadinessDetail:
+    observation_id: str
+    engine: str
+    input_path: str | None
+    source_status: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class ObservableReadiness:
+    observable: str
+    rail: str
+    ready: int
+    not_ready: int
+    details: tuple[ReadinessDetail, ...] = ()
+
+
 @dataclass
 class GateReport:
     findings: list[Finding] = field(default_factory=list)
@@ -78,6 +97,7 @@ class GateReport:
     migration_error: str | None = None
     composition_drops: list[str] = field(default_factory=list)
     tables: list[TableCoverage] = field(default_factory=list)
+    engine_readiness: list[ObservableReadiness] = field(default_factory=list)
 
     @property
     def hard_failed(self) -> bool:
@@ -97,6 +117,323 @@ def _add(
         report.findings.append(
             Finding(check, severity, f"{len(issues)} issue(s): {shown}")
         )
+
+
+_INPUT_PATHS = {
+    "quantity": "identity.quantity",
+    "quantity_unknown": "identity.quantity",
+    "species": "identity.species.formula",
+    "species_formula": "identity.species.formula",
+    "species.phase": "identity.species.phase",
+    "species.polymorph": "identity.species.polymorph",
+    "phase": "identity.species.phase",
+    "phase_role": "identity.phase_role",
+    "composition": "identity.composition",
+    "composition_role": "identity.composition_role",
+    "basis": "identity.composition.amount_basis",
+    "per": "identity.per",
+    "subtype": "identity.subtype",
+    "temperature_K": "identity.temperature_K",
+    "temperature_unknown": "identity.temperature_K",
+    "standard_pressure_Pa": "identity.standard_pressure_Pa",
+    "total_pressure_Pa": "identity.total_pressure_Pa",
+    "pressure_role": "identity.total_pressure_Pa",
+    "fO2_Pa": "identity.fO2_Pa",
+    "printed_fO2": "point_conditions.fO2_log",
+    "standard_state": "identity.reference_state",
+    "reference_state": "identity.reference_state",
+    "reservoir": "identity.reservoir",
+    "defining_equation": "identity.reaction",
+    "calibration": "experiment.apparatus.calibration",
+}
+_SOURCE_INPUT_KEYS = {
+    "identity.quantity": ("quantity", "quantity_as_printed"),
+    "identity.species.formula": ("species", "formula", "gas_species"),
+    "identity.species.phase": ("phase", "phase_as_published", "phase_label"),
+    "identity.phase_role": ("phase_role",),
+    "identity.composition": ("composition", "composition_as_published", "printed_composition"),
+    "identity.composition_role": ("composition_role", "composition_basis", "basis_as_published"),
+    "identity.composition.amount_basis": ("amount_basis", "basis", "basis_as_published"),
+    "identity.temperature_K": (
+        "temperature_K", "T_K", "T_C", "temperature_C", "temp_C",
+        "temperature", "T", "T_range_K", "temperature_range_k",
+    ),
+    "identity.total_pressure_Pa": ("total_pressure_Pa", "total_pressure", "pressure_role"),
+    "identity.fO2_Pa": ("fO2_Pa", "fO2_log", "oxygen_partial_pressure_Pa"),
+    "point_conditions.fO2_log": ("fO2_log", "fO2_Pa", "oxygen_partial_pressure_Pa"),
+    "identity.reference_state": ("standard_state", "reference_state"),
+    "identity.reservoir": ("reservoir", "reservoir_species"),
+    "identity.reaction": ("reaction", "reaction_as_published", "defining_equation"),
+    "experiment.method": ("method", "method_as_printed"),
+    "experiment.apparatus.calibration": ("calibration",),
+}
+_LOCATED_ABSENCE_REASONS = {"not_published", "in_cited_source", "illegible"}
+_LOCATOR_KEYS = {
+    "page", "published_page", "pdf_page_index", "table", "figure",
+    "paragraph", "section", "equation", "line_range",
+}
+
+
+def _input_path(token: str) -> str:
+    if token in _INPUT_PATHS:
+        return _INPUT_PATHS[token]
+    if token in {
+        "orifice_area_m2", "orifice_area_cm2", "orifice_diameter_m",
+        "orifice_diameter_mm", "clausing_factor", "orifice_to_sample_area_ratio",
+        "exposed_area_m2", "chamber_length_m", "chamber_volume_m3",
+        "orifice_channel_length_m", "orifice_count", "orifice_shape",
+    }:
+        return f"experiment.apparatus.geometry.{token}"
+    return f"scorer.{token}"
+
+
+def _source_input_status(nodes: Iterable[object], input_path: str) -> str:
+    """Classify source YAML evidence for a missing scorer input."""
+    key_set = set(_SOURCE_INPUT_KEYS.get(input_path, ()))
+    if input_path.startswith("experiment.apparatus.geometry"):
+        key_set.update(
+            {
+                "apparatus", "calibration", "orifice_area_m2", "orifice_area_cm2",
+                "orifice_diameter_m", "orifice_diameter_mm", "clausing_factor",
+                "orifice_to_sample_area_ratio", "exposed_area_m2", "chamber_length_m",
+                "chamber_volume_m3", "orifice_channel_length_m", "orifice_count",
+                "orifice_shape", "knudsen_number_orifice",
+            }
+        )
+        if input_path.count(".") > 3:
+            key_set.add(input_path.rsplit(".", 1)[-1])
+    recorded_value = False
+    for root in nodes:
+        fallback = root.get("locator") if isinstance(root, Mapping) else None
+        for mapping, _path in _mappings(root):
+            for key, raw in mapping.items():
+                if str(key) not in key_set:
+                    continue
+                state = raw.get("state", raw) if isinstance(raw, Mapping) else {}
+                tag = state.get("tag") if isinstance(state, Mapping) else None
+                reason = state.get("reason") if isinstance(state, Mapping) else None
+                if tag in {"unknown", "not_applicable"}:
+                    locator = raw.get("locator") or fallback
+                    located = isinstance(locator, Mapping) and any(
+                        locator.get(name) not in (None, "") for name in _LOCATOR_KEYS
+                    )
+                    if located and reason in _LOCATED_ABSENCE_REASONS:
+                        return f"located_absence:{reason}"
+                else:
+                    recorded_value = True
+    return "recorded_value_unresolved" if recorded_value else "unrecorded"
+
+
+def _check_input(check: object) -> tuple[str | None, str]:
+    detail = getattr(check, "detail", None)
+    if not isinstance(detail, Mapping):
+        return None, str(getattr(check, "name", "validity gate"))
+    for key in ("input", "missing_input", "determinant", "field"):
+        value = detail.get(key)
+        if isinstance(value, str) and value:
+            return _input_path(value), str(detail.get("reason") or key)
+    name = str(getattr(check, "name", "validity gate"))
+    missing = detail.get("missing")
+    if isinstance(missing, (list, tuple)) and missing:
+        if len(missing) == 1:
+            return _input_path(str(missing[0])), str(detail.get("reason") or missing[0])
+        return "experiment.apparatus.geometry", "missing " + ", ".join(map(str, missing))
+    if "method" in name:
+        return "experiment.method", str(detail.get("reason") or name)
+    if any(token in name for token in ("apparatus", "geometry", "calibration", "orifice")):
+        return "experiment.apparatus.geometry", str(detail.get("reason") or name)
+    if "pressure" in name:
+        return "identity.total_pressure_Pa", str(detail.get("reason") or name)
+    if "oxygen" in name or "fo2" in name.lower():
+        return "identity.fO2_Pa", str(detail.get("reason") or name)
+    return None, str(detail.get("reason") or name)
+
+
+def _observable_readiness(
+    doc: object,
+    observations: Mapping[str, Any],
+    experiments: Mapping[str, Any],
+) -> list[ObservableReadiness]:
+    if not isinstance(doc, Mapping):
+        return []
+    raw_rows: dict[str, Mapping[str, Any]] = {}
+    for _container, raw_row in migrate.iter_extract_observations(doc):
+        raw_id = str(raw_row.get("observation_id") or "")
+        if raw_id:
+            raw_rows[raw_id] = raw_row
+    raw_experiments = doc.get("experiments")
+    raw_experiments = raw_experiments if isinstance(raw_experiments, Mapping) else {}
+    raw_context = doc.get("context")
+    groups: dict[str, dict[str, Any]] = {}
+    for observation in observations.values():
+        identity = observation.identity
+        quantity = quantity_token(identity) if identity is not None else None
+        formula = (
+            identity.species.formula
+            if identity is not None and identity.species is not None
+            else ""
+        )
+        rail = score.rail_for_quantity(quantity, species_formula=formula)
+        rail_name = "none" if rail is None else rail.value
+        quantity_name = "quantity_unknown" if quantity is None else quantity.value
+        observable = f"{rail_name}:{quantity_name}"
+        group = groups.setdefault(
+            observable,
+            {"rail": rail_name, "ready": 0, "not_ready": 0, "details": []},
+        )
+        raw_id = observation.observation_id.split("::", 1)[-1]
+        raw_row = raw_rows.get(raw_id, {})
+        if not raw_row:
+            parts = raw_id.split("::")
+            raw_row = next(
+                (
+                    raw_rows["::".join(parts[:end])]
+                    for end in range(len(parts) - 1, 0, -1)
+                    if "::".join(parts[:end]) in raw_rows
+                ),
+                {},
+            )
+        raw_experiment_id = raw_row.get("experiment")
+        raw_experiment = raw_experiments.get(raw_experiment_id, {})
+        experiment = experiments.get(observation.experiment_id)
+        source_nodes = [raw_row, raw_experiment, raw_context]
+
+        if quantity is None:
+            group["not_ready"] += 1
+            path = "identity.quantity"
+            group["details"].append(
+                ReadinessDetail(
+                    observation.observation_id,
+                    "scorer-identity",
+                    path,
+                    _source_input_status(source_nodes, path),
+                    "quantity_unknown",
+                )
+            )
+            continue
+        if rail is None:
+            group["not_ready"] += 1
+            group["details"].append(
+                ReadinessDetail(
+                    observation.observation_id,
+                    "scorer-rail",
+                    None,
+                    "not_engine_observable",
+                    "quantity has no scorer rail",
+                )
+            )
+            continue
+
+        identity_outcome = score.identity_equal(identity, identity)
+        identity_fields = (
+            []
+            if identity_outcome.kind.value == "equal"
+            else list(identity_outcome.fields)
+            or [identity_outcome.detail or identity_outcome.kind.value]
+        )
+        validity = (
+            score.run_validity_gates(experiment, observation)
+            if experiment is not None
+            else None
+        )
+        failed_checks = (
+            []
+            if validity is None or validity.passed
+            else [
+                check
+                for check in validity.checks
+                if not check.passed
+                and check.name
+                in {
+                    "method",
+                    "kems_calibration",
+                    "geometry_determinants",
+                    "comparison_method_cell_constant_cancels",
+                }
+            ]
+        )
+        if identity_fields or failed_checks:
+            group["not_ready"] += 1
+            for field in identity_fields:
+                path = _input_path(field)
+                group["details"].append(
+                    ReadinessDetail(
+                        observation.observation_id,
+                        "scorer-identity",
+                        path,
+                        _source_input_status(source_nodes, path),
+                        identity_outcome.detail or identity_outcome.kind.value,
+                    )
+                )
+            for check in failed_checks:
+                path, reason = _check_input(check)
+                group["details"].append(
+                    ReadinessDetail(
+                        observation.observation_id,
+                        "scorer-validity",
+                        path,
+                        _source_input_status(source_nodes, path) if path else "unrecorded",
+                        reason,
+                    )
+                )
+            continue
+        group["ready"] += 1
+    return [
+        ObservableReadiness(
+            observable=name,
+            rail=values["rail"],
+            ready=values["ready"],
+            not_ready=values["not_ready"],
+            details=tuple(values["details"]),
+        )
+        for name, values in sorted(groups.items())
+    ]
+
+
+def _printed_supported_unknown_quantities(
+    doc: object, observations: Mapping[str, Any]
+) -> list[str]:
+    """Find printed supported quantity fields left unknown by migration."""
+    if not isinstance(doc, Mapping):
+        return []
+    migrated_by_raw_id = {
+        observation.observation_id.split("::", 1)[-1]: observation
+        for observation in observations.values()
+    }
+    issues: list[str] = []
+    for container, raw_row in migrate.iter_extract_observations(doc):
+        raw_id = str(raw_row.get("observation_id") or "")
+        migrated = migrated_by_raw_id.get(raw_id)
+        if migrated is None:
+            continue
+        identity_quantity = (
+            quantity_token(migrated.identity)
+            if migrated.identity is not None
+            else None
+        )
+        if identity_quantity is not None:
+            continue
+        values = raw_row.get("values")
+        values = values if isinstance(values, Mapping) else {}
+        declared, _reason = migrate.map_quantity(
+            raw_row.get("type"), values, raw_row.get("units"), raw_row
+        )
+        named = set(migrate._quantities_named_by_payload(values))
+        raw_quantity = values.get("quantity")
+        if declared.is_value and (raw_quantity not in (None, "") or named):
+            named.add(declared.value)
+        if isinstance(raw_quantity, str):
+            try:
+                explicit = Quantity(raw_quantity)
+            except ValueError:
+                explicit = None
+            if explicit is not None:
+                named.add(explicit)
+        for quantity in sorted(named, key=lambda item: item.value):
+            if score.rail_for_quantity(quantity, species_formula=str(container)) is not None:
+                issues.append(f"{raw_id}: {quantity.value}")
+                break
+    return issues
 
 
 def _mappings(node: object):
@@ -995,6 +1332,17 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
         return [report.migration_error]
 
     result = migrator.result
+    report.engine_readiness = _observable_readiness(
+        doc,
+        result.observations,
+        result.experiments,
+    )
+    _add(
+        report,
+        "engine-supported-quantity-unknown",
+        "HARD",
+        _printed_supported_unknown_quantities(doc, result.observations),
+    )
     species_issues = _species_container_issues(doc, result.observations)
     kinds = Counter(
         observation.value.kind.value
@@ -1060,6 +1408,8 @@ def _species_container_issues(doc: object, observations: Mapping[str, Any]) -> l
                 None,
             )
         if migrated is None:
+            continue
+        if migrated.identity is None or migrated.identity.species is None:
             continue
         identity_formula = migrated.identity.species.formula
         values = observation.get("values")

@@ -4,13 +4,16 @@ import json
 import shutil
 import subprocess
 import sys
+from copy import deepcopy
 from contextlib import nullcontext
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
 import simulator.battery.extract_gate as gate
+from simulator.battery import score
 from simulator.battery.extract_gate import evaluate_extract
 from simulator.yaml_cache import load_cached_safe_yaml, yaml_mapping_source_issues
 from tools import validate_literature_extracts as validator
@@ -87,6 +90,167 @@ def _checks(report) -> set[str]:
     return {finding.check for finding in report.findings}
 
 
+def _migrate_real_extract(path: Path, doc: dict, monkeypatch):
+    migrators = []
+    original_migrator = gate.migrate.Migrator
+
+    def capture_migrator(*args, **kwargs):
+        migrator = original_migrator(*args, **kwargs)
+        migrators.append(migrator)
+        return migrator
+
+    monkeypatch.setattr(gate.migrate, "Migrator", capture_migrator)
+    report = gate.GateReport()
+    try:
+        gate._migrate_one(path, doc, report)
+    finally:
+        monkeypatch.setattr(gate.migrate, "Migrator", original_migrator)
+    assert len(migrators) == 1
+    return report, migrators[0].result
+
+
+def _direct_scorer_readiness(result):
+    counts = {}
+    row_ready = {}
+    for observation in result.observations.values():
+        quantity = gate.quantity_token(observation.identity)
+        formula = (
+            observation.identity.species.formula
+            if observation.identity.species is not None
+            else ""
+        )
+        rail = score.rail_for_quantity(quantity, species_formula=formula)
+        name = f"{'none' if rail is None else rail.value}:" + (
+            "quantity_unknown" if quantity is None else quantity.value
+        )
+        ready = quantity is not None and rail is not None
+        if ready:
+            ready = score.identity_equal(
+                observation.identity, observation.identity
+            ).kind.value == "equal"
+            experiment = result.experiments.get(observation.experiment_id)
+            if ready and experiment is not None:
+                validity = score.run_validity_gates(experiment, observation)
+                readiness_checks = {
+                    "method",
+                    "kems_calibration",
+                    "geometry_determinants",
+                    "comparison_method_cell_constant_cancels",
+                }
+                ready = not any(
+                    not check.passed and check.name in readiness_checks
+                    for check in validity.checks
+                )
+        totals = counts.setdefault(name, [0, 0])
+        totals[0 if ready else 1] += 1
+        row_ready[observation.observation_id] = ready
+    return {name: tuple(totals) for name, totals in counts.items()}, row_ready
+
+
+def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutation(
+    tmp_path: Path, monkeypatch
+):
+    source_ids = (
+        "kambayashi-kato-1984-mgo-sio2-1973k",
+        "powell-1971-alkali-sulfate-metasilicate-vapour",
+    )
+    results = {}
+    for source_id in source_ids:
+        path = REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        report, result = _migrate_real_extract(path, doc, monkeypatch)
+        expected, _rows = _direct_scorer_readiness(result)
+        actual = {
+            row.observable: (row.ready, row.not_ready)
+            for row in report.engine_readiness
+        }
+        assert actual == expected
+        assert sum(ready + not_ready for ready, not_ready in actual.values()) == len(
+            result.observations
+        )
+        results[source_id] = (path, doc, result)
+
+    kambayashi_path, kambayashi_doc, kambayashi_result = results[source_ids[0]]
+    _, baseline_rows = _direct_scorer_readiness(kambayashi_result)
+    row_id = next(row_id for row_id, ready in baseline_rows.items() if ready)
+    raw_row = next(
+        row
+        for _container, row in gate.migrate.iter_extract_observations(kambayashi_doc)
+        if row.get("observation_id") == row_id.split("::", 1)[-1]
+    )
+    assert raw_row.get("point_conditions", {}).get("temperature_K")
+
+    absent_pressure_row = next(
+        row
+        for _container, row in gate.migrate.iter_extract_observations(kambayashi_doc)
+        if row.get("point_conditions", {}).get("total_pressure_Pa", {}).get("state", {}).get("reason")
+        == "not_published"
+    )
+    experiment_raw = kambayashi_doc["experiments"][absent_pressure_row["experiment"]]
+    assert gate._source_input_status(
+        [absent_pressure_row, experiment_raw], "identity.total_pressure_Pa"
+    ) == "located_absence:not_published"
+
+    mutated = deepcopy(kambayashi_doc)
+    temperature_keys = {
+        "T_K", "T_C", "temperature_K", "temperature", "T", "T_range_K"
+    }
+
+    def drop_temperature(node):
+        if isinstance(node, dict):
+            for key in tuple(node):
+                if key in temperature_keys:
+                    del node[key]
+                else:
+                    drop_temperature(node[key])
+        elif isinstance(node, list):
+            for child in node:
+                drop_temperature(child)
+
+    drop_temperature(mutated)
+    mutated_path = tmp_path / f"{source_ids[0]}.yaml"
+    mutated_path.write_text(yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8")
+    changed_report, changed_result = _migrate_real_extract(
+        mutated_path, mutated, monkeypatch
+    )
+    _, changed_rows = _direct_scorer_readiness(changed_result)
+    assert baseline_rows[row_id]
+    assert not changed_rows[row_id]
+    changed_observation = changed_result.observations[row_id]
+    changed_quantity = gate.quantity_token(changed_observation.identity)
+    changed_formula = changed_observation.identity.species.formula
+    changed_rail = score.rail_for_quantity(
+        changed_quantity, species_formula=changed_formula
+    )
+    changed_observable = f"{changed_rail.value}:{changed_quantity.value}"
+    changed_group = next(
+        row
+        for row in changed_report.engine_readiness
+        if row.observable == changed_observable
+    )
+    assert any(
+        detail.observation_id == row_id
+        and detail.input_path == "identity.temperature_K"
+        and detail.source_status == "unrecorded"
+        for detail in changed_group.details
+    )
+
+
+def test_unknown_quantity_with_printed_supported_field_is_hard(tmp_path: Path):
+    doc = _document()
+    row = doc["species"]["Fe"]["observations"][0]
+    row["values"] = {"quantity": "unresolved_target", "activity": "0.24"}
+    report = _run_gate(tmp_path, doc)
+
+    finding = next(
+        item
+        for item in report.findings
+        if item.check == "engine-supported-quantity-unknown"
+    )
+    assert finding.severity == "HARD"
+    assert "activity" in finding.detail
+
+
 def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypatch):
     report = _run_gate(tmp_path, _document())
 
@@ -97,6 +261,58 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     monkeypatch.setattr(gate, "_migrate_one", lambda *_args: ["forced refusal"])
     report = _run_gate(tmp_path, _document())
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
+
+
+def test_migration_carries_row_temperature_and_located_conditions(
+    tmp_path: Path, monkeypatch
+):
+    doc = _document()
+    rows = doc["species"]["Fe"]["observations"]
+    first = rows[0]
+    first.update(
+        {
+            "T_C": "1500",
+            "point_conditions": {
+                "total_pressure_Pa": {
+                    "state": {"tag": "value", "value": "100000"},
+                    "locator": {
+                        "page": 2,
+                        "pdf_page_index": 1,
+                        "table": "1",
+                    },
+                }
+            },
+            "values": {
+                "quantity": "evaporation_coefficient_alpha",
+                "alpha": "0.24",
+                "method_class": "measured_direct",
+            },
+        }
+    )
+    second = deepcopy(first)
+    second["observation_id"] = "fe_alpha_2"
+    second["T_C"] = "1600"
+    rows.append(second)
+
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    parsed = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    _, result = _migrate_real_extract(path, parsed, monkeypatch)
+
+    assert len(result.observations) == len(rows)
+    for row in rows:
+        observation = result.observations[f"fixture-source::{row['observation_id']}"]
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == (
+            Decimal(row["T_C"]) + Decimal("273.15")
+        )
+        pressure = observation.point_conditions["total_pressure_Pa"]
+        assert pressure.state.is_value
+        assert str(pressure.state.value) == "100000"
+        assert pressure.locator is not None
+        assert pressure.locator.page == 2
+        assert pressure.locator.pdf_page_index == 1
+        assert pressure.locator.table == "1"
 
 
 def test_kress_pdf_lineage_resolves_in_stub_index_gate(monkeypatch):
