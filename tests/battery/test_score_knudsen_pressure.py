@@ -424,6 +424,7 @@ def test_knudsen_sensitivity_uses_target_species_not_other_channels(
         reference,
         monkeypatch,
         updated_o2_pressure=100.0,
+        backend_mode="python_api",
     )
 
     residual, _candidate = compile_residual(
@@ -592,6 +593,7 @@ def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
         oxygen_balance_pO2_values=(0.01, 0.1),
         po2_calls=pressure_calls,
         oxygen_balance_calls=oxygen_balance_calls,
+        backend_mode="python_api",
     )
 
     assert oxygen_balance_calls == pytest.approx([0.01, 0.1])
