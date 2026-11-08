@@ -103,6 +103,41 @@ def test_run_metadata_round_trips_from_extract_through_migrated_store(
     )
 
 
+def test_equipment_sample_metadata_round_trips_with_locators(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "sample": {
+            "final_mass_kg": {
+                "value": 0.0008,
+                "locator": {"table": "1", "page": 2},
+            },
+            "species_loss_fraction": {
+                "Na": {
+                    "value": 0.25,
+                    "locator": {"table": "2", "page": 3},
+                },
+            },
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+
+    migrate(root, write=True)
+    _works, experiments, observations = load_migrated_store(root)
+    observation = next(iter(observations.values()))
+    experiment = experiments[observation.experiment_id]
+
+    final_mass = experiment.sample.final_mass_kg
+    assert final_mass is not None and final_mass.state.is_value
+    assert final_mass.state.value == Value.point_of("0.0008")
+    assert final_mass.locator == Locator(table="1", page=2)
+    species_loss = experiment.sample.species_loss_fraction
+    assert species_loss is not None and species_loss["Na"].state.is_value
+    assert species_loss["Na"].state.value == Value.point_of("0.25")
+    assert species_loss["Na"].locator == Locator(table="2", page=3)
+
+
 def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
     tmp_path: Path,
 ) -> None:
