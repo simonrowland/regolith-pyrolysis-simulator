@@ -546,6 +546,32 @@ def test_equilibrium_fe_row_provenance_carries_only_below_liquidus_notice():
     assert below.activity_coefficients == above.activity_coefficients
 
 
+def test_equilibrium_fe_liquidus_notice_does_not_leak_to_mg_row():
+    domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=225.0 + 273.15,
+        liquidus_T_C=1700.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    sim = _feo_fe_row_equilibrium_sim(domain=domain)
+    sim.vapor_pressures["metals"]["Mg"] = {
+        "parent_oxide": "MgO",
+        "fit_target": "pure_component_psat",
+        "valid_range_K": [400.0, 700.0],
+        "pure_component_antoine": {"A": 50.0, "B": 0.0, "C": 0.0},
+    }
+    sim._ELLINGHAM_THERMO = ("Fe", "Mg")
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    provenance = result.diagnostics["activity_provenance"]
+    assert provenance["Fe"]["notices"] == result.diagnostics[
+        "a_FeO_calphad"
+    ]["notices"]
+    assert "notices" not in provenance["Mg"]
+
+
 def _gate_host(curve, *, pinned=True):
     def _resolve(gate_authority=_RESOLVE_MELT_REDOX_GATE_AUTHORITY, **_kwargs):
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
