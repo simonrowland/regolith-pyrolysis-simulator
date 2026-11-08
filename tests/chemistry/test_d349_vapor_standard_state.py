@@ -1556,41 +1556,28 @@ def test_d350_alphamelts_preserves_explicit_and_substitutes_missing_oxide_activi
     )
 
     assert isinstance(projection, dict)
-    expected_pressures = (
-        {
-            "Mg": _catalog_pressure_from_activity(
-                vapor_pressure_data,
-                "Mg",
-                0.4,
-                temperature_C=1500.0,
-                pO2_bar=1.0,
-            ),
-            "Ca": _catalog_pressure_from_activity(
-                vapor_pressure_data,
-                "Ca",
-                0.3,
-                temperature_C=1500.0,
-                pO2_bar=1.0,
-            ),
-        }
-        if activities
-        else expected_diagnostic["vapor_pressures_Pa"]
-    )
     for species in ("Mg", "Ca"):
         assert projection[species] == pytest.approx(
-            expected_pressures[species], rel=1e-10, abs=0
+            expected_diagnostic["vapor_pressures_Pa"][species],
+            rel=1e-10,
+            abs=0,
         )
     if expected_peer is not None:
-        assert projection[expected_peer] > 0.0
+        assert projection[expected_peer] == pytest.approx(
+            _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                expected_peer,
+                activities["Na2O"],
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            ),
+            rel=1e-10,
+            abs=0,
+        )
 
     notices = backend._antoine_activity_standard_state_notices
-    if activities:
-        assert not ({"Mg", "Ca"} & set(notices))
-    else:
-        assert set(notices) >= {"Mg", "Ca"}
+    assert set(notices) >= {"Mg", "Ca"}
     for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
-        if activities:
-            continue
         notice = notices[species]
         assert notice["parent_oxide"] == parent_oxide
         assert notice["reason"] == "activity_standard_state_substitution"
@@ -1714,23 +1701,15 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         pO2_bar=1.0,
     )
     if activities:
-        explicit_parent_activities = {
-            "Na": activities["Na2O"],
-            "K": activities["K2O"],
-            "Mg": activities["MgO"],
-            "Ca": activities["CaO"],
-            "Fe": activities["FeO"],
-        }
-        expected_pressures = {
-            species: _catalog_pressure_from_activity(
+        expected_pressures = dict(expected["vapor_pressures_Pa"])
+        for species, activity_key in (("Na", "Na2O"), ("K", "K2O")):
+            expected_pressures[species] = _catalog_pressure_from_activity(
                 vapor_pressure_data,
                 species,
-                explicit_parent_activities[species],
+                activities[activity_key],
                 temperature_C=1500.0,
                 pO2_bar=1.0,
             )
-            for species in expected_species
-        }
     else:
         expected_pressures = expected["vapor_pressures_Pa"]
     for species in expected_species:
