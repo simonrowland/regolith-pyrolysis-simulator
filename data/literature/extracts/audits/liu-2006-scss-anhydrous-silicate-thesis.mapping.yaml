@@ -259,9 +259,9 @@ column_mapping:
     phase_role: matte
     unit: wt.%
     method_class: measured_direct
-  condition_rule: Temperature, pressure and absolute log fO2 join from Table 3 by run. Table 5 sulfide composition
-    is represented on the identity axis as mole fractions derived from its printed wt.% cells using simulator/accounting/formulas.py::ATOMIC_WEIGHTS_G_PER_MOL;
-    measured observations remain in wt.%. yn49 has no printed Table 3 conditions.
+  condition_rule: Temperature, pressure and absolute log fO2 join from Table 3 by run. Pt is printed <d.l. in all
+    ten Table 5 rows, so the shared sulfide composition identity is unknown and no complete mole fractions are inferred;
+    each Pt result is retained as unavailable below detection. yn49 has no printed Table 3 conditions.
 - table: '6'
   pages:
   - 67
@@ -315,12 +315,14 @@ column_mapping:
   pages:
   - 83
   rows: 77
+  retained_context_rows: 76
   columns:
   - column: 1
     header: ln S (ppm)
     quantity: log_sulfur_concentration_ppm_appendix_i
     own_rows: measured_reduced
     literature_rows: quoted_attributed
+    collaborator_rows: quoted_attributed
   - column: 2
     header: 10000/T
     role: predictor_as_printed
@@ -379,11 +381,15 @@ column_mapping:
   - column: 15
     header: Source
     role: source_attribution_as_printed
-  condition_rule: Own Appendix rows join T/P/fO2 and composition from their printed Table 3/Table 4 rows; for yn38,
-    Table 3 is absent, ln fO2 is directly printed in natural-log bar form and converted to Pa for identity, while
-    reciprocal 10000/T and ratio P/T remain as printed predictors and are not promoted to unprinted T or P.
-  render_verified: Every printed source row and model value checked on page 83; own ln S is linked to Table 4 sulfur,
-    literature rows retain original citations.
+  condition_rule: Typed own Appendix observations join T/P/fO2 and composition only from their printed Table 3/Table
+    4 rows; for yn38, Table 3 is absent, ln fO2 is directly printed in natural-log bar form and converted to Pa
+    for identity, while reciprocal 10000/T and ratio P/T remain as printed predictors and are not promoted to unprinted
+    T or P.
+  disposition: All 76 sample rows are retained as located context. Liu rows are measured_reduced, colleague-contributed
+    rows are attributed to Naji-Tom Samaha, literature rows are quoted_attributed with citations, and model outputs
+    are named model_derived refusals.
+  render_verified: Every printed source row and model value checked on page 83; all 76 sample rows have distinct
+    row locators, cited literature inputs retain their original citations, and all model outputs are named.
 tables:
 - page: 58
   table: '1'
@@ -441,7 +447,8 @@ tables:
   printed_title: Data used in the modeling process
   content_list_table: p083-t11
   printed_rows: 77
-  disposition: own_logS_typed_refusal_and_full_model_comparison_context
+  retained_context_rows: 76
+  disposition: all_76_sample_rows_context_with_attributed_inputs_and_model_outputs
   render_verified: All 76 sample rows, all 15 columns, the final average row, source labels, signs, and row/column
     assignments checked against page 83 render.
 schema_gap: Appendix I ln S (ppm), model predictions, and model deviations have no exact logarithmic sulfur-concentration

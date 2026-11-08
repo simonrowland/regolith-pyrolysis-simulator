@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from collections import Counter
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 import yaml
 
@@ -73,6 +73,11 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
     table4 = [row for key, row in source.items() if key.startswith("liu06_t4_")]
     table5 = [row for key, row in source.items() if key.startswith("liu06_t5_")]
     appendix = [row for key, row in source.items() if key.startswith("liu06_app1_")]
+    appendix_context = [
+        row
+        for row in document["species"]["S"].get("context", [])
+        if row["type"] == "appendix_i_model_comparison_row"
+    ]
     experiments = document["experiments"]
 
     assert len(table4) == 21 * 11
@@ -80,6 +85,8 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
     assert len(table5) == 10 * 6
     assert len({row["values"]["sample_id"] for row in table5}) == 10
     assert len(appendix) == 21
+    assert len(appendix_context) == 76
+    assert len({row["observation_id"] for row in appendix_context}) == 76
     assert sum("table3_cells_as_published" in row for row in experiments) == 20
     assert len(source) == 312
 
@@ -94,10 +101,108 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
         "6": 6,
         "Appendix I": 77,
     }
+    appendix_mapping = next(row for row in mapping["tables"] if row["table"] == "Appendix I")
+    assert appendix_mapping["retained_context_rows"] == 76
+    t5_mapping = next(row for row in mapping["column_mapping"] if row["table"] == "5")
+    assert "Pt is printed <d.l. in all ten" in t5_mapping["condition_rule"]
+    assert "composition identity is unknown" in t5_mapping["condition_rule"]
     with AUDIT.with_suffix(".cells.csv").open(encoding="utf-8", newline="") as stream:
         cell_audit = list(csv.DictReader(stream))
     assert len(cell_audit) == 1828
     assert all(row["confirmation"].startswith("b:") for row in cell_audit)
+    appendix_sources_in_audit = {
+        int(row["table_row_number"]): row["render_verified_text"]
+        for row in cell_audit
+        if row["page"] == "83"
+        and row["table"] == "Appendix I"
+        and row["column_header"] == "Source"
+        and row["render_verified_text"].casefold() != "average"
+    }
+    appendix_sources_in_context = {
+        int(row["locator"]["table_row_number"]): row["values"]["cells_as_printed"]["Source"]
+        for row in appendix_context
+    }
+    assert len(appendix_sources_in_audit) == 76
+    assert appendix_sources_in_context == appendix_sources_in_audit
+    assert Counter(row["values"]["input_evidence_class"] for row in appendix_context) == {
+        "measured_reduced": 21,
+        "quoted_attributed": 55,
+    }
+    assert all(
+        row["values"]["quoted_attribution"] == row["values"]["input_attribution"]
+        for row in appendix_context
+        if row["values"]["input_evidence_class"] == "quoted_attributed"
+    )
+    haughton_rows = [
+        row
+        for row in appendix_context
+        if row["locator"]["row_label"].startswith("Haughton")
+    ]
+    assert Counter(row["locator"]["row_label"] for row in haughton_rows)["Haughton 6F1"] == 2
+    assert all(
+        "Haughton DR, Roeder PL and Skinner BJ (1974)" in row["values"]["quoted_attribution"]
+        for row in haughton_rows
+    )
+    citation_checks = {
+        "MavONE65": "Mavrogenes and O’Neill (1999)",
+        "HolzGrove1400": "Holzhied A and Grove TL (2002)",
+        "HolzGrove1350": "Holzhied A and Grove TL (2002)",
+        "1450Holzheid": "Holzhied A and Grove TL (2002)",
+        "Wend741": "Wendlandt (1982)",
+        "Wend740": "Wendlandt (1982)",
+        "Wend753": "Wendlandt (1982)",
+        "Jugo1300": "Jugo et al. (2005)",
+    }
+    for row in appendix_context:
+        source_label = row["locator"]["row_label"]
+        if source_label in citation_checks:
+            assert citation_checks[source_label] in row["values"]["quoted_attribution"]
+        if source_label.startswith("TS") or "FeE" in source_label or source_label.startswith("MB"):
+            assert "Naji-Tom Samaha" in row["values"]["quoted_attribution"]
+            assert "PDF p. 7" in row["values"]["quoted_attribution"]
+    assert all(
+        len(row["values"]["model_outputs"]) == 4
+        and all(
+            value["evidence_class"] == "model_derived"
+            and value["model"].startswith("Liu 2006 Model ")
+            and value["status"] == "typed_refused_log_quantity_schema_gap"
+            for value in row["values"]["model_outputs"].values()
+        )
+        and len(row["values"]["deviations"]) == 4
+        and all(
+            value["evidence_class"] == "model_derived"
+            for value in row["values"]["deviations"].values()
+        )
+        for row in appendix_context
+    )
+
+    mismatch_rows = {
+        "liu06_app1_yn4_ln_s": ("6.63", "768", "6.64"),
+        "liu06_app1_yn11_ln_s": ("7.12", "1386", "7.23"),
+        "liu06_app1_yn27_ln_s": ("7.35", "1545", "7.34"),
+    }
+    appendix_by_id = {row["observation_id"]: row for row in appendix}
+    for observation_id, (printed_ln, table4_s, rounded_ln) in mismatch_rows.items():
+        row = appendix_by_id[observation_id]
+        assert row["values"]["value"] == printed_ln
+        assert row["values"]["value_as_published"] == printed_ln
+        assert "derived_from" not in row
+        assert row["derivation"]["raw_inputs"]["state"] == {
+            "tag": "value",
+            "value": "not_printed",
+        }
+        assert "does not identify" in row["derivation"]["relation"]
+        assert row["derivation"]["raw_inputs"]["locator"]["page"] == 83
+        assert row["derivation"]["raw_inputs"]["locator"]["table"] == "Appendix I"
+        assert f"ln(Table 4 S={table4_s} ppm) rounds to {rounded_ln}" in row["values"]["source_discrepancy"]
+    closing_derivations = [row for row in appendix if "derived_from" in row]
+    assert len(closing_derivations) == 18
+    for row in closing_derivations:
+        parent = source[row["derived_from"][0]]
+        rounded_ln = Decimal(str(parent["values"]["value"])).ln().quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        assert rounded_ln == Decimal(row["values"]["value"])
 
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     migrated = result.observations
@@ -177,6 +282,9 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
             "p2o5",
             "s",
         )
+    } | {
+        f"liu06_t5_{row['values']['sample_id']}_{row['values']['formula'].lower()}"
+        for row in table5
     }
     assert all(
         row.identity.composition is not None and row.identity.composition.is_value
@@ -188,6 +296,19 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
     assert incomplete["state"]["tag"] == "unknown"
     assert "MnO=<d.l." in incomplete["state"]["reason"]
     assert "P2O5=<d.l." in incomplete["state"]["reason"]
+    pt_rows = [row for row in table5 if row["values"]["formula"] == "Pt"]
+    assert len(pt_rows) == 10
+    for row in pt_rows:
+        assert row["values"]["value_as_published"] == "<d.l."
+        assert row["values"]["component_amount_as_published"] == "<d.l."
+        assert row["values"]["admission_status"] == "unavailable"
+        assert row["values"]["unavailable_reason"] == "below_detection_limit"
+        assert "value" not in row["values"]
+        composition = row["point_conditions"]["composition"]
+        assert composition["state"]["tag"] == "unknown"
+        assert "Pt=<d.l." in composition["state"]["reason"]
+        assert composition["locator"]["page"] == 66
+        assert composition["locator"]["table"] == "5"
     assert {
         row.identity.phase_role.value.value for row in measured
     } == {"glass", "matte"}
@@ -212,8 +333,7 @@ def test_liu_thesis_row_counts_uncertainties_and_isolated_migration(tmp_path) ->
     yn38 = next(row for key, row in migrated.items() if key.endswith("::liu06_t4_yn38_sio2"))
     assert yn38.identity.composition.is_value
     yn49 = next(row for key, row in migrated.items() if key.endswith("::liu06_t5_yn49_s"))
-    assert yn49.identity.composition.is_value
-    assert yn49.identity.composition.value.amount_basis.value == "mole_fraction"
+    assert yn49.identity.composition.is_unknown
 
     app_yn38 = source["liu06_app1_yn38_ln_s"]
     assert app_yn38["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"
