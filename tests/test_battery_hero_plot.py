@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import csv
 import gzip
 import io
 import json
+import math
 import re
+import statistics
+import subprocess
+import sys
 import tarfile
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -42,9 +48,10 @@ from scripts.battery_hero_plot import (
     TIER_MINOR,
     TIER_TRACE,
 )
-from matplotlib.colors import ListedColormap, Normalize, to_rgba
+from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
+from matplotlib.transforms import Bbox
 from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
 
@@ -479,7 +486,7 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     assert "Green landing date" not in polymerisation_svg
 
 
-def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
+def test_deck_fingerprint_uses_fixed_traffic_light_bands(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -517,19 +524,18 @@ def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
     original_draw = hero_plot._draw_hero_sweet_spot
 
     def capture_color(axis, engine, cells, **kwargs):
-        colors.setdefault(engine, []).append(
-            kwargs["colormap"](kwargs["normalization"](1.0))
-        )
-        return original_draw(axis, engine, cells, **kwargs)
+        drawn = original_draw(axis, engine, cells, **kwargs)
+        if drawn and axis.patches:
+            colors.setdefault(engine, []).append(axis.patches[0].get_facecolor())
+        return drawn
 
     monkeypatch.setattr(hero_plot, "_draw_hero_sweet_spot", capture_color)
     hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
 
-    assert len(colors["openimcc"]) == len(colors["magemin"]) == 2
-    for openimcc_color, magemin_color in zip(
-        colors["openimcc"], colors["magemin"]
-    ):
-        assert openimcc_color == pytest.approx(magemin_color)
+    assert colors["openimcc"]
+    assert colors["magemin"]
+    assert all(color == pytest.approx(to_rgba("#f6c90e")) for color in colors["openimcc"])
+    assert all(color == pytest.approx(to_rgba("#d7191c")) for color in colors["magemin"])
 
 
 def test_polymerisation_deck_facets_points_by_species_and_keeps_comparisons(
@@ -1267,6 +1273,10 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     )
     assert default_caption_tail == redox_caption_tail == expected_caption_tail
 
+    redox_rows.append(uncalibrated_other_rail)
+    redox_residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in redox_rows), encoding="utf-8"
+    )
     assert main(
         [
             "--input",
@@ -1277,8 +1287,6 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
             str(tmp_path / "history.jsonl"),
             "--rail",
             "redox",
-            "--group-by",
-            "species",
             "--simulator-commit",
             "sim-test",
             "--openimcc-commit",
@@ -1288,17 +1296,17 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         ]
     ) == 0
     summary = json.loads(capsys.readouterr().out)
-    redox_svgs = [
+    redox_collection_pngs = [
         Path(path)
         for name, path in summary["files"].items()
-        if name.endswith(":tile_svg")
+        if name == "chart:B:redox"
     ]
-    assert redox_svgs
-    assert all(
-        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial"
-        in path.read_text(encoding="utf-8")
-        for path in redox_svgs
-    )
+    assert len(redox_collection_pngs) == 1
+    assert redox_collection_pngs[0].is_file()
+    with Path(summary["files"]["table:panels"]).open(newline="") as panels_file:
+        panels = list(csv.DictReader(panels_file))
+    assert panels
+    assert {row["rail"] for row in panels} == {"redox"}
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
@@ -1570,7 +1578,7 @@ def test_melt_activity_refusals_and_diagnostics_are_collected(
     assert "magemin 1" in svg
 
 
-def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
+def test_fingerprint_panels_leave_sparse_cells_blank(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1631,17 +1639,13 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
         axis,
         "openimcc",
         openimcc_cells,
-        colormap=plt.get_cmap("viridis"),
-        normalization=Normalize(vmin=0, vmax=1),
         x_limits=x_limits,
         temperature_limits=temperature_limits,
     )
     assert axis.get_xlim() == x_limits
     assert axis.get_ylim() == temperature_limits
-    assert any(patch.get_hatch() == "///" for patch in axis.patches)
-    assert "1" in {text.get_text() for text in axis.texts}
-    assert "0" not in {text.get_text() for text in axis.texts}
-    assert len(axis.patches) == sum(int(cell["n"]) > 0 for cell in openimcc_cells)
+    assert not axis.patches
+    assert not axis.texts
     plt.close(fig)
 
     import scripts.battery_hero_plot as plotter
@@ -1660,21 +1664,22 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     assert len(rendered_limits) == 2
     assert rendered_limits[0] == rendered_limits[1]
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
-    assert "cell label=n" in svg
-    assert "sweet-spot fill=median" in svg
+    assert "fingerprint fill uses median |dex| traffic-light bands" in svg
+    assert "n&lt;3 cells are blank" in svg
+    assert "cell label=n" not in svg
+    assert "hatched" not in svg
     assert (
         "scatter marker face=engine colour; flagged/extrapolated=white face with "
         "engine-coloured edge"
     ) in svg
     assert "marker edge=sio₂ mole fraction" not in svg
-    assert "1≤n&lt;3 is grey and hatched; n=0 is blank" in svg
     assert files["hero:vapour:png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "140/147 rows" in melt_svg
     assert "main's fix is pending" in melt_svg
 
 
-def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
+def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
     cell = {
         "sio2_lower": "0.2",
         "sio2_upper": "0.25",
@@ -1684,32 +1689,22 @@ def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
         "color_eligible": True,
         "median_abs_dex": "0.25",
     }
-    colormap = plt.get_cmap("viridis")
     fig, axis = plt.subplots()
     try:
         assert _draw_hero_sweet_spot(
             axis,
             "openimcc",
             [cell],
-            colormap=colormap,
-            normalization=Normalize(vmin=0, vmax=1),
             x_limits=(0.2, 0.25),
             temperature_limits=(1900, 2000),
         )
-        assert axis.patches[0].get_facecolor() == pytest.approx(
-            colormap(0.25)
-        )
-        assert axis.patches[0].get_hatch() is None
+        assert not axis.patches
     finally:
         plt.close(fig)
 
 
-def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
-    viridis = plt.get_cmap("viridis")
-    fills = [viridis(index / 10) for index in range(11)] + [
-        (0.395, 0.797, 0.368, 1.0)
-    ]
-    colormap = ListedColormap(fills)
+def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
+    fills = ["#1a9641", "#f6c90e", "#d7191c"]
     cells = [
         {
             "sio2_lower": str(index * 0.05),
@@ -1717,10 +1712,9 @@ def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
             "temperature_lower_K": "1000",
             "temperature_upper_K": "1100",
             "n": 3,
-            "color_eligible": True,
-            "median_abs_dex": str(index),
+            "median_abs_dex": value,
         }
-        for index in range(len(fills))
+        for index, value in enumerate(("0.5", "0.8", "1.1"))
     ]
     figure, axis = plt.subplots()
     try:
@@ -1728,50 +1722,14 @@ def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
             axis,
             "openimcc",
             cells,
-            colormap=colormap,
-            normalization=Normalize(vmin=0, vmax=len(fills) - 1),
             x_limits=(0, len(fills) * 0.05),
             temperature_limits=(1000, 1100),
         )
         assert [patch.get_facecolor() for patch in axis.patches] == pytest.approx(
-            fills
+            [to_rgba(fill) for fill in fills]
         )
-        # WCAG contrast winners for viridis at 0.0 through 1.0, followed by
-        # the review's actual mid-tone green cell. At 0.5 neither candidate
-        # reaches 4.5:1, so the higher-contrast dark text is expected.
-        assert [text.get_color() for text in axis.texts] == [
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#f7f7f7",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-            "#222222",
-        ]
-        assert hero_plot._wcag_contrast_ratio("#000000", "#ffffff") == pytest.approx(
-            21.0
-        )
-        assert hero_plot._wcag_contrast_ratio(
-            fills[-1], "#222222"
-        ) == pytest.approx(7.785, abs=0.001)
-        assert hero_plot._wcag_contrast_ratio(
-            fills[-1], "#f7f7f7"
-        ) == pytest.approx(1.908, abs=0.001)
-        for fill, label in zip(fills, axis.texts, strict=True):
-            chosen = hero_plot._wcag_contrast_ratio(fill, label.get_color())
-            best = max(
-                hero_plot._wcag_contrast_ratio(fill, "#222222"),
-                hero_plot._wcag_contrast_ratio(fill, "#f7f7f7"),
-            )
-            if best >= 4.5:
-                assert chosen >= 4.5
-            else:
-                assert chosen == pytest.approx(best)
+        assert not axis.texts
+        assert all(patch.get_hatch() is None for patch in axis.patches)
     finally:
         plt.close(figure)
 
@@ -1955,6 +1913,8 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
                     "reason": "extrapolated beyond certified band",
                 }
             ]
+        if engine == "internal-analytical" and experiment == "second-shared":
+            del row["candidate_observation"]["identity"]["temperature_K"]
         rows.append(row)
     residuals.write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
@@ -1964,20 +1924,25 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     comparisons = data.hero_comparisons[("redox", "internal-analytical")][
         "comparisons"
     ]
-    assert comparisons == [
-        {
-            "engine": "vaporock",
-            "n_shared": 2,
-            "outside_rms_dex": "4.0",
-            "primary_rms_dex_on_shared": "3.0",
-        },
-        {
-            "engine": "thermoengine",
-            "n_shared": 1,
-            "outside_rms_dex": "2.0",
-            "primary_rms_dex_on_shared": "3.0",
-        },
+    assert [
+        (
+            comparison["engine"],
+            comparison["n_shared"],
+            comparison["outside_rms_dex"],
+            comparison["primary_rms_dex_on_shared"],
+        )
+        for comparison in comparisons
+    ] == [
+        ("vaporock", 2, "4.0", "3.0"),
+        ("thermoengine", 1, "2.0", "3.0"),
     ]
+    assert comparisons[0]["outside_sd_dex"] == "0"
+    assert comparisons[0]["outside_median_abs_dex"] == "4.0"
+    assert comparisons[0]["views"]["all"]["no_temperature_n"] == 1
+    assert comparisons[0]["views"]["temperature_lt_1700"]["n_shared"] == 1
+    assert data.hero_all_numeric_metrics[("redox", "internal-analytical")][
+        "views"
+    ]["all"]["no_temperature_n"] == 1
     assert data.hero_comparisons[("redox", "openimcc")]["comparisons"][0][
         "engine"
     ] == "thermoengine"
@@ -2016,11 +1981,393 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     finally:
         plt.close(figure)
 
-    files = render_hero_charts(data, tmp_path / "hero")
+    files = render_hero_charts(
+        data,
+        tmp_path / "hero",
+        openimcc_score_commit="66ec4a3",
+    )
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
     assert "vaporock" in svg and "n_shared=2" in svg
     assert "thermoengine" in svg and "n_shared=1" in svg
+    assert "cross-engine signed dex scorecard" in svg
+    assert "population sd (ddof=0)" in svg
+    assert "openimcc score commit: 66ec4a3" in svg
     assert "benchmark" not in svg
+
+
+def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> None:
+    text = hero_plot._hero_scorecard_cell_text(
+        {
+            "n": 6,
+            "rms_dex": "1.2",
+            "sd_dex": "0.4",
+            "median_abs_dex": "0.9",
+            "no_temperature_n": 1,
+            "exposed_n": 1,
+            "held_out": {
+                "n": 5,
+                "minimum_n": 5,
+                "rms_dex": "1.1",
+                "sd_dex": "0.3",
+                "median_abs_dex": "0.8",
+            },
+        },
+        include_no_temperature=True,
+    )
+
+    assert "RMS 1.20 dex (n=6)" in text
+    assert "SD 0.40 dex (n=6)" in text
+    assert "median |dex| 0.90 dex (n=6)" in text
+    assert "no T n=1" in text
+    assert "exposed n=1" in text and "held-out n=5" in text
+    assert "held-out RMS 1.10 dex (n=5)" in text
+    assert "SD 0.30 dex (n=5)" in text
+    assert "median |dex| 0.80 dex (n=5)" in text
+
+
+def _hero_metric_row(
+    engine: str,
+    reference: str,
+    value: str,
+    *,
+    temperature_K: str | None = None,
+    source_id: str | None = None,
+    source_disagreement_flagged: bool = False,
+    species: str = "SiO",
+    rail: str = "vapour",
+) -> dict[str, object]:
+    identity: dict[str, object] = {"species": {"formula": species}}
+    if temperature_K is not None:
+        identity["temperature_K"] = {"tag": "value", "value": temperature_K}
+    candidate: dict[str, object] = {
+        "observation_id": f"engine:{engine}:{reference}",
+        "identity": identity,
+    }
+    if source_id is not None:
+        candidate["source_id"] = source_id
+    row = {
+        "rail": rail,
+        "reference": reference,
+        "candidate_request": {"engine": engine},
+        "candidate_observation": candidate,
+        "numeric": {"operation": "dex", "value": value},
+    }
+    if source_disagreement_flagged:
+        row["notices"] = [
+            {
+                "kind": "source_disagreement",
+                "reason": "source_internally_inconsistent:JANAF cross-check",
+            }
+        ]
+    return row
+
+
+def test_hero_metrics_use_population_sd_and_measured_temperature_views() -> None:
+    values = [Decimal("-1"), Decimal("1"), Decimal("3"), Decimal("4")]
+    rows = [
+        _hero_metric_row("openimcc", "below", "-1", temperature_K="1699"),
+        _hero_metric_row("openimcc", "boundary", "1", temperature_K="1700"),
+        _hero_metric_row("openimcc", "above", "3", temperature_K="1701"),
+        _hero_metric_row("openimcc", "no-temperature", "4"),
+    ]
+
+    metric = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    views = metric["views"]
+    all_view = views["all"]
+    high_view = views["temperature_ge_1700"]
+    low_view = views["temperature_lt_1700"]
+
+    assert all_view["n"] == metric["n"] == 4
+    assert all_view["no_temperature_n"] == 1
+    assert high_view["n"] == 2
+    assert low_view["n"] == 1
+    assert high_view["no_temperature_n"] == low_view["no_temperature_n"] == 0
+    assert float(metric["rms_dex"]) == pytest.approx(math.sqrt(6.75))
+    assert Decimal(metric["sd_dex"]) == statistics.pstdev(values)
+    assert float(metric["median_abs_dex"]) == 2.0
+    assert Decimal(high_view["sd_dex"]) == statistics.pstdev(
+        [Decimal("1"), Decimal("3")]
+    )
+    assert float(high_view["median_abs_dex"]) == 2.0
+    assert low_view["sd_dex"] == "0"
+
+
+def test_hero_exposure_rule_uses_reference_and_both_exposure_sources() -> None:
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset({"census-only", "both"}),
+        exposed_source_ids=frozenset({"exposed-source", "both-source"}),
+        baseline_observation_ids=frozenset({"pre-cutoff"}),
+    )
+    cases = (
+        (_hero_metric_row("openimcc", "neither", "1", source_id="new-source"), "held_out"),
+        (_hero_metric_row("openimcc", "census-only", "1", source_id="new-source"), "exposed"),
+        (_hero_metric_row("openimcc", "source-only", "1", source_id="exposed-source"), "exposed"),
+        (_hero_metric_row("openimcc", "both", "1", source_id="both-source"), "exposed"),
+        (_hero_metric_row("openimcc", "pre-cutoff", "1"), "exposed"),
+        (_hero_metric_row("openimcc", "new-without-source", "1"), "held_out"),
+    )
+
+    assert [hero_plot._hero_exposure_status(row, policy) for row, _ in cases] == [
+        expected for _row, expected in cases
+    ]
+
+
+def test_hero_exposure_metrics_show_counts_below_minimum_n_only() -> None:
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset(),
+        exposed_source_ids=frozenset(),
+        baseline_observation_ids=frozenset(),
+        minimum_held_out_n=5,
+    )
+    rows = [
+        *[
+            _hero_metric_row("openimcc", f"held-{i}", str(i), temperature_K="1800")
+            for i in range(1, 6)
+        ],
+        *[
+            _hero_metric_row("vaporock", f"small-{i}", str(i), temperature_K="1600")
+            for i in range(1, 5)
+        ],
+    ]
+    metrics = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc", "vaporock"),
+        rails=("vapour",),
+        exposure_policy=policy,
+    )
+
+    held_out = metrics[("vapour", "openimcc")]["views"]["temperature_ge_1700"]["held_out"]
+    assert held_out["n"] == 5
+    assert held_out["rms_dex"] is not None
+    assert held_out["sd_dex"] is not None
+    assert held_out["median_abs_dex"] is not None
+    small = metrics[("vapour", "vaporock")]["views"]["temperature_lt_1700"]["held_out"]
+    assert small["n"] == 4
+    assert small["rms_dex"] is None
+    assert small["sd_dex"] is None
+    assert small["median_abs_dex"] is None
+
+
+def test_openimcc_vaporock_pair_metrics_split_by_species_and_temperature() -> None:
+    rows: list[dict[str, object]] = []
+    for index in range(5):
+        temperature = "1700" if index == 0 else "1600"
+        for engine, value in (("openimcc", str(index)), ("vaporock", str(index + 1))):
+            rows.append(
+                _hero_metric_row(
+                    engine,
+                    f"sio-{index}",
+                    value,
+                    temperature_K=temperature,
+                    species="SiO",
+                )
+            )
+    for index in range(2):
+        for engine, value in (("openimcc", "0"), ("vaporock", "2")):
+            rows.append(
+                _hero_metric_row(
+                    engine,
+                    f"na-{index}",
+                    value,
+                    temperature_K="1800",
+                    species="Na",
+                )
+            )
+
+    records = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+        include_species=True,
+    )
+    by_species = {record["species"]: record for record in records}
+    sio = by_species["SiO"]["comparisons"][0]
+    na = by_species["Na"]["comparisons"][0]
+
+    assert sio["n_shared"] == 5
+    assert sio["views"]["all"]["outside_median_abs_dex"] == "3"
+    assert sio["views"]["temperature_ge_1700"]["n_shared"] == 1
+    assert na["n_shared"] == 2
+    assert na["views"]["all"]["outside_rms_dex"] is None
+
+
+def test_vapour_metrics_split_source_disagreement_rows_and_shared_pairs() -> None:
+    rows = [
+        _hero_metric_row(
+            engine,
+            "flagged",
+            value,
+            temperature_K="1800",
+            source_disagreement_flagged=True,
+        )
+        for engine, value in (("openimcc", "-3"), ("vaporock", "-2"))
+    ] + [
+        _hero_metric_row(
+            engine,
+            "unflagged",
+            value,
+            temperature_K="1500",
+        )
+        for engine, value in (("openimcc", "1"), ("vaporock", "2"))
+    ]
+
+    metrics = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    all_view = metrics["views"]["all"]
+    flagged = all_view["source_disagreement_flagged"]
+    unflagged = all_view["unflagged"]
+    assert flagged["n"] == unflagged["n"] == 1
+    assert flagged["rms_dex"] == "3"
+    assert flagged["sd_dex"] == "0"
+    assert flagged["median_abs_dex"] == "3"
+    assert unflagged["rms_dex"] == "1"
+    assert metrics["views"]["temperature_ge_1700"][
+        "source_disagreement_flagged"
+    ]["n"] == 1
+    assert metrics["views"]["temperature_lt_1700"]["unflagged"]["n"] == 1
+
+    paired = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+    )[0]["comparisons"][0]
+    paired_all = paired["views"]["all"]
+    assert paired_all["source_disagreement_flagged"]["n_shared"] == 1
+    assert paired_all["source_disagreement_flagged"]["outside_rms_dex"] == "2"
+    assert paired_all["source_disagreement_flagged"]["primary_rms_dex_on_shared"] == "3"
+    assert paired_all["unflagged"]["n_shared"] == 1
+
+
+def test_source_disagreement_flag_uses_notice_kind_for_other_reason_strings() -> None:
+    rows = [
+        _hero_metric_row(
+            engine,
+            "initial-charge",
+            value,
+            temperature_K="1800",
+            source_disagreement_flagged=True,
+        )
+        for engine, value in (("openimcc", "-1"), ("vaporock", "-2"))
+    ]
+    for row in rows:
+        row["notices"][0]["reason"] = (
+            "composition_role=initial_charge_only: printed initial charge is "
+            "sample context; per-run composition is not published"
+        )
+
+    metric = hero_plot._hero_metric_records(
+        rows,
+        engines=("openimcc",),
+        rails=("vapour",),
+    )[("vapour", "openimcc")]
+    assert metric["views"]["all"]["source_disagreement_flagged"]["n"] == 1
+    assert metric["views"]["all"]["unflagged"]["n"] == 0
+
+    paired = hero_plot._hero_paired_engine_rail_comparisons(
+        rows,
+        primary_engines=("openimcc",),
+        comparison_engines=("vaporock",),
+        rails=("vapour",),
+    )[0]["comparisons"][0]
+    assert paired["views"]["all"]["source_disagreement_flagged"][
+        "n_shared"
+    ] == 1
+    assert paired["views"]["all"]["unflagged"]["n_shared"] == 0
+
+
+def _write_hero_layout_score_file(path: Path) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "green-shaped-layout"}
+    ]
+    for index in range(6):
+        for engine, residual in (("openimcc", index / 10), ("vaporock", index / 8)):
+            row = _record(
+                engine=engine,
+                experiment=f"layout-run-{index}",
+                formula="SiO",
+                temperature_K=1500 + index * 100,
+                residual=residual,
+            )
+            row["reference"] = f"layout-reference-{index}"
+            rows.append(row)
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+
+
+def _render_hero_layout_sample(tmp_path: Path, monkeypatch) -> list[Figure]:
+    residuals = tmp_path / "green-shaped-layout.jsonl"
+    _write_hero_layout_score_file(residuals)
+    data = read_scores(residuals)
+    figures: list[Figure] = []
+    close = plt.close
+
+    def capture_close(figure=None) -> None:
+        if isinstance(figure, Figure):
+            figures.append(figure)
+        close(figure)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(hero_plot.plt, "close", capture_close)
+        render_hero_charts(data, tmp_path / "green-shaped-hero")
+    return figures
+
+
+def test_hero_comparison_text_does_not_overlap_scatter_axes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    figures = _render_hero_layout_sample(tmp_path, monkeypatch)
+    figure = figures[0]
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    status = next(
+        artist
+        for artist in figure.texts
+        if "OpenIMCC vs VapoRock on shared vapour rows" in artist.get_text()
+    )
+    status_bbox = status.get_window_extent(renderer)
+    scatter_axes = [axis for axis in figure.axes if axis.get_ylabel() == "signed dex"]
+    assert scatter_axes
+    assert all(
+        not status_bbox.overlaps(axis.get_window_extent(renderer))
+        for axis in scatter_axes
+    )
+
+
+def test_hero_scorecard_row_text_does_not_overlap_adjacent_rows(
+    tmp_path: Path, monkeypatch
+) -> None:
+    figures = _render_hero_layout_sample(tmp_path, monkeypatch)
+    figure = figures[0]
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    scorecard_axis = next(axis for axis in figure.axes if axis.tables)
+    table = scorecard_axis.tables[0]
+    row_ids = sorted({row for row, _column in table.get_celld() if row > 0})
+    row_bboxes = []
+    for row_id in row_ids:
+        text_bboxes = [
+            cell.get_text().get_window_extent(renderer)
+            for (row, _column), cell in table.get_celld().items()
+            if row == row_id and cell.get_text().get_text()
+        ]
+        row_bboxes.append(
+            Bbox.union(text_bboxes)
+        )
+    assert len(row_bboxes) > 1
+    assert all(
+        not first.overlaps(second)
+        for first, second in zip(row_bboxes, row_bboxes[1:])
+    )
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
@@ -2186,6 +2533,199 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
             "not_observable_count": 4,
         }
     ]
+
+
+def test_history_record_keeps_sd_views_and_openimcc_score_commit() -> None:
+    residuals = [
+        {
+            "rail": "redox",
+            "engine": "openimcc",
+            "n": 2,
+            "rms_dex": "1",
+            "sd_dex": "1",
+            "median_abs_dex": "1",
+            "views": {
+                "all": {
+                    "n": 2,
+                    "rms_dex": "1",
+                    "sd_dex": "1",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+                "temperature_ge_1700": {
+                    "n": 1,
+                    "rms_dex": "1",
+                    "sd_dex": "0",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+                "temperature_lt_1700": {
+                    "n": 1,
+                    "rms_dex": "1",
+                    "sd_dex": "0",
+                    "median_abs_dex": "1",
+                    "no_temperature_n": 0,
+                },
+            },
+        }
+    ]
+    record = _history_record(
+        {
+            "store": {"revision": "redox-test"},
+            "records": [
+                {
+                    "tier": "all_numeric",
+                    "rail": "redox",
+                    "engine": "openimcc",
+                    "n": 2,
+                    "rms_dex": "1",
+                    "median_abs_dex": "1",
+                }
+            ],
+        },
+        landing_sha="green-test",
+        commit_date="2026-10-18T10:27:53-04:00",
+        comparisons={},
+        diagnostics={},
+        hero_metrics={("redox", "openimcc"): residuals[0]},
+        openimcc_score_commit="66ec4a3",
+    )
+
+    metric = record["metrics"][0]
+    assert record["openimcc_score_commit"] == "66ec4a3"
+    assert metric["sd_dex"] == "1"
+    assert metric["views"]["temperature_ge_1700"]["n"] == 1
+
+
+def test_legacy_history_without_sd_or_views_still_draws_convergence(tmp_path: Path) -> None:
+    history = tmp_path / "legacy-history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "legacy",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "openimcc",
+                        "n": 5,
+                        "rms_dex": "0.5",
+                        "median_abs_dex": "0.4",
+                    }
+                ],
+                "comparisons": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_history(
+            axis,
+            "vapour",
+            hero_plot.read_history(history),
+            engine_colors={"openimcc": "#0072b2"},
+        )
+        assert axis.lines
+    finally:
+        plt.close(figure)
+
+
+def test_cutoff_observation_id_script_reads_the_store_at_requested_commit(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "cutoff-store"
+    literature = repo / "data" / "literature"
+    store = literature / "observations-v2"
+    extracts = literature / "extracts-v2"
+    nested = store / "nested"
+    extract_family = extracts / "abdul-2023-cao-sio2-calphad"
+    deep = extracts / "compilations-janaf" / "deeper"
+    ignored = extracts / "_ignored"
+    for directory in (nested, extract_family, deep, ignored):
+        directory.mkdir(parents=True)
+    (store / "first.yaml").write_text(
+        "source_id: source-a\nobservations:\n  - observation_id: obs-b\n  - observation_id: obs-a\n",
+        encoding="utf-8",
+    )
+    (nested / "second.yaml").write_text(
+        "source_id: source-b\nobservations:\n  - observation_id: obs-c\n",
+        encoding="utf-8",
+    )
+    (extract_family / "row.yaml").write_text(
+        "source_id: abdul-source\nobservations:\n  - observation_id: abdul-pre-cutoff\n",
+        encoding="utf-8",
+    )
+    (extracts / "extract-root.yaml").write_text(
+        "source_id: extract-root\nobservations:\n  - observation_id: extract-root-id\n",
+        encoding="utf-8",
+    )
+    (deep / "too-deep.yaml").write_text(
+        "observations:\n  - observation_id: too-deep-id\n", encoding="utf-8"
+    )
+    (ignored / "ignored.yaml").write_text(
+        "observations:\n  - observation_id: ignored-id\n", encoding="utf-8"
+    )
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "hero@example.test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.name", "Hero Test"],
+        check=True,
+    )
+    subprocess.run(["git", "-C", str(repo), "add", "data"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-qm", "baseline observations"],
+        check=True,
+    )
+    commit = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    output = tmp_path / "baseline-observation-ids.txt"
+
+    subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts" / "battery_hero_observation_ids.py"),
+            "--repo",
+            str(repo),
+            "--commit",
+            commit,
+            "--output",
+            str(output),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    baseline_ids = frozenset(output.read_text(encoding="utf-8").splitlines())
+    assert baseline_ids == {
+        "abdul-pre-cutoff",
+        "extract-root-id",
+        "obs-a",
+        "obs-b",
+        "obs-c",
+    }
+    assert "too-deep-id" not in baseline_ids
+    assert "ignored-id" not in baseline_ids
+    policy = hero_plot._HeroExposurePolicy(
+        census_observation_ids=frozenset(),
+        exposed_source_ids=frozenset(),
+        baseline_observation_ids=baseline_ids,
+    )
+    extract_row = _hero_metric_row(
+        "openimcc", "abdul-pre-cutoff", "0.25", source_id="abdul-source"
+    )
+    assert hero_plot._hero_exposure_status(extract_row, policy) == "exposed"
 
 
 def test_history_keeps_deck_rail_all_numeric_count() -> None:
@@ -2590,7 +3130,7 @@ def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures
     render_hero_charts(data, tmp_path / "formatted-render", history_path=history)
 
     assert legend_labels
-    assert all(len(labels) <= len(data.engines) + 2 for labels in legend_labels)
+    assert all(len(labels) <= len(data.engines) + 5 for labels in legend_labels)
     labels = [
         artist.get_text()
         for figure in figures
@@ -2620,7 +3160,7 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
         openimcc_commit="openimcc-test",
         render_date="2026-10-15",
     )
-    assert "OpenIMCC 1.2.3 · openimcc-test" in stamp
+    assert "OpenIMCC 1.2.3 · SCORE openimcc-test" in stamp
     assert "simulator sim-test" in stamp
     assert "store test-store" in stamp
     assert "rendered 2026-10-15 UTC" in stamp
@@ -2661,6 +3201,8 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     )
     assert "patch 0123456789ab" in dirty_equal_stamp
     assert "openimcc patch abcdef012345" in dirty_equal_stamp
+
+
     clean = replace(
         data,
         stamp={
@@ -2699,3 +3241,91 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     assert "test-store-2026-10-15-species" in files["species:tile_png"].name
     assert "test-store-2026-10-15-element" in files["element:tile_png"].name
     assert "no scored rows: magemin (not an observable of this engine ×1)" in files["species:tile_svg"].read_text(encoding="utf-8")
+
+
+def test_stamp_derives_default_pack_from_scored_openimcc_version(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "pack-residuals.jsonl"
+    _score_file(residuals)
+    row = _record(
+        engine="openimcc",
+        experiment="pack-row",
+        formula="SiO",
+        temperature_K=1700,
+        residual=0.25,
+        version="IMCC-SF04-D066-v9",
+    )
+    row["candidate_observation"]["engine"] = {
+        "name": "openimcc",
+        "channel": "battery",
+        "run_id": "openimcc:run",
+        "coefficient_sources": [
+            "openimcc-pack-version:imcc-sf04-d066-v5",
+            "openimcc-pack-digest:sha256:green-archive-pack-digest",
+        ],
+        "lineage_complete": True,
+        "version": "66ec4a3",
+    }
+    with residuals.open("a", encoding="utf-8") as target:
+        target.write(json.dumps(row) + "\n")
+    data = read_scores(residuals)
+
+    stamp = stamp_text(
+        data,
+        simulator_commit="sim-test",
+        openimcc_commit="66ec4a3",
+        render_date="2026-11-06",
+    )
+
+    assert "default pack at scored pin: imcc-sf04-d066-v5" in stamp
+    assert "SCORE 66ec4a3" in stamp
+
+
+def test_hero_summary_exposes_split_metrics_for_every_residual_engine(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+
+    chart = hero_plot._hero_summary_payload(data)["vapour"]
+
+    metrics = chart["all_numeric_metrics_by_engine"]
+    assert set(metrics) == set(data.engines)
+    assert metrics["openimcc"]["views"]["all"]["n"] == metrics["openimcc"]["n"]
+    assert "sd_dex" in metrics["openimcc"]
+    assert "temperature_ge_1700" in metrics["openimcc"]["views"]
+    assert metrics["magemin"]["n"] == 0
+
+
+def test_hero_summary_source_disagreement_descriptor_matches_notice_kind(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals-with-source-reasons.jsonl"
+    _score_file(residuals)
+    reasons = (
+        "source_internally_inconsistent:JANAF cross-check",
+        "curated source disagreement from paired tables",
+        "source_internally_inconsistent:JANAF cross-check",
+    )
+    with residuals.open("a", encoding="utf-8") as output:
+        for index, reason in enumerate(reasons):
+            row = _hero_metric_row(
+                "openimcc",
+                f"source-reason-{index}",
+                "0.25",
+                temperature_K="1800",
+                source_disagreement_flagged=True,
+            )
+            row["notices"][0]["reason"] = reason
+            output.write(json.dumps(row) + "\n")
+
+    descriptor = hero_plot._hero_summary_payload(read_scores(residuals))["vapour"][
+        "source_disagreement_split"
+    ]
+
+    assert descriptor["rule"] == "notice.kind == source_disagreement"
+    assert descriptor["enum"] == "SOURCE_DISAGREEMENT"
+    assert "reason_prefix" not in descriptor
+    assert descriptor["reason_strings"] == sorted(set(reasons))
