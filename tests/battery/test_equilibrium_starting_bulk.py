@@ -370,6 +370,8 @@ def test_evans_closed_phase_profile_requires_composition() -> None:
         )
     )
 
+    assert evans.identity.quantity.is_value
+    assert evans.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     assert "composition" in profile_for(evans.identity).required
     assert evans.identity.composition is not None
     assert evans.identity.composition.is_unknown
