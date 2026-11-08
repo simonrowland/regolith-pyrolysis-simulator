@@ -48,6 +48,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
+from simulator.fe_redox import LIQUID_MODEL_BELOW_LIQUIDUS_KIND
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.diagnostic_helpers.vapor_pressure_omission import (
     VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
@@ -1344,6 +1345,38 @@ def refusal_closure(
     answers: dict[str, VapourAnswer] = {}
     refused: set[str] = set()
 
+    def _liquid_model_notices(
+        provenance: Mapping[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        if not isinstance(provenance, Mapping):
+            return []
+        notices = provenance.get("notices")
+        if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
+            return []
+        return [
+            dict(notice)
+            for notice in notices
+            if isinstance(notice, Mapping)
+            and notice.get("kind") == LIQUID_MODEL_BELOW_LIQUIDUS_KIND
+        ]
+
+    def _refusal_liquid_model_notices(
+        rule: RequestRule,
+    ) -> list[dict[str, Any]]:
+        if rule.species_id != "Fe" or state is None:
+            return []
+        row_notices = _liquid_model_notices(
+            state.source_reaction_activity_provenance.get(rule.species_id)
+        )
+        if row_notices:
+            return row_notices
+        shadow = state.source_reaction_activity_results.get("FeO")
+        derivation = getattr(shadow, "derivation", None)
+        if not isinstance(derivation, Mapping):
+            return []
+        redox_receipt = derivation.get("redox_receipt")
+        return _liquid_model_notices(redox_receipt)
+
     def _make_refusal(
         rule: RequestRule,
         code: str,
@@ -1351,7 +1384,15 @@ def refusal_closure(
         *,
         source_reaction_activity: SourceReactionActivity | None = None,
     ) -> VapourAnswer:
+        context_notices = _refusal_liquid_model_notices(rule)
+        if context_notices:
+            kinds = ", ".join(
+                str(notice["kind"]) for notice in context_notices
+            )
+            detail = f"{detail}; FeO activity context notice: {kinds}"
         extra: dict[str, Any] = {"detail": detail, "origin": rule.origin}
+        if context_notices:
+            extra["notices"] = context_notices
         evidence = _applicability_evidence(rule, state)
         if evidence:
             extra["applicability_evidence"] = evidence
@@ -1858,6 +1899,10 @@ def refusal_closure(
                 provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
                 )
+                if rule.species_id == "Fe":
+                    activity_notices = _liquid_model_notices(provenance)
+                    if activity_notices:
+                        evaluation_extra["notices"] = activity_notices
                 source_notice = provenance.get("extrapolation_notice")
                 if source_notice is None:
                     # Floor inversion uses the same public extra field as

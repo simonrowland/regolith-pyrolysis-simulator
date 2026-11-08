@@ -1400,6 +1400,9 @@ class EquilibriumMixin:
                         'vapor_k_standard_state_phase': target_standard_state_phase,
                     }
                 )
+            feo_notices = feo_activity_diagnostic.get('notices')
+            if feo_notices:
+                activity_provenance[species]['notices'] = list(feo_notices)
 
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
