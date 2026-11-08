@@ -751,6 +751,103 @@ def test_delayed_old_pair_cleanup_cannot_signal_replacement(
 
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_superseded_cold_start_failure_preserves_ready_replacement(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    marker = tmp_path / 'startup-subtree-started.txt'
+    worker_pid_file = tmp_path / 'old-worker.pid'
+    grandchild_pid_file = tmp_path / 'old-grandchild.pid'
+    worker = remote_worker_factory(
+        'startup-subtree-first', str(marker), str(worker_pid_file),
+        str(grandchild_pid_file),
+    )
+    startup_pgid_read = threading.Event()
+    release_startup_pgid_read = threading.Event()
+    call_results: list[dict[str, object]] = []
+    call_thread: threading.Thread | None = None
+    old_process = None
+    old_connection = None
+    old_launch = None
+    pids: tuple[int, ...] = ()
+    original_remote_pgid = _RemoteEngineLaunch.remote_pgid
+
+    def pause_stale_start(
+        launch, *, wait_for_report=False, cleanup=False,
+    ):
+        nonlocal old_process, old_connection, old_launch
+        if (
+            not cleanup
+            and threading.current_thread().name == 'stale cold call'
+            and not startup_pgid_read.is_set()
+        ):
+            assert worker.ready_payload is not None
+            with worker._state_lock:
+                old_process, old_connection = worker.process, worker.connection
+            assert old_process is not None
+            assert old_connection is not None
+            assert old_connection._remote_engine_launch is launch
+            old_launch = launch
+            startup_pgid_read.set()
+            if not release_startup_pgid_read.wait(timeout=15.0):
+                raise TimeoutError('test did not release stale startup check')
+        return original_remote_pgid(
+            launch,
+            wait_for_report=wait_for_report,
+            cleanup=cleanup,
+        )
+
+    monkeypatch.setattr(
+        _RemoteEngineLaunch, 'remote_pgid', pause_stale_start,
+    )
+    try:
+        call_thread = threading.Thread(
+            target=lambda: call_results.append(worker.call(_request())),
+            name='stale cold call',
+        )
+        call_thread.start()
+        assert startup_pgid_read.wait(timeout=5.0)
+        assert worker_pid_file.exists() and grandchild_pid_file.exists()
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        assert old_launch is not None
+        assert old_launch.process_group_id is None
+
+        ready = worker.start()
+        replacement_process = worker.process
+        assert replacement_process is not None
+        assert replacement_process is not old_process
+        assert ready == worker.ready_payload
+        assert worker.start_count == 2
+        _assert_pids_gone(pids)
+
+        release_startup_pgid_read.set()
+        call_thread.join(timeout=5.0)
+
+        assert not call_thread.is_alive()
+        assert len(call_results) == 1
+        assert call_results[0]['status'] == 'produced'
+        assert worker.process is replacement_process
+        assert replacement_process.is_alive()
+        assert worker.start_count == 2
+        assert worker.call(_request())['status'] == 'produced'
+        assert worker.process is replacement_process
+        assert worker.start_count == 2
+        assert old_process is not None
+        old_process.join(timeout=1.0)
+        assert old_process.exitcode is not None
+        assert not old_process.is_alive()
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        release_startup_pgid_read.set()
+        worker.close()
+        if call_thread is not None:
+            call_thread.join(timeout=1.0)
+        _kill_pids(pids)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
 def test_close_during_cold_start_owns_the_remote_pgid_once(
     remote_worker_factory, monkeypatch, tmp_path, inherit,
 ):

@@ -37,9 +37,15 @@ if mode == 'ready-timeout':
     time.sleep(10)
 if mode in (
     'startup-subtree', 'startup-subtree-hold',
-    'startup-subtree-bootstrap-hold',
+    'startup-subtree-bootstrap-hold', 'startup-subtree-first',
 ):
-    spawn_descendant(sys.argv[2], sys.argv[3])
+    if mode == 'startup-subtree-first':
+        marker = Path(sys.argv[2])
+        if not marker.exists():
+            spawn_descendant(sys.argv[3], sys.argv[4])
+            marker.write_text('spawned once', encoding='utf-8')
+    else:
+        spawn_descendant(sys.argv[2], sys.argv[3])
     if mode == 'startup-subtree-bootstrap-hold':
         time.sleep(60)
 
