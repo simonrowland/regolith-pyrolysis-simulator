@@ -114,6 +114,69 @@ def _capture_collection_figures(monkeypatch: pytest.MonkeyPatch) -> list[object]
     return figures
 
 
+def _collection_csv_round_trip(
+    tmp_path: Path, tables: dict[str, list[dict[str, str]]]
+) -> dict[str, list[dict[str, str]]]:
+    files = hero_plot._write_collection_csvs(tmp_path, tables)
+    result: dict[str, list[dict[str, str]]] = {}
+    for name in tables:
+        with files[f"table:{name}"].open(newline="") as source:
+            result[name] = list(csv.DictReader(source))
+    return result
+
+
+def _artist_plot_csv_inputs() -> dict[str, list[dict[str, str]]]:
+    return {
+        "temperature_density": [
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "temperature_center_K": "1600",
+                "residual_center_dex": "0.25",
+                "hex_x_radius_K": "10",
+                "hex_y_radius_dex": "0.5",
+                "flagged": "0",
+                "clipped": "0",
+                "row_count": "5",
+            },
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "temperature_center_K": "1700",
+                "residual_center_dex": "-0.25",
+                "hex_x_radius_K": "10",
+                "hex_y_radius_dex": "0.5",
+                "flagged": "0",
+                "clipped": "0",
+                "row_count": "7",
+            },
+        ],
+        "coverage": [
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "scored_n": "7",
+                "input_missing_n": "2",
+                "outside_domain_n": "1",
+                "not_output_n": "0",
+                "other_refused_n": "3",
+                "scored_percent": "54",
+            }
+        ],
+        "progress": [
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "date": "2026-11-06",
+                "rms_dex": "0.5",
+                "n": "10",
+                "held_out_n": "5",
+                "held_out_rms_dex": "5.0",
+            }
+        ],
+    }
+
+
 def test_engine_palette_is_fixed_and_never_uses_goal_colour() -> None:
     colours = hero_plot._hero_engine_colors(tuple(reversed(ENGINE_ORDER)))
 
@@ -321,6 +384,9 @@ def test_html_uses_a_stratified_sample_and_exact_window_aggregates(tmp_path: Pat
         counts[key] = counts.get(key, 0) + 1
     assert counts and max(counts.values()) <= 100
     assert "sample" in page.lower()
+    assert 'data-deferred-table="samples"' in page
+    assert 'data-deferred-table="fingerprints"' in page
+    assert "document.createElement('table')" in page
     assert len({row["temperature_bin"] for row in sampled_rows}) > 1
 
     with files["table:fingerprints"].open(newline="") as source:
@@ -346,7 +412,7 @@ def test_read_scores_peak_memory_is_bounded_for_many_scored_rows(tmp_path: Path)
     _many_row_archive(archive, 20_000)
 
     tracemalloc.start()
-    hero_plot.read_scores(archive)
+    hero_plot.read_scores(archive, _collection_mode=True)
     _current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
@@ -427,7 +493,49 @@ def test_artists_match_csv_values_for_scorecard_and_component_pairs(
             "low_comparison_rms_dex": "",
         }
     ]
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard)
+    csv_tables = _collection_csv_round_trip(
+        tmp_path,
+        {
+            "scorecard": scorecard,
+            "components": [
+                {
+                    "rail": "vapour",
+                    "component": "SiO",
+                    "engine": "openimcc",
+                    "shared_with": "vaporock",
+                    "n_shared": "10",
+                    "rms_dex": "0.1",
+                },
+                {
+                    "rail": "vapour",
+                    "component": "SiO",
+                    "engine": "vaporock",
+                    "shared_with": "vaporock",
+                    "n_shared": "10",
+                    "rms_dex": "0.2",
+                },
+                {
+                    "rail": "vapour",
+                    "component": "SiO",
+                    "engine": "openimcc",
+                    "shared_with": "thermoengine",
+                    "n_shared": "5",
+                    "rms_dex": "2.0",
+                },
+                {
+                    "rail": "vapour",
+                    "component": "SiO",
+                    "engine": "thermoengine",
+                    "shared_with": "thermoengine",
+                    "n_shared": "5",
+                    "rms_dex": "1.0",
+                },
+            ],
+            **_artist_plot_csv_inputs(),
+        },
+    )
+    scorecard_csv = csv_tables["scorecard"]
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard_csv)
     axis = figures[-1].axes[0]
     plotted_by_engine: dict[str, float] = {}
     for collection in axis.collections:
@@ -440,61 +548,41 @@ def test_artists_match_csv_values_for_scorecard_and_component_pairs(
             if value == colour
         )
         plotted_by_engine[engine] = float(collection.get_offsets()[0][0])
-    assert plotted_by_engine == {"openimcc": 0.2, "vaporock": 0.8}
+    assert plotted_by_engine == {
+        "openimcc": float(scorecard_csv[0]["high_primary_rms_dex"]),
+        "vaporock": float(scorecard_csv[0]["high_comparison_rms_dex"]),
+    }
     swapped = [
-        {
-            **scorecard[0],
-            "high_primary_rms_dex": "0.8",
-            "high_comparison_rms_dex": "0.2",
-        }
+        dict(scorecard_csv[0])
     ]
+    swapped[0]["high_primary_rms_dex"], swapped[0]["high_comparison_rms_dex"] = (
+        swapped[0]["high_comparison_rms_dex"],
+        swapped[0]["high_primary_rms_dex"],
+    )
     swapped_expected = {
         "openimcc": float(swapped[0]["high_primary_rms_dex"]),
         "vaporock": float(swapped[0]["high_comparison_rms_dex"]),
     }
     assert plotted_by_engine != swapped_expected
 
-    component_rows = [
-        {
-            "rail": "vapour",
-            "component": "SiO",
-            "engine": "openimcc",
-            "shared_with": "vaporock",
-            "n_shared": "10",
-            "rms_dex": "0.1",
-        },
-        {
-            "rail": "vapour",
-            "component": "SiO",
-            "engine": "vaporock",
-            "shared_with": "vaporock",
-            "n_shared": "10",
-            "rms_dex": "0.2",
-        },
-        {
-            "rail": "vapour",
-            "component": "SiO",
-            "engine": "openimcc",
-            "shared_with": "thermoengine",
-            "n_shared": "5",
-            "rms_dex": "2.0",
-        },
-        {
-            "rail": "vapour",
-            "component": "SiO",
-            "engine": "thermoengine",
-            "shared_with": "thermoengine",
-            "n_shared": "5",
-            "rms_dex": "1.0",
-        },
-    ]
+    component_rows = csv_tables["components"]
     hero_plot._draw_component_png(tmp_path / "c.png", "vapour", component_rows)
     pair_line_x = {
         tuple(float(value) for value in line.get_xdata())
         for line in figures[-1].axes[0].lines
         if len(line.get_xdata()) == 2 and line.get_xdata()[0] != line.get_xdata()[1]
     }
-    assert pair_line_x == {(0.1, 0.2), (2.0, 1.0)}
+    expected_pairs = {
+        tuple(
+            float(row["rms_dex"])
+            for row in sorted(
+                (item for item in component_rows if item["shared_with"] == partner),
+                key=lambda item: item["engine"],
+            )
+        )
+        for partner in {row["shared_with"] for row in component_rows}
+    }
+    assert pair_line_x == expected_pairs
 
 
 def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
@@ -503,30 +591,10 @@ def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
     from matplotlib.collections import PolyCollection
 
     figures = _capture_collection_figures(monkeypatch)
-    density = [
-        {
-            "rail": "vapour",
-            "engine": "openimcc",
-            "temperature_center_K": "1600",
-            "residual_center_dex": "0.25",
-            "hex_x_radius_K": "10",
-            "hex_y_radius_dex": "0.5",
-            "flagged": "0",
-            "clipped": "0",
-            "row_count": "5",
-        },
-        {
-            "rail": "vapour",
-            "engine": "openimcc",
-            "temperature_center_K": "1700",
-            "residual_center_dex": "-0.25",
-            "hex_x_radius_K": "10",
-            "hex_y_radius_dex": "0.5",
-            "flagged": "0",
-            "clipped": "0",
-            "row_count": "7",
-        },
-    ]
+    density = _collection_csv_round_trip(
+        tmp_path,
+        {"temperature_density": _artist_plot_csv_inputs()["temperature_density"]},
+    )["temperature_density"]
     hero_plot._draw_temperature_png(
         tmp_path / "b.png",
         "vapour",
@@ -556,13 +624,25 @@ def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
     ]
     assert hex_cells
     artist = hex_cells[0]
-    assert sorted(int(value) for value in artist.get_array()) == [5, 7]
-    assert all(len(path.vertices) == 6 for path in artist.get_paths())
-    centers = {
-        tuple(round(float(value), 6) for value in path.vertices.mean(axis=0))
+    assert sorted(int(value) for value in artist.get_array()) == sorted(
+        int(row["row_count"]) for row in density
+    )
+    vertices = [
+        path.vertices[:-1]
+        if len(path.vertices) == 7
+        and (path.vertices[0] == path.vertices[-1]).all()
+        else path.vertices
         for path in artist.get_paths()
+    ]
+    assert all(len(points) == 6 for points in vertices)
+    centers = {
+        tuple(round(float(value), 6) for value in points.mean(axis=0))
+        for points in vertices
     }
-    assert centers == {(1600.0, 0.25), (1700.0, -0.25)}
+    assert centers == {
+        (float(row["temperature_center_K"]), float(row["residual_center_dex"]))
+        for row in density
+    }
 
 
 def test_coverage_and_progress_artists_match_csv_and_include_held_out_limit(
@@ -571,44 +651,42 @@ def test_coverage_and_progress_artists_match_csv_and_include_held_out_limit(
     from matplotlib.collections import PathCollection
 
     figures = _capture_collection_figures(monkeypatch)
-    coverage = [
+    csv_tables = _collection_csv_round_trip(
+        tmp_path,
         {
-            "rail": "vapour",
-            "engine": "openimcc",
-            "scored_n": "7",
-            "input_missing_n": "2",
-            "outside_domain_n": "1",
-            "not_output_n": "0",
-            "other_refused_n": "3",
-            "scored_percent": "54",
-        }
-    ]
+            "coverage": _artist_plot_csv_inputs()["coverage"],
+            "progress": _artist_plot_csv_inputs()["progress"],
+        },
+    )
+    coverage = csv_tables["coverage"]
     hero_plot._draw_coverage_png(tmp_path / "e.png", coverage)
     widths = [patch.get_width() for patch in figures[-1].axes[0].patches[:5]]
-    assert widths == [7, 2, 1, 0, 3]
-
-    progress = [
-        {
-            "rail": "vapour",
-            "engine": "openimcc",
-            "date": "2026-11-06",
-            "rms_dex": "0.5",
-            "n": "10",
-            "held_out_n": "5",
-            "held_out_rms_dex": "5.0",
-        }
+    assert widths == [
+        int(coverage[0][field])
+        for field in (
+            "scored_n",
+            "input_missing_n",
+            "outside_domain_n",
+            "not_output_n",
+            "other_refused_n",
+        )
     ]
+
+    progress = csv_tables["progress"]
     hero_plot._draw_progress_png(tmp_path / "f.png", progress)
     axis = figures[-1].axes[0]
-    assert list(axis.lines[-1].get_ydata()) == [0.5]
+    assert list(axis.lines[-1].get_ydata()) == [float(progress[0]["rms_dex"])]
     held_out = [
         collection
         for collection in axis.collections
         if isinstance(collection, PathCollection)
         and len(collection.get_offsets())
     ]
-    assert any(float(collection.get_offsets()[0][1]) == 5.0 for collection in held_out)
-    assert axis.get_ylim()[1] > 5.0
+    assert any(
+        float(collection.get_offsets()[0][1]) == float(progress[0]["held_out_rms_dex"])
+        for collection in held_out
+    )
+    assert axis.get_ylim()[1] > float(progress[0]["held_out_rms_dex"])
 
 
 def test_fingerprint_cell_gap_is_two_export_pixels(
@@ -711,12 +789,12 @@ def test_full_silica_window_keeps_exact_totals_for_unknown_compositions(
         render_date="2026-11-07",
     )
     page = files["html"].read_text(encoding="utf-8")
-    cells = json.loads(page.split('id="cell-data">', 1)[1].split("</script>", 1)[0])
-    unknown = next(cell for cell in cells if cell.get("sio2_unknown"))
-    assert unknown["rail"] == "vapour"
-    assert unknown["engine"] == "openimcc"
-    assert unknown["temperature_lower_K"] == "1500"
-    assert int(unknown["n"]) == 2
-    assert math.isclose(float(unknown["sum_residual_dex"]), -0.1)
-    assert math.isclose(float(unknown["sum_squared_residual_dex"]), 0.25)
+    payload = json.loads(page.split('id="cell-data">', 1)[1].split("</script>", 1)[0])
+    unknown = next(cell for cell in payload["cells"] if cell[9])
+    assert payload["rails"][unknown[0]] == "vapour"
+    assert payload["engines"][unknown[1]] == "openimcc"
+    assert unknown[2] * 100 == 1500
+    assert unknown[4] == 2
+    assert math.isclose(float(unknown[5]), -0.1)
+    assert math.isclose(float(unknown[6]), 0.25)
 
