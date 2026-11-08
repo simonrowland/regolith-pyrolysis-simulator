@@ -10687,6 +10687,50 @@ def _predict_with_engine(
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     if derive_knudsen_total_pressure:
+        def invalid_knudsen_pressure_refusal(
+            result_cell: object, pressure_pass: str
+        ) -> EnginePrediction | None:
+            invalid_components = tuple(
+                getattr(
+                    result_cell,
+                    "invalid_gas_partial_pressure_components",
+                    (),
+                )
+                or ()
+            )
+            if not invalid_components:
+                return None
+            reported_pressures = dict(
+                getattr(result_cell, "gas_partial_pressures_Pa", None) or {}
+            )
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "knudsen_total_pressure_invalid_gas_components",
+                    "pressure_pass": pressure_pass,
+                    "invalid_components": sorted(str(x) for x in invalid_components),
+                    "reported": sorted(
+                        {*reported_pressures, *(str(x) for x in invalid_components)}
+                    ),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+
+        invalid_refusal = invalid_knudsen_pressure_refusal(cell, "seed")
+        if invalid_refusal is not None:
+            return invalid_refusal
         initial_pressures = pressures
         total_pressure_pa = _sum_gas_partial_pressures_pa(initial_pressures)
         if total_pressure_pa is None:
@@ -10750,6 +10794,9 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
+        invalid_refusal = invalid_knudsen_pressure_refusal(cell, "derived")
+        if invalid_refusal is not None:
+            return invalid_refusal
         authority, certified_band = _flags_from_scored_cell(
             cell, authority, certified_band
         )
