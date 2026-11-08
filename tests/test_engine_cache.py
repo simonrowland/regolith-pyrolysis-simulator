@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import json
 import os
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -23,7 +24,21 @@ class _Outcome:
     def __init__(self, value: dict[str, object]) -> None:
         self.value = value
         self.status = str(value.get("status", "ok"))
-        self.refusal_reason = value.get("refusal_reason")
+        self.refusal_reason = (
+            None
+            if value.get("refusal_reason") is None
+            else str(value["refusal_reason"])
+        )
+        self.engine_status = (
+            None
+            if value.get("engine_status") is None
+            else str(value["engine_status"])
+        )
+        self.engine_reason = (
+            None
+            if value.get("engine_reason") is None
+            else str(value["engine_reason"])
+        )
 
     def to_cache_payload(self) -> dict[str, object]:
         return dict(self.value)
@@ -122,6 +137,13 @@ def test_concurrent_process_writes_preserve_same_and_different_keys(
         stdout, stderr = process.communicate(timeout=60)
         assert process.returncode == 0, f"stdout={stdout}\nstderr={stderr}"
 
+    connection = sqlite3.connect(db_path)
+    try:
+        journal_mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
+        assert journal_mode.lower() == "wal"
+    finally:
+        connection.close()
+
     cache = EngineCache(db_path)
     assert cache.get(key("magemin", {"request": "same"})) == {"value": 1}
     assert cache.get(key("magemin", {"request": "left"})) == {"value": 2}
@@ -146,6 +168,20 @@ def test_cached_solve_skips_transient_failure_and_caches_typed_refusal(
     with pytest.raises(TransientEngineFailure):
         cached_solve(cache, "alphamelts", transient_request, fail_transiently)
     assert cache.get(key("alphamelts", transient_request)) is None
+
+    worker_request = {"temperature_K": 1525.0}
+    worker_failure = _Outcome(
+        {
+            "status": "refusal",
+            "refusal_reason": "engine_crash",
+            "engine_status": "EngineWorkerDied",
+        }
+    )
+    assert (
+        cached_solve(cache, "alphamelts", worker_request, lambda: worker_failure)
+        is worker_failure
+    )
+    assert cache.get(key("alphamelts", worker_request)) is None
 
     refusal_request = {"temperature_K": 1550.0}
     refusal = _Outcome(

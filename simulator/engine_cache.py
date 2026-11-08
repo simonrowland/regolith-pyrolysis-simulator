@@ -1,0 +1,403 @@
+"""Exact, content-addressed persistence for battery engine cell outcomes."""
+
+from __future__ import annotations
+
+import errno
+import hashlib
+import importlib.metadata
+import importlib.util
+import json
+import logging
+import math
+import os
+import sqlite3
+import threading
+from collections.abc import Callable, Mapping
+from contextlib import contextmanager
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Iterator, Protocol, runtime_checkable
+
+from simulator.canonical import canonical_json_dumps
+from simulator.engine_pool import EngineWorkerDied
+
+
+ENGINE_CHEMISTRY_VERSION: Mapping[str, int] = {
+    "openimcc": 1,
+    "internal-analytical": 1,
+    "vaporock": 1,
+    "magemin": 1,
+    "alphamelts": 1,
+    "thermoengine": 1,
+}
+
+_BUSY_TIMEOUT_MS = 60_000
+_TABLE_NAME = "engine_outputs"
+_COUNTER_NAMES = ("hits", "misses", "stores", "transient_skips")
+_LOGGER = logging.getLogger(__name__)
+_ENGINE_RUNTIME_MODULES = {
+    "openimcc": ("openimcc", "openimcc"),
+    "internal-analytical": (
+        "simulator.diagnostic_helpers.binary_pot_battery",
+        None,
+    ),
+    "vaporock": ("simulator.melt_backend.vaporock", "vaporock"),
+    "magemin": ("simulator.melt_backend.magemin", "magemin"),
+    "alphamelts": ("simulator.melt_backend.alphamelts", "petthermotools"),
+    "thermoengine": ("simulator.melt_backend.thermoengine", "thermoengine"),
+}
+_TRANSIENT_RESOURCE_ERRNOS = frozenset(
+    value
+    for value in (
+        errno.EAGAIN,
+        errno.ENOMEM,
+        errno.ENOSPC,
+        errno.EMFILE,
+        errno.ENFILE,
+        errno.ETIMEDOUT,
+        errno.EBUSY,
+    )
+)
+_TRANSIENT_CELL_ENGINE_STATUSES = frozenset(
+    {
+        "TimeoutError",
+        "EngineWorkerTimeout",
+        "EngineWorkerDied",
+        "MemoryError",
+        "ResourceError",
+        "OSError",
+        "FileNotFoundError",
+        "PermissionError",
+        "BlockingIOError",
+        "ConnectionError",
+        "BrokenPipeError",
+    }
+)
+
+
+class EngineCacheError(RuntimeError):
+    """Base error for invalid or conflicting engine cache entries."""
+
+
+class EngineCacheCollision(EngineCacheError):
+    """One exact request key produced two different serialized outcomes."""
+
+
+class TransientEngineFailure(RuntimeError):
+    """Typed signal that an engine call failed transiently and must not cache."""
+
+
+@runtime_checkable
+class _CellOutcome(Protocol):
+    status: str
+    refusal_reason: str | None
+    engine_status: str | None
+    engine_reason: str | None
+
+
+def _json_value(value: Any, *, path: str = "value") -> Any:
+    """Copy supported JSON values while rejecting lossy key/value coercions."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError(f"{path} contains a non-finite float")
+        # json.dumps uses Python's shortest round-trip float representation.
+        # That preserves the exact binary float; no quantization is applied.
+        return value
+    if isinstance(value, Mapping):
+        if not all(isinstance(name, str) for name in value):
+            raise TypeError(f"{path} mapping keys must be strings")
+        return {
+            name: _json_value(value[name], path=f"{path}.{name}")
+            for name in sorted(value)
+        }
+    if isinstance(value, (list, tuple)):
+        return [
+            _json_value(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        ]
+    raise TypeError(
+        f"{path} contains unsupported JSON value {type(value).__name__}"
+    )
+
+
+def _canonical_json(value: Any) -> str:
+    return canonical_json_dumps(_json_value(value))
+
+
+def key(engine_id: str, request_vector: Mapping[str, Any]) -> str:
+    """Return the exact SHA-256 identity of one engine request vector."""
+    if engine_id not in ENGINE_CHEMISTRY_VERSION:
+        raise ValueError(f"unknown battery engine {engine_id!r}")
+    if not isinstance(request_vector, Mapping):
+        raise TypeError("request_vector must be a mapping")
+    identity = {
+        "engine": engine_id,
+        "chemistry_version": ENGINE_CHEMISTRY_VERSION[engine_id],
+        "request": request_vector,
+    }
+    return hashlib.sha256(_canonical_json(identity).encode("utf-8")).hexdigest()
+
+
+def runtime_identity(engine_id: str) -> dict[str, Any]:
+    """Describe the installed Python runtime selected for a battery engine."""
+    try:
+        module_name, distribution = _ENGINE_RUNTIME_MODULES[engine_id]
+    except KeyError as exc:
+        raise ValueError(f"unknown battery engine {engine_id!r}") from exc
+
+    package_version: str | None = None
+    if distribution is not None:
+        try:
+            package_version = importlib.metadata.version(distribution)
+        except importlib.metadata.PackageNotFoundError:
+            pass
+
+    module_path = None
+    module_mtime_ns = None
+    try:
+        spec = importlib.util.find_spec(module_name)
+        origin = None if spec is None else spec.origin
+        if origin and origin not in {"built-in", "frozen"}:
+            path = Path(origin).resolve()
+            module_path = str(path)
+            try:
+                module_mtime_ns = path.stat().st_mtime_ns
+            except OSError:
+                pass
+    except (ImportError, ModuleNotFoundError, ValueError):
+        pass
+
+    identity = {
+        "module": module_name,
+        "package_version": package_version,
+        "module_path": module_path,
+        "module_mtime_ns": module_mtime_ns,
+    }
+    if engine_id in {"alphamelts", "magemin"}:
+        identity["binary"] = _binary_runtime_identity(engine_id)
+    return identity
+
+
+@lru_cache(maxsize=2)
+def _binary_runtime_identity(engine_id: str) -> dict[str, Any] | None:
+    if engine_id == "alphamelts":
+        from simulator.engine_local_config import find_alphamelts_binary
+
+        binary_path = find_alphamelts_binary()
+    elif engine_id == "magemin":
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        binary_path = MAGEMinBackend()._resolve_binary_path()
+    else:
+        raise ValueError(f"engine {engine_id!r} has no binary runtime identity")
+    if binary_path is None:
+        return None
+    resolved = Path(binary_path).expanduser().resolve()
+    try:
+        modified_ns = resolved.stat().st_mtime_ns
+    except OSError:
+        modified_ns = None
+    return {"path": str(resolved), "mtime_ns": modified_ns}
+
+
+def is_transient_failure(outcome: object) -> bool:
+    """Identify failures whose cell result can change on a later engine call."""
+    if isinstance(outcome, TransientEngineFailure):
+        return True
+    if isinstance(outcome, (TimeoutError, MemoryError)):
+        return True
+    if isinstance(outcome, OSError):
+        return outcome.errno in _TRANSIENT_RESOURCE_ERRNOS
+
+    if isinstance(outcome, EngineWorkerDied):
+        return True
+
+    if not isinstance(outcome, _CellOutcome):
+        return False
+    return (
+        outcome.refusal_reason == "engine_timeout"
+        or outcome.engine_status in _TRANSIENT_CELL_ENGINE_STATUSES
+        or outcome.engine_reason == "subprocess_died"
+    )
+
+
+class EngineCache:
+    """WAL-backed exact cache safe for concurrent battery shard writers."""
+
+    def __init__(self, path: str | os.PathLike[str]) -> None:
+        self.db_path = Path(path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._counter_lock = threading.Lock()
+        self._tripwire_lock = threading.Lock()
+        self._runtime_change_noticed: set[str] = set()
+        self._counters = {
+            engine_id: {name: 0 for name in _COUNTER_NAMES}
+            for engine_id in ENGINE_CHEMISTRY_VERSION
+        }
+        self._initialize()
+
+    @property
+    def counters(self) -> dict[str, dict[str, int]]:
+        """Return a detached snapshot of per-engine work-unit counters."""
+        with self._counter_lock:
+            return {
+                engine_id: dict(values)
+                for engine_id, values in self._counters.items()
+            }
+
+    def _count(self, engine_id: str, counter: str) -> None:
+        with self._counter_lock:
+            self._counters[engine_id][counter] += 1
+
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
+        connection = sqlite3.connect(
+            self.db_path,
+            timeout=_BUSY_TIMEOUT_MS / 1000,
+            isolation_level=None,
+        )
+        try:
+            connection.execute(f"PRAGMA busy_timeout={_BUSY_TIMEOUT_MS}")
+            connection.row_factory = sqlite3.Row
+            yield connection
+        finally:
+            connection.close()
+
+    def _initialize(self) -> None:
+        with self._connect() as connection:
+            connection.execute("PRAGMA journal_mode=WAL")
+            connection.execute(
+                f"""
+                CREATE TABLE IF NOT EXISTS {_TABLE_NAME} (
+                    cache_key TEXT PRIMARY KEY,
+                    payload_json TEXT NOT NULL,
+                    runtime_meta_json TEXT NOT NULL
+                ) WITHOUT ROWID
+                """
+            )
+
+    def _get_entry(self, cache_key: str) -> tuple[Any, dict[str, Any]] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                f"SELECT payload_json, runtime_meta_json FROM {_TABLE_NAME} "
+                "WHERE cache_key = ?",
+                (cache_key,),
+            ).fetchone()
+        if row is None:
+            return None
+        return json.loads(row["payload_json"]), json.loads(row["runtime_meta_json"])
+
+    def get(self, cache_key: str) -> Any | None:
+        """Return the serialized payload for a key, or ``None`` on a miss."""
+        entry = self._get_entry(cache_key)
+        return None if entry is None else entry[0]
+
+    def put(
+        self,
+        cache_key: str,
+        payload: Any,
+        runtime_meta: Mapping[str, Any],
+    ) -> None:
+        """Insert once; repeated writes are idempotent and verify payload bytes."""
+        if not isinstance(cache_key, str) or not cache_key:
+            raise ValueError("cache_key must be a non-empty string")
+        if not isinstance(runtime_meta, Mapping):
+            raise TypeError("runtime_meta must be a mapping")
+        payload_json = _canonical_json(payload)
+        runtime_meta_json = _canonical_json(runtime_meta)
+        with self._connect() as connection:
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(
+                    f"INSERT INTO {_TABLE_NAME} "
+                    "(cache_key, payload_json, runtime_meta_json) VALUES (?, ?, ?) "
+                    "ON CONFLICT(cache_key) DO NOTHING",
+                    (cache_key, payload_json, runtime_meta_json),
+                )
+                row = connection.execute(
+                    f"SELECT payload_json FROM {_TABLE_NAME} WHERE cache_key = ?",
+                    (cache_key,),
+                ).fetchone()
+                if row is None:
+                    raise EngineCacheError("cache insert did not produce a row")
+                if row["payload_json"] != payload_json:
+                    raise EngineCacheCollision(
+                        f"engine output payload differs for content key {cache_key}"
+                    )
+                connection.commit()
+            except BaseException:
+                connection.rollback()
+                raise
+
+    def _notice_runtime_change(
+        self,
+        engine_id: str,
+        stored: Mapping[str, Any],
+        current: Mapping[str, Any],
+    ) -> None:
+        if _canonical_json(stored) == _canonical_json(current):
+            return
+        with self._tripwire_lock:
+            if engine_id in self._runtime_change_noticed:
+                return
+            self._runtime_change_noticed.add(engine_id)
+        notice = {
+            "kind": "engine_cache_runtime_changed",
+            "engine": engine_id,
+            "stored": dict(stored),
+            "current": dict(current),
+        }
+        _LOGGER.info(
+            "engine_cache_runtime_changed engine=%s stored=%s current=%s",
+            engine_id,
+            _canonical_json(stored),
+            _canonical_json(current),
+            extra={"notice": notice},
+        )
+
+
+def _from_cache_payload(payload: Any) -> Any:
+    from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell
+
+    return EquilibrateCell.from_cache_payload(payload)
+
+
+def cached_solve(
+    cache: EngineCache | None,
+    engine_id: str,
+    request_vector: Mapping[str, Any],
+    solve_fn: Callable[[], Any],
+) -> Any:
+    """Reuse an exact cached cell outcome, storing only stable results."""
+    if cache is None:
+        return solve_fn()
+
+    cache_key = key(engine_id, request_vector)
+    current_runtime = runtime_identity(engine_id)
+    entry = cache._get_entry(cache_key)
+    if entry is not None:
+        payload, stored_runtime = entry
+        cache._count(engine_id, "hits")
+        cache._notice_runtime_change(engine_id, stored_runtime, current_runtime)
+        return _from_cache_payload(payload)
+
+    cache._count(engine_id, "misses")
+    try:
+        outcome = solve_fn()
+    except BaseException as exc:
+        if is_transient_failure(exc):
+            cache._count(engine_id, "transient_skips")
+        raise
+
+    if is_transient_failure(outcome):
+        cache._count(engine_id, "transient_skips")
+        return outcome
+
+    to_payload = getattr(outcome, "to_cache_payload", None)
+    if not callable(to_payload):
+        raise TypeError("engine outcome must provide to_cache_payload()")
+    cache.put(cache_key, to_payload(), current_runtime)
+    cache._count(engine_id, "stores")
+    return outcome
