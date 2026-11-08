@@ -5786,7 +5786,7 @@ def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
 
 def _knudsen_total_pressure_details(
     notices: Sequence[Notice],
-) -> tuple[Decimal, Decimal] | None:
+) -> tuple[Decimal, str, Decimal | None] | None:
     for notice in notices:
         if (
             notice.kind is not NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
@@ -5794,24 +5794,36 @@ def _knudsen_total_pressure_details(
         ):
             continue
         match = re.search(
-            r"(?:^|; )total_pressure_Pa=([^;]+); sensitivity_dex=([^;]+)$",
+            r"(?:^|; )total_pressure_Pa=([^;]+); "
+            r"sensitivity_status=([^;]+); sensitivity_reason=([^;]+); "
+            r"(?:oxygen_balance_pressure_response=([^;]+); )?"
+            r"sensitivity_dex=([^;]+)$",
             notice.reason,
         )
         if match is None:
             return None
         try:
             pressure_pa = Decimal(match.group(1))
-            sensitivity_dex = Decimal(match.group(2))
         except InvalidOperation:
             return None
-        if (
-            not pressure_pa.is_finite()
-            or pressure_pa <= 0
-            or sensitivity_dex.is_nan()
-            or sensitivity_dex < 0
-        ):
+        sensitivity_status = match.group(2)
+        sensitivity_reason = match.group(3)
+        sensitivity_text = match.group(5)
+        if not pressure_pa.is_finite() or pressure_pa <= 0 or not sensitivity_reason:
             return None
-        return pressure_pa, sensitivity_dex
+        if sensitivity_status == "not_evaluated":
+            if sensitivity_text != "null":
+                return None
+            return pressure_pa, sensitivity_status, None
+        if sensitivity_status != "measured":
+            return None
+        try:
+            sensitivity_dex = Decimal(sensitivity_text)
+        except InvalidOperation:
+            return None
+        if sensitivity_dex.is_nan() or sensitivity_dex < 0:
+            return None
+        return pressure_pa, sensitivity_status, sensitivity_dex
     return None
 
 
@@ -10424,6 +10436,76 @@ def _predict_with_engine(
             version=engine_version,
         )
 
+    def invalid_knudsen_pressure_refusal(
+        result: object,
+        pressure_pass: str,
+        *,
+        call_evidence: str,
+        result_notices: Sequence[Notice],
+    ) -> EnginePrediction | None:
+        invalid_components = tuple(
+            getattr(result, "invalid_gas_partial_pressure_components", ())
+            or getattr(result, "invalid_components", ())
+            or ()
+        )
+        if not invalid_components:
+            return None
+        reported_pressures = dict(
+            getattr(result, "gas_partial_pressures_Pa", None) or {}
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=call_evidence,
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(result_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "knudsen_total_pressure_invalid_gas_components",
+                "pressure_pass": pressure_pass,
+                "invalid_components": sorted(str(x) for x in invalid_components),
+                "reported": sorted(
+                    {*reported_pressures, *(str(x) for x in invalid_components)}
+                ),
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
+    def missing_knudsen_target_refusal(
+        pressure_pass: str,
+        *,
+        call_evidence: str,
+        result_notices: Sequence[Notice],
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=call_evidence,
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(result_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "knudsen_total_pressure_target_species_missing",
+                "pressure_pass": pressure_pass,
+                "species": formula,
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
     solve_oxygen_balance_at_current_pressure = None
     oxygen_balance_notice: Notice | None = None
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
@@ -10496,6 +10578,18 @@ def _predict_with_engine(
         except _OxygenBalanceEngineTrialRefusal as exc:
             cell = exc.cell
         except _OxygenBalanceRefusal as exc:
+            invalid_refusal = (
+                invalid_knudsen_pressure_refusal(
+                    exc,
+                    "seed",
+                    call_evidence=f"cell_oxygen_balance:{name}",
+                    result_notices=tuple(extra_notices),
+                )
+                if derive_knudsen_total_pressure
+                else None
+            )
+            if invalid_refusal is not None:
+                return invalid_refusal
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -10699,51 +10793,24 @@ def _predict_with_engine(
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     if derive_knudsen_total_pressure:
-        def invalid_knudsen_pressure_refusal(
-            result_cell: object, pressure_pass: str
-        ) -> EnginePrediction | None:
-            invalid_components = tuple(
-                getattr(
-                    result_cell,
-                    "invalid_gas_partial_pressure_components",
-                    (),
-                )
-                or ()
-            )
-            if not invalid_components:
-                return None
-            reported_pressures = dict(
-                getattr(result_cell, "gas_partial_pressures_Pa", None) or {}
-            )
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(
-                    state=ExecutionState.PRODUCED,
-                    call_evidence=call_evidence,
-                ),
-                authority=Authority.REFUSED,
-                notices=notices,
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
-                refusal_detail={
-                    "reason": "knudsen_total_pressure_invalid_gas_components",
-                    "pressure_pass": pressure_pass,
-                    "invalid_components": sorted(str(x) for x in invalid_components),
-                    "reported": sorted(
-                        {*reported_pressures, *(str(x) for x in invalid_components)}
-                    ),
-                },
-                identity=identity,
-                requested_composition=requested,
-                version=engine_version,
-            )
-
-        invalid_refusal = invalid_knudsen_pressure_refusal(cell, "seed")
+        invalid_refusal = invalid_knudsen_pressure_refusal(
+            cell,
+            "seed",
+            call_evidence=call_evidence,
+            result_notices=notices,
+        )
         if invalid_refusal is not None:
             return invalid_refusal
         initial_pressures = pressures
+        initial_target = match_reported_species(
+            formula, initial_pressures, species=identity.species
+        )
+        if initial_target is None:
+            return missing_knudsen_target_refusal(
+                "seed",
+                call_evidence=call_evidence,
+                result_notices=notices,
+            )
         total_pressure_pa = _sum_gas_partial_pressures_pa(initial_pressures)
         if total_pressure_pa is None:
             return EnginePrediction(
@@ -10778,6 +10845,40 @@ def _predict_with_engine(
                     cell_fraction,
                     cell_info,
                 ) = solve_oxygen_balance_at_current_pressure()
+            except _OxygenBalanceRefusal as exc:
+                invalid_refusal = invalid_knudsen_pressure_refusal(
+                    exc,
+                    "derived",
+                    call_evidence=(
+                        f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                    ),
+                    result_notices=notices,
+                )
+                if invalid_refusal is not None:
+                    return invalid_refusal
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                        call_evidence=(
+                            f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                        ),
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                    refusal_detail={
+                        "reason": "knudsen_total_pressure_re_evaluation_failed",
+                        "stage": "oxygen_balance",
+                        "detail": str(exc),
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
             except Exception as exc:
                 return EnginePrediction(
                     engine=engine,
@@ -10860,7 +10961,12 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
-        invalid_refusal = invalid_knudsen_pressure_refusal(cell, "derived")
+        invalid_refusal = invalid_knudsen_pressure_refusal(
+            cell,
+            "derived",
+            call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
+            result_notices=notices,
+        )
         if invalid_refusal is not None:
             return invalid_refusal
         authority, certified_band = _flags_from_scored_cell(
@@ -10869,14 +10975,33 @@ def _predict_with_engine(
         updated_pressures = dict(
             getattr(cell, "gas_partial_pressures_Pa", None) or {}
         )
-        initial_target = match_reported_species(
-            formula, initial_pressures, species=identity.species
-        )
         updated_target = match_reported_species(
             formula, updated_pressures, species=identity.species
         )
-        sensitivity_dex = math.inf
-        if initial_target is not None and updated_target is not None:
+        if updated_target is None:
+            return missing_knudsen_target_refusal(
+                "derived",
+                call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
+                result_notices=notices,
+            )
+        sensitivity_status = "measured"
+        sensitivity_reason = "engine_consumes_total_pressure"
+        oxygen_balance_pressure_response = None
+        sensitivity_dex: float | None = None
+        if engine is Engine.VAPOROCK:
+            # With an ideal vapour and condensed-phase activities unaffected
+            # by P_total across 1e-10–1e-3 bar, p_i(T, fO2) is independent of
+            # P_total. The 1e-10 vs 1e-3 bar comparison is a sanity case for
+            # scoring, but VapoRock's repeated calls cannot measure it because
+            # its active backend does not accept the supplied total pressure.
+            sensitivity_status = "not_evaluated"
+            sensitivity_reason = "engine_does_not_accept_total_pressure"
+            if solve_oxygen_balance_at_current_pressure is not None:
+                oxygen_balance_pressure_response = (
+                    "no_op_engine_ignores_total_pressure"
+                )
+        else:
+            sensitivity_dex = math.inf
             before = initial_target[1]
             after = updated_target[1]
             if (
@@ -10897,7 +11022,19 @@ def _predict_with_engine(
         # the prediction identity too; Decimal(str(float)) can spell the same
         # binary value differently (for example, 0.1 vs 0.10000000000000001).
         pressure_pa_decimal = Decimal(pressure_pa_text)
-        sensitivity_text = format(sensitivity_dex, ".17g")
+        sensitivity_text = (
+            "null"
+            if sensitivity_dex is None
+            else format(sensitivity_dex, ".17g")
+        )
+        oxygen_balance_response_text = (
+            ""
+            if oxygen_balance_pressure_response is None
+            else (
+                "oxygen_balance_pressure_response="
+                f"{oxygen_balance_pressure_response}; "
+            )
+        )
         pressure_notice = Notice(
             kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
             affected_quantities=(quantity,),
@@ -10905,6 +11042,9 @@ def _predict_with_engine(
                 "total pressure not printed; derived from Knudsen-cell "
                 "equilibrium partial pressures; "
                 f"total_pressure_Pa={pressure_pa_text}; "
+                f"sensitivity_status={sensitivity_status}; "
+                f"sensitivity_reason={sensitivity_reason}; "
+                f"{oxygen_balance_response_text}"
                 f"sensitivity_dex={sensitivity_text}"
             ),
             origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
@@ -13306,10 +13446,14 @@ def compile_residual(
         )
     pressure_details = _knudsen_total_pressure_details(prediction.notices)
     if pressure_details is not None:
-        total_pressure_pa, pressure_sensitivity_dex = pressure_details
+        total_pressure_pa, sensitivity_status, pressure_sensitivity_dex = (
+            pressure_details
+        )
         row_band = numeric.decision_band
         if (
-            numeric.operation is MetricOperation.DEX
+            sensitivity_status == "measured"
+            and pressure_sensitivity_dex is not None
+            and numeric.operation is MetricOperation.DEX
             and row_band is not None
             and row_band.unit == numeric.unit == "dimensionless"
             and pressure_sensitivity_dex > row_band.value

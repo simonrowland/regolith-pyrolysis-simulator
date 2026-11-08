@@ -1661,9 +1661,16 @@ def reclassify_projected_composition_cells(
 
 
 class _OxygenBalanceRefusal(RuntimeError):
-    def __init__(self, code: str, detail: str) -> None:
+    def __init__(
+        self,
+        code: str,
+        detail: str,
+        *,
+        invalid_components: Sequence[str] = (),
+    ) -> None:
         self.reason_code = code
         self.backend_status_reason = f"{code}: {detail}"
+        self.invalid_components = tuple(str(item) for item in invalid_components)
         super().__init__(self.backend_status_reason)
 
 
@@ -2065,11 +2072,13 @@ def _engine_gas_pressures_bar_for_oxygen_balance(
             raise _OxygenBalanceRefusal(
                 "oxygen_balance_engine_pressure_invalid",
                 f"engine pressure for {channel!r} is not numeric: {raw_pressure!r}",
+                invalid_components=(str(channel),),
             ) from exc
         if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
             raise _OxygenBalanceRefusal(
                 "oxygen_balance_engine_pressure_invalid",
                 f"engine pressure for {channel!r} is not finite and non-negative",
+                invalid_components=(str(channel),),
             )
         if formula not in species_metadata:
             if pressure_pa > 0.0:
@@ -2230,6 +2239,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
             raise _OxygenBalanceRefusal(
                 "oxygen_balance_engine_pressure_invalid",
                 f"engine returned invalid gas channels {list(invalid)!r}",
+                invalid_components=tuple(str(item) for item in invalid),
             )
         if fixed_point_activities:
             update_species_metadata(cell)
