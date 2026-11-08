@@ -8223,7 +8223,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
-        from simulator.overhead import _solve_same_hour_headspace_closure
+        from simulator.overhead import (
+            _pressure_held_closed_line_total_pressure_Pa,
+            _solve_same_hour_headspace_closure,
+        )
         from simulator.transport_regime import continuum_validity_refuses
 
         def series_flux_at(P_bulk_Pa: float, pressure_Pa: float):
@@ -8309,10 +8312,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             * 3600.0,
             native_fe_available_mol * molar_mass_kg_mol,
         )
+        pressure_held_total_Pa = (
+            _pressure_held_closed_line_total_pressure_Pa(
+                str(getattr(getattr(self.melt, 'atmosphere', None), 'name', '')),
+                overhead_pressure_mbar,
+                self._headspace_downstream_pressure_bar(None),
+            )
+        )
+        closed_line_boundary = {}
+        if pressure_held_total_Pa is not None:
+            closed_line_boundary = {
+                'closed_line_equilibrium_pressures_Pa': {
+                    'Fe': P_reference_Pa,
+                },
+                'closed_line_total_pressure_Pa': pressure_held_total_Pa,
+            }
         closure = _solve_same_hour_headspace_closure(
             {'Fe': vacuum_rate},
             native_rate_at_partials,
             native_partials_at_rates,
+            **closed_line_boundary,
         )
         P_bulk_Pa = max(
             0.0, float(closure.partial_pressures_mbar.get('Fe', 0.0)) * 100.0

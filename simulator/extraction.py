@@ -3813,7 +3813,10 @@ class ExtractionMixin:
             <= C7_MAX_TOTAL_PRESSURE_MBAR
         )
         if active_ca_transport:
-            from simulator.overhead import _solve_same_hour_headspace_closure
+            from simulator.overhead import (
+                _pressure_held_closed_line_total_pressure_Pa,
+                _solve_same_hour_headspace_closure,
+            )
             from simulator.transport_regime import continuum_validity_refuses
 
             melt_resistance = bool(
@@ -3919,6 +3922,27 @@ class ExtractionMixin:
                 )
 
             seed = series_flux_at(0.0, p_total_mbar * 100.0)
+            pressure_held_total_Pa = (
+                _pressure_held_closed_line_total_pressure_Pa(
+                    str(
+                        getattr(
+                            getattr(self.melt, 'atmosphere', None),
+                            'name',
+                            '',
+                        )
+                    ),
+                    p_total_mbar,
+                    self._headspace_downstream_pressure_bar(None),
+                )
+            )
+            closed_line_boundary = {}
+            if pressure_held_total_Pa is not None:
+                closed_line_boundary = {
+                    'closed_line_equilibrium_pressures_Pa': {
+                        'Ca': p_sat_pa,
+                    },
+                    'closed_line_total_pressure_Pa': pressure_held_total_Pa,
+                }
             closure = _solve_same_hour_headspace_closure(
                 {
                     'Ca': max(0.0, float(seed.flux_kg_s_m2))
@@ -3926,6 +3950,7 @@ class ExtractionMixin:
                 },
                 ca_rate_at_partials,
                 ca_partials_at_rates,
+                **closed_line_boundary,
             )
             p_bulk_pa = max(
                 0.0,

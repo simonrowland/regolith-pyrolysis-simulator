@@ -1251,7 +1251,10 @@ class EvaporationMixin:
         pressure_held_bounds_record = None
         closure_rates_include_liquid_fraction = False
         if overhead_partials_override_Pa is None:
-            from simulator.overhead import _solve_same_hour_headspace_closure
+            from simulator.overhead import (
+                _pressure_held_closed_line_total_pressure_Pa,
+                _solve_same_hour_headspace_closure,
+            )
 
             def dispatch_at_partials(partials_Pa):
                 iteration_controls = dict(control_inputs)
@@ -1345,20 +1348,14 @@ class EvaporationMixin:
                 atmosphere_name = str(
                     getattr(getattr(self.melt, 'atmosphere', None), 'name', '')
                 )
-                pressure_held_total_Pa = max(
-                    1.0,
-                    max(0.0, float(self.melt.p_total_mbar)) * 100.0,
+                pressure_held_total_Pa = (
+                    _pressure_held_closed_line_total_pressure_Pa(
+                        atmosphere_name,
+                        self.melt.p_total_mbar,
+                        self._headspace_downstream_pressure_bar(None),
+                    )
                 )
-                pressure_held_no_feed = (
-                    atmosphere_name in {
-                        'CONTROLLED_O2',
-                        'CONTROLLED_O2_FLOW',
-                        'O2_BACKPRESSURE',
-                    }
-                    and self._headspace_downstream_pressure_bar(None) * 1.0e5
-                    >= pressure_held_total_Pa
-                )
-                if pressure_held_no_feed:
+                if pressure_held_total_Pa is not None:
                     # Premise: these controlled-O2 campaigns hold the vessel at
                     # P_total by throttling its outlet to the inflow, but the
                     # carrier/O2 feed rate is unspecified. In the no-feed limit

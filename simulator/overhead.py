@@ -140,6 +140,17 @@ def _solve_same_hour_headspace_closure(
 
     The one-hour source map is evaluated from the current candidate each pass;
     no previous-hour headspace value enters this solve.
+
+    The pressure-held no-feed bracket has a unique scalar total molar-flow
+    root. For each species, with ``R'_i = R_i M_i / (A * 3600)`` in
+    Pa·hr/mol and total molar flow ``Φ`` in mol/hr,
+    ``n_i R'_i = P_eq,i - P_total n_i / Φ``, so
+    ``n_i / Φ = P_eq,i / (R'_i Φ + P_total)``. Summing species gives
+    ``1 = Σ P_eq,i / (R'_i Φ + P_total)``. The right side is strictly
+    decreasing in ``Φ`` (each ``R'_i`` is positive), starts at
+    ``ΣP_eq,i / P_total``, and tends to zero. Thus a positive root exists
+    exactly when ``ΣP_eq,i > P_total``; otherwise the physical boundary is
+    ``Φ = 0``. The denominator is Pa and each quotient is dimensionless.
     """
     rates = {
         str(species): max(0.0, float(rate))
@@ -168,11 +179,14 @@ def _solve_same_hour_headspace_closure(
                 iterations=0,
                 converged=True,
             )
+    evaluation_cap = 2000
     species_names = set(rates)
     evaluations = 0
 
     def evaluate(candidate_rates):
         nonlocal evaluations
+        if evaluations >= evaluation_cap:
+            return None
         partials = {
             str(species): max(0.0, float(pressure))
             for species, pressure in partials_at_rates(candidate_rates).items()
@@ -240,26 +254,35 @@ def _solve_same_hour_headspace_closure(
     # point is unique. Solve the scalar residual for each species inside a
     # guaranteed nonnegative bracket, holding other rates at their current
     # values, and sweep until the coupled vector residual also closes.
-    evaluation_cap = 2000
     for _ in range(50):
         for species in sorted(species_names):
-            if evaluations >= evaluation_cap:
+            # Keep one slot for the outer residual projection, which is the
+            # map returned with this iterate and is part of the cap.
+            if evaluations >= evaluation_cap - 1:
                 break
             zero_candidate = dict(rates)
             zero_candidate[species] = 0.0
-            _zero_partials, zero_fluxes = evaluate(zero_candidate)
+            zero_evaluation = evaluate(zero_candidate)
+            if zero_evaluation is None:
+                break
+            _zero_partials, zero_fluxes = zero_evaluation
             rates = {name: rates.get(name, 0.0) for name in species_names}
             zero_flux = zero_fluxes.get(species, 0.0)
             if zero_flux <= 0.0:
                 rates[species] = 0.0
                 continue
 
+            if evaluations >= evaluation_cap - 1:
+                break
             low = 0.0
             low_residual = zero_flux
             high = max(rates.get(species, 0.0), zero_flux)
             high_candidate = dict(rates)
             high_candidate[species] = high
-            _high_partials, high_fluxes = evaluate(high_candidate)
+            high_evaluation = evaluate(high_candidate)
+            if high_evaluation is None:
+                break
+            _high_partials, high_fluxes = high_evaluation
             high_residual = high_fluxes.get(species, 0.0) - high
             if high_residual > 0.0:
                 # The zero-backpressure output is an upper bound for this
@@ -273,7 +296,7 @@ def _solve_same_hour_headspace_closure(
 
             root = 0.5 * (low + high)
             for _root_iteration in range(64):
-                if evaluations >= evaluation_cap:
+                if evaluations >= evaluation_cap - 1:
                     break
                 width = high - low
                 secant = low + width * low_residual / (
@@ -288,7 +311,10 @@ def _solve_same_hour_headspace_closure(
                 root = secant
                 candidate = dict(rates)
                 candidate[species] = root
-                _candidate_partials, candidate_fluxes = evaluate(candidate)
+                candidate_evaluation = evaluate(candidate)
+                if candidate_evaluation is None:
+                    break
+                _candidate_partials, candidate_fluxes = candidate_evaluation
                 residual = candidate_fluxes.get(species, 0.0) - root
                 if abs(residual) <= 1.0e-9 * max(
                     abs(candidate_fluxes.get(species, 0.0)), abs(root), 1.0e-300
@@ -304,22 +330,38 @@ def _solve_same_hour_headspace_closure(
             rates[species] = max(0.0, root)
 
         rates = {species: rates.get(species, 0.0) for species in species_names}
-        last_partials, evaluated = evaluate(rates)
+        outer_evaluation = evaluate(rates)
+        if outer_evaluation is None:
+            break
+        last_partials, evaluated = outer_evaluation
         if rates_close(rates, evaluated):
             return result(rates, last_partials, converged=True)
         if evaluations >= evaluation_cap:
             break
 
-    final_partials = {
-        str(species): max(0.0, float(pressure))
-        for species, pressure in partials_at_rates(rates).items()
-    }
-    return SameHourHeadspaceClosureResult(
-        rates_kg_hr=dict(rates),
-        partial_pressures_mbar=final_partials,
-        iterations=evaluations,
-        converged=False,
+    return result(rates, last_partials, converged=False)
+
+
+def _pressure_held_closed_line_total_pressure_Pa(
+    atmosphere_name: str,
+    total_pressure_mbar: float,
+    downstream_pressure_bar: float,
+) -> float | None:
+    """Return the held-pressure no-feed boundary when this headspace has one."""
+    total_pressure_Pa = max(
+        1.0,
+        max(0.0, float(total_pressure_mbar)) * 100.0,
     )
+    if (
+        atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }
+        and float(downstream_pressure_bar) * 1.0e5 >= total_pressure_Pa
+    ):
+        return total_pressure_Pa
+    return None
 
 
 def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:

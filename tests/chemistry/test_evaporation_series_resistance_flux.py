@@ -739,3 +739,52 @@ def test_pumped_closure_prices_the_admitted_depleted_stream(
             admitted_partials_mbar[species] * 100.0,
             rel=1e-9,
         )
+
+
+def test_closure_outer_projection_is_included_in_evaluation_cap():
+    species = {f"S{index:03d}" for index in range(100)}
+    projection_calls = 0
+
+    def partials_at_rates(rates):
+        nonlocal projection_calls
+        projection_calls += 1
+        return dict(rates)
+
+    def rates_at_partials(partials):
+        return {name: partials[name] + 1.0 for name in species}
+
+    result = _solve_same_hour_headspace_closure(
+        {name: 0.0 for name in species},
+        rates_at_partials,
+        partials_at_rates,
+    )
+
+    assert not result.converged
+    assert result.iterations <= 2000
+    assert projection_calls == result.iterations
+
+
+def test_native_fe_closure_uses_pressure_held_zero_boundary(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1670.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 1.0
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.001
+
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    closure = diagnostic["same_hour_headspace_closure"]
+
+    assert diagnostic["P_reference_Antoine_Pa"] < sim.melt.p_total_mbar * 100.0
+    assert closure["converged"]
+    assert closure["iterations"] == 0
+    assert closure["rates_kg_hr"]["Fe"] == 0.0
+    assert sim._same_hour_headspace_closure_iterations_by_hour[
+        sim.melt.hour
+    ]["native_fe"] == 0
