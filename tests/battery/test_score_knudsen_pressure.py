@@ -30,7 +30,7 @@ from tests.battery import factories as F
 _PRESSURE_NOTICE_ORIGIN = "score:knudsen_total_pressure"
 
 
-def _partial_row(observation_id: str):
+def _partial_row(observation_id: str, *, observed_value: Decimal = Decimal("10")):
     experiment = F.kems_experiment()
     identity = replace(
         F.pref_identity(T_K=Decimal("1500")),
@@ -42,7 +42,7 @@ def _partial_row(observation_id: str):
         observation_id,
         experiment.experiment_id,
         identity,
-        Decimal("10"),
+        observed_value,
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="knudsen-pressure-test",
     )
@@ -58,7 +58,14 @@ def _partial_row(observation_id: str):
 
 
 def _mock_knudsen_prediction(
-    engine, experiment, reference, monkeypatch, *, sensitivity_dex: float = 0.0
+    engine,
+    experiment,
+    reference,
+    monkeypatch,
+    *,
+    sensitivity_dex: float = 0.0,
+    na_pressure: float = 10.0,
+    o2_pressure: float = 10.0,
 ):
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -82,8 +89,10 @@ def _mock_knudsen_prediction(
         **_kwargs,
     ):
         calls.append(physical_pressure_bar)
-        na_pressure = (
-            10.0 if len(calls) == 1 else 10.0 * math.pow(10.0, sensitivity_dex)
+        reported_na_pressure = (
+            na_pressure
+            if len(calls) == 1
+            else na_pressure * math.pow(10.0, sensitivity_dex)
         )
         return EquilibrateCell(
             pot_id=pot.pot_id,
@@ -95,7 +104,10 @@ def _mock_knudsen_prediction(
             engine_status="ok",
             engine_reason=None,
             melt_activities={},
-            gas_partial_pressures_Pa={"Na": na_pressure, "O2": 10.0},
+            gas_partial_pressures_Pa={
+                "Na": reported_na_pressure,
+                "O2": o2_pressure,
+            },
             liquid_fraction=1.0,
             wall_s=0.0,
             cpu_s=0.0,
@@ -198,3 +210,33 @@ def test_knudsen_total_pressure_sensitivity_above_row_band_refuses(
         notice.origin == _PRESSURE_NOTICE_ORIGIN
         for notice in residual.notices
     )
+
+
+def test_knudsen_total_pressure_round_trip_matches_prediction_identity(
+    monkeypatch,
+) -> None:
+    experiment, reference, context = _partial_row(
+        "knudsen-pressure-decimal-round-trip",
+        observed_value=Decimal("0.1"),
+    )
+    prediction, _calls = _mock_knudsen_prediction(
+        Engine.VAPOROCK,
+        experiment,
+        reference,
+        monkeypatch,
+        na_pressure=0.1,
+        o2_pressure=0.0,
+    )
+
+    assert prediction.value == Decimal("0.1")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        prediction=prediction,
+        derived_band=DecisionBand(
+            Decimal("0.01"), "dimensionless", "test row band"
+        ),
+    )
+
+    assert residual.status is ResidualStatus.MATCH
