@@ -113,6 +113,20 @@ def test_series_row_extra_ignores_derived_from() -> None:
     )
 
 
+def test_series_row_extra_ignores_supported_sigma_alias_for_legacy_width() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    legacy = {
+        "sample": "Cu12.1",
+        "T_C": 1200,
+        "isotope_delta_delta65CuERM633_permil": 0.39,
+        "two_sigma_permil": 0.08,
+    }
+    supported = {**legacy, "sigma": 0.08}
+
+    assert series_row_extra(supported) == series_row_extra(legacy)
+
+
 def test_series_row_extra_preserves_species_annotation_identity() -> None:
     from simulator.battery.stable_ids import series_row_extra
 

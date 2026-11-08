@@ -100,6 +100,10 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
         "composition_role",
         "derived_from",
     }
+    if "two_sigma_permil" in raw_item:
+        # Florin's supported sigma field mirrors its original 2 s.d. column.
+        # Keep that shape change from renaming already-stable table rows.
+        skip.add("sigma")
     printed_species = raw_item.get("species_as_printed")
     if isinstance(printed_species, str) and printed_species in (
         raw_item.get("sample"),
