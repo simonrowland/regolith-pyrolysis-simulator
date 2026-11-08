@@ -136,7 +136,9 @@ def _mock_knudsen_prediction(
     return prediction, calls
 
 
-@pytest.mark.parametrize("engine", (Engine.ALPHAMELTS, Engine.VAPOROCK))
+@pytest.mark.parametrize(
+    "engine", (Engine.ALPHAMELTS, Engine.VAPOROCK, Engine.THERMOENGINE)
+)
 def test_knudsen_partial_pressure_derives_total_pressure_and_scores(
     engine, monkeypatch
 ) -> None:
