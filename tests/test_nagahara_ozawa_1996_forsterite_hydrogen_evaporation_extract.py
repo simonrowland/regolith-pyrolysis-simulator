@@ -293,3 +293,63 @@ def test_table_rows_render_pins_migration_and_unprinted_conditions() -> None:
         assert alpha.identity.quantity.is_unknown
         assert alpha.value.kind is ValueKind.UNAVAILABLE
         assert "condensation" in alpha.value.unavailable_reason
+
+
+def test_initial_mass_and_table_rows_link_to_each_run_experiment() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    table_rows = [
+        row
+        for row in _observations(document).values()
+        if "_sample_weights_" in row["observation_id"]
+    ]
+    experiments_by_local_id = {
+        row["experiment_id"]: row
+        for row in document["experiments"]
+        if str(row["experiment_id"]).startswith("run_")
+    }
+    assert len(table_rows) == 45
+    assert len(experiments_by_local_id) == 45
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    result = migrator.result
+    migrated_experiments = {
+        row.experiment_id.rsplit("::", 1)[-1]: row
+        for row in result.experiments.values()
+        if row.experiment_id.endswith(
+            tuple(f"::experiment::run_{run_id}" for run_id in RUN_IDS)
+        )
+    }
+    observations = [
+        row for row in result.observations.values() if row.source_id == SID
+    ]
+
+    linked_rows = 0
+    for row in table_rows:
+        values = row["values"]
+        run_id = values["run_id_as_printed"]
+        local_id = f"run_{run_id}"
+        experiment = migrated_experiments[local_id]
+        mass = experiment.sample.mass_kg
+        assert mass is not None and mass.state.is_value
+        assert mass.state.value.kind is ValueKind.POINT
+        assert mass.state.value.point == Decimal(values["initial_mass_g"]) / 1000
+        assert mass.locator.page == 4 and mass.locator.table == "1"
+
+        # The table establishes one new crystal sample per experiment. Keep the
+        # final mass and printed run sequence in the source record until the
+        # corresponding fields land in the observation schema.
+        assert "final_mass_kg" in experiments_by_local_id[local_id]["sample"]
+        assert "charge_sequence" in experiments_by_local_id[local_id]
+        assert getattr(experiment.sample, "final_mass_kg", None) is None
+        assert getattr(experiment, "charge_sequence", None) is None
+
+        run_observations = [
+            item for item in observations
+            if f"_run_{run_id}_" in item.observation_id
+        ]
+        assert len(run_observations) == 4
+        assert all(item.experiment_id == experiment.experiment_id for item in run_observations)
+        linked_rows += len(run_observations)
+
+    assert linked_rows == 180
