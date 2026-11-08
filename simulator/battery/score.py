@@ -3740,6 +3740,48 @@ def fusion_comparison_reference(
     )
 
 
+def _fusion_comparison_input_gap(
+    reference: Observation, engine: Engine
+) -> tuple[Notice, str, str] | None:
+    """Resolve the scorer's fusion-reference blocker and its missing input."""
+    notice = next(
+        (
+            item
+            for item in reference.notices
+            if item.reason.startswith("fusion conversion missing input:")
+            or item.reason.startswith("fusion conversion missing input for ")
+            or item.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
+        ),
+        None,
+    )
+    if notice is None:
+        return None
+    native_pair_failure = (
+        engine is Engine.MAGEMIN
+        and "MAGEMin native reference could not be resolved:" in notice.reason
+    )
+    if notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT):
+        missing_input = "Darken & Gurry iron-boundary ratios and JANAF formation rows"
+        input_path = (
+            "identity.temperature_K"
+            if "has no temperature_K" in notice.reason
+            else "scorer.fusion_reference_data"
+        )
+    elif native_pair_failure:
+        missing_input = "JANAF source/target tables for MAGEMin native reference"
+        input_path = "scorer.fusion_reference_data"
+    elif "JANAF solid table " in notice.reason:
+        missing_input = "JANAF solid polymorph matching the selected table"
+        input_path = "identity.species.polymorph"
+    elif "no temperature_K" in notice.reason:
+        missing_input = "activity observation temperature_K"
+        input_path = "identity.temperature_K"
+    else:
+        missing_input = "JANAF solid/liquid formation Gibbs rows"
+        input_path = "scorer.fusion_reference_data"
+    return notice, missing_input, input_path
+
+
 def temperature_of(identity: Identity) -> Decimal | None:
     state = identity.temperature_K
     if state is not None and state.is_value and state.value is not None:
@@ -12759,34 +12801,14 @@ def compile_residual(
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )
 
-    missing_fusion_input = next(
-        (
-            notice
-            for notice in notices
-            if notice.reason.startswith("fusion conversion missing input:")
-            or notice.reason.startswith("fusion conversion missing input for ")
-            or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
-        ),
-        None,
-    )
-    if missing_fusion_input is not None:
+    fusion_input_gap = _fusion_comparison_input_gap(reference, engine)
+    if fusion_input_gap is not None:
+        missing_fusion_input, missing_input, _input_path = fusion_input_gap
         native_pair_failure = (
             engine is Engine.MAGEMIN
             and "MAGEMin native reference could not be resolved:"
             in missing_fusion_input.reason
         )
-        if missing_fusion_input.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT):
-            missing_input = (
-                "Darken & Gurry iron-boundary ratios and JANAF formation rows"
-            )
-        elif native_pair_failure:
-            missing_input = "JANAF source/target tables for MAGEMin native reference"
-        elif "JANAF solid table " in missing_fusion_input.reason:
-            missing_input = "JANAF solid polymorph matching the selected table"
-        elif "no temperature_K" in missing_fusion_input.reason:
-            missing_input = "activity observation temperature_K"
-        else:
-            missing_input = "JANAF solid/liquid formation Gibbs rows"
         return _refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {

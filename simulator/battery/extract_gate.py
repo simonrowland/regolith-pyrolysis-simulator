@@ -83,8 +83,11 @@ class ReadinessDetail:
 class ObservableReadiness:
     observable: str
     rail: str
+    engine: str
     ready: int
     not_ready: int
+    not_computable: int
+    not_applicable: int
     details: tuple[ReadinessDetail, ...] = ()
 
 
@@ -145,11 +148,18 @@ _INPUT_PATHS = {
     "reservoir": "identity.reservoir",
     "defining_equation": "identity.reaction",
     "calibration": "experiment.apparatus.calibration",
+    "normalized_composition": "identity.composition",
+    "pressure_boundary": "identity.total_pressure_Pa",
+    "oxygen_condition": "identity.fO2_Pa",
+    "method": "experiment.method",
 }
 _SOURCE_INPUT_KEYS = {
     "identity.quantity": ("quantity", "quantity_as_printed"),
     "identity.species.formula": ("species", "formula", "gas_species"),
     "identity.species.phase": ("phase", "phase_as_published", "phase_label"),
+    "identity.species.polymorph": (
+        "polymorph", "polymorph_as_published", "crystal_form",
+    ),
     "identity.phase_role": ("phase_role",),
     "identity.composition": ("composition", "composition_as_published", "printed_composition"),
     "identity.composition_role": ("composition_role", "composition_basis", "basis_as_published"),
@@ -187,66 +197,90 @@ def _input_path(token: str) -> str:
     return f"scorer.{token}"
 
 
-def _source_input_status(nodes: Iterable[object], input_path: str) -> str:
-    """Classify source YAML evidence for a missing scorer input."""
-    key_set = set(_SOURCE_INPUT_KEYS.get(input_path, ()))
-    if input_path.startswith("experiment.apparatus.geometry"):
-        key_set.update(
-            {
-                "apparatus", "calibration", "orifice_area_m2", "orifice_area_cm2",
-                "orifice_diameter_m", "orifice_diameter_mm", "clausing_factor",
-                "orifice_to_sample_area_ratio", "exposed_area_m2", "chamber_length_m",
-                "chamber_volume_m3", "orifice_channel_length_m", "orifice_count",
-                "orifice_shape", "knudsen_number_orifice",
-            }
+def _source_field_matches(input_path: str, key: object, path: str) -> bool:
+    field_path = f"{path}.{key}" if path else str(key)
+    aliases = _SOURCE_INPUT_KEYS.get(input_path)
+    if input_path.startswith("experiment.apparatus.geometry."):
+        field = input_path.rsplit(".", 1)[-1]
+        return (
+            str(key) == field
+            and field_path.endswith(
+                (f"apparatus.geometry.{field}", f"geometry.{field}")
+            )
         )
-        if input_path.count(".") > 3:
-            key_set.add(input_path.rsplit(".", 1)[-1])
+    if aliases is None or str(key) not in aliases:
+        return False
+    # Keep source matching to field names. In particular, an absence attached
+    # to one geometry determinant must not answer a query for its sibling.
+    return field_path.rsplit(".", 1)[-1] == str(key)
+
+
+def _source_scope_status(scope: str, root: object, input_path: str) -> str:
+    if (
+        input_path.startswith("experiment.apparatus.geometry.")
+        and not scope.startswith(("experiment:", "context:"))
+    ):
+        return "unrecorded"
+    fallback = root.get("locator") if isinstance(root, Mapping) else None
     recorded_value = False
-    for root in nodes:
-        fallback = root.get("locator") if isinstance(root, Mapping) else None
-        for mapping, _path in _mappings(root):
-            for key, raw in mapping.items():
-                if str(key) not in key_set:
-                    continue
-                state = raw.get("state", raw) if isinstance(raw, Mapping) else {}
-                tag = state.get("tag") if isinstance(state, Mapping) else None
-                reason = state.get("reason") if isinstance(state, Mapping) else None
-                if tag in {"unknown", "not_applicable"}:
-                    locator = raw.get("locator") or fallback
-                    located = isinstance(locator, Mapping) and any(
-                        locator.get(name) not in (None, "") for name in _LOCATOR_KEYS
-                    )
-                    if located and reason in _LOCATED_ABSENCE_REASONS:
-                        return f"located_absence:{reason}"
-                else:
-                    recorded_value = True
+    for mapping, path in _mappings(root):
+        for key, raw in mapping.items():
+            if not _source_field_matches(input_path, key, path):
+                continue
+            state = raw.get("state", raw) if isinstance(raw, Mapping) else {}
+            tag = state.get("tag") if isinstance(state, Mapping) else None
+            reason = state.get("reason") if isinstance(state, Mapping) else None
+            if tag in {"unknown", "not_applicable"}:
+                locator = raw.get("locator") or fallback
+                located = isinstance(locator, Mapping) and any(
+                    locator.get(name) not in (None, "") for name in _LOCATOR_KEYS
+                )
+                if located and reason in _LOCATED_ABSENCE_REASONS:
+                    return f"located_absence:{reason}"
+            else:
+                recorded_value = True
     return "recorded_value_unresolved" if recorded_value else "unrecorded"
 
 
-def _check_input(check: object) -> tuple[str | None, str]:
-    detail = getattr(check, "detail", None)
-    if not isinstance(detail, Mapping):
-        return None, str(getattr(check, "name", "validity gate"))
-    for key in ("input", "missing_input", "determinant", "field"):
-        value = detail.get(key)
-        if isinstance(value, str) and value:
-            return _input_path(value), str(detail.get("reason") or key)
-    name = str(getattr(check, "name", "validity gate"))
-    missing = detail.get("missing")
-    if isinstance(missing, (list, tuple)) and missing:
-        if len(missing) == 1:
-            return _input_path(str(missing[0])), str(detail.get("reason") or missing[0])
-        return "experiment.apparatus.geometry", "missing " + ", ".join(map(str, missing))
-    if "method" in name:
-        return "experiment.method", str(detail.get("reason") or name)
-    if any(token in name for token in ("apparatus", "geometry", "calibration", "orifice")):
-        return "experiment.apparatus.geometry", str(detail.get("reason") or name)
-    if "pressure" in name:
-        return "identity.total_pressure_Pa", str(detail.get("reason") or name)
-    if "oxygen" in name or "fo2" in name.lower():
-        return "identity.fO2_Pa", str(detail.get("reason") or name)
-    return None, str(detail.get("reason") or name)
+def _source_input_status(
+    scopes: Iterable[tuple[str, object]],
+    input_path: str,
+    memo: dict[tuple[str, str], str] | None = None,
+) -> str:
+    """Classify exact source-field evidence within its observation scope."""
+    cache = memo if memo is not None else {}
+    statuses = []
+    for scope, root in scopes:
+        key = (scope, input_path)
+        if key not in cache:
+            cache[key] = _source_scope_status(scope, root, input_path)
+        status = cache[key]
+        if status.startswith("located_absence:"):
+            return f"{scope}:{status}"
+        if status == "recorded_value_unresolved":
+            statuses.append(status)
+    return "recorded_value_unresolved" if statuses else "unrecorded"
+
+
+def _request_gap_path(gap: object, missing: str | None = None) -> str:
+    waypoint = str(getattr(gap, "waypoint", ""))
+    aliases = {
+        "normalized_composition": "identity.composition",
+        "temperature_K": "identity.temperature_K",
+        "pressure_boundary": "identity.total_pressure_Pa",
+        "oxygen_condition": "identity.fO2_Pa",
+    }
+    candidate = missing or waypoint
+    if candidate.startswith(("identity.", "experiment.", "point_conditions.")):
+        return candidate
+    if candidate in aliases:
+        return aliases[candidate]
+    leaf = candidate.rsplit(".", 1)[-1]
+    if leaf in _INPUT_PATHS:
+        return _input_path(leaf)
+    if leaf in _SOURCE_INPUT_KEYS:
+        return leaf
+    return _input_path(waypoint or candidate)
 
 
 def _observable_readiness(
@@ -264,7 +298,11 @@ def _observable_readiness(
     raw_experiments = doc.get("experiments")
     raw_experiments = raw_experiments if isinstance(raw_experiments, Mapping) else {}
     raw_context = doc.get("context")
-    groups: dict[str, dict[str, Any]] = {}
+    groups: dict[tuple[str, str], dict[str, Any]] = {}
+    source_memo: dict[tuple[str, str], str] = {}
+    from simulator.battery.generators.bench import activity_request_for_engine
+    from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if identity is not None else None
@@ -277,10 +315,6 @@ def _observable_readiness(
         rail_name = "none" if rail is None else rail.value
         quantity_name = "quantity_unknown" if quantity is None else quantity.value
         observable = f"{rail_name}:{quantity_name}"
-        group = groups.setdefault(
-            observable,
-            {"rail": rail_name, "ready": 0, "not_ready": 0, "details": []},
-        )
         raw_id = observation.observation_id.split("::", 1)[-1]
         raw_row = raw_rows.get(raw_id, {})
         if not raw_row:
@@ -296,97 +330,116 @@ def _observable_readiness(
         raw_experiment_id = raw_row.get("experiment")
         raw_experiment = raw_experiments.get(raw_experiment_id, {})
         experiment = experiments.get(observation.experiment_id)
-        source_nodes = [raw_row, raw_experiment, raw_context]
+        source_scopes = (
+            (f"observation:{raw_id}", raw_row),
+            (f"experiment:{raw_experiment_id or observation.experiment_id}", raw_experiment),
+            (f"context:{doc.get('source_id', '')}", raw_context),
+        )
 
-        if quantity is None:
-            group["not_ready"] += 1
-            path = "identity.quantity"
-            group["details"].append(
-                ReadinessDetail(
-                    observation.observation_id,
-                    "scorer-identity",
-                    path,
-                    _source_input_status(source_nodes, path),
-                    "quantity_unknown",
-                )
+        for engine in score.SCORE_ENGINE_SET:
+            group = groups.setdefault(
+                (observable, engine.value),
+                {
+                    "rail": rail_name,
+                    "ready": 0,
+                    "not_ready": 0,
+                    "not_computable": 0,
+                    "not_applicable": 0,
+                    "details": [],
+                },
             )
-            continue
-        if rail is None:
-            group["not_ready"] += 1
-            group["details"].append(
-                ReadinessDetail(
-                    observation.observation_id,
-                    "scorer-rail",
-                    None,
-                    "not_engine_observable",
-                    "quantity has no scorer rail",
-                )
-            )
-            continue
-
-        identity_outcome = score.identity_equal(identity, identity)
-        identity_fields = (
-            []
-            if identity_outcome.kind.value == "equal"
-            else list(identity_outcome.fields)
-            or [identity_outcome.detail or identity_outcome.kind.value]
-        )
-        validity = (
-            score.run_validity_gates(experiment, observation)
-            if experiment is not None
-            else None
-        )
-        failed_checks = (
-            []
-            if validity is None or validity.passed
-            else [
-                check
-                for check in validity.checks
-                if not check.passed
-                and check.name
-                in {
-                    "method",
-                    "kems_calibration",
-                    "geometry_determinants",
-                    "comparison_method_cell_constant_cancels",
-                }
-            ]
-        )
-        if identity_fields or failed_checks:
-            group["not_ready"] += 1
-            for field in identity_fields:
-                path = _input_path(field)
+            if quantity is None:
+                group["not_computable"] += 1
+                path = "identity.quantity"
                 group["details"].append(
                     ReadinessDetail(
                         observation.observation_id,
-                        "scorer-identity",
+                        engine.value,
                         path,
-                        _source_input_status(source_nodes, path),
-                        identity_outcome.detail or identity_outcome.kind.value,
+                        _source_input_status(source_scopes, path, source_memo),
+                        "quantity_unknown",
                     )
                 )
-            for check in failed_checks:
-                path, reason = _check_input(check)
+                continue
+            if quantity not in score.MELT_ACTIVITY_QUANTITIES:
+                group["not_computable"] += 1
+                continue
+            if engine.value not in MELT_ACTIVITY_ENGINES:
+                group["not_applicable"] += 1
+                continue
+            if experiment is None:
+                group["not_ready"] += 1
+                path = "experiment"
                 group["details"].append(
                     ReadinessDetail(
                         observation.observation_id,
-                        "scorer-validity",
+                        engine.value,
                         path,
-                        _source_input_status(source_nodes, path) if path else "unrecorded",
-                        reason,
+                        _source_input_status(source_scopes, path, source_memo),
+                        "melt_activity_contract_requires_experiment",
                     )
                 )
-            continue
-        group["ready"] += 1
+                continue
+
+            converted_reference = score.fusion_comparison_reference(
+                observation, engine=engine
+            )
+            fusion_input_gap = score._fusion_comparison_input_gap(
+                converted_reference, engine
+            )
+            if fusion_input_gap is not None:
+                notice, missing_input, path = fusion_input_gap
+                group["not_ready"] += 1
+                group["details"].append(
+                    ReadinessDetail(
+                        observation.observation_id,
+                        engine.value,
+                        path,
+                        _source_input_status(source_scopes, path, source_memo),
+                        f"{missing_input}: {notice.reason}",
+                    )
+                )
+                continue
+            generated = activity_request_for_engine(
+                experiment, converted_reference, engine.value
+            )
+            if generated is None:
+                group["not_applicable"] += 1
+                continue
+            if generated.payload is not None:
+                group["ready"] += 1
+                continue
+
+            group["not_ready"] += 1
+            for gap in generated.readiness.gaps:
+                missing_fields = gap.missing or (gap.waypoint,)
+                paths = tuple(dict.fromkeys(
+                    _request_gap_path(gap, missing) for missing in missing_fields
+                ))
+                for path in paths:
+                    group["details"].append(
+                        ReadinessDetail(
+                            observation.observation_id,
+                            engine.value,
+                            path,
+                            _source_input_status(source_scopes, path, source_memo),
+                            f"{gap.reason.value}: {', '.join(gap.missing)}"
+                            if gap.missing
+                            else gap.reason.value,
+                        )
+                    )
     return [
         ObservableReadiness(
             observable=name,
             rail=values["rail"],
+            engine=engine,
             ready=values["ready"],
             not_ready=values["not_ready"],
+            not_computable=values["not_computable"],
+            not_applicable=values["not_applicable"],
             details=tuple(values["details"]),
         )
-        for name, values in sorted(groups.items())
+        for (name, engine), values in sorted(groups.items())
     ]
 
 

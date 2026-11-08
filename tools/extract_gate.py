@@ -171,8 +171,10 @@ def _run_one(
     print(f"MIGRATION refusal reasons: {refusals}")
     for readiness in report.engine_readiness:
         print(
-            f"ENGINE-READINESS {readiness.observable}: "
-            f"ready={readiness.ready} not_ready={readiness.not_ready}"
+            f"ENGINE-READINESS {readiness.observable} engine={readiness.engine}: "
+            f"ready={readiness.ready} not_ready={readiness.not_ready} "
+            f"not_computable={readiness.not_computable} "
+            f"not_applicable={readiness.not_applicable}"
         )
         for detail in readiness.details:
             input_path = detail.input_path or "none"
