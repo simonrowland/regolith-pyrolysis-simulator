@@ -10875,6 +10875,136 @@ def uncertainty_for(raw: object) -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
 
 
+class _LegacyPointWidthDiagnostic(str, Enum):
+    NON_NUMERIC = "legacy_point_width.non_numeric"
+    SELECTOR_MISMATCH = "legacy_point_width.selector_mismatch"
+    EXPLICIT_SIGMA_CONFLICT = "legacy_point_width.explicit_sigma_conflict"
+    PARENT_CONVENTION_MISMATCH = "legacy_point_width.parent_convention_mismatch"
+    MULTIPLE_WIDTHS = "legacy_point_width.multiple_widths"
+
+
+# These are source-proven sibling/value pairs. The exact target fields keep
+# similarly named widths from attaching to another quantity on the same row.
+# A width binds only when select_declared_source chooses its paired value field;
+# the width key alone does not identify which printed value it describes.
+_LEGACY_POINT_WIDTH_VALUE_FIELDS: Mapping[str, frozenset[str]] = {
+    "uncertainty_ppm": frozenset({"residue_ppm"}),
+    "uncertainty_permil": frozenset({"isotope_delta_isotope_delta"}),
+    "two_sigma_permil": frozenset(
+        {
+            "isotope_delta_delta65CuERM633_permil",
+            "isotope_delta_Delta65CuSC_permil",
+        }
+    ),
+    "uncertainty_wt_pct": frozenset({"Cl_wt_pct"}),
+    "Cl_uncertainty_wt_pct": frozenset({"Cl_wt_pct"}),
+    "uncertainty_width_as_printed": frozenset({"value"}),
+}
+
+
+def _point_uncertainty_from_row(
+    row: Mapping[str, Any],
+    selection: "SourceSelection",
+    parent_uncertainty: Uncertainty,
+) -> tuple[
+    object | None,
+    int | None,
+    str | None,
+    tuple[_LegacyPointWidthDiagnostic, ...],
+]:
+    """Read explicit sigma or a source-proven width bound to the selected value."""
+
+    explicit = row.get("sigma")
+    if explicit is None or explicit == "":
+        explicit = row.get("gamma_SD")
+    has_explicit = explicit is not None and explicit != ""
+
+    # Preserve the existing source-specific two-sigma column while this
+    # helper owns the point-row uncertainty selection.
+    wimpenny_width = row.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
+    if not has_explicit and wimpenny_width not in (None, ""):
+        return wimpenny_width, 2, None, ()
+
+    width_keys = [key for key in _LEGACY_POINT_WIDTH_VALUE_FIELDS if key in row]
+    if not width_keys:
+        if has_explicit:
+            return explicit, None, None, ()
+        return None, None, None, ()
+    if len(width_keys) != 1:
+        return (
+            explicit if has_explicit else None,
+            None,
+            None,
+            (_LegacyPointWidthDiagnostic.MULTIPLE_WIDTHS,),
+        )
+
+    width_key = width_keys[0]
+    width = _as_dec_or_none(row.get(width_key))
+    if width is None:
+        return (
+            explicit if has_explicit else None,
+            None,
+            None,
+            (_LegacyPointWidthDiagnostic.NON_NUMERIC,),
+        )
+    if selection.field_name not in _LEGACY_POINT_WIDTH_VALUE_FIELDS[width_key]:
+        return (
+            explicit if has_explicit else None,
+            None,
+            None,
+            (_LegacyPointWidthDiagnostic.SELECTOR_MISMATCH,),
+        )
+
+    if width_key == "two_sigma_permil":
+        parent = parent_uncertainty.verbatim
+        if isinstance(parent, Mapping):
+            confidence = parent.get("confidence_level")
+            confidence_text = str(confidence).strip().removesuffix("%")
+            confidence_value = _as_dec_or_none(confidence_text)
+            if confidence is not None and confidence_value is None:
+                return (
+                    explicit if has_explicit else None,
+                    None,
+                    None,
+                    (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                )
+            if confidence_value is not None:
+                if Decimal(0) < confidence_value <= Decimal(1):
+                    confidence_value *= Decimal(100)
+                if confidence_value != Decimal(95):
+                    return (
+                        explicit if has_explicit else None,
+                        None,
+                        None,
+                        (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                    )
+            if parent.get("one_sigma") not in (None, ""):
+                return (
+                    explicit if has_explicit else None,
+                    None,
+                    None,
+                    (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                )
+
+    if has_explicit:
+        explicit_value = _as_dec_or_none(explicit)
+        if explicit_value is None or explicit_value != width:
+            return (
+                explicit,
+                None,
+                None,
+                (_LegacyPointWidthDiagnostic.EXPLICIT_SIGMA_CONFLICT,),
+            )
+        return explicit, None, width_key, ()
+
+    return (
+        width,
+        2 if width_key == "two_sigma_permil" else None,
+        width_key,
+        (),
+    )
+
+
 # Wimpenny's printed isotope rows use this explicit 2-sigma column name.
 _WIMPENNY_DELTA_2SIGMA_FIELD = "delta66Zn_2sigma_permil"
 
@@ -23731,6 +23861,7 @@ class Migrator:
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
+        extra_unc_key: str | None = None
         point_locator = locator
         t_trail: str | None = None
         t_original: object = None
@@ -24069,11 +24200,21 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
-            extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
-            if extra_unc is None and _WIMPENNY_DELTA_2SIGMA_FIELD in raw_item:
-                extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
-                if extra_unc not in (None, ""):
-                    extra_unc_k = 2
+            (
+                extra_unc,
+                extra_unc_k,
+                extra_unc_key,
+                uncertainty_diagnostics,
+            ) = _point_uncertainty_from_row(raw_item, value_sel, uncertainty)
+            for diagnostic in uncertainty_diagnostics:
+                self.result.add_queue(
+                    work.work_id,
+                    point_locator,
+                    ["uncertainty"],
+                    diagnostic.value,
+                    source=source_key,
+                    observation_id=point_id,
+                )
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -24442,6 +24583,8 @@ class Migrator:
         unc = uncertainty
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
+            if extra_unc_key is not None:
+                verbatim["legacy_width_key"] = extra_unc_key
             if isinstance(uncertainty.verbatim, Mapping):
                 confidence_level = uncertainty.verbatim.get("confidence_level")
                 if confidence_level is not None:
@@ -24462,9 +24605,16 @@ class Migrator:
                         verbatim=verbatim,
                     )
             else:
+                numeric_extra_unc = _as_dec_or_none(extra_unc)
                 unc = Uncertainty(
                     kind=UncertaintyKind.PRINTED,
                     verbatim=verbatim,
+                    value=(
+                        numeric_extra_unc
+                        if extra_unc_key is not None
+                        else None
+                    ),
+                    basis=("absolute" if extra_unc_key is not None else None),
                 )
             if value_sel is not None and value_sel.printed_form is not None:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)

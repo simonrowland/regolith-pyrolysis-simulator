@@ -5549,6 +5549,287 @@ def test_wimpenny_unknown_uncertainty_column_is_not_guessed(tmp_path: Path) -> N
     assert "delta66Zn_1sigma_permil" not in str(observation.uncertainty.verbatim)
 
 
+def _legacy_width_row(
+    doc: dict, key: str
+) -> tuple[dict, dict]:
+    for block in doc.get("species", {}).values():
+        for observation in block.get("observations", []):
+            values = observation.get("values") or {}
+            stack = [values]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, dict):
+                    if key in item:
+                        return observation, item
+                    stack.extend(reversed(item.values()))
+                elif isinstance(item, list):
+                    stack.extend(reversed(item))
+    raise AssertionError(f"extract has no point row with {key!r}")
+
+
+def _legacy_width_observations(result, key: str) -> list:
+    return [
+        observation
+        for observation in result.observations.values()
+        if isinstance(observation.uncertainty.verbatim, dict)
+        and observation.uncertainty.verbatim.get("legacy_width_key") == key
+    ]
+
+
+def _legacy_width_diagnostics(result, code: str) -> list:
+    return [entry for entry in result.queue if entry.why == code]
+
+
+def test_renggli_printed_ppm_widths_bind_to_selected_residue_values(
+    tmp_path: Path,
+) -> None:
+    source_id = "renggli-2022-te-evaporation"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+
+    widths = _legacy_width_observations(result, "uncertainty_ppm")
+    assert len(widths) == 36
+    first = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("5874")
+    )
+    assert first.uncertainty.value == Decimal("110")
+    assert first.uncertainty.basis == "absolute"
+    assert first.uncertainty.verbatim["parent"].endswith(
+        "::renggli_2022_table1_residue_te"
+    )
+
+
+def test_wang_printed_ppm_widths_bind_to_selected_residue_values(
+    tmp_path: Path,
+) -> None:
+    source_id = "wang-2001-solar-melt-evaporation-residues"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+
+    widths = _legacy_width_observations(result, "uncertainty_ppm")
+    assert len(widths) == 221
+    assert all(observation.uncertainty.basis == "absolute" for observation in widths)
+
+
+def test_wang_printed_permil_widths_bind_to_selected_isotope_values(
+    tmp_path: Path,
+) -> None:
+    source_id = "wang-2001-solar-melt-evaporation-residues"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+
+    widths = _legacy_width_observations(result, "uncertainty_permil")
+    assert len(widths) == 30
+    assert all(observation.uncertainty.basis == "absolute" for observation in widths)
+
+
+def test_florin_printed_two_sigma_widths_bind_to_both_selected_isotope_fields(
+    tmp_path: Path,
+) -> None:
+    source_id = "florin-2025-cu-silicate-evaporation"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+
+    widths = _legacy_width_observations(result, "two_sigma_permil")
+    assert len(widths) == 48
+    assert Counter(
+        observation.uncertainty.basis for observation in widths
+    ) == {"2sigma": 48}
+    assert Counter(
+        observation.uncertainty.verbatim["parent"].split("::")[-1]
+        for observation in widths
+    ) == {
+        "florin_2025_table_3_cu_isotope_delta_erm633": 24,
+        "florin_2025_table_3_cu_isotope_delta_sc": 24,
+    }
+    assert all(observation.uncertainty.verbatim["k"] == 2 for observation in widths)
+
+
+@pytest.mark.parametrize(
+    ("filename", "width_key", "expected_rows"),
+    [
+        (
+            "thomas-2022-chlorine-bonding-silicate-melts.yaml",
+            "uncertainty_wt_pct",
+            43,
+        ),
+        (
+            "thomas-wood-2021-chlorine-silicate-melts.yaml",
+            "Cl_uncertainty_wt_pct",
+            37,
+        ),
+        (
+            "sugawara-2013-soda-lime-melt-na2o-activity.yaml",
+            "uncertainty_width_as_printed",
+            59,
+        ),
+    ],
+)
+def test_selector_unknown_legacy_width_groups_are_diagnosed_and_unbound(
+    tmp_path: Path, filename: str, width_key: str, expected_rows: int
+) -> None:
+    result = _migrate_real_extract(tmp_path, filename)
+
+    assert not _legacy_width_observations(result, width_key)
+    assert len(
+        _legacy_width_diagnostics(
+            result, "legacy_point_width.selector_mismatch"
+        )
+    ) == expected_rows
+
+
+def test_explicit_sigma_wins_and_records_matching_legacy_width_key(
+    tmp_path: Path,
+) -> None:
+    source_id = "renggli-2022-te-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    _observation, row = _legacy_width_row(doc, "uncertainty_ppm")
+    row["sigma"] = row["uncertainty_ppm"]
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.value.point == Decimal("5874")
+    )
+    assert observation.uncertainty.verbatim["sigma"] == "110"
+    assert observation.uncertainty.verbatim["legacy_width_key"] == "uncertainty_ppm"
+
+
+def test_conflicting_explicit_sigma_refuses_legacy_width_with_diagnostic(
+    tmp_path: Path,
+) -> None:
+    source_id = "renggli-2022-te-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    _observation, row = _legacy_width_row(doc, "uncertainty_ppm")
+    row["sigma"] = "111"
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.value.point == Decimal("5874")
+    )
+    assert observation.uncertainty.verbatim["sigma"] == "111"
+    assert "legacy_width_key" not in observation.uncertainty.verbatim
+    assert len(
+        _legacy_width_diagnostics(
+            result, "legacy_point_width.explicit_sigma_conflict"
+        )
+    ) == 1
+
+
+def test_nonnumeric_legacy_width_is_unbound_with_diagnostic(tmp_path: Path) -> None:
+    source_id = "renggli-2022-te-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    _observation, row = _legacy_width_row(doc, "uncertainty_ppm")
+    row["uncertainty_ppm"] = "not numeric"
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.value.point == Decimal("5874")
+    )
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert len(
+        _legacy_width_diagnostics(result, "legacy_point_width.non_numeric")
+    ) == 1
+
+
+def test_two_sigma_width_rejects_parent_confidence_mismatch(tmp_path: Path) -> None:
+    source_id = "florin-2025-cu-silicate-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    observation, row = _legacy_width_row(doc, "two_sigma_permil")
+    observation["uncertainty"] = {
+        "two_sigma": 0.03,
+        "confidence_level": "68%",
+        "units": "per mil",
+    }
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    assert len(_legacy_width_observations(result, "two_sigma_permil")) == 24
+    assert len(
+        _legacy_width_diagnostics(
+            result, "legacy_point_width.parent_convention_mismatch"
+        )
+    ) == 24
+
+
+def test_two_sigma_width_copies_only_parent_confidence_level(tmp_path: Path) -> None:
+    source_id = "florin-2025-cu-silicate-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    parent, row = _legacy_width_row(doc, "two_sigma_permil")
+    parent["uncertainty"] = {
+        "two_sigma": 0.03,
+        "confidence_level": "95%",
+        "units": "per mil",
+    }
+    row["confidence_level"] = "68%"
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    observation = next(
+        item
+        for item in _legacy_width_observations(result, "two_sigma_permil")
+        if item.value.point == Decimal("0.39")
+        and item.uncertainty.verbatim["parent"].endswith(
+            "::florin_2025_table_3_cu_isotope_delta_erm633"
+        )
+    )
+    assert observation.uncertainty.verbatim["confidence_level"] == "95%"
+    assert "row_confidence_level" not in observation.uncertainty.verbatim
+
+
+def test_non_allowlisted_uncertainty_like_key_is_ignored(tmp_path: Path) -> None:
+    source_id = "renggli-2022-te-evaporation"
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    _observation, row = _legacy_width_row(doc, "uncertainty_ppm")
+    row["temperature_uncertainty_K_as_printed"] = row.pop("uncertainty_ppm")
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=doc
+    )
+
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.value.point == Decimal("5874")
+    )
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert len(_legacy_width_observations(result, "uncertainty_ppm")) == 35
+
+
 def test_h04_ocr_locator_does_not_fall_through_to_pdf(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["locator"] = {
