@@ -2297,6 +2297,100 @@ def test_pre_rg_missing_crystalline_conversion_provenance_fails_closed() -> None
         )
 
 
+def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    )
+
+    standard_state = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase="liquid",
+        reference_pressure_bar=1.0,
+        component_basis="raoultian_pure_endmember",
+        identity_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        component_id="FeO",
+    )
+    declaration = ActivityInputDeclaration(
+        component_id="FeO",
+        standard_state=standard_state,
+        activity_model="provider_reported_thermodynamic_activity",
+        require_assemblage_match=False,
+    )
+    rule = RequestRule(
+        species_id="Fe",
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"FeO"}),
+        required_source_atoms=frozenset({"Fe", "O"}),
+        solve_group_id="fe_test",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id="Fe",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+        source_reaction_activity=declaration,
+        evidence=MappingProxyType({
+            "vapor_activity_source_standard_state_id": (
+                MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+            ),
+            "vapor_activity_source_standard_state_phase": "liquid",
+            "vapor_k_standard_state_id": (
+                MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
+            ),
+            "vapor_k_standard_state_phase": "solid",
+        }),
+    )
+
+    class Evaluator:
+        activity_exponent = 1.0
+        pO2_exponent = 0.0
+        pO2_reference_bar = 1.0
+        oxygen_fugacity_channel = None
+        valid_temperature_K = (298.15, 4000.0)
+
+        def evaluate(
+            self, temperature_K, *, source_activity=1.0, pO2_bar=None
+        ):
+            return SimpleNamespace(pressure_pa=100.0 * float(source_activity))
+
+    batch = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"FeO": 1.0}},
+        state=VapourResolveState(
+            temperature_K=1300.0,
+            source_reaction_activities={"Fe": 0.25},
+            source_reaction_activity_provider="test_fe_provider",
+            source_reaction_activity_evidence_refs={"Fe": "test:fe-value"},
+            source_reaction_activity_provenance={},
+        ),
+        catalog_species={
+            "Fe": SimpleNamespace(
+                species_id="Fe",
+                evaluator=Evaluator(),
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            )
+        },
+        flux_activation_context=_pre_rg_activation_context("Fe"),
+    )
+
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.pressure.pa > 0.0
+    notice = answer.extra["notices"][0]
+    assert notice["kind"] == "fe_channel_reference_state_predict_and_flag"
+    assert notice["reason"] == "missing_reference_state_provenance"
+    assert notice["authority_level"] == "predict_and_flag"
+    assert notice["liquid_referenced_pressure_Pa"] > 0.0
+    assert notice["crystalline_referenced_pressure_Pa"] > 0.0
+    assert notice["selected_pressure_Pa"] == answer.pressure.pa
+
+
 # ---------------------------------------------------------------------------
 # Refusal closure fixed point precedes solve bundles
 # ---------------------------------------------------------------------------
