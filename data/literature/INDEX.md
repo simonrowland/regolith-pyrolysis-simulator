@@ -1749,6 +1749,7 @@ The builder does not pick a winner.
 - source_id_alias `gaillard-2003`: `gaillard-2003-hydrogen-iron-redox-rate`, `gaillard-2003-hydrous-silicic-melt-activity` — needs owner/controller resolution
 - source_id_alias `giauque-1939`: `giauque-powell-1939-cl2`, `giauque-ruehrwein-1939-hcn-psat` — needs owner/controller resolution
 - source_id_alias `haskin-1991`: `lpi-lunar-sourcebook-chapter08`, `usgs-lunar-sourcebook-tab8-2` — needs owner/controller resolution
+- source_id_alias `hastie-1980`: `hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry`, `kems-214-hastie-1980-nbsir-80-2178` — needs owner/controller resolution
 - source_id_alias `huang-2003`: `huang-furukawa-aoto-2003-sodium-iron-oxides-kems`, `huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram` — needs owner/controller resolution
 - source_id_alias `ichise-1989`: `kems-112-ichise-1989`, `kems-198-ichise-ueshima-1989` — needs owner/controller resolution
 - source_id_alias `inoue-1982`: `inoue-suito-1982-na-silicate-sulfur-partitions`, `inoue-suito-1982-vanadium-mgo-saturated-slag` — needs owner/controller resolution
@@ -1798,4 +1799,3 @@ The builder does not pick a winner.
 - source_id_alias `yamada-1980`: `kems-067-yamada-1980`, `kems-087-yamada-kato-1980` — needs owner/controller resolution
 - source_id_alias `zaitsev-2000`: `zaitsev-2000-ms2000-045`, `zaitsev-2000-sodium-silicate-thermodynamics` — needs owner/controller resolution
 - source_id_alias `zhang-2021`: `kems-006-zhang-2021`, `zhang-2021-acsesc-si` — needs owner/controller resolution
-- source_id_alias `hastie-1980`: `hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry`, `kems-214-hastie-1980-nbsir-80-2178` — needs owner/controller resolution
