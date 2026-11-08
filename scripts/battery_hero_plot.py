@@ -1133,17 +1133,18 @@ def read_scores(
                     else:
                         summary.not_observable_by_rail[rail] += 1
                     if rail in HERO_AND_DECK_SOURCE_RAILS and engine_observable:
-                        formula = _row_formula(row)
-                        identity = _row_identity(row)
-                        composition_key, _composition_label = _composition_fields(identity)
-                        observable = _row_observable(row)
-                        facets = [_battery_hero_facet(rail, formula, observable)]
-                        if rail == Rail.VAPOUR.value:
-                            facets.extend(_battery_hero_minor_foulant_facets(formula))
-                        for facet in facets:
-                            hero_refusals[
-                                (rail, facet, composition_key, engine, reason)
-                            ] += 1
+                        if not _collection_mode:
+                            formula = _row_formula(row)
+                            identity = _row_identity(row)
+                            composition_key, _composition_label = _composition_fields(identity)
+                            observable = _row_observable(row)
+                            facets = [_battery_hero_facet(rail, formula, observable)]
+                            if rail == Rail.VAPOUR.value:
+                                facets.extend(_battery_hero_minor_foulant_facets(formula))
+                            for facet in facets:
+                                hero_refusals[
+                                    (rail, facet, composition_key, engine, reason)
+                                ] += 1
                         hero_refusal_totals[(rail, engine, reason)] += 1
                     continue
 
@@ -3602,7 +3603,8 @@ def _collection_stratified_sample(
         for (temperature_bin, sio2_bin), quota in quotas.items():
             query = database.execute(
                 """SELECT source, reference, temperature_K, sio2, composition,
-                          species, residual_dex, flagged, temperature_bin, sio2_bin
+                          species, residual_dex, flagged, temperature_bin, sio2_bin,
+                          temperature_key
                      FROM collection_unique_rows
                     WHERE rail = ? AND engine = ?
                       AND temperature_bin = ? AND sio2_bin IS ?
@@ -3635,6 +3637,9 @@ def _collection_stratified_sample(
                     "clipped": float(row[6]) < -3 or float(row[6]) > 3,
                     "temperature_bin": row[8],
                     "sio2_bin": row[9],
+                    "fingerprint_temperature_bin": _battery_hero_temperature_bin_index(
+                        row[10]
+                    ),
                 }
                 for row in reservoir
             )
@@ -4029,7 +4034,7 @@ def _write_collection_methods(
                 "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
                 f"- Temperature views split at {HERO_TEMPERATURE_FLOOR_K:g} K; "
                 f"{HERO_TEMPERATURE_FLOOR_K:g} K belongs to the upper view.",
-                f"- The interactive temperature and SiO₂ windows snap to {BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K:g} K and {BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH:g} mole-fraction fingerprint bin edges. Windows select half-open bins [lower, upper); samples and aggregate cells use the same integer bin indices. RMS is exact for those selected bins: sqrt(sum(e²) / n); the page embeds n, sum(e), and sum(e²) for each occupied fingerprint cell.",
+                f"- The interactive temperature and SiO₂ windows snap to {BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K:g} K and {BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH:g} mole-fraction fingerprint bin edges. Windows select half-open bins [lower, upper); samples and aggregate cells use the same integer bin indices. A window quotient within 8 × Number.EPSILON × max(1, abs(value / bin width)) of an integer uses the nearest integer index; otherwise lower bounds floor and upper bounds ceil. RMS is exact for those selected bins: sqrt(sum(e²) / n); the page embeds n, sum(e), and sum(e²) for each occupied fingerprint cell.",
                 "- Rows without a resolvable SiO₂ fraction contribute to exact RMS only when the full 0–1 composition range is selected.",
                 f"- Interactive plotted points and tooltips use a stratified sample capped at {COLLECTION_HTML_SAMPLE_LIMIT} rows per rail and engine; static density plots use all scored rows.",
                 "- Exposed rows match the exposure census or exposed-source list. Held-out rows are absent from both and from the pre-cutoff observation IDs; held-out RMS is displayed only when n ≥ 5.",
@@ -4084,7 +4089,7 @@ def _draw_scorecard_png(
     figure, axes = plt.subplots(
         1,
         len(observables),
-        figsize=(max(15.0, 5.2 * len(observables)), max(3.8, 0.48 * max_rows + 1.5)),
+        figsize=(max(15.0, 5.2 * len(observables)), max(4.2, 0.75 * max_rows + 1.5)),
         squeeze=False,
         sharex=True,
     )
@@ -4149,15 +4154,15 @@ def _draw_scorecard_png(
                 )
             row_label = f"{primary} vs {partner}"
             axis.text(
-                -0.04,
-                index - 0.32,
+                0.02,
+                index - 0.38,
                 row_label,
                 transform=axis.get_yaxis_transform(),
-                ha="right",
+                ha="left",
                 va="center",
                 color="#334155",
                 fontsize=5.5,
-                clip_on=False,
+                clip_on=True,
             )
             counts = f"n={row['n_shared']}"
             high_n = row.get("high_n_shared")
@@ -4167,14 +4172,15 @@ def _draw_scorecard_png(
             if low_n:
                 counts += f" · <{HERO_TEMPERATURE_FLOOR_K:g} {low_n}"
             axis.text(
-                0.98,
-                index + 0.32,
+                0.985,
+                index + 0.38,
                 counts,
                 transform=axis.get_yaxis_transform(),
                 ha="right",
                 va="center",
                 color="#64748b",
                 fontsize=5.3,
+                clip_on=True,
             )
         axis.set_title(label, loc="left", fontsize=8)
         axis.set_yticks([])
@@ -4259,7 +4265,8 @@ def _draw_temperature_png(
                 color="#64748b",
             )
         axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
-        axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
+        if n:
+            axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
         axis.axvline(
             float(HERO_TEMPERATURE_FLOOR_K),
             color="#64748b",
@@ -4701,15 +4708,13 @@ def _draw_progress_png(
                 axis.scatter(
                     candidate_dates,
                     candidate_values,
-                    color="#b45309",
+                    color=colors[engine],
                     marker="X",
-                    s=28,
+                    s=34,
+                    edgecolors="#263238",
+                    linewidths=0.75,
                     zorder=5,
-                    label=(
-                        "candidate (not green)"
-                        if not candidate_legend_added
-                        else "_nolegend_"
-                    ),
+                    label=f"candidate:{engine}",
                 )
                 candidate_legend_added = True
             if held_dates:
@@ -4731,14 +4736,15 @@ def _draw_progress_png(
         if candidate_legend_added:
             handles.append(
                 Line2D(
-                    [0], [0], marker="X", linestyle="", color="#b45309",
+                    [0], [0], marker="X", linestyle="", color="#263238",
+                    markerfacecolor="white", markeredgecolor="#263238",
                     label="candidate (not green)", markersize=4,
                 )
             )
         figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.91), ncol=min(7, len(handles)), frameon=False, fontsize=6)
     figure.suptitle("Is RMS error improving across green landings?", fontsize=10, y=0.995)
     figure.text(0.5, 0.955, "Lower shared-row RMS is better · green band = within 0.5 dex · diamonds show held-out RMS when n ≥ 5", ha="center", fontsize=6)
-    figure.subplots_adjust(left=0.11, right=0.99, top=0.84, bottom=0.06, hspace=0.62)
+    figure.subplots_adjust(left=0.11, right=0.99, top=0.865, bottom=0.06, hspace=0.62)
     _save_collection_png(figure, path)
 
 
@@ -5046,7 +5052,7 @@ function resolveBinIndex(value,step,edge){const quotient=value/step,nearest=Math
 function windowIndices(){return [resolveBinIndex(+tMin.value,TEMPERATURE_BIN_K,'lower'),resolveBinIndex(+tMax.value,TEMPERATURE_BIN_K,'upper'),resolveBinIndex(+sMin.value,SIO2_BIN_WIDTH,'lower'),resolveBinIndex(+sMax.value,SIO2_BIN_WIDTH,'upper')];}
 function windowValues(){const [tlo,thi,slo,shi]=windowIndices();return [tlo*TEMPERATURE_BIN_K,thi*TEMPERATURE_BIN_K,slo*SIO2_BIN_WIDTH,shi*SIO2_BIN_WIDTH];}
 function snapControls(){const [lo,hi,slo,shi]=windowValues();tMin.value=lo;tMax.value=hi;sMin.value=slo.toFixed(2);sMax.value=shi.toFixed(2);}
-function inWindow(row){const [tlo,thi,slo,shi]=windowIndices();if(row.temperature_bin<tlo||row.temperature_bin>=thi)return false;return row.sio2_bin==null?(slo===0&&shi>=Math.round(1/SIO2_BIN_WIDTH)):(row.sio2_bin>=slo&&row.sio2_bin<shi);}
+function inWindow(row){const [tlo,thi,slo,shi]=windowIndices();if(row.fingerprint_temperature_bin<tlo||row.fingerprint_temperature_bin>=thi)return false;return row.sio2_bin==null?(slo===0&&shi>=Math.round(1/SIO2_BIN_WIDTH)):(row.sio2_bin>=slo&&row.sio2_bin<shi);}
 function updateWindowRms(){
   const [tlo,thi,slo,shi]=windowIndices(),lo=tlo*TEMPERATURE_BIN_K,hi=thi*TEMPERATURE_BIN_K,rail=railSelect.value,parts=[];
   for(const engine of engines){if(!enabled(engine))continue;let n=0,squares=0;
@@ -5366,9 +5372,17 @@ def _scorecard_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
             comparisons = comparison_record.get("comparisons")
             if not isinstance(comparisons, Sequence) or isinstance(comparisons, (str, bytes)):
                 continue
-            for comparison in comparisons:
-                if not isinstance(comparison, Mapping):
-                    continue
+            selected_comparisons = [
+                comparison
+                for comparison in comparisons
+                if isinstance(comparison, Mapping)
+            ]
+            selected_comparisons.sort(
+                key=lambda comparison: _HERO_ENGINE_ORDER.index(
+                    str(comparison.get("engine") or "")
+                )
+            )
+            for comparison in selected_comparisons:
                 views = comparison.get("views")
                 views = views if isinstance(views, Mapping) else {}
                 all_view = views.get("all", {})
