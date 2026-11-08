@@ -84,20 +84,20 @@ def _assert_trailing_decimal_pins(observations: dict[str, dict]) -> None:
     # Render-checked Table 3 cells: the footnote defines (n) as one SD on the final digit.
     assert len(TRAILING_DECIMAL_PINS) == 20
     for observation_id, formula, printed, value, sigma, page in TRAILING_DECIMAL_PINS:
-        point = _point(observations[observation_id], formula)
+        observation = observations[observation_id]
+        assert observation["uncertainty"]["confidence_level"] == "one_sigma"
+        point = _point(observation, formula)
         assert (
             point["value_as_published"],
             Decimal(str(point["value"])),
             Decimal(str(point["sigma"])),
             point["sigma_as_published"],
-            point["sigma_confidence_level"],
             point["locator"]["page"],
         ) == (
             printed,
             Decimal(value),
             Decimal(sigma),
             f"({sigma})",
-            "one_sigma",
             page,
         )
 
@@ -131,6 +131,15 @@ def test_all_printed_table_rows_and_audited_table3_cells_are_retained() -> None:
         "glass": 157,
         "cr": 2,
     }
+    assert all(
+        row["uncertainty"]["confidence_level"] == "one_sigma"
+        for row in observations.values()
+    )
+    assert all(
+        "uncertainty" not in point and "sigma_confidence_level" not in point
+        for row in observations.values()
+        for point in row["values"]["points"]
+    )
     _assert_trailing_decimal_pins(observations)
 
     # Independent render pins from three printed cells on three PREPRINT pages.
@@ -338,7 +347,15 @@ def test_isolated_migration_maps_conditions_and_preserves_measured_cells() -> No
     assert len(rows) == 1256
     assert len(result.validation.hard_issues) == 0
     assert Counter(row.value.kind.value for row in rows) == {"point": 1178, "unavailable": 78}
-    assert Counter(row.uncertainty.kind.value for row in rows) == {"printed": 1160, "none": 96}
+    assert Counter(row.uncertainty.kind.value for row in rows) == {"printed": 1256}
+    assert Counter(
+        (
+            row.uncertainty.kind.value,
+            row.uncertainty.verbatim["confidence_level"],
+            "sigma" in row.uncertainty.verbatim,
+        )
+        for row in rows
+    ) == {("printed", "one_sigma", True): 1160, ("printed", "one_sigma", False): 96}
     assert all(row.identity.quantity.is_value for row in rows)
     assert all(row.identity.quantity.value.value == "equilibrium_phase_composition" for row in rows)
     assert all(row.identity.species.phase.is_value for row in rows)
@@ -389,6 +406,13 @@ def test_isolated_migration_maps_conditions_and_preserves_measured_cells() -> No
         if matching_source_point.get("sigma") is not None:
             assert row.uncertainty.kind.value == "printed"
             assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            assert Decimal(str(row.uncertainty.verbatim["sigma"])) == Decimal(
+                str(matching_source_point["sigma"])
+            )
+        else:
+            assert row.uncertainty.kind.value == "printed"
+            assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            assert "sigma" not in row.uncertainty.verbatim
         if row.identity.species.phase.value.value == "glass":
             assert condition["quench_state"].state.value == "not_stated"
             assert condition["quench_state"].locator.page == 7
