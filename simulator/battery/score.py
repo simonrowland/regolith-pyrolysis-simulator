@@ -16764,6 +16764,7 @@ def _battery_hero_binned_score_records(
     hero_rails: Sequence[str],
     bin_width_K: float,
     composition_sio2_by_key: Mapping[str, float],
+    include_series: bool = True,
 ) -> dict[str, object]:
     """Deduplicate and bin battery hero residuals from the streamed score table.
 
@@ -16806,7 +16807,7 @@ def _battery_hero_binned_score_records(
             unique_points[engine] += 1
             residual_square_sums[engine] += float(residual) ** 2
         bin_index = math.floor(float(temperature) / bin_width_K)
-        if rail in selected:
+        if rail in selected and include_series:
             key = (
                 engine,
                 formula,
@@ -16821,7 +16822,7 @@ def _battery_hero_binned_score_records(
             accumulator.temperature_sum += float(temperature)
             accumulator.n += 1
             accumulator.flagged = accumulator.flagged or bool(flagged)
-        if rail in hero:
+        if rail in hero and include_series:
             facets = [_battery_hero_facet(rail, formula, observable)]
             if rail == Rail.VAPOUR.value:
                 facets.extend(_battery_hero_minor_foulant_facets(formula))

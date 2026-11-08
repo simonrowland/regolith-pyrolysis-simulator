@@ -1397,6 +1397,7 @@ def read_scores(
             hero_rails=HERO_RAILS,
             bin_width_K=bin_width_K,
             composition_sio2_by_key=_SQLiteCompositionSio2(database),
+            include_series=not _collection_mode,
         )
         summary_records = binned_records["summaries"]
         for engine, record in summary_records.items():
@@ -3640,6 +3641,27 @@ def _collection_stratified_sample(
     return samples
 
 
+def _configure_temperature_figure_layout(figure: Any) -> None:
+    figure.subplots_adjust(left=0.09, right=0.985, top=0.94, bottom=0.08, hspace=0.55)
+
+
+def _collection_temperature_axis_aspect(engine_count: int) -> float:
+    figure, axes = plt.subplots(
+        max(1, engine_count),
+        1,
+        figsize=(12.2, max(3.0, 2.0 * engine_count)),
+        squeeze=False,
+        sharex=True,
+        sharey=True,
+    )
+    _configure_temperature_figure_layout(figure)
+    figure.canvas.draw()
+    bounds = axes.flat[0].get_window_extent()
+    aspect = bounds.height / bounds.width
+    plt.close(figure)
+    return aspect
+
+
 def _collection_raw_tables(
     database: sqlite3.Connection,
     data: ScorePlotData,
@@ -3663,8 +3685,9 @@ def _collection_raw_tables(
             "clipped_high_n": int(above or 0),
         }
     panel_rows: list[dict[str, object]] = []
-    rail_limits: dict[str, tuple[float, float]] = {}
     engines = _ordered_hero_engines(data.engines)
+    axis_height_to_width = _collection_temperature_axis_aspect(len(engines))
+    plot_limits: dict[str, tuple[float, float]] = {}
     for rail, label in COLLECTION_OBSERVABLES:
         rail_panels = [
             panel_counts.get((rail, engine), {}) for engine in engines
@@ -3677,10 +3700,11 @@ def _collection_raw_tables(
         ]
         if temperatures:
             low, high = min(temperatures), max(temperatures)
-            padding = max(25.0, (high - low) * 0.02)
-            rail_limits[rail] = (low - padding, high + padding)
+            plot_limits[rail] = (
+                (low - 50.0, high + 50.0) if low == high else (low, high)
+            )
         else:
-            rail_limits[rail] = data.x_limits
+            plot_limits[rail] = data.x_limits
         for engine in engines:
             panel = panel_counts.get((rail, engine), {})
             metric = _collection_metric(data, rail, engine)
@@ -3767,58 +3791,63 @@ def _collection_raw_tables(
         """SELECT rail, engine, temperature_K, residual_dex, flagged
              FROM collection_unique_rows"""
     ):
-        x_low, x_high = rail_limits[str(rail)]
+        x_low, x_high = plot_limits[str(rail)]
         value = float(residual)
-        clipped = int(value < -3 or value > 3)
-        if value < -3:
-            q, r = 0, -1
-        elif value > 3:
-            q, r = 0, 1
+        clipped_side = -1 if value < -3 else 1 if value > 3 else 0
+        x = (
+            (float(temperature) - x_low)
+            / (x_high - x_low)
+            / axis_height_to_width
+        )
+        y = (max(-3.0, min(3.0, value)) + 3) / 6
+        fractional_q = (sqrt_three / 3 * x - y / 3) / hex_radius
+        fractional_r = (2 / 3 * y) / hex_radius
+        cube_x = fractional_q
+        cube_z = fractional_r
+        cube_y = -cube_x - cube_z
+        rounded_x, rounded_y, rounded_z = (
+            round(cube_x), round(cube_y), round(cube_z)
+        )
+        x_error = abs(rounded_x - cube_x)
+        y_error = abs(rounded_y - cube_y)
+        z_error = abs(rounded_z - cube_z)
+        if x_error > y_error and x_error > z_error:
+            rounded_x = -rounded_y - rounded_z
+        elif y_error > z_error:
+            rounded_y = -rounded_x - rounded_z
         else:
-            x = (float(temperature) - x_low) / (x_high - x_low)
-            y = (value + 3) / 6
-            fractional_q = (sqrt_three / 3 * x - y / 3) / hex_radius
-            fractional_r = (2 / 3 * y) / hex_radius
-            cube_x = fractional_q
-            cube_z = fractional_r
-            cube_y = -cube_x - cube_z
-            rounded_x, rounded_y, rounded_z = (
-                round(cube_x), round(cube_y), round(cube_z)
-            )
-            x_error = abs(rounded_x - cube_x)
-            y_error = abs(rounded_y - cube_y)
-            z_error = abs(rounded_z - cube_z)
-            if x_error > y_error and x_error > z_error:
-                rounded_x = -rounded_y - rounded_z
-            elif y_error > z_error:
-                rounded_y = -rounded_x - rounded_z
-            else:
-                rounded_z = -rounded_x - rounded_y
-            q, r = int(rounded_x), int(rounded_z)
+            rounded_z = -rounded_x - rounded_y
+        q, r = int(rounded_x), int(rounded_z)
         density_counts[
-            (str(rail), str(engine), q, r, int(flagged), clipped)
+            (str(rail), str(engine), q, r, int(flagged), clipped_side)
         ] += 1
     density_rows: list[dict[str, object]] = []
-    for (rail, engine, q, r, flagged, clipped), count in sorted(density_counts.items()):
-        x_low, x_high = rail_limits[rail]
-        x_center = sqrt_three * hex_radius * (q + r / 2)
+    for (rail, engine, q, r, flagged, clipped_side), count in sorted(density_counts.items()):
+        x_low, x_high = plot_limits[rail]
+        x_center = sqrt_three * hex_radius * (q + r / 2) * axis_height_to_width
         y_center = 1.5 * hex_radius * r
         temperature_center = x_low + x_center * (x_high - x_low)
         residual_center = -3 + y_center * 6
+        if clipped_side:
+            plot_low, plot_high = plot_limits[rail]
+            inset = (plot_high - plot_low) * 0.005
+            temperature_center = min(
+                max(temperature_center, plot_low + inset), plot_high - inset
+            )
         density_rows.append(
             {
                 "rail": rail,
                 "engine": engine,
                 "x_bin": q,
-                "y_bin": -1 if clipped and r < 0 else 36 if clipped else r,
+                "y_bin": -1 if clipped_side < 0 else 36 if clipped_side > 0 else r,
                 "temperature_center_K": temperature_center,
                 "residual_center_dex": (
-                    -3.0 if clipped and r < 0 else 3.0 if clipped else residual_center
+                    -3.0 if clipped_side < 0 else 3.0 if clipped_side > 0 else residual_center
                 ),
                 "flagged": flagged,
-                "clipped": clipped,
+                "clipped": int(clipped_side != 0),
                 "row_count": count,
-                "hex_x_radius_K": hex_radius * (x_high - x_low),
+                "hex_x_radius_K": hex_radius * axis_height_to_width * (x_high - x_low),
                 "hex_y_radius_dex": hex_radius * 6,
             }
         )
@@ -4000,7 +4029,7 @@ def _write_collection_methods(
                 "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
                 f"- Temperature views split at {HERO_TEMPERATURE_FLOOR_K:g} K; "
                 f"{HERO_TEMPERATURE_FLOOR_K:g} K belongs to the upper view.",
-                f"- The interactive temperature and SiO₂ windows snap to {BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K:g} K and {BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH:g} mole-fraction fingerprint bin edges. RMS is exact for those selected bins: sqrt(sum(e²) / n); the page embeds n, sum(e), and sum(e²) for each occupied fingerprint cell.",
+                f"- The interactive temperature and SiO₂ windows snap to {BATTERY_HERO_FINGERPRINT_TEMPERATURE_BIN_K:g} K and {BATTERY_HERO_FINGERPRINT_SIO2_BIN_WIDTH:g} mole-fraction fingerprint bin edges. Windows select half-open bins [lower, upper); samples and aggregate cells use the same integer bin indices. RMS is exact for those selected bins: sqrt(sum(e²) / n); the page embeds n, sum(e), and sum(e²) for each occupied fingerprint cell.",
                 "- Rows without a resolvable SiO₂ fraction contribute to exact RMS only when the full 0–1 composition range is selected.",
                 f"- Interactive plotted points and tooltips use a stratified sample capped at {COLLECTION_HTML_SAMPLE_LIMIT} rows per rail and engine; static density plots use all scored rows.",
                 "- Exposed rows match the exposure census or exposed-source list. Held-out rows are absent from both and from the pre-cutoff observation IDs; held-out RMS is displayed only when n ≥ 5.",
@@ -4044,7 +4073,10 @@ def _draw_scorecard_png(
     ) if rows else {}
     max_rows = max(
         (
-            sum(row["rail"] == rail for row in rows)
+            sum(
+                row["rail"] == rail and int(row.get("n_shared") or 0) > 0
+                for row in rows
+            )
             for rail, _label in observables
         ),
         default=1,
@@ -4052,7 +4084,7 @@ def _draw_scorecard_png(
     figure, axes = plt.subplots(
         1,
         len(observables),
-        figsize=(max(4.2, 3.6 * len(observables)), max(3.8, 0.48 * max_rows + 1.5)),
+        figsize=(max(15.0, 5.2 * len(observables)), max(3.8, 0.48 * max_rows + 1.5)),
         squeeze=False,
         sharex=True,
     )
@@ -4063,9 +4095,13 @@ def _draw_scorecard_png(
         for value in values
         if value is not None
     ]
-    right = max(0.6, max(all_values, default=0.5) * 1.18)
+    right = max(0.8, max(all_values, default=0.5) * 1.5 + 0.15)
     for axis, (rail, label) in zip(axes.flat, observables, strict=True):
-        selected = [row for row in rows if row["rail"] == rail]
+        selected = [
+            row
+            for row in rows
+            if row["rail"] == rail and int(row.get("n_shared") or 0) > 0
+        ]
         partners = list(dict.fromkeys(str(row["comparison_engine"]) for row in selected))
         primaries = list(dict.fromkeys(str(row["primary_engine"]) for row in selected))
         comparisons = [(primary, partner) for primary in primaries for partner in partners]
@@ -4075,6 +4111,17 @@ def _draw_scorecard_png(
         ]
         axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axvline(0, color="#263238", linewidth=1.1, zorder=1)
+        if not comparisons:
+            axis.text(
+                0.5,
+                0.5,
+                "no shared rows",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
         for index, (primary, partner) in enumerate(comparisons):
             row = next(
                 item for item in selected
@@ -4100,6 +4147,18 @@ def _draw_scorecard_png(
                     [float(partner_value)], [y], marker="s", s=21,
                     color=colors[partner], alpha=alpha, zorder=3,
                 )
+            row_label = f"{primary} vs {partner}"
+            axis.text(
+                -0.04,
+                index - 0.32,
+                row_label,
+                transform=axis.get_yaxis_transform(),
+                ha="right",
+                va="center",
+                color="#334155",
+                fontsize=5.5,
+                clip_on=False,
+            )
             counts = f"n={row['n_shared']}"
             high_n = row.get("high_n_shared")
             low_n = row.get("low_n_shared")
@@ -4107,14 +4166,21 @@ def _draw_scorecard_png(
                 counts += f" · ≥{HERO_TEMPERATURE_FLOOR_K:g} {high_n}"
             if low_n:
                 counts += f" · <{HERO_TEMPERATURE_FLOOR_K:g} {low_n}"
-            axis.text(right * 0.995, index, counts, ha="right", va="center", color="#64748b", fontsize=5.3)
+            axis.text(
+                0.98,
+                index + 0.32,
+                counts,
+                transform=axis.get_yaxis_transform(),
+                ha="right",
+                va="center",
+                color="#64748b",
+                fontsize=5.3,
+            )
         axis.set_title(label, loc="left", fontsize=8)
-        axis.set_yticks(range(len(comparisons)))
-        axis.set_yticklabels(
-            [f"{primary} vs {partner}" for primary, partner in comparisons],
-            fontsize=5.5,
-        )
+        axis.set_yticks([])
         axis.invert_yaxis()
+        if comparisons:
+            axis.set_ylim(len(comparisons) - 0.5, -0.5)
         axis.set_xlim(0, right)
         axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.5)
         axis.tick_params(axis="x", labelsize=6)
@@ -4133,11 +4199,11 @@ def _draw_scorecard_png(
             label=f"<{HERO_TEMPERATURE_FLOOR_K:g} K", markersize=4
         ),
     ]
-    figure.suptitle("Which engine is closest to measurement for each observable?", fontsize=11, y=0.99)
-    figure.text(0.5, 0.955, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=7)
+    figure.suptitle("Which engine is closest to measurement for each observable?", fontsize=11, y=0.995)
+    figure.text(0.5, 0.91, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=7)
     if engine_handles:
-        figure.legend(handles=engine_handles + temp_handles, loc="upper center", bbox_to_anchor=(0.5, 0.925), ncol=min(8, len(engine_handles) + 2), frameon=False, fontsize=6)
-    figure.subplots_adjust(left=0.08, right=0.99, top=0.82, bottom=0.14, wspace=0.32)
+        figure.legend(handles=engine_handles + temp_handles, loc="upper center", bbox_to_anchor=(0.5, 0.86), ncol=min(8, len(engine_handles) + 2), frameon=False, fontsize=6)
+    figure.subplots_adjust(left=0.14, right=0.99, top=0.76, bottom=0.14, wspace=0.5)
     _save_collection_png(figure, path)
 
 
@@ -4176,11 +4242,22 @@ def _draw_temperature_png(
         color = colors[engine]
         n = int(panel.get("n") or 0)
         plotted_n = int(panel.get("plotted_n") or 0)
-        rms = panel.get("rms_dex") or "unavailable"
+        rms = _format_dex(panel.get("rms_dex"))
         flagged = int(panel.get("flagged_n") or 0)
         clipped_low = int(panel.get("clipped_low_n") or 0)
         clipped_high = int(panel.get("clipped_high_n") or 0)
         count_label = f"{plotted_n} plotted of {n} scored"
+        if n == 0:
+            axis.text(
+                0.5,
+                0.5,
+                "no scored rows",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
         axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
         axis.axvline(
@@ -4301,18 +4378,17 @@ def _draw_temperature_png(
         axis.set_ylabel("Signed error (dex)", fontsize=7)
         axis.grid(color="#94a3b8", alpha=0.17, linewidth=0.45)
         axis.tick_params(labelsize=6)
-        axis.set_title(
-            f"{engine} · {count_label} · all-scored RMS {rms} dex · {flagged} extrapolated · {clipped_low + clipped_high} beyond ±3 dex",
-            loc="left",
-            fontsize=7.5,
+        title = (
+            f"{engine} · no scored rows"
+            if n == 0
+            else f"{engine} · {count_label} · all-scored RMS {rms} dex · {flagged} extrapolated · {clipped_low + clipped_high} beyond ±3 dex"
         )
+        axis.set_title(title, loc="left", fontsize=7.5)
     axes_flat[-1].set_xlabel("Temperature (K)", fontsize=7)
-    if axes_flat:
-        axes_flat[0].text(0.995, 0.94, "association data floor", transform=axes_flat[0].transAxes, ha="right", va="top", fontsize=5.5, color="#64748b")
     observable = dict(COLLECTION_OBSERVABLES)[rail]
     figure.suptitle(f"How does {observable.lower()} error change with temperature?", fontsize=10, y=0.995)
     figure.text(0.5, 0.978, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=6.5)
-    figure.subplots_adjust(left=0.09, right=0.985, top=0.94, bottom=0.08, hspace=0.55)
+    _configure_temperature_figure_layout(figure)
     _save_collection_png(figure, path)
 
 
@@ -4408,6 +4484,7 @@ def _draw_fingerprint_png(
     rows: Sequence[Mapping[str, str]],
     engines: Sequence[str],
 ) -> None:
+    engines = _ordered_hero_engines(engines)
     colors = _hero_engine_colors(engines)
     figure, axes = plt.subplots(
         1,
@@ -4417,7 +4494,7 @@ def _draw_fingerprint_png(
         sharex=True,
         sharey=True,
     )
-    figure.subplots_adjust(left=0.07, right=0.99, top=0.87, bottom=0.14, wspace=0.18)
+    figure.subplots_adjust(left=0.07, right=0.99, top=0.82, bottom=0.14, wspace=0.18)
     rail_rows = [row for row in rows if row["rail"] == rail]
     temperatures = [
         _finite_float(row.get(key))
@@ -4449,10 +4526,32 @@ def _draw_fingerprint_png(
             temperature_limits=limits,
             export_dpi=COLLECTION_EXPORT_DPI,
         )
+        if not cells:
+            axis.text(
+                0.5,
+                0.5,
+                "no scored rows",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
+        elif not any(cell["n"] >= 3 for cell in cells):
+            axis.text(
+                0.5,
+                0.5,
+                "no cells with n ≥ 3",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
         axis.set_title(engine, loc="left", fontsize=6.5)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
     figure.suptitle(f"Where does {observable.lower()} meet the target?", fontsize=10, y=0.99)
-    figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.94), ncol=3, frameon=False, fontsize=6)
+    figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.91), ncol=3, frameon=False, fontsize=6)
     _save_collection_png(figure, path)
 
 
@@ -4540,6 +4639,7 @@ def _draw_progress_png(
         figsize=(12, 2.25 * len(observables)),
         squeeze=False,
         sharey=True,
+        sharex=True,
     )
     max_rms = max(
         [
@@ -4553,6 +4653,7 @@ def _draw_progress_png(
         ]
         + [1.0]
     )
+    candidate_legend_added = False
     for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
         axis.axhspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
@@ -4562,6 +4663,8 @@ def _draw_progress_png(
             engine_rows.sort(key=lambda row: row.get("date") or "")
             dates: list[float] = []
             values: list[float] = []
+            candidate_dates: list[float] = []
+            candidate_values: list[float] = []
             held_dates: list[float] = []
             held_values: list[float] = []
             for row in engine_rows:
@@ -4569,8 +4672,15 @@ def _draw_progress_png(
                 rms = _finite_float(row.get("rms_dex"))
                 if date is None or rms is None:
                     continue
-                dates.append(date)
-                values.append(rms)
+                is_candidate = str(row.get("basis") or "").startswith(
+                    "candidate (not green)"
+                )
+                if is_candidate:
+                    candidate_dates.append(date)
+                    candidate_values.append(rms)
+                else:
+                    dates.append(date)
+                    values.append(rms)
                 held_n = int(row.get("held_out_n") or 0)
                 held_rms = _finite_float(row.get("held_out_rms_dex"))
                 if held_n >= HERO_MINIMUM_REPORT_N and held_rms is not None:
@@ -4587,6 +4697,21 @@ def _draw_progress_png(
                     )
             if dates:
                 axis.plot(dates, values, color=colors[engine], marker="o", markersize=3, linewidth=1.0, label=engine)
+            if candidate_dates:
+                axis.scatter(
+                    candidate_dates,
+                    candidate_values,
+                    color="#b45309",
+                    marker="X",
+                    s=28,
+                    zorder=5,
+                    label=(
+                        "candidate (not green)"
+                        if not candidate_legend_added
+                        else "_nolegend_"
+                    ),
+                )
+                candidate_legend_added = True
             if held_dates:
                 axis.scatter(held_dates, held_values, color=colors[engine], marker="D", s=20, zorder=4)
         axis.set_title(observable, loc="left", fontsize=7.5)
@@ -4596,17 +4721,24 @@ def _draw_progress_png(
         axis.tick_params(axis="x", rotation=22, labelsize=5.5)
         axis.tick_params(axis="y", labelsize=5.5)
         axis.grid(color="#94a3b8", alpha=0.2, linewidth=0.45)
-    axes.flat[-1].set_xlabel("Green landing date", fontsize=6)
+    axes.flat[-1].set_xlabel("Green landing or candidate date", fontsize=6)
     handles = [
         Line2D([0], [0], marker="o", linestyle="-", color=colors[engine], label=engine, markersize=3)
         for engine in engine_names
     ]
     if handles:
         handles.append(Line2D([0], [0], marker="D", linestyle="", color="#334155", label="held-out RMS (n ≥ 5)", markersize=4))
-        figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.985), ncol=min(7, len(handles)), frameon=False, fontsize=6)
-    figure.suptitle("Is RMS error improving across green landings?", fontsize=10, y=0.999)
-    figure.text(0.5, 0.987, "Lower shared-row RMS is better · green band = within 0.5 dex · diamonds show held-out RMS when n ≥ 5", ha="center", fontsize=6)
-    figure.subplots_adjust(left=0.11, right=0.99, top=0.95, bottom=0.06, hspace=0.62)
+        if candidate_legend_added:
+            handles.append(
+                Line2D(
+                    [0], [0], marker="X", linestyle="", color="#b45309",
+                    label="candidate (not green)", markersize=4,
+                )
+            )
+        figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.91), ncol=min(7, len(handles)), frameon=False, fontsize=6)
+    figure.suptitle("Is RMS error improving across green landings?", fontsize=10, y=0.995)
+    figure.text(0.5, 0.955, "Lower shared-row RMS is better · green band = within 0.5 dex · diamonds show held-out RMS when n ≥ 5", ha="center", fontsize=6)
+    figure.subplots_adjust(left=0.11, right=0.99, top=0.84, bottom=0.06, hspace=0.62)
     _save_collection_png(figure, path)
 
 
@@ -4654,10 +4786,32 @@ def _html_table(rows: Sequence[Mapping[str, str]]) -> str:
     columns = tuple(rows[0])
     header = "".join(f"<th>{html.escape(column)}</th>" for column in columns)
     body = "".join(
-        "<tr>" + "".join(f"<td>{html.escape(str(row.get(column, '')))}</td>" for column in columns) + "</tr>"
+        "<tr>"
+        + "".join(
+            f"<td>{html.escape(_html_table_value(column, row.get(column, '')))}</td>"
+            for column in columns
+        )
+        + "</tr>"
         for row in rows
     )
     return f"<div class=table-wrap><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></div>"
+
+
+def _html_table_value(column: str, value: object) -> str:
+    text = str(value)
+    if column.endswith(("_dex", "_K")) or column in {
+        "sio2",
+        "sio2_lower",
+        "sio2_upper",
+        "scored_percent",
+    }:
+        try:
+            number = Decimal(text)
+        except (InvalidOperation, ValueError):
+            return text
+        if number.is_finite():
+            return format(number, ".3f")
+    return text
 
 
 def _write_collection_html(
@@ -4668,6 +4822,8 @@ def _write_collection_html(
     engine_names: Sequence[str],
     observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
 ) -> None:
+    engine_names = _ordered_hero_engines(engine_names)
+
     def section(
         chart_id: str,
         title: str,
@@ -4844,7 +5000,9 @@ def _write_collection_html(
         output.write("const cells=cellData.cells;\n")
         output.write("const PALETTE=")
         output.write(json.dumps(_hero_engine_colors(engine_names)))
-        output.write(";const BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'};\n")
+        output.write(";const BANDS=")
+        output.write(json.dumps(dict(FINGERPRINT_BANDS), separators=(",", ":")))
+        output.write(";\n")
         output.write(
             _COLLECTION_INTERACTIVE_SCRIPT
             .replace("__RAILS__", json.dumps([rail for rail, _label in observables]))
@@ -4884,24 +5042,23 @@ let minTemp=Infinity,maxTemp=-Infinity;
 for(const cell of cells){minTemp=Math.min(minTemp,cell[2]*TEMPERATURE_BIN_K);maxTemp=Math.max(maxTemp,(cell[2]+1)*TEMPERATURE_BIN_K);}
 tMin.value=Number.isFinite(minTemp)?Math.floor(minTemp):0;tMax.value=Number.isFinite(maxTemp)?Math.ceil(maxTemp):3000;sMin.value=0;sMax.value=1;
 function enabled(engine){return !!toggles.querySelector('[data-engine-toggle=\"'+CSS.escape(engine)+'\"]')?.checked;}
-function snap(value,step,round){return round(value/step)*step;}
-function windowValues(){return [snap(+tMin.value,TEMPERATURE_BIN_K,Math.floor),snap(+tMax.value,TEMPERATURE_BIN_K,Math.ceil),snap(+sMin.value,SIO2_BIN_WIDTH,Math.floor),snap(+sMax.value,SIO2_BIN_WIDTH,Math.ceil)];}
+function resolveBinIndex(value,step,edge){const quotient=value/step,nearest=Math.round(quotient),tolerance=Number.EPSILON*Math.max(1,Math.abs(quotient))*8;if(Math.abs(quotient-nearest)<=tolerance)return nearest;return edge==='lower'?Math.floor(quotient):Math.ceil(quotient);}
+function windowIndices(){return [resolveBinIndex(+tMin.value,TEMPERATURE_BIN_K,'lower'),resolveBinIndex(+tMax.value,TEMPERATURE_BIN_K,'upper'),resolveBinIndex(+sMin.value,SIO2_BIN_WIDTH,'lower'),resolveBinIndex(+sMax.value,SIO2_BIN_WIDTH,'upper')];}
+function windowValues(){const [tlo,thi,slo,shi]=windowIndices();return [tlo*TEMPERATURE_BIN_K,thi*TEMPERATURE_BIN_K,slo*SIO2_BIN_WIDTH,shi*SIO2_BIN_WIDTH];}
 function snapControls(){const [lo,hi,slo,shi]=windowValues();tMin.value=lo;tMax.value=hi;sMin.value=slo.toFixed(2);sMax.value=shi.toFixed(2);}
-function inWindow(row){const [lo,hi,slo,shi]=windowValues();if(+row.temperature_K<lo||+row.temperature_K>hi)return false;return row.sio2==null?(slo<=0&&shi>=1):(+row.sio2>=slo&&+row.sio2<=shi);}
+function inWindow(row){const [tlo,thi,slo,shi]=windowIndices();if(row.temperature_bin<tlo||row.temperature_bin>=thi)return false;return row.sio2_bin==null?(slo===0&&shi>=Math.round(1/SIO2_BIN_WIDTH)):(row.sio2_bin>=slo&&row.sio2_bin<shi);}
 function updateWindowRms(){
-  const [lo,hi,slo,shi]=windowValues(),rail=railSelect.value,parts=[];
+  const [tlo,thi,slo,shi]=windowIndices(),lo=tlo*TEMPERATURE_BIN_K,hi=thi*TEMPERATURE_BIN_K,rail=railSelect.value,parts=[];
   for(const engine of engines){if(!enabled(engine))continue;let n=0,squares=0;
     for(const cell of cells){if(cellData.rails[cell[0]]!==rail||cellData.engines[cell[1]]!==engine)continue;
-      const temperatureLower=cell[2]*TEMPERATURE_BIN_K,temperatureUpper=(cell[2]+1)*TEMPERATURE_BIN_K;
-      if(temperatureLower<lo||temperatureUpper>hi)continue;
-      if(cell[9]){if(slo<=0&&shi>=1){n+=cell[4];squares+=+cell[6];}continue;}
-      const sio2Lower=cell[3]*SIO2_BIN_WIDTH,sio2Upper=(cell[3]+1)*SIO2_BIN_WIDTH;
-      if(sio2Lower<slo||sio2Upper>shi)continue;
+      if(cell[2]<tlo||cell[2]>=thi)continue;
+      if(cell[9]){if(slo===0&&shi>=Math.round(1/SIO2_BIN_WIDTH)){n+=cell[4];squares+=+cell[6];}continue;}
+      if(cell[3]<slo||cell[3]>=shi)continue;
       n+=cell[4];squares+=+cell[6];
     }
     parts.push(engine+': '+(n?Math.sqrt(squares/n).toFixed(3)+' dex (n='+n+')':'no scored bins'));
   }
-  document.getElementById('window-rms').textContent='Exact binned RMS for '+lo+'–'+hi+' K and SiO₂ '+slo.toFixed(2)+'–'+shi.toFixed(2)+': '+(parts.join(' · ')||'no engines selected');
+  document.getElementById('window-rms').textContent='Exact binned RMS for ['+lo+', '+hi+') K and SiO₂ ['+(slo*SIO2_BIN_WIDTH).toFixed(2)+', '+(shi*SIO2_BIN_WIDTH).toFixed(2)+'): '+(parts.join(' · ')||'no engines selected');
 }
 function size(canvas){const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height};}
 function lighten(hex,amount){const n=parseInt(hex.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return 'rgb('+Math.round(r+(255-r)*amount)+','+Math.round(g+(255-g)*amount)+','+Math.round(b+(255-b)*amount)+')';}
@@ -4940,6 +5097,7 @@ function showTip(event,kind){
   const detail=row?'Row source: '+row.source+' ('+row.reference+')\nT: '+row.temperature_K+' K\nComposition: '+row.composition+'\nResidual: '+row.residual_dex+' dex':'No row in this cell';
   tip.textContent=cell?'Median |error|: '+cell[7]+' dex · n='+cell[4]+'\n'+detail:detail;tip.style.display='block';tip.style.left=Math.min(event.clientX+12,innerWidth-350)+'px';tip.style.top=Math.min(event.clientY+12,innerHeight-120)+'px';
 }
+function displayCell(column,value){if(value==null||value==='')return value??'';if(column.endsWith('_dex')||column.endsWith('_K')||['sio2','sio2_lower','sio2_upper','scored_percent'].includes(column)){const number=Number(value);if(Number.isFinite(number))return number.toFixed(3);}return String(value);}
 function deferredRows(kind,rail){
   if(kind==='samples')return rows.filter(row=>row.rail===rail);
   const bandNames=['','good','okay','needs work'];
@@ -4955,7 +5113,7 @@ function renderDeferredTable(holder,tableRows){
   if(!tableRows.length){holder.textContent='No rows.';return;}
   const columns=Object.keys(tableRows[0]),table=document.createElement('table'),head=document.createElement('thead'),headRow=document.createElement('tr'),body=document.createElement('tbody');
   for(const column of columns){const cell=document.createElement('th');cell.textContent=column;headRow.append(cell);}head.append(headRow);
-  for(const record of tableRows){const row=document.createElement('tr');for(const column of columns){const cell=document.createElement('td');cell.textContent=record[column]??'';row.append(cell);}body.append(row);}
+  for(const record of tableRows){const row=document.createElement('tr');for(const column of columns){const cell=document.createElement('td');cell.textContent=displayCell(column,record[column]);row.append(cell);}body.append(row);}
   table.append(head,body);holder.replaceChildren(table);
 }
 for(const holder of document.querySelectorAll('[data-deferred-table]')){
@@ -5432,11 +5590,13 @@ def _history_collection_rows(
     annotations: Mapping[str, str],
 ) -> list[dict[str, object]]:
     entries = list(history)
+    candidate_landing: str | None = None
     if not any(
         str(entry.get("store_sha") or "") == simulator_commit
         or str(entry.get("store_revision") or "") == str(data.stamp.get("revision") or "")
         for entry in entries
     ):
+        candidate_landing = simulator_commit
         entries.append(
             {
                 "store_sha": simulator_commit,
@@ -5557,6 +5717,9 @@ def _history_collection_rows(
             shared = selected_shared.get((rail, engine))
             if rail in rails_with_comparisons and shared is None:
                 continue
+            basis = shared["basis"] if shared is not None else "legacy_all_rows"
+            if landing == candidate_landing:
+                basis = f"candidate (not green); {basis}"
             rows.append(
                 {
                     "landing": landing,
@@ -5585,7 +5748,7 @@ def _history_collection_rows(
                         else held.get("rms_dex", "")
                     ),
                     "shared_with": shared["shared_with"] if shared is not None else "",
-                    "basis": shared["basis"] if shared is not None else "legacy_all_rows",
+                    "basis": basis,
                     "annotation": annotation,
                 }
             )
