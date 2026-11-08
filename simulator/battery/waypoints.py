@@ -24,6 +24,8 @@ from simulator.battery.migrate import (
     _knudsen_effusion_chamber_background_not_for_identity,
     _mass_percent_kept_total,
     _printed_mass_percent_map_refusal,
+    _printed_composition_map as _migration_printed_composition_map,
+    _unrecognized_printed_chemical_components,
 )
 from simulator.battery.records import (
     Bench,
@@ -473,6 +475,18 @@ def charge_moles_by_species(
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
     printed = experiment.sample.printed_composition
+    initial_composition_refused = (
+        composition.state.reason
+        if composition is not None
+        and composition.state.is_unknown
+        and composition.state.reason is not None
+        and composition.state.reason.startswith(
+            "mass-percent composition is not usable:"
+        )
+        else None
+    )
+    unsupported_printed_composition = False
+    refused_printed_components: tuple[str, ...] = ()
     sibling_printed_mass_percent_refused = False
     if (
         composition is not None
@@ -574,11 +588,29 @@ def charge_moles_by_species(
         is_mass_percent, refusal = _printed_mass_percent_map_refusal(
             source_map, {}, reject_dropped_components=True
         )
-        raw = (
-            None
-            if is_mass_percent and refusal is not None
-            else _printed_composition_map(source_map)
+        raw = _printed_composition_map(source_map)
+        unsupported_component_refusal = (
+            refusal is not None
+            and "partial analysis contains unsupported component(s)" in refusal
         )
+        ambiguous_iron_refusal = (
+            refusal is not None
+            and "ambiguous total iron components" in refusal
+        )
+        if is_mass_percent and refusal is not None:
+            unsupported_printed_composition = (
+                unsupported_component_refusal or ambiguous_iron_refusal
+            )
+            diagnostic_map = _migration_printed_composition_map(source_map)
+            if unsupported_component_refusal and diagnostic_map is not None:
+                refused = _unrecognized_printed_chemical_components(
+                    diagnostic_map,
+                    {"printed_composition": source_map},
+                    declared_component_map=diagnostic_map,
+                )
+                dropped.extend(refused)
+                refused_printed_components = tuple(sorted(refused))
+            raw = None
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():
@@ -662,6 +694,20 @@ def charge_moles_by_species(
             tuple(charge_inputs),
             present=charge_inputs,
         ).absence
+        if unsupported_printed_composition:
+            missing = tuple(
+                f"experiment.sample.printed_composition.{name}"
+                for name in refused_printed_components
+            ) or ("experiment.sample.printed_composition",)
+            absence = WaypointAbsence(
+                "charge_moles_by_species", GapReason.UNSUPPORTED_PRINT_FORM, missing
+            )
+        elif initial_composition_refused is not None:
+            absence = WaypointAbsence(
+                "charge_moles_by_species",
+                GapReason.UNSUPPORTED_PRINT_FORM,
+                ("experiment.sample.initial_composition",),
+            )
     return SpeciesWaypoints(results, absence, tuple(sorted(set(dropped) - set(results))))
 
 
