@@ -62,22 +62,40 @@ fidelity_samples:
     note: 35 CaO / 65 SiO2 first quench
 - species: SiO2
   observation_id: greig1927_t5_mgo_siliceous_glass
-  field: composition_mass_percent_as_published
-  value: {MgO: '0.8', SiO2: '99.2'}
+  field: component_amount
+  value: '99.2'
   locator:
     page: 19
     published_page: 19
     table: V
-    note: Table V MgO-SiO2 composition at 1710°; rendered value 99.2SiO2.
+    note: Table V MgO-SiO2 SiO2 component at 1710°; rendered value 99.2 wt%.
+- species: MgO
+  observation_id: greig1927_t5_mgo_siliceous_glass_MgO
+  field: component_amount
+  value: '0.8'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V MgO-SiO2 MgO component at 1710°; rendered value 0.8 wt%.
 - species: SiO2
   observation_id: greig1927_t5_cao_siliceous_glass
-  field: composition_mass_percent_as_published
-  value: {CaO: '0.6', SiO2: '99.4'}
+  field: component_amount
+  value: '99.4'
   locator:
     page: 19
     published_page: 19
     table: V
-    note: Table V CaO-SiO2 composition at 1710°; rendered value 99.4SiO2.
+    note: Table V CaO-SiO2 SiO2 component at 1710°; rendered value 99.4 wt%.
+- species: CaO
+  observation_id: greig1927_t5_cao_siliceous_glass_CaO
+  field: component_amount
+  value: '0.6'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V CaO-SiO2 CaO component at 1710°; rendered value 0.6 wt%.
 - species: SiO2
   observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
   field: composition_mass_percent_as_published
@@ -842,6 +860,117 @@ species:
       quench_statement:
         preservation: not_stated
         locator: {page: 14, published_page: 14, table: III, note: Quench results are determined by microscopic examination; no preservation statement.}
+    - observation_id: greig1927_t5_mgo_siliceous_glass
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[MgO, '0.8'], [SiO2, '99.2']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '99.2'
+        component_amount_as_published: 99.2 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: MgO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {MgO: '0.8', SiO2: '99.2'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
+        reference_glass_refractive_index_as_printed: '1.580'
+        reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
+        reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+    - observation_id: greig1927_t5_cao_siliceous_glass
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[CaO, '0.6'], [SiO2, '99.4']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '99.4'
+        component_amount_as_published: 99.4 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: CaO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {CaO: '0.6', SiO2: '99.4'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
+        reference_glass_refractive_index_as_printed: '1.589'
+        reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
+        reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
     context:
     - observation_id: greig1927_t2a_run9
       type: phase_equilibrium_run_products
@@ -3154,6 +3283,10 @@ species:
       values:
         method_class: measured_text
         composition_mass_percent: {CaO: 5, SiO2: 95}
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 20, published_page: 20, note: 'The composition is the mixture melted on the Pt-Rh ribbon, before formation of the resulting liquids.'}
+          quote: Small amount melted on a Pt-Rh ribbon heated by electric current.
         method: Small amount melted on Pt-Rh ribbon heated by electric current.
         result: Drop of resulting liquids photographed in Fig. 12; two liquids.
     - observation_id: greig1927_t6_r1
@@ -3521,58 +3654,47 @@ species:
         procedure: Crystal-free baria-silica liquids easily quench clear even in large charges. Holding just below liquidus produces large cristobalite crystals; rapid cooling into a blast of air yields clear glass but higher-index glass film around crystals. Dropping charge under mercury usually removes that film.
         atmosphere_note: Blast of air is a cooling treatment; it does not specify furnace operating atmosphere.
 
-    - observation_id: greig1927_t5_mgo_siliceous_glass
+    - observation_id: greig1927_t5_mgo_siliceous_glass_raw_indices
       phase: glass
       quench_statement:
         preservation: not_stated
         locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
-      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
-      type: phase_composition_reduction_lineage_refused
-      experiment: critical-quenches-binary
+      type: characterization
       locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
       units: wt%; refractive index; °C
       values:
-        method_class: measured_reduced
-        evidence_class: measured_reduced
-        disposition: Typed composition token exists, but measured_reduced lineage cannot resolve its printed refractive-index inputs as scored parent observations. The refractive-index quantity has no exact token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES; phase_equilibrium_run_products is outside the closed set tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        method_class: measured_tabulated
         system: MgO-SiO2
         temperature_C_as_printed: 1710
         phase_as_measured: quenched glass
-        composition_mass_percent_as_published: {MgO: '0.8', SiO2: '99.2'}
         refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
         reference_glass_refractive_index_as_printed: '1.580'
         reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
         reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
         silica_glass_refractive_index_as_printed: '1.4584'
-        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
         row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
-    - observation_id: greig1927_t5_cao_siliceous_glass
+    - observation_id: greig1927_t5_cao_siliceous_glass_raw_indices
       phase: glass
       quench_statement:
         preservation: not_stated
         locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
-      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
-      type: phase_composition_reduction_lineage_refused
-      experiment: critical-quenches-binary
+      type: characterization
       locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
       units: wt%; refractive index; °C
       values:
-        method_class: measured_reduced
-        evidence_class: measured_reduced
-        disposition: Typed composition token exists, but measured_reduced lineage cannot resolve its printed refractive-index inputs as scored parent observations. The refractive-index quantity has no exact token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES; phase_equilibrium_run_products is outside the closed set tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        method_class: measured_tabulated
         system: CaO-SiO2
         temperature_C_as_printed: 1710
         phase_as_measured: quenched glass
-        composition_mass_percent_as_published: {CaO: '0.6', SiO2: '99.4'}
         refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
         reference_glass_refractive_index_as_printed: '1.589'
         reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
         reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
         silica_glass_refractive_index_as_printed: '1.4584'
         table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
-        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
         row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
     - observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
+      phase: glass
       quench_statement:
         preservation: asserted_altered
         locator: {page: 44, published_page: 44, note: The droplet was not perfectly quenched; cristobalite formed during chilling.}
@@ -3584,9 +3706,128 @@ species:
         evidence_class: measured_reduced
         disposition: The source's approximate liquid composition is printed, but its measured_reduced ancestry is in Table III and Table IV context rows rather than scored parent observations; no source-defined calculation can be linked without changing the migrator.
         system: CaO-SiO2
+        phase_label: glass
+        phase_as_measured: Quenched glass droplet; the source describes its liquid-phase composition before imperfect quenching.
         composition_mass_percent_as_published: {CaO: about 27.5, SiO2: '72.5'}
         ribbon_temperature_C_as_printed: about 1725
         liquidus_temperature_C_as_printed: 1698
         composition_note: The prose describes the liquid in the cited Pt-Rh ribbon droplet; it does not identify this value as a conjugate endpoint.
         quench_as_printed: Droplet explicitly not perfectly quenched; cristobalite formed during chilling (page 44).
         uncertainty_note: "Composition is qualified as 'about'; no numeric width or confidence level is stated."
+
+  MgO:
+    observations:
+    - observation_id: greig1927_t5_mgo_siliceous_glass_MgO
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[MgO, '0.8'], [SiO2, '99.2']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '0.8'
+        component_amount_as_published: 0.8 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: MgO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {MgO: '0.8', SiO2: '99.2'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
+        reference_glass_refractive_index_as_printed: '1.580'
+        reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
+        reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+
+  CaO:
+    observations:
+    - observation_id: greig1927_t5_cao_siliceous_glass_CaO
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[CaO, '0.6'], [SiO2, '99.4']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '0.6'
+        component_amount_as_published: 0.6 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: CaO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {CaO: '0.6', SiO2: '99.4'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
+        reference_glass_refractive_index_as_printed: '1.589'
+        reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
+        reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]

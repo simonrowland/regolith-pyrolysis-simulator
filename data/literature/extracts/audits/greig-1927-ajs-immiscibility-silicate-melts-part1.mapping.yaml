@@ -83,7 +83,7 @@ tables:
       - cell: CaO-SiO2 refractive index at 1744 C
         machine_read: '1.462−'
         rendered: '1.462−'
-    destination: Composition outputs remain typed-refused context because their measured refractive-index inputs have no exact quantity token and cannot be resolved as lineage parents.
+    destination: Four scored equilibrium_phase_composition rows at 1710 C: MgO and SiO2 components for MgO-SiO2, and CaO and SiO2 components for CaO-SiO2. Each is measured_reduced and cites its located refractive-index and reference-glass context row as an input.
 prose:
   - page: 16
     cells: MgO-SiO2 and CaO-SiO2 more-siliceous liquid bound
@@ -96,7 +96,7 @@ prose:
   - page: 20
     cells: 5CaO 95SiO2 ribbon charge
     printed: two liquids; Figure 12 caption reports cristobalite formed during quenching
-    destination: context with asserted_altered quench state
+    destination: initial_charge_only context with asserted_altered quench state
   - page: 30
     cells: binary equilibrium temperatures restated
     printed: CaO-SiO2 1698 C; MgO-SiO2 1695 C
@@ -104,7 +104,7 @@ prose:
   - page: 44
     cells: approximate ribbon-droplet liquid composition and liquidus
     printed: ribbon about 1725 C; about 27.5CaO 72.5SiO2; liquidus 1698 C
-    destination: typed-refused context; not identified as a conjugate endpoint
+    destination: analyzed liquid-phase composition retained in glass-phase context; not identified as a conjugate endpoint
   - page: 44
     cells: comparison quench charge
     printed: 10 g, 37CaO 63SiO2; completely quenched by plunging under water
