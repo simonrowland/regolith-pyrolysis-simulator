@@ -18,6 +18,7 @@ backend (``INELIGIBLE_ACTIVE_BACKENDS``).
 from __future__ import annotations
 
 import atexit
+import importlib
 import inspect
 import json
 import math
@@ -25,14 +26,16 @@ import os
 import re
 import signal
 import socket
+import struct
 import subprocess
 import sys
 import threading
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, is_dataclass, replace
 from datetime import datetime, timezone
 from decimal import Decimal
+from enum import Enum
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -423,6 +426,22 @@ class EquilibrateCell:
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
 
+    def to_cache_payload(self) -> str:
+        """Return canonical JSON that preserves this cell's Python value types."""
+
+        return _to_equilibrate_cell_cache_payload(self)
+
+    @classmethod
+    def from_cache_payload(cls, payload: str) -> "EquilibrateCell":
+        """Restore an exact cell from :meth:`to_cache_payload` JSON."""
+
+        value = _from_equilibrate_cell_cache_payload(payload)
+        if type(value) is not cls:
+            raise TypeError(
+                f"cache payload contains {type(value).__name__}, expected {cls.__name__}"
+            )
+        return value
+
     def as_payload(self) -> dict[str, Any]:
         return {
             "pot_id": self.pot_id,
@@ -582,6 +601,177 @@ class EquilibrateCell:
             ),
             fe_redox_split=_finite_component_map(payload.get("fe_redox_split")),
         )
+
+
+_CELL_CACHE_FORMAT = "regolith-equilibrate-cell-cache"
+_CELL_CACHE_VERSION = 1
+
+
+def _cache_payload_sort_key(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _encode_cell_cache_value(value: Any) -> list[Any]:
+    """Encode supported cell values with explicit Python type tags."""
+
+    if value is None:
+        return ["none"]
+    if isinstance(value, bool):
+        return ["bool", value]
+    if isinstance(value, Enum):
+        enum_type = type(value)
+        return ["enum", enum_type.__module__, enum_type.__qualname__, value.name]
+    if isinstance(value, Decimal):
+        return ["decimal", str(value)]
+    if isinstance(value, float):
+        return ["float64", struct.pack(">d", value).hex()]
+    if isinstance(value, int):
+        return ["int", str(value)]
+    if isinstance(value, str):
+        return ["str", value]
+    if isinstance(value, tuple):
+        return ["tuple", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, list):
+        return ["list", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, dict):
+        items = [
+            [_encode_cell_cache_value(key), _encode_cell_cache_value(item)]
+            for key, item in value.items()
+        ]
+        items.sort(key=lambda pair: _cache_payload_sort_key(pair[0]))
+        return ["dict", items]
+    if is_dataclass(value) and not isinstance(value, type):
+        value_type = type(value)
+        return [
+            "dataclass",
+            value_type.__module__,
+            value_type.__qualname__,
+            [
+                [item.name, _encode_cell_cache_value(getattr(value, item.name))]
+                for item in fields(value)
+            ],
+        ]
+    raise TypeError(
+        f"unsupported cache payload value type: {type(value).__module__}."
+        f"{type(value).__qualname__}"
+    )
+
+
+def _resolve_cache_payload_type(module_name: str, qualname: str) -> type[Any]:
+    resolved: Any = importlib.import_module(module_name)
+    for part in qualname.split("."):
+        resolved = getattr(resolved, part)
+    if not isinstance(resolved, type):
+        raise ValueError(f"cache payload type is not a class: {module_name}.{qualname}")
+    return resolved
+
+
+def _decode_cell_cache_value(value: Any) -> Any:
+    if not isinstance(value, list) or not value or not isinstance(value[0], str):
+        raise ValueError("invalid tagged cell cache payload value")
+    tag, *items = value
+    if tag == "none" and not items:
+        return None
+    if tag == "bool" and len(items) == 1 and type(items[0]) is bool:
+        return items[0]
+    if tag == "enum" and len(items) == 3 and all(
+        isinstance(item, str) for item in items
+    ):
+        enum_type = _resolve_cache_payload_type(items[0], items[1])
+        if not issubclass(enum_type, Enum):
+            raise ValueError(f"cache payload type is not an enum: {items[0]}.{items[1]}")
+        try:
+            return enum_type.__members__[items[2]]
+        except KeyError as exc:
+            raise ValueError(
+                f"unknown enum member {items[2]!r} in {items[0]}.{items[1]}"
+            ) from exc
+    if tag == "decimal" and len(items) == 1 and isinstance(items[0], str):
+        return Decimal(items[0])
+    if tag == "float64" and len(items) == 1 and isinstance(items[0], str):
+        try:
+            raw = bytes.fromhex(items[0])
+        except ValueError as exc:
+            raise ValueError("invalid float64 cell cache payload") from exc
+        if len(raw) != 8:
+            raise ValueError("invalid float64 cell cache payload length")
+        return struct.unpack(">d", raw)[0]
+    if tag == "int" and len(items) == 1 and isinstance(items[0], str):
+        return int(items[0])
+    if tag == "str" and len(items) == 1 and isinstance(items[0], str):
+        return items[0]
+    if tag in {"tuple", "list"} and len(items) == 1 and isinstance(items[0], list):
+        decoded = [_decode_cell_cache_value(item) for item in items[0]]
+        return tuple(decoded) if tag == "tuple" else decoded
+    if tag == "dict" and len(items) == 1 and isinstance(items[0], list):
+        result: dict[Any, Any] = {}
+        for pair in items[0]:
+            if not isinstance(pair, list) or len(pair) != 2:
+                raise ValueError("invalid dict entry in cell cache payload")
+            key = _decode_cell_cache_value(pair[0])
+            if key in result:
+                raise ValueError("duplicate dict key in cell cache payload")
+            result[key] = _decode_cell_cache_value(pair[1])
+        return result
+    if tag == "dataclass" and len(items) == 3:
+        module_name, qualname, raw_fields = items
+        if not isinstance(module_name, str) or not isinstance(qualname, str):
+            raise ValueError("invalid dataclass type in cell cache payload")
+        if not isinstance(raw_fields, list):
+            raise ValueError("invalid dataclass fields in cell cache payload")
+        value_type = _resolve_cache_payload_type(module_name, qualname)
+        if value_type not in {Po2Request, EquilibrateCell} or not is_dataclass(value_type):
+            raise ValueError(f"unsupported cell cache payload dataclass: {module_name}.{qualname}")
+        decoded_fields: dict[str, Any] = {}
+        for pair in raw_fields:
+            if (
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not isinstance(pair[0], str)
+                or pair[0] in decoded_fields
+            ):
+                raise ValueError("invalid dataclass field in cell cache payload")
+            decoded_fields[pair[0]] = _decode_cell_cache_value(pair[1])
+        expected_fields = {item.name for item in fields(value_type)}
+        if decoded_fields.keys() != expected_fields:
+            raise ValueError(f"incomplete dataclass fields in {value_type.__name__} cache payload")
+        return value_type(**decoded_fields)
+    raise ValueError(f"invalid {tag!r} tagged cell cache payload value")
+
+
+def _to_equilibrate_cell_cache_payload(cell: EquilibrateCell) -> str:
+    if type(cell) is not EquilibrateCell:
+        raise TypeError("cache payloads support EquilibrateCell values only")
+    payload = {
+        "format": _CELL_CACHE_FORMAT,
+        "value": _encode_cell_cache_value(cell),
+        "version": _CELL_CACHE_VERSION,
+    }
+    return json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+def _from_equilibrate_cell_cache_payload(payload: str) -> EquilibrateCell:
+    try:
+        decoded = json.loads(payload)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ValueError("invalid EquilibrateCell cache JSON") from exc
+    if (
+        not isinstance(decoded, dict)
+        or decoded.get("format") != _CELL_CACHE_FORMAT
+        or decoded.get("version") != _CELL_CACHE_VERSION
+        or set(decoded) != {"format", "value", "version"}
+    ):
+        raise ValueError("unsupported EquilibrateCell cache payload")
+    result = _decode_cell_cache_value(decoded["value"])
+    if type(result) is not EquilibrateCell:
+        raise ValueError("EquilibrateCell cache payload did not contain a cell")
+    return result
 
 
 # ---------------------------------------------------------------------------

@@ -8,7 +8,6 @@ from simulator.battery.enums import NoticeKind
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     ARM_HEADLINE,
-    BinaryPot,
     EquilibrateCell,
     Po2Request,
     close_battery_engine_handle,
@@ -98,6 +97,8 @@ def test_cache_payload_preserves_nested_types_and_presence() -> None:
                 "kind": NoticeKind.INPUT_OMITTED,
                 "decimal": Decimal("1.2300"),
                 "tuple": ("component", None),
+                "list": ["component", None],
+                "signed_zero": -0.0,
                 "present_none": None,
             }
         ],
@@ -114,5 +115,8 @@ def test_cache_payload_preserves_nested_types_and_presence() -> None:
     assert str(notice["decimal"]) == "1.2300"
     assert type(notice["tuple"]) is tuple
     assert notice["tuple"] == ("component", None)
+    assert type(notice["list"]) is list
+    assert notice["list"] == ["component", None]
+    assert notice["signed_zero"].hex() == "-0x0.0p+0"
     assert "present_none" in notice and notice["present_none"] is None
     assert "absent" not in notice
