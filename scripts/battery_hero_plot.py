@@ -3741,9 +3741,11 @@ def _collection_raw_tables(
     current_key: tuple[str, str, int] | None = None
     current_index = 0
     current_targets: set[int] = set()
-    current_values: dict[int, float] = {}
+    current_values: dict[int, Decimal] = {}
 
-    def save_quantiles(key: tuple[str, str, int], values: Mapping[int, float]) -> None:
+    def save_quantiles(
+        key: tuple[str, str, int], values: Mapping[int, Decimal]
+    ) -> None:
         count = bins_by_key[key]
         quantiles = _battery_hero_ordered_percentiles_from_samples(
             count, values, (0.25, 0.5, 0.75)
@@ -3767,7 +3769,7 @@ def _collection_raw_tables(
             )
             current_values = {}
         if current_index in current_targets:
-            current_values[current_index] = float(residual)
+            current_values[current_index] = Decimal(str(residual))
         current_index += 1
     if current_key is not None:
         save_quantiles(current_key, current_values)
@@ -3931,7 +3933,7 @@ _COLLECTION_TABLE_FIELDS = {
     "temperature_sample": (
         "rail", "engine", "source", "reference", "temperature_K", "sio2",
         "composition", "species", "residual_dex", "flagged", "clipped",
-        "temperature_bin", "sio2_bin",
+        "temperature_bin", "sio2_bin", "fingerprint_temperature_bin",
     ),
     "components": (
         "rail", "component", "engine", "shared_with", "n_shared", "rms_dex"
@@ -5523,8 +5525,8 @@ def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
                     "engine": engine,
                     "temperature_lower_K": cell.get("temperature_lower_K"),
                     "temperature_upper_K": cell.get("temperature_upper_K"),
-                    "sio2_lower": cell.get("sio2_lower"),
-                    "sio2_upper": cell.get("sio2_upper"),
+                    "sio2_lower": _decimal_key(cell.get("sio2_lower")),
+                    "sio2_upper": _decimal_key(cell.get("sio2_upper")),
                     "n": count,
                     "sum_residual_dex": cell.get("sum_residual_dex", ""),
                     "sum_squared_residual_dex": cell.get(

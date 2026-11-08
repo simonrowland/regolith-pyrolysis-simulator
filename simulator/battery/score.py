@@ -13941,32 +13941,33 @@ def _battery_hero_ordered_percentile_indices(
 
     if count < 1:
         return frozenset()
-    return frozenset(
-        index
-        for percentile in percentiles
-        for index in (
-            math.floor((count - 1) * percentile),
-            math.ceil((count - 1) * percentile),
-        )
-    )
+    indices: set[int] = set()
+    for percentile in percentiles:
+        position = (count - 1) * percentile
+        lower_index = int(position)
+        upper_index = min(lower_index + 1, count - 1)
+        indices.update((lower_index, upper_index))
+    return frozenset(indices)
 
 
 def _battery_hero_ordered_percentiles_from_samples(
     count: int,
-    samples: Mapping[int, float],
+    samples: Mapping[int, Decimal],
     percentiles: Sequence[float],
-) -> tuple[float, ...]:
-    """Interpolate percentiles from only the required ordered rank samples."""
+) -> tuple[Decimal, ...]:
+    """Interpolate Decimal percentiles from the required ordered rank samples."""
 
-    results: list[float] = []
+    results: list[Decimal] = []
     for percentile in percentiles:
         position = (count - 1) * percentile
-        lower_index = math.floor(position)
-        upper_index = math.ceil(position)
+        lower_index = int(position)
+        upper_index = min(lower_index + 1, count - 1)
+        fraction = Decimal(str(position - lower_index))
         lower_value = samples[lower_index]
         upper_value = samples[upper_index]
-        fraction = position - lower_index
-        results.append(lower_value + (upper_value - lower_value) * fraction)
+        results.append(
+            lower_value + (upper_value - lower_value) * fraction
+        )
     return tuple(results)
 
 
@@ -14008,18 +14009,13 @@ def _iqr(values: Sequence[Decimal]) -> Decimal | None:
         return None
     ordered = sorted(values)
     n = len(ordered)
-
-    def _quartile(p: float) -> Decimal:
-        # Inclusive rank; matches the descriptive IQR used in the report.
-        position = p * (n - 1)
-        lower_index = int(position)
-        upper_index = min(lower_index + 1, n - 1)
-        fraction = Decimal(str(position - lower_index))
-        return ordered[lower_index] + (
-            ordered[upper_index] - ordered[lower_index]
-        ) * fraction
-
-    return _quartile(0.75) - _quartile(0.25)
+    percentiles = (0.25, 0.75)
+    indices = _battery_hero_ordered_percentile_indices(n, percentiles)
+    samples = {index: ordered[index] for index in indices}
+    q1, q3 = _battery_hero_ordered_percentiles_from_samples(
+        n, samples, percentiles
+    )
+    return q3 - q1
 
 
 def _measured_residuals(
@@ -16641,10 +16637,10 @@ def _battery_hero_sweet_spot_records_from_database(
                                 temperature_lower + temperature_width, "f"
                             ),
                             "sio2_lower": format(
-                                (Decimal(sio2_bin) * sio2_width).normalize(), "f"
+                                Decimal(sio2_bin) * sio2_width, "f"
                             ),
                             "sio2_upper": format(
-                                (Decimal(sio2_bin + 1) * sio2_width).normalize(), "f"
+                                Decimal(sio2_bin + 1) * sio2_width, "f"
                             ),
                             "n": count,
                             "sum_residual_dex": str(total),
