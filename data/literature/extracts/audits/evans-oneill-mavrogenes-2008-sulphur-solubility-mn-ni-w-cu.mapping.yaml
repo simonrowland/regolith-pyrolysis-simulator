@@ -1,68 +1,45 @@
 source_id: evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
 source:
-  citation: K. Evans, T. M. O’Neill, J. Mavrogenes (2008), “Sulphur solubility and sulphide immiscibility in silicate
-    melts as a function of the concentration of manganese, nickel, tungsten and copper at 1 atm and 1400 °C,” Chemical
-    Geology 255, 236–249.
+  citation: K. Evans, H. St.C. O’Neill, J. Mavrogenes (2008), “Sulphur solubility and sulphide immiscibility
+    in silicate melts as a function of the concentration of manganese, nickel, tungsten and copper at
+    1 atm and 1400 °C,” Chemical Geology 255, 236–249.
   version: Curtin accepted-manuscript PREPRINT
 tables:
-- table: '1'
-  pages:
-  - 39
-  - 40
-  type: experimental_context
-  quantity: run conditions and starting-composition labels
-  evidence_class: source_context
-  rows: all printed run rows
-  columns:
-  - column: 1
-    field: run_id
-  - column: 2
-    field: metal
-  - column: 3
-    field: concentration_level
-  - column: 4
-    field: log_fO2
-  - column: 5
-    field: log_fS2
-  - column: 6
-    field: log_fSO2
-  disposition: exact strings retained under extraction.tables_as_published and in the cell audit
-- table: '2'
-  pages:
-  - 41
-  type: gas_mixture_conditions
-  quantity: gas flow and log fugacity conditions
-  evidence_class: source_context
-  rows: all five gas groups
-  columns:
-  - column: 1
-    field: gas_group
-  - column: 2
-    field: CO SCCM
-  - column: 3
-    field: CO2 SCCM
-  - column: 4
-    field: SO2 SCCM
-  - column: 5
-    field: log_fO2
-  - column: 6
-    field: log_fS2
-  - column: 7
-    field: log_fSO2
-  disposition: conditions are bound to Table 3 measured rows by printed group; exact strings retained under extraction.tables_as_published
-    and audit
-- table: 3a
-  pages:
-  - 42
-  - 43
-  - 44
-  - 45
-  type: equilibrium_phase_composition
-  quantity: equilibrium_phase_composition
-  unit: wt%
-  evidence_class: measured_direct
-  phase: glass
-  rows: all 56 printed sample rows
+- page: 39
+  table_index: 1
+  value_pairs:
+  - species_column: 1
+    value_column: 4
+  - species_column: 1
+    value_column: 5
+  - species_column: 1
+    value_column: 6
+- page: 40
+  table_index: 2
+  value_pairs:
+  - species_column: 1
+    value_column: 4
+  - species_column: 1
+    value_column: 5
+  - species_column: 1
+    value_column: 6
+- page: 41
+  table_index: 3
+  value_pairs:
+  - species_column: 1
+    value_column: 2
+  - species_column: 1
+    value_column: 3
+  - species_column: 1
+    value_column: 4
+  - species_column: 1
+    value_column: 5
+  - species_column: 1
+    value_column: 6
+  - species_column: 1
+    value_column: 7
+- page: 42
+  table_index: 4
   values:
   - column: 2
     species: Si
@@ -80,23 +57,116 @@ tables:
     species: Mn
   - column: 9
     species: O
-  conditions:
-  - T_C
-  - group from Table 3a / Table 2
-  - total pressure from Experimental section
-  - composition unknown per sample
-  disposition: measured numeric values and uncertainties stored in points; Total, Group and Appearance remain in
-    printed_cells
-- table: 3b
-  pages:
-  - 46
-  - 47
-  type: equilibrium_phase_composition
-  quantity: equilibrium_phase_composition
-  unit: wt%
-  evidence_class: measured_direct
-  phase: glass
-  rows: all 36 printed sample rows
+  render_verified:
+  - row: 12
+    column: 9
+    text: 41.(1)
+  - row: 14
+    column: 5
+    text: 21.(1)
+  - row: 14
+    column: 8
+    text: 6.(2)
+  - row: 14
+    column: 9
+    text: 39.(2)
+  - row: 15
+    column: 5
+    text: 20.(1)
+  - row: 15
+    column: 9
+    text: 39.(1)
+  - row: 17
+    column: 9
+    text: 41.(1)
+- page: 43
+  table_index: 5
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Mn
+  - column: 9
+    species: O
+  render_verified:
+  - row: 5
+    column: 5
+    text: 23.(1)
+  - row: 5
+    column: 8
+    text: 6.(4)
+  - row: 6
+    column: 2
+    text: 18.(1)
+  - row: 6
+    column: 5
+    text: 24.(1)
+  - row: 6
+    column: 8
+    text: 5.(3)
+  - row: 6
+    column: 9
+    text: 41.(1)
+- page: 44
+  table_index: 6
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Mn
+  - column: 9
+    species: O
+  render_verified:
+  - row: 8
+    column: 5
+    text: 24.(1)
+  - row: 9
+    column: 2
+    text: 20.(1)
+  - row: 9
+    column: 5
+    text: 25.(1)
+- page: 45
+  table_index: 7
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Mn
+  - column: 9
+    species: O
+- page: 46
+  table_index: 8
   values:
   - column: 2
     species: Si
@@ -114,24 +184,27 @@ tables:
     species: W
   - column: 9
     species: O
-  conditions:
-  - T_C
-  - group from Table 3b / Table 2
-  - total pressure from Experimental section
-  - composition unknown per sample
-  disposition: measured numeric values and uncertainties stored in points; Total, Group and Appearance remain in
-    printed_cells
-- table: 3c
-  pages:
-  - 48
-  - 49
-  - 50
-  type: equilibrium_phase_composition
-  quantity: equilibrium_phase_composition
-  unit: wt%
-  evidence_class: measured_direct
-  phase: glass, plus two NiS condensed-solid rows
-  rows: all 55 printed sample/phase rows
+- page: 47
+  table_index: 9
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: W
+  - column: 9
+    species: O
+- page: 48
+  table_index: 10
   values:
   - column: 2
     species: Si
@@ -149,22 +222,60 @@ tables:
     species: Ni
   - column: 9
     species: O
-  conditions:
-  - T_C
-  - group from Table 3c / Table 2 where printed
-  - total pressure from Experimental section
-  - composition unknown per sample
-  disposition: 53 glass rows are migrated; both NiS rows retain their printed cells but are typed-refused for missing
-    crystalline sulfide phase role; Total, Group and Appearance remain in printed_cells
-- table: 3d
-  pages:
-  - 51
-  type: equilibrium_phase_composition
-  quantity: equilibrium_phase_composition
-  unit: wt%
-  evidence_class: measured_direct
-  phase: glass
-  rows: all 12 printed sample rows
+  render_verified:
+  - row: 13
+    column: 2
+    text: 21.(3)
+  - row: 13
+    column: 5
+    text: 21.(6)
+  - row: 13
+    column: 9
+    text: 43.(2)
+- page: 49
+  table_index: 11
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Ni
+  - column: 9
+    species: O
+  render_verified:
+  - row: 7
+    column: 9
+    text: 41.(1)
+- page: 50
+  table_index: 12
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Ni
+  - column: 9
+    species: O
+- page: 51
+  table_index: 13
   values:
   - column: 2
     species: Si
@@ -182,43 +293,21 @@ tables:
     species: Cu
   - column: 9
     species: O
-  conditions:
-  - T_C
-  - matching run id from Table 1 and gas flow from Table 2 Copper row
-  - total pressure from Experimental section
-  - composition unknown per sample
-  disposition: measured numeric values and uncertainties stored in points; ‡ laser cell render checked; Total and
-    Appearance remain in printed_cells
-- table: '4'
-  pages:
-  - 52
-  type: model_parameter_context
-  quantity: interaction_parameter
-  evidence_class: model_derived
-  rows: all eight coefficient rows
-  values:
-  - column: 2
-    field: coefficient
-  - column: 3
-    field: s.d.
-  derivation:
-    equation: '3'
-    page: 3
-  disposition: coefficients and s.d. retained as model-derived context with fit input lineage
-- table: '5'
-  pages:
-  - 53
-  type: model_comparison
-  quantity: model_performance_summary
-  evidence_class: typed_refused
-  rows: all four model rows
-  values:
-  - column: 2
-    field: mean residual
-  - column: 3
-    field: sigma residuals
-  - column: 4
-    field: R2
-  - column: 5
-    field: NMRSD
-  disposition: typed refusal; exact strings retained under extraction.tables_as_published and in cell audit
+- page: 52
+  table_index: 14
+  value_pairs:
+  - species_column: 1
+    value_column: 2
+  - species_column: 1
+    value_column: 3
+- page: 53
+  table_index: 15
+  value_pairs:
+  - species_column: 1
+    value_column: 2
+  - species_column: 1
+    value_column: 3
+  - species_column: 1
+    value_column: 4
+  - species_column: 1
+    value_column: 5
