@@ -25,6 +25,8 @@ from typing import Any, Mapping
 logger = logging.getLogger(__name__)
 _WARNING_REPEAT_COUNTS: dict[str, int] = {}
 _WARNING_REPEAT_LOCK = threading.RLock()
+_BINARY_SHA256_CACHE: dict[tuple[str, int, int], str] = {}
+_BINARY_SHA256_CACHE_LOCK = threading.Lock()
 _ALPHAMELTS_BINARY_NAMES = (
     "alphamelts2",
     "alphamelts_macos",
@@ -851,6 +853,24 @@ def sha256_file(path: Path) -> str:
     return f"sha256:{hashlib.sha256(path.read_bytes()).hexdigest()}"
 
 
+def _cached_binary_sha256(binary_path: str | Path) -> str | None:
+    path = Path(binary_path).expanduser()
+    try:
+        resolved = path.resolve()
+        stat = resolved.stat()
+        if not resolved.is_file():
+            return None
+        cache_key = (str(resolved), stat.st_mtime_ns, stat.st_size)
+        with _BINARY_SHA256_CACHE_LOCK:
+            digest = _BINARY_SHA256_CACHE.get(cache_key)
+            if digest is None:
+                digest = sha256_file(resolved)
+                _BINARY_SHA256_CACHE[cache_key] = digest
+            return digest
+    except OSError:
+        return None
+
+
 def _cache_version_for_binary(
     engine: str,
     binary_path: str | Path,
@@ -862,10 +882,33 @@ def _cache_version_for_binary(
         if resolved is None:
             return None
         path = Path(resolved)
-    try:
-        digest = sha256_file(path)
-    except OSError:
+    digest = _cached_binary_sha256(path)
+    if digest is None:
         return None
+    identity = identity_for(engine)
+    if identity is not None:
+        configured_digest = normalize_digest(identity.digest)
+        if configured_digest != digest:
+            logger.warning(
+                "Configured %s binary digest mismatch; using actual binary "
+                "SHA-256 (configured=%s, actual=%s)",
+                engine,
+                configured_digest,
+                digest,
+            )
+        version = identity.version
+        if (
+            str(engine).strip().lower() in {"alphamelts", "alphamelts2"}
+            and _cache_version_label(engine, version) == "alphaMELTS"
+            and reported_version
+        ):
+            version = reported_version
+        return EngineIdentity(
+            name=identity.name,
+            version=version,
+            digest=digest,
+            extra=identity.extra,
+        ).cache_version()
     return EngineIdentity(
         name=engine,
         version=reported_version,

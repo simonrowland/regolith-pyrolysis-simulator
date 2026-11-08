@@ -1603,7 +1603,6 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _subprocess_engine_version(self) -> Optional[str]:
         from simulator.engine_local_config import (
-            EngineIdentity,
             _cache_version_label,
             _cache_version_for_binary,
             identity_for,
@@ -1612,46 +1611,49 @@ class _MELTSBackendSupport(MeltBackend):
 
         config_identity = identity_for('alphamelts')
         binary = self._binary_path
-        if config_identity is not None and (
-            binary is None
-            or _cache_version_label(
+        if binary is None:
+            return (
+                config_identity.cache_version()
+                if config_identity is not None
+                else None
+            )
+
+        reported_version = (
+            config_identity.version
+            if config_identity is not None
+            and _cache_version_label(
                 'alphamelts', config_identity.version
             ) != 'alphaMELTS'
-        ):
-            return config_identity.cache_version()
-        if binary is None:
-            return None
-        reported_version = ""
-        try:
-            result = _run_alphamelts_subprocess(
-                [str(binary), '--version'],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            text = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and text:
-                reported_version = text[0]
-        except (OSError, subprocess.TimeoutExpired):
-            pass
-        if config_identity is not None:
-            version = reported_version or config_identity.version
-            return EngineIdentity(
-                name=config_identity.name,
-                version=version,
-                digest=config_identity.digest,
-                extra=config_identity.extra,
-            ).cache_version()
+            else ""
+        )
+        if not reported_version:
+            try:
+                result = _run_alphamelts_subprocess(
+                    [str(binary), '--version'],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                text = (result.stdout or result.stderr).strip().splitlines()
+                if result.returncode == 0 and text:
+                    reported_version = text[0]
+            except (OSError, subprocess.TimeoutExpired):
+                pass
         cache_version = _cache_version_for_binary(
             'alphamelts', binary, reported_version
         )
         if cache_version is None:
-            return None
-        warn_legacy_once(
-            'alphamelts',
-            'engines.local.toml absent; using the alphaMELTS binary SHA-256 '
-            'identity for cache comparison',
-        )
+            return (
+                config_identity.cache_version()
+                if config_identity is not None
+                else None
+            )
+        if config_identity is None:
+            warn_legacy_once(
+                'alphamelts',
+                'engines.local.toml absent; using the alphaMELTS binary '
+                'SHA-256 identity for cache comparison',
+            )
         return cache_version
 
     def capabilities(self) -> Dict[str, object]:
