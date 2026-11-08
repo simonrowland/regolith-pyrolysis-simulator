@@ -113,6 +113,10 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
         sample_id = row["sample_id"]
         expected_components = ("V", "Mo", "Ni", "C") if row["table"] == "1" else ("V", "C")
         expected_values = {component: row[component] for component in expected_components}
+        reported_total = sum(
+            (Decimal(value) for value in expected_values.values()), Decimal("0")
+        )
+        assert reported_total < Decimal("95"), (sample_id, expected_values)
         for item in source_rows[sample_id]:
             migrated = migrated_by_id[item["observation_id"]]
             formula = item["values"]["formula"]
@@ -129,7 +133,8 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert migrated.identity.composition is not None
             assert migrated.identity.composition.is_unknown
             assert migrated.identity.composition.reason.endswith(
-                "printed oxide wt% map has no positive mass"
+                "partial analysis: kept sum="
+                f"{reported_total} wt% is below 95 wt%"
             )
             assert migrated.identity.fO2_Pa.is_unknown
 
@@ -137,9 +142,8 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
     prediction = predict_with_engine(Engine.MAGEMIN, phase_row)
     assert prediction.execution.state is ExecutionState.NOT_PROBED
     assert prediction.authority is Authority.REFUSED
-    # The printed phase map contains elemental metal and carbon only. Green's
-    # oxide admission gate refuses it, so identity stays incomplete and the
-    # engine is not probed.
+    # The printed elemental total is below 95 wt%, so Green refuses the
+    # partial phase analysis and the engine is not probed.
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
 
     expected_parameters = {

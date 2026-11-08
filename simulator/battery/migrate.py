@@ -2070,33 +2070,39 @@ def _composition_map_reserved_scalar_reason(payload: object) -> str | None:
 
 
 def _mass_percent_kept_total(
-    components: Mapping[str, Decimal], *, closure_context: object = None
+    components: Mapping[str, Decimal],
+    *,
+    closure_context: object = None,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
 ) -> Decimal:
     """Return S from the oxide, volatile, and same-row closure analytes."""
 
-    source_map = _printed_composition_source_map(closure_context)
     analysis = components
-    if source_map is not None:
+    if component_vocabulary == "elemental":
+        kept = dict(components)
+    else:
+        source_map = _printed_composition_source_map(closure_context)
+        if source_map is not None:
+            try:
+                source_oxides = _oxide_mass_percent_components(source_map)
+            except ValueError as exc:
+                if "ambiguous total iron components" in str(exc):
+                    return sum(components.values(), Decimal("0"))
+            else:
+                if source_oxides:
+                    analysis = source_map
         try:
-            source_oxides = _oxide_mass_percent_components(source_map)
+            kept = _oxide_mass_percent_components(analysis)
         except ValueError as exc:
-            if "ambiguous total iron components" in str(exc):
-                return sum(components.values(), Decimal("0"))
-        else:
-            if source_oxides:
-                analysis = source_map
-    try:
-        kept = _oxide_mass_percent_components(analysis)
-    except ValueError as exc:
-        if not any(
-            reason in str(exc)
-            for reason in (
-                "ambiguous total iron components",
-                "malformed printed oxide amount",
-            )
-        ):
-            raise
-        return sum(components.values(), Decimal("0"))
+            if not any(
+                reason in str(exc)
+                for reason in (
+                    "ambiguous total iron components",
+                    "malformed printed oxide amount",
+                )
+            ):
+                raise
+            return sum(components.values(), Decimal("0"))
     kept.update(_printed_volatile_mass_percent(analysis, closure_context))
     for name, amount in _printed_composition_closure_components(
         closure_context
@@ -2109,6 +2115,7 @@ def _mass_percent_kept_total(
         declared_component_map=_declared_printed_composition_map(
             closure_context
         ),
+        component_vocabulary=component_vocabulary,
     )
     if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
         for name, amount in dropped.items():
@@ -2339,7 +2346,19 @@ def _composition_located_from_plain(
             inference=inference,
         )
     wt = _mass_percent_components(body)
-    if wt is not None and any(_is_mass_percent_oxide_component(name) for name in wt):
+    is_elemental_phase_vector = (
+        wt is not None
+        and isinstance(body, Mapping)
+        and str(body.get("basis") or "") == "printed_phase_composition"
+        and _uses_elemental_mass_percent_vocabulary(wt)
+    )
+    component_vocabulary: Literal["oxide", "elemental"] = (
+        "elemental" if is_elemental_phase_vector else "oxide"
+    )
+    if wt is not None and (
+        any(_is_mass_percent_oxide_component(name) for name in wt)
+        or is_elemental_phase_vector
+    ):
         serialized_inference = None
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
@@ -2357,11 +2376,13 @@ def _composition_located_from_plain(
                 wt,
                 closure_context=composition_context,
                 declared_component_map=declared_component_map,
+                component_vocabulary=component_vocabulary,
             )
             composition = _composition_from_plain(
                 body,
                 closure_context=composition_context,
                 declared_component_map=declared_component_map,
+                component_vocabulary=component_vocabulary,
                 closure_result=closure_result,
             )
         except (ArithmeticError, ValueError) as exc:
@@ -2369,16 +2390,19 @@ def _composition_located_from_plain(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
-        accepted_wt = _oxide_mass_percent_components(wt)
-        derivation = _mass_percent_composition_derivation(
-            accepted_wt,
-            locator,
-            closure_result=closure_result,
-            source_note=_wt_percent_derivation_source_note(
-                wt, closure_result=closure_result
-            ),
-            admitted=serialized_inference is None,
-        )
+        if component_vocabulary == "elemental":
+            derivation = serialized_inference
+        else:
+            accepted_wt = _oxide_mass_percent_components(wt)
+            derivation = _mass_percent_composition_derivation(
+                accepted_wt,
+                locator,
+                closure_result=closure_result,
+                source_note=_wt_percent_derivation_source_note(
+                    wt, closure_result=closure_result
+                ),
+                admitted=serialized_inference is None,
+            )
         renorm_input = next(
             (
                 item
@@ -2387,7 +2411,11 @@ def _composition_located_from_plain(
             ),
             None,
         )
-        if renorm_input and renorm_input not in derivation.inputs:
+        if (
+            derivation is not None
+            and renorm_input
+            and renorm_input not in derivation.inputs
+        ):
             derivation = replace(derivation, inputs=(*derivation.inputs, renorm_input))
         projection_inputs = tuple(
             item
@@ -2399,7 +2427,7 @@ def _composition_located_from_plain(
                 )
             )
         )
-        if projection_inputs:
+        if projection_inputs and derivation is not None:
             derivation = replace(
                 derivation,
                 inputs=tuple(
@@ -2728,6 +2756,7 @@ def _composition_from_plain(
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
     closure_result: _MassPercentClosureResult | None = None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
@@ -2765,6 +2794,7 @@ def _composition_from_plain(
             wt,
             closure_context=payload if closure_context is None else closure_context,
             declared_component_map=declared_component_map,
+            component_vocabulary=component_vocabulary,
         )
         if result.composition is None:
             reason = (
@@ -5327,6 +5357,7 @@ def _unrecognized_printed_chemical_components(
     closure_context: object,
     *,
     declared_component_map: Mapping[str, Any] | None = None,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
     volatile_components: Mapping[str, Decimal] | None = None,
     volatile_sources: Mapping[str, str] | None = None,
     green_read_maps: Sequence[Mapping[str, Any]] = (),
@@ -5383,6 +5414,10 @@ def _unrecognized_printed_chemical_components(
             # conversion deliberately omits; its mass still counts as dropped.
             or (name in _COMPOSITION_COMPONENTS and name != "Cl")
             or (equivalent is not None and equivalent[0] != "Cl")
+            or (
+                component_vocabulary == "elemental"
+                and _recognized_elemental_component_symbol(name) is not None
+            )
         ):
             continue
         amount = _printed_mass_percent_number(raw_amount)
@@ -5657,9 +5692,15 @@ def _mass_percent_renormalization_notice(
     ):
         return None
     oxide_prefix = "renormalized to 100 wt% from kept oxide total S="
-    source_prefix = oxide_prefix if any(
-        item.startswith(oxide_prefix) for item in located.inference.inputs
-    ) else None
+    phase_prefix = "renormalized to 100 wt% from printed phase total S="
+    source_prefix = next(
+        (
+            prefix
+            for prefix in (oxide_prefix, phase_prefix)
+            if any(item.startswith(prefix) for item in located.inference.inputs)
+        ),
+        None,
+    )
     kept_total = next(
         (
             _as_dec_or_none(item.split("S=", 1)[1].split(" wt%", 1)[0])
@@ -5670,6 +5711,15 @@ def _mass_percent_renormalization_notice(
     )
     if kept_total is None:
         return None
+    if source_prefix == phase_prefix:
+        return _hold_reason_notice(
+            "out_of_certified_band: printed phase mass-percent total="
+            f"{kept_total} wt% was renormalized to 100 wt% per d-336 item 2",
+            quantity=quantity,
+            origin=origin,
+            band="95-102 wt% printed phase total",
+            original=kept_total,
+        )
     return _hold_reason_notice(
         "out_of_certified_band: mass-percent analysis with kept oxide total="
         f"{kept_total} wt% was renormalized to 100 wt% per d-336 item 2",
@@ -6638,11 +6688,31 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     )
 
 
+def _uses_elemental_mass_percent_vocabulary(
+    components: Mapping[str, Any],
+) -> bool:
+    return any(
+        _recognized_elemental_component_symbol(name) is not None
+        for name, amount in components.items()
+        if not _is_as_printed_provenance_echo(name)
+        and not _is_composition_map_noncomponent_name(
+            str(name), explicit_map_value=amount
+        )
+    )
+
+
+def _recognized_elemental_component_symbol(name: object) -> str | None:
+    token, _has_mass_suffix = _mass_percent_component_key(str(name))
+    symbol = _metallic_element_symbol(token)
+    return symbol if symbol in ATOMIC_WEIGHTS_G_PER_MOL else None
+
+
 def _wt_percent_conversion_or_refusal(
     wt: Mapping[str, Decimal],
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
 ) -> _MassPercentClosureResult:
     try:
         declared_maps = [declared_component_map]
@@ -6679,6 +6749,42 @@ def _wt_percent_conversion_or_refusal(
                 return _MassPercentClosureResult(
                     None, _CompositionRefusal(reserved_reason)
                 )
+            pairs = _mass_percent_pairs(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": component_map,
+                }
+            )
+            if pairs is not None and _duplicate_mass_percent_component_names(
+                pairs
+            ):
+                diagnostics.append(
+                    (
+                        _GREEN_READ_OXIDE_MAP,
+                        "mass-percent composition has duplicate component keys",
+                    )
+                )
+            for raw_name, raw_amount in component_map.items():
+                if _is_as_printed_provenance_echo(raw_name) or _is_composition_map_noncomponent_name(
+                    str(raw_name), explicit_map_value=raw_amount
+                ):
+                    continue
+                name, _has_mass_suffix = _mass_percent_component_key(
+                    str(raw_name)
+                )
+                if (
+                    _classify_composition_cell(raw_amount)[0] == "blank"
+                    and not (
+                        _volatile_closure_component(name) is not None
+                        and name != "S"
+                    )
+                ):
+                    diagnostics.append(
+                        (
+                            _GREEN_READ_OXIDE_MAP,
+                            "mass-percent composition contains invalid component cells",
+                        )
+                    )
 
         try:
             oxide_wt = _oxide_mass_percent_components(
@@ -6690,6 +6796,27 @@ def _wt_percent_conversion_or_refusal(
         except (ArithmeticError, ValueError) as exc:
             oxide_wt = {}
             diagnostics.append((_GREEN_READ_OXIDE_MAP, str(exc)))
+        if component_vocabulary == "elemental":
+            source_map = declared_component_map or wt
+            parsed_components = _mass_percent_components(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": source_map,
+                }
+            )
+            admitted_wt = {}
+            for raw_name, amount in (parsed_components or {}).items():
+                name, _has_mass_suffix = _mass_percent_component_key(
+                    str(raw_name)
+                )
+                if (
+                    name in _COMPOSITION_COMPONENTS
+                    or _kume_formula_unit_oxide(name) is not None
+                    or _recognized_elemental_component_symbol(name) is not None
+                ):
+                    admitted_wt[name] = amount
+        else:
+            admitted_wt = oxide_wt
         if any(
             not amount.is_finite() or amount < 0
             for amount in oxide_wt.values()
@@ -6700,13 +6827,11 @@ def _wt_percent_conversion_or_refusal(
                     "printed oxide component amount is negative or non-finite",
                 )
             )
-        positive_oxide_mass = sum(
+        positive_admitted_mass = sum(
             (
                 amount
-                for name, amount in oxide_wt.items()
-                if name in _COMPOSITION_COMPONENTS
-                and amount.is_finite()
-                and amount > 0
+                for amount in admitted_wt.values()
+                if amount.is_finite() and amount > 0
             ),
             Decimal("0"),
         )
@@ -6720,14 +6845,21 @@ def _wt_percent_conversion_or_refusal(
             ),
             Decimal("0"),
         )
-        if positive_oxide_mass <= 0:
+        if positive_admitted_mass <= 0:
             diagnostics.append(
                 (
                     _GREEN_READ_OXIDE_MAP,
-                    "printed oxide wt% map has no positive mass",
+                    (
+                        "printed elemental wt% map has no positive mass"
+                        if component_vocabulary == "elemental"
+                        else "printed oxide wt% map has no positive mass"
+                    ),
                 )
             )
-        elif engine_supported_oxide_mass <= 0:
+        elif (
+            component_vocabulary == "oxide"
+            and engine_supported_oxide_mass <= 0
+        ):
             diagnostics.append(
                 (
                     _M1_ONLY_CLOSURE_CONTRIBUTOR,
@@ -6762,6 +6894,7 @@ def _wt_percent_conversion_or_refusal(
             wt,
             closure_context,
             declared_component_map=declared_component_map,
+            component_vocabulary=component_vocabulary,
             volatile_components=volatile_wt,
             volatile_sources=volatile_sources,
             green_read_maps=green_read_maps,
@@ -6785,7 +6918,8 @@ def _wt_percent_conversion_or_refusal(
                 component = _COMPOSITION_COMPONENTS.get(name)
                 if (
                     component is None
-                    or component[1] in oxide_wt
+                    or name in admitted_wt
+                    or component[1] in admitted_wt
                     or (_is_closure_only_volatile(name) and name != "Cl")
                 ):
                     continue
@@ -6812,13 +6946,15 @@ def _wt_percent_conversion_or_refusal(
                 )
             )
 
-        closure_wt = {**oxide_wt, **volatile_wt}
+        closure_wt = {**admitted_wt, **volatile_wt}
         for name, amount in closure_only_wt.items():
             if name not in closure_wt:
                 closure_wt[name] = amount
 
         kept_total = _mass_percent_kept_total(
-            closure_wt, closure_context=closure_context
+            closure_wt,
+            closure_context=closure_context,
+            component_vocabulary=component_vocabulary,
         )
         closure_error = _percent_composition_closure_error(
             closure_wt,
@@ -6908,7 +7044,24 @@ def _wt_percent_conversion_or_refusal(
                     closure_refusal=True,
                 ),
             )
-        converted = _mole_fraction_from_wt_percent_components(oxide_wt)
+        if component_vocabulary == "elemental":
+            scale = (
+                Decimal("100") / kept_total
+                if _MASS_PERCENT_RENORMALIZE_ABOVE
+                < kept_total
+                <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+                else Decimal("1")
+            )
+            converted = Composition(
+                basis="printed_phase_composition",
+                components=tuple(
+                    (name, amount * scale)
+                    for name, amount in admitted_wt.items()
+                ),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        else:
+            converted = _mole_fraction_from_wt_percent_components(oxide_wt)
         printed = _source_printed_composition_values(
             wt,
             closure_context,
@@ -7112,6 +7265,7 @@ def _mass_percent_composition_state(
     basis: str,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide",
     closure_result: _MassPercentClosureResult | None = None,
 ) -> State[Composition]:
     """Convert a printed wt% map after its kept mass meets the b-704 limits."""
@@ -7120,10 +7274,13 @@ def _mass_percent_composition_state(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
+        component_vocabulary=component_vocabulary,
     )
     if result.composition is None:
         assert result.refusal is not None
         return State.unknown(result.refusal.reason)
+    if result.composition.amount_basis is AmountBasis.MASS_PERCENT:
+        return State.of(replace(result.composition, basis=basis))
     if any(
         amount != 0
         for amount in _printed_volatile_mass_percent(wt, closure_context).values()
@@ -7157,50 +7314,51 @@ def _mass_percent_composition_located(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> Located[Composition]:
-    if basis == "printed_phase_composition":
-        source_map = declared_component_map or wt
-        parsed_wt = _mass_percent_components(
-            {
-                "amount_basis": AmountBasis.MASS_PERCENT.value,
-                "components": source_map,
-            }
-        )
-        if parsed_wt is None:
-            result = _wt_percent_conversion_or_refusal(
-                wt,
-                closure_context=closure_context,
-                declared_component_map=declared_component_map,
-            )
-            if result.composition is None:
-                assert result.refusal is not None
-                return Located(State.unknown(result.refusal.reason), locator=locator)
-            return Located(
-                State.unknown(
-                    "mass-percent composition contains invalid, duplicate, "
-                    "unsupported or ambiguous components"
-                ),
-                locator=locator,
-            )
-        wt = parsed_wt
+    source_map = declared_component_map or wt
+    component_vocabulary: Literal["oxide", "elemental"] = "oxide"
+    if basis == "printed_phase_composition" and _uses_elemental_mass_percent_vocabulary(
+        source_map
+    ):
+        component_vocabulary = "elemental"
     closure_result = _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
+        component_vocabulary=component_vocabulary,
     )
     state = _mass_percent_composition_state(
         wt,
         basis=basis,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
+        component_vocabulary=component_vocabulary,
         closure_result=closure_result,
     )
     inference = None
     if state.is_value:
-        inference = _mass_percent_composition_derivation(
-            _oxide_mass_percent_components(wt),
-            locator,
-            closure_result=closure_result,
-        )
+        if component_vocabulary == "elemental":
+            kept_total = closure_result.kept_total
+            assert kept_total is not None
+            if (
+                _MASS_PERCENT_RENORMALIZE_ABOVE
+                < kept_total
+                <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+            ):
+                inference = Derivation(
+                    relation="mass_percent_renormalization",
+                    inputs=(
+                        "renormalized to 100 wt% from printed phase total "
+                        f"S={kept_total} wt% (d-336 item 2)",
+                    ),
+                    parameters=(),
+                    output_unit="wt_percent",
+                )
+        else:
+            inference = _mass_percent_composition_derivation(
+                _oxide_mass_percent_components(wt),
+                locator,
+                closure_result=closure_result,
+            )
     return Located(state, locator=locator, inference=inference)
 
 

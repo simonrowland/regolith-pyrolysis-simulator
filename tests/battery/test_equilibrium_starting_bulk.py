@@ -583,7 +583,7 @@ def test_partial_equilibrium_phase_child_refusal_keeps_green_parent_identity(
     assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
 
 
-def test_missing_major_equilibrium_child_keeps_green_parent_identity(
+def test_missing_major_equilibrium_child_refuses_identity_with_parent_charge(
     tmp_path: Path,
 ) -> None:
     document = _extract(_initial())
@@ -612,16 +612,23 @@ def test_missing_major_equilibrium_child_keeps_green_parent_identity(
         if "::T=1303" in observation.observation_id
     )
     identity_composition = child.identity.composition
-    assert identity_composition is not None and identity_composition.is_value
-    # Green keeps the parent X0 identity when the child has a blank major
-    # oxide; the closure refusal stays on the child point condition.
+    assert identity_composition is not None and identity_composition.is_unknown
+    assert "invalid component cells" in identity_composition.reason
+    # Green's blank-cell refusal applies to the identity and child condition;
+    # the source's parent initial charge remains on the experiment sample.
     expected_charge = wt_pct_to_mole_fraction(
         {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
     )
-    assert identity_composition.value.components == expected_charge.components
+    experiment = result.experiments[child.experiment_id]
+    assert experiment.sample.initial_composition is not None
+    assert experiment.sample.initial_composition.state.is_value
+    assert (
+        experiment.sample.initial_composition.state.value.components
+        == expected_charge.components
+    )
     child_composition = child.point_conditions["composition"]
     assert child_composition.state.is_unknown
-    assert "missing major oxides: Al2O3" in child_composition.state.reason
+    assert "invalid component cells" in child_composition.state.reason
 
 
 def test_ambiguous_feot_mass_loss_child_keeps_green_unknown_identity(
