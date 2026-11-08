@@ -333,6 +333,21 @@ def test_invalid_gas_channel_refuses_knudsen_pressure_sum(
     assert prediction.refusal_detail["invalid_components"] == ["O2"]
 
 
+def test_oxygen_balance_invalid_pressure_preserves_channel_name() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _engine_gas_pressures_bar_for_oxygen_balance,
+    )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _engine_gas_pressures_bar_for_oxygen_balance(
+            {"O2": float("nan")}, {"O2": object()}
+        )
+
+    assert exc_info.value.reason_code == "oxygen_balance_engine_pressure_invalid"
+    assert exc_info.value.invalid_components == ("O2",)
+
+
 def test_knudsen_sensitivity_uses_target_species_not_other_channels(
     monkeypatch,
 ) -> None:
