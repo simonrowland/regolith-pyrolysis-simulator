@@ -26,7 +26,9 @@ from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
+from statistics import median
+from types import MappingProxyType
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
 
 import yaml
 
@@ -74,6 +76,7 @@ from simulator.battery.enums import (
     VAPORIZATION_ENTHALPIES,
     ValueKind,
     residual_status_token,
+    refuse_proprietary_engine_use,
 )
 from simulator.battery.identity import (
     Identity,
@@ -439,6 +442,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.MAGEMIN: "magemin",
     Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
+    Engine.PROPRIETARY_REMOTE: "proprietary-remote",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.VAPOROCK: ("vaporock",),
@@ -447,6 +451,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.MAGEMIN: ("magemin",),
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
+    Engine.PROPRIETARY_REMOTE: (),
 }
 
 
@@ -765,6 +770,80 @@ class ScoreContext:
 
 
 @dataclass(frozen=True)
+class ProprietaryProduced:
+    """One scalar returned by a proprietary provider for an observation."""
+
+    observation_id: str
+    quantity: Quantity
+    scalar: Decimal
+    unit: str
+    engine_version: str
+    datafile_fingerprint: str
+
+    def __post_init__(self) -> None:
+        if not self.observation_id:
+            raise ValueError("proprietary result observation_id is required")
+        object.__setattr__(self, "scalar", as_decimal(self.scalar))
+        if not self.scalar.is_finite():
+            raise ValueError("proprietary result scalar must be finite")
+        if not self.unit or not self.engine_version or not self.datafile_fingerprint:
+            raise ValueError(
+                "proprietary result unit, engine_version, and datafile_fingerprint are required"
+            )
+
+
+@dataclass(frozen=True)
+class ProprietaryRefused:
+    """One typed refusal returned by a proprietary provider."""
+
+    observation_id: str
+    code: str
+    detail: str
+
+    def __post_init__(self) -> None:
+        if not self.observation_id or not self.code:
+            raise ValueError("proprietary refusal observation_id and code are required")
+
+
+ProprietaryProviderResult = ProprietaryProduced | ProprietaryRefused
+
+
+@dataclass(frozen=True)
+class ProprietaryScalarRequest:
+    """Observation-bound query containing conditions but no corpus result."""
+
+    observation_id: str
+    quantity: Quantity
+    identity: Identity
+
+
+class ProprietaryScalarProvider(Protocol):
+    """Provider seam for one observation-bound scalar or typed refusal."""
+
+    def score(
+        self, request: ProprietaryScalarRequest
+    ) -> ProprietaryProviderResult: ...
+
+
+@dataclass(frozen=True)
+class ProprietaryRailAggregate:
+    rail: Rail
+    n: int
+    rms_dex: Decimal | None
+    median_abs_dex: Decimal | None
+    refusal_counts_by_code: Mapping[str, int]
+    engine_tier_label: str
+    datafile_fingerprint: str | None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "refusal_counts_by_code",
+            MappingProxyType(dict(sorted(self.refusal_counts_by_code.items()))),
+        )
+
+
+@dataclass(frozen=True)
 class _PrintedBandResolution:
     band: DecisionBand | None = None
     refusal: Mapping[str, object] | None = None
@@ -833,6 +912,7 @@ def parse_engine(name: str) -> Engine:
         )
     return Engine(value)
 def _require_score_engine(engine: Engine) -> None:
+    refuse_proprietary_engine_use(engine, mode="row-oriented battery scoring")
     if engine not in SCORE_ENGINE_SET:
         raise ValueError(
             f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"
@@ -13651,6 +13731,141 @@ def score_store(
         handles=handles,
     )
     return residuals, candidates
+
+
+def score_proprietary_aggregate(
+    context: ScoreContext,
+    *,
+    engine: Engine,
+    observation_ids: Sequence[str],
+    provider: ProprietaryScalarProvider | None = None,
+) -> tuple[ProprietaryRailAggregate, ...]:
+    """Score admitted observation IDs and retain only per-rail aggregates.
+
+    The provider receives only the admitted ID and its corpus identity, which
+    is the sole source of query conditions. This route deliberately bypasses the
+    row scorer, its residue memo, candidate serializers, stores, and reports.
+    """
+
+    if not engine.proprietary:
+        raise ValueError("aggregate scoring requires a proprietary engine")
+    if len(set(observation_ids)) != len(observation_ids):
+        raise ValueError("aggregate scoring observation_ids must be unique")
+
+    dex_by_rail: dict[Rail, list[Decimal]] = defaultdict(list)
+    refusals_by_rail: dict[Rail, dict[str, int]] = defaultdict(
+        lambda: defaultdict(int)
+    )
+    fingerprint_by_rail: dict[Rail, str] = {}
+
+    def count_refusal(rail: Rail, code: str) -> None:
+        refusals_by_rail[rail][code] += 1
+
+    for observation_id in observation_ids:
+        observation = context.observations.get(observation_id)
+        if observation is None or observation.observation_id != observation_id:
+            raise KeyError(f"unknown corpus observation_id {observation_id!r}")
+        if observation.admission.status is not AdmissionStatus.ADMITTED:
+            raise ValueError(
+                f"observation_id {observation_id!r} is not admitted"
+            )
+        identity = observation.identity
+        if not isinstance(identity, Identity):
+            raise ValueError(f"observation_id {observation_id!r} has no typed identity")
+        quantity = quantity_token(identity)
+        if quantity is None:
+            raise ValueError(f"observation_id {observation_id!r} has no quantity")
+        species_formula = (
+            identity.species.formula if identity.species is not None else ""
+        )
+        rail = rail_for_quantity(quantity, species_formula=species_formula)
+        if rail is None:
+            raise ValueError(
+                f"observation_id {observation_id!r} has no score rail"
+            )
+
+        if provider is None:
+            outcome: ProprietaryProviderResult = ProprietaryRefused(
+                observation_id,
+                RefusalReason.ATTEMPTED_UNAVAILABLE.value,
+                "no proprietary scalar provider is configured",
+            )
+        else:
+            if (
+                metric_operation_for_identity(identity) is not MetricOperation.DEX
+                or observation.value.kind is not ValueKind.POINT
+                or observation.value.point is None
+            ):
+                count_refusal(rail, RefusalReason.UNSUPPORTED.value)
+                continue
+            outcome = provider.score(
+                ProprietaryScalarRequest(
+                    observation_id=observation_id,
+                    quantity=quantity,
+                    identity=identity,
+                )
+            )
+
+        if not isinstance(outcome, (ProprietaryProduced, ProprietaryRefused)):
+            raise TypeError("provider must return one scalar result or typed refusal")
+        if outcome.observation_id != observation_id:
+            raise ValueError("provider result observation_id does not match request")
+        if isinstance(outcome, ProprietaryRefused):
+            count_refusal(rail, outcome.code)
+            continue
+        if outcome.quantity is not quantity:
+            count_refusal(rail, RefusalReason.UNSUPPORTED.value)
+            continue
+        if outcome.unit != QUANTITY_UNITS[quantity]:
+            count_refusal(rail, RefusalReason.METRIC_DOMAIN.value)
+            continue
+
+        previous_fingerprint = fingerprint_by_rail.get(rail)
+        if (
+            previous_fingerprint is not None
+            and previous_fingerprint != outcome.datafile_fingerprint
+        ):
+            raise ValueError(
+                f"rail {rail.value!r} received results from multiple data files"
+            )
+        fingerprint_by_rail[rail] = outcome.datafile_fingerprint
+        assert observation.value.point is not None
+        reference = _phase_component_reference_wt_percent(
+            identity, observation.value.point
+        )
+        dex = compute_metric(
+            MetricOperation.DEX,
+            outcome.scalar,
+            reference,
+        )
+        if dex is None:
+            count_refusal(rail, RefusalReason.METRIC_DOMAIN.value)
+            continue
+        dex_by_rail[rail].append(dex)
+
+    rails = set(dex_by_rail) | set(refusals_by_rail)
+    aggregates: list[ProprietaryRailAggregate] = []
+    for rail in sorted(rails, key=lambda item: item.value):
+        dex_values = dex_by_rail[rail]
+        n = len(dex_values)
+        rms_dex = (
+            (sum((value * value for value in dex_values), Decimal(0)) / n).sqrt()
+            if n
+            else None
+        )
+        median_abs_dex = median(map(abs, dex_values)) if n else None
+        aggregates.append(
+            ProprietaryRailAggregate(
+                rail=rail,
+                n=n,
+                rms_dex=rms_dex,
+                median_abs_dex=median_abs_dex,
+                refusal_counts_by_code=refusals_by_rail[rail],
+                engine_tier_label=ENGINE_CHANNELS[engine],
+                datafile_fingerprint=fingerprint_by_rail.get(rail),
+            )
+        )
+    return tuple(aggregates)
 
 
 def residual_to_plain(

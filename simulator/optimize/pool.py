@@ -29,6 +29,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.battery.enums import refuse_proprietary_engine_use
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import (
@@ -182,6 +183,8 @@ def _evaluate_batch(
         )
         for index, request in enumerate(requests)
     )
+    for task in tasks:
+        _task_backend_name(task)
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     if results_store is not None:
         results_store.initialize()
@@ -952,24 +955,34 @@ def _warm_runtime_spec(tasks: Sequence[_PoolTask]) -> _WarmRuntimeSpec | None:
     )
 
 
-def _task_backend_name(task: _PoolTask) -> str:
+def _backend_name_for_fidelity(
+    profile: Mapping[str, Any], fidelity: str, *, mode: str
+) -> str:
     merged: dict[str, Any] = {}
-    profile = task.profile
     run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
     if isinstance(run_options, Mapping):
         merged.update(run_options)
     fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
     if isinstance(fidelities, Mapping):
-        selected = fidelities.get(task.fidelity, {})
+        selected = fidelities.get(fidelity, {})
         if isinstance(selected, Mapping):
             merged.update(selected)
     # Fold legacy `stub` onto canonical `internal-analytical` when reading the
     # profile boundary; mirrors EvalSpec.backend_name canonicalization.
-    return canonical_backend_name(
+    backend_name = canonical_backend_name(
         str(
             merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
             or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
         )
+    )
+    assert backend_name is not None
+    refuse_proprietary_engine_use(backend_name, mode=mode)
+    return backend_name
+
+
+def _task_backend_name(task: _PoolTask) -> str:
+    return _backend_name_for_fidelity(
+        task.profile, task.fidelity, mode="optimizer_search"
     )
 
 

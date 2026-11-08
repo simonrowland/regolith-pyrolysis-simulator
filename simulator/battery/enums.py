@@ -37,6 +37,13 @@ class Engine(StrEnum):
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
     OPENIMCC = "openimcc"
+    PROPRIETARY_REMOTE = "proprietary_remote"
+
+    @property
+    def proprietary(self) -> bool:
+        """Whether this engine's outputs require the aggregate-only route."""
+
+        return self is Engine.PROPRIETARY_REMOTE
 
 
 class Fo2Mode(StrEnum):
@@ -174,6 +181,7 @@ class RefusalReason(StrEnum):
     DECISION_RULE_MISSING = "decision_rule_missing"
     METRIC_DOMAIN = "metric_domain"
     UNSUPPORTED = "unsupported"
+    PROPRIETARY_ENGINE_EXCLUDED = "proprietary_engine_excluded"
     NOT_PROBED = "not_probed"
     ATTEMPTED_UNAVAILABLE = "attempted_unavailable"
     ADMISSION_NOT_ADMITTED = "admission_not_admitted"
@@ -198,6 +206,30 @@ class RefusalReason(StrEnum):
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
+
+
+class ProprietaryEngineRefusal(ValueError):
+    """Typed refusal when a proprietary engine enters a row or grind workflow."""
+
+    def __init__(self, engine: Engine, *, mode: str):
+        self.engine = engine
+        self.mode = str(mode)
+        self.code = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED.value
+        self.reason = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED
+        super().__init__(
+            f"{self.code}: engine={engine.value!r} is not allowed in {self.mode}"
+        )
+
+
+def refuse_proprietary_engine_use(engine: Engine | str, *, mode: str) -> None:
+    """Raise a typed refusal using Engine.proprietary as the sole policy rule."""
+
+    try:
+        resolved = engine if isinstance(engine, Engine) else Engine(str(engine))
+    except ValueError:
+        return
+    if resolved.proprietary:
+        raise ProprietaryEngineRefusal(resolved, mode=mode)
 
 
 class CellMaterial(StrEnum):

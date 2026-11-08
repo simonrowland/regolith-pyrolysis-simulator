@@ -9296,7 +9296,7 @@ def test_non_liquid_engine_scores_vapour_over_a_crystalline_sample() -> None:
 
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
-        ENGINE_CHANNELS,
+        SCORE_ENGINE_SET,
         metric_operation,
         predict_with_engine,
         rail_for_quantity,
@@ -9317,7 +9317,7 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
 
     assert rail_for_quantity(Quantity.RESIDUE_COMPONENT_COMPOSITION) is Rail.RESIDUE_COMPOSITION
     assert metric_operation(Quantity.RESIDUE_COMPONENT_COMPOSITION) is MetricOperation.ABSOLUTE
-    for engine in ENGINE_CHANNELS:
+    for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
         assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
@@ -9326,7 +9326,7 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
 
 
 def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
-    from simulator.battery.score import ENGINE_CHANNELS, predict_with_engine
+    from simulator.battery.score import SCORE_ENGINE_SET, predict_with_engine
 
     identity = replace(
         F.psat_identity("FeO(l)"),
@@ -9342,7 +9342,7 @@ def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
         source_id="darken-gurry-1946-iron-oxygen-ii",
     )
 
-    for engine in ENGINE_CHANNELS:
+    for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
         assert prediction.refusal_reason is RefusalReason.UNSUPPORTED

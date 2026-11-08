@@ -50,6 +50,8 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     ValueKind,
+    ProprietaryEngineRefusal,
+    refuse_proprietary_engine_use,
 )
 from simulator.battery.identity import (
     Identity,
@@ -2711,6 +2713,16 @@ def predict_thermo_attempt(
     identity = observation.identity
     origin = observation.observation_id
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    try:
+        refuse_proprietary_engine_use(engine, mode="surrogate_fitting")
+    except ProprietaryEngineRefusal as exc:
+        return _refuse(
+            exc.reason,
+            exc.code,
+            quantity=quantity or Quantity.DELTA_FG,
+            origin=origin,
+            extra={"engine": engine.value},
+        )
     if not isinstance(identity, Identity) or quantity is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
