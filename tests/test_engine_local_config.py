@@ -108,6 +108,55 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
 
 
+def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = _sample_config(tmp_path, monkeypatch)
+    alpha_binary = config.paths.alphamelts_binary_path
+    assert alpha_binary is not None
+    legacy_identity = EngineIdentity(
+        name="alphamelts",
+        version="alphaMELTS",
+        digest="sha256:abc111",
+    )
+    config.identities["alphamelts"] = legacy_identity
+    write_config(config)
+
+    reported_version = "alphamelts2 2.3.1"
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 0, stdout=reported_version, stderr=""
+        ),
+    )
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = alpha_binary
+
+    version = backend.get_engine_version()
+
+    expected = EngineIdentity(
+        name=legacy_identity.name,
+        version=reported_version,
+        digest=legacy_identity.digest,
+    ).cache_version()
+    assert version == expected
+    assert "2.3.1" in version
+    assert "digest=sha256:abc111" in version
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 1, stdout="", stderr="probe unavailable"
+        ),
+    )
+    backend._engine_version = None
+    fallback = backend.get_engine_version()
+    assert fallback == legacy_identity.cache_version()
+    assert "digest=sha256:abc111" in fallback
+
+
 def test_alphamelts_cache_version_drops_host_metadata() -> None:
     identity = EngineIdentity(
         name="alphamelts",
