@@ -364,13 +364,15 @@ def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable(
     evans = next(
         observation
         for observation in migrator.result.observations.values()
-        if observation.observation_id.endswith(
-            "::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:h=1e9620f6f131"
+        if observation.observation_id.startswith(
+            "evans-2009-sulfur-mn-ni-w-xanes::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:"
         )
     )
 
     assert evans.identity.composition is not None
     assert evans.identity.composition.is_not_applicable
+    assert evans.point_conditions["composition"].state.is_unknown
+    assert evans.point_conditions["composition"].state.reason == "not_published"
 
 
 def test_inoue_elemental_assay_keeps_composition_context_out_of_identity() -> None:
