@@ -1385,6 +1385,9 @@ class EquilibriumMixin:
                     'melt_oxide_activity_evidence_tier': 'ANALYTICAL_EXTERNAL_GROUNDED',
                     'melt_oxide_activity_model': 'kress_calphad_ferrous_feo',
                 }
+                feo_notices = feo_activity_diagnostic.get('notices')
+                if feo_notices:
+                    activity_provenance[species]['notices'] = list(feo_notices)
             if activity_conversion is not None:
                 activity_provenance[species].update(
                     {
@@ -1400,10 +1403,6 @@ class EquilibriumMixin:
                         'vapor_k_standard_state_phase': target_standard_state_phase,
                     }
                 )
-            feo_notices = feo_activity_diagnostic.get('notices')
-            if feo_notices:
-                activity_provenance[species]['notices'] = list(feo_notices)
-
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
             # ΔG_f(T) = ΔH_f - T × ΔS_f   (kJ/mol O₂)
