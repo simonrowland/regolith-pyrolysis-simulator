@@ -1,0 +1,140 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  citation: Bennington, K. O.; Brown, R. R.; Beyer, R. P. (1984). Thermodynamic Properties of Aegirine. U.S. Bureau of Mines
+    Report of Investigations 8912.
+  source_ids:
+  - bennington-brown-beyer-1984-aegirine-ri8912
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9fab7bc5edc14849ae601a0e6f546aaec1553960
+    files:
+    - asset_id: pdf:bennington-brown-beyer-1984-aegirine-ri8912
+      role: pdf
+      path: raw/bennington-brown-beyer-1984-aegirine-ri8912/bennington-brown-beyer-1984-aegirine-ri8912.pdf
+      sha256:
+        tag: value
+        value: 4bad0cc89dc75720d1fe0b44003cc8a44cf7de61165083041acafd63fe956859
+    - asset_id: pdftotext:bennington-brown-beyer-1984-aegirine-ri8912
+      role: pdftotext
+      path: text/bennington-brown-beyer-1984-aegirine-ri8912
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:bennington-brown-beyer-1984-aegirine-ri8912
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605::bennington-brown-beyer-1984-aegirine-ri8912
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  locator:
+    page: 11
+    published_page: 6
+    table: '3'
+    note: row=11
+context:
+- observation_id: aegirine_calorimetry_conditions
+  type: experimental_conditions
+  locator:
+    page: 14
+    published_page: 9
+    row: low-temperature method
+    section: Low-Temperature Thermal Properties
+  units: g, K, mol He, K/min as printed
+  values:
+    low_temperature_method: Adiabatic calorimetry; range 19.1–304.6 K.
+    low_temperature_sample_mass_g: '144.8180'
+    low_temperature_sample_pretreatment: Dried overnight at 383 K; loaded into a 90-mL copper calorimeter vessel. Calorimeter
+      was evacuated and backfilled with 1.3 × 10^-4 mol He before sealing.
+    low_temperature_total_pressure: not stated; helium amount is not a pressure
+    low_temperature_uncertainty: ±1% from 19–50 K; ±0.2% from 50–200 K; ±0.1% from 200–300 K; confidence level not stated.
+    high_temperature_method: Differential scanning calorimetry; DSC measurement range 323–1223 K; argon atmosphere; 10 K/min
+      in 50-K steps.
+    high_temperature_sample_mass_g: '0.11867'
+    high_temperature_capsule: Platinum capsule; full and empty capsule and an Al2O3 reference were measured.
+    high_temperature_uncertainty: ±3% from 323–700 K and ±1% from 700–1223 K; confidence level not stated.
+    high_temperature_enthalpy_method: Authors analyzed DSC data by the enthalpy method of Mraw and Naas.
+    calorie_definition: 1 cal = 4.1840 J; no conversion was made in this extract.
+    fit_coefficients: No numerical Cp fit coefficients or fitted equation coefficients are printed. Justice FITAB smoothing
+      is named; Cp below 19 K was extrapolated graphically.
+    drop_calorimetry_relative_enthalpy: No high-temperature drop-calorimetry relative-enthalpy table is printed. Table 6 H(T)-H(0)
+      is a smoothed thermodynamic function, not a direct drop-calorimetry series.
+  context_id: bennington-brown-beyer-1984-aegirine-ri8912::context::aegirine_calorimetry_conditions
+  work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  source_id: bennington-brown-beyer-1984-aegirine-ri8912
+  species: Aegirine natural sample
+- observation_id: aegirine_table1_sample_characterization
+  type: sample_characterization
+  locator:
+    page: 9
+    published_page: 4
+    row: analysis and formula
+    table: '1'
+  units: wt% and formula atoms as printed
+  values:
+    sample_origin: Mont Ste. Hilaire, Quebec; dark green bladed crystals with albite in the interstices; obtained commercially,
+      crushed, washed, screened, and separated.
+    sample_description: No evidence of alteration or separate impurities; X-ray diffraction matched the aegirine pattern (PDF
+      card 18-1222).
+    analysis_by: Sarah T. Neil, chemist, U.S. Geological Survey.
+    analysis_wt_percent:
+      SiO2: '51.10'
+      Al2O3: '3.07'
+      P2O5: '.03'
+      TiO2: '.84'
+      Fe2O3: '24.21'
+      FeO: '4.94'
+      MgO: '.30'
+      MnO: '.92'
+      CaO: '2.71'
+      Na2O: '11.59'
+      K2O: '.02'
+      CO2: '.32'
+      H2O_plus: '.14'
+      H2O_minus: '.02'
+    extended_formula_as_printed: (Na0.868Fe3+0.7037Fe2+0.1596Mn0.030Ca0.1121Ti0.0244K0.0009P0.0010Al0.1398Si1.9738)O6
+    adjusted_formula_as_printed: (Na0.869Fe3+0.7362Fe2+0.160Mn0.030Ca0.1121)(Al0.141Si1.9738)O6
+    extended_formula_weight_g_per_mol: '230.746'
+    adjusted_formula_weight_g_per_mol: '231.404'
+    iron_ions_per_adjusted_formula:
+      Fe3+: '0.7362'
+      Fe2+: '0.160'
+    impurities_as_printed: Bound water, hygroscopic water, and MgCO3 are calculated out as discrete separate impurities. No
+      evidence of separate impurities was observed in the crystal sample.
+    analysis_note: P2O5 was .03 wt% and assigned to the Al site in the adjusted formula; TiO2 was .84 wt% and assigned to
+      Fe2O3 in the substitution-site column. MgO was .30 wt%.
+  context_id: bennington-brown-beyer-1984-aegirine-ri8912::context::aegirine_table1_sample_characterization
+  work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  source_id: bennington-brown-beyer-1984-aegirine-ri8912
+  species: Aegirine natural sample

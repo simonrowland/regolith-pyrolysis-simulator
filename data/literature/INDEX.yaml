@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 775
-  extracts: 773
+  sources: 777
+  extracts: 775
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 79
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 773
+  extracts_without_pdf: 775
   alias_groups_needing_resolution: 83
 gaps:
   pdfs_without_extract: []
@@ -64,6 +64,8 @@ gaps:
   - beerkens-2003-sulfate-decomposition-na2o-activity
   - behrens-rosenblatt-1972
   - bencze-yazhenskikh-2016
+  - bennington-brown-1982-synthetic-acmite-ri8621
+  - bennington-brown-beyer-1984-aegirine-ri8912
   - bennour-1996-ternary-cs-na-silicate
   - berkowitz-chupka-inghram-1957
   - berman-1988-internally-consistent-mineral-thermodynamic-data
@@ -4090,6 +4092,122 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: bennington-brown-1982-synthetic-acmite-ri8621
+  aliases: []
+  citation: Bennington, K. O. & Brown, R. R. (1982), Thermodynamic Properties of Synthetic Acmite (NaFe3+Si2O6),
+    U.S. Bureau of Mines Report of Investigations 8621.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
+    review_status: draft
+    rows: 43
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/bennington-brown-1982-synthetic-acmite-ri8621/bennington-brown-1982-synthetic-acmite-ri8621.pdf
+      present: true
+      sha256: f8112cdb11fb15aaba135f286fa8563c35be0a53e655d078eb1d69c2d8add99b
+      matches_simulator: null
+    sidecar:
+      path: raw/bennington-brown-1982-synthetic-acmite-ri8621/sidecar.yaml
+      present: true
+    text:
+      path: text/bennington-brown-1982-synthetic-acmite-ri8621
+      exists: true
+      file_count: 31
+    tables:
+      path: tables/bennington-brown-1982-synthetic-acmite-ri8621
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/bennington-brown-1982-synthetic-acmite-ri8621.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9fab7bc5edc14849ae601a0e6f546aaec1553960
+- source_id: bennington-brown-beyer-1984-aegirine-ri8912
+  aliases: []
+  citation: Bennington, K. O.; Brown, R. R.; Beyer, R. P. (1984). Thermodynamic Properties of Aegirine.
+    U.S. Bureau of Mines Report of Investigations 8912.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
+    review_status: draft
+    rows: 54
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/bennington-brown-beyer-1984-aegirine-ri8912/bennington-brown-beyer-1984-aegirine-ri8912.pdf
+      present: true
+      sha256: 4bad0cc89dc75720d1fe0b44003cc8a44cf7de61165083041acafd63fe956859
+      matches_simulator: null
+    sidecar:
+      path: raw/bennington-brown-beyer-1984-aegirine-ri8912/sidecar.yaml
+      present: true
+    text:
+      path: text/bennington-brown-beyer-1984-aegirine-ri8912
+      exists: true
+      file_count: 47
+    tables:
+      path: tables/bennington-brown-beyer-1984-aegirine-ri8912
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/bennington-brown-beyer-1984-aegirine-ri8912.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9fab7bc5edc14849ae601a0e6f546aaec1553960
 - source_id: bennour-1996-ternary-cs-na-silicate
   aliases: []
   citation: Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination
