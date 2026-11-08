@@ -786,36 +786,56 @@ class WarmEngineWorker:
         except OSError:
             pass
 
-    def _finish_native_output_capture(
+    def _release_process_records(
         self,
         process: Any,
         *,
         process_start_failed: bool = False,
-    ) -> None:
+    ) -> bool:
+        """Release the pending-launch and output-capture records together.
+
+        Spawn reserves both records. Process.start publishes the wrapper PID,
+        and the locked reader may publish the PGID. On close requested, the
+        synchronous closer owns cleanup through its close deadline; if that
+        deadline arrives first, the PGID reaper owns the pending launch and
+        capture. Startup expiry only bounds the synchronous wait; it releases
+        neither record. The owner kills the remote group, waits for PID
+        publication (or a settled start failure), then stops/reaps the wrapper
+        and calls this method. Reaper exit is allowed only after that release.
+        Normal startup transfers the pending-launch record to self.process
+        when the PID is published; close/start-failure cleanup releases any
+        remaining records here. The state lock makes this the single,
+        idempotent release point, including when close and startup race.
+        """
+        if process is None:
+            return False
+        pid = _process_pid(process)
+        if pid is None:
+            if not process_start_failed:
+                return False
+        elif process.is_alive():
+            return False
         with self._state_lock:
+            had_pending_reap = process in self._pending_reap
+            if had_pending_reap:
+                self._pending_reap.remove(process)
             capture = self._native_output_capture
-            if capture is None:
-                return
-            captured_process, _reader, _writer, thread = capture
-            if captured_process is not process:
-                return
-        if thread.ident is not None:
-            pid = _process_pid(process)
-            if (
-                pid is None and not process_start_failed
-            ) or (
-                pid is not None and process.is_alive()
-            ):
-                return
-        self._close_native_output_writer(process)
-        with self._state_lock:
-            capture = self._native_output_capture
-            if capture is None or capture[0] is not process:
-                return
-            self._native_output_capture = None
-        # The daemon reader may outlive this join while stderr is blocked; it
-        # resumes when the sink unblocks and closes its own read fd in finally.
-        thread.join(timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S)
+            if capture is not None and capture[0] is process:
+                self._native_output_capture = None
+            else:
+                capture = None
+        if capture is not None:
+            _captured_process, _reader, writer, thread = capture
+            if writer is not None:
+                try:
+                    writer.close()
+                except OSError:
+                    pass
+            # The daemon reader may outlive this join while stderr is blocked;
+            # it resumes when the sink unblocks and closes its own read fd.
+            if thread.ident is not None:
+                thread.join(timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S)
+        return had_pending_reap or capture is not None
 
     def _receive_frame_with_deadline(
         self,
@@ -1102,7 +1122,7 @@ class WarmEngineWorker:
                 )
             )
         if not still_ours:
-            self._finish_native_output_capture(
+            self._release_process_records(
                 process,
                 process_start_failed=True,
             )
@@ -1118,7 +1138,7 @@ class WarmEngineWorker:
         try:
             process.start()
         except BaseException:
-            self._finish_native_output_capture(
+            self._release_process_records(
                 process,
                 process_start_failed=True,
             )
@@ -1565,7 +1585,7 @@ class WarmEngineWorker:
         finally:
             if connection is not None:
                 self._close_connection_or_defer(connection)
-            self._finish_native_output_capture(process)
+            self._release_process_records(process)
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
@@ -1611,7 +1631,7 @@ class WarmEngineWorker:
                     _signal_worker_process(process, signal.SIGKILL)
                     process.join(timeout=1.0)
                 _signal_worker_process(process, signal.SIGKILL)
-            self._finish_native_output_capture(process)
+            self._release_process_records(process)
         self._reap_pending(timeout_s=1.0)
 
     def request_disable(self) -> None:
@@ -1668,7 +1688,7 @@ class WarmEngineWorker:
             if process.is_alive():
                 remaining_processes.append(process)
             else:
-                self._finish_native_output_capture(process)
+                self._release_process_records(process)
         if remaining_processes:
             with self._state_lock:
                 self._pending_reap.extend(remaining_processes)
@@ -2091,6 +2111,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self._remote_pgid_reaper_started = False
         self._remote_startup_deadline: float | None = None
         self._remote_cleanup_deadline: float | None = None
+        self._remote_pid_publication_complete = threading.Event()
         self._remote_started = False
         self._remote_terminal = False
         self._remote_start_failure: BaseException | None = None
@@ -2333,6 +2354,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 sender.close()
             except (OSError, ValueError):
                 pass
+            self._remote_pid_publication_complete.set()
         if self._remote_pgid(wait_for_report=True) is None:
             with self._state_lock:
                 process, connection = self.process, self.connection
@@ -2412,11 +2434,6 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 self.process = None
             if self.connection is connection:
                 self.connection = None
-            if process is not None:
-                try:
-                    self._pending_reap.remove(process)
-                except ValueError:
-                    pass
             self.ready_payload = None
 
     def _kill_remote_process_group(self, group_id: int) -> None:
@@ -2430,6 +2447,15 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         process: Any,
         connection: Any,
     ) -> bool:
+        with self._state_lock:
+            if process is None:
+                process = self.process
+                if process is None and self._pending_reap:
+                    process = self._pending_reap[0]
+            if connection is None:
+                connection = self.connection
+        if process is None:
+            return False
         with self._remote_pgid_reaper_lock:
             if self._remote_pgid_reaper_started:
                 return True
@@ -2458,20 +2484,35 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         process: Any,
         connection: Any,
     ) -> None:
-        group_id = self._remote_pgid(
-            wait_for_report=True,
-            cleanup=True,
-            background_reaper=True,
-        )
-        if group_id is not None:
-            self._kill_remote_process_group(group_id)
-        WarmEngineWorker._stop_pair(
-            self,
-            process,
-            connection,
-            diagnostic=False,
-            cleanup_group=True,
-        )
+        try:
+            group_id = self._remote_pgid(
+                wait_for_report=True,
+                cleanup=True,
+                background_reaper=True,
+            )
+            if group_id is not None:
+                self._kill_remote_process_group(group_id)
+        finally:
+            # Process.start may still be inside Popen after the launch has
+            # transferred to this reaper. Keep ownership until it publishes
+            # the PID, or reports that startup failed, so wrapper cleanup can
+            # release the launch and output-capture records exactly once.
+            self._remote_pid_publication_complete.wait()
+            if process is not None and _process_pid(process) is None:
+                if connection is not None:
+                    self._close_connection_or_defer(connection)
+                self._release_process_records(
+                    process,
+                    process_start_failed=True,
+                )
+            else:
+                WarmEngineWorker._stop_pair(
+                    self,
+                    process,
+                    connection,
+                    diagnostic=False,
+                    cleanup_group=True,
+                )
 
     def _stop_pair(
         self,

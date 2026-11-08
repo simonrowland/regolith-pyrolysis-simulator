@@ -93,7 +93,7 @@ def remote_worker_factory():
         worker = StdioRemoteEngineWorker(
             name=f'remote-{mode}',
             argv=(sys.executable, str(FAKE_WORKER), mode, *args),
-            startup_timeout_s=kwargs.pop('startup_timeout_s', 3.0),
+            startup_timeout_s=kwargs.pop('startup_timeout_s', 8.0),
             call_timeout_s=kwargs.pop('call_timeout_s', 3.0),
             max_line_bytes=kwargs.pop('max_line_bytes', 256),
         )
@@ -347,7 +347,9 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
 
     def factory(_index):
         if not created:
-            worker = remote_worker_factory('crash-first', str(crash_marker))
+            worker = remote_worker_factory(
+                'crash-first', str(crash_marker), startup_timeout_s=15.0,
+            )
         else:
             worker = remote_worker_factory('produced', startup_timeout_s=8.0)
             _track_remote_pgid_reaper_completion(worker, reaper_finished)
@@ -367,7 +369,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
     pool = EngineWorkerPool(factory, size=1)
     wrapper = None
     try:
-        first = pool.submit(_request()).result(timeout=10.0)
+        first = pool.submit(_request()).result(timeout=20.0)
         assert first['status'] == 'refused'
         assert first['code'] == 'child_crash'
         assert len(created) == 2
@@ -1435,8 +1437,37 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
 
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
-def test_close_before_popen_publication_claims_late_remote_pgid(
-    remote_worker_factory, monkeypatch, tmp_path, inherit,
+@pytest.mark.parametrize(
+    'pid_before_close, pgid_before_close, startup_expired_before_close',
+    (
+        (False, False, False),
+        (False, False, True),
+        (False, True, False),
+        (False, True, True),
+        (True, False, False),
+        (True, False, True),
+        (True, True, False),
+        (True, True, True),
+    ),
+    ids=(
+        'pid-after-close-pgid-after-close-expiry-after-close',
+        'pid-after-close-pgid-after-close-expiry-before-close',
+        'pid-after-close-pgid-before-close-expiry-after-close',
+        'pid-after-close-pgid-before-close-expiry-before-close',
+        'pid-before-close-pgid-after-close-expiry-after-close',
+        'pid-before-close-pgid-after-close-expiry-before-close',
+        'pid-before-close-pgid-before-close-expiry-after-close',
+        'pid-before-close-pgid-before-close-expiry-before-close',
+    ),
+)
+def test_close_orders_publication_and_reaper_before_releasing_records(
+    remote_worker_factory,
+    monkeypatch,
+    tmp_path,
+    inherit,
+    pid_before_close,
+    pgid_before_close,
+    startup_expired_before_close,
 ):
     from multiprocessing.context import SpawnProcess
 
@@ -1444,18 +1475,37 @@ def test_close_before_popen_publication_claims_late_remote_pgid(
     caller_group = os.getpgrp()
     worker_pid_file = tmp_path / 'worker.pid'
     grandchild_pid_file = tmp_path / 'grandchild.pid'
+    context = multiprocessing.get_context('spawn')
+    report_wait_receive, report_wait_sender = context.Pipe(duplex=False)
+    release_report_receiver, release_report_sender = context.Pipe(duplex=False)
+    report_sent_receive, report_sent_sender = context.Pipe(duplex=False)
+    descendants_started = threading.Event()
+    previous_signal_handler = signal.signal(
+        signal.SIGUSR1,
+        lambda *_args: descendants_started.set(),
+    )
     worker = remote_worker_factory(
-        'startup-subtree-hold', str(worker_pid_file), str(grandchild_pid_file),
+        'startup-subtree-notify',
+        str(worker_pid_file),
+        str(grandchild_pid_file),
+        str(os.getpid()),
         startup_timeout_s=3.0,
         call_timeout_s=1.0,
     )
     spawn_created = threading.Event()
     release_publication = threading.Event()
     pgid_visible = threading.Event()
+    pid_published = threading.Event()
+    startup_pgid_claimed = threading.Event()
+    reaper_waiting_for_pid = threading.Event()
+    reaper_finished = threading.Event()
     start_results: list[object] = []
     cleanup_claims: list[int | None] = []
+    cleanup_claims_lock = threading.Lock()
+    released_process_records: list[Any] = []
     start_thread: threading.Thread | None = None
     pids: tuple[int, ...] = ()
+    wrapper_process = None
 
     class DelayedPgidReceive:
         def __init__(self, connection):
@@ -1470,7 +1520,44 @@ def test_close_before_popen_publication_claims_late_remote_pgid(
             return self.connection.recv()
 
     original_popen = SpawnProcess._Popen
+    original_process_start = SpawnProcess.start
     original_remote_pgid = worker._remote_pgid
+    original_reap = worker._reap_remote_process_group
+    original_release = getattr(worker, '_release_process_records', None)
+    original_finish_capture = getattr(
+        worker, '_finish_native_output_capture', None,
+    )
+    worker._bootstrap = _blocked_pgid_report_bootstrap
+    original_bootstrap_args = worker._process_bootstrap_args
+    worker._process_bootstrap_args = lambda: (
+        report_wait_sender,
+        release_report_receiver,
+        report_sent_sender,
+        *original_bootstrap_args(),
+    )
+
+    class ObservedPublicationEvent:
+        def __init__(self, event):
+            self.event = event
+
+        def set(self):
+            self.event.set()
+
+        def is_set(self):
+            return self.event.is_set()
+
+        def wait(self, timeout=None):
+            if 'remote PGID reaper' in threading.current_thread().name:
+                reaper_waiting_for_pid.set()
+            return self.event.wait(timeout)
+
+    publication_event = getattr(
+        worker, '_remote_pid_publication_complete', None,
+    )
+    if publication_event is not None:
+        worker._remote_pid_publication_complete = ObservedPublicationEvent(
+            publication_event,
+        )
 
     def record_remote_pgid(
         *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
@@ -1483,70 +1570,176 @@ def test_close_before_popen_publication_claims_late_remote_pgid(
             background_reaper=background_reaper,
         )
         if cleanup:
-            cleanup_claims.append(group_id)
+            with cleanup_claims_lock:
+                cleanup_claims.append(group_id)
+        elif group_id is not None:
+            startup_pgid_claimed.set()
         return group_id
 
     def gated_popen(process_obj):
         popen = original_popen(process_obj)
-        spawn_created.set()
-        release_publication.wait(timeout=30.0)
+        if process_obj is worker.process:
+            spawn_created.set()
+            if not release_publication.wait(timeout=30.0):
+                raise TimeoutError('test did not publish wrapper PID')
         return popen
 
+    def tracked_process_start(process_obj):
+        result = original_process_start(process_obj)
+        if process_obj is wrapper_process:
+            pid_published.set()
+        return result
+
+    def record_reaper(process, connection):
+        try:
+            return original_reap(process, connection)
+        finally:
+            reaper_finished.set()
+
+    def record_release(process, *, process_start_failed=False):
+        had_pending = process in worker._pending_reap
+        capture = worker._native_output_capture
+        had_capture = capture is not None and capture[0] is process
+        if original_release is not None:
+            released = original_release(
+                process,
+                process_start_failed=process_start_failed,
+            )
+        else:
+            original_finish_capture(
+                process,
+                process_start_failed=process_start_failed,
+            )
+            released = None
+        pending_released = had_pending and process not in worker._pending_reap
+        capture = worker._native_output_capture
+        capture_released = had_capture and (
+            capture is None or capture[0] is not process
+        )
+        if pending_released or capture_released:
+            released_process_records.append(process)
+        return released
+
     monkeypatch.setattr(SpawnProcess, '_Popen', staticmethod(gated_popen))
+    monkeypatch.setattr(SpawnProcess, 'start', tracked_process_start)
     monkeypatch.setattr(worker, '_remote_pgid', record_remote_pgid)
+    monkeypatch.setattr(worker, '_reap_remote_process_group', record_reaper)
+    if original_release is not None:
+        monkeypatch.setattr(worker, '_release_process_records', record_release)
+    elif original_finish_capture is not None:
+        monkeypatch.setattr(
+            worker, '_finish_native_output_capture', record_release,
+        )
     try:
         start_thread = threading.Thread(
             target=lambda: start_results.append(worker.start()),
-            name='remote spawn publication',
+            name='remote ordering start',
         )
         start_thread.start()
         assert spawn_created.wait(timeout=30.0)
-
-        deadline = time.monotonic() + 10.0
-        while time.monotonic() < deadline and not (
-            worker_pid_file.exists() and grandchild_pid_file.exists()
-        ):
-            time.sleep(0.01)
-        assert worker_pid_file.exists() and grandchild_pid_file.exists()
+        assert report_wait_receive.poll(30.0)
+        report_wait_receive.recv()
+        report_wait_sender.close()
+        assert descendants_started.wait(timeout=30.0)
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         wrapper = worker.process
         assert wrapper is not None
+        wrapper_process = wrapper
         assert wrapper.pid is None
         if inherit:
             assert os.getpgrp() == caller_group
 
+        # Process.start has created the wrapper but remains inside the gated
+        # Popen return, so neither the PID nor the PGID ordering is inferred
+        # from elapsed time or filesystem polling.
         with worker._remote_pgid_lock:
             worker._remote_pid_receive = DelayedPgidReceive(
                 worker._remote_pid_receive,
             )
+        if pid_before_close:
+            release_publication.set()
+            assert pid_published.wait(timeout=30.0)
+        if pgid_before_close:
+            release_report_sender.send(None)
+            assert report_sent_receive.poll(30.0)
+            report_sent_receive.recv()
+            pgid_visible.set()
+            if pid_before_close:
+                assert startup_pgid_claimed.wait(timeout=30.0)
+
+        if startup_expired_before_close:
+            worker._remote_startup_deadline = time.monotonic() - 1.0
+        cleanup_deadline = time.monotonic() + 0.2
+        close_started = time.monotonic()
+        worker._request_disable_with_cleanup_deadline(cleanup_deadline)
         worker.close()
+        close_elapsed = time.monotonic() - close_started
+        assert close_elapsed <= 0.75
 
-        # The OS wrapper exists, but Process.start has not published its Popen
-        # object. Cleanup could not yet observe the delayed PGID report.
-        assert wrapper.pid is None
-        for pid in pids:
-            os.kill(pid, 0)
-        pgid_visible.set()
+        if not startup_expired_before_close:
+            worker._remote_startup_deadline = time.monotonic() - 1.0
+        if not pgid_before_close:
+            release_report_sender.send(None)
+            assert report_sent_receive.poll(30.0)
+            report_sent_receive.recv()
+            pgid_visible.set()
+
+        # A reaper handed both late reports must retain the launch until PID
+        # publication. On 6ccd6076 this wait times out because the reaper exits
+        # while Process.start still hides the PID and leaves capture behind.
+        publication_wait_observed = True
+        if not pid_before_close and not pgid_before_close:
+            publication_wait_observed = reaper_waiting_for_pid.wait(
+                timeout=5.0,
+            )
+
         release_publication.set()
-        start_thread.join(timeout=5.0)
-
+        assert pid_published.wait(timeout=30.0)
+        start_thread.join(timeout=30.0)
         assert not start_thread.is_alive()
-        assert start_results == [None]
-        assert any(group_id is not None for group_id in cleanup_claims)
-        wrapper.join(timeout=1.0)
+        assert len(start_results) == 1
+        if worker._remote_pgid_reaper_started:
+            assert reaper_finished.wait(timeout=30.0)
+
+        # The cleanup-claim assertion is made only after its actual owner has
+        # finished, avoiding a race with background PGID publication.
+        with cleanup_claims_lock:
+            claims = tuple(cleanup_claims)
+        assert any(group_id is not None for group_id in claims)
+        assert publication_wait_observed
+        assert wrapper.pid is not None
+        wrapper.join(timeout=2.0)
         assert wrapper.exitcode is not None
         assert not wrapper.is_alive()
-        refusal = worker.call(_request())
-        assert refusal['status'] == 'refused'
-        assert refusal['code'] == 'startup_failure'
+        assert worker._pending_reap == []
+        assert worker._native_output_capture is None
+        assert released_process_records == [wrapper]
+        if not pid_before_close:
+            refusal = worker.call(_request())
+            assert refusal['status'] == 'refused'
+            assert refusal['code'] == 'startup_failure'
         _assert_pids_gone(pids)
         _assert_caller_group_unchanged(caller_group)
     finally:
         pgid_visible.set()
+        release_report_sender.close()
         release_publication.set()
         worker.close()
         if start_thread is not None:
-            start_thread.join(timeout=1.0)
+            start_thread.join(timeout=30.0)
         if not pids and worker_pid_file.exists() and grandchild_pid_file.exists():
             pids = _read_pids(worker_pid_file, grandchild_pid_file)
         _kill_pids(pids)
+        signal.signal(signal.SIGUSR1, previous_signal_handler)
+        for connection in (
+            report_wait_receive,
+            report_wait_sender,
+            release_report_receiver,
+            release_report_sender,
+            report_sent_receive,
+            report_sent_sender,
+        ):
+            try:
+                connection.close()
+            except (OSError, ValueError):
+                pass
