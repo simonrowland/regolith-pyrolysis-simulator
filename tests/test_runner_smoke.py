@@ -22,6 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 import hashlib
+import re
 from collections import defaultdict
 from dataclasses import replace
 import json
@@ -1181,20 +1182,31 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
     return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
 
 
-def test_runner_payload_engine_versions_have_no_host_identity(runner_golden_loader):
-    payload, _, _ = runner_golden_loader(SCENARIOS[0])
+@pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda scenario: scenario["name"])
+def test_runner_payload_engine_versions_have_no_host_identity(
+    scenario, runner_golden_loader
+):
+    payload, _, expected_text = runner_golden_loader(scenario)
     versions = [
         token["value"]
         for path, token in nodes(payload).items()
         if path.rsplit("/", 1)[-1] == "engine_version"
     ]
+    expected_versions = [
+        token["value"]
+        for path, token in nodes(json.loads(expected_text)).items()
+        if path.rsplit("/", 1)[-1] == "engine_version"
+    ]
 
-    assert versions
-    assert all(
-        marker.casefold() not in version.casefold()
-        for version in versions
-        for marker in ("/Users/", "/home/", "server=")
-    )
+    assert bool(versions) == bool(expected_versions)
+    for version in versions:
+        assert re.search(
+            r"/(?:Users|home|private|tmp|var|root|opt)(?:/|\b)",
+            version,
+            flags=re.IGNORECASE,
+        ) is None
+        assert re.search(r"\b[A-Za-z]:\\", version) is None
+        assert "server=" not in version.casefold()
 
 
 def _flux_ledger_pins(capture: dict) -> dict[str, str]:
