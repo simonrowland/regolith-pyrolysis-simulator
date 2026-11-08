@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.identity import profile_for
 from simulator.battery.migrate import _mole_fraction_composition_from_values
 from tests.battery.test_migrate import _migrate_real_extract
 from tests.literature_extract_test_helpers import iter_locators
@@ -201,9 +202,13 @@ def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: P
         assert Decimal("99.7") <= total_pct <= Decimal("100.3")
         assert printed["basis"] == "printed_mole_fraction"
         observation = migrated_by_id[observation_id]
+        composition_profile = profile_for(observation.identity)
         if source_row["experiment"].startswith("cheng21_t5_e"):
+            condition = observation.point_conditions["composition"]
+            assert condition.state.is_unknown
+            assert condition.state.reason == CHENG_RUN_COMPOSITION_REASON
+        if "composition" in composition_profile.required:
             assert observation.identity.composition.is_unknown
-            assert observation.identity.composition.reason == CHENG_RUN_COMPOSITION_REASON
         else:
             assert observation.identity.composition.is_not_applicable
         composition, omitted = _mole_fraction_composition_from_values(source_row["values"])

@@ -12,6 +12,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, MethodToken
+from simulator.battery.identity import profile_for
 from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract
 
@@ -364,7 +365,12 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
             source_state = conditions["composition"]["state"]
             if source_state["tag"] == "unknown":
                 assert observation.identity.composition is not None
-                assert observation.identity.composition.is_unknown
+                if "composition" in profile_for(
+                    observation.identity
+                ).permitted_not_applicable:
+                    assert observation.identity.composition.is_not_applicable
+                else:
+                    assert observation.identity.composition.is_unknown
                 assert observation.point_conditions["composition"].state.is_unknown
             else:
                 printed = source_state["value"]

@@ -1972,9 +1972,12 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "alpha": (71, 2, 6),
         "gibbs_table": (305, 0, 0),
         "ordering_activity": (120, 0, 0),
-        "ordering_bound": (161, 2, 2),
+        # Jacobson's FactSage row is now typed partial_pressure rather than a
+        # bound_not_point_ordering claim. Its unchanged Table 1 value therefore
+        # moves one observation from ordering_bound to rate_hkl.
+        "ordering_bound": (160, 2, 2),
         "psat_series": (260, 1, 2),
-        "rate_hkl": (658, 0, 0),
+        "rate_hkl": (659, 0, 0),
         "relative_volatility": (1, 0, 0),
         "transition_point": (112, 15, 15),
     }

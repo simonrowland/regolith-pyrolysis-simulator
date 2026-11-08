@@ -251,7 +251,7 @@ def test_real_rows_that_fail_series_admission_stay_as_parent_context(
             ),
             38,
             17,
-            28,
+            0,
         ),
         (
             "kems-035-sauerborn-2005.yaml",

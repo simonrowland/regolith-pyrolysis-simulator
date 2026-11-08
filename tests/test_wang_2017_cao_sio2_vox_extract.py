@@ -54,7 +54,7 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
     assert not migrator.result.registry_issues
 
     by_sample: dict[str, set[str]] = {}
-    composition_by_measurement: dict[str, dict[str, Decimal]] = {}
+    composition_by_measurement: dict[str, dict[str, Decimal] | None] = {}
     for container, raw in source_rows:
         raw_id = str(raw["observation_id"])
         observation = migrated[f"{SOURCE_ID}::{raw_id}"]
@@ -75,25 +75,45 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
         assert observation.point_conditions["pO2_Pa"].state.value == EXPECTED_PO2_PA
         assert observation.point_conditions["printed_sum"].state.value == printed_sum
         assert observation.point_conditions["pO2_Pa"].locator.section == "Article title"
-        composition_condition = observation.point_conditions["composition"]
-        assert composition_condition.locator.table == raw["locator"]["table"]
-        # The row prints no phase, so provenance stays unset. Both copies
-        # keep the printed composition.
-        assert composition_condition.state.value.components == observation.identity.composition.value.components
-        assert observation.identity.composition.value.input_provenance is None
-        assert composition_condition.state.value.input_provenance is None
         assert observation.identity.composition is not None
-        assert observation.identity.composition.is_value
-        composition = dict(observation.identity.composition.value.as_map())
-        assert set(composition) == {"CaO", "SiO2", "V2O3"}
-        expected_composition = wt_pct_to_mole_fraction(
-            {
+        measurement_id = raw_id.rsplit("_", 1)[0]
+        composition_condition = observation.point_conditions.get("composition")
+        if observation.identity.composition.is_unknown:
+            printed_composition = {
                 component: Decimal(str(amount))
                 for component, amount in values["composition_wt_pct"].items()
             }
-        )
-        assert composition == expected_composition.as_map()
-        measurement_id = raw_id.rsplit("_", 1)[0]
+            printed_composition_total = sum(printed_composition.values())
+            assert printed_composition_total < Decimal("95")
+            assert (
+                f"partial analysis: kept sum={printed_composition_total} wt% is below 95 wt%"
+                in observation.identity.composition.reason
+            )
+            if composition_condition is not None:
+                assert composition_condition.state.is_unknown
+                assert composition_condition.locator.table == raw["locator"]["table"]
+            composition = None
+        else:
+            assert observation.identity.composition.is_value
+            assert composition_condition is not None
+            assert composition_condition.locator.table == raw["locator"]["table"]
+            # The row prints no phase, so provenance stays unset. Both copies
+            # keep the printed composition, including retained V2O3.
+            assert (
+                composition_condition.state.value.components
+                == observation.identity.composition.value.components
+            )
+            assert observation.identity.composition.value.input_provenance is None
+            assert composition_condition.state.value.input_provenance is None
+            composition = dict(observation.identity.composition.value.as_map())
+            assert set(composition) == {"CaO", "SiO2", "V2O3"}
+            expected_composition = wt_pct_to_mole_fraction(
+                {
+                    component: Decimal(str(amount))
+                    for component, amount in values["composition_wt_pct"].items()
+                }
+            )
+            assert composition == expected_composition.as_map()
         if measurement_id in composition_by_measurement:
             assert composition_by_measurement[measurement_id] == composition
         else:
@@ -112,6 +132,8 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
     assert all(len(experiment_ids) == 1 for experiment_ids in by_sample.values())
     assert len(by_sample) == 29
     assert len(composition_by_measurement) == 172
+    assert sum(value is not None for value in composition_by_measurement.values()) == 157
+    assert sum(value is None for value in composition_by_measurement.values()) == 15
 
     contexts = [
         row

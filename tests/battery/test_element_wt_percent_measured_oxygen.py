@@ -301,8 +301,12 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
         "I2O": Decimal("0.5"),
         "Re": Decimal("0.1"),
     }
-    stored = wt_pct_to_mole_fraction(printed)
-    assert set(dict(stored.components)) == set(printed)
+    assert sum(printed.values()) == Decimal("88.6")
+    with pytest.raises(
+        ValueError,
+        match="mass-percent composition is a partial analysis: kept sum=88.6 wt% is below 95 wt%",
+    ):
+        wt_pct_to_mole_fraction(printed)
 
     kept, excluded = partition_engine_components(
         printed,
@@ -338,8 +342,8 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
     with pytest.raises(
         ValueError,
         match=(
-            "printed oxide wt% map has unsupported numeric component\\(s\\): "
-            "Na2O_plus_K2O"
+            "partial analysis contains unsupported component\\(s\\) above "
+            "0.5 wt%: Na2O_plus_K2O=10 wt%"
         ),
     ):
         wt_pct_to_mole_fraction(
@@ -347,37 +351,33 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
         )
     with pytest.raises(
         ValueError,
-        match="printed oxide wt% map has unsupported numeric component\\(s\\): XxO",
+        match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%: XxO=10 wt%",
     ):
         wt_pct_to_mole_fraction({"SiO2": Decimal("90"), "XxO": Decimal("10")})
 
-    # Integer formulas that are not aliases of a mapped component stay.
-    # Fractional formula units, and an integer multiple of a mapped oxide,
-    # are refused unless the component map names them.
-    metals = wt_pct_to_mole_fraction(
-        {
-            "Fe": Decimal("40"),
-            "Ni": Decimal("20"),
-            "CO2": Decimal("10"),
-            "Cu2O": Decimal("10"),
-            "SiO2": Decimal("20"),
-        }
-    )
-    assert set(dict(metals.components)) == {"Fe", "Ni", "CO2", "Cu2O", "SiO2"}
+    # Closure refusal runs before formula conversion for unrecognized major
+    # components, including integer and fractional formulas.
     with pytest.raises(
         ValueError,
-        match=(
-            "printed oxide wt% map has unsupported numeric component\\(s\\): "
-            "FeO1.5"
-        ),
+        match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",
+    ):
+        wt_pct_to_mole_fraction(
+            {
+                "Fe": Decimal("40"),
+                "Ni": Decimal("20"),
+                "CO2": Decimal("10"),
+                "Cu2O": Decimal("10"),
+                "SiO2": Decimal("20"),
+            }
+        )
+    with pytest.raises(
+        ValueError,
+        match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",
     ):
         wt_pct_to_mole_fraction({"SiO2": Decimal("90"), "FeO1.5": Decimal("10")})
     with pytest.raises(
         ValueError,
-        match=(
-            "printed oxide wt% map has unsupported numeric component\\(s\\): "
-            "Fe2O2"
-        ),
+        match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",
     ):
         wt_pct_to_mole_fraction({"SiO2": Decimal("90"), "Fe2O2": Decimal("10")})
 
@@ -389,14 +389,16 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
     )
     assert refused is None
     assert reasons == [
-        "printed oxide wt% map has unsupported numeric component(s): Na2O_plus_K2O"
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "Na2O_plus_K2O=10 wt%"
     ]
+    reasons.clear()
     accepted = _oxide_map_from_mapping(
         {"SiO2": "80", "H2O": "5", "Cl": "1"},
         declared_map=True,
     )
-    assert accepted is not None
-    assert set(accepted) == {"SiO2", "H2O", "Cl"}
+    assert accepted is None
+    assert reasons == []
 
 
 def _located(value: object) -> dict:
