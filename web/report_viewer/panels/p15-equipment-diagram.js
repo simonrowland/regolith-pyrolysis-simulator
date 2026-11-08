@@ -280,6 +280,21 @@
       }
       flaggedProduct = `<p class="sec-p15-stage-flag">${esc(parts.join(" · "))}</p>`;
     }
+    let silicaAvailabilityNotice = "";
+    if (silicaAvailability?.status === "available") {
+      const parts = [];
+      if (typeof silicaAvailability.state === "string") {
+        parts.push(`state: ${silicaAvailability.state}`);
+      }
+      if (typeof silicaAvailability.reason === "string") {
+        parts.push(`reason: ${silicaAvailability.reason}`);
+      }
+      if (parts.length) {
+        silicaAvailabilityNotice = `<p class="sec-p15-stage-flag">${esc(
+          `availability · ${parts.join(" · ")}`
+        )}</p>`;
+      }
+    }
     // Empty-stage classification sentence only when the backend emitted a
     // verdict; inventing "backend's empty-stage classification" for a missing
     // verdict contradicts the PENDING badge and the artifact.
@@ -295,7 +310,9 @@
     return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
-      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${flaggedProduct}${warning}` +
+      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>` +
+      `${emptyStage}${flaggedCapture}${flaggedProduct}` +
+      `${silicaAvailabilityNotice}${warning}` +
       `${stageMassMetric}` +
       metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
       metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +

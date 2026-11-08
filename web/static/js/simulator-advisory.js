@@ -218,6 +218,12 @@ function renderCeramicRumpPanel(payload) {
     if (productClassStatus || estimateNote) {
         const availabilityDetails = {};
         if (productClassStatus) availabilityDetails.status = productClassStatus;
+        if (availability && availability.state) {
+            availabilityDetails.state = availability.state;
+        }
+        if (availability && availability.reason) {
+            availabilityDetails.reason = availability.reason;
+        }
         if (availability && availability.total_basis) {
             availabilityDetails.total_basis = availability.total_basis;
         }
