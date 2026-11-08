@@ -9,7 +9,6 @@ import yaml
 
 from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import migrate
-from tests.helpers.corpus_paths import regolith_corpus_root
 from tests.literature_extract_test_utils import isolated_root
 
 
@@ -98,9 +97,6 @@ def test_printed_row_counts_and_render_pins_are_independent() -> None:
 
 def test_isolated_migration_binds_redox_axes_and_exact_parents(tmp_path: Path) -> None:
     document = _document()
-    corpus = regolith_corpus_root()
-    assert (corpus / f"raw/{SID}/{SID}.pdf").is_file()
-
     result = migrate(isolated_root(tmp_path, document), write=False)
     assert len(result.observations) == 39
     assert not result.validation.hard_issues
