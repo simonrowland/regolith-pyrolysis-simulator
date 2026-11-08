@@ -3,9 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.campaigns import CampaignManager
+from simulator.optimize.evaluate import _build_eval_inputs
+from simulator.optimize.profiles import load_profile, validate_profile
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.strategy.staged import StagedStrategy
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
 from simulator.state import BatchRecord, CampaignPhase, MeltState, DecisionType
@@ -15,27 +20,43 @@ ROOT = Path(__file__).resolve().parents[1]
 RECIPE = ROOT / "data" / "recipes" / "canonical_lunar_full_yield.yaml"
 DEMO = ROOT / "web" / "report_viewer" / "sample-run-artifact.json"
 LEGACY_REQUIRED_SPECIES_TOTAL_KG = 134.88620592669162
+LOW_TI_PROFILE = ROOT / "data" / "optimize_profiles" / "lunar_mare_low_ti.yaml"
 
 
 def _yaml(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
 
-def test_canonical_recipe_is_catalog_grounded_and_pinned_in_lunar_profile() -> None:
-    setpoints = _yaml(ROOT / "data" / "setpoints.yaml")
-    furnace_catalog = _yaml(ROOT / "data" / "furnace_materials.yaml")
-    profile = _yaml(ROOT / "data" / "optimize_profiles" / "lunar_mare_low_ti.yaml")
-    recipe = load_recipe_patch(RECIPE)
-
-    alumina_ceiling = furnace_catalog["furnace_materials"]["dense_alumina_max"][
-        "max_service_T_C"
-    ]
+def _staged_seed_eval_spec(profile, schema: RecipeSchema):
+    strategy = StagedStrategy(schema, seed=0, objective_profile=profile)
     seed = next(
         item
         for item in profile["seed_recipes"]
         if item["id"] == "canonical-lunar-full-yield"
     )
+    patch = RecipePatch.from_nested(seed["patch"])
+    # The strategy resolves profile topology before building this C5 context.
+    conditional_context = strategy._conditional_context_for_stage("C5", patch)
+    return _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "high",
+        profile,
+        schema,
+        conditional_context=conditional_context,
+    )[0]
 
+
+def test_canonical_recipe_is_catalog_grounded_and_pinned_in_lunar_profile() -> None:
+    setpoints = _yaml(ROOT / "data" / "setpoints.yaml")
+    furnace_catalog = _yaml(ROOT / "data" / "furnace_materials.yaml")
+    schema = RecipeSchema()
+    optimizer_profile = load_profile(LOW_TI_PROFILE, schema=schema)
+    recipe = load_recipe_patch(RECIPE)
+
+    alumina_ceiling = furnace_catalog["furnace_materials"]["dense_alumina_max"][
+        "max_service_T_C"
+    ]
     assert alumina_ceiling == 1843
     assert recipe["furnace_max_T_C"] == alumina_ceiling
     assert recipe["campaigns"]["C2A_continuous"]["temp_range_C"][-1] == alumina_ceiling
@@ -44,7 +65,32 @@ def test_canonical_recipe_is_catalog_grounded_and_pinned_in_lunar_profile() -> N
         "Na_kg": 140.0,
     }
     assert setpoints["campaigns"]["C5"]["allow_mre_voltage_cap_V"] == 0.0
-    assert seed["patch"]["campaigns"]["C5"]["allow_mre_voltage_cap_V"] == 0.0
+
+    def assert_no_mre(eval_spec) -> None:
+        assert eval_spec.c5_enabled is False
+        assert eval_spec.mre_max_voltage_V == 0.0
+
+    assert_no_mre(_staged_seed_eval_spec(optimizer_profile, schema))
+
+    mutated_profile_data = _yaml(LOW_TI_PROFILE)
+    mutated_profile_data["staged"] = {
+        "topology": {"path_ab": "A", "branch": "two", "c5": True, "c6": True}
+    }
+    mutated_seed = next(
+        item
+        for item in mutated_profile_data["seed_recipes"]
+        if item["id"] == "canonical-lunar-full-yield"
+    )
+    mutated_seed["patch"].setdefault("campaigns", {}).setdefault("C5", {})[
+        "allow_mre_voltage_cap_V"
+    ] = 1.6
+    mutated_profile = validate_profile(
+        mutated_profile_data,
+        expected_feedstock="lunar_mare_low_ti",
+        schema=schema,
+    )
+    with pytest.raises(AssertionError):
+        assert_no_mre(_staged_seed_eval_spec(mutated_profile, schema))
 
 
 def test_canonical_sequence_recovers_mg_before_final_boiloff_and_skips_mre() -> None:

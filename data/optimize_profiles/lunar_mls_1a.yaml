@@ -23,13 +23,16 @@ fidelities:
   fast: {backend_name: internal-analytical, hours: 60}
   high: {backend_name: internal-analytical, hours: 60}
   auto: {backend_name: internal-analytical, hours: 60}
+staged:
+  topology: {path_ab: A, branch: two, c5: true, c6: true}
 seed_recipes:
   - id: mls1a-mare-high-ti-mre-seed
     source_campaign: C5
-    rationale: Use the high-Ti mare limited-MRE backpressure window for the Ti-rich MLS-1A analog.
+    rationale: Use the setpoints branch-two limited-MRE cap and backpressure window for the Ti-rich MLS-1A analog.
     patch:
       campaigns:
         C5:
+          allow_mre_voltage_cap_V: 1.6
           temp_range_C: [1500, 1650]
           pO2_bar: [0.01, 0.1]
           pO2_mbar_default: 50.0

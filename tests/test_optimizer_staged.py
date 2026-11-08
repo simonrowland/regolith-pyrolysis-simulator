@@ -17,7 +17,13 @@ from simulator.optimize import doe as doe_module
 from simulator.optimize import study
 from simulator.optimize import evalspec as evalspec_module
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec, cache_key
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize.evaluate import (
+    EvaluationInputError,
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+    _build_eval_inputs,
+)
 from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
@@ -25,9 +31,11 @@ from simulator.optimize.objective import (
     objective_scores,
     pareto_front,
 )
+from simulator.optimize.profiles import constrained_max_profile, load_profile
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import (
     C2A_STAGED_ORDER_PATH,
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -2674,3 +2682,122 @@ def test_staged_strip_trace_preserves_real_backend_provenance(tmp_path) -> None:
     assert stored.run_reference.backend_status == "ok"
     assert stored.run_reference.backend_authoritative is True
     study._assert_result_artifact_floor(stored)
+
+
+@pytest.mark.parametrize(
+    ("profile_name", "feedstock", "budget"),
+    (
+        ("lunar_mare_low_ti", "lunar_mare_low_ti", 4),
+        ("lunar_mare_high_ti", "lunar_mare_high_ti", 1),
+        ("lunar_mls_1a", "lunar_mls_1a", 1),
+    ),
+)
+def test_shipped_staged_profiles_score_seed_candidates_with_conditional_context(
+    tmp_path, profile_name: str, feedstock: str, budget: int
+) -> None:
+    profile_path = (
+        Path(__file__).parents[1]
+        / "data"
+        / "optimize_profiles"
+        / f"{profile_name}.yaml"
+    )
+    profile = constrained_max_profile(
+        load_profile(profile_path),
+        furnace_T_max_C=2200.0,
+    )
+
+    def fixture_evaluator(
+        patch: RecipePatch,
+        candidate_feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        schema: RecipeSchema | None = None,
+        constraints: Any = None,
+        conditional_context: Any = None,
+        staged_replay: study.StagedReplay | None = None,
+        **_: Any,
+    ) -> ScoredResult:
+        if staged_replay is not None:
+            assert patch == staged_replay.stage_patch
+        active_schema = schema or SCHEMA
+        spec, _ = _build_eval_inputs(
+            patch.validated(active_schema),
+            candidate_feedstock,
+            fidelity,
+            profile,
+            active_schema,
+            constraints=constraints,
+            conditional_context=conditional_context,
+        )
+        objectives = ObjectiveVector(
+            tuple(
+                ObjectiveValue(
+                    definition.metric,
+                    definition.sense,
+                    1.0,
+                    definition.units,
+                    ordinal=definition.ordinal,
+                )
+                for definition in objective_definitions(profile)
+            )
+        )
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=objectives,
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="ok",
+                trace={
+                    "backend_status": "ok",
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "mass_closure": _closed_mass_closure(),
+                    "furnace_amortization_status": "available",
+                    "furnace_amortization_batch_cost_equivalents": 0.0,
+                },
+                backend_name=spec.backend_name,
+                backend_status="ok",
+                backend_authoritative=False,
+            ),
+        )
+
+    result = study.run(
+        profile,
+        feedstock,
+        "staged",
+        "high",
+        parallel=1,
+        budget=budget,
+        out_dir=tmp_path / profile_name,
+        seed=0,
+        evaluator=fixture_evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert any(
+        record.proposal_source == "seed_recipe"
+        and record.feasible
+        and record.objectives
+        for record in result.records
+    )
+
+
+def test_inactive_c5_parent_patch_remains_rejected() -> None:
+    with pytest.raises(
+        EvaluationInputError,
+        match="inactive C5 subspace patch contains its parent",
+    ):
+        _build_eval_inputs(
+            RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
+            FEEDSTOCK,
+            "high",
+            PROFILE,
+            SCHEMA,
+            conditional_context=c5_sampler_context(SCHEMA, active=False),
+        )
