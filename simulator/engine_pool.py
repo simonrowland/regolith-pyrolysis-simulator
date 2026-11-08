@@ -10,6 +10,7 @@ from __future__ import annotations
 import atexit
 import faulthandler
 import hashlib
+import json
 import logging
 import math
 import multiprocessing
@@ -18,15 +19,18 @@ import os
 import re
 import signal
 import queue
+import selectors
 import socket
+import subprocess
 import sys
 import threading
 import time
 import traceback
+import uuid
 import weakref
 from concurrent.futures import Future
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional, Sequence
 
 ENGINE_WORKER_CANCEL_POLL_S = 0.05
 ENGINE_WORKER_WATCHDOG_GRACE_S = 0.25
@@ -1667,6 +1671,472 @@ class WarmEngineWorker:
 
 
 EngineWorkerTransport = WarmEngineWorker
+
+
+REMOTE_ENGINE_PROTOCOL_VERSION = 1
+REMOTE_ENGINE_MAX_LINE_BYTES = 64 * 1024
+_REMOTE_ENGINE_STDERR_BYTES = 64 * 1024
+_REMOTE_ENGINE_ERROR_DETAIL_CHARS = 1024
+_REMOTE_ENGINE_CLOSE_WAIT_S = 0.2
+
+
+class _RemoteEngineProtocolFailure(RuntimeError):
+    def __init__(self, code: str, detail: str):
+        self.failure_disposition = code
+        super().__init__(str(detail)[:_REMOTE_ENGINE_ERROR_DETAIL_CHARS])
+
+
+def _encode_remote_engine_line(
+    value: Mapping[str, Any],
+    max_line_bytes: int,
+) -> bytes:
+    try:
+        line = json.dumps(
+            value,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(',', ':'),
+        ).encode('utf-8') + b'\n'
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise _RemoteEngineProtocolFailure(
+            'invalid_request', f'request is not JSON-safe: {exc}',
+        ) from exc
+    if len(line) > max_line_bytes:
+        raise _RemoteEngineProtocolFailure(
+            'line_too_large',
+            f'request line exceeds {max_line_bytes} bytes',
+        )
+    return line
+
+
+def _unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError(f'duplicate JSON field {key!r}')
+        value[key] = item
+    return value
+
+
+class _RemoteEngineStdioProcess:
+    """One framed stdio process; stderr is drained and retained with a cap."""
+
+    def __init__(self, process: subprocess.Popen[bytes], max_line_bytes: int):
+        self.process = process
+        self.max_line_bytes = max_line_bytes
+        self.ready: dict[str, Any] = {}
+        self._stderr_lock = threading.Lock()
+        self._stderr = bytearray()
+        self._stderr_thread = threading.Thread(
+            target=self._drain_stderr,
+            name='remote-engine-stderr',
+            daemon=True,
+        )
+        self._stderr_thread.start()
+
+    def _drain_stderr(self) -> None:
+        stream = self.process.stderr
+        if stream is None:
+            return
+        try:
+            while True:
+                chunk = stream.read(4096)
+                if not chunk:
+                    return
+                with self._stderr_lock:
+                    room = _REMOTE_ENGINE_STDERR_BYTES - len(self._stderr)
+                    if room > 0:
+                        self._stderr.extend(chunk[:room])
+        except (OSError, ValueError):
+            return
+
+    def _closed_stream_failure(self) -> _RemoteEngineProtocolFailure:
+        returncode = self.process.poll()
+        with self._stderr_lock:
+            stderr = bytes(self._stderr).decode('utf-8', errors='replace').strip()
+        detail = 'remote worker closed stdout before a complete response'
+        if stderr:
+            detail = f'{detail}; stderr: {stderr[-_REMOTE_ENGINE_ERROR_DETAIL_CHARS:]}'
+        if returncode not in (None, 0):
+            return _RemoteEngineProtocolFailure(
+                'child_crash',
+                f'remote worker exited with status {returncode}; {detail}',
+            )
+        return _RemoteEngineProtocolFailure('eof', detail)
+
+    def read_json_line(self) -> dict[str, Any]:
+        stream = self.process.stdout
+        if stream is None:
+            raise _RemoteEngineProtocolFailure(
+                'startup_failure', 'remote worker stdout is unavailable',
+            )
+        pending = bytearray()
+        with selectors.DefaultSelector() as selector:
+            selector.register(stream, selectors.EVENT_READ)
+            while True:
+                selector.select()
+                chunk = os.read(
+                    stream.fileno(),
+                    min(4096, self.max_line_bytes + 1 - len(pending)),
+                )
+                if not chunk:
+                    raise self._closed_stream_failure()
+                newline = chunk.find(b'\n')
+                if newline >= 0:
+                    if len(pending) + newline + 1 > self.max_line_bytes:
+                        raise _RemoteEngineProtocolFailure(
+                            'line_too_large',
+                            f'remote line exceeds {self.max_line_bytes} bytes',
+                        )
+                    if newline + 1 != len(chunk):
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_response',
+                            'remote worker wrote more than one response line',
+                        )
+                    raw = bytes(pending) + chunk[:newline]
+                    try:
+                        value = json.loads(
+                            raw.decode('utf-8'),
+                            object_pairs_hook=_unique_json_object,
+                        )
+                    except (
+                        UnicodeDecodeError,
+                        json.JSONDecodeError,
+                        ValueError,
+                    ) as exc:
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_json', f'invalid remote JSON line: {exc}',
+                        ) from exc
+                    if not isinstance(value, dict):
+                        raise _RemoteEngineProtocolFailure(
+                            'malformed_response',
+                            'remote response must be a JSON object',
+                        )
+                    return value
+                if len(pending) + len(chunk) > self.max_line_bytes:
+                    raise _RemoteEngineProtocolFailure(
+                        'line_too_large',
+                        f'remote line exceeds {self.max_line_bytes} bytes',
+                    )
+                pending.extend(chunk)
+
+    def write_line(self, line: bytes) -> None:
+        stream = self.process.stdin
+        if stream is None:
+            raise self._closed_stream_failure()
+        view = memoryview(line)
+        try:
+            while view:
+                written = os.write(stream.fileno(), view)
+                if written <= 0:
+                    raise self._closed_stream_failure()
+                view = view[written:]
+        except (BrokenPipeError, OSError) as exc:
+            raise self._closed_stream_failure() from exc
+
+    def close(self) -> None:
+        stream = self.process.stdin
+        if stream is not None:
+            try:
+                stream.close()
+            except OSError:
+                pass
+        try:
+            self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        except subprocess.TimeoutExpired:
+            try:
+                self.process.terminate()
+            except OSError:
+                pass
+            try:
+                self.process.wait(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+            except subprocess.TimeoutExpired:
+                try:
+                    self.process.kill()
+                except OSError:
+                    pass
+                self.process.wait()
+        self._stderr_thread.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+        for stream in (self.process.stdout, self.process.stderr):
+            if stream is not None:
+                try:
+                    stream.close()
+                except (OSError, ValueError):
+                    pass
+
+
+def _remote_engine_stdio_bootstrap(
+    argv: tuple[str, ...],
+    protocol_version: int,
+    max_line_bytes: int,
+) -> tuple[_RemoteEngineStdioProcess, dict[str, Any]]:
+    try:
+        process = subprocess.Popen(
+            argv,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=0,
+            close_fds=True,
+            shell=False,
+        )
+    except (OSError, ValueError) as exc:
+        raise _RemoteEngineProtocolFailure(
+            'startup_failure', f'could not launch remote worker: {exc}',
+        ) from exc
+    client = _RemoteEngineStdioProcess(process, max_line_bytes)
+    try:
+        ready = client.read_json_line()
+        expected = {
+            'protocol_version', 'engine_version', 'datafile_fingerprint',
+        }
+        if set(ready) != expected:
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response', 'READY fields do not match the protocol',
+            )
+        ready_version = ready['protocol_version']
+        if (
+            isinstance(ready_version, bool)
+            or not isinstance(ready_version, int)
+            or ready_version != protocol_version
+        ):
+            raise _RemoteEngineProtocolFailure(
+                'protocol_version_mismatch',
+                f'expected protocol {protocol_version}, got '
+                f'{ready["protocol_version"]!r}',
+            )
+        if any(
+            not isinstance(ready[key], str)
+            for key in ('engine_version', 'datafile_fingerprint')
+        ):
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response', 'READY identity fields must be strings',
+            )
+        client.ready = ready
+        return client, ready
+    except _RemoteEngineProtocolFailure as exc:
+        client.close()
+        if exc.failure_disposition in ('eof', 'child_crash'):
+            raise _RemoteEngineProtocolFailure(
+                'startup_failure', f'remote worker failed before READY: {exc}',
+            ) from exc
+        raise
+    except BaseException:
+        client.close()
+        raise
+
+
+def _remote_engine_stdio_handler(
+    client: _RemoteEngineStdioProcess,
+    call: tuple[dict[str, Any], bytes],
+    _errlog: Any,
+) -> dict[str, Any]:
+    request, line = call
+    client.write_line(line)
+    response = client.read_json_line()
+    if response.get('request_id') != request['request_id'] or response.get(
+        'observation_id'
+    ) != request['observation_id']:
+        raise _RemoteEngineProtocolFailure(
+            'wrong_id', 'remote response ids do not match the request',
+        )
+    status = response.get('status')
+    if status == 'refused':
+        code = response.get('code')
+        detail = response.get('detail')
+        if set(response) != {
+            'request_id', 'observation_id', 'status', 'code', 'detail',
+        } or not isinstance(code, str) or not code or not isinstance(detail, str):
+            raise _RemoteEngineProtocolFailure(
+                'malformed_response',
+                'refused response fields do not match the protocol',
+            )
+        return response
+    if status != 'produced' or set(response) != {
+        'request_id', 'observation_id', 'status', 'quantity', 'scalar', 'unit',
+        'engine_version', 'datafile_fingerprint',
+    }:
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'produced response fields do not match the protocol',
+        )
+    if response['quantity'] != request['quantity']:
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'response quantity does not match the request',
+        )
+    if any(
+        not isinstance(response[key], str)
+        for key in ('unit', 'engine_version', 'datafile_fingerprint')
+    ):
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'produced identity and unit fields must be strings',
+        )
+    if (
+        response['engine_version'] != client.ready['engine_version']
+        or response['datafile_fingerprint'] != client.ready['datafile_fingerprint']
+    ):
+        raise _RemoteEngineProtocolFailure(
+            'malformed_response', 'response identity differs from READY',
+        )
+    scalar = response['scalar']
+    if isinstance(scalar, bool) or not isinstance(scalar, (int, float)):
+        raise _RemoteEngineProtocolFailure(
+            'invalid_scalar', 'produced scalar must be one JSON number',
+        )
+    try:
+        finite = math.isfinite(float(scalar))
+    except (OverflowError, ValueError):
+        finite = False
+    if not finite:
+        raise _RemoteEngineProtocolFailure(
+            'non_finite_value', 'produced scalar must be finite',
+        )
+    return response
+
+
+def _remote_engine_refusal(
+    request_id: str,
+    observation_id: str,
+    code: str,
+    detail: str,
+) -> dict[str, str]:
+    return {
+        'request_id': request_id,
+        'observation_id': observation_id,
+        'status': 'refused',
+        'code': code,
+        'detail': str(detail)[:_REMOTE_ENGINE_ERROR_DETAIL_CHARS],
+    }
+
+
+def _remote_engine_failure_code(exc: BaseException, *, phase: str) -> str:
+    if isinstance(exc, EngineWorkerTimeout):
+        return 'ready_timeout' if exc.phase == 'initialization' else 'call_timeout'
+    if isinstance(exc, EngineWorkerRemoteError):
+        if exc.failure_disposition:
+            return exc.failure_disposition
+        return 'startup_failure' if phase == 'start' else 'child_crash'
+    if isinstance(exc, EngineWorkerDied):
+        return 'startup_failure' if exc.phase in ('start', 'restart') else 'child_crash'
+    if isinstance(exc, EngineWorkerUnavailable):
+        return 'startup_failure' if phase == 'start' else 'child_crash'
+    return 'startup_failure' if phase == 'start' else 'child_crash'
+
+
+class StdioRemoteEngineWorker(WarmEngineWorker):
+    """Persistent argv-launched NDJSON worker with typed refusal results.
+
+    The first stdout line is READY with exactly ``protocol_version``,
+    ``engine_version``, and ``datafile_fingerprint``. Each slot owns one
+    subprocess through the existing WarmEngineWorker lifecycle. Calls accept
+    only observation_id, quantity, and conditions; result values are never
+    cached.
+    """
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        argv: Sequence[str],
+        startup_timeout_s: float = 30.0,
+        call_timeout_s: float = 60.0,
+        max_line_bytes: int = REMOTE_ENGINE_MAX_LINE_BYTES,
+    ) -> None:
+        command = tuple(argv)
+        if not command or not command[0] or any(
+            not isinstance(part, str) for part in command
+        ):
+            raise ValueError('remote worker argv must be a nonempty string sequence')
+        if isinstance(max_line_bytes, bool) or int(max_line_bytes) < 1:
+            raise ValueError('remote worker max_line_bytes must be positive')
+        self.max_line_bytes = int(max_line_bytes)
+        self._pending_start_failure: BaseException | None = None
+        super().__init__(
+            name=name,
+            bootstrap=_remote_engine_stdio_bootstrap,
+            handler=_remote_engine_stdio_handler,
+            bootstrap_args=(
+                command,
+                REMOTE_ENGINE_PROTOCOL_VERSION,
+                self.max_line_bytes,
+            ),
+            startup_timeout_s=startup_timeout_s,
+            call_timeout_s=call_timeout_s,
+        )
+
+    def start(self, *, timeout_s: Optional[float] = None) -> Any:
+        try:
+            ready = super().start(timeout_s=timeout_s)
+        except Exception as exc:
+            self._pending_start_failure = exc
+            return None
+        self._pending_start_failure = None
+        return ready
+
+    def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
+        request_id = uuid.uuid4().hex
+        observation_id = ''
+        if isinstance(request, Mapping):
+            raw_observation_id = request.get('observation_id')
+            if isinstance(raw_observation_id, str):
+                observation_id = raw_observation_id
+        expected = {'observation_id', 'quantity', 'conditions'}
+        if not isinstance(request, Mapping) or set(request) != expected:
+            return _remote_engine_refusal(
+                request_id, observation_id, 'invalid_request',
+                'call requires observation_id, quantity, and conditions',
+            )
+        if (
+            not isinstance(request['observation_id'], str)
+            or not request['observation_id']
+            or not isinstance(request['quantity'], str)
+            or not request['quantity']
+            or not isinstance(request['conditions'], Mapping)
+        ):
+            return _remote_engine_refusal(
+                request_id, observation_id, 'invalid_request',
+                'request identity, quantity, and conditions have invalid types',
+            )
+        wire_request = {
+            'request_id': request_id,
+            'observation_id': request['observation_id'],
+            'quantity': request['quantity'],
+            'conditions': request['conditions'],
+        }
+        try:
+            encoded = _encode_remote_engine_line(
+                {
+                    'protocol_version': REMOTE_ENGINE_PROTOCOL_VERSION,
+                    **wire_request,
+                },
+                self.max_line_bytes,
+            )
+        except _RemoteEngineProtocolFailure as exc:
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                exc.failure_disposition,
+                str(exc),
+            )
+        if self._pending_start_failure is not None:
+            exc = self._pending_start_failure
+            self._pending_start_failure = None
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                _remote_engine_failure_code(exc, phase='start'),
+                str(exc),
+            )
+        try:
+            return super().call((wire_request, encoded), timeout_s=timeout_s)
+        except Exception as exc:
+            failure = self._pending_start_failure or exc
+            self._pending_start_failure = None
+            return _remote_engine_refusal(
+                request_id,
+                request['observation_id'],
+                _remote_engine_failure_code(failure, phase='call'),
+                str(failure),
+            )
 
 
 class EngineWorkerPool:
