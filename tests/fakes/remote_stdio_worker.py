@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -18,7 +19,11 @@ def send(value: object) -> None:
     sys.stdout.flush()
 
 
-def spawn_descendant(parent_pid_file: str, child_pid_file: str) -> None:
+def spawn_descendant(
+    parent_pid_file: str,
+    child_pid_file: str,
+    notify_pid: str | None = None,
+) -> None:
     child = subprocess.Popen(
         [sys.executable, '-c', 'import time; time.sleep(60)'],
         stdin=subprocess.DEVNULL,
@@ -27,6 +32,8 @@ def spawn_descendant(parent_pid_file: str, child_pid_file: str) -> None:
     )
     Path(parent_pid_file).write_text(str(os.getpid()), encoding='utf-8')
     Path(child_pid_file).write_text(str(child.pid), encoding='utf-8')
+    if notify_pid is not None:
+        os.kill(int(notify_pid), signal.SIGUSR1)
 
 
 if mode == 'startup-failure':
@@ -38,12 +45,15 @@ if mode == 'ready-timeout':
 if mode in (
     'startup-subtree', 'startup-subtree-hold',
     'startup-subtree-bootstrap-hold', 'startup-subtree-first',
+    'startup-subtree-notify',
 ):
     if mode == 'startup-subtree-first':
         marker = Path(sys.argv[2])
         if not marker.exists():
             spawn_descendant(sys.argv[3], sys.argv[4])
             marker.write_text('spawned once', encoding='utf-8')
+    elif mode == 'startup-subtree-notify':
+        spawn_descendant(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         spawn_descendant(sys.argv[2], sys.argv[3])
     if mode == 'startup-subtree-bootstrap-hold':

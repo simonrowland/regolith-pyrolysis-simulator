@@ -2087,7 +2087,9 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self._remote_pgid_read = False
         self._remote_pgid_closed = False
         self._remote_pgid_error: str | None = None
+        self._remote_pgid_reaper_started = False
         self._remote_startup_deadline: float | None = None
+        self._remote_cleanup_deadline: float | None = None
         self._remote_started = False
         self._remote_terminal = False
         self._remote_start_failure: BaseException | None = None
@@ -2117,6 +2119,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         *,
         wait_for_report: bool = False,
         cleanup: bool = False,
+        cleanup_deadline: float | None = None,
     ) -> int | None:
         """Read the launch PGID once and transfer it to cleanup once."""
         with self._remote_pgid_lock:
@@ -2133,13 +2136,30 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             deadline = self._remote_startup_deadline
             if receive is None:
                 return None
-            wait_s = (
-                max(0.0, deadline - time.monotonic())
-                if wait_for_report and deadline is not None
-                else 0.0
-            )
             try:
-                if not receive.poll(wait_s):
+                if wait_for_report and deadline is not None:
+                    if cleanup_deadline is not None:
+                        deadline = min(deadline, cleanup_deadline)
+                    while True:
+                        if not cleanup:
+                            with self._state_lock:
+                                active_cleanup_deadline = (
+                                    self._remote_cleanup_deadline
+                                )
+                            if active_cleanup_deadline is not None:
+                                deadline = min(
+                                    deadline, active_cleanup_deadline,
+                                )
+                        wait_s = deadline - time.monotonic()
+                        if wait_s <= 0.0:
+                            if receive.poll(0.0):
+                                break
+                            return None
+                        if receive.poll(
+                            min(wait_s, ENGINE_WORKER_CANCEL_POLL_S)
+                        ):
+                            break
+                elif not receive.poll(0.0):
                     return None
                 group_id = receive.recv()
             except (EOFError, OSError, ValueError) as exc:
@@ -2278,18 +2298,30 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         self,
         process: Any,
         connection: Any,
+        *,
+        cleanup_deadline: float | None = None,
     ) -> None:
         with self._remote_pgid_lock:
             self._remote_pgid_closed = True
+        if cleanup_deadline is None:
+            with self._state_lock:
+                cleanup_deadline = self._remote_cleanup_deadline
+        wait_deadline = cleanup_deadline
+        if wait_deadline is not None:
+            # Leave one close wait and one cancellation poll for wrapper reap.
+            wait_deadline -= (
+                _REMOTE_ENGINE_CLOSE_WAIT_S
+                + ENGINE_WORKER_CANCEL_POLL_S
+            )
         group_id = self._remote_pgid(
             wait_for_report=process is not None,
             cleanup=True,
+            cleanup_deadline=wait_deadline,
         )
         if group_id is not None:
-            try:
-                os.killpg(group_id, signal.SIGKILL)
-            except OSError:
-                pass
+            self._kill_remote_process_group(group_id)
+        else:
+            self._start_remote_pgid_reaper()
         if (
             process is not None
             and process.is_alive()
@@ -2299,7 +2331,44 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 connection.send(None)
             except (BrokenPipeError, EOFError, OSError):
                 pass
-            process.join(timeout=_REMOTE_ENGINE_CLOSE_WAIT_S)
+            join_timeout = _REMOTE_ENGINE_CLOSE_WAIT_S
+            if cleanup_deadline is not None:
+                join_timeout = min(
+                    join_timeout,
+                    max(0.0, cleanup_deadline - time.monotonic()),
+                )
+            process.join(timeout=join_timeout)
+
+    def _kill_remote_process_group(self, group_id: int) -> None:
+        try:
+            os.killpg(group_id, signal.SIGKILL)
+        except OSError:
+            pass
+
+    def _start_remote_pgid_reaper(self) -> None:
+        with self._remote_pgid_lock:
+            deadline = self._remote_startup_deadline
+            if (
+                self._remote_pgid_reaper_started
+                or self._remote_pgid_read
+                or self._remote_pid_receive is None
+                or deadline is None
+            ):
+                return
+            self._remote_pgid_reaper_started = True
+        threading.Thread(
+            target=self._reap_remote_process_group,
+            name=f'{self.name} remote PGID reaper',
+            daemon=True,
+        ).start()
+
+    def _reap_remote_process_group(self) -> None:
+        group_id = self._remote_pgid(
+            wait_for_report=True,
+            cleanup=True,
+        )
+        if group_id is not None:
+            self._kill_remote_process_group(group_id)
 
     def _stop_pair(
         self,
@@ -2326,6 +2395,19 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             process, connection = self.process, self.connection
         self._stop_remote_process_tree(process, connection)
         super().request_disable()
+
+    def _request_disable_with_cleanup_deadline(
+        self,
+        cleanup_deadline: float | None,
+    ) -> None:
+        if cleanup_deadline is not None:
+            with self._state_lock:
+                if (
+                    self._remote_cleanup_deadline is None
+                    or cleanup_deadline < self._remote_cleanup_deadline
+                ):
+                    self._remote_cleanup_deadline = cleanup_deadline
+        self.request_disable()
 
     def close(self) -> None:
         if getattr(self._remote_call_state, 'starting', False):
@@ -2721,7 +2803,11 @@ class EngineWorkerPool:
                 item = future = request = timeout_s = None
                 self._queue.task_done()
 
-    def _request_cancel_pending(self) -> None:
+    def _request_cancel_pending(
+        self,
+        *,
+        cleanup_deadline: float | None = None,
+    ) -> None:
         self._cancel_pending.set()
         sentinels = 0
         while True:
@@ -2740,7 +2826,12 @@ class EngineWorkerPool:
         for _sentinel in range(sentinels):
             self._queue.put(None)
         for worker in self._workers:
-            worker.request_disable()
+            if isinstance(worker, StdioRemoteEngineWorker):
+                worker._request_disable_with_cleanup_deadline(
+                    cleanup_deadline,
+                )
+            else:
+                worker.request_disable()
 
     def close(
         self,
@@ -2764,7 +2855,7 @@ class EngineWorkerPool:
                 self._closed = True
                 owns_close = True
         if cancel_pending:
-            self._request_cancel_pending()
+            self._request_cancel_pending(cleanup_deadline=deadline)
         if not owns_close:
             wait_timeout = (
                 None if deadline is None else max(0.0, deadline - time.monotonic())
@@ -2792,7 +2883,7 @@ class EngineWorkerPool:
                 )
                 thread.join(timeout=join_timeout)
             if any(thread.is_alive() for thread in live_threads):
-                self._request_cancel_pending()
+                self._request_cancel_pending(cleanup_deadline=deadline)
                 close_timeout = EngineWorkerTimeout(
                     'engine worker pool cleanup',
                     max(0.001, float(timeout_s)),
@@ -2869,7 +2960,10 @@ def close_all_engine_pools(
     first_error: BaseException | None = None
     for pool, thread in zip(pools, threads):
         if thread.is_alive():
-            pool._request_cancel_pending()
+            if isinstance(pool, EngineWorkerPool):
+                pool._request_cancel_pending(cleanup_deadline=deadline)
+            else:
+                pool._request_cancel_pending()
             error: BaseException | None = EngineWorkerTimeout(
                 'all engine pool cleanup',
                 max(0.001, float(total_timeout_s)),

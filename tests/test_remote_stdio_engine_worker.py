@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import multiprocessing
 import os
 import signal
 import sys
@@ -13,10 +14,44 @@ from simulator.engine_pool import (
     EngineWorkerPool,
     StdioRemoteEngineWorker,
     WarmEngineWorker,
+    _remote_engine_stdio_bootstrap,
 )
 
 
 FAKE_WORKER = Path(__file__).parent / 'fakes' / 'remote_stdio_worker.py'
+
+
+def _blocked_remote_bootstrap(entered_sender, release_receiver, *bootstrap_args):
+    entered_sender.send(None)
+    release_receiver.recv()
+    return _remote_engine_stdio_bootstrap(*bootstrap_args)
+
+
+def _blocked_pgid_report_bootstrap(
+    report_wait_sender,
+    release_report_receiver,
+    report_sent_sender,
+    argv,
+    protocol_version,
+    max_line_bytes,
+    pgid_sender,
+):
+    class DelayedPgidSender:
+        def send(self, group_id):
+            report_wait_sender.send(None)
+            release_report_receiver.recv()
+            pgid_sender.send(group_id)
+            report_sent_sender.send(None)
+
+        def close(self):
+            pgid_sender.close()
+
+    return _remote_engine_stdio_bootstrap(
+        argv,
+        protocol_version,
+        max_line_bytes,
+        DelayedPgidSender(),
+    )
 
 
 @pytest.fixture
@@ -261,6 +296,158 @@ def test_pool_cancel_active_call_respects_cleanup_budget(
 
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    context = multiprocessing.get_context('spawn')
+    bootstrap_entered_receive, bootstrap_entered_sender = context.Pipe(
+        duplex=False,
+    )
+    release_bootstrap_receiver, release_bootstrap_sender = context.Pipe(
+        duplex=False,
+    )
+    crash_marker = tmp_path / 'crash-first.marker'
+    worker_pid_file = tmp_path / 'replacement-worker.pid'
+    grandchild_pid_file = tmp_path / 'replacement-grandchild.pid'
+    created: list[StdioRemoteEngineWorker] = []
+
+    def factory(_index):
+        if not created:
+            worker = remote_worker_factory('crash-first', str(crash_marker))
+        else:
+            worker = remote_worker_factory(
+                'startup-subtree-notify', str(worker_pid_file),
+                str(grandchild_pid_file), str(os.getpid()),
+                startup_timeout_s=8.0,
+            )
+            original_args = worker._process_bootstrap_args
+            worker._bootstrap = _blocked_remote_bootstrap
+            worker._process_bootstrap_args = lambda: (
+                bootstrap_entered_sender,
+                release_bootstrap_receiver,
+                *original_args(),
+            )
+        created.append(worker)
+        return worker
+
+    pool = EngineWorkerPool(factory, size=1)
+    try:
+        first = pool.submit(_request()).result(timeout=10.0)
+        assert first['status'] == 'refused'
+        assert first['code'] == 'child_crash'
+        assert len(created) == 2
+        assert pool.workers[0] is created[1]
+
+        replacement_call = pool.submit(_request())
+        assert bootstrap_entered_receive.poll(5.0)
+        bootstrap_entered_receive.recv()
+        bootstrap_entered_sender.close()
+        release_bootstrap_receiver.close()
+
+        close_started = time.monotonic()
+        pool.close(cancel_pending=True, timeout_s=3.0)
+        close_elapsed = time.monotonic() - close_started
+
+        assert close_elapsed <= 3.0
+        assert replacement_call.done()
+    finally:
+        try:
+            release_bootstrap_sender.send(None)
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+        try:
+            pool.close(cancel_pending=True, timeout_s=1.0)
+        except TimeoutError:
+            pass
+        bootstrap_entered_receive.close()
+        bootstrap_entered_sender.close()
+        release_bootstrap_receiver.close()
+        release_bootstrap_sender.close()
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_late_remote_pgid_report_is_claimed_after_cleanup_wait(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    context = multiprocessing.get_context('spawn')
+    report_wait_receive, report_wait_sender = context.Pipe(duplex=False)
+    release_report_receiver, release_report_sender = context.Pipe(duplex=False)
+    report_sent_receive, report_sent_sender = context.Pipe(duplex=False)
+    descendants_started = threading.Event()
+    previous_signal_handler = signal.signal(
+        signal.SIGUSR1,
+        lambda *_args: descendants_started.set(),
+    )
+    worker = remote_worker_factory(
+        'startup-subtree-notify', str(worker_pid_file),
+        str(grandchild_pid_file), str(os.getpid()),
+        startup_timeout_s=8.0,
+    )
+    original_args = worker._process_bootstrap_args
+    worker._bootstrap = _blocked_pgid_report_bootstrap
+    worker._process_bootstrap_args = lambda: (
+        report_wait_sender,
+        release_report_receiver,
+        report_sent_sender,
+        *original_args(),
+    )
+    start_results: list[object] = []
+    start_thread = threading.Thread(
+        target=lambda: start_results.append(worker.start()),
+        name='remote delayed PGID startup',
+    )
+    pids: tuple[int, ...] = ()
+    try:
+        start_thread.start()
+        assert report_wait_receive.poll(5.0)
+        report_wait_receive.recv()
+        report_wait_sender.close()
+        release_report_receiver.close()
+        report_sent_sender.close()
+        assert descendants_started.wait(timeout=5.0)
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        process, connection = worker.process, worker.connection
+        assert process is not None and connection is not None
+
+        worker._stop_remote_process_tree(
+            process,
+            connection,
+            cleanup_deadline=time.monotonic(),
+        )
+        release_report_sender.send(None)
+        assert report_sent_receive.poll(5.0)
+        report_sent_receive.recv()
+
+        _assert_pids_gone(pids)
+        start_thread.join(timeout=5.0)
+        assert not start_thread.is_alive()
+        assert worker._remote_process_group_id is None
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        try:
+            release_report_sender.send(None)
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+        worker.close()
+        start_thread.join(timeout=1.0)
+        signal.signal(signal.SIGUSR1, previous_signal_handler)
+        if not pids and worker_pid_file.exists() and grandchild_pid_file.exists():
+            pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        _kill_pids(pids)
+        report_wait_receive.close()
+        report_wait_sender.close()
+        release_report_receiver.close()
+        release_report_sender.close()
+        report_sent_receive.close()
+        report_sent_sender.close()
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
 def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
     remote_worker_factory, monkeypatch, tmp_path, inherit,
 ):
@@ -282,7 +469,7 @@ def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
     original_remote_pgid = worker._remote_pgid
 
     def pause_active_cleanup(
-        *, wait_for_report=False, cleanup=False,
+        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
     ):
         if (
             cleanup
@@ -298,6 +485,7 @@ def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
         result = original_remote_pgid(
             wait_for_report=wait_for_report,
             cleanup=cleanup,
+            cleanup_deadline=cleanup_deadline,
         )
         if cleanup and release_cleanup.is_set():
             stale_cleanup_resumed.set()
@@ -898,7 +1086,7 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
     original_remote_pgid = worker._remote_pgid
 
     def pause_stale_start(
-        *, wait_for_report=False, cleanup=False,
+        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
     ):
         nonlocal old_process, old_connection
         if (
@@ -919,6 +1107,7 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
         return original_remote_pgid(
             wait_for_report=wait_for_report,
             cleanup=cleanup,
+            cleanup_deadline=cleanup_deadline,
         )
 
     monkeypatch.setattr(worker, '_remote_pgid', pause_stale_start)
@@ -985,7 +1174,7 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
     original_remote_pgid = worker._remote_pgid
 
     def pause_start_pgid_read(
-        *, wait_for_report=False, cleanup=False,
+        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
     ):
         if (
             threading.current_thread().name == 'remote cold start'
@@ -997,6 +1186,7 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         return original_remote_pgid(
             wait_for_report=wait_for_report,
             cleanup=cleanup,
+            cleanup_deadline=cleanup_deadline,
         )
 
     monkeypatch.setattr(worker, '_remote_pgid', pause_start_pgid_read)
@@ -1072,11 +1262,12 @@ def test_close_before_popen_publication_claims_late_remote_pgid(
     original_remote_pgid = worker._remote_pgid
 
     def record_remote_pgid(
-        *, wait_for_report=False, cleanup=False,
+        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
     ):
         group_id = original_remote_pgid(
             wait_for_report=wait_for_report,
             cleanup=cleanup,
+            cleanup_deadline=cleanup_deadline,
         )
         if cleanup:
             cleanup_claims.append(group_id)
