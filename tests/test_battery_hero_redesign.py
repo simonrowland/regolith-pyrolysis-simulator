@@ -887,7 +887,7 @@ def test_collection_mode_does_not_retain_composition_keyed_series(
     assert not data.element_series
 
 
-def test_r2_metric_and_temperature_quantile_outputs_are_bit_identical(
+def test_r2_metrics_remain_bit_identical_and_quantiles_use_scorer_rule(
     tmp_path: Path,
 ) -> None:
     rows: list[dict[str, object]] = [
@@ -913,14 +913,17 @@ def test_r2_metric_and_temperature_quantile_outputs_are_bit_identical(
     temperature_bin = next(
         row for row in tables["temperature_bins"] if row["engine"] == "openimcc"
     )
+    residuals = {
+        index: Decimal(str(residual))
+        for index, residual in enumerate((0.1, 0.2, 0.5, 1.1))
+    }
+    expected_quantiles = battery_score._battery_hero_ordered_percentiles_from_samples(
+        len(residuals), residuals, (0.25, 0.5, 0.75)
+    )
     assert tuple(
         float(temperature_bin[field]).hex()
         for field in ("q1_dex", "median_dex", "q3_dex")
-    ) == (
-        "0x1.6666666666667p-3",
-        "0x1.6666666666666p-2",
-        "0x1.4cccccccccccdp-1",
-    )
+    ) == tuple(float(value).hex() for value in expected_quantiles)
 
 
 def test_scorer_long_decimal_median_and_iqr_match_pre_r3_outputs() -> None:
