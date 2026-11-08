@@ -5822,6 +5822,7 @@ def _activity_request_or_contract_refusal(
     """Ready melt-activity request, or the contract refusal when it is not.
 
     One owner for both ``predict_with_engine`` and ``compile_residual``.
+    Keep generated gaps alongside refusals for readiness reports.
     A malformed row composition is ``RefusalReason.INVALID_SOURCE``.
     ``run_validity_gates`` does not read that composition.
     """
@@ -5838,7 +5839,7 @@ def _activity_request_or_contract_refusal(
         if identity.composition is not None and identity.composition.is_value
         else None
     )
-    return None, _activity_contract_refusal(
+    return generated, _activity_contract_refusal(
         engine,
         channel=channel,
         sources=sources,
@@ -11973,7 +11974,9 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
-def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+def _knudsen_residue_prediction(
+    context, reference, engine, cache=None, *, readiness_only: bool = False
+) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
@@ -11983,15 +11986,25 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
     experiment = context.experiments.get(reference.experiment_id)
     try:
         cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
-        if cache is not None and cache_key in cache:
+        if not readiness_only and cache is not None and cache_key in cache:
             result = cache[cache_key]
         else:
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
+                readiness_only=readiness_only,
             )
-            if cache is not None:
+            if not readiness_only and cache is not None:
                 cache[cache_key] = result
+        if readiness_only:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                identity=reference.identity,
+            )
         provenance = {k: v for k, v in result.items() if k != "notices"}
         value = result["composition_wt_pct"].get(reference.identity.species.formula)
         if value is None:
@@ -12350,6 +12363,77 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
+@dataclass(frozen=True)
+class _PredictionReadinessBoundary:
+    request: Any | None = None
+    not_applicable: bool = False
+    refusal: EnginePrediction | None = None
+
+
+@dataclass
+class _ReadinessProbeCapture:
+    boundary: _PredictionReadinessBoundary | None = None
+
+
+@dataclass(frozen=True)
+class _ResidualReadinessProbe:
+    residual: Residual
+    request: Any | None
+    not_applicable: bool
+    boundary_reached: bool
+
+
+def _prediction_readiness_boundary(
+    context: ScoreContext,
+    reference: Observation,
+    engine: Engine,
+    quantity: Quantity | None,
+    identity: Identity | None,
+    experiment: Experiment | None,
+    *,
+    fo2_mode: Fo2Mode | None,
+) -> _PredictionReadinessBoundary:
+    """Resolve scorer-owned input contracts before any prediction is run."""
+    if quantity in MELT_ACTIVITY_QUANTITIES and isinstance(identity, Identity):
+        if experiment is None:
+            return _PredictionReadinessBoundary(not_applicable=True)
+        generated, contract_refusal = _activity_request_or_contract_refusal(
+            engine,
+            experiment=experiment,
+            observation=reference,
+            identity=identity,
+            channel=ENGINE_CHANNELS[engine],
+            sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            fo2_mode=fo2_mode or Fo2Mode.SHARED_LADDER,
+        )
+        if generated is None:
+            return _PredictionReadinessBoundary(not_applicable=True)
+        return _PredictionReadinessBoundary(
+            request=generated,
+            refusal=contract_refusal,
+        )
+
+    if (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ):
+        prediction = _knudsen_residue_prediction(
+            context, reference, engine, readiness_only=True
+        )
+        if (
+            prediction.refusal_detail.get("reason")
+            == "engine_capability_unsupported"
+        ):
+            return _PredictionReadinessBoundary(not_applicable=True)
+        return _PredictionReadinessBoundary(
+            refusal=prediction if prediction.refusal_reason is not None else None
+        )
+
+    return _PredictionReadinessBoundary()
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -12366,6 +12450,7 @@ def compile_residual(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
+    _readiness_probe: _ReadinessProbeCapture | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
@@ -12629,7 +12714,7 @@ def compile_residual(
             "engine": engine.value,
         }
         unclassified = _without_outside_single_liquid_field(source_reference)
-        if unclassified is not None:
+        if unclassified is not None and _readiness_probe is None:
             # t-1123a / E16: a classified (not printed) outside-single-liquid row
             # is never scored at bulk composition, but the number the engine
             # gives there is kept as a non-scored diagnostic so nothing
@@ -12823,7 +12908,8 @@ def compile_residual(
         )
 
     if (
-        prediction is None and predict in (None, predict_with_engine)
+        _readiness_probe is None
+        and prediction is None and predict in (None, predict_with_engine)
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
         and experiment is not None and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
@@ -12914,6 +13000,47 @@ def compile_residual(
                         "source_oxygen_fallback": oxygen.reason.value,
                     },
                 )
+        if _readiness_probe is not None:
+            prediction_reference = _melt_prediction_reference(
+                implied_alpha_reference or reference
+            )
+            boundary = _prediction_readiness_boundary(
+                context,
+                prediction_reference,
+                engine,
+                quantity,
+                prediction_reference.identity
+                if isinstance(prediction_reference.identity, Identity)
+                else None,
+                experiment,
+                fo2_mode=fo2_mode,
+            )
+            _readiness_probe.boundary = boundary
+            if boundary.refusal is not None:
+                return _refused(
+                    boundary.refusal.refusal_reason or RefusalReason.UNSUPPORTED,
+                    boundary.refusal.refusal_detail
+                    or {"reason": boundary.refusal.execution.state.value},
+                    execution=boundary.refusal.execution,
+                    extra_notices=boundary.refusal.notices,
+                )
+            probe_mode = fo2_mode or _fo2_mode_from_notices(notices)
+            return (
+                Residual(
+                    key=_key_for_fo2_mode(key, probe_mode),
+                    reference=reference.observation_id,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    rail=rail,
+                    status=ResidualStatus.NO_BAND,
+                    source_relation=SourceRelation.UNKNOWN,
+                    score_eligible=False,
+                    exclusions=("readiness_probe_only",),
+                    notices=notices,
+                    quench_state=_residual_quench_state(reference),
+                    fo2_mode=probe_mode,
+                ),
+                None,
+            )
         predictor_kwargs: dict[str, object] = {
             "handles": handles,
             "experiment": experiment,
@@ -13667,6 +13794,31 @@ def compile_residual(
             fo2_mode=result_mode,
         ),
         candidate,
+    )
+
+
+def _probe_residual_readiness(
+    reference: Observation,
+    engine: Engine,
+    *,
+    context: ScoreContext,
+    point_observations: Sequence[Observation] | None = None,
+) -> _ResidualReadinessProbe:
+    capture = _ReadinessProbeCapture()
+    residual, _candidate = compile_residual(
+        reference,
+        engine,
+        context=context,
+        comparison_ids={reference.observation_id},
+        point_observations=point_observations,
+        _readiness_probe=capture,
+    )
+    boundary = capture.boundary
+    return _ResidualReadinessProbe(
+        residual=residual,
+        request=None if boundary is None else boundary.request,
+        not_applicable=False if boundary is None else boundary.not_applicable,
+        boundary_reached=boundary is not None,
     )
 
 

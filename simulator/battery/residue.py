@@ -1854,8 +1854,14 @@ def _mass_loss_corner_bounds(
                     "inventory_capped_channels": sorted(inventory_caps)}
 
 def predict_knudsen_residue_composition(
-    engine: str, reference, experiment, observations, bench=None,
-) -> dict[str, object]:
+    engine: str,
+    reference,
+    experiment,
+    observations,
+    bench=None,
+    *,
+    readiness_only: bool = False,
+) -> dict[str, object] | None:
     """Predict a residue at its own printed loss, never at its measured composition."""
     from dataclasses import replace
 
@@ -2010,6 +2016,8 @@ def predict_knudsen_residue_composition(
 
         kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
                       near_saturated=True, source_fO2_log_by_interval=source_logs)
+        if readiness_only:
+            return None
         primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
         composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
         diagnostic = {}

@@ -169,6 +169,33 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
     assert sha256(before_bytes).hexdigest() == expected_digest
 
 
+def test_readiness_probe_uses_feo_input_contract_not_prediction_standard() -> None:
+    context, _experiment, reference, prediction = _case(
+        Engine.OPENIMCC,
+        ("openimcc-redox-pack:sha256:" + _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,),
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+
+    probe = score_module._probe_residual_readiness(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+    )
+
+    assert probe.boundary_reached
+    assert not probe.not_applicable
+    assert probe.residual.status is ResidualStatus.NO_BAND
+    assert probe.request is not None
+    assert probe.request.payload is not None
+    assert probe.request.readiness.gaps == ()
+
+
 def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     actual_digest = "a" * 64
     sources = _openimcc_sources(

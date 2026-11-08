@@ -290,6 +290,36 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
+def test_readiness_probe_stops_before_knudsen_pressure_model(extent_point, monkeypatch):
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import ResidualStatus
+    from simulator.battery.score import ScoreContext, _probe_residual_readiness
+
+    reference, experiment, rows = extent_point
+    context = ScoreContext(
+        {},
+        {experiment.experiment_id: experiment},
+        {row.observation_id: row for row in (reference, *rows)},
+    )
+    calls = []
+
+    def pressure_model_sentinel(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise AssertionError("readiness probe entered the residue pressure model")
+
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", pressure_model_sentinel)
+    probe = _probe_residual_readiness(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+    )
+
+    assert probe.boundary_reached
+    assert not probe.not_applicable
+    assert probe.residual.status is ResidualStatus.NO_BAND
+    assert calls == []
+
+
 @pytest.mark.parametrize("change,reason", (
     ("no_path", "printed_temperature_path_missing_or_invalid"),
     ("no_extent", "measured_mass_loss_fraction_missing_or_invalid"),

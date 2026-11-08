@@ -9,7 +9,6 @@ from contextlib import nullcontext
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 import yaml
@@ -134,53 +133,29 @@ def _direct_scorer_readiness(context):
                 status = "not_computable"
                 reasons = ()
             else:
-                predictor_calls = []
-                requests = []
-
-                def predictor_spy(requested_engine, reference, **kwargs):
-                    predictor_calls.append(None)
-                    request = None
-                    if quantity in score.MELT_ACTIVITY_QUANTITIES:
-                        from simulator.battery.generators.bench import (
-                            activity_request_for_engine,
-                        )
-
-                        experiment = context.experiments.get(reference.experiment_id)
-                        if experiment is not None:
-                            request = activity_request_for_engine(
-                                experiment,
-                                reference,
-                                requested_engine.value,
-                                fo2_mode=kwargs.get(
-                                    "fo2_mode", score.Fo2Mode.SHARED_LADDER
-                                ),
-                            )
-                    requests.append(request)
-                    return score.EnginePrediction(
-                        engine=requested_engine,
-                        channel=score.ENGINE_CHANNELS[requested_engine],
-                        execution=score.Execution(
-                            state=score.ExecutionState.PRODUCED
-                        ),
-                        value=Decimal("1"),
-                        unit=score.QUANTITY_UNITS[quantity],
-                        coefficient_basis=score.SINGLE_CATION_COEFFICIENT_BASIS,
-                        coefficient_sources=score.ENGINE_COEFFICIENT_SOURCES[
-                            requested_engine
-                        ],
-                        identity=reference.identity,
-                    )
-
-                with patch.object(
-                    score, "_score_predict_with_engine", predictor_spy
+                probe = score._probe_residual_readiness(
+                    observation,
+                    engine,
+                    context=context,
+                )
+                residual = probe.residual
+                request = probe.request
+                if probe.not_applicable:
+                    status = "not_applicable"
+                    reasons = ()
+                elif (
+                    request is not None
+                    and request.payload is None
+                    and request.readiness.gaps
                 ):
-                    residual, _candidate = score.compile_residual(
-                        observation,
-                        engine,
-                        context=context,
-                        comparison_ids={observation.observation_id},
+                    status = "not_ready"
+                    reasons = tuple(
+                        f"{gap.reason.value}: {', '.join(gap.missing)}"
+                        if gap.missing
+                        else gap.reason.value
+                        for gap in request.readiness.gaps
                     )
-                if residual.status is score.ResidualStatus.REFUSED:
+                elif residual.status is score.ResidualStatus.REFUSED:
                     assert residual.refusal is not None
                     status = "not_ready"
                     detail = residual.refusal.detail
@@ -189,25 +164,17 @@ def _direct_scorer_readiness(context):
                             detail.get("reason") or residual.refusal.reason.value
                         ),
                     )
-                elif not predictor_calls:
+                elif request is not None and request.payload is None:
                     status = "not_ready"
-                    reasons = ("scorer did not reach predictor boundary",)
-                elif quantity in score.MELT_ACTIVITY_QUANTITIES:
-                    request = requests[-1]
-                    if request is None:
-                        status = "not_applicable"
-                        reasons = ()
-                    elif request.payload is None:
-                        status = "not_ready"
-                        reasons = tuple(
-                            f"{gap.reason.value}: {', '.join(gap.missing)}"
-                            if gap.missing
-                            else gap.reason.value
-                            for gap in request.readiness.gaps
-                        ) or ("engine request has no payload",)
-                    else:
-                        status = "ready"
-                        reasons = ()
+                    reasons = tuple(
+                        f"{gap.reason.value}: {', '.join(gap.missing)}"
+                        if gap.missing
+                        else gap.reason.value
+                        for gap in request.readiness.gaps
+                    ) or ("engine request has no payload",)
+                elif not probe.boundary_reached:
+                    status = "not_ready"
+                    reasons = ("scorer did not reach prediction boundary",)
                 else:
                     status = "ready"
                     reasons = ()
@@ -466,7 +433,7 @@ def test_real_extract_readiness_uses_scorer_applicability_and_temperature_mutati
     )
 
 
-def test_crystalline_activity_readiness_matches_compile_residual_predictor_spy():
+def test_crystalline_activity_readiness_matches_scorer_probe():
     from tests.battery.test_score import _oxide_activity_at_sample_phase
 
     experiment, observation = _oxide_activity_at_sample_phase(

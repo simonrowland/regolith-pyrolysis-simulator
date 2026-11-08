@@ -14,7 +14,6 @@ from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable, Mapping
-from unittest.mock import patch
 
 from simulator.battery import migrate
 from simulator.battery import score
@@ -420,55 +419,42 @@ def _observable_readiness(
             if quantity is not None and rail is None:
                 group["not_computable"] += 1
                 continue
-            predictor_reached = False
-            requests: list[Any] = []
-
-            def predictor_spy(
-                requested_engine: Any,
-                reference: Any,
-                **kwargs: Any,
-            ) -> Any:
-                nonlocal predictor_reached
-                predictor_reached = True
-                request = None
-                if quantity in score.MELT_ACTIVITY_QUANTITIES:
-                    from simulator.battery.generators.bench import (
-                        activity_request_for_engine,
-                    )
-
-                    experiment = context.experiments.get(reference.experiment_id)
-                    if experiment is not None:
-                        request = activity_request_for_engine(
-                            experiment,
-                            reference,
-                            requested_engine.value,
-                            fo2_mode=kwargs.get(
-                                "fo2_mode", score.Fo2Mode.SHARED_LADDER
-                            ),
+            probe = score._probe_residual_readiness(
+                observation,
+                engine,
+                context=context,
+            )
+            residual = probe.residual
+            request = probe.request
+            if (
+                request is not None
+                and request.payload is None
+                and request.readiness.gaps
+            ):
+                group["not_ready"] += 1
+                for gap in request.readiness.gaps:
+                    missing_fields = gap.missing or (gap.waypoint,)
+                    paths = tuple(
+                        dict.fromkeys(
+                            _request_gap_path(gap, missing)
+                            for missing in missing_fields
                         )
-                requests.append(request)
-                return score.EnginePrediction(
-                    engine=requested_engine,
-                    channel=score.ENGINE_CHANNELS[requested_engine],
-                    execution=score.Execution(
-                        state=score.ExecutionState.PRODUCED
-                    ),
-                    value=Decimal("1"),
-                    unit=score.QUANTITY_UNITS[quantity],
-                    coefficient_basis=score.SINGLE_CATION_COEFFICIENT_BASIS,
-                    coefficient_sources=score.ENGINE_COEFFICIENT_SOURCES[
-                        requested_engine
-                    ],
-                    identity=reference.identity,
-                )
-
-            with patch.object(score, "_score_predict_with_engine", predictor_spy):
-                residual, _candidate = score.compile_residual(
-                    observation,
-                    engine,
-                    context=context,
-                    comparison_ids={observation.observation_id},
-                )
+                    )
+                    for path in paths:
+                        group["details"].append(
+                            ReadinessDetail(
+                                observation.observation_id,
+                                engine.value,
+                                path,
+                                _source_input_status(
+                                    source_scopes, path, source_memo
+                                ),
+                                f"{gap.reason.value}: {', '.join(gap.missing)}"
+                                if gap.missing
+                                else gap.reason.value,
+                            )
+                        )
+                continue
             scorer_refused = residual.status is score.ResidualStatus.REFUSED
             if scorer_refused:
                 group["not_ready"] += 1
@@ -494,7 +480,10 @@ def _observable_readiness(
                         )
                     )
                 continue
-            if not predictor_reached:
+            if probe.not_applicable:
+                group["not_applicable"] += 1
+                continue
+            if not probe.boundary_reached:
                 group["not_ready"] += 1
                 group["details"].append(
                     ReadinessDetail(
@@ -506,46 +495,6 @@ def _observable_readiness(
                     )
                 )
                 continue
-            if quantity in score.MELT_ACTIVITY_QUANTITIES:
-                request = requests[-1]
-                if request is None:
-                    group["not_applicable"] += 1
-                    continue
-                if request.payload is None:
-                    group["not_ready"] += 1
-                    for gap in request.readiness.gaps:
-                        missing_fields = gap.missing or (gap.waypoint,)
-                        paths = tuple(
-                            dict.fromkeys(
-                                _request_gap_path(gap, missing)
-                                for missing in missing_fields
-                            )
-                        )
-                        for path in paths:
-                            group["details"].append(
-                                ReadinessDetail(
-                                    observation.observation_id,
-                                    engine.value,
-                                    path,
-                                    _source_input_status(
-                                        source_scopes, path, source_memo
-                                    ),
-                                    f"{gap.reason.value}: {', '.join(gap.missing)}"
-                                    if gap.missing
-                                    else gap.reason.value,
-                                )
-                            )
-                    if not request.readiness.gaps:
-                        group["details"].append(
-                            ReadinessDetail(
-                                observation.observation_id,
-                                engine.value,
-                                None,
-                                "unrecorded",
-                                "engine request has no payload",
-                            )
-                        )
-                    continue
             group["ready"] += 1
     return [
         ObservableReadiness(
