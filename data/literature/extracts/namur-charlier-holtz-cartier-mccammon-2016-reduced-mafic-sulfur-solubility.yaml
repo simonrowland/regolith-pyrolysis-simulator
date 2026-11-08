@@ -1,0 +1,262 @@
+schema_version: literature_extract.v1
+source_id: namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility
+source:
+  citation: >-
+    Namur, O.; Charlier, B.; Holtz, F.; Cartier, C.; McCammon, C. (2016),
+    “Sulfur solubility in reduced mafic silicate melts: Implications for the
+    speciation and distribution of sulfur on Mercury,” Earth and Planetary
+    Science Letters 448, 102–114.
+  doi: 10.1016/j.epsl.2016.05.024
+  year: 2016
+  url: https://doi.org/10.1016/j.epsl.2016.05.024
+extraction:
+  method: MinerU table drafts and pdftotext layout, reconciled against rendered pages 3 and 7
+  date: '2026-11-07'
+  worker: w1107sx-nm16
+  provenance_path: corpus/raw/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility/namur-charlier-holtz-cartier-mccammon-2016-reduced-mafic-sulfur-solubility.pdf
+review_status: draft
+fidelity_samples:
+  - path: species.S.context[namur2016_table1_starting_compositions].values.table_1.messenger_data.rows.NVP.Mg_Si
+    value: '0.309 ± 0.13'
+    locator: {page: 3, published_page: 104, table: '1'}
+  - path: species.S.context[namur2016_table1_starting_compositions].values.table_1.synthetic_silicate_compositions.rows.high_mg_icp_hct.Na2O
+    value: '2.74'
+    locator: {page: 3, published_page: 104, table: '1'}
+  - path: species.S.context[namur2016_table1_starting_compositions].values.table_1.silicate_metal_sulfide_mixture_ratios.rows.F.FeS
+    value: '0.35'
+    locator: {page: 3, published_page: 104, table: '1'}
+  - path: species.S.context[namur2016_table2_scss_regression].values.coefficients.b.value_as_printed
+    value: '−2.54 × 10⁴'
+    locator: {page: 7, published_page: 108, table: '2'}
+  - path: species.S.context[namur2016_table2_scss_regression].values.fit_quality.p_value
+    value: '7 × 10⁻⁷⁹'
+    locator: {page: 7, published_page: 108, table: '2'}
+species:
+  S:
+    observations: []
+    context:
+      - observation_id: namur2016_table1_starting_compositions
+        type: starting_material_compositions_and_mixture_ratios
+        locator:
+          page: 3
+          published_page: 104
+          table: '1'
+          note: >-
+            All three printed sections and all 12 labeled data rows are retained.
+            Table units are not stated for the ratios, oxide entries, or mixture
+            proportions. The confidence level for the printed ± widths is not stated.
+        units: as printed; table does not state units for these entries
+        values:
+          table_1:
+            title_as_published: Starting compositions for the experiments
+            messenger_data:
+              units_as_published: not stated in the table
+              uncertainty_note: confidence level not stated
+              rows:
+                NVP:
+                  Mg_Si: '0.309 ± 0.13'
+                  Al_Si: '0.263 ± 0.07'
+                  Ca_Si: '0.156 ± 0.04'
+                  SiO2: '62.41 ± 3.75'
+                  Al2O3: '14.65 ± 3.36'
+                  MgO: '14.85 ± 5.0'
+                  CaO: '6.19 ± 1.57'
+                high_mg_icp_hct:
+                  printed_label: High-Mg IcP-HCT
+                  Mg_Si: '0.682 ± 0.07'
+                  Al_Si: '0.189 ± 0.07'
+                  Ca_Si: '0.211 ± 0.04'
+                  SiO2: '53.06 ± 2.36'
+                  Al2O3: '8.85 ± 3.11'
+                  MgO: '28.05 ± 2.39'
+                  CaO: '7.32 ± 1.33'
+                EH:
+                  Mg_Si: '–'
+                  Al_Si: '–'
+                  Ca_Si: '–'
+                  SiO2: '–'
+                  Al2O3: '–'
+                  MgO: '–'
+                  CaO: '–'
+              footnote_a: Calculated using elemental ratios from MESSENGER (Weider et al., 2012).
+            synthetic_silicate_compositions:
+              units_as_published: not stated in the table
+              note: Mixture of oxides and carbonates; minor-element source assignments follow footnote b.
+              rows:
+                NVP:
+                  SiO2: '58.59'
+                  TiO2: '0.40'
+                  Al2O3: '13.72'
+                  MnO: '0.20'
+                  MgO: '13.91'
+                  CaO: '5.79'
+                  Na2O: '6.99'
+                  K2O: '0.20'
+                  NiO: '0.10'
+                  Cr2O3: '0.10'
+                high_mg_icp_hct:
+                  printed_label: High-Mg IcP-HCT
+                  SiO2: '52.56'
+                  TiO2: '0.40'
+                  Al2O3: '8.77'
+                  MnO: '0.20'
+                  MgO: '27.78'
+                  CaO: '7.26'
+                  Na2O: '2.74'
+                  K2O: '0.08'
+                  NiO: '0.10'
+                  Cr2O3: '0.10'
+                EH:
+                  SiO2: '62.42'
+                  TiO2: '0.10'
+                  Al2O3: '2.70'
+                  MnO: '0.10'
+                  MgO: '30.81'
+                  CaO: '1.77'
+                  Na2O: '1.70'
+                  K2O: '0.20'
+                  NiO: '0.10'
+                  Cr2O3: '0.10'
+              footnote_b: >-
+                K2O and Na2O calculated from Peplowski et al. (2012, 2014);
+                TiO2 and MnO contents based on Weider et al. (2014). EH
+                composition from Berthet et al. (2009).
+            silicate_metal_sulfide_mixture_ratios:
+              units_as_published: not stated in the table
+              rows:
+                A:
+                  Silicate: '0.70'
+                  FeS: '0.25'
+                  Fe: '0.05'
+                  S: '–'
+                B:
+                  Silicate: '0.90'
+                  FeS: '–'
+                  Fe: '0.05'
+                  S: '0.05'
+                C:
+                  Silicate: '0.60'
+                  FeS: '0.25'
+                  Fe: '0.05'
+                  S: '0.10'
+                D:
+                  Silicate: '0.85'
+                  FeS: '–'
+                  Fe: '0.05'
+                  S: '0.10'
+                E:
+                  Silicate: '0.70'
+                  FeS: '–'
+                  Fe: '0.15'
+                  S: '0.15'
+                F:
+                  Silicate: '0.55'
+                  FeS: '0.35'
+                  Fe: '0.05'
+                  S: '0.05'
+              footnote_c: >-
+                Experiment-specific silicate–metal mixtures and Si metal added
+                to the starting material are referred to Supplementary Dataset 1.
+      - observation_id: namur2016_table2_scss_regression
+        type: fitted_scss_regression_coefficients_and_statistics
+        locator:
+          page: 7
+          published_page: 108
+          table: '2'
+          note: >-
+            All seven coefficient rows and all five fit-quality statistics are
+            retained from the printed table. Coefficient widths are explicitly
+            labeled 1σ. The fit is held as context because no exact closed
+            quantity represents regression coefficients for ln[S wt.%]SCSS.
+        units: coefficient and statistic units as printed; not otherwise specified
+        values:
+          method_class: model_derived
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact regression-coefficient quantity token exists. The sulfur
+            series type is scored as a measured observable, and neither its
+            type nor the quantity aliases infer a fitted coefficient quantity;
+            interaction_parameter would misidentify this empirical SCSS fit.
+            See tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+            simulator/battery/migrate.py::TYPE_QUANTITY,
+            simulator/battery/migrate.py::QUANTITY_ALIASES, and
+            simulator/battery/enums.py::Quantity.
+          equation_as_published: >-
+            ln[S wt.%]SCSS = a + b/T + cP/T + d log fO2 + Σ_i e_i(X_i/X_SiO2)
+          equation_note: >-
+            T is in K, P is in bar, fO2 is in bar, and X_i are oxide mole
+            fractions recalculated to 100% on a sulfur-free basis.
+          coefficient_uncertainty: 1σ as labeled in Table 2.
+          table_footnotes:
+            a: Standard deviation of each coefficient.
+            b: >-
+              P-values test parameter significance; only parameters significant
+              at the 10% significance level were retained.
+            c: >-
+              r² is the coefficient of determination. F and p-value test the
+              significance of the linear regression at the 5% significance
+              level. n is the number of observations.
+          coefficients:
+            a:
+              coefficient_label_as_printed: a
+              value_as_printed: '7.25'
+              one_sigma_as_printed: '0.64'
+              p_value_as_printed: '2 × 10⁻²²'
+            b:
+              coefficient_label_as_printed: b
+              value_as_printed: '−2.54 × 10⁴'
+              one_sigma_as_printed: '0.13'
+              p_value_as_printed: '4 × 10⁻⁴⁸'
+            c:
+              coefficient_label_as_printed: c
+              value_as_printed: '0.04'
+              one_sigma_as_printed: '0.005'
+              p_value_as_printed: '0.08'
+            d:
+              coefficient_label_as_printed: d
+              value_as_printed: '−0.551'
+              one_sigma_as_printed: '0.020'
+              p_value_as_printed: '2 × 10⁻⁶⁹'
+            eTiO2:
+              coefficient_label_as_printed: eTiO2
+              value_as_printed: '−62'
+              one_sigma_as_printed: '14'
+              p_value_as_printed: '4 × 10⁻⁵'
+            eMgO:
+              coefficient_label_as_printed: eMgO
+              value_as_printed: '0.426'
+              one_sigma_as_printed: '0.13'
+              p_value_as_printed: '0.03'
+            eNa2O:
+              coefficient_label_as_printed: eNa2O
+              value_as_printed: '1.56'
+              one_sigma_as_printed: '0.31'
+              p_value_as_printed: '1 × 10⁻⁵'
+          fit_quality:
+            r_squared: '0.928'
+            RMSE: '0.351'
+            F: '225'
+            p_value: '7 × 10⁻⁷⁹'
+            n: '180'
+          fit_input_note: >-
+            Figure 5 caption says the fit combines this study's experiments and
+            published experiments performed under similar conditions. The
+            underlying run-level observations are in Supplementary Dataset 2,
+            which is not present in the held corpus or supporting files; no
+            non-stored rows are named as lineage parents.
+      - observation_id: namur2016_fO2_estimation_method
+        type: oxygen_fugacity_calculation_method
+        locator:
+          page: 4
+          published_page: 105
+          equation: '2'
+          section: 3.1 Phase assemblages and microstructures
+          note: Authors calculate fO2 from Si in metal and SiO2 in silicate.
+        units: not applicable; located calculation method
+        values:
+          reaction_as_published: Si^Met + O2 = SiO2^Sil
+          method_class: method_only
+          calculation_note: >-
+            The paper refers to its Appendix for the calculation details. No
+            run-specific silicon analyses or fO2 results are present in the
+            held main-text tables.
