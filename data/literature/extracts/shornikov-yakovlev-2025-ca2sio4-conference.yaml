@@ -1,0 +1,337 @@
+schema_version: literature_extract.v1
+source_id: shornikov-yakovlev-2025-ca2sio4-conference
+source:
+  citation: >-
+    Shornikov, S. I., and Yakovlev, O. I. (2025). Thermodynamic Properties of Calcium Orthosilicate.
+    XXVI International Conference on Physicochemical and Petrophysical Research in Earth Sciences,
+    Moscow: IGEM RAS, pp. 264–267.
+  year: 2025
+  corpus_asset: raw/shornikov-yakovlev-2025-ca2sio4-conference/shornikov-yakovlev-2025-ca2sio4-conference.pdf
+  corpus_sha256: d12a4867f996c12e1f505b8d894abf1c470c46a7b8c91fcd873c8913540d4983
+extraction:
+  method: Manual transcription from MinerU markdown and the born-digital pdftotext layer; no printed tables; plotted data not digitized.
+  date: '2026-11-07'
+  worker: w1107sx-sy25
+  table_inventory:
+    printed_table_count: 0
+    mineru_table_block_count: 0
+    numeric_table_cell_count: 0
+  notes:
+    - >-
+      This conference source prints the experimental interval as 1762–2269 K. The journal abstract is reported elsewhere
+      as 1762–2267 K, and an old queue citation as 2288 K; only 1762–2269 K is transcribed from this file.
+    - >-
+      Figure 2's caption says inverse temperature, but its plotted abscissa is T (K), confirmed on the rendered page.
+      Figure-only pressure and mixing-energy values were not digitized.
+    - >-
+      No numerical component activities or printed standard-state definition occur in this conference text. No reference
+      frame is assigned to the mixing quantities.
+    - >-
+      The text calls the reported mixing enthalpy and entropy calculated; they are KEMS-derived results, not calorimetry.
+review_status: draft
+fidelity_samples:
+  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_enthalpy].values.mixing_enthalpy_kJ_mol_as_published
+    value: '-34.90'
+    locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_enthalpy].values.uncertainty_kJ_mol_as_published
+    value: '0.20'
+    locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_entropy].values.mixing_entropy_J_mol_K_as_published
+    value: '6.60'
+    locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+  - path: species.Ca2SiO4.observations[shornikov_yakovlev_2025_mixing_entropy].values.uncertainty_J_mol_K_as_published
+    value: '0.10'
+    locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+species:
+  Ca2SiO4:
+    observations:
+      - observation_id: shornikov_yakovlev_2025_mixing_enthalpy
+        type: gibbs_table
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 266
+          paragraph: Calculated enthalpy and entropy
+        phase: l
+        regime: knudsen_effusion_mass_spectrometry
+        T_range_K: ['1762', '2269']
+        units: kJ/mol as printed
+        uncertainty:
+          confidence_level: not_stated
+          note: Printed ±0.20 kJ/mol; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
+            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+        derivation:
+          relation: >-
+            The authors calculated the mixing enthalpy by second-/third-law treatment of their KEMS pressure-temperature
+            measurements; the proceedings state the result is calculated but do not print the treatment equations.
+          output_unit: kJ/mol
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 265
+              figure: '2'
+              note: Numerical pressure-versus-temperature inputs are plotted, not tabulated.
+        values:
+          quantity: Ca2SiO4_mixing_enthalpy_as_printed
+          method_class: measured_reduced
+          admission_status: typed_refusal
+          schema_gap: >-
+            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
+            Quantity.DELTA_FH is formation enthalpy, Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar enthalpy,
+            and Quantity.ENTHALPY_OF_FUSION is fusion enthalpy; none means integral mixing enthalpy, and
+            QUANTITY_ALIASES has no exact mixing-enthalpy token. Because TYPE_QUANTITY infers delta_fG for
+            gibbs_table when quantity is absent, the descriptive non-token quantity prevents that near-miss.
+            PhaseRole.MELT and PHASE_MAP accept the printed liquid phase, so phase is not a schema gap. Retain the
+            printed result as a measured-reduced typed refusal; do not classify it as calorimetry.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.DELTA_FH
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/migrate.py::PHASE_MAP
+          mixing_enthalpy_kJ_mol_as_published: '-34.90'
+          uncertainty_kJ_mol_as_published: '0.20'
+          value_as_printed: '−34.90 ± 0.20 kJ/mol'
+          temperature_range_as_printed: 1762–2269 K
+          method_as_printed: >-
+            The paper identifies Knudsen mass-spectrometric effusion from a molybdenum cell and says the mixing
+            enthalpy was calculated. The task specifies the second-/third-law treatment; the proceedings do not print
+            its equations.
+          reference_state_as_printed: not stated in this conference text
+      - observation_id: shornikov_yakovlev_2025_mixing_entropy
+        type: gibbs_table
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 266
+          paragraph: Calculated enthalpy and entropy
+        phase: l
+        regime: knudsen_effusion_mass_spectrometry
+        T_range_K: ['1762', '2269']
+        units: J/(mol K) as printed
+        uncertainty:
+          confidence_level: not_stated
+          note: Printed ±0.10 J/(mol K); confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: '1762', interval_high: '2269'}
+            locator: {page: 3, pdf_page_index: 2, published_page: 266, paragraph: Calculated enthalpy and entropy}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, paragraph: Sample preparation}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 2, pdf_page_index: 1, published_page: 265, section: Experimental conditions}
+        derivation:
+          relation: >-
+            The authors calculated the mixing entropy by second-/third-law treatment of their KEMS pressure-temperature
+            measurements; the proceedings state the result is calculated but do not print the treatment equations.
+          output_unit: J/(mol K)
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 265
+              figure: '2'
+              note: Numerical pressure-versus-temperature inputs are plotted, not tabulated.
+        values:
+          quantity: Ca2SiO4_mixing_entropy_as_printed
+          method_class: measured_reduced
+          admission_status: typed_refusal
+          schema_gap: >-
+            OBSERVATION_TYPES offers the generic gibbs_table family but no mixing-specific observation type.
+            Quantity.S is entropy, not entropy of mixing, and Quantity.ENTROPY_OF_FUSION is fusion entropy; neither
+            means integral mixing entropy, and QUANTITY_ALIASES has no exact mixing-entropy token. Because
+            TYPE_QUANTITY infers delta_fG for gibbs_table when quantity is absent, the descriptive non-token quantity
+            prevents that near-miss. PhaseRole.MELT and PHASE_MAP accept the printed liquid phase, so phase is not a
+            schema gap. Retain the printed result as a measured-reduced typed refusal; do not classify it as
+            calorimetry.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.S
+            - simulator/battery/enums.py::Quantity.ENTROPY_OF_FUSION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/migrate.py::PHASE_MAP
+          mixing_entropy_J_mol_K_as_published: '6.60'
+          uncertainty_J_mol_K_as_published: '0.10'
+          value_as_printed: '6.60 ± 0.10 J/(mol K)'
+          temperature_range_as_printed: 1762–2269 K
+          method_as_printed: >-
+            The paper identifies Knudsen mass-spectrometric effusion from a molybdenum cell and says the mixing
+            entropy was calculated. The task specifies the second-/third-law treatment; the proceedings do not print
+            its equations.
+          reference_state_as_printed: not stated in this conference text
+      - observation_id: shornikov_yakovlev_2025_prior_mixing_enthalpy_range
+        type: gibbs_table
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 264
+          paragraph: Review of prior thermodynamic data
+        phase: cr
+        units: kJ/mol as printed
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+        values:
+          quantity: Ca2SiO4_mixing_enthalpy_range_as_printed
+          method_class: quoted_attributed
+          attribution: DeNoirfontaine et al. (2012) and Abdul et al. (2023), as cited by Shornikov and Yakovlev
+          admission_status: typed_refusal
+          schema_gap: >-
+            The exact observable is a range of prior calcium orthosilicate mixing enthalpies. Quantity.DELTA_FH is
+            formation enthalpy and Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar; neither is the printed mixing
+            enthalpy, and QUANTITY_ALIASES has no exact mixing-enthalpy token. The descriptive label also prevents
+            TYPE_QUANTITY from inferring delta_fG from the generic gibbs_table type.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.DELTA_FH
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+          range_kJ_mol_as_published: ['−54', '−34']
+          temperature_K_as_published: '298'
+          value_as_printed: '−54 to −34 kJ/mol at 298 K'
+      - observation_id: shornikov_yakovlev_2025_prior_mixing_entropy_range
+        type: gibbs_table
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 264
+          paragraph: Review of prior thermodynamic data
+        phase: cr
+        units: J/(mol K) as printed
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                amount_basis: mol_inventory
+                components:
+                  - [CaO, '2']
+                  - [SiO2, '1']
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 1, pdf_page_index: 0, published_page: 264, paragraph: Review of prior thermodynamic data}
+        values:
+          quantity: Ca2SiO4_mixing_entropy_range_as_printed
+          method_class: quoted_attributed
+          attribution: DeNoirfontaine et al. (2012) and Abdul et al. (2023), as cited by Shornikov and Yakovlev
+          admission_status: typed_refusal
+          schema_gap: >-
+            The exact observable is a range of prior calcium orthosilicate mixing entropies. Quantity.S is entropy,
+            not entropy of mixing, and Quantity.ENTROPY_OF_FUSION is fusion entropy; neither is the printed mixing
+            entropy, and QUANTITY_ALIASES has no exact mixing-entropy token. The descriptive label also prevents
+            TYPE_QUANTITY from inferring delta_fG from the generic gibbs_table type.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity.S
+            - simulator/battery/enums.py::Quantity.ENTROPY_OF_FUSION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+          range_J_mol_K_as_published: ['−2.4', '3.3']
+          temperature_K_as_published: '298'
+          value_as_printed: '−2.4 to 3.3 J/(mol K)'
+    context:
+      - observation_id: shornikov_yakovlev_2025_sample_preparation
+        type: method
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 265
+          paragraph: Sample preparation
+        units: temperature in K; composition and methods as printed
+        values:
+          formula_as_printed: Ca2SiO4
+          starting_materials_as_printed: Stoichiometric chemically pure SiO2 and CaCO3 or CaO
+          firing_temperature_range_K_as_printed: ['1773', '1823']
+          characterization_as_printed: X-ray phase and chemical analysis
+      - observation_id: shornikov_yakovlev_2025_prior_precision_context
+        type: literature_context
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 264
+          paragraph: Review of prior thermodynamic data
+        units: kJ/mol as printed
+        values:
+          high_temperature_mixing_energy_measurement_error_up_to_kJ_mol_as_printed: '4'
+          wording_as_printed: High-temperature measurements of mixing energy have low accuracy, up to 4 kJ/mol.
+      - observation_id: shornikov_yakovlev_2025_barin_comparison_context
+        type: literature_comparison
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 266
+          paragraph: Comparison with prior studies
+          figure: '3'
+        units: kJ/mol as printed
+        values:
+          difference_from_Barin_1995_kJ_mol_as_printed: approximately 1.5
+          comparison_as_printed: The determined mixing-energy values exceed Barin (1995) thermochemical calculations by approximately 1.5 kJ/mol.
