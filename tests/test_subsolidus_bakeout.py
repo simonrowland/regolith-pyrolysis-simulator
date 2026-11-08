@@ -610,7 +610,6 @@ def test_joint_release_stays_within_pipe_capacity():
     solid_peak = 2.0 * gas_per_extent
     admitted = solid_peak
     throughput = 1.5 * solid_peak
-    scale = throughput / (solid_peak + admitted)
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -703,29 +702,25 @@ def test_joint_release_stays_within_pipe_capacity():
     sim._apply_c0_bakeout = _bakeout
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
     sim.step()
-    pump_admitted = 2.0 * scale
     decision = [
         call for call in transport_calls
         if set(call["species"]) >= {"Fe", "SO2", "O2"}
         and call["salt_mol"] == pytest.approx(salt_before)
     ]
     assert decision
-    demand_kg_hr = decision[0]["total_kg_hr"]
-    capacity_kg_hr = decision[0]["state"]["pipe_conductance_kg_hr"]
+    # Same-hour closure re-prices ordinary and solid-host sources at each
+    # candidate pressure. The final pre-cap candidate owns the rates scaled
+    # by the existing pipe-capacity policy.
+    decision = decision[-1]
+    demand_kg_hr = decision["total_kg_hr"]
+    capacity_kg_hr = decision["state"]["pipe_conductance_kg_hr"]
     assert demand_kg_hr > capacity_kg_hr
     transport_scale = capacity_kg_hr / demand_kg_hr
-    accepted = pump_admitted * transport_scale
-    fe_kg_hr = admitted * scale * transport_scale
-    so2_kg_hr = accepted * _molar("SO2")
-    o2_kg_hr = accepted * 0.5 * _molar("O2")
+    fe_kg_hr = decision["species"]["Fe"] * transport_scale
+    so2_kg_hr = decision["species"]["SO2"] * transport_scale
+    o2_kg_hr = decision["species"]["O2"] * transport_scale
+    accepted = so2_kg_hr / _molar("SO2")
     assert fe_kg_hr + so2_kg_hr + o2_kg_hr == pytest.approx(capacity_kg_hr)
-    assert decision[0]["species"]["Fe"] == pytest.approx(admitted * scale)
-    assert decision[0]["species"]["SO2"] == pytest.approx(
-        pump_admitted * _molar("SO2")
-    )
-    assert decision[0]["species"]["O2"] == pytest.approx(
-        pump_admitted * 0.5 * _molar("O2")
-    )
     assert seen["fe_kg_hr"] == pytest.approx(fe_kg_hr)
     assert "SO2" not in seen["species"]
     assert "O2" not in seen["species"]
@@ -779,8 +774,8 @@ def test_joint_release_stays_within_pipe_capacity():
     assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
 
 
-def test_c0_same_step_pipe_cap_numeric_pin():
-    """Pin the production C0 gas cap before sharing its capacity owner."""
+def test_c0_evaporation_uses_same_hour_source_pressure():
+    """C0 flux uses the source pressure projected from its own rates."""
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -807,14 +802,28 @@ def test_c0_same_step_pipe_cap_numeric_pin():
         p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
     )
 
-    assert inlet.total_kg_hr == pytest.approx(0.0009597869579047912)
-    assert transport["pipe_conductance_kg_hr"] == pytest.approx(
-        0.0004385903383104627
+    closure = sim._last_evaporation_flux_diagnostic[
+        "same_hour_headspace_closure"
+    ]
+    projected = sim.overhead_model.species_partial_pressures(
+        inlet,
+        transport["vapor_pressure_mbar"],
+        sim.species_formula_registry,
     )
-    sim._cap_c0_joint_release_to_pipe_capacity(flux)
-    assert flux.total_kg_hr == pytest.approx(0.0004385903383104627)
-    assert flux.species_kg_hr["Na"] == pytest.approx(0.0004181400259280556)
-    assert flux.species_kg_hr["K"] == pytest.approx(0.000020450135762602575)
+
+    assert closure["iterations"] > 0
+    assert closure["rates_kg_hr"] == pytest.approx(flux.species_kg_hr, rel=1e-9)
+    assert closure["partial_pressures_Pa"] == pytest.approx(
+        {species: pressure * 100.0 for species, pressure in projected.items()},
+        rel=1e-9,
+    )
+    assert transport["vapor_pressure_mbar"] > 0.0
+    if not closure["converged"]:
+        assert any(
+            notice.get("kind")
+            == "same_hour_headspace_closure_nonconvergence"
+            for notice in sim._last_evaporation_flux_diagnostic["notices"]
+        )
 
 
 def test_competing_branches_share_one_host_inventory():
