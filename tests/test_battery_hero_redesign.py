@@ -4,6 +4,8 @@ import csv
 import io
 import json
 import math
+import sqlite3
+import subprocess
 import tarfile
 import tracemalloc
 from dataclasses import replace
@@ -103,6 +105,43 @@ def _many_row_archive(path: Path, count: int) -> None:
         member = tarfile.TarInfo("data/battery/residuals.jsonl")
         member.size = len(residuals)
         archive.addfile(member, io.BytesIO(residuals))
+
+
+def _write_archive(path: Path, rows: list[dict[str, object]]) -> None:
+    residuals = "".join(json.dumps(row) + "\n" for row in rows).encode()
+    with tarfile.open(path, "w:gz") as archive:
+        member = tarfile.TarInfo("data/battery/residuals.jsonl")
+        member.size = len(residuals)
+        archive.addfile(member, io.BytesIO(residuals))
+
+
+def _csv_rows(rows: list[dict[str, object]]) -> list[dict[str, str]]:
+    return [{key: str(value) for key, value in row.items()} for row in rows]
+
+
+def _assert_chart_header_text_does_not_overlap(figure: object) -> None:
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    labels = []
+    if figure._suptitle is not None:
+        labels.append(("suptitle", figure._suptitle.get_window_extent(renderer)))
+    labels.extend(
+        (f"subtitle-{index}", text.get_window_extent(renderer))
+        for index, text in enumerate(figure.texts)
+        if text is not figure._suptitle
+    )
+    labels.extend(
+        (f"legend-{index}", legend.get_window_extent(renderer))
+        for index, legend in enumerate(figure.legends)
+    )
+    labels.extend(
+        (f"panel-title-{index}", axis._left_title.get_window_extent(renderer))
+        for index, axis in enumerate(figure.axes)
+        if axis.get_title(loc="left")
+    )
+    for index, (left_name, left_box) in enumerate(labels):
+        for right_name, right_box in labels[index + 1 :]:
+            assert not left_box.overlaps(right_box), f"{left_name} overlaps {right_name}"
 
 
 def _capture_collection_figures(monkeypatch: pytest.MonkeyPatch) -> list[object]:
@@ -804,4 +843,532 @@ def test_full_silica_window_keeps_exact_totals_for_unknown_compositions(
     assert unknown[4] == 2
     assert math.isclose(float(unknown[5]), -0.1)
     assert math.isclose(float(unknown[6]), 0.25)
+
+
+def test_collection_mode_does_not_retain_composition_keyed_series(
+    tmp_path: Path,
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "many-compositions"}
+    ]
+    for index in range(1000):
+        sio2 = 0.3 + index / 10000
+        row = _residual("openimcc", "vapour", f"composition-{index}", 1500, 0.1)
+        row["candidate_observation"]["identity"]["composition"]["value"][
+            "components"
+        ] = [["SiO2", f"{sio2:.4f}"], ["FeO", f"{1 - sio2:.4f}"]]
+        rows.append(row)
+    archive = tmp_path / "many-compositions.tgz"
+    _write_archive(archive, rows)
+
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+
+    assert data.summaries["openimcc"].unique_points == 1000
+    assert not data.series
+    assert not data.hero_series
+    assert not data.element_series
+
+
+def test_r2_metric_and_temperature_quantile_outputs_are_bit_identical(
+    tmp_path: Path,
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "numeric-pin"}
+    ]
+    for index, residual in enumerate((0.1, 0.2, 0.5, 1.1)):
+        rows.append(_residual("openimcc", "vapour", f"pin-{index}", 1500, residual))
+    archive = tmp_path / "numeric-pin.tgz"
+    _write_archive(archive, rows)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+
+    metric = data.hero_all_numeric_metrics[("vapour", "openimcc")]["views"]["all"]
+    assert metric["rms_dex"] == "0.6144102863722253795906081777"
+    assert metric["sd_dex"] == "0.3897114317029973910436754268"
+    assert metric["median_abs_dex"] == "0.35"
+
+    database = sqlite3.connect(":memory:")
+    hero_plot._collection_row_database(archive, database, bin_width_K=data.bin_width_K)
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=data.bin_width_K
+    )
+    database.close()
+    temperature_bin = next(
+        row for row in tables["temperature_bins"] if row["engine"] == "openimcc"
+    )
+    assert tuple(
+        float(temperature_bin[field]).hex()
+        for field in ("q1_dex", "median_dex", "q3_dex")
+    ) == (
+        "0x1.6666666666667p-3",
+        "0x1.6666666666666p-2",
+        "0x1.4cccccccccccdp-1",
+    )
+
+
+def test_clipped_hexbin_rows_keep_temperature_and_count_all_rows(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "clipped-temperature"}
+    ]
+    rows.extend(
+        _residual("openimcc", "vapour", f"clipped-{index}", 1500 + index % 100, 4.0)
+        for index in range(301)
+    )
+    archive = tmp_path / "clipped-temperature.tgz"
+    _write_archive(archive, rows)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+    database = sqlite3.connect(":memory:")
+    hero_plot._collection_row_database(archive, database, bin_width_K=data.bin_width_K)
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=data.bin_width_K
+    )
+    database.close()
+    panel = next(
+        row
+        for row in tables["panels"]
+        if row["rail"] == "vapour" and row["engine"] == "openimcc"
+    )
+    clipped = [
+        row
+        for row in tables["density"]
+        if row["rail"] == "vapour"
+        and row["engine"] == "openimcc"
+        and row["clipped"] == 1
+        and row["y_bin"] == 36
+    ]
+
+    assert sum(int(row["row_count"]) for row in clipped) == 301
+    assert all(
+        float(panel["temperature_min_K"])
+        <= float(row["temperature_center_K"])
+        <= float(panel["temperature_max_K"])
+        for row in clipped
+    )
+
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "clipped.png",
+        "vapour",
+        _csv_rows([row for row in tables["panels"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["temperature_bins"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["density"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["points"] if row["rail"] == "vapour"]),
+    )
+    axis = figures[-1].axes[0]
+    axis.figure.canvas.draw()
+    high_triangles = [
+        collection
+        for collection in axis.collections
+        if len(collection.get_offsets())
+        and all(float(point[1]) == 3.0 for point in collection.get_offsets())
+    ]
+    assert high_triangles
+    x_low, x_high = axis.get_xlim()
+    assert all(
+        x_low <= float(point[0]) <= x_high
+        for collection in high_triangles
+        for point in collection.get_offsets()
+    )
+
+
+def test_window_filters_use_snapped_half_open_bin_indices() -> None:
+    script = hero_plot._COLLECTION_INTERACTIVE_SCRIPT
+    assert "function resolveBinIndex" in script
+    assert "function windowIndices" in script
+    assert "row.temperature_bin<tlo||row.temperature_bin>=thi" in script
+    assert "cell[2]<tlo||cell[2]>=thi" in script
+    assert "cell[3]<slo||cell[3]>=shi" in script
+
+    start = script.index("function resolveBinIndex")
+    end = script.index("\nfunction updateWindowRms()", start)
+    browser_functions = script[start:end]
+    node_script = "\n".join(
+        (
+            "const TEMPERATURE_BIN_K=100,SIO2_BIN_WIDTH=0.05;",
+            "const tMin={value:'1500'},tMax={value:'1600'},sMin={value:'0.15'},sMax={value:'0.30'};",
+            browser_functions,
+            "console.log(JSON.stringify({edges:[resolveBinIndex(0.15,0.05,'lower'),resolveBinIndex(0.30,0.05,'lower'),resolveBinIndex(0.60,0.05,'upper')],window:windowIndices(),inside:inWindow({temperature_bin:15,sio2_bin:3}),upperSiO2:inWindow({temperature_bin:15,sio2_bin:6}),upperTemperature:inWindow({temperature_bin:16,sio2_bin:3})}));",
+        )
+    )
+    result = subprocess.run(
+        ["node", "-e", node_script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) == {
+        "edges": [3, 6, 12],
+        "window": [15, 16, 3, 6],
+        "inside": True,
+        "upperSiO2": False,
+        "upperTemperature": False,
+    }
+
+
+def test_interactive_fingerprint_palette_uses_one_python_definition(
+    tmp_path: Path,
+) -> None:
+    chart = tmp_path / "chart.png"
+    chart.write_bytes(b"png")
+    charts = {
+        "chart:A": chart,
+        **{f"chart:B:{rail}": chart for rail, _label in hero_plot.COLLECTION_OBSERVABLES},
+        "chart:C:vapour": chart,
+        "chart:C:melt_activity": chart,
+        **{f"chart:D:{rail}": chart for rail, _label in hero_plot.COLLECTION_OBSERVABLES},
+        "chart:E": chart,
+        "chart:F": chart,
+        "chart:G": chart,
+    }
+    tables = {name: [] for name in hero_plot._COLLECTION_TABLE_FIELDS}
+    page = tmp_path / "collection.html"
+
+    hero_plot._write_collection_html(
+        page,
+        chart_files=charts,
+        table_rows=tables,
+        engine_names=ENGINE_ORDER,
+    )
+
+    html = page.read_text(encoding="utf-8")
+    palette = json.dumps(dict(hero_plot.FINGERPRINT_BANDS), separators=(",", ":"))
+    assert f"const BANDS={palette};" in html
+    assert "const BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'}" not in html
+
+
+def test_html_tables_format_decimals_but_csv_keeps_full_precision(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    precise = "1.214777037924557481161297120"
+    csv_files = hero_plot._write_collection_csvs(
+        tmp_path,
+        {
+            "all_rows": [
+                {
+                    "rail": "vapour",
+                    "engine": "openimcc",
+                    "view": "all",
+                    "n": 1,
+                    "rms_dex": precise,
+                    "sd_dex": "0",
+                    "median_abs_dex": precise,
+                }
+            ]
+        },
+    )
+    rows = hero_plot._read_collection_csv(csv_files["table:all_rows"])
+    html = hero_plot._html_table(rows)
+
+    assert rows[0]["rms_dex"] == precise
+    assert "1.215" in html
+    assert precise not in html
+    assert "function displayCell" in hero_plot._COLLECTION_INTERACTIVE_SCRIPT
+    assert "cell.textContent=displayCell(column,record[column])" in hero_plot._COLLECTION_INTERACTIVE_SCRIPT
+
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "temperature.png",
+        "vapour",
+        [
+            {
+                "engine": "openimcc",
+                "n": "1",
+                "plotted_n": "1",
+                "rms_dex": precise,
+                "flagged_n": "0",
+                "clipped_low_n": "0",
+                "clipped_high_n": "0",
+                "temperature_min_K": "1500",
+                "temperature_max_K": "1500",
+            }
+        ],
+        [],
+        [],
+        [],
+    )
+    title = figures[-1].axes[0].get_title(loc="left")
+    assert "1.21 dex" in title
+    assert precise not in title
+
+
+def test_hero_chart_header_legends_and_panel_titles_do_not_overlap(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    scorecard = [
+        {
+            "rail": "vapour",
+            "primary_engine": "openimcc",
+            "comparison_engine": "vaporock",
+            "n_shared": "5",
+            "high_n_shared": "5",
+            "high_primary_rms_dex": "0.2",
+            "high_comparison_rms_dex": "0.8",
+            "low_n_shared": "",
+            "low_primary_rms_dex": "",
+            "low_comparison_rms_dex": "",
+        }
+    ]
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard)
+    _assert_chart_header_text_does_not_overlap(figures[-1])
+
+    fingerprint = [
+        {
+            "rail": "vapour",
+            "engine": engine,
+            "temperature_lower_K": "1500",
+            "temperature_upper_K": "1600",
+            "sio2_lower": "0.0",
+            "sio2_upper": "0.05",
+            "n": "3",
+            "median_abs_dex": "0.2",
+            "colour": "#1a9641",
+        }
+        for engine in ENGINE_ORDER
+    ]
+    hero_plot._draw_fingerprint_png(
+        tmp_path / "d.png", "vapour", fingerprint, ENGINE_ORDER
+    )
+    _assert_chart_header_text_does_not_overlap(figures[-1])
+
+    hero_plot._draw_progress_png(tmp_path / "f.png", _artist_plot_csv_inputs()["progress"])
+    _assert_chart_header_text_does_not_overlap(figures[-1])
+
+
+def test_scorecard_row_band_groups_temperature_pairs_and_counts(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    row = {
+        "rail": "vapour",
+        "primary_engine": "openimcc",
+        "comparison_engine": "vaporock",
+        "n_shared": "10",
+        "high_n_shared": "6",
+        "high_primary_rms_dex": "0.2",
+        "high_comparison_rms_dex": "0.3",
+        "low_n_shared": "4",
+        "low_primary_rms_dex": "0.4",
+        "low_comparison_rms_dex": "0.5",
+    }
+
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", [row])
+
+    figure = figures[-1]
+    axis = figure.axes[0]
+    labels = [text for text in axis.texts if text.get_text() == "openimcc vs vaporock"]
+    counts = [text for text in axis.texts if text.get_text().startswith("n=10")]
+    pair_lines = [
+        line
+        for line in axis.lines
+        if len(line.get_ydata()) == 2
+        and line.get_ydata()[0] == line.get_ydata()[1]
+        and line.get_xdata()[0] != line.get_xdata()[1]
+        and line.get_ydata()[0] != 0
+    ]
+    assert len(labels) == 1
+    assert len(counts) == 1
+    assert len(pair_lines) == 2
+    row_center = 0
+    pair_positions = sorted(float(line.get_ydata()[0]) for line in pair_lines)
+    assert pair_positions[0] < row_center < pair_positions[1]
+    assert abs(pair_positions[0] - row_center) < 0.2
+    assert abs(pair_positions[1] - row_center) < 0.2
+    assert labels[0].get_position()[1] < pair_positions[0]
+    assert counts[0].get_position()[1] > pair_positions[1]
+
+
+def test_empty_collection_panels_explain_missing_rows(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", [])
+    scorecard_text = [text.get_text() for axis in figures[-1].axes for text in axis.texts]
+    assert scorecard_text.count("no shared rows") >= 2
+
+    hero_plot._draw_temperature_png(
+        tmp_path / "b.png",
+        "vapour",
+        [
+            {
+                "engine": "magemin",
+                "n": "0",
+                "plotted_n": "0",
+                "rms_dex": "",
+                "flagged_n": "0",
+                "clipped_low_n": "0",
+                "clipped_high_n": "0",
+                "temperature_min_K": "",
+                "temperature_max_K": "",
+            }
+        ],
+        [],
+        [],
+        [],
+    )
+    temperature_text = [text.get_text() for text in figures[-1].axes[0].texts]
+    assert "no scored rows" in temperature_text
+    assert "unavailable dex" not in figures[-1].axes[0].get_title()
+
+    hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", [], ["magemin"])
+    fingerprint_text = [text.get_text() for text in figures[-1].axes[0].texts]
+    assert "no scored rows" in fingerprint_text
+
+
+def test_temperature_hexagons_are_regular_in_display_space(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from matplotlib.collections import PolyCollection
+
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "hex-aspect"}
+    ]
+    rows.extend(
+        _residual(
+            "vaporock",
+            "vapour",
+            f"hex-{index}",
+            1100 + round(index * 1900 / 300),
+            -2.9 + (index % 30) * 0.2,
+        )
+        for index in range(301)
+    )
+    archive = tmp_path / "hex-aspect.tgz"
+    _write_archive(archive, rows)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+    database = sqlite3.connect(":memory:")
+    hero_plot._collection_row_database(archive, database, bin_width_K=data.bin_width_K)
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=data.bin_width_K
+    )
+    database.close()
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "hex-aspect.png",
+        "vapour",
+        _csv_rows([row for row in tables["panels"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["temperature_bins"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["density"] if row["rail"] == "vapour"]),
+        _csv_rows([row for row in tables["points"] if row["rail"] == "vapour"]),
+    )
+    figure = figures[-1]
+    figure.canvas.draw()
+    axis = next(
+        axis
+        for axis in figure.axes
+        if axis.get_title(loc="left").startswith("vaporock")
+    )
+    collections = [
+        collection
+        for collection in axis.collections
+        if isinstance(collection, PolyCollection) and collection.get_array() is not None
+    ]
+    assert collections
+    lengths = []
+    for polygon in collections[0].get_paths():
+        screen = axis.transData.transform(polygon.vertices)
+        lengths.extend(
+            math.dist(screen[index], screen[index + 1])
+            for index in range(6)
+        )
+    assert lengths
+    assert max(lengths) / min(lengths) < 1.02
+
+
+def test_fingerprint_and_html_engine_order_use_one_definition(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", [], tuple(reversed(ENGINE_ORDER)))
+    assert [axis.get_title(loc="left") for axis in figures[-1].axes] == list(ENGINE_ORDER)
+
+    chart = tmp_path / "chart.png"
+    chart.write_bytes(b"png")
+    charts = {
+        "chart:A": chart,
+        **{f"chart:B:{rail}": chart for rail, _label in hero_plot.COLLECTION_OBSERVABLES},
+        "chart:C:vapour": chart,
+        "chart:C:melt_activity": chart,
+        **{f"chart:D:{rail}": chart for rail, _label in hero_plot.COLLECTION_OBSERVABLES},
+        "chart:E": chart,
+        "chart:F": chart,
+        "chart:G": chart,
+    }
+    tables = {name: [] for name in hero_plot._COLLECTION_TABLE_FIELDS}
+    page = tmp_path / "ordered.html"
+    hero_plot._write_collection_html(
+        page,
+        chart_files=charts,
+        table_rows=tables,
+        engine_names=tuple(reversed(ENGINE_ORDER)),
+    )
+    html = page.read_text(encoding="utf-8")
+    assert json.dumps(hero_plot._hero_engine_colors(ENGINE_ORDER)) in html
+    payload = json.loads(html.split('id="cell-data">', 1)[1].split("</script>", 1)[0])
+    assert payload["engines"] == list(ENGINE_ORDER)
+
+
+def test_progress_uses_shared_dates_and_marks_current_candidate_not_green(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    archive = tmp_path / "candidate.tgz"
+    _fixture_archive(archive)
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+    rows = hero_plot._history_collection_rows(
+        data,
+        [],
+        simulator_commit="candidate-sha",
+        render_date="2026-11-08",
+        annotations={},
+    )
+    assert rows
+    assert all(str(row["basis"]).startswith("candidate (not green)") for row in rows)
+
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_progress_png(tmp_path / "f.png", rows)
+    figure = figures[-1]
+    axes = figure.axes
+    assert len(axes) > 1
+    assert all(axes[0].get_shared_x_axes().joined(axes[0], axis) for axis in axes[1:])
+    assert "candidate (not green)" in [
+        text.get_text() for text in figure.legends[0].get_texts()
+    ]
+    assert any(
+        collection.get_label() == "candidate (not green)"
+        for axis in axes
+        for collection in axis.collections
+    )
+
+
+def test_temperature_chart_omits_unexplained_association_floor(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "b.png",
+        "vapour",
+        [
+            {
+                "engine": "openimcc",
+                "n": "1",
+                "plotted_n": "1",
+                "rms_dex": "0.25",
+                "flagged_n": "0",
+                "clipped_low_n": "0",
+                "clipped_high_n": "0",
+                "temperature_min_K": "1500",
+                "temperature_max_K": "1500",
+            }
+        ],
+        [],
+        [],
+        [],
+    )
+    text = " ".join(
+        artist.get_text()
+        for artist in figures[-1].findobj()
+        if hasattr(artist, "get_text")
+    )
+    assert "association data floor" not in text
 
