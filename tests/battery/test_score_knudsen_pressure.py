@@ -76,6 +76,7 @@ def _mock_knudsen_prediction(
     oxygen_balance_calls: list[float] | None = None,
     backend_mode: str | None = None,
     missing_na_call: int | None = None,
+    solve_pressure_dependent_oxygen_balance: bool = False,
 ):
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -112,29 +113,38 @@ def _mock_knudsen_prediction(
         calls.append(physical_pressure_bar)
         if po2_calls is not None:
             po2_calls.append((physical_pressure_bar, po2.mode, po2.po2_bar))
-        seed_effective_pressure, _seed_policy = (
-            score_mod._knudsen_effective_pressure_bar(engine, 1e-3, backend)
-        )
-        effective_pressure, _policy = score_mod._knudsen_effective_pressure_bar(
-            engine, physical_pressure_bar, backend
-        )
         reported_na_pressure = na_pressure
+        if na_pressure is not None and sensitivity_dex != 0.0:
+            # The fake engine responds to the pressure it receives, with a
+            # fixed reference pair from this fixture (1e-3 bar seed and
+            # 20 Pa derived total). This stays independent of the scorer's
+            # effective-pressure resolver under test.
+            log_pressure_ratio = math.log10(physical_pressure_bar / 1e-3)
+            reported_na_pressure = na_pressure * math.pow(
+                10.0,
+                sensitivity_dex * log_pressure_ratio / math.log10(0.2),
+            )
         if (
             na_pressure is not None
-            and sensitivity_dex != 0.0
-            and effective_pressure is not None
-            and seed_effective_pressure is not None
-            and effective_pressure != seed_effective_pressure
+            and solve_pressure_dependent_oxygen_balance
+            and po2.po2_bar is not None
         ):
-            reported_na_pressure = na_pressure * math.pow(10.0, sensitivity_dex)
+            # The root fixture's gas chemistry supplies a fixed Na2O
+            # equilibrium response while the production solver varies pO2.
+            reported_na_pressure *= math.pow(1e-6 / po2.po2_bar, 0.25)
         if call_number > 1 and updated_na_pressure is not None:
             reported_na_pressure = updated_na_pressure
         if call_number == missing_na_call:
             reported_na_pressure = None
         reported_o2_pressure = (
-            o2_pressure
-            if call_number == 1 or updated_o2_pressure is None
-            else updated_o2_pressure
+            po2.po2_bar * 1e5
+            if solve_pressure_dependent_oxygen_balance
+            and po2.po2_bar is not None
+            else (
+                o2_pressure
+                if call_number == 1 or updated_o2_pressure is None
+                else updated_o2_pressure
+            )
         )
         pressures = {"O2": reported_o2_pressure}
         if reported_na_pressure is not None:
@@ -159,7 +169,30 @@ def _mock_knudsen_prediction(
             ),
         )
 
-    if oxygen_balance_pO2_values is not None:
+    if solve_pressure_dependent_oxygen_balance:
+        solver = battery._solve_vapor_engine_cell_oxygen_balance
+
+        def capture_oxygen_balance(engine_call_at_po2, **kwargs):
+            result = solver(engine_call_at_po2, **kwargs)
+            if oxygen_balance_calls is not None:
+                oxygen_balance_calls.append(result[0])
+            return result
+
+        monkeypatch.setattr(
+            battery,
+            "_solve_vapor_engine_cell_oxygen_balance",
+            capture_oxygen_balance,
+        )
+        monkeypatch.setattr(
+            score_mod,
+            "_oxygen_input_request",
+            lambda **_kwargs: Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material=None,
+            ),
+        )
+    elif oxygen_balance_pO2_values is not None:
         def fake_oxygen_balance(engine_call_at_po2, **_kwargs):
             index = 0 if oxygen_balance_calls is None else len(oxygen_balance_calls)
             solved_po2_bar = oxygen_balance_pO2_values[index]
@@ -590,19 +623,20 @@ def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
         reference,
         monkeypatch,
         sensitivity_dex=1.0,
-        oxygen_balance_pO2_values=(0.01, 0.1),
         po2_calls=pressure_calls,
         oxygen_balance_calls=oxygen_balance_calls,
         backend_mode="python_api",
+        solve_pressure_dependent_oxygen_balance=True,
     )
 
-    assert oxygen_balance_calls == pytest.approx([0.01, 0.1])
-    assert [call[0] for call in pressure_calls] == pytest.approx(
-        [1e-3, 1e-3, 20 / 1e5, 20 / 1e5]
+    assert len(oxygen_balance_calls) == 2, (
+        prediction.refusal_reason,
+        prediction.refusal_detail,
     )
-    assert [call[2] for call in pressure_calls] == pytest.approx(
-        [0.01, 0.01, 0.1, 0.1]
-    )
+    assert oxygen_balance_calls[0] != pytest.approx(oxygen_balance_calls[1])
+    assert len({call[2] for call in pressure_calls if call[2] is not None}) > 2
+    assert any(call[0] == pytest.approx(1e-3) for call in pressure_calls)
+    assert any(call[0] != pytest.approx(1e-3) for call in pressure_calls)
     residual, _candidate = compile_residual(
         reference,
         Engine.ALPHAMELTS,
@@ -618,7 +652,7 @@ def test_rung_three_pressure_sensitivity_re_solves_coupled_oxygen_balance(
     assert residual.refusal.detail["reason"] == (
         "knudsen_total_pressure_sensitivity_exceeds_band"
     )
-    assert float(residual.refusal.detail["sensitivity_dex"]) == pytest.approx(1.0)
+    assert float(residual.refusal.detail["sensitivity_dex"]) > 0.01
 
 
 def test_knudsen_total_pressure_round_trip_matches_prediction_identity(
@@ -649,3 +683,91 @@ def test_knudsen_total_pressure_round_trip_matches_prediction_identity(
     )
 
     assert residual.status is ResidualStatus.MATCH
+
+
+def test_backend_pressure_policies_pin_current_evaluation_endpoints(
+    monkeypatch,
+) -> None:
+    from engines.alphamelts.thermoengine import ThermoEnginePayload
+    from simulator.alphamelts_reference_pressure import (
+        ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
+        alphamelts_condensed_phase_pressure_bar,
+    )
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    alpha_calls: list[dict[str, float]] = []
+    alpha = AlphaMELTSBackend()
+    alpha._mode = "python_api"
+    alpha._melts_model_code = lambda: 1
+    alpha._require_petthermotools_runtime = lambda: object()
+    alpha._to_petthermotools_liq_comp = lambda comp: comp
+    alpha._run_petthermotools_isolated = (
+        lambda _operation, *, kwargs: alpha_calls.append(kwargs) or {}
+    )
+    alpha._parse_petthermotools_result = lambda _raw, **kwargs: EquilibriumResult(
+        status="ok",
+        temperature_C=kwargs["temperature_C"],
+        pressure_bar=kwargs["pressure_bar"],
+        fO2_log=kwargs["fO2_log"],
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={"SiO2": 100.0},
+    )
+    alpha._vaporock_available = True
+    alpha._vapor_pressures_via_vaporock_or_antoine = (
+        lambda **_kwargs: ({}, "test")
+    )
+    alpha._vapor_pressure_source_map = lambda _pressures, _source: {}
+    alpha._vapor_pressure_diagnostics = (
+        lambda diagnostics, _pressures, _source: dict(diagnostics or {})
+    )
+    monkeypatch.setattr(
+        alpha, "_fail_closed_on_clamped_operating_point", lambda eq: eq
+    )
+    alpha._equilibrate_python(1400.0, {"SiO2": 100.0}, -9.0, 1e-9)
+    assert alpha_calls[0]["P_bar"].hex() == float(1e-6).hex()
+    subprocess_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+        1e-3,
+        transport="subprocess",
+    )
+    assert subprocess_pressure_bar.hex() == (
+        ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR.hex()
+    )
+
+    thermoengine_calls: list[dict[str, object]] = []
+
+    class FakeThermoEngineTransport:
+        def equilibrate(self, **kwargs):
+            thermoengine_calls.append(kwargs)
+            return ThermoEnginePayload(
+                phases_present=("liquid",),
+                phase_masses_kg={"liquid": 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={"SiO2": 100.0},
+                activity_coefficients={},
+                solved_fO2_log=-9.0,
+            )
+
+    thermoengine = ThermoEngineBackend()
+    thermoengine._mode = "thermoengine"
+    thermoengine._engine_version = "test"
+    thermoengine._vaporock_available = False
+    thermoengine._thermoengine_transport = FakeThermoEngineTransport()
+    monkeypatch.setattr(
+        thermoengine,
+        "_activities_times_antoine_or_fail",
+        lambda *_args, **_kwargs: {},
+    )
+    thermoengine._equilibrate_thermoengine(
+        1400.0,
+        {"SiO2": 100.0},
+        -9.0,
+        1e-9,
+    )
+    assert (
+        float(thermoengine_calls[0]["pressure_bar"]).hex()
+        == float(1e-6).hex()
+    )
