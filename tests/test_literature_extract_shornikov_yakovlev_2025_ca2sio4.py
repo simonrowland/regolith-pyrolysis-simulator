@@ -6,7 +6,6 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass, ValueKind
 from simulator.battery.migrate import Migrator
-from simulator.battery.score import _printed_uncertainty_source
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -18,6 +17,10 @@ OBSERVATION_IDS = {
     "shornikov_yakovlev_2025_prior_mixing_enthalpy_range",
     "shornikov_yakovlev_2025_prior_mixing_entropy_range",
 }
+RESULT_CONTEXT_IDS = {
+    "shornikov_yakovlev_2025_mixing_enthalpy",
+    "shornikov_yakovlev_2025_mixing_entropy",
+}
 RENDERED_PINS = (
     "−34.90 ± 0.20 kJ/mol",
     "6.60 ± 0.10 J/(mol K)",
@@ -26,15 +29,16 @@ RENDERED_PINS = (
 )
 
 
-def _observations(document: dict) -> dict[str, dict]:
+def _rows_by_id(document: dict) -> dict[str, dict]:
+    species = document["species"]["Ca2SiO4"]
     return {
         row["observation_id"]: row
-        for row in document["species"]["Ca2SiO4"]["observations"]
+        for row in (*species["observations"], *species["context"])
     }
 
 
 def _render_pins(document: dict) -> tuple[object, ...]:
-    rows = _observations(document)
+    rows = _rows_by_id(document)
     return (
         rows["shornikov_yakovlev_2025_mixing_enthalpy"]["values"]["value_as_printed"],
         rows["shornikov_yakovlev_2025_mixing_entropy"]["values"]["value_as_printed"],
@@ -45,13 +49,21 @@ def _render_pins(document: dict) -> tuple[object, ...]:
 
 def test_render_pins_row_count_conditions_and_isolated_migration():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    rows = _observations(document)
+    rows = _rows_by_id(document)
+    species = document["species"]["Ca2SiO4"]
+    scored_ids = {row["observation_id"] for row in species["observations"]}
+    context_ids_in_source = {row["observation_id"] for row in species["context"]}
 
     assert validate_extract_document(
         document, expected_source_id=document["source_id"]
     ) == []
-    assert len(rows) == 4
-    assert set(rows) == OBSERVATION_IDS
+    assert scored_ids == OBSERVATION_IDS - RESULT_CONTEXT_IDS
+    assert context_ids_in_source == RESULT_CONTEXT_IDS | {
+        "shornikov_yakovlev_2025_sample_preparation",
+        "shornikov_yakovlev_2025_prior_precision_context",
+        "shornikov_yakovlev_2025_barin_comparison_context",
+    }
+    assert set(rows) == OBSERVATION_IDS | context_ids_in_source
     assert document["extraction"]["table_inventory"]["printed_table_count"] == 0
     assert _render_pins(document) == RENDERED_PINS
     assert rows["shornikov_yakovlev_2025_mixing_enthalpy"]["values"]["uncertainty_kJ_mol_as_published"] == "0.20"
@@ -78,7 +90,7 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
     ] == "4"
 
     mutated = deepcopy(document)
-    _observations(mutated)["shornikov_yakovlev_2025_mixing_enthalpy"]["values"][
+    _rows_by_id(mutated)["shornikov_yakovlev_2025_mixing_enthalpy"]["values"][
         "value_as_printed"
     ] = "−34.9 ± 0.20 kJ/mol"
     assert _render_pins(mutated) != RENDERED_PINS
@@ -92,14 +104,11 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
         for row in result.observations.values()
         if row.source_id == document["source_id"]
     }
-    kems_ids = {
-        "shornikov_yakovlev_2025_mixing_enthalpy",
-        "shornikov_yakovlev_2025_mixing_entropy",
-    }
-
     assert result.validation is not None
-    assert set(migrated) == OBSERVATION_IDS
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 4
+    assert result.validation.hard_issues == (), result.validation.hard_issues
+    assert result.registry_issues == [], result.registry_issues
+    assert set(migrated) == OBSERVATION_IDS - RESULT_CONTEXT_IDS
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 2
     context_ids = {
         row["context_id"].rsplit("::", 1)[-1]
         for context_rows in result.context_by_work.values()
@@ -107,12 +116,11 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
         if row["source_id"] == document["source_id"]
     }
     assert context_ids == {
+        *RESULT_CONTEXT_IDS,
         "shornikov_yakovlev_2025_sample_preparation",
         "shornikov_yakovlev_2025_prior_precision_context",
         "shornikov_yakovlev_2025_barin_comparison_context",
     }
-    assert migrated["shornikov_yakovlev_2025_mixing_enthalpy"].locator.page == 3
-    assert migrated["shornikov_yakovlev_2025_mixing_enthalpy"].locator.pdf_page_index == 2
     assert migrated["shornikov_yakovlev_2025_prior_mixing_enthalpy_range"].locator.page == 1
     assert migrated["shornikov_yakovlev_2025_prior_mixing_enthalpy_range"].locator.pdf_page_index == 0
     unknown_quantity_ids = {
@@ -120,46 +128,36 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
         for observation_id, row in migrated.items()
         if row.identity.quantity.value is None
     }
-    assert unknown_quantity_ids == OBSERVATION_IDS
-    assert all(migrated[observation_id].identity.species.phase.is_unknown for observation_id in kems_ids)
-    assert all(migrated[observation_id].identity.species.phase.is_value for observation_id in OBSERVATION_IDS - kems_ids)
+    assert unknown_quantity_ids == OBSERVATION_IDS - RESULT_CONTEXT_IDS
+    assert all(rows[observation_id]["phase"] == "unknown" for observation_id in OBSERVATION_IDS)
+    assert all(
+        migrated[observation_id].identity.species.phase.is_unknown
+        for observation_id in OBSERVATION_IDS - RESULT_CONTEXT_IDS
+    )
+    context_by_id = {
+        row["context_id"].rsplit("::", 1)[-1]: row
+        for context_rows in result.context_by_work.values()
+        for row in context_rows
+        if row["source_id"] == document["source_id"]
+    }
     uncertainty_pins = {
         "shornikov_yakovlev_2025_mixing_enthalpy": (Decimal("0.20"), "kJ/mol"),
         "shornikov_yakovlev_2025_mixing_entropy": (Decimal("0.10"), "J/(mol K)"),
     }
-    for observation_id in kems_ids:
-        row = migrated[observation_id]
-        assert row.evidence.class_.is_value
-        assert row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        assert row.value.kind is ValueKind.UNAVAILABLE
+    for observation_id in RESULT_CONTEXT_IDS:
+        row = context_by_id[observation_id]
+        assert row["type"] == "thermodynamic_example"
+        assert row["values"]["method_class"] == EvidenceClass.MODEL_DERIVED.value
+        assert row["values"]["admission_status"] == "typed_refusal"
+        assert "calculation equation" in row["values"]["reason"]
+        assert "numerical pressure inputs" in row["values"]["reason"]
+        assert row["locator"]["published_page"] == 266
+        assert row["derivation"]["method"]["locator"]["published_page"] == 267
+        source_row = rows[observation_id]
+        assert row["uncertainty"] == source_row["uncertainty"]
         expected_width, expected_unit = uncertainty_pins[observation_id]
-        assert row.uncertainty.kind.value == "printed"
-        assert _printed_uncertainty_source(row.uncertainty) == (
-            expected_width,
-            "scalar",
-            expected_unit,
-        )
-        assert row.uncertainty.verbatim["confidence_level"] == "not_stated"
-        assert "calculation equation" in row.admission.reason
-        assert "numerical pressure inputs" in row.admission.reason
-        assert row.derivation is None
-        source_derivation = rows[observation_id]["derivation"]
-        assert "raw_inputs" not in source_derivation
-        assert source_derivation["method"]["locator"]["published_page"] == 267
-
-    expected_hard_issue_details = {
-        "derived_from": "derived observation requires derived_from",
-    }
-    for observation_id in kems_ids:
-        row_issues = [
-            issue
-            for issue in result.validation.hard_issues
-            if f"::{observation_id}]" in issue.path
-        ]
-        assert len(row_issues) == 1
-        assert {
-            (issue.path.rsplit("].", 1)[-1], issue.detail) for issue in row_issues
-        } == set(expected_hard_issue_details.items())
+        assert Decimal(row["uncertainty"]["value"]) == expected_width
+        assert row["uncertainty"]["unit"] == expected_unit
 
     for observation_id, row in migrated.items():
         assert row.point_conditions["temperature_K"].locator is not None
@@ -180,7 +178,7 @@ def test_render_pins_row_count_conditions_and_isolated_migration():
 
     print(
         "isolated migration:",
-        f"obs={len(migrated)} hard={len(result.validation.hard_issues)} (typed refusals without a raw_inputs declaration)",
+        f"obs={len(migrated)} hard={len(result.validation.hard_issues)} registry={len(result.registry_issues)}",
         f"unavailable={sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values())}",
         f"context={len(context_ids)}",
     )
