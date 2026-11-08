@@ -23,6 +23,7 @@ from simulator.account_ids import (
     STAGE_COLLECTION_BACKING_ACCOUNTS,
     STAGE_COLLECTION_SOURCE_ACCOUNTS,
 )
+from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS, REE_OXIDE_SPECIES
 from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -1837,6 +1838,7 @@ class ExtractionMixin:
             electrolysis_controls['commit_empty_transition'] = True
         melt_fO2_log = self._current_melt_redox_fO2_log()
         electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
+        residue_transfer_snapshot = None
         if is_plant and c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
             from engines.builtin.metallothermic_step import (
@@ -1845,6 +1847,16 @@ class ExtractionMixin:
             residue_kg = self.atom_ledger.kg_by_account(
                 SPENT_REDUCTANT_RESIDUE_ACCOUNT
             )
+            if any(
+                residue_kg.get(oxide, 0.0) > 0.0
+                for oxide in c5_allowed_oxides
+            ):
+                # The provider needs these oxides in cleaned_melt to assess the
+                # rung. Keep a snapshot at this boundary so a veto removes only
+                # this transfer, leaving prior thermal and ledger work intact.
+                residue_transfer_snapshot = snapshot_atom_ledger(
+                    self.atom_ledger
+                )
             for oxide in c5_allowed_oxides:
                 self._move_ledger_species(
                     'c5_mre_spent_residue_to_cleaned_melt',
@@ -1937,6 +1949,13 @@ class ExtractionMixin:
         )
 
         proposal = kernel_result.transition
+        if (
+            proposal is None
+            and getattr(kernel_result, 'status', '') == 'refused'
+            and residue_transfer_snapshot is not None
+        ):
+            self.atom_ledger = residue_transfer_snapshot
+            self._chem_kernel = self._build_chemistry_kernel()
         if proposal is None and getattr(kernel_result, 'status', '') == 'refused':
             reason = str(
                 diagnostic.get('reason_refused', 'electrolysis_step_refused')

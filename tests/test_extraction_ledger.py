@@ -697,6 +697,59 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products():
     }
 
 
+def test_vetoed_c5_mre_preserves_spent_residue_account():
+    from simulator.electrolysis import MRE_RAW_MARGIN_REFUSAL
+
+    def with_spent_residue():
+        sim = _sim(
+            {
+                "sodium oxide": {
+                    "label": "Sodium oxide",
+                    "composition_wt_pct": {"Na2O": 100.0},
+                }
+            }
+        )
+        sim.load_batch("sodium oxide", mass_kg=10.0)
+        sim._move_ledger_species(
+            "test_seed_spent_reductant_residue",
+            "process.cleaned_melt",
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            "Na2O",
+            10.0,
+            reason="seed the C5 spent-residue regression fixture",
+        )
+        return sim
+
+    sim = with_spent_residue()
+    mre_off = with_spent_residue()
+    _enable_c5_mre(sim, target_species="Na2O", max_voltage_V=0.75)
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.temperature_C = 30.0
+    sim._mre_voltage_sequence = [{
+        "voltage": 0.5,
+        "species": ["Na2O"],
+        "min_hold_hours": 1,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+
+    sim._step_mre()
+
+    assert sim._mre_ellingham_ladder_diagnostic["step_outcome"] == {
+        "status": "refused",
+        "reason": MRE_RAW_MARGIN_REFUSAL,
+    }
+    assert sim.atom_ledger.kg_by_account(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    ) == pytest.approx(
+        mre_off.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)
+    )
+    assert not any(
+        transition.name == "c5_mre_spent_residue_to_cleaned_melt"
+        for transition in sim.atom_ledger.transitions
+    )
+
+
 def test_condensed_species_projection_does_not_double_count_across_stages():
     sim = _sim(
         {
