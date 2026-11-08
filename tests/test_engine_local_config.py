@@ -101,11 +101,22 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _sample_config(tmp_path, monkeypatch)
+    config = _sample_config(tmp_path, monkeypatch)
+    binary_path = config.paths.alphamelts_binary_path
+    assert binary_path is not None
+    configured_identity = config.identities["alphamelts"]
+    config.identities["alphamelts"] = EngineIdentity(
+        name=configured_identity.name,
+        version=configured_identity.version,
+        digest=engine_local_config.sha256_file(binary_path),
+    )
+    write_config(config)
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
-    backend._binary_path = tmp_path / "alphamelts2"
-    assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
+    backend._binary_path = binary_path
+    assert backend.get_engine_version() == config.identities[
+        "alphamelts"
+    ].cache_version()
 
 
 def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
@@ -118,7 +129,7 @@ def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
     legacy_identity = EngineIdentity(
         name="alphamelts",
         version="alphaMELTS",
-        digest="sha256:abc111",
+        digest=engine_local_config.sha256_file(alpha_binary),
     )
     config.identities["alphamelts"] = legacy_identity
     write_config(config)
@@ -143,7 +154,7 @@ def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
     ).cache_version()
     assert version == expected
     assert "2.3.1" in version
-    assert "digest=sha256:abc111" in version
+    assert legacy_identity.digest in version
 
     monkeypatch.setattr(
         "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
@@ -154,7 +165,83 @@ def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
     backend._engine_version = None
     fallback = backend.get_engine_version()
     assert fallback == legacy_identity.cache_version()
-    assert "digest=sha256:abc111" in fallback
+    assert legacy_identity.digest in fallback
+
+
+def test_configured_alphamelts_digest_mismatch_uses_actual_binary_digest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    config = _sample_config(tmp_path, monkeypatch)
+    alpha_binary = config.paths.alphamelts_binary_path
+    assert alpha_binary is not None
+    configured_identity = config.identities["alphamelts"]
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = alpha_binary
+    caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
+
+    version = backend.get_engine_version()
+
+    actual_identity = EngineIdentity(
+        name=configured_identity.name,
+        version=configured_identity.version,
+        digest=engine_local_config.sha256_file(alpha_binary),
+    )
+    assert version == actual_identity.cache_version()
+    assert "Configured alphamelts binary digest mismatch" in caplog.text
+
+
+def test_binary_sha256_cache_uses_path_mtime_and_size(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_local_config, "_BINARY_SHA256_CACHE", {})
+    binary_path = tmp_path / "first-binary"
+    binary_path.write_bytes(b"same-size")
+    original_stat = binary_path.stat()
+    other_path = tmp_path / "second-binary"
+    other_path.write_bytes(b"same-size")
+    os.utime(
+        other_path,
+        ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns),
+    )
+
+    original_sha256_file = engine_local_config.sha256_file
+    calls = 0
+
+    def count_hashes(path: Path) -> str:
+        nonlocal calls
+        calls += 1
+        return original_sha256_file(path)
+
+    monkeypatch.setattr(engine_local_config, "sha256_file", count_hashes)
+    first_digest = engine_local_config._cached_binary_sha256(binary_path)
+    assert engine_local_config._cached_binary_sha256(binary_path) == first_digest
+    assert calls == 1
+
+    engine_local_config._cached_binary_sha256(other_path)
+    assert calls == 2
+
+    binary_path.write_bytes(b"different-size")
+    os.utime(
+        binary_path,
+        ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns),
+    )
+    engine_local_config._cached_binary_sha256(binary_path)
+    assert calls == 3
+
+    binary_path.write_bytes(b"x" * len(b"different-size"))
+    os.utime(
+        binary_path,
+        ns=(
+            original_stat.st_atime_ns,
+            original_stat.st_mtime_ns + 1_000_000_000,
+        ),
+    )
+    engine_local_config._cached_binary_sha256(binary_path)
+    assert calls == 4
 
 
 def test_alphamelts_cache_version_drops_host_metadata() -> None:
