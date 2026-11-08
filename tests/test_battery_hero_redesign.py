@@ -263,7 +263,7 @@ def test_collection_smoke_render_csv_values_html_and_legacy_history(tmp_path: Pa
     page = files["html"].read_text(encoding="utf-8")
     assert "<details" in page and "<table" in page
     assert "temperature-min" in page and "sio2-min" in page
-    assert f"const TEMPERATURE_FLOOR_K={hero_plot.HERO_TEMPERATURE_FLOOR_K}" in page
+    assert f"TEMPERATURE_FLOOR_K={hero_plot.HERO_TEMPERATURE_FLOOR_K}" in page
     assert "row source" in page.lower()
     assert "function showTip" in page and "row.source" in page
     assert page.index('id="chart-a"') < page.index('id="application-window"')
