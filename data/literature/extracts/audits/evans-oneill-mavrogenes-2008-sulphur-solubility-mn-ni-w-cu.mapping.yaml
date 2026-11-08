@@ -1,0 +1,224 @@
+source_id: evans-oneill-mavrogenes-2008-sulphur-solubility-mn-ni-w-cu
+source:
+  citation: K. Evans, T. M. O’Neill, J. Mavrogenes (2008), “Sulphur solubility and sulphide immiscibility in silicate
+    melts as a function of the concentration of manganese, nickel, tungsten and copper at 1 atm and 1400 °C,” Chemical
+    Geology 255, 236–249.
+  version: Curtin accepted-manuscript PREPRINT
+tables:
+- table: '1'
+  pages:
+  - 39
+  - 40
+  type: experimental_context
+  quantity: run conditions and starting-composition labels
+  evidence_class: source_context
+  rows: all printed run rows
+  columns:
+  - column: 1
+    field: run_id
+  - column: 2
+    field: metal
+  - column: 3
+    field: concentration_level
+  - column: 4
+    field: log_fO2
+  - column: 5
+    field: log_fS2
+  - column: 6
+    field: log_fSO2
+  disposition: exact strings retained under extraction.tables_as_published and in the cell audit
+- table: '2'
+  pages:
+  - 41
+  type: gas_mixture_conditions
+  quantity: gas flow and log fugacity conditions
+  evidence_class: source_context
+  rows: all five gas groups
+  columns:
+  - column: 1
+    field: gas_group
+  - column: 2
+    field: CO SCCM
+  - column: 3
+    field: CO2 SCCM
+  - column: 4
+    field: SO2 SCCM
+  - column: 5
+    field: log_fO2
+  - column: 6
+    field: log_fS2
+  - column: 7
+    field: log_fSO2
+  disposition: conditions are bound to Table 3 measured rows by printed group; exact strings retained under extraction.tables_as_published
+    and audit
+- table: 3a
+  pages:
+  - 42
+  - 43
+  - 44
+  - 45
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: glass
+  rows: all 56 printed sample rows
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Mn
+  - column: 9
+    species: O
+  conditions:
+  - T_C
+  - group from Table 3a / Table 2
+  - total pressure from Experimental section
+  - composition unknown per sample
+  disposition: measured numeric values and uncertainties stored in points; Total, Group and Appearance remain in
+    printed_cells
+- table: 3b
+  pages:
+  - 46
+  - 47
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: glass
+  rows: all 36 printed sample rows
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: W
+  - column: 9
+    species: O
+  conditions:
+  - T_C
+  - group from Table 3b / Table 2
+  - total pressure from Experimental section
+  - composition unknown per sample
+  disposition: measured numeric values and uncertainties stored in points; Total, Group and Appearance remain in
+    printed_cells
+- table: 3c
+  pages:
+  - 48
+  - 49
+  - 50
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: glass, plus two NiS condensed-solid rows
+  rows: all 55 printed sample/phase rows
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Ni
+  - column: 9
+    species: O
+  conditions:
+  - T_C
+  - group from Table 3c / Table 2 where printed
+  - total pressure from Experimental section
+  - composition unknown per sample
+  disposition: 53 glass rows are migrated; both NiS rows retain their printed cells but are typed-refused for missing
+    crystalline sulfide phase role; Total, Group and Appearance remain in printed_cells
+- table: 3d
+  pages:
+  - 51
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: glass
+  rows: all 12 printed sample rows
+  values:
+  - column: 2
+    species: Si
+  - column: 3
+    species: Al
+  - column: 4
+    species: Mg
+  - column: 5
+    species: Ca
+  - column: 6
+    species: Fe
+  - column: 7
+    species: S
+  - column: 8
+    species: Cu
+  - column: 9
+    species: O
+  conditions:
+  - T_C
+  - matching run id from Table 1 and gas flow from Table 2 Copper row
+  - total pressure from Experimental section
+  - composition unknown per sample
+  disposition: measured numeric values and uncertainties stored in points; ‡ laser cell render checked; Total and
+    Appearance remain in printed_cells
+- table: '4'
+  pages:
+  - 52
+  type: model_parameter_context
+  quantity: interaction_parameter
+  evidence_class: model_derived
+  rows: all eight coefficient rows
+  values:
+  - column: 2
+    field: coefficient
+  - column: 3
+    field: s.d.
+  derivation:
+    equation: '3'
+    page: 3
+  disposition: coefficients and s.d. retained as model-derived context with fit input lineage
+- table: '5'
+  pages:
+  - 53
+  type: model_comparison
+  quantity: model_performance_summary
+  evidence_class: typed_refused
+  rows: all four model rows
+  values:
+  - column: 2
+    field: mean residual
+  - column: 3
+    field: sigma residuals
+  - column: 4
+    field: R2
+  - column: 5
+    field: NMRSD
+  disposition: typed refusal; exact strings retained under extraction.tables_as_published and in cell audit
