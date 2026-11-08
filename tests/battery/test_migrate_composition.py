@@ -2901,6 +2901,282 @@ def test_retained_phase_composition_obeys_shared_admission_refusals(
     assert reason in located.state.reason
 
 
+@pytest.mark.parametrize(
+    ("case", "components", "expected_reason"),
+    (
+        pytest.param(
+            "blank-metal-cell",
+            {"Fe": "100", "Ni": None},
+            "mass-percent composition contains invalid component cells",
+            id="blank-retained-metal-cell",
+        ),
+        pytest.param(
+            "blank-major-cell",
+            {"Fe": "100", "SiO2": None},
+            "mass-percent composition contains invalid component cells",
+            id="blank-major-cell",
+        ),
+        pytest.param(
+            "missing-major",
+            {"Fe": "100"},
+            "missing major oxides: SiO2",
+            id="explicitly-missing-major",
+        ),
+        pytest.param(
+            "ambiguous-total-iron",
+            {"Fe": "20", "FeO": "40", "FeOT": "40"},
+            "ambiguous total iron components: FeOT with FeO",
+            id="ambiguous-feot",
+        ),
+        pytest.param(
+            "negative-amount",
+            {"Fe": "100", "Na2O_plus_K2O": "-1"},
+            "negative or non-finite amount",
+            id="negative-amount",
+        ),
+        pytest.param(
+            "negative-cancels-unsupported",
+            {"Fe": "100", "XxO": "1", "Na2O_plus_K2O": "-1"},
+            "negative or non-finite amount",
+            id="negative-cancels-unsupported",
+        ),
+        pytest.param(
+            "invalid-amount",
+            {"Fe": "100", "Ni": "unreadable"},
+            "malformed printed component amount for 'Ni'",
+            id="invalid-amount",
+        ),
+        pytest.param(
+            "non-finite-amount",
+            {"Fe": "100", "Ni": float("nan")},
+            "malformed printed component amount for 'Ni'",
+            id="non-finite-amount",
+        ),
+        pytest.param(
+            "unsupported-over-limit",
+            {"Fe": "99", "XxO": "1"},
+            "partial analysis contains unsupported component(s) above 0.5 wt%",
+            id="unsupported-over-drop-limit",
+        ),
+        pytest.param(
+            "unrecognized-label-over-limit",
+            {"Fe": "99", "unknown-component": "1"},
+            "partial analysis contains unsupported component(s) above 0.5 wt%",
+            id="unrecognized-label-over-drop-limit",
+        ),
+        pytest.param(
+            "duplicate-component",
+            {"Fe": "50", "SiO2": "25", "SiO2 wt%": "25"},
+            "mass-percent composition has duplicate component keys",
+            id="duplicate-canonical-component",
+        ),
+        pytest.param(
+            "zero-mass",
+            {"Fe": "0"},
+            "printed oxide wt% map has no positive mass",
+            id="zero-mass",
+        ),
+        pytest.param(
+            "below-closure",
+            {"Fe": "94"},
+            "mass-percent composition is a partial analysis",
+            id="below-95-closure",
+        ),
+        pytest.param(
+            "above-closure",
+            {"Fe": "106"},
+            "mass-percent composition exceeds the accepted kept-sum limit",
+            id="above-105-closure",
+        ),
+        pytest.param(
+            "same-row-sulfur",
+            {"Fe": "104"},
+            "sum=106 wt% is above 105 wt%",
+            id="same-row-sulfur-closes-above-105",
+        ),
+        pytest.param(
+            "negative-same-row-sulfur",
+            {"Fe": "100"},
+            "negative or non-finite amount",
+            id="negative-same-row-sulfur",
+        ),
+        pytest.param(
+            "malformed-same-row-sulfur",
+            {"Fe": "100"},
+            "malformed printed closure component amount for 'S'",
+            id="malformed-same-row-sulfur",
+        ),
+    ),
+)
+def test_retained_phase_refusals_reach_validator_and_full_migration(
+    tmp_path: Path,
+    case: str,
+    components: dict[str, object],
+    expected_reason: str,
+) -> None:
+    numeric_components = {
+        name: amount
+        for name, amount in components.items()
+        if migrate_module._classify_composition_cell(amount)[0] == "number"
+    }
+    closure_context = components
+    if case == "missing-major":
+        closure_context = {"absent_table_entries": ["SiO2"]}
+    elif case == "same-row-sulfur":
+        closure_context = {"_migrate_closure_only_components": {"S": "2"}}
+    elif case == "negative-same-row-sulfur":
+        closure_context = {"_migrate_closure_only_components": {"S": "-1"}}
+    elif case == "malformed-same-row-sulfur":
+        closure_context = {
+            "_migrate_closure_only_components": {"S": "unreadable"}
+        }
+    validated, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        numeric_components,
+        closure_context=closure_context,
+        declared_component_map=components,
+        retain_components=True,
+    )
+    assert validated is None, case
+    assert refusal is not None, case
+    assert expected_reason in refusal.reason, (case, refusal.reason)
+
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "retained-phase-refusal",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": components},
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.update(
+        {
+            "observation_id": "retained-phase-refusal",
+            "experiment": "retained-phase-refusal",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    observation["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "50",
+    }
+    if case == "missing-major":
+        observation["values"]["absent_table_entries"] = ["SiO2"]
+    elif case == "same-row-sulfur":
+        observation["values"]["_migrate_closure_only_components"] = {"S": "2"}
+    elif case == "negative-same-row-sulfur":
+        observation["values"]["_migrate_closure_only_components"] = {"S": "-1"}
+    elif case == "malformed-same-row-sulfur":
+        observation["values"]["_migrate_closure_only_components"] = {
+            "S": "unreadable"
+        }
+
+    result = migrate(
+        _write_min_tree(tmp_path / case, extract),
+        write=False,
+    )
+    migrated = result.observations[
+        "fixture-source::retained-phase-refusal"
+    ]
+    assert migrated.identity.composition is not None
+    assert migrated.identity.composition.is_unknown, case
+    assert expected_reason in migrated.identity.composition.reason, (
+        case,
+        migrated.identity.composition.reason,
+    )
+    condition = migrated.point_conditions.get("composition")
+    assert condition is not None, case
+    assert condition.state.is_unknown, case
+    assert expected_reason in condition.state.reason, (
+        case,
+        condition.state.reason,
+    )
+
+
+def test_retained_phase_102_to_105_total_renormalizes_with_notice(
+    tmp_path: Path,
+) -> None:
+    components = {"Fe": "103"}
+    amount = Decimal("103")
+    validation = migrate_module._wt_percent_conversion_or_refusal(
+        {"Fe": amount},
+        closure_context=components,
+        declared_component_map=components,
+        retain_components=True,
+    )
+    assert validation.refusal is None
+    assert validation.composition is not None
+    assert validation.kept_total == amount
+    assert sum(
+        (value for _name, value in validation.composition.components), Decimal("0")
+    ) == Decimal("100")
+
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "retained-phase-renormalization",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": components},
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.update(
+        {
+            "observation_id": "retained-phase-renormalization",
+            "experiment": "retained-phase-renormalization",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    observation["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "50",
+    }
+    result = migrate(
+        _write_min_tree(tmp_path, extract),
+        write=False,
+    )
+    migrated = result.observations[
+        "fixture-source::retained-phase-renormalization"
+    ]
+    assert migrated.identity.composition is not None
+    assert migrated.identity.composition.is_value
+    assert sum(
+        migrated.identity.composition.value.as_map().values(), Decimal("0")
+    ) == Decimal("100")
+    condition = migrated.point_conditions["composition"]
+    assert condition.state.is_value
+    assert condition.inference is not None
+    assert any(
+        "printed phase total S=103 wt%" in item
+        for item in condition.inference.inputs
+    )
+    notice = next(
+        notice
+        for notice in migrated.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert notice.original == amount
+    assert notice.band == "95-102 wt% printed phase total"
+
+
 def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
     extract_path = (
         REPO_ROOT

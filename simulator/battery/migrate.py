@@ -6750,6 +6750,14 @@ def _wt_percent_conversion_or_refusal(
                     str(raw_name)
                 )
                 kind, amount = _classify_composition_cell(raw_amount)
+                if kind == "blank":
+                    diagnostics.append(
+                        (
+                            _GREEN_READ_OXIDE_MAP,
+                            "mass-percent composition contains invalid component cells",
+                        )
+                    )
+                    continue
                 if kind != "number" or amount is None:
                     continue
                 recognized = (
@@ -6940,17 +6948,13 @@ def _wt_percent_conversion_or_refusal(
             closure_context=closure_context,
             mass_kept_total=kept_total,
         )
-        missing_major = (
-            ()
-            if retained_phase_wt is not None
-            else tuple(
-                dict.fromkeys(
-                    (
-                        *_missing_major_oxide_names(wt, declared_component_map),
-                        *_missing_major_oxide_names(
-                            closure_context, declared_component_map
-                        ),
-                    )
+        missing_major = tuple(
+            dict.fromkeys(
+                (
+                    *_missing_major_oxide_names(wt, declared_component_map),
+                    *_missing_major_oxide_names(
+                        closure_context, declared_component_map
+                    ),
                 )
             )
         )
@@ -26193,6 +26197,7 @@ class Migrator:
                 else None
             )
             phase_closure_context = values
+            invalid_phase_amount = False
             if (
                 printed is not None
                 and printed.state.is_value
@@ -26209,6 +26214,11 @@ class Migrator:
                     )
                     kind, amount = _classify_composition_cell(raw_amount)
                     if kind == "number" and amount is not None:
+                        invalid_phase_amount = (
+                            invalid_phase_amount
+                            or not amount.is_finite()
+                            or amount < 0
+                        )
                         phase_components[formula] = (
                             phase_components.get(formula, Decimal("0")) + amount
                         )
@@ -26218,20 +26228,33 @@ class Migrator:
                     isinstance(current_composition, State)
                     and current_composition.is_value
                 ):
-                    # The run's printed phase vector is identity context, not
-                    # an inferred starting charge or a second scored value.
-                    composition = Composition(
-                        basis="printed_phase_composition",
-                        components=components,
-                        amount_basis=AmountBasis.MASS_PERCENT,
-                        input_provenance=phase_map_provenance(
-                            printed.locator, locator
-                        ),
-                    )
-                    composition_state = State.of(composition)
-                    located_composition = Located(
-                        composition_state, locator=printed.locator
-                    )
+                    if invalid_phase_amount:
+                        # Let the shared validator refuse invalid numbers before
+                        # Composition's constructor can raise on them.
+                        located_composition = _mass_percent_composition_located(
+                            dict(components),
+                            basis="printed_phase_composition",
+                            locator=printed.locator,
+                            closure_context=phase_closure_context,
+                            declared_component_map=printed.state.value,
+                        )
+                        composition_state = located_composition.state
+                    else:
+                        # The run's printed phase vector is identity context,
+                        # not an inferred starting charge or a second scored
+                        # value. The later shared check replaces this stamp.
+                        composition = Composition(
+                            basis="printed_phase_composition",
+                            components=components,
+                            amount_basis=AmountBasis.MASS_PERCENT,
+                            input_provenance=phase_map_provenance(
+                                printed.locator, locator
+                            ),
+                        )
+                        composition_state = State.of(composition)
+                        located_composition = Located(
+                            composition_state, locator=printed.locator
+                        )
                     point_conditions = {
                         **(point_conditions or {}),
                         "composition": located_composition,
