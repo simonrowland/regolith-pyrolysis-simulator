@@ -47,6 +47,9 @@ from simulator.battery.score import (
 from simulator.battery.waypoints import (
     GapReason,
     ReadinessStatus,
+    Waypoint,
+    WaypointAuthority,
+    WaypointResult,
     oxygen_condition,
 )
 from simulator.fe_redox import (
@@ -687,7 +690,7 @@ def test_closable_knudsen_row_is_one_effusion_closure() -> None:
     assert resolved.cell_material is None
 
 
-def test_unmodelled_knudsen_row_does_not_borrow_intrinsic_fo2() -> None:
+def test_unmodelled_knudsen_row_uses_melt_closure_not_intrinsic_fo2() -> None:
     from simulator.battery.enums import CellMaterial, Quantity
     from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
 
@@ -698,6 +701,149 @@ def test_unmodelled_knudsen_row_does_not_borrow_intrinsic_fo2() -> None:
         observation,
         composition=observation.identity.composition.value,
         temperature_K=float(observation.identity.temperature_K.value),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert resolved is not None
+    assert resolved.closure
+    assert resolved.route == "effusion_oxygen_balance"
+    assert resolved.cell_material is None
+
+
+def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
+    from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
+
+    observation, experiment = _kems_partial(cell_material=None)
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(Decimal("1200")),
+        ),
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "temperature_K": F.located(Decimal("1200")),
+            "total_pressure_Pa": F.located(Value.point_of("100000")),
+        },
+    )
+    bench = _cell_material_bench((CellMaterial.PT,))
+    composition = observation.identity.composition.value
+    linked_bar = 1.0e-9  # a same-cell measured O/O2 condition
+
+    printed_pa = Decimal("1e-8")
+    printed_row = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            fO2_Pa=State.of(printed_pa),
+        ),
+    )
+    printed = resolve_row_fo2(
+        experiment,
+        bench,
+        printed_row,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert printed is not None
+    assert printed.route == "identity_fO2_Pa"
+    assert printed.po2_bar == float(printed_pa / Decimal("100000"))
+
+    buffer_experiment = replace(
+        experiment,
+        conditions={
+            **experiment.conditions,
+            "temperature_K": F.located(Decimal("1200")),
+        },
+        fO2_control=FO2Control(
+            channel=State.of(FO2Channel.BUFFER),
+            buffer=F.located("IW"),
+        ),
+    )
+    buffer = resolve_row_fo2(
+        buffer_experiment,
+        bench,
+        observation,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    selected = oxygen_condition(buffer_experiment, bench, observation).selected
+    assert selected is not None
+    assert buffer is not None
+    assert buffer.route == selected.route == "buffer_relation"
+    assert buffer.log10_fO2_bar == float(selected.value.point)
+
+    linked = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert linked is not None
+    assert linked.route == "source_linked_oxygen_condition"
+    assert linked.po2_bar == linked_bar
+
+    balanced = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert balanced is not None and balanced.closure
+    assert balanced.route == "effusion_oxygen_balance"
+
+
+@pytest.mark.parametrize("missing", ("composition", "temperature"))
+def test_knudsen_missing_balance_input_refuses_before_vacuum_bound(missing) -> None:
+    from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
+
+    observation, experiment = _kems_partial(cell_material=None)
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(Decimal("1200")),
+        ),
+    )
+    bench = _cell_material_bench((CellMaterial.PT,))
+    vacuum = Waypoint(
+        name="oxygen_condition",
+        value=Value.point_of("-9"),
+        route="vacuum_total_pressure_upper_bound",
+        authority=WaypointAuthority.EXTRAPOLATED,
+        inputs=("printed run vacuum pressure", "Dalton: pO2 <= P_total"),
+        notice="upper bound from printed vacuum 1e-4 Pa; bound, not a measurement",
+    )
+    oxygen = WaypointResult("oxygen_condition", vacuum, (vacuum,))
+    composition = observation.identity.composition.value
+    temperature = 1200.0
+    if missing == "composition":
+        observation = replace(
+            observation,
+            identity=replace(
+                observation.identity,
+                composition=State.unknown("not printed"),
+            ),
+        )
+        composition = None
+    else:
+        temperature = None
+
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition,
+        temperature_K=temperature,
+        oxygen=oxygen,
         quantity=Quantity.P_PARTIAL,
     )
     assert resolved is None
@@ -819,7 +965,8 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
             if "effusion closure borrowed from internal-analytical" in notice.reason
         )
         assert borrowed_notice.reason.startswith(
-            "fo2_tier=3; route=effusion_oxygen_balance;"
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance;"
         )
         assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         assert borrowed_notice.authority is Authority.BRIDGE

@@ -30,6 +30,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    Fo2Mode,
     IdentityEqualKind,
     MethodToken,
     MetricOperation,
@@ -536,6 +537,18 @@ def test_pressure_dependent_prediction_still_refuses_unknown_total_pressure() ->
     reference = replace(reference, point_conditions=None)
     prediction = replace(
         _partial_prediction(Engine.VAPOROCK, reference),
+        notices=(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                reason=(
+                    "fo2_tier=3; physics_rung=2:measured_same_cell_oxygen; "
+                    "route=source_linked_oxygen_condition"
+                ),
+                origin="fo2_ladder",
+                fo2_mode=Fo2Mode.SHARED_LADDER,
+            ),
+        ),
         identity=replace(
             identity, total_pressure_Pa=State.of(Decimal("0.1"))
         ),
@@ -17254,12 +17267,7 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
 
 
 def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
-    """An unlinked experiment does not inherit its work's only typed bench.
-
-    Restoring the sole-bench adoption in _bench_for_score makes this red:
-    the W bench would be attached and the refusal would not be
-    cell_material_unknown.
-    """
+    """An unlinked bench stays unknown while the melt-only closure is flagged."""
     from simulator.battery.enums import BenchIdentityBasis, CellMaterial
     from simulator.battery.records import Bench, BenchIdentity
 
@@ -17280,12 +17288,8 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     ident = replace(
-        F.activity_identity(
-            formula="K",
-            composition=composition,
-            component_basis="K2O",
-        ),
-        quantity=Quantity.P_PARTIAL,
+        _partial_identity(),
+        composition=State.of(composition),
         species=Species("K", Phase.G),
         fO2_Pa=State.unknown("no fO2 printed"),
     )
@@ -17306,8 +17310,20 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
         Engine.OPENIMCC,
         context=context,
     )
-    assert residual.refusal is not None
-    assert residual.refusal.detail.get("reason") == "cell_material_unknown"
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        and '"cell_material":[]' in notice.reason
+        for notice in residual.notices
+    )
+    assert any(
+        notice.reason == (
+            "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+            "route=effusion_oxygen_balance"
+        )
+        for notice in residual.notices
+    )
 
 
 def _cell_material_score_case(material, inference):
@@ -17436,7 +17452,7 @@ def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) 
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
         and notice.reason == (
-            "model assumption: vapour-only zero-storage closure; "
+            "predict-and-flag substitution: congruent vapour-only zero-storage closure; "
             "source_oxygen_fallback=lineage_untyped"
         )
         for notice in prediction.notices
@@ -17869,7 +17885,7 @@ def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> No
 def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
     from simulator.battery.enums import CellMaterial
     from simulator.battery.records import union_notices
-    from simulator.battery.score import _reactive_cell_not_modelled_notice
+    from simulator.battery.score import _cell_oxygen_not_modelled_notice
 
     reference, context, bench, prediction = _cell_material_score_case(
         CellMaterial.TA,
@@ -17888,7 +17904,7 @@ def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
             notices=union_notices(
                 base.notices,
                 (
-                    _reactive_cell_not_modelled_notice(
+                    _cell_oxygen_not_modelled_notice(
                         Quantity.P_PARTIAL, bench.cell_materials
                     ),
                 ),

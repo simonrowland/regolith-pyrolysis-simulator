@@ -98,6 +98,7 @@ from simulator.battery.source_oxygen import (
     printed_source_pressure,
     resolve_source_oxygen,
     source_oxygen_closure_notice,
+    source_oxygen_condition_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.physical_constants import GAS_CONSTANT
@@ -227,6 +228,8 @@ _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
         (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
     }
 )
+_KNUDSEN_TOTAL_PRESSURE_SEED_BAR = 1.0e-3
+_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN = "score:knudsen_total_pressure"
 _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
     {Quantity.MASS_LOSS_FRACTION}
 )
@@ -1654,6 +1657,37 @@ def authority_allowed(quantity: Quantity | None, authority: Authority | None) ->
     if authority in {Authority.CERTIFIED, Authority.BRIDGE, Authority.EXTRAPOLATED}:
         return True
     return False
+
+
+def _knudsen_effective_pressure_bar(
+    engine: Engine,
+    physical_pressure_bar: float,
+    backend: Any,
+) -> tuple[float | None, str]:
+    """Resolve the pressure each Knudsen prediction pass actually evaluates."""
+
+    if engine is Engine.VAPOROCK:
+        return None, "engine_does_not_accept_total_pressure"
+    pressure_bar = float(physical_pressure_bar)
+    if engine is Engine.ALPHAMELTS:
+        transport = str(getattr(backend, "_mode", "") or "").strip().lower()
+        if transport not in {"subprocess", "python_api"}:
+            return None, "alphamelts_transport_unavailable"
+        from simulator.alphamelts_reference_pressure import (
+            alphamelts_effective_pressure_policy,
+        )
+
+        return alphamelts_effective_pressure_policy(
+            pressure_bar,
+            transport=transport,
+        )
+    if engine is Engine.THERMOENGINE:
+        from simulator.melt_backend.thermoengine import (
+            thermoengine_effective_pressure_policy,
+        )
+
+        return thermoengine_effective_pressure_policy(pressure_bar)
+    return None, "engine_has_no_total_pressure_policy"
 
 
 def _origin_under_compilations(origin: str | None) -> bool:
@@ -5781,6 +5815,69 @@ def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+def _knudsen_total_pressure_details(
+    notices: Sequence[Notice],
+) -> tuple[Decimal, str, Decimal | None] | None:
+    for notice in notices:
+        if (
+            notice.kind is not NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            or notice.origin != _KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN
+        ):
+            continue
+        match = re.search(
+            r"(?:^|; )total_pressure_Pa=([^;]+); "
+            r"sensitivity_status=([^;]+); sensitivity_reason=([^;]+); "
+            r"(?:oxygen_balance_pressure_response=([^;]+); )?"
+            r"sensitivity_dex=([^;]+)"
+            r"(?:; effective_seed_pressure_bar=[^;]+; "
+            r"effective_derived_pressure_bar=[^;]+)?$",
+            notice.reason,
+        )
+        if match is None:
+            return None
+        try:
+            pressure_pa = Decimal(match.group(1))
+        except InvalidOperation:
+            return None
+        sensitivity_status = match.group(2)
+        sensitivity_reason = match.group(3)
+        sensitivity_text = match.group(5)
+        if not pressure_pa.is_finite() or pressure_pa <= 0 or not sensitivity_reason:
+            return None
+        if sensitivity_status == "not_evaluated":
+            if sensitivity_text != "null":
+                return None
+            return pressure_pa, sensitivity_status, None
+        if sensitivity_status != "measured":
+            return None
+        try:
+            sensitivity_dex = Decimal(sensitivity_text)
+        except InvalidOperation:
+            return None
+        if sensitivity_dex.is_nan() or sensitivity_dex < 0:
+            return None
+        return pressure_pa, sensitivity_status, sensitivity_dex
+    return None
+
+
+def _sum_gas_partial_pressures_pa(
+    pressures: Mapping[str, object],
+) -> float | None:
+    try:
+        values = tuple(float(value) for value in pressures.values())
+        total = math.fsum(values)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if (
+        not values
+        or any(not math.isfinite(value) or value < 0.0 for value in values)
+        or not math.isfinite(total)
+        or total <= 0.0
+    ):
+        return None
+    return total
+
+
 def _pressure_independent_comparison_notice(
     quantity: Quantity, prediction: EnginePrediction
 ) -> Notice:
@@ -5805,7 +5902,7 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
-def _reactive_cell_not_modelled_notice(
+def _cell_oxygen_not_modelled_notice(
     quantity: Quantity,
     materials: Sequence[Located[CellMaterial]] | None,
 ) -> Notice:
@@ -5823,13 +5920,16 @@ def _reactive_cell_not_modelled_notice(
         sort_keys=True,
         separators=(",", ":"),
     )
+    material_class, _modelled = _cell_oxygen_class(materials)
+    reason = (
+        "reactive cell: oxygen balance of the cell not modelled"
+        if material_class == "reactive"
+        else "cell oxygen balance not modelled"
+    )
     return Notice(
         kind=NoticeKind.REACTIVE_CELL_NOT_MODELLED,
         affected_quantities=(quantity,),
-        reason=(
-            "reactive cell: oxygen balance of the cell not modelled "
-            f"{payload}"
-        ),
+        reason=f"{reason} {payload}",
         origin="score:predict_with_engine",
     )
 
@@ -6165,21 +6265,25 @@ def _comparison_identity(
 
     KEMS activity series can store printed composition on the point while
     leaving it unknown on the identity. Their comparison uses that same
-    printed composition. Oxygen-balance effusion predictions also supply
-    their solved pO2 and scorer pressure assumption. Stored identities remain
-    unchanged.
+    printed composition. A shared-ladder prediction carries its selected
+    fO2 on the prediction identity and its route/tier notices; a measured
+    source-link notice records the physical selection rung. Comparison uses
+    that selection rather than resolving oxygen from the source again.
+    Oxygen selection never supplies total pressure.
     """
 
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    selected_oxygen = _selected_shared_ladder_oxygen(prediction)
     shared_oxygen_condition = any(
         notice.fo2_mode is Fo2Mode.SHARED_LADDER
         for notice in prediction.notices
     )
     melt_identity = _melt_identity_for_valence(identity)
-    source_pressure = _source_oxygen_pressure_for_score(reference)
-    resolved_oxygen = solved_oxygen_balance or source_pressure is not None
+    resolved_oxygen = solved_oxygen_balance or (
+        selected_oxygen is not None and selected_oxygen[0] is not None
+    )
     pressure_independent = _pressure_independent_comparison(reference, prediction)
     redox = quantity_token(identity) in {
         Quantity.FE3_FE2_RATIO,
@@ -6196,12 +6300,16 @@ def _comparison_identity(
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
+    knudsen_total_pressure = _knudsen_total_pressure_details(
+        prediction.notices
+    )
     if (
         not resolved_oxygen
         and not shared_oxygen_condition
         and not pressure_independent
         and not comparison_activity
         and not redox
+        and knudsen_total_pressure is None
         and melt_identity is identity
         and not fusion_polymorph_flag
     ):
@@ -6220,17 +6328,10 @@ def _comparison_identity(
             if (actual is None or not actual.is_value) and used is not None and used.is_value:
                 updates[field_name] = used
     if (
-        shared_oxygen_condition
-        and "fO2_Pa" in profile_for(identity).required
-        and (identity.fO2_Pa is None or not identity.fO2_Pa.is_value)
-        and isinstance(prediction.identity, Identity)
+        knudsen_total_pressure is not None
+        and (identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value)
     ):
-        # The prediction identity carries the exact commanded bar value. Use
-        # it as the comparison condition on both sides, while leaving the
-        # stored reference identity untouched.
-        used_oxygen = prediction.identity.fO2_Pa
-        if used_oxygen is not None and used_oxygen.is_value:
-            updates["fO2_Pa"] = used_oxygen
+        updates["total_pressure_Pa"] = State.of(knudsen_total_pressure[0])
     if fusion_polymorph_flag:
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
@@ -6246,15 +6347,19 @@ def _comparison_identity(
         point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
-    if source_pressure is not None:
-        updates["fO2_Pa"] = State.of(source_pressure)
+    if (
+        selected_oxygen is not None
+        and selected_oxygen[0] is not None
+        and "fO2_Pa" in profile_for(identity).required
+    ):
+        updates["fO2_Pa"] = State.of(selected_oxygen[0])
     elif solved_oxygen_balance and (
         identity.fO2_Pa is None or not identity.fO2_Pa.is_value
     ):
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if (resolved_oxygen or pressure_independent) and (
+    if pressure_independent and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
         quantity = quantity_token(identity)
@@ -6265,6 +6370,49 @@ def _comparison_identity(
     if not updates:
         return identity
     return replace(identity, **updates)
+
+
+def _selected_shared_ladder_oxygen(
+    prediction: EnginePrediction,
+) -> tuple[Decimal | None, int, int | None, str] | None:
+    """Read the selected pressure, generic tier, physics rung, and route once.
+
+    The prediction identity is the pressure passed to the engine. The ladder
+    notice records generic tier and physics rung separately. Effusion balance
+    has no commanded pressure, so use its solver output when the engine
+    reports one.
+    """
+
+    for notice in prediction.notices:
+        if (
+            notice.origin != "fo2_ladder"
+            or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
+        ):
+            continue
+        match = re.fullmatch(
+            r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)",
+            notice.reason,
+        )
+        if match is None:
+            continue
+        route = match.group(3)
+        borrowed_suffix = "; borrowed"
+        if route.endswith(borrowed_suffix):
+            route = route[:-len(borrowed_suffix)]
+        physics_rung = None if match.group(2) is None else int(match.group(2))
+        value_pa: Decimal | None = None
+        if has_own_engine_solved_oxygen_balance(
+            prediction.engine, prediction.notices
+        ):
+            po2_bar = _solved_effusion_po2_bar(prediction)
+            if po2_bar is not None:
+                value_pa = Decimal(str(po2_bar)) * Decimal("1e5")
+        if value_pa is None and isinstance(prediction.identity, Identity):
+            state = prediction.identity.fO2_Pa
+            if state is not None and state.is_value and state.value is not None:
+                value_pa = state.value
+        return value_pa, int(match.group(1)), physics_rung, route
+    return None
 
 
 def _derived_fo2_condition(observation: Observation) -> bool:
@@ -6281,15 +6429,26 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 
 
 def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
+    """Return point-associated oxygen pressure, not identity-only fO2.
+
+    Comparison uses a returned pressure to align prediction conditions. An
+    identity fO2 alone must not make an unknown total-pressure axis known.
+    """
+
     if quantity_token(observation.identity) not in _VAPOUR_EQUILIBRIUM:
         return None
-    pressure = linked_source_pressure(observation)
-    if pressure is None and _has_printed_fo2(observation, observation.identity):
+    if _has_printed_fo2(observation, observation.identity):
         pressure = printed_source_pressure(observation)
         identity_pressure = observation.identity.fO2_Pa
-        if pressure is not None and identity_pressure is not None and identity_pressure.is_value:
-            pressure = identity_pressure.value
-    return pressure
+        if (
+            pressure is not None
+            and identity_pressure is not None
+            and identity_pressure.is_value
+            and identity_pressure.value is not None
+        ):
+            return identity_pressure.value
+        return pressure
+    return linked_source_pressure(observation)
 
 
 _FE_REDOX_RATIO_UNDEFINED = object()
@@ -7451,6 +7610,16 @@ def _knudsen_vapour_equilibrium(
     )
 
 
+def _knudsen_oxygen_refusal_notices(
+    quantity: Quantity, experiment: Experiment | None
+) -> tuple[Notice, ...]:
+    if not _knudsen_vapour_equilibrium(quantity, experiment):
+        return ()
+    from simulator.battery.fo2_ladder import fo2_refusal_notice
+
+    return (fo2_refusal_notice(quantity),)
+
+
 def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
     tier = payload.get("fO2_tier")
     if tier is None:
@@ -7480,14 +7649,21 @@ def _payload_fo2_bar(payload: Mapping) -> float | None:
 
 
 def _prediction_identity_with_fo2(
-    identity: Identity, po2_bar: float | None
+    identity: Identity,
+    po2_bar: float | None,
+    *,
+    preserve_existing: bool,
 ) -> Identity:
     if (
         po2_bar is None
         or not math.isfinite(po2_bar)
         or po2_bar <= 0.0
         or "fO2_Pa" not in profile_for(identity).required
-        or (identity.fO2_Pa is not None and identity.fO2_Pa.is_value)
+        or (
+            preserve_existing
+            and identity.fO2_Pa is not None
+            and identity.fO2_Pa.is_value
+        )
     ):
         return identity
     return replace(
@@ -7511,7 +7687,7 @@ def _oxygen_input_request(
     bench: Bench | None = None,
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
-    force_ladder: bool = False,
+    source_oxygen_bar: float | None = None,
 ) -> "Po2Request | EnginePrediction":
     """The scorer's one oxygen-input decision.
 
@@ -7521,11 +7697,8 @@ def _oxygen_input_request(
     a commanded number; engines that cannot solve it are rewritten by the
     comparison path onto the internal-analytical closure. A row the ladder
     cannot resolve refuses ``missing_fO2`` for every engine when oxygen is
-    required. ``force_ladder`` still asks the ladder for a quantity that
-    does not require oxygen; it does not override a closure, and it does
-    not fill a Knudsen cell that cannot close. Any other quantity that
-    does not take oxygen records the omission and runs with oxygen not an
-    input.
+    required. A quantity that does not take oxygen records the omission
+    before any ladder rung can command a condition.
 
     Callers that predate the ladder pass no observation. They keep the
     identity-only decision: command an identity fO2, refuse ``missing_fO2``
@@ -7543,6 +7716,9 @@ def _oxygen_input_request(
     oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
         identity, composition_value
     )
+    if not oxygen_required:
+        input_notices.append(_omission_notice(quantity, oxygen_why))
+        return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     if observation is None:
         fo2_state = identity.fO2_Pa
         if (
@@ -7554,24 +7730,21 @@ def _oxygen_input_request(
                 mode=PO2_COMMANDED,
                 po2_bar=float(fo2_state.value) / 1.0e5,
             )
-        if oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=tuple(input_notices),
-            )
-        input_notices.append(_omission_notice(quantity, oxygen_why))
-        return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+                "multivalent": list(redox),
+            },
+            notices=tuple(input_notices),
+        )
 
     from simulator.battery.fo2_ladder import (
         ResolvedFo2,
@@ -7593,6 +7766,11 @@ def _oxygen_input_request(
                             "identity_fO2_Pa",
                             False,
                             po2_bar=po2_bar,
+                            physics_rung=(
+                                1
+                                if _knudsen_vapour_equilibrium(quantity, experiment)
+                                else None
+                            ),
                         ),
                     )
                 )
@@ -7604,8 +7782,15 @@ def _oxygen_input_request(
         composition=composition_value,
         composition_wt=composition_wt,
         temperature_K=temperature_K,
+        source_oxygen_bar=source_oxygen_bar,
         quantity=quantity,
     )
+    if (
+        resolved is not None
+        and resolved.route == "source_linked_oxygen_condition"
+        and observation is not None
+    ):
+        input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             input_notices.append(fo2_tier_notice(quantity, resolved))
@@ -7614,33 +7799,32 @@ def _oxygen_input_request(
             po2_bar=None,
             cell_material=resolved.cell_material,
         )
-    if oxygen_required or force_ladder:
-        if resolved is not None and not resolved.closure:
-            input_notices.append(fo2_tier_notice(quantity, resolved))
-            bar = (
-                resolved.po2_bar
-                if resolved.po2_bar is not None
-                else 10.0 ** resolved.log10_fO2_bar
-            )
-            return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
-        if oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=tuple(input_notices),
-            )
-    input_notices.append(_omission_notice(quantity, oxygen_why))
-    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    if resolved is not None and not resolved.closure:
+        input_notices.append(fo2_tier_notice(quantity, resolved))
+        bar = (
+            resolved.po2_bar
+            if resolved.po2_bar is not None
+            else 10.0 ** resolved.log10_fO2_bar
+        )
+        return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+    return _input_refusal(
+        engine=engine,
+        channel=channel,
+        sources=sources,
+        identity=identity,
+        requested=requested,
+        reason=RefusalReason.IDENTITY_INCOMPLETE,
+        detail={
+            "reason": "missing_fO2",
+            "quantity": quantity.value,
+            "why": oxygen_why,
+            "multivalent": list(redox),
+        },
+        notices=(
+            *input_notices,
+            *_knudsen_oxygen_refusal_notices(quantity, experiment),
+        ),
+    )
 
 
 def _borrow_internal_analytical_effusion(
@@ -7702,6 +7886,7 @@ def _borrow_internal_analytical_effusion(
                 "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
                 True,
                 po2_bar=bar,
+                physics_rung=3,
             ),
         )
     )
@@ -9328,6 +9513,7 @@ def _predict_with_engine(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             coefficient_sources=sources,
             lineage_complete=False,
+            notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "temperature_unknown"},
             identity=identity,
@@ -9850,7 +10036,11 @@ def _predict_with_engine(
                 coefficient_sources=activity_sources,
                 lineage_complete=activity_lineage_complete,
                 certified_band=certified_band,
-                identity=_prediction_identity_with_fo2(identity, activity_fo2_bar),
+                identity=_prediction_identity_with_fo2(
+                    identity,
+                    activity_fo2_bar,
+                    preserve_existing=_has_printed_fo2(observation, identity),
+                ),
                 requested_composition=requested,
                 version=activity.activity_model,
             )
@@ -9888,6 +10078,7 @@ def _predict_with_engine(
                 requested=requested,
                 reason=RefusalReason.IDENTITY_INCOMPLETE,
                 detail=detail,
+                notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
             )
         formula_pot, phase_name = stated
         wt = {formula_pot: 100.0}
@@ -9933,40 +10124,64 @@ def _predict_with_engine(
             refusal_detail={"reason": "quantity_has_no_engine_pot", "quantity": quantity.value},
             identity=identity,
         )
-    pressure_bar: float | None = None
-    if activity_payload is None:
-        pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
-            identity, quantity
-        )
-        if pressure_invalid is not None:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.INVALID_IDENTITY,
-                detail={"reason": pressure_invalid, "quantity": quantity.value},
-                notices=tuple(input_notices),
-            )
-        if pressure_notice is not None:
-            input_notices.append(pressure_notice)
-
     knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
-    # d-216: a linked or printed source pressure is the row's fO2 before
-    # the ladder runs, so every engine is commanded the measured condition.
-    source_pressure = _source_oxygen_pressure_for_score(observation)
-    if knudsen_vapour and source_pressure is not None:
+    total_pressure_state = identity.total_pressure_Pa
+    derive_knudsen_total_pressure = (
+        engine in {Engine.ALPHAMELTS, Engine.VAPOROCK, Engine.THERMOENGINE}
+        and quantity is Quantity.P_PARTIAL
+        and knudsen_vapour
+        and (
+            total_pressure_state is None
+            or total_pressure_state.is_unknown
+        )
+    )
+    pressure_bar: float | None = None
+    knudsen_seed_pressure_bar: float | None = None
+    if activity_payload is None:
+        if derive_knudsen_total_pressure:
+            # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
+            # d ln(a)/dP~V_m/RT. At V_m=2e-5 m3/mol and T=1800 K,
+            # this is 1.34e-9 Pa^-1; over 1e-3 bar (100 Pa),
+            # delta ln(a)<=1.34e-7 or 5.8e-8 dex. Units check:
+            # Pa*m3/mol=J/mol, so V_m*P/(RT) is dimensionless.
+            # As P approaches zero, the pressure contribution approaches zero.
+            # Seed at the top of the ruled interval, then update once from
+            # the equilibrium partial-pressure sum below.
+            pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
+            knudsen_seed_pressure_bar = pressure_bar
+        else:
+            pressure_bar, pressure_notice, pressure_invalid = (
+                total_pressure_bar_for_score(identity, quantity)
+            )
+            if pressure_invalid is not None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.INVALID_IDENTITY,
+                    detail={"reason": pressure_invalid, "quantity": quantity.value},
+                    notices=tuple(input_notices),
+                )
+            if pressure_notice is not None:
+                input_notices.append(pressure_notice)
+
+    printed_fo2 = _has_printed_fo2(observation, identity)
+    source_pressure = (
+        _source_oxygen_pressure_for_score(observation)
+        if knudsen_vapour and printed_fo2
+        else None
+    )
+    if source_pressure is not None:
         identity = replace(identity, fO2_Pa=State.of(source_pressure))
-    # A found source pressure is commanded below. The shared ladder is only
-    # the unlinked Knudsen closure: no linked or printed pressure on the row.
-    shared_oxygen = (
-        knudsen_vapour
-        and source_pressure is None
-        and not _has_printed_fo2(observation, identity)
+    shared_oxygen = knudsen_vapour and not _has_printed_fo2(observation, identity)
+    linked_pressure = linked_source_pressure(observation) if shared_oxygen else None
+    source_oxygen_bar = (
+        None if linked_pressure is None else float(linked_pressure) / 1.0e5
     )
 
-    def oxygen_decision(*, force_ladder: bool = False):
+    def oxygen_decision():
         return _oxygen_input_request(
             engine=engine,
             channel=channel,
@@ -9981,7 +10196,7 @@ def _predict_with_engine(
             bench=bench,
             temperature_K=float(T),
             composition_wt=wt if isinstance(wt, dict) else None,
-            force_ladder=force_ladder,
+            source_oxygen_bar=source_oxygen_bar,
         )
 
     if activity_payload is not None:
@@ -10001,77 +10216,30 @@ def _predict_with_engine(
     elif shared_oxygen:
         cell_materials = bench.cell_materials if bench is not None else None
         material_class, modelled = _cell_oxygen_class(cell_materials)
-        if material_class == "reactive" and modelled is None:
-            # Out-of-domain physics: predict and flag. Keep refusal only when
-            # a required input is genuinely missing (the shared decision).
+        if material_class != "inert" and modelled is None:
+            # Out-of-domain wall physics: use the melt-only closure and flag
+            # the unmodelled wall. The shared decision refuses only if the
+            # melt composition or temperature needed by that closure is absent.
             input_notices.append(
-                _reactive_cell_not_modelled_notice(quantity, cell_materials)
+                _cell_oxygen_not_modelled_notice(quantity, cell_materials)
             )
             decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
-        elif material_class != "inert" and modelled is None:
-            refusal_token = {
-                "not_inert": "cell_material_not_inert",
-                "unknown": "cell_material_unknown",
-            }[material_class]
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=(
-                    RefusalReason.IDENTITY_INCOMPLETE
-                    if material_class == "unknown"
-                    else RefusalReason.UNSUPPORTED
-                ),
-                detail={
-                    "reason": refusal_token,
-                    "cell_material": [
-                        {
-                            "field": "bench.cell_materials",
-                            "value": item.state.value.value,
-                        }
-                        for item in cell_materials or ()
-                        if item.state.is_value
-                    ],
-                },
-                notices=tuple(input_notices),
-            )
         else:
-            # Inert or uniform W/Mo. The ladder returns the tier-3 effusion
-            # closure, the same condition for every engine. Engines that
-            # cannot solve it borrow the internal-analytical closure later.
+            # Inert or uniform W/Mo. The shared ladder can select a printed
+            # control, measured source condition, or congruent balance; an
+            # effusion request carries this same cell material to each engine.
             decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
-            if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
-                input_notices.append(
-                    source_oxygen_closure_notice(quantity, observation)
-                )
     else:
-        if (
-            knudsen_vapour
-            and source_pressure is not None
-            and not _has_printed_fo2(observation, identity)
-        ):
-            # Derived linked source pressure is the measured condition.
-            # Command it here. The ladder treats that fO2 as not printed
-            # and would replace it with the effusion closure. A printed
-            # fO2 stays on oxygen_decision so both cell branches attach
-            # the same tier-1 notice.
-            po2 = Po2Request(
-                mode=PO2_COMMANDED,
-                po2_bar=float(source_pressure) / 1.0e5,
-            )
-        else:
-            decision = oxygen_decision()
-            if isinstance(decision, EnginePrediction):
-                return decision
-            po2 = decision
+        decision = oxygen_decision()
+        if isinstance(decision, EnginePrediction):
+            return decision
+        po2 = decision
         # Printed, linked, or oxygen-not-required Knudsen path: still flag
         # an unmodelled reactive cell so the label travels with the prediction.
         if knudsen_vapour and bench is not None:
@@ -10082,10 +10250,13 @@ def _predict_with_engine(
                     for notice in input_notices
                 ):
                     input_notices.append(
-                        _reactive_cell_not_modelled_notice(
+                        _cell_oxygen_not_modelled_notice(
                             quantity, bench.cell_materials
                         )
                     )
+
+    if shared_oxygen and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        input_notices.append(source_oxygen_closure_notice(quantity, observation))
 
     if composition_value is not None:
         wt = composition_wt_pct(composition_value)
@@ -10300,10 +10471,83 @@ def _predict_with_engine(
             version=engine_version,
         )
 
+    def invalid_knudsen_pressure_refusal(
+        result: object,
+        pressure_pass: str,
+        *,
+        call_evidence: str,
+        result_notices: Sequence[Notice],
+    ) -> EnginePrediction | None:
+        invalid_components = tuple(
+            getattr(result, "invalid_gas_partial_pressure_components", ())
+            or getattr(result, "invalid_components", ())
+            or ()
+        )
+        if not invalid_components:
+            return None
+        reported_pressures = dict(
+            getattr(result, "gas_partial_pressures_Pa", None) or {}
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=call_evidence,
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(result_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "knudsen_total_pressure_invalid_gas_components",
+                "pressure_pass": pressure_pass,
+                "invalid_components": sorted(str(x) for x in invalid_components),
+                "reported": sorted(
+                    {*reported_pressures, *(str(x) for x in invalid_components)}
+                ),
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
+    def missing_knudsen_target_refusal(
+        pressure_pass: str,
+        *,
+        call_evidence: str,
+        result_notices: Sequence[Notice],
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=call_evidence,
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(result_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "knudsen_total_pressure_target_species_missing",
+                "pressure_pass": pressure_pass,
+                "species": formula,
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
+    solve_oxygen_balance_at_current_pressure = None
+    oxygen_balance_notice: Notice | None = None
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,
     }:
+        oxygen_balance_cell_material = po2.cell_material
 
         def engine_call_at_po2(pO2_bar: float) -> object:
             return equilibrate_cell(
@@ -10321,18 +10565,66 @@ def _predict_with_engine(
                 native_activity_formula=native_activity_formula,
             )
 
+        def solve_oxygen_balance_at_current_pressure():
+            return _solve_vapor_engine_cell_oxygen_balance(
+                engine_call_at_po2,
+                temperature_K=float(T),
+                cell_material=oxygen_balance_cell_material,
+                fixed_point_activities=engine is Engine.ALPHAMELTS,
+            )
+
+        def oxygen_balance_solved_notice(
+            solved_pO2_bar, balance, cell_fraction, cell_info
+        ) -> Notice:
+            solved_notice = {
+                "kind": "fo2_oxygen_balance_effusion_solved",
+                "pO2_bar": solved_pO2_bar,
+                "relative_residual": balance["residual"],
+                "bracket_log10_bar": balance["bracket"],
+                "dominant_O_carriers": balance["dominant_O_carriers"],
+                "dominant_metal_carriers": balance["dominant_metal_carriers"],
+                "cell_material": cell_info["cell_material"],
+                "cell_oxide_flux_fraction": cell_fraction,
+                "buffer_pinned": cell_info["buffer_pinned"],
+                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
+                "cell_oxide_janaf_sources": cell_info[
+                    "cell_oxide_janaf_sources"
+                ],
+            }
+            return Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(quantity,),
+                reason=(
+                    OXYGEN_BALANCE_NOTICE_PREFIX
+                    + " "
+                    + json.dumps(
+                        solved_notice,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
+                ),
+                origin=f"engine:{engine.value}",
+            )
+
         try:
             solved_pO2_bar, _pressures, balance, cell_fraction, cell_info = (
-                _solve_vapor_engine_cell_oxygen_balance(
-                    engine_call_at_po2,
-                    temperature_K=float(T),
-                    cell_material=po2.cell_material,
-                    fixed_point_activities=engine is Engine.ALPHAMELTS,
-                )
+                solve_oxygen_balance_at_current_pressure()
             )
         except _OxygenBalanceEngineTrialRefusal as exc:
             cell = exc.cell
         except _OxygenBalanceRefusal as exc:
+            invalid_refusal = (
+                invalid_knudsen_pressure_refusal(
+                    exc,
+                    "seed",
+                    call_evidence=f"cell_oxygen_balance:{name}",
+                    result_notices=tuple(extra_notices),
+                )
+                if derive_knudsen_total_pressure
+                else None
+            )
+            if invalid_refusal is not None:
+                return invalid_refusal
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -10353,37 +10645,10 @@ def _predict_with_engine(
         except Exception as exc:
             return engine_call_failure(exc)
         else:
-            solved_notice = {
-                "kind": "fo2_oxygen_balance_effusion_solved",
-                "pO2_bar": solved_pO2_bar,
-                "relative_residual": balance["residual"],
-                "bracket_log10_bar": balance["bracket"],
-                "dominant_O_carriers": balance["dominant_O_carriers"],
-                "dominant_metal_carriers": balance["dominant_metal_carriers"],
-                "cell_material": cell_info["cell_material"],
-                "cell_oxide_flux_fraction": cell_fraction,
-                "buffer_pinned": cell_info["buffer_pinned"],
-                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
-                "cell_oxide_janaf_sources": cell_info[
-                    "cell_oxide_janaf_sources"
-                ],
-            }
-            extra_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(quantity,),
-                    reason=(
-                        OXYGEN_BALANCE_NOTICE_PREFIX
-                        + " "
-                        + json.dumps(
-                            solved_notice,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                        )
-                    ),
-                    origin=f"engine:{engine.value}",
-                )
+            oxygen_balance_notice = oxygen_balance_solved_notice(
+                solved_pO2_bar, balance, cell_fraction, cell_info
             )
+            extra_notices.append(oxygen_balance_notice)
             po2 = Po2Request(
                 mode=PO2_COMMANDED,
                 po2_bar=solved_pO2_bar,
@@ -10562,6 +10827,329 @@ def _predict_with_engine(
 
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
+    if derive_knudsen_total_pressure:
+        invalid_refusal = invalid_knudsen_pressure_refusal(
+            cell,
+            "seed",
+            call_evidence=call_evidence,
+            result_notices=notices,
+        )
+        if invalid_refusal is not None:
+            return invalid_refusal
+        initial_pressures = pressures
+        initial_target = match_reported_species(
+            formula, initial_pressures, species=identity.species
+        )
+        if initial_target is None:
+            return missing_knudsen_target_refusal(
+                "seed",
+                call_evidence=call_evidence,
+                result_notices=notices,
+            )
+        total_pressure_pa = _sum_gas_partial_pressures_pa(initial_pressures)
+        if total_pressure_pa is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "knudsen_total_pressure_not_derived",
+                    "reported": sorted(str(name) for name in initial_pressures),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        pressure_bar = total_pressure_pa / 1.0e5
+        if solve_oxygen_balance_at_current_pressure is not None:
+            # This callback closes over pressure_bar, so after the one-pass
+            # P_total update the same balance runs with the derived pressure.
+            try:
+                (
+                    solved_pO2_bar,
+                    _pressures,
+                    balance,
+                    cell_fraction,
+                    cell_info,
+                ) = solve_oxygen_balance_at_current_pressure()
+            except _OxygenBalanceRefusal as exc:
+                invalid_refusal = invalid_knudsen_pressure_refusal(
+                    exc,
+                    "derived",
+                    call_evidence=(
+                        f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                    ),
+                    result_notices=notices,
+                )
+                if invalid_refusal is not None:
+                    return invalid_refusal
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                        call_evidence=(
+                            f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                        ),
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                    refusal_detail={
+                        "reason": "knudsen_total_pressure_re_evaluation_failed",
+                        "stage": "oxygen_balance",
+                        "detail": str(exc),
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
+            except Exception as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                        call_evidence=(
+                            f"cell_oxygen_balance:{name}:knudsen_pressure_update"
+                        ),
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                    refusal_detail={
+                        "reason": "knudsen_total_pressure_re_evaluation_failed",
+                        "stage": "oxygen_balance",
+                        "detail": str(exc),
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=solved_pO2_bar,
+            )
+            updated_oxygen_balance_notice = oxygen_balance_solved_notice(
+                solved_pO2_bar, balance, cell_fraction, cell_info
+            )
+            if oxygen_balance_notice is not None:
+                extra_notices[:] = [
+                    notice
+                    for notice in extra_notices
+                    if notice != oxygen_balance_notice
+                ]
+                notices = tuple(
+                    notice for notice in notices if notice != oxygen_balance_notice
+                )
+            oxygen_balance_notice = updated_oxygen_balance_notice
+            extra_notices.append(oxygen_balance_notice)
+            notices = union_notices(notices, (oxygen_balance_notice,))
+        try:
+            cell = equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=po2,
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
+            )
+        except Exception as exc:
+            return engine_call_failure(exc)
+        notices = union_notices(notices, cell_notices(quantity, engine, cell))
+        if getattr(cell, "status", None) != "ok":
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=(
+                        f"equilibrate_cell:{name}:knudsen_pressure_update"
+                    ),
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                refusal_detail={
+                    "reason": "knudsen_total_pressure_re_evaluation_failed",
+                    "engine_status": getattr(cell, "engine_status", None),
+                    "engine_reason": getattr(cell, "engine_reason", None),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        invalid_refusal = invalid_knudsen_pressure_refusal(
+            cell,
+            "derived",
+            call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
+            result_notices=notices,
+        )
+        if invalid_refusal is not None:
+            return invalid_refusal
+        authority, certified_band = _flags_from_scored_cell(
+            cell, authority, certified_band
+        )
+        updated_pressures = dict(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        updated_target = match_reported_species(
+            formula, updated_pressures, species=identity.species
+        )
+        if updated_target is None:
+            return missing_knudsen_target_refusal(
+                "derived",
+                call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
+                result_notices=notices,
+            )
+        sensitivity_status = "not_evaluated"
+        sensitivity_reason = ""
+        oxygen_balance_pressure_response = None
+        sensitivity_dex: float | None = None
+        if knudsen_seed_pressure_bar is None or pressure_bar is None:
+            effective_seed_pressure_bar = None
+            seed_pressure_policy = "seed_pressure_unavailable"
+            effective_derived_pressure_bar = None
+            derived_pressure_policy = "derived_pressure_unavailable"
+        else:
+            effective_seed_pressure_bar, seed_pressure_policy = (
+                _knudsen_effective_pressure_bar(
+                    engine, knudsen_seed_pressure_bar, handle.backend
+                )
+            )
+            effective_derived_pressure_bar, derived_pressure_policy = (
+                _knudsen_effective_pressure_bar(
+                    engine, pressure_bar, handle.backend
+                )
+            )
+        if engine is Engine.VAPOROCK:
+            # With an ideal vapour and condensed-phase activities unaffected
+            # by P_total across 1e-10–1e-3 bar, p_i(T, fO2) is independent of
+            # P_total. The 1e-10 vs 1e-3 bar comparison is a sanity case for
+            # scoring, but VapoRock's repeated calls cannot measure it because
+            # its active backend does not accept the supplied total pressure.
+            sensitivity_status = "not_evaluated"
+            sensitivity_reason = "engine_does_not_accept_total_pressure"
+            if solve_oxygen_balance_at_current_pressure is not None:
+                oxygen_balance_pressure_response = (
+                    "no_op_engine_ignores_total_pressure"
+                )
+        elif (
+            effective_seed_pressure_bar is None
+            or effective_derived_pressure_bar is None
+        ):
+            sensitivity_status = "not_evaluated"
+            unknown_policy = (
+                seed_pressure_policy
+                if effective_seed_pressure_bar is None
+                else derived_pressure_policy
+            )
+            sensitivity_reason = f"effective_pressure_unavailable: {unknown_policy}"
+        elif effective_seed_pressure_bar == effective_derived_pressure_bar:
+            # Equal evaluation pressures cannot measure P_total sensitivity,
+            # even when the backend accepted both different physical inputs.
+            sensitivity_status = "not_evaluated"
+            sensitivity_reason = (
+                "effective_pressure_identical: " + seed_pressure_policy
+            )
+            if solve_oxygen_balance_at_current_pressure is not None:
+                oxygen_balance_pressure_response = (
+                    "no_op_effective_pressure_identical"
+                )
+        else:
+            sensitivity_status = "measured"
+            sensitivity_reason = (
+                "effective_pressure_differs: " + seed_pressure_policy
+            )
+            sensitivity_dex = math.inf
+            before = initial_target[1]
+            after = updated_target[1]
+            if (
+                math.isfinite(before)
+                and math.isfinite(after)
+                and before >= 0.0
+                and after >= 0.0
+            ):
+                if before == 0.0 and after == 0.0:
+                    sensitivity_dex = 0.0
+                elif before > 0.0 and after > 0.0:
+                    # The band constrains this row's p_i: Δdex =
+                    # |log10(p_i,new / p_i,seed)|, dimensionless; unchanged
+                    # p_i gives 0 dex and a tenfold change gives 1 dex.
+                    sensitivity_dex = abs(math.log10(after / before))
+        pressure_pa_text = format(total_pressure_pa, ".17g")
+        # Identity equality is exact. Use the notice's round-trip Decimal in
+        # the prediction identity too; Decimal(str(float)) can spell the same
+        # binary value differently (for example, 0.1 vs 0.10000000000000001).
+        pressure_pa_decimal = Decimal(pressure_pa_text)
+        sensitivity_text = (
+            "null"
+            if sensitivity_dex is None
+            else format(sensitivity_dex, ".17g")
+        )
+        effective_seed_pressure_text = (
+            "null"
+            if effective_seed_pressure_bar is None
+            else format(effective_seed_pressure_bar, ".15g")
+        )
+        effective_derived_pressure_text = (
+            "null"
+            if effective_derived_pressure_bar is None
+            else format(effective_derived_pressure_bar, ".15g")
+        )
+        oxygen_balance_response_text = (
+            ""
+            if oxygen_balance_pressure_response is None
+            else (
+                "oxygen_balance_pressure_response="
+                f"{oxygen_balance_pressure_response}; "
+            )
+        )
+        pressure_notice = Notice(
+            kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            affected_quantities=(quantity,),
+            reason=(
+                "total pressure not printed; derived from Knudsen-cell "
+                "equilibrium partial pressures; "
+                f"total_pressure_Pa={pressure_pa_text}; "
+                f"sensitivity_status={sensitivity_status}; "
+                f"sensitivity_reason={sensitivity_reason}; "
+                f"{oxygen_balance_response_text}"
+                f"sensitivity_dex={sensitivity_text}; "
+                f"effective_seed_pressure_bar={effective_seed_pressure_text}; "
+                "effective_derived_pressure_bar="
+                f"{effective_derived_pressure_text}"
+            ),
+            origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
+        )
+        notices = union_notices(notices, (pressure_notice,))
+        call_evidence = (
+            f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
+            f":exit={getattr(cell, 'exit_code', None)}"
+        )
+        activities = dict(getattr(cell, "melt_activities", None) or {})
+        pressures = updated_pressures
+        identity = replace(
+            identity,
+            total_pressure_Pa=State.of(pressure_pa_decimal),
+        )
     reported: Mapping[str, float]
     coefficient_basis: str | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
@@ -10730,21 +11318,8 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
-        try:
-            partial_pressures = tuple(float(value) for value in pressures.values())
-            magnitude = math.fsum(partial_pressures)
-        except (TypeError, ValueError, OverflowError):
-            partial_pressures = ()
-            magnitude = 0.0
-        if (
-            not partial_pressures
-            or any(
-                not math.isfinite(value) or value < 0.0
-                for value in partial_pressures
-            )
-            or not math.isfinite(magnitude)
-            or magnitude <= 0.0
-        ):
+        magnitude = _sum_gas_partial_pressures_pa(pressures)
+        if magnitude is None:
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -10877,6 +11452,18 @@ def _predict_with_engine(
             ),
         )
     expanded = expand_coefficient_sources(sources)
+    prediction_fo2_bar = (
+        po2.po2_bar if po2.mode == PO2_COMMANDED else None
+    )
+    if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        solved_oxygen = _solved_effusion_oxygen_payload(engine, notices)
+        solved_bar = None if solved_oxygen is None else solved_oxygen.get("pO2_bar")
+        if (
+            isinstance(solved_bar, (int, float))
+            and math.isfinite(float(solved_bar))
+            and float(solved_bar) > 0.0
+        ):
+            prediction_fo2_bar = float(solved_bar)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -10891,7 +11478,8 @@ def _predict_with_engine(
         coefficient_basis=coefficient_basis,
         identity=_prediction_identity_with_fo2(
             identity,
-            po2.po2_bar if po2.mode == PO2_COMMANDED else None,
+            prediction_fo2_bar,
+            preserve_existing=printed_fo2,
         ),
         requested_composition=requested,
         version=engine_version,
@@ -10912,6 +11500,28 @@ def candidate_observation(
         )
     else:
         value = Value.point_of(prediction.value)
+    provenance = (
+        dict(prediction.refusal_detail)
+        if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and prediction.value is not None
+        else (
+            {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
+            if reference.provenance and "source_oxygen_condition" in reference.provenance
+            else None
+        )
+    )
+    selected_oxygen = _selected_shared_ladder_oxygen(prediction)
+    if selected_oxygen is not None:
+        if provenance is None:
+            provenance = {}
+        provenance["selected_oxygen_condition"] = {
+            "value_Pa": (
+                None if selected_oxygen[0] is None else str(selected_oxygen[0])
+            ),
+            "fo2_tier": selected_oxygen[1],
+            "physics_rung": selected_oxygen[2],
+            "route": selected_oxygen[3],
+        }
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",
         experiment_id=reference.experiment_id,
@@ -10940,16 +11550,7 @@ def candidate_observation(
         ),
         authority=prediction.authority,
         certified_band=prediction.certified_band,
-        provenance=(
-            dict(prediction.refusal_detail)
-            if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and prediction.value is not None
-            else (
-                {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
-                if reference.provenance and "source_oxygen_condition" in reference.provenance
-                else None
-            )
-        ),
+        provenance=provenance,
     )
 
 
@@ -12933,6 +13534,34 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
+    pressure_details = _knudsen_total_pressure_details(prediction.notices)
+    if pressure_details is not None:
+        total_pressure_pa, sensitivity_status, pressure_sensitivity_dex = (
+            pressure_details
+        )
+        row_band = numeric.decision_band
+        if (
+            sensitivity_status == "measured"
+            and pressure_sensitivity_dex is not None
+            and numeric.operation is MetricOperation.DEX
+            and row_band is not None
+            and row_band.unit == numeric.unit == "dimensionless"
+            and pressure_sensitivity_dex > row_band.value
+        ):
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "knudsen_total_pressure_sensitivity_exceeds_band",
+                    "sensitivity_dex": str(pressure_sensitivity_dex),
+                    "band_dex": str(row_band.value),
+                    "total_pressure_Pa": str(total_pressure_pa),
+                },
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                candidate=candidate,
+                source_relation=source_relation,
+                exclusions=("knudsen_total_pressure_sensitivity_within_band",),
+            )
     # figure_only and reactive-cell-not-modelled keep their numeric band: they
     # are labels on a predicted quantity, not reasons the reading band is void.
     # Catalogue-composition on a figure row is the same kind of label: preserve

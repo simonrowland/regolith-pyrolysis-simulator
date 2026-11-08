@@ -101,6 +101,10 @@ from simulator.environment import (
 )
 from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.alphamelts_reference_pressure import (
+    ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
+    alphamelts_effective_pressure_policy,
+)
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -131,7 +135,6 @@ ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 # this name stays so importers keep the published number. Do not restore
 # a hard refusal on this constant.
 ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800.0
-ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
 # it independently to each native call rather than treating it as a run budget.
@@ -3095,8 +3098,12 @@ class _MELTSBackendSupport(MeltBackend):
         try:
             ptt = self._require_petthermotools_runtime()
             ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
-            solved_pressure_bar = max(
-                float(pressure_bar), ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR)
+            solved_pressure_bar, _pressure_policy = (
+                alphamelts_effective_pressure_policy(
+                    pressure_bar,
+                    transport='python_api',
+                )
+            )
             clamp_diagnostics, result_warnings = (
                 self._clamped_operating_point_context(
                     requested_temperature_C=temperature_C,
@@ -3528,11 +3535,17 @@ class _MELTSBackendSupport(MeltBackend):
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
         find_liq = getattr(ptt, 'findLiq', None)
         self._melts_model_code()
+        evaluation_pressure_bar, _pressure_policy = (
+            alphamelts_effective_pressure_policy(
+                pressure_bar,
+                transport='python_api',
+            )
+        )
         if callable(find_liq_melts):
             operation = 'findLiq_MELTS'
             args = ()
             kwargs = {
-                'P_bar': max(pressure_bar, 1e-6),
+                'P_bar': evaluation_pressure_bar,
                 'Model': self._model,
                 'T_C_init': float(seed_T_C),
                 'comp': ptt_comp,
@@ -3545,7 +3558,7 @@ class _MELTSBackendSupport(MeltBackend):
             args = (None, 0)
             kwargs = {
                 'Model': self._model,
-                'P_bar': max(pressure_bar, 1e-6),
+                'P_bar': evaluation_pressure_bar,
                 'T_initial_C': float(seed_T_C),
                 'comp': ptt_comp,
                 'fO2_buffer': self._redox_buffer,
@@ -3824,7 +3837,12 @@ class _MELTSBackendSupport(MeltBackend):
                         ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C,
                     )
                 )
-            calculation_pressure_bar = requested_pressure_bar
+            calculation_pressure_bar, _pressure_policy = (
+                alphamelts_effective_pressure_policy(
+                    requested_pressure_bar,
+                    transport='subprocess',
+                )
+            )
             result_warnings = list(warnings or [])
             self._write_melts_file(
                 melts_path,
