@@ -517,6 +517,7 @@ def test_constant_temperature_multihour_closure_does_not_alternate():
                 flux_at,
                 project,
             )
+            assert result.converged, species
             hourly_fluxes.append(result.rates_kg_hr[species])
 
         assert all(value > 0.0 for value in hourly_fluxes), species
