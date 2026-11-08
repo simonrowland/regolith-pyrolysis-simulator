@@ -26,7 +26,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
 )
-from simulator.diagnostic_helpers.vapor_pressure_omission import (
+from simulator.vapour_rail.batch import (
     vapor_pressure_omission_proof,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend

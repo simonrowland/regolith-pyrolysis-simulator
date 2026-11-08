@@ -23,9 +23,6 @@ from contextvars import ContextVar
 from types import MappingProxyType
 from typing import Any, Iterator
 
-from simulator.diagnostic_helpers.vapor_pressure_omission import (
-    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
-)
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
     FluxDiagnosticUpperBound,
@@ -34,6 +31,7 @@ from simulator.vapour_rail.batch import (
     PressureRefusal,
     PressureUpperBound,
     PressureValue,
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
     VapourAnswer,
     VapourBatch,
     VERDICT_AUTHORITATIVE,

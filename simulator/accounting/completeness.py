@@ -25,7 +25,7 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.state import MOLAR_MASS
-from simulator.diagnostic_helpers.vapor_pressure_omission import (
+from simulator.vapour_rail.batch import (
     VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
     vapor_pressure_omission_proof,
 )

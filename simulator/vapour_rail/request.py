@@ -50,10 +50,6 @@ from simulator.chemistry.melt_activity import (
 )
 from simulator.fe_redox import LIQUID_MODEL_BELOW_LIQUIDUS_KIND
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.diagnostic_helpers.vapor_pressure_omission import (
-    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
-    vapor_pressure_omission_proof,
-)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityRefusalCode,
@@ -78,9 +74,11 @@ from simulator.vapour_rail.batch import (
     PressureRefusal,
     PressureUpperBound,
     PressureValue,
+    VAPOR_PRESSURE_OMISSION_CHANNEL_STATE,
     VapourAnswer,
     VapourBatch,
     VapourRequestConstructionError,
+    vapor_pressure_omission_proof,
 )
 from simulator.vapour_rail.u0_manifest import (
     canonicalize_gas_id,

@@ -25,7 +25,7 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
-from simulator.diagnostic_helpers.vapor_pressure_omission import (
+from simulator.vapour_rail.batch import (
     vapor_pressure_omission_proof,
 )
 
