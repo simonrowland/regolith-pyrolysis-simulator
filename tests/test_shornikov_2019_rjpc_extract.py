@@ -152,11 +152,36 @@ def test_table3_series_are_render_pinned_and_migrate_without_hard_issues():
     assert initial is not None and initial.state.is_value
     assert initial.locator.published_page == 1024
     assert initial.state.value.proxy_flag == "initial_charge_only"
+    assert (
+        experiment.locator.page,
+        experiment.locator.published_page,
+        experiment.locator.pdf_page_index,
+    ) == (4, 1027, 3)
     cell = experiment.apparatus.cell_material_and_liner
     assert cell.state.is_value
     assert "molybdenum" in cell.state.value.casefold()
+    assert (
+        cell.locator.page,
+        cell.locator.published_page,
+        cell.locator.pdf_page_index,
+    ) == (4, 1027, 3)
     bench = migrator.result.benches[experiment.bench_id]
+    assert (
+        bench.apparatus_family.locator.page,
+        bench.apparatus_family.locator.published_page,
+        bench.apparatus_family.locator.pdf_page_index,
+    ) == (4, 1027, 3)
     assert "molybdenum" in bench.cell_material_and_liner.state.value.casefold()
+    assert (
+        bench.cell_material_and_liner.locator.page,
+        bench.cell_material_and_liner.locator.published_page,
+        bench.cell_material_and_liner.locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    assert (
+        bench.cell_materials[0].locator.page,
+        bench.cell_materials[0].locator.published_page,
+        bench.cell_materials[0].locator.pdf_page_index,
+    ) == (4, 1027, 3)
     assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
     residual = experiment.pressure_environment.cell_internal_pressure_note
     assert residual.state.is_value
@@ -176,13 +201,24 @@ def test_table3_series_are_render_pinned_and_migrate_without_hard_issues():
         assert composition.state.value.proxy_flag == "initial_charge_only"
         measured = row.point_conditions["measurement_state_composition"]
         assert measured.state.is_unknown
-        assert measured.locator.published_page == 1025
+        assert (
+            measured.locator.page,
+            measured.locator.published_page,
+            measured.locator.pdf_page_index,
+        ) == (4, 1027, 3)
         for field in ("run_order_index", "depletion_evidence", "vaporization_mode"):
             assert row.point_conditions[field].state.is_unknown
-            assert row.point_conditions[field].locator.published_page == 1025
+            locator = row.point_conditions[field].locator
+            assert (locator.page, locator.published_page, locator.pdf_page_index) == (
+                4, 1027, 3
+            )
         oxygen = row.point_conditions["fO2_Pa"]
         assert oxygen.state.is_unknown
-        assert oxygen.locator.published_page == 1025
+        assert (
+            oxygen.locator.page,
+            oxygen.locator.published_page,
+            oxygen.locator.pdf_page_index,
+        ) == (4, 1027, 3)
     assert {
         int(row.identity.temperature_K.value) for row in migrated
     } == set(TABLE3_TEMPERATURES)
