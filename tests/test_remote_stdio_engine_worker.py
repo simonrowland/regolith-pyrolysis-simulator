@@ -203,6 +203,64 @@ def test_remote_worker_runs_as_an_engine_pool_slot(remote_worker_factory):
         pool.close(cancel_pending=True)
 
 
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_pool_cancel_active_call_respects_cleanup_budget(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    worker_pid_file = tmp_path / 'worker.pid'
+    grandchild_pid_file = tmp_path / 'grandchild.pid'
+    pool = EngineWorkerPool(
+        worker_factory=lambda _index: remote_worker_factory(
+            'subtree-timeout', str(worker_pid_file), str(grandchild_pid_file),
+            startup_timeout_s=8.0,
+            call_timeout_s=30.0,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    future = pool.submit(_request())
+    pids: tuple[int, ...] = ()
+    close_error: TimeoutError | None = None
+    try:
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline and not (
+            worker_pid_file.exists() and grandchild_pid_file.exists()
+        ):
+            time.sleep(0.01)
+        assert worker_pid_file.exists() and grandchild_pid_file.exists()
+        pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+
+        close_started = time.monotonic()
+        try:
+            pool.close(cancel_pending=True, timeout_s=0.5)
+        except TimeoutError as exc:
+            close_error = exc
+        close_elapsed = time.monotonic() - close_started
+        result = future.result(timeout=5.0)
+
+        assert close_error is None
+        assert close_elapsed <= 0.75
+        assert result['status'] == 'refused'
+        assert 'scalar' not in result
+        wrapper.join(timeout=1.0)
+        assert wrapper.exitcode is not None
+        assert not wrapper.is_alive()
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        try:
+            pool.close(cancel_pending=True, timeout_s=1.0)
+        except TimeoutError:
+            pass
+        if not pids and worker_pid_file.exists() and grandchild_pid_file.exists():
+            pids = _read_pids(worker_pid_file, grandchild_pid_file)
+        _kill_pids(pids)
+
+
 def test_startup_failure_and_ready_timeout_are_typed(remote_worker_factory):
     failed = remote_worker_factory('startup-failure').call(_request())
     timed_out = remote_worker_factory(

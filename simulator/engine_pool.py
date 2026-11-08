@@ -2175,6 +2175,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 )
                 return None
             self._remote_process_group_id = group_id
+            self._remote_startup_deadline = time.monotonic()
             return group_id
 
     def _stop_remote_process_tree(
