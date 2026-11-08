@@ -34,6 +34,7 @@ from simulator.fe_redox import (
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
+from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 from scripts import evaporation_selectivity_map as selectivity_map
 from tests.magemin_test_support import close_test_owned_magemin_backend
 from web.events import _tick_payload
@@ -3409,15 +3410,8 @@ def test_c7_transport_closes_against_same_hour_headspace() -> None:
     )
 
 
-def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:
-    """Bug B residual teeth: reverify probe (T=2023.15 K, D=0.12 m, P=3.632 Pa).
-
-    Both the C7 ledger path and native-Fe partition must soft-suppress
-    ledger-authoritative yields with the typed validity vocabulary
-    (not a Kn safety/coating gate). At P=100 Pa (Kn≈0.0036, 0.6.3 floor)
-    both paths behave normally — no domain suppression.
-    """
-    # --- transitional probe: Kn≈0.1 ---
+def test_c7_same_hour_pressure_and_native_fe_transitional_validity() -> None:
+    """The self-pumped C7 pressure is projected; native Fe keeps its floor."""
     sim = _make_sim()
     sim.melt.temperature_C = 1750.0
     sim.melt.p_total_mbar = 0.03632  # 3.632 Pa
@@ -3437,20 +3431,17 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
     )
     extent, c7_diag = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
 
-    assert extent == pytest.approx(0.0)
-    assert c7_diag["transport_ca_mol"] == pytest.approx(0.0)
-    assert c7_diag["c7_ca_flux_kg_s_m2"] == pytest.approx(0.0)
-    assert c7_diag["c7_transport_refusal"] == (
-        "viscous_p_bulk_transport_out_of_domain"
+    c7_closure = c7_diag["same_hour_headspace_closure"]
+    assert c7_closure["converged"] is True
+    assert extent > 0.0
+    assert c7_diag["transport_ca_mol"] > 0.0
+    assert c7_diag["c7_ca_p_bulk_pa"] == pytest.approx(
+        c7_closure["partial_pressures_Pa"]["Ca"], rel=1e-9
     )
-    assert c7_diag["ledger_yields_authorized"] is False
-    assert c7_diag["authority_class"] == "diagnostic-limited"
-    assert c7_diag["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert c7_diag["p_bulk_transport_domain"] == "out_of_domain_transitional"
-    assert c7_diag["knudsen_number"] == pytest.approx(0.100002, rel=1e-3)
-    assert "transport_model_validity_domain" in c7_diag["framing"]
-    assert "not_kn_safety_gate" in c7_diag["framing"]
-    assert "not_coating_gate" in c7_diag["framing"]
+    assert c7_diag["c7_overhead_pressure_pa"] > 100.0
+    assert c7_diag["c7_knudsen_number"] < VISCOUS_KNUDSEN_MAX
+    assert c7_diag["c7_transport_refusal"] == ""
+    assert c7_diag.get("reason") != "viscous_p_bulk_transport_out_of_domain"
 
     native = sim._native_fe_partition_diagnostic(1.0)
     assert native["native_fe_vapor_mol"] == pytest.approx(0.0)
