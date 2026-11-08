@@ -1603,16 +1603,22 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _subprocess_engine_version(self) -> Optional[str]:
         from simulator.engine_local_config import (
+            EngineIdentity,
+            _cache_version_label,
             _cache_version_for_binary,
-            cache_version_for,
+            identity_for,
             warn_legacy_once,
         )
 
-        config_version = cache_version_for('alphamelts')
-        if config_version is not None:
-            return config_version
-
+        config_identity = identity_for('alphamelts')
         binary = self._binary_path
+        if config_identity is not None and (
+            binary is None
+            or _cache_version_label(
+                'alphamelts', config_identity.version
+            ) != 'alphaMELTS'
+        ):
+            return config_identity.cache_version()
         if binary is None:
             return None
         reported_version = ""
@@ -1628,6 +1634,14 @@ class _MELTSBackendSupport(MeltBackend):
                 reported_version = text[0]
         except (OSError, subprocess.TimeoutExpired):
             pass
+        if config_identity is not None:
+            version = reported_version or config_identity.version
+            return EngineIdentity(
+                name=config_identity.name,
+                version=version,
+                digest=config_identity.digest,
+                extra=config_identity.extra,
+            ).cache_version()
         cache_version = _cache_version_for_binary(
             'alphamelts', binary, reported_version
         )
