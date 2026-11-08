@@ -10803,30 +10803,29 @@ def _predict_with_engine(
         updated_pressures = dict(
             getattr(cell, "gas_partial_pressures_Pa", None) or {}
         )
-        sensitivity_dex = 0.0
-        for species_name in initial_pressures.keys() | updated_pressures.keys():
-            try:
-                before = float(initial_pressures.get(species_name, 0.0))
-                after = float(updated_pressures.get(species_name, 0.0))
-            except (TypeError, ValueError, OverflowError):
-                sensitivity_dex = math.inf
-                break
+        initial_target = match_reported_species(
+            formula, initial_pressures, species=identity.species
+        )
+        updated_target = match_reported_species(
+            formula, updated_pressures, species=identity.species
+        )
+        sensitivity_dex = math.inf
+        if initial_target is not None and updated_target is not None:
+            before = initial_target[1]
+            after = updated_target[1]
             if (
-                not math.isfinite(before)
-                or not math.isfinite(after)
-                or before < 0.0
-                or after < 0.0
+                math.isfinite(before)
+                and math.isfinite(after)
+                and before >= 0.0
+                and after >= 0.0
             ):
-                sensitivity_dex = math.inf
-                break
-            if before == 0.0 and after == 0.0:
-                continue
-            if before == 0.0 or after == 0.0:
-                sensitivity_dex = math.inf
-                break
-            sensitivity_dex = max(
-                sensitivity_dex, abs(math.log10(after / before))
-            )
+                if before == 0.0 and after == 0.0:
+                    sensitivity_dex = 0.0
+                elif before > 0.0 and after > 0.0:
+                    # The band constrains this row's p_i: Δdex =
+                    # |log10(p_i,new / p_i,seed)|, dimensionless; unchanged
+                    # p_i gives 0 dex and a tenfold change gives 1 dex.
+                    sensitivity_dex = abs(math.log10(after / before))
         pressure_pa_text = format(total_pressure_pa, ".17g")
         # Identity equality is exact. Use the notice's round-trip Decimal in
         # the prediction identity too; Decimal(str(float)) can spell the same
