@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import importlib.util
 import json
@@ -82,6 +83,27 @@ class EngineBindingAdmissionError(RuntimeError):
         super().__init__(
             f"engine binding {identity.producer_transport} is not admitted: {reason}"
         )
+
+
+def _detached_exception_copy(exc: Exception) -> Exception:
+    """Copy an error for long-lived state without retaining traceback frames."""
+    if isinstance(exc, EngineBindingAdmissionError):
+        detached = EngineBindingAdmissionError(exc.identity, exc.reason)
+    else:
+        try:
+            detached = copy.copy(exc)
+            if detached is exc:
+                raise TypeError("exception copy returned the original")
+        except Exception:
+            try:
+                detached = type(exc)(*exc.args)
+            except Exception:
+                detached = RuntimeError(f"{type(exc).__name__}: {exc}")
+    # This clears standard traceback/cause/context links only.
+    detached.__traceback__ = None
+    detached.__cause__ = None
+    detached.__context__ = None
+    return detached
 
 
 @dataclass(frozen=True)
@@ -272,7 +294,12 @@ def publish_live_backend_admission(backend: Any) -> None:
         fingerprint = admission_fingerprint(identity, provenance)
     except Exception as exc:  # noqa: BLE001 - an unadmitted backend still computes live
         try:
-            backend._engine_binding_admission_error = exc
+            # MAGEMin's finalizer retains backend.close. Keeping this live
+            # traceback here can lead back through sim to its provider, so
+            # the finalizer never runs; cache a fresh, detached error instead.
+            backend._engine_binding_admission_error = _detached_exception_copy(
+                exc
+            )
             backend._engine_binding_admission_fingerprint = None
         except (AttributeError, TypeError):
             pass
