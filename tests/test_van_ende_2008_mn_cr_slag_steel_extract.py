@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, to_plain
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,14 +59,22 @@ def _section_strings(value: object):
             yield from _section_strings(child)
 
 
-def test_every_locator_section_is_a_printed_source_heading() -> None:
-    document = _document()
-    sections = set(_section_strings(document))
-
+def _assert_printed_section_headings(sections: set[object]) -> None:
     assert sections
     assert "2.3 Experimental Procedure" not in sections
     assert sections <= PRINTED_SECTION_HEADINGS
     assert sections == {"3. Experimental"}
+
+
+def test_every_locator_section_is_a_printed_source_heading() -> None:
+    document = _document()
+    _assert_printed_section_headings(set(_section_strings(document)))
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    migrated_sections = set(_section_strings(to_plain(migrator.result)))
+    _assert_printed_section_headings(migrated_sections)
 
 
 def _assert_table4_pins(document: dict) -> None:
