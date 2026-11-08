@@ -3,9 +3,14 @@ from __future__ import annotations
 import csv
 import io
 import json
+import math
 import tarfile
+import tracemalloc
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+
+import pytest
 
 import scripts.battery_hero_plot as hero_plot
 
@@ -78,6 +83,35 @@ def _fixture_archive(path: Path) -> None:
         member = tarfile.TarInfo("data/battery/residuals.jsonl")
         member.size = len(residuals)
         archive.addfile(member, io.BytesIO(residuals))
+
+
+def _many_row_archive(path: Path, count: int) -> None:
+    rows = [{"kind": "battery_store_stamp", "revision": "memory-fixture"}]
+    rows.extend(
+        _residual(
+            "openimcc",
+            "vapour",
+            f"memory-{index}",
+            1500 + index % 1200,
+            ((index % 5) - 2) / 10,
+        )
+        for index in range(count)
+    )
+    residuals = "".join(json.dumps(row) + "\n" for row in rows).encode()
+    with tarfile.open(path, "w:gz") as archive:
+        member = tarfile.TarInfo("data/battery/residuals.jsonl")
+        member.size = len(residuals)
+        archive.addfile(member, io.BytesIO(residuals))
+
+
+def _capture_collection_figures(monkeypatch: pytest.MonkeyPatch) -> list[object]:
+    figures: list[object] = []
+    monkeypatch.setattr(
+        hero_plot,
+        "_save_collection_png",
+        lambda figure, _path: figures.append(figure),
+    )
+    return figures
 
 
 def test_engine_palette_is_fixed_and_never_uses_goal_colour() -> None:
@@ -263,4 +297,387 @@ def test_progress_uses_shared_row_metrics_when_history_has_comparisons(tmp_path:
     assert by_engine["vaporock"]["rms_dex"] == "0.75"
     assert by_engine["vaporock"]["n"] == 7
     assert by_engine["vaporock"]["held_out_rms_dex"] == "0.8"
+
+
+def test_html_uses_a_stratified_sample_and_exact_window_aggregates(tmp_path: Path) -> None:
+    archive = tmp_path / "many-rows.tgz"
+    _many_row_archive(archive, 1200)
+    data = hero_plot.read_scores(archive)
+    files = hero_plot.render_hero_collection(
+        data,
+        archive,
+        tmp_path / "collection",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-07",
+    )
+
+    page = files["html"].read_text(encoding="utf-8")
+    row_payload = page.split('id="row-data">', 1)[1].split("</script>", 1)[0]
+    sampled_rows = json.loads(row_payload)
+    counts: dict[tuple[str, str], int] = {}
+    for row in sampled_rows:
+        key = row["rail"], row["engine"]
+        counts[key] = counts.get(key, 0) + 1
+    assert counts and max(counts.values()) <= 100
+    assert "sample" in page.lower()
+    assert len({row["temperature_bin"] for row in sampled_rows}) > 1
+
+    with files["table:fingerprints"].open(newline="") as source:
+        cells = list(csv.DictReader(source))
+    cell = next(
+        row
+        for row in cells
+        if row["rail"] == "vapour"
+        and row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "1500"
+        and row["sio2_lower"] == "0.4"
+    )
+    assert int(cell["n"]) == 100
+    assert math.isclose(float(cell["sum_residual_dex"]), 0.0)
+    assert math.isclose(float(cell["sum_squared_residual_dex"]), 2.0)
+    assert "snap" in files["methods"].read_text(encoding="utf-8").lower()
+    assert "exact" in files["methods"].read_text(encoding="utf-8").lower()
+    assert files["html"].stat().st_size <= 8 * 1024 * 1024
+
+
+def test_read_scores_peak_memory_is_bounded_for_many_scored_rows(tmp_path: Path) -> None:
+    archive = tmp_path / "memory.tgz"
+    _many_row_archive(archive, 20_000)
+
+    tracemalloc.start()
+    hero_plot.read_scores(archive)
+    _current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    assert peak < 40 * 1024 * 1024
+
+
+def test_component_rows_pair_openimcc_with_each_partners_shared_rows(tmp_path: Path) -> None:
+    archive = tmp_path / "fixture.tgz"
+    _fixture_archive(archive)
+    data = hero_plot.read_scores(archive)
+    comparisons = (
+        {
+            "rail": "vapour",
+            "species": "SiO",
+            "primary_engine": "openimcc",
+            "comparisons": [
+                {
+                    "engine": "vaporock",
+                    "views": {
+                        "all": {
+                            "n_shared": 10,
+                            "primary_rms_dex_on_shared": "0.1",
+                            "outside_rms_dex": "0.2",
+                        }
+                    },
+                },
+                {
+                    "engine": "thermoengine",
+                    "views": {
+                        "all": {
+                            "n_shared": 5,
+                            "primary_rms_dex_on_shared": "2.0",
+                            "outside_rms_dex": "1.0",
+                        }
+                    },
+                },
+            ],
+        },
+    )
+    rows = hero_plot._component_table_rows(
+        replace(data, hero_component_comparisons=comparisons)
+    )
+    pairs = {
+        (row["engine"], row.get("shared_with")): (
+            int(row["n_shared"]),
+            str(row["rms_dex"]),
+        )
+        for row in rows
+        if row["rail"] == "vapour" and row["component"] == "SiO"
+    }
+
+    assert pairs == {
+        ("openimcc", "vaporock"): (10, "0.1"),
+        ("vaporock", "vaporock"): (10, "0.2"),
+        ("openimcc", "thermoengine"): (5, "2.0"),
+        ("thermoengine", "thermoengine"): (5, "1.0"),
+    }
+
+
+def test_artists_match_csv_values_for_scorecard_and_component_pairs(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from matplotlib.collections import PathCollection
+    from matplotlib.colors import to_hex
+
+    figures = _capture_collection_figures(monkeypatch)
+    scorecard = [
+        {
+            "rail": "vapour",
+            "primary_engine": "openimcc",
+            "comparison_engine": "vaporock",
+            "n_shared": "5",
+            "high_n_shared": "5",
+            "high_primary_rms_dex": "0.2",
+            "high_comparison_rms_dex": "0.8",
+            "low_n_shared": "",
+            "low_primary_rms_dex": "",
+            "low_comparison_rms_dex": "",
+        }
+    ]
+    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard)
+    axis = figures[-1].axes[0]
+    plotted_by_engine: dict[str, float] = {}
+    for collection in axis.collections:
+        if not isinstance(collection, PathCollection) or not len(collection.get_offsets()):
+            continue
+        colour = to_hex(collection.get_facecolors()[0])
+        engine = next(
+            name
+            for name, value in hero_plot._hero_engine_colors(ENGINE_ORDER).items()
+            if value == colour
+        )
+        plotted_by_engine[engine] = float(collection.get_offsets()[0][0])
+    assert plotted_by_engine == {"openimcc": 0.2, "vaporock": 0.8}
+    swapped = [
+        {
+            **scorecard[0],
+            "high_primary_rms_dex": "0.8",
+            "high_comparison_rms_dex": "0.2",
+        }
+    ]
+    swapped_expected = {
+        "openimcc": float(swapped[0]["high_primary_rms_dex"]),
+        "vaporock": float(swapped[0]["high_comparison_rms_dex"]),
+    }
+    assert plotted_by_engine != swapped_expected
+
+    component_rows = [
+        {
+            "rail": "vapour",
+            "component": "SiO",
+            "engine": "openimcc",
+            "shared_with": "vaporock",
+            "n_shared": "10",
+            "rms_dex": "0.1",
+        },
+        {
+            "rail": "vapour",
+            "component": "SiO",
+            "engine": "vaporock",
+            "shared_with": "vaporock",
+            "n_shared": "10",
+            "rms_dex": "0.2",
+        },
+        {
+            "rail": "vapour",
+            "component": "SiO",
+            "engine": "openimcc",
+            "shared_with": "thermoengine",
+            "n_shared": "5",
+            "rms_dex": "2.0",
+        },
+        {
+            "rail": "vapour",
+            "component": "SiO",
+            "engine": "thermoengine",
+            "shared_with": "thermoengine",
+            "n_shared": "5",
+            "rms_dex": "1.0",
+        },
+    ]
+    hero_plot._draw_component_png(tmp_path / "c.png", "vapour", component_rows)
+    pair_line_x = {
+        tuple(float(value) for value in line.get_xdata())
+        for line in figures[-1].axes[0].lines
+        if len(line.get_xdata()) == 2 and line.get_xdata()[0] != line.get_xdata()[1]
+    }
+    assert pair_line_x == {(0.1, 0.2), (2.0, 1.0)}
+
+
+def test_hexbin_artists_use_tessellated_cells_and_csv_counts(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from matplotlib.collections import PolyCollection
+
+    figures = _capture_collection_figures(monkeypatch)
+    density = [
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "temperature_center_K": "1600",
+            "residual_center_dex": "0.25",
+            "flagged": "0",
+            "clipped": "0",
+            "row_count": "5",
+        },
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "temperature_center_K": "1700",
+            "residual_center_dex": "-0.25",
+            "flagged": "0",
+            "clipped": "0",
+            "row_count": "7",
+        },
+    ]
+    hero_plot._draw_temperature_png(
+        tmp_path / "b.png",
+        "vapour",
+        [
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "n": "400",
+                "plotted_n": "400",
+                "rms_dex": "0.5",
+                "temperature_min_K": "1500",
+                "temperature_max_K": "1800",
+                "flagged_n": "0",
+                "clipped_low_n": "0",
+                "clipped_high_n": "0",
+            }
+        ],
+        [],
+        density,
+        [],
+    )
+    hex_cells = [
+        collection
+        for collection in figures[-1].axes[0].collections
+        if isinstance(collection, PolyCollection)
+        and collection.get_array() is not None
+    ]
+    assert hex_cells
+    artist = hex_cells[0]
+    assert sorted(int(value) for value in artist.get_array()) == [5, 7]
+    assert all(len(path.vertices) == 6 for path in artist.get_paths())
+    centers = {
+        tuple(round(float(value), 6) for value in path.vertices.mean(axis=0))
+        for path in artist.get_paths()
+    }
+    assert centers == {(1600.0, 0.25), (1700.0, -0.25)}
+
+
+def test_coverage_and_progress_artists_match_csv_and_include_held_out_limit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from matplotlib.collections import PathCollection
+
+    figures = _capture_collection_figures(monkeypatch)
+    coverage = [
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "scored_n": "7",
+            "input_missing_n": "2",
+            "outside_domain_n": "1",
+            "not_output_n": "0",
+            "other_refused_n": "3",
+            "scored_percent": "54",
+        }
+    ]
+    hero_plot._draw_coverage_png(tmp_path / "e.png", coverage)
+    widths = [patch.get_width() for patch in figures[-1].axes[0].patches[:5]]
+    assert widths == [7, 2, 1, 0, 3]
+
+    progress = [
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "date": "2026-11-06",
+            "rms_dex": "0.5",
+            "n": "10",
+            "held_out_n": "5",
+            "held_out_rms_dex": "5.0",
+        }
+    ]
+    hero_plot._draw_progress_png(tmp_path / "f.png", progress)
+    axis = figures[-1].axes[0]
+    assert list(axis.lines[-1].get_ydata()) == [0.5]
+    held_out = [
+        collection
+        for collection in axis.collections
+        if isinstance(collection, PathCollection)
+        and len(collection.get_offsets())
+    ]
+    assert any(float(collection.get_offsets()[0][1]) == 5.0 for collection in held_out)
+    assert axis.get_ylim()[1] > 5.0
+
+
+def test_fingerprint_cell_gap_is_two_export_pixels(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    rows = [
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "temperature_lower_K": "1500",
+            "temperature_upper_K": "1600",
+            "sio2_lower": "0.0",
+            "sio2_upper": "0.05",
+            "n": "3",
+            "median_abs_dex": "0.2",
+            "colour": "#1a9641",
+        },
+        {
+            "rail": "vapour",
+            "engine": "openimcc",
+            "temperature_lower_K": "1500",
+            "temperature_upper_K": "1600",
+            "sio2_lower": "0.05",
+            "sio2_upper": "0.1",
+            "n": "3",
+            "median_abs_dex": "0.2",
+            "colour": "#1a9641",
+        },
+    ]
+    hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", rows, ["openimcc"])
+    figure = figures[-1]
+    axis = figure.axes[0]
+    left, right = sorted(axis.patches, key=lambda patch: patch.get_x())
+    y = 1550
+    left_px = axis.transData.transform((left.get_x() + left.get_width(), y))[0]
+    right_px = axis.transData.transform((right.get_x(), y))[0]
+    gap_at_export = (right_px - left_px) * 150 / figure.dpi
+    assert gap_at_export == pytest.approx(2.0, abs=0.05)
+
+
+def test_collection_cli_flags_are_applied_or_rejected(tmp_path: Path) -> None:
+    archive = tmp_path / "fixture.tgz"
+    _fixture_archive(archive)
+    data = hero_plot.read_scores(archive, rails=("vapour",))
+
+    files = hero_plot.render_hero_collection(
+        data,
+        archive,
+        tmp_path / "selected",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-07",
+    )
+    assert "chart:B:vapour" in files
+    assert "chart:B:melt_activity" not in files
+
+    with pytest.raises(ValueError, match="group_by"):
+        hero_plot.render_plots(
+            data,
+            tmp_path / "grouped",
+            simulator_commit="simulator-pin",
+            openimcc_commit="openimcc-pin",
+            source_path=archive,
+            group_by=("species",),
+        )
+    with pytest.raises(ValueError, match="omit_empty_engines"):
+        hero_plot.render_plots(
+            data,
+            tmp_path / "empty-engines",
+            simulator_commit="simulator-pin",
+            openimcc_commit="openimcc-pin",
+            source_path=archive,
+            omit_empty_engines=True,
+        )
 
