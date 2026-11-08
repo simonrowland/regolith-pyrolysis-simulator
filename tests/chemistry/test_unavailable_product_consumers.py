@@ -156,6 +156,44 @@ def test_product_class_with_only_refused_parts_is_unavailable(two_hour_run):
     assert unavailable["class_total_kg"] is None
 
 
+def test_available_product_omission_flag_reaches_classification(
+    two_hour_run,
+    monkeypatch,
+):
+    baseline = classify_products(two_hour_run)
+    omission_flag = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "provider computed pressure was below its reporting floor",
+    }
+
+    monkeypatch.setattr(
+        "simulator.three_product_report.product_class_availability",
+        lambda *_args, **_kwargs: {
+            "class_total_kg": 0.0,
+            "status": "available",
+            "excluded": [],
+            "estimated_contributions": [],
+            "flag": omission_flag,
+        },
+    )
+    products = classify_products(two_hour_run)
+
+    for name in (
+        "metals_plus_O2",
+        "ingots_metals",
+        "oxygen",
+        "pure_silica_glass",
+        "glass",
+        "refractory_ceramic_rump",
+        "captured_volatiles",
+    ):
+        bucket = products[name]
+        assert bucket["status"] == "available"
+        assert bucket.get("availability_flag", bucket.get("flag")) == omission_flag
+        assert bucket["class_total_kg"] == baseline[name]["class_total_kg"]
+
+
 def test_product_class_keeps_estimated_flux_and_marks_empty_refusal_partial():
     estimated_sio = {
         "species_id": "SiO",

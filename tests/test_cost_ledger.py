@@ -3,6 +3,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+import simulator.cost_ledger as cost_ledger_module
 
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -332,6 +333,45 @@ def test_cost_rollup_leaves_run_input_unallocated_when_no_product_mass():
     assert diagnostic["run_input_cost"]["allocation_status"] == "unallocated_no_product_mass"
     assert "run_input_cost_unallocated_no_product_mass" in diagnostic["warnings"]
     assert diagnostic["product_costs"] == {}
+
+
+def test_available_product_omission_flag_reaches_cost_rows(monkeypatch):
+    omission_flag = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "provider computed pressure was below its reporting floor",
+    }
+
+    def build_rollup():
+        return build_cost_rollup_diagnostic(
+            cost_ledger=CostLedger(),
+            per_hour=({"T_C": 1000.0},),
+            products_kg={"Fe": 1.0},
+        )
+
+    baseline = build_rollup()
+    monkeypatch.setattr(
+        cost_ledger_module,
+        "product_class_availability",
+        lambda *_args, **_kwargs: {
+            "class_total_kg": 1.0,
+            "status": "available",
+            "excluded": [],
+            "estimated_contributions": [],
+            "flag": omission_flag,
+        },
+    )
+
+    flagged = build_rollup()
+
+    row_key = "terminal.product:Fe"
+    assert flagged["product_costs"][row_key]["flag"] == omission_flag
+    assert flagged["product_costs"][row_key]["accumulated_cost"] == baseline[
+        "product_costs"
+    ][row_key]["accumulated_cost"]
+    assert flagged["product_costs"][row_key]["quantity_kg"] == baseline[
+        "product_costs"
+    ][row_key]["quantity_kg"]
 
 
 def test_run_input_allocation_uses_existing_species_product_row():

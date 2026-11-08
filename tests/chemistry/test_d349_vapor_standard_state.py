@@ -23,8 +23,7 @@ from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-from simulator.vapour_rail.batch import PressureValue
-from simulator.vapour_rail.batch import FluxEligible
+from simulator.vapour_rail.batch import FluxEligible, PressureValue, VapourBatch
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
     flux_pressures_from_batch,
@@ -1292,6 +1291,61 @@ def test_d354_mars_low_temperature_ca_conversion_survives_reporting_floor(
         batch,
         report,
         "Ca",
+    )
+
+
+def test_d354_mars_low_temperature_omissions_do_not_refuse_evaporation(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    temperature_K = 478.15
+    sim, diagnostic, equilibrium, effective_source = (
+        _mars_low_temperature_provider_probe(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            temperature_C=temperature_K - 273.15,
+        )
+    )
+    batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+        temperature_K=temperature_K,
+    )
+
+    assert batch is not None
+    assert {"Fe", "Ca"}.issubset(
+        diagnostic["below_reporting_threshold_omissions"]
+    )
+    restricted_batch = VapourBatch(
+        requested_species_ids=frozenset({"Fe", "Ca"}),
+        channels_by_species={
+            species: batch.channel(species) for species in ("Fe", "Ca")
+        },
+        flux_active_species_ids=frozenset(),
+    )
+    sim.melt.temperature_C = temperature_K - 273.15
+    sim._last_vapor_pressure_diagnostic = diagnostic
+    sim._last_vapour_batch_resolve_error = {}
+    sim._resolve_evaporation_vapour_batch = (
+        lambda *_args, **_kwargs: restricted_batch
+    )
+
+    flux = sim._calculate_evaporation(equilibrium)
+
+    assert flux.species_kg_hr == {}
+    assert sim._last_evaporation_flux_diagnostic["reason"] == (
+        "vapour_batch_all_channels_non_debiting"
+    )
+    assert sim._last_evaporation_flux_diagnostic["batch_channel_states"] == {
+        "Ca": "evaluated_below_reporting_floor",
+        "Fe": "evaluated_below_reporting_floor",
+    }
+    assert not sim._last_vapor_pressure_diagnostic.get(
+        "vapor_pressure_zero_reason"
     )
 
 

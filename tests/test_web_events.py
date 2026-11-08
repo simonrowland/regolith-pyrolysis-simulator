@@ -182,6 +182,70 @@ def test_product_story_rump_composition_keeps_partial_flag_and_exclusion():
     assert story["terminal_residue"]["excluded"] == excluded
 
 
+def test_product_story_rump_composition_keeps_available_omission_flag():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    omission_flag = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "provider computed pressure was below its reporting floor",
+    }
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={"Al2O3": 542.0, "SiO2": 457.0},
+        classification={
+            "refractory_ceramic_rump": {
+                "status": "available",
+                "availability_flag": omission_flag,
+                "class_total_kg": 999.0,
+                "rump_silicate_residual_kg": 457.0,
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+
+    assert story["refractory_ceramic"]["availability_flag"] == omission_flag
+    assert story["terminal_residue"]["availability_flag"] == omission_flag
+    assert story["refractory_ceramic"]["status"] == "available"
+
+
+def test_completion_ceramic_panel_keeps_available_omission_flag(monkeypatch):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    omission_flag = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "provider computed pressure was below its reporting floor",
+    }
+    monkeypatch.setattr(
+        sim,
+        "_terminal_rump_by_species",
+        lambda: {"CaO": 25.0, "Al2O3": 35.0, "SiO2": 30.0},
+    )
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "refractory_ceramic_rump": {
+                "status": "available",
+                "availability_flag": omission_flag,
+                "class_total_kg": 60.0,
+                "estimated_contributions": [],
+            }
+        },
+    )
+
+    payload = _completion_payload(sim)
+
+    assert payload["ceramic_rump_panel"]["availability_flag"] == omission_flag
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
