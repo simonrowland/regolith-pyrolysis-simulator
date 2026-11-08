@@ -2122,10 +2122,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
             with self._remote_pgid_lock:
                 if self._parent_start_close_thread == start_thread:
                     self._parent_start_close_thread = None
-        remaining = max(
-            0.0, self._remote_startup_deadline - time.monotonic(),
-        )
-        if self._remote_pgid(timeout_s=remaining) is None:
+        if self._remote_pgid(wait_for_report=True) is None:
             process, connection = self.process, self.connection
             self._discard_current(
                 diagnostic=False,
@@ -2147,7 +2144,7 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
     def _remote_pgid(
         self,
         *,
-        timeout_s: float = 0.0,
+        wait_for_report: bool = False,
         cleanup: bool = False,
     ) -> int | None:
         with self._remote_pgid_lock:
@@ -2155,8 +2152,16 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
                 return None
             if self._remote_process_group_id is not None:
                 return self._remote_process_group_id
+            wait_s = (
+                max(
+                    0.0,
+                    self._remote_startup_deadline - time.monotonic(),
+                )
+                if wait_for_report
+                else 0.0
+            )
             try:
-                if not self._remote_pid_receive.poll(max(0.0, timeout_s)):
+                if not self._remote_pid_receive.poll(wait_s):
                     return None
                 group_id = self._remote_pid_receive.recv()
             except (EOFError, OSError, ValueError) as exc:
@@ -2188,14 +2193,8 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
         if closing:
             with self._remote_pgid_lock:
                 self._remote_pgid_closed = True
-        timeout_s = 0.0
-        if process is not None and _process_pid(process) is not None:
-            timeout_s = max(
-                0.0,
-                self._remote_startup_deadline - time.monotonic(),
-            )
         group_id = self._remote_pgid(
-            timeout_s=timeout_s,
+            wait_for_report=process is not None,
             cleanup=True,
         )
         if group_id is not None:

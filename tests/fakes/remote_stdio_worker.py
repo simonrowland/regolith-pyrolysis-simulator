@@ -35,8 +35,13 @@ if mode == 'startup-failure':
     raise SystemExit(17)
 if mode == 'ready-timeout':
     time.sleep(10)
-if mode in ('startup-subtree', 'startup-subtree-hold'):
+if mode in (
+    'startup-subtree', 'startup-subtree-hold',
+    'startup-subtree-bootstrap-hold',
+):
     spawn_descendant(sys.argv[2], sys.argv[3])
+    if mode == 'startup-subtree-bootstrap-hold':
+        time.sleep(60)
 
 send({
     'protocol_version': 2 if mode == 'version-mismatch' else 1,

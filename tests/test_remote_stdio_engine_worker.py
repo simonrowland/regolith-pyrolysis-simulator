@@ -261,6 +261,107 @@ def test_pool_cancel_active_call_respects_cleanup_budget(
         _kill_pids(pids)
 
 
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
+    remote_worker_factory, monkeypatch, tmp_path, inherit,
+):
+    _set_process_group_mode(monkeypatch, inherit)
+    caller_group = os.getpgrp()
+    parent_pid_file = tmp_path / 'remote-worker.pid'
+    child_pid_file = tmp_path / 'remote-grandchild.pid'
+    worker = remote_worker_factory(
+        'startup-subtree-bootstrap-hold',
+        str(parent_pid_file), str(child_pid_file),
+        startup_timeout_s=8.0,
+        call_timeout_s=30.0,
+    )
+    cleanup_entered = threading.Event()
+    release_cleanup = threading.Event()
+    stale_wait_poll_started = threading.Event()
+    replies: list[dict[str, object]] = []
+    pids: tuple[int, ...] = ()
+    original_remote_pgid = worker._remote_pgid
+    original_receiver = worker._remote_pid_receive
+
+    class ObservePgidPoll:
+        def poll(self, timeout=0.0):
+            if release_cleanup.is_set():
+                stale_wait_poll_started.set()
+            return original_receiver.poll(timeout)
+
+        def recv(self):
+            return original_receiver.recv()
+
+    worker._remote_pid_receive = ObservePgidPoll()
+
+    def pause_active_cleanup(*, wait_for_report=False, cleanup=False):
+        if (
+            cleanup
+            and wait_for_report
+            and worker._remote_startup_deadline - time.monotonic() > 1.0
+            and threading.current_thread().name == 'remote active call'
+            and not cleanup_entered.is_set()
+        ):
+            cleanup_entered.set()
+            if not release_cleanup.wait(timeout=15.0):
+                raise TimeoutError('test did not release active PGID cleanup')
+        return original_remote_pgid(
+            wait_for_report=wait_for_report,
+            cleanup=cleanup,
+        )
+
+    monkeypatch.setattr(worker, '_remote_pgid', pause_active_cleanup)
+    call_thread = threading.Thread(
+        target=lambda: replies.append(worker.call(_request())),
+        name='remote active call',
+    )
+    try:
+        call_thread.start()
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline and not (
+            parent_pid_file.exists() and child_pid_file.exists()
+        ):
+            time.sleep(0.01)
+        assert parent_pid_file.exists() and child_pid_file.exists()
+        pids = _read_pids(parent_pid_file, child_pid_file)
+        wrapper = worker.process
+        assert wrapper is not None
+
+        wrapper.kill()
+        wrapper.join(timeout=1.0)
+        assert wrapper.exitcode is not None
+        assert cleanup_entered.wait(timeout=3.0)
+        assert worker.process is None
+
+        worker.close()
+        assert worker._remote_process_group_id is None
+        assert worker._remote_startup_deadline <= time.monotonic()
+
+        cleanup_released_at = time.monotonic()
+        release_cleanup.set()
+        assert stale_wait_poll_started.wait(timeout=2.0)
+        repeated_close_started = time.monotonic()
+        worker.close()
+        repeated_close_wall = time.monotonic() - repeated_close_started
+        call_thread.join(timeout=2.0)
+        call_cleanup_wall = time.monotonic() - cleanup_released_at
+
+        assert repeated_close_wall <= 0.75
+        assert not call_thread.is_alive()
+        assert call_cleanup_wall <= 0.75
+        assert len(replies) == 1
+        assert replies[0]['status'] == 'refused'
+        assert replies[0]['code'] == 'startup_failure'
+        assert 'scalar' not in replies[0]
+        _assert_pids_gone(pids)
+        _assert_caller_group_unchanged(caller_group)
+    finally:
+        release_cleanup.set()
+        call_thread.join(timeout=1.0)
+        worker.close()
+        _kill_pids(pids)
+
+
 def test_startup_failure_and_ready_timeout_are_typed(remote_worker_factory):
     failed = remote_worker_factory('startup-failure').call(_request())
     timed_out = remote_worker_factory(
@@ -575,7 +676,7 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
     pids: tuple[int, ...] = ()
     original_remote_pgid = worker._remote_pgid
 
-    def pause_start_pgid_read(*, timeout_s=0.0, cleanup=False):
+    def pause_start_pgid_read(*, wait_for_report=False, cleanup=False):
         if (
             threading.current_thread().name == 'remote cold start'
             and not cleanup
@@ -584,7 +685,7 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
             if not release_pgid_read.wait(timeout=5.0):
                 raise TimeoutError('test did not release startup PGID read')
         return original_remote_pgid(
-            timeout_s=timeout_s,
+            wait_for_report=wait_for_report,
             cleanup=cleanup,
         )
 
@@ -660,9 +761,9 @@ def test_close_before_popen_publication_claims_late_remote_pgid(
     original_popen = SpawnProcess._Popen
     original_remote_pgid = worker._remote_pgid
 
-    def record_remote_pgid(*, timeout_s=0.0, cleanup=False):
+    def record_remote_pgid(*, wait_for_report=False, cleanup=False):
         group_id = original_remote_pgid(
-            timeout_s=timeout_s,
+            wait_for_report=wait_for_report,
             cleanup=cleanup,
         )
         if cleanup:
