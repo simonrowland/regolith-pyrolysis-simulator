@@ -26,7 +26,6 @@ from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from statistics import median
 from types import MappingProxyType
 from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
 
@@ -13848,12 +13847,8 @@ def score_proprietary_aggregate(
     for rail in sorted(rails, key=lambda item: item.value):
         dex_values = dex_by_rail[rail]
         n = len(dex_values)
-        rms_dex = (
-            (sum((value * value for value in dex_values), Decimal(0)) / n).sqrt()
-            if n
-            else None
-        )
-        median_abs_dex = median(map(abs, dex_values)) if n else None
+        rms_dex = _rms(dex_values)
+        median_abs_dex = _median_abs(dex_values)
         aggregates.append(
             ProprietaryRailAggregate(
                 rail=rail,

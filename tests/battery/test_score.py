@@ -9295,6 +9295,7 @@ def test_non_liquid_engine_scores_vapour_over_a_crystalline_sample() -> None:
 
 
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
+    from simulator.battery.enums import ProprietaryEngineRefusal
     from simulator.battery.score import (
         SCORE_ENGINE_SET,
         metric_operation,
@@ -9323,9 +9324,12 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
         assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
+    with pytest.raises(ProprietaryEngineRefusal):
+        predict_with_engine(Engine.PROPRIETARY_REMOTE, observation)
 
 
 def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
+    from simulator.battery.enums import ProprietaryEngineRefusal
     from simulator.battery.score import SCORE_ENGINE_SET, predict_with_engine
 
     identity = replace(
@@ -9350,6 +9354,8 @@ def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
             "reason": "quantity_not_predicted",
             "quantity": "equilibrium_phase_composition",
         }
+    with pytest.raises(ProprietaryEngineRefusal):
+        predict_with_engine(Engine.PROPRIETARY_REMOTE, observation)
 
 
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:

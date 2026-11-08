@@ -342,6 +342,76 @@ def test_optimizer_pool_refuses_before_result_store_initialization(
         )
 
 
+def test_cold_single_request_refuses_before_evaluator_or_result_file(
+    monkeypatch, tmp_path
+) -> None:
+    from simulator.battery.enums import ProprietaryEngineRefusal
+    from simulator.optimize import pool
+
+    monkeypatch.setenv("REGOLITH_OPTIMIZER_WARM_WORKERS", "0")
+    monkeypatch.setattr(
+        pool,
+        "_task_stage0_subprocess_required",
+        lambda _feedstock: False,
+    )
+    evaluator_calls = []
+
+    def fake_evaluate(*_args, output_dir, **_kwargs):
+        evaluator_calls.append(True)
+        Path(output_dir, "evaluator-ran").write_text("unexpected")
+        raise AssertionError("proprietary evaluator must not execute")
+
+    profile = {
+        "run": {"backend_name": Engine.PROPRIETARY_REMOTE.value},
+        "fidelities": {"high": {"backend_name": Engine.PROPRIETARY_REMOTE.value}},
+    }
+    output_root = tmp_path / "cold-single-request"
+    with pytest.raises(ProprietaryEngineRefusal) as caught:
+        pool.evaluate_request_supervised(
+            ({}, "test-feedstock", "high"),
+            profile=profile,
+            output_root=output_root,
+            evaluate_fn=fake_evaluate,
+        )
+
+    assert caught.value.mode == "optimizer_search"
+    assert evaluator_calls == []
+    assert not output_root.exists()
+    assert not (output_root / "eval-000000" / ".supervised-result.pickle").exists()
+
+
+def test_cold_fidelity_batch_refuses_before_starting_workers(monkeypatch) -> None:
+    from simulator.battery.enums import ProprietaryEngineRefusal
+    from simulator.optimize import fidelity
+
+    monkeypatch.setenv("REGOLITH_OPTIMIZER_WARM_WORKERS", "0")
+    worker_contexts = []
+    monkeypatch.setattr(
+        fidelity.mp,
+        "get_context",
+        lambda *_args, **_kwargs: worker_contexts.append(True),
+    )
+    task = fidelity._FidelityTask(
+        index=0,
+        tier="high",
+        fn=lambda *_args, **_kwargs: None,
+        patch={},
+        feedstock_id="test-feedstock",
+        fidelity="high",
+        profile={
+            "run": {"backend_name": Engine.PROPRIETARY_REMOTE.value},
+            "fidelities": {"high": {"backend_name": Engine.PROPRIETARY_REMOTE.value}},
+        },
+        candidate_id="candidate-1",
+        kwargs={},
+    )
+    with pytest.raises(ProprietaryEngineRefusal) as caught:
+        fidelity._run_eval_batch([task], timeout_s=1.0, max_workers=1)
+
+    assert caught.value.mode == "optimizer_search"
+    assert worker_contexts == []
+
+
 def test_optimizer_certification_refuses_before_results_store_fetch(
     monkeypatch, tmp_path
 ) -> None:

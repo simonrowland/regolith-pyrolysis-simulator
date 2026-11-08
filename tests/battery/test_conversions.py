@@ -87,6 +87,7 @@ def test_engine_enum_excludes_retired_imcc_identities() -> None:
         "vaporock",
         "magemin",
         "openimcc",
+        "proprietary_remote",
     }
     import ast
     from pathlib import Path

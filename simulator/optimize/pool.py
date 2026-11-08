@@ -323,12 +323,13 @@ def evaluate_request_supervised(
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-supervised-")
     )
-    root.mkdir(parents=True, exist_ok=True)
     task = replace(
         _task_from_request(0, request, profile=profile, output_root=root),
         constraints=constraints,
         schema=schema,
     )
+    _task_backend_name(task)
+    root.mkdir(parents=True, exist_ok=True)
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     outcome = _evaluate_task_supervised(
         task,
@@ -649,6 +650,7 @@ def _evaluate_task_supervised(
     warm_runtime_spec: _WarmRuntimeSpec | None,
     per_eval_timeout_seconds: float | None,
 ) -> dict[str, Any]:
+    _task_backend_name(task)
     output_dir = Path(task.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     result_path = output_dir / ".supervised-result.pickle"
