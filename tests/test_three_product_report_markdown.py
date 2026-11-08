@@ -270,6 +270,21 @@ def test_silica_availability_flag_renders_with_or_without_certification(
         assert "reason=outside certified SiO source band" in report
 
 
+def test_non_silica_availability_flag_renders_from_availability_field():
+    classification = _empty_classification()
+    classification["metals_plus_O2"]["availability_flag"] = {
+        "status": "available",
+        "state": "evaluated_below_reporting_floor",
+        "reason": "provider pressure was below its reporting floor",
+    }
+
+    report = format_three_product_markdown(classification)
+
+    assert "status=available" in report
+    assert "state=evaluated_below_reporting_floor" in report
+    assert "reason=provider pressure was below its reporting floor" in report
+
+
 def test_refused_silica_product_quantity_is_unavailable_not_zero():
     classification = _empty_classification()
     classification['pure_silica_glass'].update({
