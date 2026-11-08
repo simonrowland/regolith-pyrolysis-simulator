@@ -124,6 +124,27 @@ def _builtin_pressure_projection(
     return dict(result.diagnostic)
 
 
+def _catalog_pressure_from_activity(
+    vapor_pressure_data,
+    species,
+    activity,
+    *,
+    temperature_C,
+    pO2_bar,
+):
+    from simulator.chemistry.ellingham_graph import (
+        effective_equilibrium_pressure_Pa,
+    )
+
+    return effective_equilibrium_pressure_Pa(
+        species,
+        float(temperature_C) + 273.15,
+        float(pO2_bar),
+        a_oxide=float(activity),
+        vapor_pressure_data=vapor_pressure_data,
+    )
+
+
 def _live_gateway_probe(
     vapor_pressure_data,
     feedstocks_data,
@@ -921,7 +942,7 @@ def test_d349_alphamelts_fe_fallback_uses_same_fe020_conversion(
 ):
     temperature_K = 1500.0
     temperature_C = temperature_K - 273.15
-    composition = {"FeO": 25.0, "SiO2": 75.0}
+    composition = {"FeO": 100.0}
     expected = _builtin_pressure_projection(
         vapor_pressure_data,
         composition,
@@ -931,7 +952,7 @@ def test_d349_alphamelts_fe_fallback_uses_same_fe020_conversion(
     backend = AlphaMELTSBackend()
     projected = backend._activities_times_antoine_or_fail(
         temperature_C,
-        {"FeO": 0.2},
+        {},
         composition,
         pO2_bar=1.0,
         context="d-349 FeO standard substitution test",
@@ -1041,7 +1062,7 @@ def test_d349_live_evaporation_gateway_uses_crystalline_activity_basis(
         assert conversion["from_standard_state_id"] == source_id
         assert conversion["to_standard_state_id"] == k_id
 
-def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
+def test_d349_live_gateway_converts_when_crystalline_provenance_is_missing(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -1062,17 +1083,16 @@ def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
             species,
             remove=required_fields,
         )
-        refused_batch = _resolve_live_gateway_batch(
+        converted_batch = _resolve_live_gateway_batch(
             sim,
             mutated,
             equilibrium,
             effective_source,
         )
-        assert refused_batch is None, species
-        assert sim._last_vapour_batch_resolve_error["reason"] == (
-            "vapour_batch_resolve_failed"
-        )
-        assert species in sim._last_vapour_batch_resolve_error["detail"]
+        assert converted_batch is not None, species
+        channel = converted_batch.channel(species)
+        assert isinstance(channel.pressure, PressureValue), species
+        assert channel.is_refused is False, species
 
 
 @pytest.mark.parametrize("species", ("Mg", "Fe"))
@@ -1084,7 +1104,7 @@ def test_d349_live_gateway_requires_the_crystalline_id_on_every_route(
         "activity_standard_state_conversion",
     ),
 )
-def test_d349_live_gateway_uses_channel_contract_when_provenance_is_missing(
+def test_d349_live_gateway_converts_when_provider_phase_is_documented(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -1112,14 +1132,13 @@ def test_d349_live_gateway_uses_channel_contract_when_provenance_is_missing(
         temperature_K=temperature_K,
     )
 
-    assert refused is None
-    assert sim._last_vapour_batch_resolve_error["reason"] == (
-        "vapour_batch_resolve_failed"
-    )
-    assert species in sim._last_vapour_batch_resolve_error["detail"]
+    assert refused is not None
+    channel = refused.channel(species)
+    assert isinstance(channel.pressure, PressureValue)
+    assert channel.is_refused is False
 
 
-def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
+def test_d349_live_gateway_recomputes_from_documented_source_phase(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -1129,6 +1148,13 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
         feedstocks_data,
         setpoints_data,
     )
+    expected_batch = _resolve_live_gateway_batch(
+        sim,
+        diagnostic,
+        equilibrium,
+        effective_source,
+    )
+    assert expected_batch is not None
     for species in _D349_VAPOR_ROUTES:
         source_standard_state_id, _ = _D349_SOURCE_K_STANDARD_IDS[species]
         mutated = _diagnostic_with_route_provenance(
@@ -1142,12 +1168,13 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
             equilibrium,
             effective_source,
         )
-        assert batch is None, species
-        assert species in sim._last_vapour_batch_resolve_error["detail"]
+        assert batch is not None, species
+        assert batch.channel(species).pressure.pa == pytest.approx(
+            expected_batch.channel(species).pressure.pa
+        )
 
-        # A converted value carrying the liquid source ID is just as invalid
-        # as a liquid value carrying the crystalline K ID. Keep both guards
-        # at the request gateway that feeds the pressure evaluator.
+        # A provider-documented phase lets the gateway recompute the normal
+        # conversion. An explicitly mismatched K identity remains malformed.
         mislabeled = _diagnostic_with_route_provenance(
             diagnostic,
             species,
@@ -1165,7 +1192,7 @@ def test_d349_live_gateway_raw_liquid_assignment_fails_every_route(
         assert species in sim._last_vapour_batch_resolve_error["detail"]
 
 
-def test_d349_fe_conversion_reaches_live_gateway_guard_below_1650k(
+def test_d349_fe_conversion_recomputes_raw_liquid_assignment_below_1650k(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -1212,8 +1239,10 @@ def test_d349_fe_conversion_reaches_live_gateway_guard_below_1650k(
         effective_source,
         temperature_K=temperature_K,
     )
-    assert refused is None
-    assert "Fe" in sim._last_vapour_batch_resolve_error["detail"]
+    assert refused is not None
+    assert refused.channel("Fe").pressure.pa == pytest.approx(
+        batch.channel("Fe").pressure.pa
+    )
 
 
 def test_d354_mars_low_temperature_fe_activity_reaches_crystalline_k(
@@ -1505,7 +1534,7 @@ def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
     ],
     ids=("mixed-with-peer", "all-mg-ca"),
 )
-def test_d350_alphamelts_fallback_substitutes_builtin_mgo_cao_activity(
+def test_d350_alphamelts_preserves_explicit_and_substitutes_missing_oxide_activity(
     vapor_pressure_data,
     composition_wt_pct,
     activities,
@@ -1527,18 +1556,41 @@ def test_d350_alphamelts_fallback_substitutes_builtin_mgo_cao_activity(
     )
 
     assert isinstance(projection, dict)
+    expected_pressures = (
+        {
+            "Mg": _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                "Mg",
+                0.4,
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            ),
+            "Ca": _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                "Ca",
+                0.3,
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            ),
+        }
+        if activities
+        else expected_diagnostic["vapor_pressures_Pa"]
+    )
     for species in ("Mg", "Ca"):
         assert projection[species] == pytest.approx(
-            expected_diagnostic["vapor_pressures_Pa"][species],
-            rel=1e-10,
-            abs=0,
+            expected_pressures[species], rel=1e-10, abs=0
         )
     if expected_peer is not None:
         assert projection[expected_peer] > 0.0
 
     notices = backend._antoine_activity_standard_state_notices
-    assert set(notices) >= {"Mg", "Ca"}
+    if activities:
+        assert not ({"Mg", "Ca"} & set(notices))
+    else:
+        assert set(notices) >= {"Mg", "Ca"}
     for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
+        if activities:
+            continue
         notice = notices[species]
         assert notice["parent_oxide"] == parent_oxide
         assert notice["reason"] == "activity_standard_state_substitution"
@@ -1661,11 +1713,29 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         temperature_C=1500.0,
         pO2_bar=1.0,
     )
+    if activities:
+        explicit_parent_activities = {
+            "Na": activities["Na2O"],
+            "K": activities["K2O"],
+            "Mg": activities["MgO"],
+            "Ca": activities["CaO"],
+            "Fe": activities["FeO"],
+        }
+        expected_pressures = {
+            species: _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                species,
+                explicit_parent_activities[species],
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            )
+            for species in expected_species
+        }
+    else:
+        expected_pressures = expected["vapor_pressures_Pa"]
     for species in expected_species:
         assert projection[species] == pytest.approx(
-            expected["vapor_pressures_Pa"][species],
-            rel=1e-10,
-            abs=0,
+            expected_pressures[species], rel=1e-10, abs=0
         )
 
     diagnostics = backend._vapor_pressure_diagnostics(
