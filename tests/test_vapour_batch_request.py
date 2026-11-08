@@ -1071,6 +1071,7 @@ def test_d349_typed_shadow_uses_crystalline_activity_for_crystalline_k() -> None
         request_rule_kind="source_inventory_present",
         origin="catalog",
         formula_id="Mg",
+        parent_oxide="MgO",
         has_pressure_evaluator=True,
         has_alpha=True,
         has_route=True,
@@ -2219,17 +2220,22 @@ def test_pre_rg_missing_activity_declaration_fails_closed_for_claimed_channel() 
 
 
 def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None:
-    from simulator.chemistry.melt_activity import (
-        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair
+
+    source_standard_state, target_standard_state = d144_vapor_standard_state_pair(
+        "MgO"
     )
+    assert source_standard_state is not None
+    assert target_standard_state is not None
+    source_id, source_phase = source_standard_state
+    target_id, target_phase = target_standard_state
 
     standard_state = StandardStateIdentity(
         convention="raoultian_pure_endmember",
-        phase="liquid",
+        phase=source_phase,
         reference_pressure_bar=1.0,
         component_basis="raoultian_pure_endmember",
-        identity_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        identity_id=source_id,
         component_id="MgO",
     )
     declaration = ActivityInputDeclaration(
@@ -2248,6 +2254,7 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
         request_rule_kind="source_inventory_present",
         origin="catalog",
         formula_id="Mg",
+        parent_oxide="MgO",
         has_pressure_evaluator=True,
         has_alpha=True,
         has_route=True,
@@ -2255,13 +2262,11 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
         source_reaction_activity=declaration,
         evidence=MappingProxyType({
             "vapor_activity_source_standard_state_id": (
-                MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                source_id
             ),
-            "vapor_activity_source_standard_state_phase": "liquid",
-            "vapor_k_standard_state_id": (
-                MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-            ),
-            "vapor_k_standard_state_phase": "solid",
+            "vapor_activity_source_standard_state_phase": source_phase,
+            "vapor_k_standard_state_id": target_id,
+            "vapor_k_standard_state_phase": target_phase,
         }),
     )
 
@@ -2284,13 +2289,11 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
         source_reaction_activity_provenance={
             "Mg": {
                 "melt_oxide_activity_reference_state": (
-                    MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                    source_id
                 ),
-                "melt_oxide_activity_reference_state_phase": "liquid",
-                "vapor_k_standard_state_id": (
-                    MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-                ),
-                "vapor_k_standard_state_phase": "solid",
+                "melt_oxide_activity_reference_state_phase": source_phase,
+                "vapor_k_standard_state_id": target_id,
+                "vapor_k_standard_state_phase": target_phase,
             }
         },
     )
@@ -2301,10 +2304,10 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
         "MgO",
         0.25,
         1773.15,
-        source_standard_state_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        target_standard_state_id=MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
-        source_standard_state_phase="liquid",
-        target_standard_state_phase="solid",
+        source_standard_state_id=source_id,
+        target_standard_state_id=target_id,
+        source_standard_state_phase=source_phase,
+        target_standard_state_phase=target_phase,
     )
     batch = resolve_vapour_batch(
         rules=(rule,),
@@ -2331,17 +2334,22 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
 
 
 def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
-    from simulator.chemistry.melt_activity import (
-        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
-        MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+    from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair
+
+    source_standard_state, target_standard_state = d144_vapor_standard_state_pair(
+        "FeO"
     )
+    assert source_standard_state is not None
+    assert target_standard_state is not None
+    source_id, source_phase = source_standard_state
+    target_id, target_phase = target_standard_state
 
     standard_state = StandardStateIdentity(
         convention="raoultian_pure_endmember",
-        phase="liquid",
+        phase=source_phase,
         reference_pressure_bar=1.0,
         component_basis="raoultian_pure_endmember",
-        identity_id=MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+        identity_id=source_id,
         component_id="FeO",
     )
     declaration = ActivityInputDeclaration(
@@ -2360,20 +2368,17 @@ def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
         request_rule_kind="source_inventory_present",
         origin="catalog",
         formula_id="Fe",
+        parent_oxide="FeO",
         has_pressure_evaluator=True,
         has_alpha=True,
         has_route=True,
         has_formula=True,
         source_reaction_activity=declaration,
         evidence=MappingProxyType({
-            "vapor_activity_source_standard_state_id": (
-                MELT_OXIDE_ACTIVITY_REFERENCE_STATE
-            ),
-            "vapor_activity_source_standard_state_phase": "liquid",
-            "vapor_k_standard_state_id": (
-                MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE
-            ),
-            "vapor_k_standard_state_phase": "solid",
+            "vapor_activity_source_standard_state_id": source_id,
+            "vapor_activity_source_standard_state_phase": source_phase,
+            "vapor_k_standard_state_id": target_id,
+            "vapor_k_standard_state_phase": target_phase,
         }),
     )
 
@@ -2421,6 +2426,25 @@ def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
     assert notice["authority_level"] == "predict_and_flag"
     assert notice["liquid_referenced_pressure_Pa"] > 0.0
     assert notice["crystalline_referenced_pressure_Pa"] > 0.0
+
+    unavailable = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"FeO": 1.0}},
+        state=replace(state, source_reaction_activities={}),
+        catalog_species={
+            "Fe": SimpleNamespace(
+                species_id="Fe",
+                evaluator=Evaluator(),
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            )
+        },
+        flux_activation_context=_pre_rg_activation_context("Fe"),
+    ).channel("Fe")
+    assert isinstance(unavailable.pressure, PressureRefusal)
+    assert unavailable.refusal_code == ActivityRefusalCode.MISSING_EVIDENCE.value
+    assert isinstance(unavailable.flux, FluxRefusal)
     assert notice["selected_pressure_Pa"] == answer.pressure.pa
 
 
