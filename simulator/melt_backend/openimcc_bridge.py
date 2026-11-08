@@ -312,15 +312,24 @@ class OpenImccBridgeResult:
             "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
         }
 
+    def to_cache_payload(self) -> dict[str, Any]:
+        """Serialize the exact bridge result for the battery engine cache."""
+        return self.to_transport()
+
+    @classmethod
+    def from_cache_payload(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
+        """Restore a bridge result from :meth:`to_cache_payload`."""
+        return cls.from_transport(payload)
+
     @classmethod
     def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
         """Rebuild the immutable bridge DTO after crossing a process boundary."""
         labels = payload["labels"]
         return cls(
             parent_oxide_activities=payload["parent_oxide_activities"],
-            parent_oxides=payload["parent_oxides"],
-            flags=payload["flags"],
-            notices=payload["notices"],
+            parent_oxides=tuple(payload["parent_oxides"]),
+            flags=tuple(payload["flags"]),
+            notices=tuple(payload["notices"]),
             acid_sink_ratio=payload["acid_sink_ratio"],
             pack_model_id=payload["pack_model_id"],
             pack_version=payload["pack_version"],
@@ -328,7 +337,13 @@ class OpenImccBridgeResult:
             openimcc_version=payload["openimcc_version"],
             envelope_status=payload["envelope_status"],
             extrapolated=payload["extrapolated"],
-            labels=ImccAdapterLabels(**labels),
+            labels=ImccAdapterLabels(
+                **{
+                    **labels,
+                    "flags": tuple(labels["flags"]),
+                    "notices": tuple(labels["notices"]),
+                }
+            ),
             coverage=payload["coverage"],
             activity_coefficients=payload["activity_coefficients"],
             parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],

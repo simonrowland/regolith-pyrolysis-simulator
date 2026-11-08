@@ -6828,6 +6828,7 @@ def _predict_distin_closed_feo_activity(
     identity: Identity,
     channel: str,
     sources: tuple[str, ...],
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
         return EnginePrediction(
@@ -6897,8 +6898,18 @@ def _predict_distin_closed_feo_activity(
             },
         )
     try:
-        result = openimcc_redox.evaluate_redox(
-            inventory, float(temperature_K), "closed"
+        from simulator.melt_backend.openimcc_cache import cached_openimcc_redox
+
+        temperature = float(temperature_K)
+        result = cached_openimcc_redox(
+            engine_cache,
+            inventory=inventory,
+            temperature_K=temperature,
+            mode="closed",
+            lambda_imposed=None,
+            solve_fn=lambda: openimcc_redox.evaluate_redox(
+                inventory, temperature, "closed"
+            ),
         )
     except openimcc.ImccRefusal as exc:
         return refused(
@@ -6983,6 +6994,7 @@ def _predict_fe_redox(
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
 
@@ -7127,11 +7139,22 @@ def _predict_fe_redox(
                 },
             )
         try:
-            result = openimcc.evaluate_redox(
-                inventory,
-                float(material.temperature),
-                "imposed",
-                lambda_imposed=float(fo2_log) * math.log(10.0),
+            from simulator.melt_backend.openimcc_cache import cached_openimcc_redox
+
+            temperature = float(material.temperature)
+            lambda_imposed = float(fo2_log) * math.log(10.0)
+            result = cached_openimcc_redox(
+                engine_cache,
+                inventory=inventory,
+                temperature_K=temperature,
+                mode="imposed",
+                lambda_imposed=lambda_imposed,
+                solve_fn=lambda: openimcc.evaluate_redox(
+                    inventory,
+                    temperature,
+                    "imposed",
+                    lambda_imposed=lambda_imposed,
+                ),
             )
         except openimcc.ImccRefusal as exc:
             return refused(
@@ -7348,6 +7371,7 @@ def _predict_fe_redox(
         qualification=False,
         isolated=isolated,
         physical_pressure_bar=pressure_bar,
+        engine_cache=engine_cache,
     )
     name = str(getattr(handle, "name", engine.value))
     call_evidence = (
@@ -7840,6 +7864,7 @@ def _borrow_internal_analytical_effusion(
     bench: Bench | None,
     handles: Mapping[str, object] | None,
     isolated: bool | None,
+    engine_cache: object | None,
     notices: list[Notice],
 ) -> "Po2Request | EnginePrediction":
     """Command the internal-analytical closure for an engine that cannot solve it.
@@ -7861,6 +7886,7 @@ def _borrow_internal_analytical_effusion(
         isolated=isolated,
         experiment=experiment,
         bench=bench,
+        engine_cache=engine_cache,
     )
     bar = _solved_effusion_po2_bar(prediction)
     if bar is None or not math.isfinite(bar) or bar <= 0.0:
@@ -9045,6 +9071,7 @@ def _predict_mass_loss_with_residue(
     sources: tuple[str, ...],
     experiment: Experiment | None,
     observation: Observation,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -9095,6 +9122,7 @@ def _predict_mass_loss_with_residue(
             temperature_K=None if temperature is None else float(temperature),
             source_document=source_document,
             observation=observation,
+            engine_cache=engine_cache,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
@@ -9208,6 +9236,7 @@ def _engine_prediction_or_unparseable_component(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Return one prediction. One unparseable component refuses that row."""
 
@@ -9222,6 +9251,7 @@ def _engine_prediction_or_unparseable_component(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            engine_cache=engine_cache,
         )
     except UnparseableCompositionComponent as exc:
         identity = (
@@ -9253,6 +9283,7 @@ def predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
@@ -9272,6 +9303,7 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            engine_cache=engine_cache,
         )
 
     provided_handles = handles or {}
@@ -9285,6 +9317,7 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            engine_cache=engine_cache,
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -9309,6 +9342,7 @@ def _score_predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode | None = None,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Route scorer calls while preserving custom predictor keyword contracts."""
 
@@ -9319,6 +9353,8 @@ def _score_predict_with_engine(
             kwargs["bench"] = bench
         if fo2_mode is not None:
             kwargs["fo2_mode"] = fo2_mode
+        if engine_cache is not None:
+            kwargs["engine_cache"] = engine_cache
         if engine is Engine.INTERNAL_ANALYTICAL:
             # Scoring owns a shared handle cache, but every IA row still uses
             # the CPU-budgeted child. Direct predictor callers keep their own
@@ -9336,6 +9372,7 @@ def _predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -9397,6 +9434,7 @@ def _predict_with_engine(
             sources,
             experiment,
             observation,
+            engine_cache=engine_cache,
         )
     if engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM:
         return EnginePrediction(
@@ -9424,6 +9462,7 @@ def _predict_with_engine(
             channel,
             handles=handles,
             isolated=isolated,
+            engine_cache=engine_cache,
         )
     phase_basis = (
         identity.subtype.value
@@ -9831,6 +9870,7 @@ def _predict_with_engine(
             identity,
             channel,
             sources,
+            engine_cache=engine_cache,
         )
 
     wt: dict[str, float] | None = None
@@ -10442,6 +10482,7 @@ def _predict_with_engine(
             bench=bench,
             handles=handle_map,
             isolated=isolated,
+            engine_cache=engine_cache,
             notices=extra_notices,
         )
         if isinstance(borrowed, EnginePrediction):
@@ -10563,6 +10604,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                engine_cache=engine_cache,
             )
 
         def solve_oxygen_balance_at_current_pressure():
@@ -10664,6 +10706,7 @@ def _predict_with_engine(
                     arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                     physical_pressure_bar=pressure_bar,
                     native_activity_formula=native_activity_formula,
+                    engine_cache=engine_cache,
                 )
             except Exception as exc:
                 return engine_call_failure(exc)
@@ -10679,6 +10722,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                engine_cache=engine_cache,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -10968,6 +11012,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                engine_cache=engine_cache,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -11666,6 +11711,7 @@ def _hashimoto_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -11727,6 +11773,7 @@ def _hashimoto_residue_prediction(
                 preform_dimensions_mm=geometry,
                 code_revision=revision,
                 engine=engine.value,
+                engine_cache=engine_cache,
             )
             cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -11931,7 +11978,9 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
-def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+def _knudsen_residue_prediction(
+    context, reference, engine, cache=None, engine_cache=None
+) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
@@ -11947,6 +11996,7 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
+                engine_cache=engine_cache,
             )
             if cache is not None:
                 cache[cache_key] = result
@@ -11978,6 +12028,7 @@ def _sossi_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -12067,6 +12118,7 @@ def _sossi_residue_prediction(
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                 code_revision=revision,
                 engine=engine.value,
+                engine_cache=engine_cache,
             )
             cache[cache_key] = {
                 row.experiment_id: row for row in rows
@@ -12324,6 +12376,7 @@ def compile_residual(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
+    engine_cache: object | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
@@ -12806,7 +12859,9 @@ def compile_residual(
         and experiment is not None and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     ):
-        prediction = _knudsen_residue_prediction(context, reference, engine)
+        prediction = _knudsen_residue_prediction(
+            context, reference, engine, engine_cache=engine_cache
+        )
     if prediction is None:
         builtin_predictor = (
             predict is _BUILTIN_SCORE_PREDICTOR
@@ -12905,6 +12960,8 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if builtin_predictor and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
+        if builtin_predictor and engine_cache is not None:
+            predictor_kwargs["engine_cache"] = engine_cache
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
@@ -13888,6 +13945,7 @@ def _score_store_with_decisions(
     measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    engine_cache: object | None = None,
     _stream: _ResidualJsonlStream | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
     engine_set = (
@@ -14073,6 +14131,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                engine_cache=engine_cache,
                             )
                         if (
                             predict is None
@@ -14086,6 +14145,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                engine_cache=engine_cache,
                             )
                         if (
                             predict is None
@@ -14096,6 +14156,7 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
+                                engine_cache=engine_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
@@ -14125,6 +14186,7 @@ def _score_store_with_decisions(
                                 if intrinsic_redox_activity
                                 else None
                             ),
+                            engine_cache=engine_cache,
                         )
                         if _stream is None:
                             assert residuals is not None
@@ -14157,6 +14219,7 @@ def _score_store_with_decisions(
                                     point.experiment_id, ()
                                 ),
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+                                engine_cache=engine_cache,
                             )
                             if _stream is None:
                                 assert residuals is not None
@@ -14229,6 +14292,7 @@ def _score_store_to_jsonl(
     measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    engine_cache: object | None = None,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
@@ -14244,6 +14308,7 @@ def _score_store_to_jsonl(
             measured_only=measured_only,
             predict=predict,
             handles=handles,
+            engine_cache=engine_cache,
             _stream=stream,
         )
         return stream.count, _ResidualReportMetadata(
@@ -14266,6 +14331,7 @@ def score_store(
     include_diagnostics: bool = True,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    engine_cache: object | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
     """Score the store and keep the historical residual/candidate return shape."""
 
@@ -14278,6 +14344,7 @@ def score_store(
         include_diagnostics=include_diagnostics,
         predict=predict,
         handles=handles,
+        engine_cache=engine_cache,
     )
     return residuals, candidates
 
