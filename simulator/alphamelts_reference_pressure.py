@@ -14,14 +14,16 @@ from typing import Any
 # alphaMELTS.  The subprocess transport hard-refuses sub-bar input, so its
 # consumers evaluate condensed-phase speciation at the alphaMELTS 1-bar model
 # reference whenever the physical overhead is sub-bar.  Ordinary ThermoEngine
-# and Python-API calls retain their historical physical-pressure inputs; the
-# EC/GATE intent-specific exception stays visible in the provider.  Whether
-# 1e-6 bar is meaningfully inside the MELTS calibration for ThermoEngine remains
-# an open physics question; see docs-private/tickler-2026-05-18.md.
+# and Python-API calls retain their historical physical-pressure inputs at this
+# consumer boundary; their backends apply their own evaluation-pressure floors.
+# The EC/GATE intent-specific exception stays visible in the provider. Whether
+# 1e-6 bar is meaningfully inside the MELTS calibration remains an open physics
+# question; see docs-private/tickler-2026-05-18.md.
 # Unit check: the adapter argument is pressure_bar, so this value is in bar.
 # Sanity: for subprocess this is exactly the old adapter's silent 1-bar clamp,
 # made explicit at the consumer boundary, so subprocess goldens are unchanged.
 ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR = 1.0
+ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 
 
 def alphamelts_condensed_phase_pressure_bar(
@@ -38,6 +40,39 @@ def alphamelts_condensed_phase_pressure_bar(
     ):
         return ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR
     return pressure_bar
+
+
+def alphamelts_effective_pressure_policy(
+    physical_pressure_bar: float,
+    *,
+    transport: str | None,
+) -> tuple[float, str]:
+    """Return the evaluation pressure and label for an alphaMELTS transport."""
+
+    pressure_bar = float(physical_pressure_bar)
+    transport_name = str(transport or "").strip().lower()
+    if transport_name == "subprocess":
+        reference_pressure = format(
+            ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
+            "g",
+        ).replace("e-0", "e-")
+        return (
+            alphamelts_condensed_phase_pressure_bar(
+                pressure_bar,
+                transport=transport_name,
+            ),
+            f"alphamelts subprocess reference {reference_pressure} bar",
+        )
+    if transport_name == "python_api":
+        minimum_pressure = format(
+            ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
+            "g",
+        ).replace("e-0", "e-")
+        return (
+            max(pressure_bar, ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR),
+            f"alphamelts Python API floor {minimum_pressure} bar",
+        )
+    raise ValueError(f"unsupported alphaMELTS transport: {transport!r}")
 
 
 def annotate_alphamelts_reference_pressure(
@@ -82,7 +117,9 @@ def alphamelts_reference_pressure_diagnostics(
 
 __all__ = (
     "ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR",
+    "ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR",
     "alphamelts_condensed_phase_pressure_bar",
+    "alphamelts_effective_pressure_policy",
     "alphamelts_reference_pressure_diagnostics",
     "annotate_alphamelts_reference_pressure",
 )

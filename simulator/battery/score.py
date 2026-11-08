@@ -1674,40 +1674,19 @@ def _knudsen_effective_pressure_bar(
         if transport not in {"subprocess", "python_api"}:
             return None, "alphamelts_transport_unavailable"
         from simulator.alphamelts_reference_pressure import (
-            alphamelts_condensed_phase_pressure_bar,
+            alphamelts_effective_pressure_policy,
         )
 
-        # Reuse the adapter's subprocess reference mapping. Python API calls
-        # retain physical pressure at the adapter, then the backend applies
-        # P_eval=max(P_input, P_min) in bar before calling PetThermoTools.
-        effective_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+        return alphamelts_effective_pressure_policy(
             pressure_bar,
             transport=transport,
         )
-        if transport == "python_api":
-            from simulator.melt_backend.alphamelts import (
-                ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
-            )
-
-            effective_pressure_bar = max(
-                effective_pressure_bar,
-                ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
-            )
-            return float(effective_pressure_bar), (
-                "alphamelts Python API floor 1e-6 bar"
-            )
-        return float(effective_pressure_bar), (
-            "alphamelts subprocess reference 1 bar"
-        )
     if engine is Engine.THERMOENGINE:
         from simulator.melt_backend.thermoengine import (
-            THERMOENGINE_MIN_PRESSURE_BAR,
+            thermoengine_effective_pressure_policy,
         )
 
-        # ThermoEngine applies the same max(P_input, P_min) policy in bar.
-        return max(pressure_bar, THERMOENGINE_MIN_PRESSURE_BAR), (
-            "ThermoEngine floor 1e-6 bar"
-        )
+        return thermoengine_effective_pressure_policy(pressure_bar)
     return None, "engine_has_no_total_pressure_policy"
 
 

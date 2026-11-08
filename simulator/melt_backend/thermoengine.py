@@ -64,6 +64,22 @@ def _commissioning_notice_fields(
 THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
 
 
+def thermoengine_effective_pressure_policy(
+    physical_pressure_bar: float,
+) -> tuple[float, str]:
+    """Return the pressure sent to ThermoEngine and its policy label."""
+
+    pressure_bar = float(physical_pressure_bar)
+    minimum_pressure = format(
+        THERMOENGINE_MIN_PRESSURE_BAR,
+        "g",
+    ).replace("e-0", "e-")
+    return (
+        max(pressure_bar, THERMOENGINE_MIN_PRESSURE_BAR),
+        f"ThermoEngine floor {minimum_pressure} bar",
+    )
+
+
 class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     """First-class MeltBackend using ENKI ThermoEngine's spawned worker."""
 
@@ -401,8 +417,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._mode = None
             raise ImportError('ThermoEngine transport not initialized')
         try:
-            solved_pressure_bar = max(
-                float(pressure_bar), THERMOENGINE_MIN_PRESSURE_BAR
+            solved_pressure_bar, _pressure_policy = (
+                thermoengine_effective_pressure_policy(pressure_bar)
             )
             clamp_diagnostics, result_warnings = (
                 self._clamped_operating_point_context(
