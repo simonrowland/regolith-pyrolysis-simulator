@@ -9,8 +9,32 @@ import pytest
 
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import load_migrated_store, migrate, to_plain
-from simulator.battery.records import Located, Locator, State, Value
+from simulator.battery.records import (
+    RUN_METADATA_FIELD_HOMES,
+    Located,
+    Locator,
+    State,
+    Value,
+)
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tools.validate_literature_extracts import validate_extract_document
+
+
+_RUN_METADATA_VALUE_HOMES = tuple(
+    (field, home)
+    for field, (shape, homes) in RUN_METADATA_FIELD_HOMES.items()
+    if shape in {"located_value", "species_located_values"}
+    for home in homes
+)
+
+_RUN_METADATA_VALUE_SHAPES = (
+    ("scalar", True),
+    ("point-wrapper", True),
+    ("located-state", True),
+    ("malformed-point", False),
+    ("unknown-kind", False),
+    ("nonnumeric-scalar", False),
+)
 
 
 def _extract_with_experiments(
@@ -53,6 +77,74 @@ def _plain_located_point(point: str, *, table: str, page: int) -> dict:
             State.of(Value.point_of(point)),
             locator=Locator(table=table, page=page),
         )
+    )
+
+
+def _run_metadata_value_shape(shape: str, point: str) -> object:
+    if shape == "scalar":
+        return point
+    if shape == "point-wrapper":
+        return {"kind": "point", "point": point}
+    if shape == "located-state":
+        return _located_point(point, table="shape", page=7)
+    if shape == "malformed-point":
+        return {"kind": "point"}
+    if shape == "unknown-kind":
+        return {"kind": "unsupported", "point": point}
+    if shape == "nonnumeric-scalar":
+        return "not-numeric"
+    raise AssertionError(f"unexpected run metadata shape: {shape}")
+
+
+def _run_metadata_shape_extract(
+    root: Path,
+    field: str,
+    home: str,
+    value_shape: str,
+) -> tuple[Path, dict]:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    point = "0.0008" if field == "final_mass_kg" else "0.25"
+    leaf = _run_metadata_value_shape(value_shape, point)
+    field_value = {"Na": leaf} if field == "species_loss_fraction" else leaf
+    experiment = {"experiment_id": "run-1", "sample": {}}
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["experiment"] = "run-1"
+
+    if home.startswith("experiments[].") or home.startswith("experiments.*."):
+        registry_field = (
+            home.split(".", 2)[1]
+            if home.startswith("experiments[].")
+            else home.split(".", 2)[2].split(".", 1)[0]
+        )
+        experiment[registry_field] = {field: field_value}
+        if home.startswith("experiments[]."):
+            extract["experiments"] = [experiment]
+        else:
+            extract["experiments"] = {"run-1": experiment}
+    else:
+        extract["experiments"] = [experiment]
+        locator = {"table": "equipment", "page": 1}
+        if ".equipment.sample.value." in home:
+            observation["equipment"] = {
+                "sample": {
+                    "value": {field: field_value},
+                    "locator": locator,
+                }
+            }
+        else:
+            observation["equipment"] = {
+                field: {"value": field_value, "locator": locator}
+            }
+
+    return _write_min_tree(root, extract), extract
+
+
+def _run_metadata_shape_home_path(home: str) -> str:
+    return (
+        home.replace("experiments[]", "experiments[0]")
+        .replace("experiments.*", "experiments.run-1")
+        .replace("species.*", "species.Na")
+        .replace("observations[]", "observations[0]")
     )
 
 
@@ -484,3 +576,69 @@ def test_extract_without_run_metadata_keeps_legacy_store_bytes(
     assert hashlib.sha256(work_yaml.read_bytes()).hexdigest() == (
         "4f9553f197a2b2397e71bdee20e264b4061d21463c493179e3e65ac424e027e8"
     )
+
+
+@pytest.mark.parametrize(
+    ("field", "home"),
+    _RUN_METADATA_VALUE_HOMES,
+    ids=[f"{field}-{home}" for field, home in _RUN_METADATA_VALUE_HOMES],
+)
+@pytest.mark.parametrize(
+    ("value_shape", "accepted"),
+    _RUN_METADATA_VALUE_SHAPES,
+    ids=[shape for shape, _accepted in _RUN_METADATA_VALUE_SHAPES],
+)
+def test_run_metadata_value_shapes_validate_and_round_trip_at_every_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    value_shape: str,
+    accepted: bool,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, field, home, value_shape
+    )
+    errors = validate_extract_document(extract)
+    issue_suffix = (
+        f"sample.{field}[Na]"
+        if field == "species_loss_fraction"
+        else f"sample.{field}"
+    )
+    point = "0.0008" if field == "final_mass_kg" else "0.25"
+    raw_value = _run_metadata_value_shape(value_shape, point)
+
+    if not accepted:
+        assert any(
+            _run_metadata_shape_home_path(home) in error
+            and "[run-metadata-shape]" in error
+            for error in errors
+        ), errors
+        result = migrate(root, write=False)
+        assert result.validation is not None
+        assert any(
+            issue.reason is RefusalReason.INVALID_SOURCE
+            and issue.path.endswith(issue_suffix)
+            and repr(raw_value) in issue.detail
+            for issue in result.validation.issues
+        ), result.validation.issues
+        return
+
+    assert errors == []
+    migrate(root, write=True)
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    expected_point = point
+    if field == "final_mass_kg":
+        located = experiment.sample.final_mass_kg
+    else:
+        assert experiment.sample.species_loss_fraction is not None
+        located = experiment.sample.species_loss_fraction["Na"]
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of(expected_point)
+
+    if value_shape == "located-state":
+        assert located.locator == Locator(table="shape", page=7)
+    elif ".equipment." in home:
+        assert located.locator == Locator(table="equipment", page=1)
+    else:
+        assert located.locator is None
