@@ -111,46 +111,230 @@ class SameHourHeadspaceClosureResult:
 
 def _solve_same_hour_headspace_closure(
     initial_rates_kg_hr: Mapping[str, float],
+    rates_at_projection_g: Callable[[float, float], Mapping[str, float]],
+    partials_at_rates: Callable[[Mapping[str, float]], Mapping[str, float]],
+    molar_masses_kg_mol: Mapping[str, float],
+    *,
+    pressure_floor_Pa: float = 0.0,
+    closed_line_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
+    closed_line_total_pressure_Pa: float | None = None,
+) -> SameHourHeadspaceClosureResult:
+    """Close ordinary source rates on their single projected pressure scalar.
+
+    Every source projection has ``P_bulk,i = n_i * g`` with
+    ``g = P_bulk,total / N`` and ``N = Σ n_i`` in mol/hr. From the series
+    resistance law ``n_i * R'_i = P_eq,i - n_i*g``, so each untransformed
+    species rate is explicit: ``n_i(g) = P_eq,i / (R'_i + g)``. The callback
+    receives the same-hour total pressure as well as g, allowing pressure-
+    dependent gas resistance to be evaluated at the projected state. It then
+    applies existing admission, freeze, depletion and native-Fe limits. The
+    inner pressure bracket resolves that resistance for fixed g; the scalar
+    residual is ``h(g) = G(N(g), mdot(g)) - g``.
+
+    For a pumped line against vacuum, Poiseuille gives P proportional to
+    sqrt(mdot), so G=P/N is proportional to N**-1/2. Thus h(0)>0 for any
+    positive source, while N(g) is asymptotic to 1/g, G grows only as sqrt(g),
+    and h tends to -infinity. Bracketing and bisection therefore converge.
+    On a pressure-held no-feed line, a nonzero root exists only when
+    ΣP_eq,i>P_total; otherwise the explicit zero-flow boundary is returned.
+    For positive flow, the species equations imply
+    ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ. Its right
+    side strictly decreases from ΣP_eq/P_total to zero, proving the unique
+    positive root and the same sign change in h(g).
+
+    R'_i and g both have units Pa·hr/mol: R'_i=R_i*M_i/(A*3600), converting
+    the existing pressure-area-time-per-mass resistance from kg/hr to mol/hr.
+    Limiting cases are g=0 for a zero-resistance/open-vacuum source and zero
+    rate for the pressure-held sub-boiling boundary. The 200-evaluation cap
+    includes every source callback and transport projection in both brackets.
+    """
+    evaluation_cap = 200
+    relative_tolerance = 1.0e-12
+    pressure_floor = max(0.0, float(pressure_floor_Pa))
+    species_names = {str(species) for species in initial_rates_kg_hr}
+    evaluations = 0
+
+    def result(rates, partials, *, converged):
+        return SameHourHeadspaceClosureResult(
+            rates_kg_hr=dict(rates),
+            partial_pressures_mbar=dict(partials),
+            iterations=evaluations,
+            converged=converged,
+        )
+
+    if (
+        closed_line_equilibrium_pressures_Pa is not None
+        and closed_line_total_pressure_Pa is not None
+    ):
+        equilibrium_pressures = {
+            str(species): max(0.0, float(pressure))
+            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
+        }
+        if math.fsum(equilibrium_pressures.values()) <= max(
+            0.0, float(closed_line_total_pressure_Pa)
+        ):
+            zero_species = species_names | set(equilibrium_pressures)
+            return result(
+                {species: 0.0 for species in zero_species},
+                {},
+                converged=True,
+            )
+
+    class _ClosureEvaluationCapReached(Exception):
+        pass
+
+    def evaluate_at_pressure(g, pressure):
+        nonlocal evaluations
+        if evaluations >= evaluation_cap:
+            raise _ClosureEvaluationCapReached
+        evaluations += 1
+        candidate_rates = {
+            str(species): max(0.0, float(rate))
+            for species, rate in rates_at_projection_g(g, pressure).items()
+        }
+        species_names.update(candidate_rates)
+        for species in species_names:
+            candidate_rates.setdefault(species, 0.0)
+        partials = {
+            str(species): max(0.0, float(value))
+            for species, value in partials_at_rates(candidate_rates).items()
+        }
+        molar_flow = math.fsum(
+            candidate_rates[species] / float(molar_masses_kg_mol[species])
+            for species in species_names
+            if candidate_rates[species] > 0.0
+        )
+        projected_pressure_Pa = 100.0 * math.fsum(partials.values())
+        projected_g = (
+            projected_pressure_Pa / molar_flow if molar_flow > 0.0 else 0.0
+        )
+        pressure_residual = max(pressure_floor, projected_pressure_Pa) - pressure
+        return candidate_rates, partials, projected_g - g, pressure_residual
+
+    def evaluate(g):
+        if closed_line_total_pressure_Pa is not None:
+            return evaluate_at_pressure(
+                g,
+                max(pressure_floor, float(closed_line_total_pressure_Pa)),
+            )
+
+        pressure_low = pressure_floor
+        low_evaluation = evaluate_at_pressure(g, pressure_low)
+        if low_evaluation[3] <= 0.0:
+            return low_evaluation
+        pressure_high = max(
+            pressure_low * 2.0,
+            pressure_low + 1.0,
+            2.0 * (pressure_low + low_evaluation[3]),
+        )
+        high_evaluation = evaluate_at_pressure(g, pressure_high)
+        while high_evaluation[3] > 0.0:
+            pressure_high *= 2.0
+            high_evaluation = evaluate_at_pressure(g, pressure_high)
+
+        from scipy.optimize import brentq
+
+        last_pressure = None
+        last_pressure_evaluation = None
+
+        def pressure_residual(pressure):
+            nonlocal last_pressure, last_pressure_evaluation
+            last_pressure = pressure
+            last_pressure_evaluation = evaluate_at_pressure(g, pressure)
+            return last_pressure_evaluation[3]
+
+        pressure = brentq(
+            pressure_residual,
+            pressure_low,
+            pressure_high,
+            xtol=1.0e-300,
+            rtol=relative_tolerance,
+            maxiter=max(1, evaluation_cap - evaluations),
+        )
+        if pressure == last_pressure:
+            return last_pressure_evaluation
+        return evaluate_at_pressure(g, pressure)
+
+    low = 0.0
+    last_evaluation = None
+    last_g = None
+    try:
+        low_evaluation = evaluate(low)
+        last_evaluation = low_evaluation
+        last_g = low
+        low_rates, low_partials, low_residual, _ = low_evaluation
+        if low_residual <= 0.0:
+            return result(low_rates, low_partials, converged=low_residual == 0.0)
+
+        low_molar_flow = math.fsum(
+            low_rates[species] / float(molar_masses_kg_mol[species])
+            for species in species_names
+            if low_rates[species] > 0.0
+        )
+        high = max(
+            1.0e-300,
+            100.0 * math.fsum(low_partials.values()) / low_molar_flow,
+        )
+        high_evaluation = evaluate(high)
+        last_evaluation = high_evaluation
+        last_g = high
+        while high_evaluation[2] > 0.0:
+            high *= 2.0
+            high_evaluation = evaluate(high)
+            last_evaluation = high_evaluation
+            last_g = high
+        if high_evaluation[2] == 0.0:
+            return result(
+                high_evaluation[0], high_evaluation[1], converged=True
+            )
+
+        from scipy.optimize import brentq
+
+        def outer_residual(g):
+            nonlocal last_evaluation, last_g
+            last_g = g
+            last_evaluation = evaluate(g)
+            return last_evaluation[2]
+
+        root = brentq(
+            outer_residual,
+            low,
+            high,
+            xtol=1.0e-300,
+            rtol=relative_tolerance,
+            maxiter=max(1, evaluation_cap - evaluations),
+        )
+        if root != last_g:
+            last_g = root
+            last_evaluation = evaluate(root)
+        return result(
+            last_evaluation[0],
+            last_evaluation[1],
+            converged=abs(last_evaluation[2])
+            <= relative_tolerance * max(abs(root), 1.0e-300),
+        )
+    except _ClosureEvaluationCapReached:
+        if last_evaluation is None:
+            return result({}, {}, converged=False)
+        return result(last_evaluation[0], last_evaluation[1], converged=False)
+
+
+def _solve_c0_joint_solid_host_bakeout_closure(
+    initial_rates_kg_hr: Mapping[str, float],
     rates_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
     partials_at_rates: Callable[[Mapping[str, float]], Mapping[str, float]],
     *,
     closed_line_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
     closed_line_total_pressure_Pa: float | None = None,
 ) -> SameHourHeadspaceClosureResult:
-    """Close source rates against the pressure projected from those rates.
+    """Close C0's joint ordinary and solid-host source against transport.
 
-    The premise is a self-pumped Poiseuille headspace: candidate evolved-gas
-    rates determine the pipe pressure through ``estimate_transport_state``,
-    and mole fractions determine species partials through
-    ``species_partial_pressures``. The fixed point is
-    ``j_i = series_flux_i(P_eq,i - P_bulk,i(j)) * A * 3600``. Each rate falls
-    as its own backpressure rises, while greater total throughput raises the
-    projected pressure. A damped pass estimates a negative local fixed-point
-    slope per species to avoid full-rate/zero oscillation; if that stalls, a
-    bracketed scalar solve finds each species rate
-    while holding the other current rates fixed, then repeats across species.
-    The bracket is valid because raising one species rate raises its projected
-    partial pressure, so its series flux decreases. The series-resistance
-    terms have units Pa m² s kg⁻¹, so Pa divided by resistance gives kg m⁻²
-    s⁻¹, then area and 3600 s/hr give kg/hr.
-    With pipe conductance tending to infinity, projected vapor pressure and
-    ``P_bulk`` tend to zero and rates tend to the zero-backpressure flux. As
-    conductance tends to zero, any positive rate requires unbounded pressure;
-    backpressure reaches equilibrium pressure and the net flux tends to zero.
-
-    The one-hour source map is evaluated from the current candidate each pass;
-    no previous-hour headspace value enters this solve.
-
-    The pressure-held no-feed bracket has a unique scalar total molar-flow
-    root. For each species, with ``R'_i = R_i M_i / (A * 3600)`` in
-    Pa·hr/mol and total molar flow ``Φ`` in mol/hr,
-    ``n_i R'_i = P_eq,i - P_total n_i / Φ``, so
-    ``n_i / Φ = P_eq,i / (R'_i Φ + P_total)``. Summing species gives
-    ``1 = Σ P_eq,i / (R'_i Φ + P_total)``. The right side is strictly
-    decreasing in ``Φ`` (each ``R'_i`` is positive), starts at
-    ``ΣP_eq,i / P_total``, and tends to zero. Thus a positive root exists
-    exactly when ``ΣP_eq,i > P_total``; otherwise the physical boundary is
-    ``Φ = 0``. The denominator is Pa and each quotient is dimensionless.
+    This composite source has no single per-species ``P_eq/(R' + g)`` form:
+    it combines ordinary melt evaporation with independently reaction-limited
+    solid-host releases, then applies shared host-inventory and pipe-capacity
+    scaling. Keep its coupled callback here; ordinary evaporation and native
+    Fe use the exact scalar reduction. Every outer projection is counted by
+    the same evaluation budget as source-map evaluations.
     """
     rates = {
         str(species): max(0.0, float(rate))

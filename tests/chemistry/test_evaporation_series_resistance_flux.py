@@ -494,17 +494,51 @@ def _self_pumped_case(species, *, pipe_diameter_m=0.12):
         return {species: series.flux_kg_s_m2 * area_m2 * 3600.0}
 
     vacuum = flux_at_partials({})
-    return model, melt, area_m2, vacuum, project_partials, flux_at_partials
+    vacuum_series = _evap(
+        species=species,
+        P_eq_pa=80.0,
+        P_bulk_pa=0.0,
+        T_surface_K=1800.0,
+        T_gas_K=1800.0,
+        molar_mass_kg_mol=molar_mass,
+        alpha_i=0.13,
+        knudsen_number=math.inf,
+        gas_resistance_enabled=False,
+    )
+    resistance_Pa_m2_s_kg = (
+        vacuum_series.r_interface
+        + vacuum_series.r_gas
+        + vacuum_series.r_melt
+    )
+    molar_resistance_Pa_hr_mol = (
+        resistance_Pa_m2_s_kg * molar_mass / (area_m2 * 3600.0)
+    )
+
+    def rates_at_projection_g(g, _pressure_Pa):
+        molar_rate = 80.0 / (molar_resistance_Pa_hr_mol + g)
+        return {species: molar_rate * molar_mass}
+
+    return (
+        model,
+        melt,
+        area_m2,
+        vacuum,
+        project_partials,
+        flux_at_partials,
+        rates_at_projection_g,
+        molar_mass,
+    )
 
 
 def _solve_self_pumped_case(species, *, pipe_diameter_m=0.12):
-    model, melt, area_m2, vacuum, project, flux_at = _self_pumped_case(
+    model, melt, area_m2, vacuum, project, _flux_at, rates_at_g, molar_mass = _self_pumped_case(
         species, pipe_diameter_m=pipe_diameter_m
     )
     result = _solve_same_hour_headspace_closure(
         vacuum,
-        flux_at,
+        rates_at_g,
         project,
+        {species: molar_mass},
     )
     return model, melt, area_m2, result
 
@@ -516,14 +550,24 @@ def test_constant_temperature_multihour_closure_does_not_alternate():
             # Stale end-of-hour pressures alternate deliberately; each hour
             # supplies the corresponding extreme initial rate, while the
             # fixed point closes against its own evolved-rate projection.
-            _model, _melt, _area_m2, vacuum, project, flux_at = _self_pumped_case(
+            (
+                _model,
+                _melt,
+                _area_m2,
+                vacuum,
+                project,
+                _flux_at,
+                rates_at_g,
+                molar_mass,
+            ) = _self_pumped_case(
                 species
             )
             stale_bulk_mbar = 0.0 if hour % 2 == 0 else 1.6
             result = _solve_same_hour_headspace_closure(
-                vacuum if stale_bulk_mbar == 0.0 else flux_at({species: stale_bulk_mbar}),
-                flux_at,
+                vacuum if stale_bulk_mbar == 0.0 else _flux_at({species: stale_bulk_mbar}),
+                rates_at_g,
                 project,
+                {species: molar_mass},
             )
             assert result.converged, species
             hourly_fluxes.append(result.rates_kg_hr[species])
@@ -565,9 +609,7 @@ def test_projected_pressure_carries_the_converged_evolved_rate():
 
 def test_pipe_geometry_limits_recover_vacuum_and_suppress_closed_line_flux():
     species = "K"
-    _model, _melt, _area_m2, vacuum, _project, _flux_at = _self_pumped_case(
-        species
-    )
+    _model, _melt, _area_m2, vacuum, _project, _flux_at, _rates, _mass = _self_pumped_case(species)
     _open_model, _open_melt, _open_area, open_result = _solve_self_pumped_case(
         species, pipe_diameter_m=1.2e6
     )
@@ -591,13 +633,14 @@ def test_pipe_geometry_limits_recover_vacuum_and_suppress_closed_line_flux():
 def test_closed_line_subboiling_root_is_recognized_without_iteration():
     equilibrium_pressures = {"A": 40.0, "B": 39.0}
 
-    def unexpected_evaluation(_values):
+    def unexpected_evaluation(*_values):
         raise AssertionError("zero-boundary root must not iterate")
 
     result = _solve_same_hour_headspace_closure(
         {"A": 1.0, "B": 2.0},
         unexpected_evaluation,
         unexpected_evaluation,
+        {"A": 1.0, "B": 1.0},
         closed_line_equilibrium_pressures_Pa=equilibrium_pressures,
         closed_line_total_pressure_Pa=80.0,
     )
@@ -732,8 +775,8 @@ def test_pumped_closure_prices_the_admitted_depleted_stream(
         transport["vapor_pressure_mbar"],
         sim.species_formula_registry,
     )
-
     assert closure["converged"]
+    assert closure["iterations"] <= 200
     for species in ("Na", "Fe"):
         assert closure["partial_pressures_Pa"][species] == pytest.approx(
             admitted_partials_mbar[species] * 100.0,
@@ -741,100 +784,44 @@ def test_pumped_closure_prices_the_admitted_depleted_stream(
         )
 
 
-def test_closure_outer_projection_is_included_in_evaluation_cap():
-    species = {f"S{index:03d}" for index in range(100)}
+def test_scalar_closure_counts_source_and_projection_evaluations():
+    species = tuple(f"S{index:03d}" for index in range(100))
     projection_calls = 0
 
     def partials_at_rates(rates):
         nonlocal projection_calls
         projection_calls += 1
-        return dict(rates)
+        total_molar_flow = math.fsum(rates.values())
+        pressure_mbar = math.sqrt(total_molar_flow) / 100.0
+        return {
+            name: pressure_mbar / len(species)
+            for name in species
+        }
 
-    def rates_at_partials(partials):
-        return {name: partials[name] + 1.0 for name in species}
+    def rates_at_projection_g(g, _pressure_Pa):
+        rate = 1.0 / (1.0 + g)
+        return {name: rate for name in species}
 
     result = _solve_same_hour_headspace_closure(
-        {name: 0.0 for name in species},
-        rates_at_partials,
+        {name: 1.0 for name in species},
+        rates_at_projection_g,
         partials_at_rates,
+        {name: 1.0 for name in species},
     )
 
-    assert not result.converged
-    assert result.iterations <= 2000
+    total_molar_flow = math.fsum(result.rates_kg_hr.values())
+    projected_g = (
+        100.0 * math.fsum(result.partial_pressures_mbar.values())
+        / total_molar_flow
+    )
+    assert result.converged
+    assert result.iterations <= 200
     assert projection_calls == result.iterations
-
-
-def test_stiff_species_coupling_closes_before_the_evaluation_cap():
-    species = tuple(f"S{index:02d}" for index in range(11))
-    coupling = 0.999
-
-    def partials_at_rates(rates):
-        return dict(rates)
-
-    def rates_at_partials(partials):
-        return {
-            name: 1.0 - coupling + coupling * sum(
-                partials[other] for other in species if other != name
-            ) / (len(species) - 1)
-            for name in species
-        }
-
-    result = _solve_same_hour_headspace_closure(
-        {
-            name: (0.5 if index == 0 else 1.0)
-            for index, name in enumerate(species)
-        },
-        rates_at_partials,
-        partials_at_rates,
+    assert projected_g == pytest.approx(
+        1.0 / math.sqrt(total_molar_flow), rel=1.0e-12
     )
-
-    assert result.converged
-    assert result.iterations < 2000
-    assert result.rates_kg_hr == pytest.approx(
-        {name: 1.0 for name in species}, rel=1e-8
-    )
-
-
-def test_closure_projects_the_optimizer_candidate_before_returning(monkeypatch):
-    from types import SimpleNamespace
-
-    import scipy.optimize
-
-    species = tuple(f"S{index:02d}" for index in range(11))
-    coupling = 0.999
-
-    def partials_at_rates(rates):
-        return dict(rates)
-
-    def rates_at_partials(partials):
-        return {
-            name: 1.0 - coupling + coupling * sum(
-                partials[other] for other in species if other != name
-            ) / (len(species) - 1)
-            for name in species
-        }
-
-    def optimizer_with_a_final_probe(residual, x0, **_kwargs):
-        residual(x0)
-        # All initial species scales are one, so this is the unit-rate fixed point.
-        return SimpleNamespace(x=[1.0 for _ in species])
-
-    monkeypatch.setattr(
-        scipy.optimize, "root", optimizer_with_a_final_probe
-    )
-    result = _solve_same_hour_headspace_closure(
-        {
-            name: (0.5 if index == 0 else 1.0)
-            for index, name in enumerate(species)
-        },
-        rates_at_partials,
-        partials_at_rates,
-    )
-
-    assert result.converged
-    assert result.iterations < 2000
-    assert result.rates_kg_hr == pytest.approx(
-        {name: 1.0 for name in species}, rel=1e-9
+    assert 1.0 / result.rates_kg_hr[species[0]] - 1.0 == pytest.approx(
+        projected_g, rel=1.0e-12
     )
 
 

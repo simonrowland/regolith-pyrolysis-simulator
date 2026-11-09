@@ -8123,6 +8123,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
             EvaporationFluxConfigurationError,
             _evaluate_alpha_control,
+            _molar_series_resistance_Pa_hr_mol,
             _series_resistance_evaporation_flux_kg_m2_s,
         )
         from simulator.evaporation import (
@@ -8252,20 +8253,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             except EvaporationFluxConfigurationError as exc:
                 raise evaporation_flux_refusal_from_configuration_error(exc) from exc
 
-        def native_rate_at_partials(partials_mbar):
-            projected_bulk_Pa = max(
-                0.0, float(partials_mbar.get('Fe', 0.0)) * 100.0
-            )
-            projected_total_Pa = max(
+        def native_rate_at_projection_g(g, pressure_Pa):
+            reference_pressure_Pa = max(
                 overhead_pressure_mbar * 100.0,
-                sum(max(0.0, float(value)) for value in partials_mbar.values())
-                * 100.0,
+                float(pressure_Pa),
             )
-            candidate_flux = series_flux_at(
-                projected_bulk_Pa, projected_total_Pa
+            source_resistance = series_flux_at(0.0, reference_pressure_Pa)
+            molar_resistance = _molar_series_resistance_Pa_hr_mol(
+                source_resistance,
+                molar_mass_kg_mol=molar_mass_kg_mol,
+                area_m2=float(self.melt.melt_surface_area_m2),
+            )
+            candidate_mol_hr = (
+                P_reference_Pa / (molar_resistance + float(g))
+                if math.isfinite(molar_resistance)
+                else 0.0
+            )
+            projected_bulk_Pa = candidate_mol_hr * float(g)
+            projected_total_Pa = max(
+                reference_pressure_Pa,
             )
             candidate_domain = viscous_p_bulk_out_of_domain_diagnostic(
-                knudsen_number=float(candidate_flux.knudsen_number),
+                knudsen_number=float(
+                    series_flux_at(
+                        projected_bulk_Pa, projected_total_Pa
+                    ).knudsen_number
+                ),
                 overhead_pressure_pa=projected_total_Pa,
                 pipe_diameter_m=pipe_diameter_m,
                 gas_temperature_K=gas_temperature_K,
@@ -8278,11 +8291,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if continuum_validity_refuses(candidate_domain):
                 return {'Fe': 0.0}
-            candidate_rate = (
-                max(0.0, float(candidate_flux.flux_kg_s_m2))
-                * max(0.0, float(self.melt.melt_surface_area_m2))
-                * 3600.0
-            )
+            candidate_rate = max(0.0, candidate_mol_hr) * molar_mass_kg_mol
             candidate_rate = min(
                 candidate_rate,
                 native_fe_available_mol * molar_mass_kg_mol,
@@ -8329,8 +8338,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         closure = _solve_same_hour_headspace_closure(
             {'Fe': vacuum_rate},
-            native_rate_at_partials,
+            native_rate_at_projection_g,
             native_partials_at_rates,
+            {'Fe': molar_mass_kg_mol},
+            pressure_floor_Pa=overhead_pressure_mbar * 100.0,
             **closed_line_boundary,
         )
         P_bulk_Pa = max(
@@ -16117,7 +16128,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         bakeout_closure = None
         if solve_bakeout_closure:
-            from simulator.overhead import _solve_same_hour_headspace_closure
+            from simulator.overhead import (
+                _solve_c0_joint_solid_host_bakeout_closure,
+            )
 
             def rates_at_bakeout_partials(partials_mbar):
                 partials_Pa = {
@@ -16193,7 +16206,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
 
             initial_rates = dict(evap_flux.species_kg_hr)
-            bakeout_closure = _solve_same_hour_headspace_closure(
+            bakeout_closure = _solve_c0_joint_solid_host_bakeout_closure(
                 initial_rates,
                 rates_at_bakeout_partials,
                 partials_at_bakeout_rates,

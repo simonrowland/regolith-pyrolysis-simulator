@@ -212,6 +212,35 @@ class SeriesEvaporationFlux:
         }
 
 
+def _molar_series_resistance_Pa_hr_mol(
+    series_flux: SeriesEvaporationFlux | Mapping[str, Any],
+    *,
+    molar_mass_kg_mol: float,
+    area_m2: float,
+) -> float:
+    """Convert pressure-area-time-per-mass resistance to Pa·hr/mol."""
+    diagnostic = (
+        series_flux.as_diagnostic()
+        if isinstance(series_flux, SeriesEvaporationFlux)
+        else series_flux
+    )
+    if not isinstance(diagnostic, Mapping):
+        return math.inf
+    area = float(area_m2)
+    molar_mass = float(molar_mass_kg_mol)
+    if not math.isfinite(area) or area <= 0.0:
+        return math.inf
+    if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+        return math.inf
+    interface = max(0.0, float(diagnostic.get("r_interface", 0.0) or 0.0))
+    melt = max(0.0, float(diagnostic.get("r_melt", 0.0) or 0.0))
+    gas = max(0.0, float(diagnostic.get("r_gas", 0.0) or 0.0))
+    # R_total [Pa m² s/kg] × M [kg/mol] / (A [m²] × 3600 [s/hr])
+    # gives R' [Pa·hr/mol], the basis used by n_i*R'_i = P_eq,i-P_bulk,i.
+    resistance = math.fsum((interface, gas, melt))
+    return resistance * molar_mass / (area * 3600.0)
+
+
 def _coerce_alpha_by_species(alpha_control) -> dict[str, Any]:
     if isinstance(alpha_control, Mapping):
         coerced: dict[str, Any] = {}

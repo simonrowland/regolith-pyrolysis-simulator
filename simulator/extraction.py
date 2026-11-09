@@ -3586,6 +3586,7 @@ class ExtractionMixin:
         )
         from engines.builtin.evaporation_flux import (
             EvaporationFluxConfigurationError,
+            _molar_series_resistance_Pa_hr_mol,
             _series_resistance_evaporation_flux_kg_m2_s,
         )
         from simulator.evaporation import (
@@ -3871,20 +3872,24 @@ class ExtractionMixin:
                         exc
                     ) from exc
 
-            def ca_rate_at_partials(partials_mbar):
-                projected_bulk_Pa = max(
-                    0.0, float(partials_mbar.get('Ca', 0.0)) * 100.0
-                )
+            def ca_rate_at_projection_g(g, pressure_Pa):
+                molar_mass_kg_mol = MOLAR_MASS['Ca'] / 1000.0
                 total_pressure_Pa = max(
-                    p_total_mbar * 100.0,
-                    sum(
-                        max(0.0, float(value))
-                        for value in partials_mbar.values()
-                    ) * 100.0,
+                    p_total_mbar * 100.0, float(pressure_Pa)
                 )
-                candidate = series_flux_at(
-                    projected_bulk_Pa, total_pressure_Pa
+                source_resistance = series_flux_at(0.0, total_pressure_Pa)
+                molar_resistance = _molar_series_resistance_Pa_hr_mol(
+                    source_resistance,
+                    molar_mass_kg_mol=molar_mass_kg_mol,
+                    area_m2=area_m2,
                 )
+                candidate_mol_hr = (
+                    p_sat_pa / (molar_resistance + float(g))
+                    if math.isfinite(molar_resistance)
+                    else 0.0
+                )
+                projected_bulk_Pa = candidate_mol_hr * float(g)
+                candidate = series_flux_at(projected_bulk_Pa, total_pressure_Pa)
                 domain = viscous_p_bulk_out_of_domain_diagnostic(
                     knudsen_number=float(candidate.knudsen_number),
                     overhead_pressure_pa=total_pressure_Pa,
@@ -3897,8 +3902,7 @@ class ExtractionMixin:
                 if continuum_validity_refuses(domain):
                     return {'Ca': 0.0}
                 return {
-                    'Ca': max(0.0, float(candidate.flux_kg_s_m2))
-                    * area_m2 * 3600.0
+                    'Ca': max(0.0, candidate_mol_hr) * molar_mass_kg_mol
                 }
 
             def ca_partials_at_rates(rates_kg_hr):
@@ -3948,8 +3952,10 @@ class ExtractionMixin:
                     'Ca': max(0.0, float(seed.flux_kg_s_m2))
                     * area_m2 * 3600.0
                 },
-                ca_rate_at_partials,
+                ca_rate_at_projection_g,
                 ca_partials_at_rates,
+                {'Ca': MOLAR_MASS['Ca'] / 1000.0},
+                pressure_floor_Pa=p_total_mbar * 100.0,
                 **closed_line_boundary,
             )
             p_bulk_pa = max(

@@ -1274,24 +1274,17 @@ class EvaporationMixin:
             if str(seed_result.status) != 'ok':
                 kernel_result = seed_result
             else:
-                def rates_from_result(result):
-                    rates = {
-                        str(species): max(0.0, float(rate))
-                        for species, rate in dict(
-                            (result.diagnostic or {}).get(
-                                'evaporation_flux_kg_hr', {}
-                            ) or {}
-                        ).items()
-                    }
-                    liquid_factor = (
-                        self._freeze_gate_liquid_fraction_factor(
-                            gate_authority=gate_authority,
-                        )
-                        if self._freeze_gate_enabled()
-                        else 1.0
+                liquid_factor = (
+                    self._freeze_gate_liquid_fraction_factor(
+                        gate_authority=gate_authority,
                     )
+                    if self._freeze_gate_enabled()
+                    else 1.0
+                )
+
+                def apply_source_limits(rates):
                     rates = {
-                        species: rate * liquid_factor
+                        str(species): max(0.0, float(rate)) * liquid_factor
                         for species, rate in rates.items()
                     }
                     residual_capacity_mol = getattr(
@@ -1310,16 +1303,129 @@ class EvaporationMixin:
                         )
                     return rates
 
-                def rates_at_partials(partials_mbar):
-                    partials_Pa = {
-                        str(species): max(0.0, float(pressure)) * 100.0
-                        for species, pressure in partials_mbar.items()
+                def rates_from_result(result):
+                    rates = {
+                        str(species): max(0.0, float(rate))
+                        for species, rate in dict(
+                            (result.diagnostic or {}).get(
+                                'evaporation_flux_kg_hr', {}
+                            ) or {}
+                        ).items()
                     }
-                    rates = rates_from_result(
-                        dispatch_at_partials(partials_Pa)
+                    return apply_source_limits(rates)
+
+                seed_diagnostic = dict(seed_result.diagnostic or {})
+                seed_series = dict(
+                    seed_diagnostic.get('evaporation_series_resistance') or {}
+                )
+                admitted_species = set(
+                    dict(seed_diagnostic.get('evaporation_flux_kg_hr') or {})
+                )
+                area_m2 = max(
+                    0.0,
+                    float(getattr(self.melt, 'melt_surface_area_m2', 0.0)),
+                )
+                def rates_at_projection_g(g, pressure_Pa):
+                    from engines.builtin.evaporation_flux import (
+                        DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+                        DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+                        _molar_series_resistance_Pa_hr_mol,
+                        _series_resistance_evaporation_flux_kg_m2_s,
                     )
+                    from simulator.config_flags import bool_feature_flag
+
+                    raw_rates = {}
+                    stir = dict(control_inputs.get('stir_factor') or {})
+                    upper_bound_species = set(
+                        control_inputs.get('hkl_upper_bound_transport_species')
+                        or ()
+                    )
+                    series_config = dict(
+                        control_inputs.get('evaporation_series_resistance')
+                        or {}
+                    )
+                    gas_enabled = bool_feature_flag(
+                        series_config,
+                        'gas_resistance_enabled',
+                        True,
+                    )
+                    for species in admitted_species:
+                        molar_mass = float(molar_masses_kg_mol[species])
+                        series = seed_series.get(species)
+                        if not isinstance(series, Mapping):
+                            continue
+                        uses_gas_resistance = (
+                            gas_enabled and species not in upper_bound_species
+                        )
+                        series_at_pressure = _series_resistance_evaporation_flux_kg_m2_s(
+                            species=species,
+                            P_eq_pa=max(
+                                0.0, float(vapor_pressures.get(species, 0.0))
+                            ),
+                            P_bulk_pa=0.0,
+                            T_surface_K=T_K,
+                            molar_mass_kg_mol=molar_mass,
+                            alpha_i=max(
+                                0.0,
+                                float(series.get('alpha_intrinsic', 0.0)),
+                            ),
+                            pipe_diameter_m=float(
+                                control_inputs.get('pipe_diameter_m', 0.12)
+                            ),
+                            overhead_pressure_pa=max(0.0, float(pressure_Pa)),
+                            axial_stir_factor=float(stir.get('axial', 0.0)),
+                            radial_stir_factor=float(stir.get('radial', 1.0)),
+                            cold_skull_envelope=(
+                                control_inputs.get('cold_skull_envelope')
+                            ),
+                            carrier_gas=str(
+                                control_inputs.get('carrier_gas') or 'N2'
+                            ),
+                            T_gas_K=float(
+                                control_inputs.get('gas_temperature_K', T_K)
+                            ),
+                            melt_resistance_enabled=bool(
+                                series_config.get('melt_resistance_enabled', False)
+                            ),
+                            melt_surface_renewal_base_kg_s_m2_pa=float(
+                                series_config.get(
+                                    'melt_surface_renewal_base_kg_s_m2_pa',
+                                    DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+                                )
+                                or DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
+                            ),
+                            melt_surface_renewal_source=str(
+                                series_config.get(
+                                    'melt_surface_renewal_source',
+                                    DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+                                )
+                            ),
+                            gas_resistance_enabled=uses_gas_resistance,
+                            extrapolate_continuum=(
+                                'continuum_extrapolation_notice' in series
+                            ),
+                        )
+                        molar_resistance = _molar_series_resistance_Pa_hr_mol(
+                            series_at_pressure,
+                            molar_mass_kg_mol=molar_mass,
+                            area_m2=area_m2,
+                        )
+                        bulk_projection_Pa = (
+                            float(g) if uses_gas_resistance else 0.0
+                        )
+                        molar_rate = (
+                            max(0.0, float(vapor_pressures.get(species, 0.0)))
+                            / (molar_resistance + bulk_projection_Pa)
+                            if math.isfinite(molar_resistance)
+                            and molar_resistance + bulk_projection_Pa > 0.0
+                            else 0.0
+                        )
+                        raw_rates[species] = (
+                            molar_rate * molar_mass
+                        )
+                    limited_rates = apply_source_limits(raw_rates)
                     admitted_flux = self._apply_analytic_evaporation_depletion(
-                        EvaporationFlux(species_kg_hr=rates)
+                        EvaporationFlux(species_kg_hr=limited_rates)
                     )
                     return dict(admitted_flux.species_kg_hr)
 
@@ -1380,8 +1486,12 @@ class EvaporationMixin:
                     upper_rates = dict(upper_flux.species_kg_hr)
                     lower_closure = _solve_same_hour_headspace_closure(
                         upper_rates,
-                        rates_at_partials,
+                        rates_at_projection_g,
                         partials_at_rates,
+                        molar_masses_kg_mol,
+                        pressure_floor_Pa=float(
+                            control_inputs.get('commanded_pressure_pa', 0.0)
+                        ),
                         closed_line_equilibrium_pressures_Pa=vapor_pressures,
                         closed_line_total_pressure_Pa=pressure_held_total_Pa,
                     )
@@ -1471,8 +1581,12 @@ class EvaporationMixin:
                 else:
                     closure = _solve_same_hour_headspace_closure(
                         seed_rates,
-                        rates_at_partials,
+                        rates_at_projection_g,
                         partials_at_rates,
+                        molar_masses_kg_mol,
+                        pressure_floor_Pa=float(
+                            control_inputs.get('commanded_pressure_pa', 0.0)
+                        ),
                     )
                     final_partials_Pa = {
                         str(species): max(0.0, float(pressure)) * 100.0
