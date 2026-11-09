@@ -1096,3 +1096,356 @@ def test_unknown_equipment_mass_unit_keys_are_typed_errors(
         and issue.path.endswith("sample.final_mass_kg")
         for issue in result.validation.issues
     ), result.validation.issues
+
+
+_MASS_ANNOTATION_CASES = tuple(
+    (field, home, shape, unit_key)
+    for field in ("mass_kg", "final_mass_kg")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+    for shape, unit_key in (
+        ("wrapper", "unit"),
+        ("point-value", "units"),
+        ("located-state-value", "unit"),
+    )
+)
+
+
+def _mass_unit_annotation_payload(shape: str, unit_key: str) -> dict:
+    unit_locator = {"table": f"r7-{shape}", "page": 9}
+    point = {"kind": "point", "point": "0.5"}
+    if shape == "wrapper":
+        return {"value": point, unit_key: "g", "locator": unit_locator}
+    if shape == "point-value":
+        return {**point, unit_key: "g", "locator": unit_locator}
+    if shape == "located-state-value":
+        point[unit_key] = "g"
+        return {
+            "state": {"tag": "value", "value": point},
+            "locator": unit_locator,
+        }
+    raise AssertionError(f"unexpected unit annotation shape: {shape}")
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "shape", "unit_key"),
+    _MASS_ANNOTATION_CASES,
+    ids=[
+        f"{field}-{home}-{shape}"
+        for field, home, shape, _unit_key in _MASS_ANNOTATION_CASES
+    ],
+)
+def test_mass_unit_annotations_normalize_at_every_home_and_value_layer(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    shape: str,
+    unit_key: str,
+) -> None:
+    unit_locator = Locator(table=f"r7-{shape}", page=9)
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        field,
+        home,
+        "scalar",
+        raw_value=_mass_unit_annotation_payload(shape, unit_key),
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, observations = load_migrated_store(root)
+    experiment = experiments[next(iter(observations.values())).experiment_id]
+    located = getattr(experiment.sample, field)
+
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of("0.0005")
+    assert located.locator == unit_locator
+
+
+def test_registry_initial_mass_point_unit_annotation_witness_converts_from_grams(
+    tmp_path: Path,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "point-wrapper",
+        raw_value={
+            "kind": "point",
+            "point": "1",
+            "units": "g",
+            "locator": {"page": 1},
+        },
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, _observations = load_migrated_store(root)
+    located = experiments["10.1234/fixture::experiment::run-1"].sample.mass_kg
+
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of("0.001")
+    assert located.locator == Locator(page=1)
+
+
+def test_registry_initial_mass_unit_alias_is_typed_instead_of_ignored(
+    tmp_path: Path,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "point-wrapper",
+        raw_value={
+            "kind": "point",
+            "point": "1",
+            "mass_unit": "g",
+        },
+    )
+
+    assert any(
+        "experiments[0].sample.mass_kg" in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+def test_registry_species_loss_fraction_unit_annotation_is_typed(
+    tmp_path: Path,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "species_loss_fraction",
+        "experiments[].sample.species_loss_fraction",
+        "scalar",
+        raw_value={
+            "Na": {"kind": "point", "point": "0.25", "units": "g"},
+        },
+    )
+
+    assert any(
+        "experiments[0].sample.species_loss_fraction" in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.species_loss_fraction[Na]")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_MASS_UNIT_ERROR_CASES = tuple(
+    (field, home, error_case, annotations)
+    for field in ("mass_kg", "final_mass_kg")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+    for error_case, annotations in (
+        ("unknown-unit", {"unit": "lb"}),
+        ("duplicate-unit", {"unit": "g", "units": "g"}),
+        ("conflicting-units", {"unit": "g", "units": "kg"}),
+        ("unknown-unit-key", {"mass_unit": "g"}),
+    )
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "error_case", "annotations"),
+    _MASS_UNIT_ERROR_CASES,
+    ids=[
+        f"{field}-{home}-{error_case}"
+        for field, home, error_case, _annotations in _MASS_UNIT_ERROR_CASES
+    ],
+)
+def test_invalid_mass_unit_annotations_are_typed_at_every_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    error_case: str,
+    annotations: dict,
+) -> None:
+    del error_case
+    point = "1" if field == "mass_kg" else "0.5"
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        field,
+        home,
+        "scalar",
+        raw_value={"kind": "point", "point": point, **annotations},
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(f"sample.{field}")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_MASS_COMPOSITE_UNIT_CASES = tuple(
+    (field, home, kind)
+    for field in ("mass_kg", "final_mass_kg")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+    for kind in ("series", "interval")
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "kind"),
+    _MASS_COMPOSITE_UNIT_CASES,
+    ids=[
+        f"{field}-{home}-{kind}"
+        for field, home, kind in _MASS_COMPOSITE_UNIT_CASES
+    ],
+)
+def test_mass_units_on_series_and_interval_values_are_typed_at_every_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    kind: str,
+) -> None:
+    raw_value = (
+        {"kind": kind, "series": [["1", "0.5"]], "unit": "g"}
+        if kind == "series"
+        else {
+            "kind": kind,
+            "interval_low": "0.5",
+            "interval_high": "1",
+            "units": "g",
+        }
+    )
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, field, home, "scalar", raw_value=raw_value
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    issue_suffix = f"sample.{field}"
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(issue_suffix)
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+@pytest.mark.parametrize(
+    "home", RUN_METADATA_FIELD_HOMES["species_loss_fraction"][1],
+    ids=RUN_METADATA_FIELD_HOMES["species_loss_fraction"][1],
+)
+def test_species_loss_fraction_rejects_units_at_every_home(
+    tmp_path: Path,
+    home: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "species_loss_fraction",
+        home,
+        "scalar",
+        raw_value={
+            "Na": {
+                "state": {
+                    "tag": "value",
+                    "value": {"kind": "point", "point": "0.25", "unit": "g"},
+                },
+                "locator": {"table": "r7-loss", "page": 3},
+            },
+        },
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.species_loss_fraction[Na]")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_UNITLESS_RUN_METADATA_CASES = tuple(
+    (field, home)
+    for field in ("charge_sequence", "vaporization_statement")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+)
+
+
+def _unitless_run_metadata_extract(
+    root: Path,
+    field: str,
+    home: str,
+    payload: dict,
+) -> tuple[Path, dict]:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    experiment = {"experiment_id": "run-1", field: payload}
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["experiment"] = "run-1"
+    if home.startswith("experiments[]."):
+        extract["experiments"] = [experiment]
+    else:
+        extract["experiments"] = {"run-1": experiment}
+    return _write_min_tree(root, extract), extract
+
+
+@pytest.mark.parametrize(
+    ("field", "home"),
+    _UNITLESS_RUN_METADATA_CASES,
+    ids=[f"{field}-{home}" for field, home in _UNITLESS_RUN_METADATA_CASES],
+)
+def test_run_metadata_without_unit_semantics_rejects_unit_annotations(
+    tmp_path: Path,
+    field: str,
+    home: str,
+) -> None:
+    payload = (
+        {"charge_id": "charge-a", "run_index": 1, "unit": "g"}
+        if field == "charge_sequence"
+        else {
+            "state": {"tag": "value", "value": "congruent"},
+            "unit": "g",
+            "locator": {"table": "r7-vapor", "page": 4},
+        }
+    )
+    root, extract = _unitless_run_metadata_extract(
+        tmp_path, field, home, payload
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(field)
+        for issue in result.validation.issues
+    ), result.validation.issues
