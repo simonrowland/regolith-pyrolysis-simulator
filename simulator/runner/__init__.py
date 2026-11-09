@@ -2534,6 +2534,7 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
         "temperature_K",
         "pressure_bar",
         "iw_log",
+        "native_fe_anchor_log10_fO2_bar",
     }
     exported: dict[str, Any] = {}
     for key, value in sorted(summary.items()):
@@ -2544,10 +2545,11 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
             )
         elif isinstance(value, bool):
             exported[key] = bool(value)
-        elif (
-            key in ("native_fe_partition", "native_fe_saturation_event")
-            and isinstance(value, Mapping)
+        elif key in ("native_fe_partition", "native_fe_saturation_event") and isinstance(
+            value, Mapping
         ):
+            exported[key] = _json_safe(value)
+        elif key == "notices" and isinstance(value, (list, tuple)):
             exported[key] = _json_safe(value)
         elif value is None:
             exported[key] = None

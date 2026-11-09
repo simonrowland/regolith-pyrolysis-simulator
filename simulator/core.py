@@ -7914,6 +7914,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
             pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+            activity_authority = activity.get('authority')
+            if not isinstance(activity_authority, Mapping):
+                raise ValueError('FeO activity diagnostic has no authority record')
+            anchor_log10_fO2 = float(
+                activity_authority['anchor_log10_fO2_bar']
+            )
+            if not math.isfinite(anchor_log10_fO2):
+                raise ValueError('FeO activity diagnostic anchor is non-finite')
+            anchor_fallback_pure_iw = bool(
+                activity_authority.get('anchor_fallback_pure_iw', False)
+            )
         except Exception as exc:
             raise AccountingError(
                 'native Fe saturation split requires grounded FeO activity; '
@@ -7932,6 +7943,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_threshold': 'FeO_activity_saturation',
                 'native_fe_frac': 0.0,
                 'native_fe_activity_source': 'unavailable:no_positive_a_FeO',
+                'native_fe_anchor_log10_fO2_bar': anchor_log10_fO2,
+                'anchor_fallback_pure_iw': anchor_fallback_pure_iw,
             })
         a_feo_wustite = _feo_activity_to_wustite_basis(
             a_feo,
@@ -7964,6 +7977,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'native_fe_activity': a_feo_wustite,
             'native_fe_saturation_activity': a_feo_saturation,
             'native_fe_pure_feo_iw_log': pure_feo_iw,
+            'native_fe_anchor_log10_fO2_bar': anchor_log10_fO2,
+            'anchor_fallback_pure_iw': anchor_fallback_pure_iw,
             'native_fe_activity_source': (
                 'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
                 'FeO(wustite l)=Fe+0.5O2 saturation'

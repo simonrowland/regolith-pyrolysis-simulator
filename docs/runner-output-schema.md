@@ -959,8 +959,10 @@ incident, stuck, re-evaporated, and net continuous flux and has
      ```
   * `fe_redox_split` -- emitted by `_fe_redox_split_observables` when
      `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
-    native-Fe redox split (numeric fields finite-export-checked; flags
-    serialized as bool / str / null).
+    native-Fe redox split. `native_fe_anchor_log10_fO2_bar` records the
+    solved Fe-saturation anchor, and `notices` is an array of typed notice
+    objects when a fallback or liquid-model extrapolation applies; numeric
+    fields are finite-export-checked and flags serialize as bool / str / null.
   * `stage_3_capture` -- emitted with `fe_redox_split`; stage-3 Fe kg,
     total kg, and Fe wt% so pN2/native-Fe recipe reports expose condenser
     contamination instead of requiring raw ledger inspection.

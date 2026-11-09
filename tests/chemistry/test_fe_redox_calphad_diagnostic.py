@@ -179,6 +179,14 @@ def test_metal_saturation_anchor_no_bracket_falls_back_and_is_flagged(
     )
     assert diagnostic["authority"]["anchor_fallback_pure_iw"] is True
     assert diagnostic["authority"]["calphad_weight"] == pytest.approx(0.5)
+    assert diagnostic["authority"]["anchor_log10_fO2_bar"] == pytest.approx(
+        pure_iw
+    )
+    notice = diagnostic["notices"][0]
+    assert notice["type"] == "typed_notice"
+    assert notice["kind"] == fe_redox_module.ANCHOR_FALLBACK_PURE_IW_KIND
+    assert notice["anchor_log10_fO2_bar"] == pytest.approx(pure_iw)
+    assert notice["authority"] == "extrapolated"
 
 
 def test_calphad_feo_activity_is_banded_above_melt_saturation_anchor():

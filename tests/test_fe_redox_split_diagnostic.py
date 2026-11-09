@@ -149,6 +149,47 @@ def test_native_fe_saturation_is_zero_at_the_melt_anchor() -> None:
     )
 
 
+def test_anchor_fallback_notice_and_root_are_exported_in_hour_record(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _make_sim("lunar_mare_low_ti")
+
+    def no_bracket(**kwargs: Any) -> dict[str, Any]:
+        pure_iw = fe_redox_module.feo_iw_log10_fO2_bar(
+            kwargs["T_K"],
+            a_feo=1.0,
+        )
+        return {
+            "log10_fO2_bar": pure_iw,
+            "a_FeO": None,
+            "anchor_fallback_pure_iw": True,
+        }
+
+    monkeypatch.setattr(
+        fe_redox_module,
+        "_solve_calphad_metal_saturation_anchor",
+        no_bracket,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    snapshot = sim.step()
+
+    split = build_per_hour_summary(sim, snapshot)["fe_redox_split"]
+    expected_anchor = fe_redox_module.feo_iw_log10_fO2_bar(
+        split["temperature_K"],
+        a_feo=1.0,
+    )
+    assert split["anchor_fallback_pure_iw"] is True
+    assert split["native_fe_anchor_log10_fO2_bar"] == pytest.approx(
+        expected_anchor
+    )
+    assert isinstance(split["notices"], list)
+    assert any(
+        notice["type"] == "typed_notice"
+        and notice["kind"] == fe_redox_module.ANCHOR_FALLBACK_PURE_IW_KIND
+        for notice in split["notices"]
+    )
+
+
 def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
     sim = _make_sim("lunar_mare_low_ti")
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -5.25

@@ -1046,6 +1046,7 @@ def _calphad_authority_weight(delta_iw_log10: float) -> float:
 
 
 LIQUID_MODEL_BELOW_LIQUIDUS_KIND = "liquid_model_below_liquidus"
+ANCHOR_FALLBACK_PURE_IW_KIND = "anchor_fallback_pure_iw"
 
 
 def _finite_domain_float(value: object, name: str) -> float:
@@ -1123,7 +1124,8 @@ def _with_liquid_model_below_liquidus_notice(
 
     if liquid_domain is None or liquid_domain.below_liquidus is False:
         return components
-    components["notices"] = [
+    notices = list(components.get("notices", ()))
+    notices.append(
         {
             "type": "typed_notice",
             "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
@@ -1133,7 +1135,8 @@ def _with_liquid_model_below_liquidus_notice(
             "source": liquid_domain.source,
             "authority": "extrapolated",
         }
-    ]
+    )
+    components["notices"] = notices
     return components
 
 
@@ -1407,7 +1410,7 @@ def _calphad_feo_activity_components(
     else:
         regime = 'melt_anchor_to_melt_anchor_plus_1_smooth_blend'
 
-    return _with_liquid_model_below_liquidus_notice({
+    components: dict[str, object] = {
         'status': 'ok',
         'diagnostic_only': False,
         'consumed_by_behavior': True,
@@ -1442,6 +1445,7 @@ def _calphad_feo_activity_components(
             'regime': regime,
             'iw_basis': 'IW(pure-FeO) with self-consistent melt-saturation anchor',
             'relative_to_iw_pure_feo_log10': delta_iw_pure_feo,
+            'anchor_log10_fO2_bar': anchor_log10_fO2,
             'anchor_fallback_pure_iw': anchor_fallback_pure_iw,
             'calphad_weight': calphad_weight,
             'kress91_weight': kress91_weight,
@@ -1517,7 +1521,21 @@ def _calphad_feo_activity_components(
         },
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
-    }, liquid_domain)
+    }
+    if anchor_fallback_pure_iw:
+        components['notices'] = [{
+            'type': 'typed_notice',
+            'kind': ANCHOR_FALLBACK_PURE_IW_KIND,
+            'reason': (
+                'No finite sign-changing CALPHAD Fe-saturation bracket; '
+                'the pure-FeO IW anchor was used.'
+            ),
+            'temperature_K': T_K,
+            'anchor_log10_fO2_bar': anchor_log10_fO2,
+            'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
+            'authority': 'extrapolated',
+        }]
+    return _with_liquid_model_below_liquidus_notice(components, liquid_domain)
 
 
 def calphad_ferrous_feo_activity_diagnostic(
