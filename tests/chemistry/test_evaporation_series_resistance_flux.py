@@ -628,7 +628,7 @@ def test_pipe_geometry_limits_recover_vacuum_and_suppress_closed_line_flux():
     closed_pressure = closed_model.estimate_transport_state(
         closed_candidate, closed_melt
     )["vapor_pressure_mbar"]
-    assert closed_pressure >= 80.0 / 100.0
+    assert closed_pressure == pytest.approx(80.0 / 100.0, rel=1.0e-12)
 
 
 def test_closed_line_subboiling_root_is_recognized_without_iteration():
