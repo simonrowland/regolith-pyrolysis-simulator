@@ -216,9 +216,6 @@ def _source_pages() -> dict[int, str]:
 
 
 def test_takeda_1990_render_cells_and_page_proofs() -> None:
-    if not _source_text_path().is_file():
-        pytest.skip("Takeda 1990 Tesseract layout text is absent")
-
     document = _document()
     _assert_table1_render_cells(document)
     _assert_figure4_marker_legend(document)
@@ -242,6 +239,8 @@ def test_takeda_1990_render_cells_and_page_proofs() -> None:
         {"Sn_mass_percent": 80, "Fe_mass_percent": 20},
         {"Sn_mass_percent": 53, "Fe_mass_percent": 47},
     ]
+    if not _source_text_path().is_file():
+        pytest.skip("Takeda 1990 Tesseract layout text is absent")
     pages = _source_pages()
     assert "Table 1 Reported values of the activity coefficient" in pages[2]
     assert "1.4 to 0.9" in pages[2]
