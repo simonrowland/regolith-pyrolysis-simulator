@@ -197,10 +197,9 @@ python3 -m simulator.runner \
   --output hero-run.json
 ```
 
-This is one fixed campaign run with the default recipe. It is not an optimizer result.
+This uses a default recipe.
 
-The figures below come from green commit `883ad52548671b266616f1c5f44c1c40556a99bc`, run with the built-in analytical backend. The
-furnace reached 2200 °C at hour 213 and held there through hour 225. The largest per-element
+The furnace reached 2200 °C at hour 213 and held there through hour 225. The largest per-element
 mass-closure residual is 1.5e-15, against a limit of 5e-14.
 
 **What leaves the melt.** This is the fraction of each element's feedstock atoms that evaporates out of
