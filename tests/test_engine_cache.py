@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -228,13 +229,24 @@ def test_runtime_identity_tripwire_logs_once_and_keeps_the_hit(
         first_hit = cached_solve(cache, "thermoengine", request, must_not_solve)
         second_hit = cached_solve(cache, "thermoengine", request, must_not_solve)
 
-    notices = [record for record in caplog.records if "engine_cache_runtime_changed" in record.getMessage()]
+    notices = [
+        record
+        for record in caplog.records
+        if getattr(record, "notice", {}).get("kind")
+        == "engine_cache_runtime_changed"
+    ]
     assert first_hit.value == original.value
     assert second_hit.value == original.value
     assert solve_calls == 0
     assert len(notices) == 1
     assert "old" in notices[0].getMessage()
     assert "new" in notices[0].getMessage()
+    assert (
+        "thermoengine runtime changed (stored {\"version\":\"old\"}, now "
+        "{\"version\":\"new\"}). Cached outputs are still used. Bump "
+        "ENGINE_CHEMISTRY_VERSION['thermoengine'] ONLY if this change affects "
+        "chemistry; leave it for non-chemistry patches."
+    ) == notices[0].getMessage()
 
 
 def test_cached_solve_tracks_per_engine_work_unit_counters(
@@ -272,10 +284,57 @@ def test_cached_solve_tracks_per_engine_work_unit_counters(
         "misses": 3,
         "stores": 2,
         "transient_skips": 1,
+        "calls_by_kind": {
+            "equilibrate_cell": 3,
+            "evaluate": 0,
+            "evaluate_redox": 0,
+        },
     }
     assert cache.counters["openimcc"] == {
         "hits": 0,
         "misses": 0,
         "stores": 0,
         "transient_skips": 0,
+        "calls_by_kind": {
+            "equilibrate_cell": 0,
+            "evaluate": 0,
+            "evaluate_redox": 0,
+        },
     }
+
+
+def test_runtime_identity_is_memoized_per_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    engine_cache.runtime_identity.cache_clear()
+    original_find_spec = engine_cache.importlib.util.find_spec
+    calls = 0
+
+    def counted_find_spec(module_name: str):
+        nonlocal calls
+        calls += 1
+        return original_find_spec(module_name)
+
+    monkeypatch.setattr(engine_cache.importlib.util, "find_spec", counted_find_spec)
+    try:
+        first = engine_cache.runtime_identity("internal-analytical")
+        second = engine_cache.runtime_identity("internal-analytical")
+    finally:
+        engine_cache.runtime_identity.cache_clear()
+
+    assert first == second
+    assert calls == 1
+
+
+def test_every_chemistry_version_has_a_changelog_entry() -> None:
+    source = Path(engine_cache.__file__).read_text(encoding="utf-8")
+    entries = {
+        (engine, int(version))
+        for engine, version in re.findall(
+            r"^\s*#\s*(\S+) v(\d+):", source, re.MULTILINE
+        )
+    }
+    assert all(
+        (engine, version) in entries
+        for engine, version in ENGINE_CHEMISTRY_VERSION.items()
+    )

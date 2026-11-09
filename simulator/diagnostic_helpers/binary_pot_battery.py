@@ -4445,6 +4445,160 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     return _DEFAULT_FO2_LOG
 
 
+def _engine_cache_request_vector(
+    handle: EngineHandle,
+    pot: BinaryPot,
+    *,
+    temperature_K: float,
+    po2: Po2Request,
+    physical_pressure_bar: float | None,
+    native_activity_formula: str | None,
+) -> dict[str, Any] | None:
+    """Describe the engine-bound cell inputs, after adapter pressure policy."""
+
+    composition_kg, composition_mol = composition_kg_and_mol(
+        pot.composition_wt_pct
+    )
+    pressure_bar = (
+        _DEFAULT_PRESSURE_BAR
+        if physical_pressure_bar is None
+        else float(physical_pressure_bar)
+    )
+    temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+    fo2_log = _fo2_log_for_request(handle, po2)
+    engine_id = handle.name
+    options: dict[str, Any] = {}
+    try:
+        parameters = inspect.signature(handle.backend.equilibrate).parameters
+    except (TypeError, ValueError):
+        parameters = {}
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+
+    options.update(isothermal_run_kwargs(engine_id, parameters))
+
+    if engine_id == "openimcc":
+        bridge = handle.backend._bridge
+        if composition_mol:
+            engine_composition, _notices = bridge.fold_ferric_to_feot(
+                composition_mol
+            )
+            composition = {"basis": "mol", "components": engine_composition}
+        elif composition_kg is not None:
+            if bridge.positive_fe2o3(composition_kg):
+                batch_mol = composition_kg_and_mol(
+                    {
+                        str(name): float(amount) * 100.0
+                        for name, amount in composition_kg.items()
+                    }
+                )[1]
+                engine_composition, _notices = bridge.fold_ferric_to_feot(
+                    batch_mol
+                )
+                composition = {"basis": "mol", "components": engine_composition}
+            else:
+                composition = {"basis": "kg", "components": composition_kg}
+        else:
+            composition = {"basis": "mol", "components": composition_mol}
+        pressure = None
+        options.update(
+            {
+                "pack": handle.backend._pack_name,
+                "allow_extrapolation": True,
+                "allow_out_of_envelope": True,
+            }
+        )
+    elif engine_id == "internal-analytical":
+        composition = {
+            "composition_kg": composition_kg,
+            "composition_mol": composition_mol,
+        }
+        pressure = pressure_bar
+        options["po2_request"] = po2.as_payload()
+    else:
+        # The four engine backends accept the submitted molar bulk as their
+        # composition input; their adapters own any later projection.
+        composition = {"basis": "mol", "components": composition_mol}
+        pressure = pressure_bar
+        if engine_id == "alphamelts":
+            from simulator.alphamelts_reference_pressure import (
+                alphamelts_effective_pressure_policy,
+            )
+
+            pressure, _label = alphamelts_effective_pressure_policy(
+                pressure_bar, transport=getattr(handle.backend, "_mode", None)
+            )
+            if po2.mode == PO2_COMMANDED:
+                options.update(
+                    vapor_transport_pO2_bar=po2.po2_bar,
+                    vapor_transport_pO2_admission="observation",
+                )
+        elif engine_id == "thermoengine":
+            from simulator.melt_backend.thermoengine import (
+                thermoengine_effective_pressure_policy,
+            )
+
+            pressure, _label = thermoengine_effective_pressure_policy(pressure_bar)
+            if po2.mode == PO2_COMMANDED:
+                options.update(
+                    vapor_transport_pO2_bar=po2.po2_bar,
+                    vapor_transport_pO2_admission="observation",
+                )
+        elif engine_id == "vaporock":
+            # The VapoRock adapter documents that pressure_bar is diagnostic
+            # only and does not send total pressure to eval_gas_abundances.
+            pressure = None
+        elif engine_id == "magemin":
+            backend = handle.backend
+            pressure = format(
+                backend._GPa_to_kbar(backend._pressure_bar_to_GPa(pressure_bar)),
+                ".6f",
+            )
+        elif engine_id not in {"alphamelts", "thermoengine", "vaporock", "magemin"}:
+            return None
+        if po2.mode == PO2_NOT_AN_INPUT and engine_id in {
+            "alphamelts",
+            "thermoengine",
+        }:
+            from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+            from simulator.melt_backend.base import multivalent_components
+
+            if not multivalent_components(
+                pot.composition_wt_pct, oxide_aliases=MELTS_OXIDE_ALIASES
+            ):
+                options["redox_mode"] = REDOX_MODE_NOT_AN_INPUT
+        if native_activity_formula is not None and engine_id == "magemin":
+            options["native_activity_formula"] = native_activity_formula
+
+    if fo2_log is not None:
+        oxygen: dict[str, Any] = {"mode": "fO2", "value": fo2_log}
+    elif po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        oxygen = {"mode": "buffer", "value": po2.as_payload()}
+    elif po2.mode == PO2_NOT_AN_INPUT:
+        oxygen = {"mode": "intrinsic", "value": None}
+    else:
+        oxygen = {"mode": "engine_default", "value": None}
+
+    if engine_id in {"openimcc", "internal-analytical"}:
+        oxygen["adapter_request"] = po2.as_payload()
+    request = {
+        "call": "equilibrate_cell",
+        "composition": composition,
+        "temperature_C": temperature_C,
+        "pressure_bar": pressure,
+        "oxygen": oxygen,
+        "solver_options": options,
+    }
+    if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        request["oxygen"]["cell_material"] = po2.cell_material
+    if any(
+        isinstance(value, float) and not math.isfinite(value)
+        for value in (temperature_C, pressure_bar, fo2_log)
+        if value is not None
+    ):
+        return None
+    return request
+
+
 def _hostname() -> str:
     env_name = os.environ.get("GOALFLIGHT_HOSTNAME") or os.environ.get("HOSTNAME")
     if env_name:
@@ -4477,8 +4631,63 @@ def equilibrate_cell(
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
+    engine_cache: Any | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
+
+    if (
+        engine_cache is not None
+        and handle.available
+        and handle.backend is not None
+        and simulate_crash is None
+        and not qualification
+        and not (
+            po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+            and po2.cell_material not in {None, "W", "Mo"}
+        )
+    ):
+        request_vector = _engine_cache_request_vector(
+            handle,
+            pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            physical_pressure_bar=physical_pressure_bar,
+            native_activity_formula=native_activity_formula,
+        )
+        if request_vector is not None:
+            from simulator.engine_cache import cached_solve
+
+            started_wall = time.perf_counter()
+            started_cpu = time.process_time()
+            cell_arm = arm or (
+                ARM_QUALIFICATION if qualification else ARM_HEADLINE
+            )
+            cell = cached_solve(
+                engine_cache,
+                handle.name,
+                request_vector,
+                lambda: equilibrate_cell(
+                    handle,
+                    pot,
+                    temperature_K=temperature_K,
+                    po2=po2,
+                    timeout_s=timeout_s,
+                    qualification=qualification,
+                    isolated=isolated,
+                    arm=arm,
+                    simulate_crash=simulate_crash,
+                    physical_pressure_bar=physical_pressure_bar,
+                    native_activity_formula=native_activity_formula,
+                ),
+            )
+            return replace(
+                cell,
+                pot_id=pot.pot_id,
+                arm=cell_arm,
+                wall_s=time.perf_counter() - started_wall,
+                cpu_s=time.process_time() - started_cpu,
+                hostname=_hostname(),
+            )
 
     hostname = _hostname()
     wall0 = time.perf_counter()

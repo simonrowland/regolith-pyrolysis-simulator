@@ -31,9 +31,17 @@ ENGINE_CHEMISTRY_VERSION: Mapping[str, int] = {
     "thermoengine": 1,
 }
 
+# Chemistry-version history. Increment a version only when engine chemistry may change.
+# openimcc v1: 2026-11-08 uv.lock pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache population
+# internal-analytical v1: 2026-11-08 repository source d5e6b8dc2 - initial cache population
+# vaporock v1: 2026-11-08 engine lock pin 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache population
+# magemin v1: 2026-11-08 engine lock pin 40ed109d07d4246001cab59382596d33fed79086 - initial cache population
+# alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 with PetThermoTools pin 74a41ff5685d9c8280b90667bfa43efe97fca87c - initial cache population
+# thermoengine v1: 2026-11-08 engine lock pin df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache population
 _BUSY_TIMEOUT_MS = 60_000
 _TABLE_NAME = "engine_outputs"
 _COUNTER_NAMES = ("hits", "misses", "stores", "transient_skips")
+_CALL_KINDS = ("equilibrate_cell", "evaluate", "evaluate_redox")
 _LOGGER = logging.getLogger(__name__)
 _ENGINE_RUNTIME_MODULES = {
     "openimcc": ("openimcc", "openimcc"),
@@ -140,6 +148,7 @@ def key(engine_id: str, request_vector: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical_json(identity).encode("utf-8")).hexdigest()
 
 
+@lru_cache(maxsize=len(ENGINE_CHEMISTRY_VERSION))
 def runtime_identity(engine_id: str) -> dict[str, Any]:
     """Describe the installed Python runtime selected for a battery engine."""
     try:
@@ -229,27 +238,55 @@ class EngineCache:
     def __init__(self, path: str | os.PathLike[str]) -> None:
         self.db_path = Path(path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._defer_runtime_notices = False
         self._counter_lock = threading.Lock()
         self._tripwire_lock = threading.Lock()
         self._runtime_change_noticed: set[str] = set()
+        self._runtime_changes: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
         self._counters = {
-            engine_id: {name: 0 for name in _COUNTER_NAMES}
+            engine_id: {
+                **{name: 0 for name in _COUNTER_NAMES},
+                "calls_by_kind": {call_kind: 0 for call_kind in _CALL_KINDS},
+            }
             for engine_id in ENGINE_CHEMISTRY_VERSION
         }
         self._initialize()
 
     @property
-    def counters(self) -> dict[str, dict[str, int]]:
+    def counters(self) -> dict[str, dict[str, Any]]:
         """Return a detached snapshot of per-engine work-unit counters."""
         with self._counter_lock:
             return {
-                engine_id: dict(values)
+                engine_id: {
+                    **{
+                        name: value
+                        for name, value in values.items()
+                        if name != "calls_by_kind"
+                    },
+                    "calls_by_kind": dict(values["calls_by_kind"]),
+                }
                 for engine_id, values in self._counters.items()
+            }
+
+    @property
+    def runtime_changes(
+        self,
+    ) -> dict[str, tuple[dict[str, Any], dict[str, Any]]]:
+        with self._tripwire_lock:
+            return {
+                engine_id: (dict(stored), dict(current))
+                for engine_id, (stored, current) in self._runtime_changes.items()
             }
 
     def _count(self, engine_id: str, counter: str) -> None:
         with self._counter_lock:
             self._counters[engine_id][counter] += 1
+
+    def _count_call(self, engine_id: str, call_kind: str) -> None:
+        if call_kind not in _CALL_KINDS:
+            raise ValueError(f"unknown engine call kind {call_kind!r}")
+        with self._counter_lock:
+            self._counters[engine_id]["calls_by_kind"][call_kind] += 1
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
@@ -343,6 +380,10 @@ class EngineCache:
             if engine_id in self._runtime_change_noticed:
                 return
             self._runtime_change_noticed.add(engine_id)
+        if self._defer_runtime_notices:
+            with self._tripwire_lock:
+                self._runtime_changes[engine_id] = (dict(stored), dict(current))
+            return
         notice = {
             "kind": "engine_cache_runtime_changed",
             "engine": engine_id,
@@ -350,10 +391,13 @@ class EngineCache:
             "current": dict(current),
         }
         _LOGGER.info(
-            "engine_cache_runtime_changed engine=%s stored=%s current=%s",
+            "%s runtime changed (stored %s, now %s). Cached outputs are still used. "
+            "Bump ENGINE_CHEMISTRY_VERSION['%s'] ONLY if this change affects chemistry; "
+            "leave it for non-chemistry patches.",
             engine_id,
             _canonical_json(stored),
             _canonical_json(current),
+            engine_id,
             extra={"notice": notice},
         )
 
@@ -362,6 +406,20 @@ def _from_cache_payload(payload: Any) -> Any:
     from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell
 
     return EquilibrateCell.from_cache_payload(payload)
+
+
+def _from_cache_call_payload(payload: Any, call_kind: str) -> Any:
+    if call_kind == "equilibrate_cell":
+        return _from_cache_payload(payload)
+    if call_kind == "evaluate":
+        from simulator.melt_backend.openimcc_cache import OpenImccEvaluationOutcome
+
+        return OpenImccEvaluationOutcome.from_cache_payload(payload)
+    if call_kind == "evaluate_redox":
+        from simulator.melt_backend.openimcc_cache import OpenImccRedoxOutcome
+
+        return OpenImccRedoxOutcome.from_cache_payload(payload)
+    raise ValueError(f"unknown engine call kind {call_kind!r}")
 
 
 def cached_solve(
@@ -375,15 +433,27 @@ def cached_solve(
         return solve_fn()
 
     cache_key = key(engine_id, request_vector)
-    current_runtime = runtime_identity(engine_id)
+    call_kind = str(request_vector.get("call", "equilibrate_cell"))
+    if call_kind not in _CALL_KINDS:
+        raise ValueError(f"unknown engine call kind {call_kind!r}")
     entry = cache._get_entry(cache_key)
     if entry is not None:
         payload, stored_runtime = entry
         cache._count(engine_id, "hits")
-        cache._notice_runtime_change(engine_id, stored_runtime, current_runtime)
-        return _from_cache_payload(payload)
+        try:
+            current_runtime = runtime_identity(engine_id)
+        except Exception:
+            current_runtime = None
+        if current_runtime is not None:
+            cache._notice_runtime_change(engine_id, stored_runtime, current_runtime)
+        return _from_cache_call_payload(payload, call_kind)
 
     cache._count(engine_id, "misses")
+    cache._count_call(engine_id, call_kind)
+    try:
+        current_runtime = runtime_identity(engine_id)
+    except Exception:
+        current_runtime = {}
     try:
         outcome = solve_fn()
     except BaseException as exc:

@@ -15,6 +15,7 @@ import importlib.metadata
 import importlib.util
 import json
 import os
+import shlex
 import socket
 import subprocess
 import sys
@@ -165,7 +166,12 @@ def _measured_report(payload: Mapping[str, object]) -> str:
 
 
 def _run_measured_headline(
-    root: Path, engines: tuple, context=None, *, workers: int = 1
+    root: Path,
+    engines: tuple,
+    context=None,
+    *,
+    workers: int = 1,
+    engine_cache=None,
 ) -> int:
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
@@ -218,6 +224,7 @@ def _run_measured_headline(
             measured_only=True,
             handles=score_handles,
             workers=workers,
+            engine_cache=engine_cache,
         )
         residuals = _ResidualJsonlRows(
             residuals_partial,
@@ -246,6 +253,9 @@ def _run_measured_headline(
             "process_cpu_seconds": round(time.process_time() - started_cpu, 3),
             "load_average": load_average,
             "records": records,
+            "engine_cache": _engine_cache_summary(
+                engine_cache, local_counters=metadata.engine_cache_counters
+            ),
         }
         summary_path = battery / "score-summary.json"
         summary_partial = summary_path.with_name(summary_path.name + ".partial")
@@ -286,34 +296,46 @@ def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
 
 
 def _run_studio(
-    engines: list[str], extra: list[str]
-) -> tuple[str | None, Path | None]:
+    engines: list[str], extra: list[str], *, engine_cache_path: Path | None = None
+) -> tuple[str | None, Path | None, dict[str, object] | None]:
     """Dispatch MELTS engines to Studio 1. Prints a progress line every 60 s."""
 
     remote_root = "/tmp/battery-score-impl-chunk2"
     print(f"rsync worktree → {STUDIO_HOST}:{remote_root}", flush=True)
-    rsync = subprocess.run(
-        [
-            "rsync",
-            "-a",
-            "--delete",
-            "--exclude",
-            ".venv",
-            "--exclude",
-            ".git",
-            "--exclude",
-            "__pycache__",
-            f"{ROOT}/",
-            f"{STUDIO_HOST}:{remote_root}/",
-        ],
-        check=False,
-    )
+    rsync_args = [
+        "rsync",
+        "-a",
+        "--delete",
+        "--exclude",
+        ".venv",
+        "--exclude",
+        ".git",
+        "--exclude",
+        "__pycache__",
+    ]
+    remote_cache_path = None
+    if engine_cache_path is not None:
+        resolved_cache_path = engine_cache_path.resolve()
+        try:
+            relative_cache_path = resolved_cache_path.relative_to(ROOT)
+        except ValueError:
+            remote_cache_path = str(engine_cache_path)
+        else:
+            remote_cache_path = relative_cache_path.as_posix()
+            rsync_args.extend(["--exclude", f"/{remote_cache_path}"])
+    rsync_args.extend([f"{ROOT}/", f"{STUDIO_HOST}:{remote_root}/"])
+    rsync = subprocess.run(rsync_args, check=False)
     if rsync.returncode != 0:
         print(f"studio rsync failed: {rsync.returncode}", flush=True)
-        return None, None
+        return None, None, None
     remote_py = "~/repos/regolith-pyrolysis-simulator/.venv/bin/python"
     engine_csv = ",".join(engines)
-    extra_args = " ".join(extra)
+    remote_extra = list(extra)
+    if remote_cache_path is not None:
+        remote_extra.extend(
+            ["--engine-cache", shlex.quote(remote_cache_path)]
+        )
+    extra_args = " ".join(remote_extra)
     remote = (
         f"hostname; "
         f"cd {remote_root} && "
@@ -346,7 +368,7 @@ def _run_studio(
     code = proc.wait()
     if code != 0:
         print(f"studio score failed: {code}", flush=True)
-        return hostname, None
+        return hostname, None, None
     subprocess.run(
         [
             "rsync",
@@ -383,7 +405,110 @@ def _run_studio(
     if copied.returncode != 0 or studio_comparisons_path.stat().st_size == 0:
         studio_comparisons_path.unlink(missing_ok=True)
         studio_comparisons_path = None
-    return hostname, studio_comparisons_path
+    studio_cache_summary = None
+    if remote_cache_path is not None:
+        remote_summary_path = f"{remote_root}/data/battery/score-summary.json"
+        summary = subprocess.run(
+            [
+                "ssh",
+                "-o",
+                "BatchMode=yes",
+                STUDIO_HOST,
+                f"cat {shlex.quote(remote_summary_path)}",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if summary.returncode == 0:
+            try:
+                remote_payload = json.loads(summary.stdout)
+                candidate = remote_payload.get("engine_cache")
+                if isinstance(candidate, dict):
+                    studio_cache_summary = candidate
+            except json.JSONDecodeError:
+                pass
+        if studio_cache_summary is None:
+            print("studio cache counters were unavailable", flush=True)
+    return hostname, studio_comparisons_path, studio_cache_summary
+
+
+def _engine_cache_summary(
+    engine_cache,
+    studio_cache_summary: Mapping[str, object] | None = None,
+    local_counters: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    if engine_cache is None:
+        engines = (
+            "openimcc",
+            "internal-analytical",
+            "vaporock",
+            "magemin",
+            "alphamelts",
+            "thermoengine",
+        )
+        names = ("hits", "misses", "stores", "transient_skips")
+        return {
+            "enabled": False,
+            "by_engine": {
+                engine: {
+                    **{name: 0 for name in names},
+                    "calls_by_kind": {
+                        call: 0
+                        for call in (
+                            "equilibrate_cell",
+                            "evaluate",
+                            "evaluate_redox",
+                        )
+                    },
+                }
+                for engine in engines
+            },
+        }
+    summary: dict[str, object] = {
+        "enabled": True,
+        "path": str(engine_cache.db_path),
+        "by_engine": (
+            engine_cache.counters if local_counters is None else local_counters
+        ),
+    }
+    if studio_cache_summary is not None:
+        by_engine = summary["by_engine"]
+        studio_by_engine = studio_cache_summary.get("by_engine", {})
+        if isinstance(by_engine, dict) and isinstance(studio_by_engine, Mapping):
+            for engine, studio_counts in studio_by_engine.items():
+                if not isinstance(studio_counts, Mapping):
+                    continue
+                local_counts = by_engine.setdefault(str(engine), {})
+                if not isinstance(local_counts, dict):
+                    continue
+                for name, value in studio_counts.items():
+                    if name == "calls_by_kind" and isinstance(value, Mapping):
+                        local_calls = local_counts.setdefault(name, {})
+                        if isinstance(local_calls, dict):
+                            for call_kind, count in value.items():
+                                local_calls[str(call_kind)] = (
+                                    local_calls.get(str(call_kind), 0) + int(count)
+                                )
+                    elif isinstance(value, int):
+                        local_counts[str(name)] = local_counts.get(str(name), 0) + value
+        summary["studio_path"] = studio_cache_summary.get("path")
+    return summary
+
+
+def _attach_engine_cache_summary(
+    path: Path,
+    engine_cache,
+    studio_cache_summary: Mapping[str, object] | None = None,
+    local_counters: Mapping[str, object] | None = None,
+) -> None:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["engine_cache"] = _engine_cache_summary(
+        engine_cache, studio_cache_summary, local_counters
+    )
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -414,6 +539,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument(
+        "--engine-cache",
+        type=Path,
+        default=None,
+        help="reuse exact engine outputs from this SQLite cache file",
+    )
+    parser.add_argument(
         "--measured-headline",
         action="store_true",
         help="score measured-evidence candidates only and write the per-engine headline",
@@ -432,6 +563,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.workers < 1:
         parser.error("--workers must be at least 1")
 
+    engine_cache = None
+    if args.engine_cache is not None:
+        from simulator.engine_cache import EngineCache
+
+        engine_cache = EngineCache(args.engine_cache)
+
     if args.update_band_ratchet:
         context = load_score_context(args.root)
         groups = update_decision_band_ratchet(context)
@@ -442,7 +579,12 @@ def main(argv: list[str] | None = None) -> int:
     rail = None if args.rail is None else canonicalize_rail(args.rail)
 
     if args.measured_headline:
-        return _run_measured_headline(args.root, engines, workers=args.workers)
+        return _run_measured_headline(
+            args.root,
+            engines,
+            workers=args.workers,
+            engine_cache=engine_cache,
+        )
 
     if args.write_pins:
         payload = migrate_pin_records(args.root)
@@ -511,6 +653,7 @@ def main(argv: list[str] | None = None) -> int:
             origins=context.origins,
             store_stamp=recorded,
         )
+        _attach_engine_cache_summary(summary_partial_path, engine_cache)
         os.replace(summary_partial_path, summary_path)
         os.replace(report_partial_path, report_path)
         print(
@@ -523,6 +666,7 @@ def main(argv: list[str] | None = None) -> int:
     laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
     studio_hostname = None
     studio_comparisons_path = None
+    studio_cache_summary = None
     studio_routed = False
     host = socket.gethostname()
     if args.studio and melts and STUDIO_HOST not in host and "studio" not in host.lower():
@@ -536,7 +680,13 @@ def main(argv: list[str] | None = None) -> int:
             extra.extend(["--limit", str(args.limit)])
         if args.workers > 1:
             extra.extend(["--workers", str(args.workers)])
-        studio_hostname, studio_comparisons_path = _run_studio(melts, extra)
+        (
+            studio_hostname,
+            studio_comparisons_path,
+            studio_cache_summary,
+        ) = _run_studio(
+            melts, extra, engine_cache_path=args.engine_cache
+        )
         engines = tuple(laptop)
 
     context = load_score_context(args.root)
@@ -549,6 +699,7 @@ def main(argv: list[str] | None = None) -> int:
         work_id=args.work,
         limit=args.limit,
         workers=args.workers,
+        engine_cache=engine_cache,
     )
     partial_path = residuals_path.with_name(residuals_path.name + ".partial")
     payloads = _ResidualJsonlRows(
@@ -638,6 +789,12 @@ def main(argv: list[str] | None = None) -> int:
             report_aggregate,
             summary_partial_path,
             store_stamp=recorded,
+        )
+        _attach_engine_cache_summary(
+            summary_partial_path,
+            engine_cache,
+            studio_cache_summary,
+            metadata.engine_cache_counters,
         )
         report_partial_path.write_text(report, encoding="utf-8")
         os.replace(summary_partial_path, summary_path)
