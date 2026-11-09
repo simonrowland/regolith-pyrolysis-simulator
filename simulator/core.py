@@ -7515,23 +7515,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or {}
                 ).items()
             }
-            residual_fe_mol = getattr(
-                self,
-                '_native_fe_vapor_residual_capacity_mol_this_hr',
-                None,
-            )
-            if residual_fe_mol is not None and 'Fe' in rates:
-                rates['Fe'] = min(
-                    rates['Fe'],
-                    max(0.0, float(residual_fe_mol))
-                    * molar_masses.get('Fe', 0.0),
-                )
             rates = self._analytic_evaporation_depletion_rates(
                 rates,
                 dt_hr=1.0,
                 phase_scalar=1.0,
                 cleaned_melt_kg=frozen_cleaned_melt_kg,
                 available_o2_kg=frozen_overhead_o2_kg,
+            )
+            rates, _ = self._apply_native_fe_residual_capacity(
+                rates,
+                molar_masses,
             )
             rates_cache[cache_key] = dict(rates)
             return rates
@@ -8270,9 +8263,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else 0.0
             )
             projected_bulk_Pa = candidate_mol_hr * float(g)
-            projected_total_Pa = max(
-                reference_pressure_Pa,
-            )
+            projected_total_Pa = reference_pressure_Pa
             candidate_domain = viscous_p_bulk_out_of_domain_diagnostic(
                 knudsen_number=float(
                     series_flux_at(

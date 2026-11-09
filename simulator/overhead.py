@@ -122,31 +122,38 @@ def _solve_same_hour_headspace_closure(
     """Close ordinary source rates on their single projected pressure scalar.
 
     Every source projection has ``P_bulk,i = n_i * g`` with
-    ``g = P_bulk,total / N`` and ``N = Σ n_i`` in mol/hr. From the series
-    resistance law ``n_i * R'_i = P_eq,i - n_i*g``, so each untransformed
-    species rate is explicit: ``n_i(g) = P_eq,i / (R'_i + g)``. The callback
-    receives the same-hour total pressure as well as g, allowing pressure-
-    dependent gas resistance to be evaluated at the projected state. It then
-    applies existing admission, freeze, depletion and native-Fe limits. The
-    inner pressure bracket resolves that resistance for fixed g; the scalar
-    residual is ``h(g) = G(N(g), mdot(g)) - g``.
+    ``g = P_bulk,total / N`` and ``N = Σ n_i`` in mol/hr. For each candidate
+    g, the raw series-resistance rate is explicit,
+    ``raw_i(g) = P_eq,i / (R'_i + g)``. The callback applies the complete
+    vector transform used by transport -- admission, freeze scaling, shared
+    depletion, then the native-Fe cap -- to obtain ``n_i(g)``. Shared depletion
+    retains the existing convention that species in one parent group split
+    their scaled amount in proportion to their raw rates. The same-hour total
+    pressure is passed as well, so pressure-dependent gas resistance is
+    evaluated at the projected state. The pressure map is built from those
+    transformed rates, and the scalar residual is
+    ``h(g) = G(N(g), mdot(g)) - g`` with N and mdot computed from n(g).
 
     For a pumped line against vacuum, Poiseuille gives P proportional to
-    sqrt(mdot), so G=P/N is proportional to N**-1/2. Thus h(0)>0 for any
-    positive source, while N(g) is asymptotic to 1/g, G grows only as sqrt(g),
-    and h tends to -infinity. Bracketing and bisection therefore converge.
-    On a pressure-held no-feed line, a nonzero root exists only when
-    ΣP_eq,i>P_total; otherwise the explicit zero-flow boundary is returned.
-    For positive flow, the species equations imply
-    ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ. Its right
-    side strictly decreases from ΣP_eq/P_total to zero, proving the unique
-    positive root and the same sign change in h(g).
+    sqrt(mdot), so G=P/N is proportional to N**-1/2. As g grows, each raw
+    rate falls; admission, freeze scaling, group depletion and Fe capping make
+    the transformed total N(g) non-increasing. Group-scaled species retain
+    their raw-rate proportions. Thus h(0)>0 for a positive source and
+    h tends to -infinity as g grows. The scalar bracket therefore contains the
+    pumped root. On a pressure-held no-feed line, the sub-boiling case returns
+    the explicit zero-flow boundary. When T is the identity (no admission,
+    depletion, or inventory cap binds), the positive-flow species equations
+    reduce to ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ.
+    Its right side strictly decreases from ΣP_eq/P_total to zero, so there is
+    exactly one positive root iff ΣP_eq>P_total; otherwise the physical root
+    is zero. With T active, the same scalar callback evaluates the complete
+    transformed vector at each bracket point.
 
     R'_i and g both have units Pa·hr/mol: R'_i=R_i*M_i/(A*3600), converting
     the existing pressure-area-time-per-mass resistance from kg/hr to mol/hr.
-    Limiting cases are g=0 for a zero-resistance/open-vacuum source and zero
-    rate for the pressure-held sub-boiling boundary. The 200-evaluation cap
-    includes every source callback and transport projection in both brackets.
+    Limiting cases are g=0 for the open-vacuum source and zero rate at the
+    pressure-held sub-boiling boundary. The 200-evaluation cap includes every
+    source callback and transport projection in both brackets.
     """
     evaluation_cap = 200
     relative_tolerance = 1.0e-12

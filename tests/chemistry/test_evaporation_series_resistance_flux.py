@@ -760,11 +760,16 @@ def test_pumped_closure_prices_the_admitted_depleted_stream(
     sim.overhead_model.pipe_diameter_m = 1.2
     sim.melt.melt_surface_area_m2 = 100.0
 
-    raw_flux = sim._calculate_evaporation(sim._get_equilibrium())
+    admitted_flux = sim._calculate_evaporation(sim._get_equilibrium())
     closure = sim._last_evaporation_flux_diagnostic[
         "same_hour_headspace_closure"
     ]
-    admitted_flux = sim._apply_analytic_evaporation_depletion(raw_flux)
+    assert (
+        sim._last_evaporation_flux_diagnostic[
+            "evaporation_flux_rates_are_admitted"
+        ]
+        is True
+    )
     transport = sim.overhead_model.estimate_transport_state(
         admitted_flux,
         sim.melt,
@@ -778,6 +783,10 @@ def test_pumped_closure_prices_the_admitted_depleted_stream(
     assert closure["converged"]
     assert closure["iterations"] <= 200
     for species in ("Na", "Fe"):
+        assert admitted_flux.species_kg_hr[species] == pytest.approx(
+            closure["rates_kg_hr"][species],
+            rel=1e-12,
+        )
         assert closure["partial_pressures_Pa"][species] == pytest.approx(
             admitted_partials_mbar[species] * 100.0,
             rel=1e-9,

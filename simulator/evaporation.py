@@ -1249,7 +1249,8 @@ class EvaporationMixin:
         )
         closure_record = None
         pressure_held_bounds_record = None
-        closure_rates_include_liquid_fraction = False
+        closure_rates_are_admitted = False
+        native_fe_capacity_allocation = None
         if overhead_partials_override_Pa is None:
             from simulator.overhead import (
                 _pressure_held_closed_line_total_pressure_Pa,
@@ -1282,26 +1283,25 @@ class EvaporationMixin:
                     else 1.0
                 )
 
-                def apply_source_limits(rates):
-                    rates = {
+                def apply_freeze_scaling(rates):
+                    return {
                         str(species): max(0.0, float(rate)) * liquid_factor
                         for species, rate in rates.items()
                     }
-                    residual_capacity_mol = getattr(
-                        self,
-                        '_native_fe_vapor_residual_capacity_mol_this_hr',
-                        None,
+
+                def admit_rates(raw_rates):
+                    nonlocal native_fe_capacity_allocation
+                    frozen_rates = apply_freeze_scaling(raw_rates)
+                    depleted = self._apply_analytic_evaporation_depletion(
+                        EvaporationFlux(species_kg_hr=frozen_rates)
                     )
-                    if residual_capacity_mol is not None and 'Fe' in rates:
-                        fe_molar_mass = float(
-                            molar_masses_kg_mol.get('Fe', 0.0) or 0.0
+                    admitted_rates, native_fe_capacity_allocation = (
+                        self._apply_native_fe_residual_capacity(
+                            depleted.species_kg_hr,
+                            molar_masses_kg_mol,
                         )
-                        rates['Fe'] = min(
-                            rates['Fe'],
-                            max(0.0, float(residual_capacity_mol))
-                            * fe_molar_mass,
-                        )
-                    return rates
+                    )
+                    return admitted_rates
 
                 def rates_from_result(result):
                     rates = {
@@ -1312,7 +1312,7 @@ class EvaporationMixin:
                             ) or {}
                         ).items()
                     }
-                    return apply_source_limits(rates)
+                    return rates
 
                 seed_diagnostic = dict(seed_result.diagnostic or {})
                 seed_series = dict(
@@ -1410,9 +1410,7 @@ class EvaporationMixin:
                             molar_mass_kg_mol=molar_mass,
                             area_m2=area_m2,
                         )
-                        bulk_projection_Pa = (
-                            float(g) if uses_gas_resistance else 0.0
-                        )
+                        bulk_projection_Pa = max(0.0, float(g))
                         molar_rate = (
                             max(0.0, float(vapor_pressures.get(species, 0.0)))
                             / (molar_resistance + bulk_projection_Pa)
@@ -1423,11 +1421,7 @@ class EvaporationMixin:
                         raw_rates[species] = (
                             molar_rate * molar_mass
                         )
-                    limited_rates = apply_source_limits(raw_rates)
-                    admitted_flux = self._apply_analytic_evaporation_depletion(
-                        EvaporationFlux(species_kg_hr=limited_rates)
-                    )
-                    return dict(admitted_flux.species_kg_hr)
+                    return admit_rates(raw_rates)
 
                 def partials_at_rates(rates_kg_hr):
                     candidate = EvaporationFlux(
@@ -1447,10 +1441,13 @@ class EvaporationMixin:
                         self.species_formula_registry,
                     )
 
-                # Seed from the same postprocessed map as later iterates so
-                # freeze-gate scaling and the native-Fe residual cap are not
-                # applied only after the first pressure projection.
-                seed_rates = rates_from_result(seed_result)
+                # Seed from the same full admission/freeze/depletion/cap map
+                # used by each scalar candidate, so no transform lands only
+                # after its first pressure projection.
+                seed_rates = admit_rates(rates_from_result(seed_result))
+                seed_native_fe_capacity_allocation = (
+                    native_fe_capacity_allocation
+                )
                 atmosphere_name = str(
                     getattr(getattr(self.melt, 'atmosphere', None), 'name', '')
                 )
@@ -1480,10 +1477,7 @@ class EvaporationMixin:
                     # The closed-line projection below pins P_total for any
                     # positive candidate; at zero it returns an empty mixture,
                     # so the solver receives the explicit boiling boundary.
-                    upper_flux = self._apply_analytic_evaporation_depletion(
-                        EvaporationFlux(species_kg_hr=dict(seed_rates))
-                    )
-                    upper_rates = dict(upper_flux.species_kg_hr)
+                    upper_rates = dict(seed_rates)
                     lower_closure = _solve_same_hour_headspace_closure(
                         upper_rates,
                         rates_at_projection_g,
@@ -1496,13 +1490,22 @@ class EvaporationMixin:
                         closed_line_total_pressure_Pa=pressure_held_total_Pa,
                     )
                     lower_rates = dict(lower_closure.rates_kg_hr)
+                    lower_native_fe_capacity_allocation = (
+                        native_fe_capacity_allocation
+                    )
                     if PRESSURE_HELD_FLUX_BOUND == 'upper':
                         selected_rates = upper_rates
+                        native_fe_capacity_allocation = (
+                            seed_native_fe_capacity_allocation
+                        )
                         selected_partials_Pa = {
                             str(species): 0.0 for species in vapor_pressures
                         }
                     elif PRESSURE_HELD_FLUX_BOUND == 'lower':
                         selected_rates = lower_rates
+                        native_fe_capacity_allocation = (
+                            lower_native_fe_capacity_allocation
+                        )
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
                             for species, pressure in (
@@ -1517,6 +1520,7 @@ class EvaporationMixin:
                             ) / 2.0
                             for species in set(upper_rates) | set(lower_rates)
                         }
+                        native_fe_capacity_allocation = None
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
                             for species, pressure in (
@@ -1527,7 +1531,7 @@ class EvaporationMixin:
                         raise ValueError(
                             'PRESSURE_HELD_FLUX_BOUND must be upper, lower, or mid'
                         )
-                    closure_rates_include_liquid_fraction = True
+                    closure_rates_are_admitted = True
                     selected_bound_converged = (
                         PRESSURE_HELD_FLUX_BOUND == 'upper'
                         or lower_closure.converged
@@ -1619,15 +1623,19 @@ class EvaporationMixin:
                     'ordinary_evaporation'
                 ] = int(closure_record['iterations'])
             if (
+                pressure_held_bounds_record is None
+                and str(kernel_result.status) == 'ok'
+            ):
+                diagnostic['evaporation_flux_kg_hr'] = dict(
+                    closure_record['rates_kg_hr']
+                )
+                diagnostic['evaporation_flux_rates_are_admitted'] = True
+                closure_rates_are_admitted = True
+            if (
                 not closure_record['converged']
                 and pressure_held_bounds_record is None
+                and str(kernel_result.status) == 'ok'
             ):
-                if str(kernel_result.status) == 'ok':
-                    diagnostic['evaporation_flux_kg_hr'] = dict(
-                        closure_record['rates_kg_hr']
-                    )
-                    diagnostic['evaporation_flux_rates_are_admitted'] = True
-                    closure_rates_include_liquid_fraction = True
                 diagnostic.setdefault('notices', []).append({
                     'type': 'typed_notice',
                     'kind': 'same_hour_headspace_closure_nonconvergence',
@@ -1640,6 +1648,7 @@ class EvaporationMixin:
                 closure_record['rates_kg_hr']
             )
             diagnostic['evaporation_flux_rates_are_admitted'] = True
+            closure_rates_are_admitted = True
             diagnostic['pressure_held_sweep_bounds'] = {
                 key: value
                 for key, value in pressure_held_bounds_record.items()
@@ -1660,6 +1669,13 @@ class EvaporationMixin:
                     ],
                     'authority': 'extrapolated',
                 })
+        if (
+            closure_rates_are_admitted
+            and native_fe_capacity_allocation is not None
+        ):
+            diagnostic['native_fe_capacity_allocation'] = (
+                native_fe_capacity_allocation
+            )
         if batch_report is not None:
             diagnostic[CONTROL_BATCH_REPORT_KEY] = batch_report
         diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
@@ -1803,7 +1819,7 @@ class EvaporationMixin:
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
-            if closure_rates_include_liquid_fraction:
+            if closure_rates_are_admitted:
                 liquid_fraction_factor = 1.0
             elif gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
                 liquid_fraction_factor = (
@@ -1821,41 +1837,16 @@ class EvaporationMixin:
                 return flux
         for species, rate_kg_hr in flux_kg_hr.items():
             gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
-            if species == 'Fe':
-                residual_capacity_mol = getattr(
-                    self,
-                    '_native_fe_vapor_residual_capacity_mol_this_hr',
-                    None,
+            if species == 'Fe' and not closure_rates_are_admitted:
+                capped, allocation = self._apply_native_fe_residual_capacity(
+                    {'Fe': gated_rate_kg_hr},
+                    molar_masses_kg_mol,
                 )
-                if residual_capacity_mol is not None:
-                    fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                    residual_capacity_kg_hr = max(
-                        0.0,
-                        float(residual_capacity_mol),
-                    ) * fe_molar_mass
-                    # Explicit scheduling policy, not an activity calculation:
-                    # native-pool Fe claims the shared transport capacity first,
-                    # then melt-derived Fe is capped at the residual molar
-                    # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                    # melt activity is an operand here. Limiting cases: zero
-                    # residual gives zero melt-derived Fe; residual >= raw
-                    # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                    original_gated_rate = gated_rate_kg_hr
-                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
-                    diagnostic['native_fe_capacity_allocation'] = {
-                        'rule': 'pool_first_residual',
-                        'native_pool_activity_argument': (
-                            'not modeled; allocation is an explicit pool-first '
-                            'scheduling policy'
-                        ),
-                        'melt_fe_raw_kg_hr': float(original_gated_rate),
-                        'melt_fe_residual_capacity_kg_hr': float(
-                            residual_capacity_kg_hr
-                        ),
-                        'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
-                    }
+                gated_rate_kg_hr = capped['Fe']
+                if allocation is not None:
+                    diagnostic['native_fe_capacity_allocation'] = allocation
             if gated_rate_kg_hr > 1e-12 or (
-                closure_rates_include_liquid_fraction and gated_rate_kg_hr > 0.0
+                closure_rates_are_admitted and gated_rate_kg_hr > 0.0
             ):
                 flux.species_kg_hr[species] = gated_rate_kg_hr
                 alpha_authority_status = alpha_authority_statuses.get(species)
@@ -2204,6 +2195,44 @@ class EvaporationMixin:
         if isinstance(backend_diagnostics, Mapping):
             diagnostics.update(dict(backend_diagnostics))
         return diagnostics
+
+    def _apply_native_fe_residual_capacity(
+        self,
+        rates_kg_hr: Mapping[str, float],
+        molar_masses_kg_mol: Mapping[str, float],
+    ) -> tuple[dict[str, float], dict[str, float | str] | None]:
+        rates = {
+            str(species): max(0.0, float(rate))
+            for species, rate in rates_kg_hr.items()
+        }
+        residual_capacity_mol = getattr(
+            self,
+            '_native_fe_vapor_residual_capacity_mol_this_hr',
+            None,
+        )
+        if residual_capacity_mol is None or 'Fe' not in rates:
+            return rates, None
+        fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
+        residual_capacity_kg_hr = (
+            max(0.0, float(residual_capacity_mol)) * fe_molar_mass
+        )
+        # Premise: native-pool Fe claims shared transport capacity first, so
+        # melt-derived Fe is limited to residual molar capacity times M_Fe
+        # [kg/mol], yielding kg/hr. This is an explicit scheduling policy;
+        # zero residual gives zero melt-derived Fe, while capacity at least as
+        # large as the rate leaves it unchanged.
+        original_rate = rates['Fe']
+        rates['Fe'] = min(original_rate, residual_capacity_kg_hr)
+        return rates, {
+            'rule': 'pool_first_residual',
+            'native_pool_activity_argument': (
+                'not modeled; allocation is an explicit pool-first '
+                'scheduling policy'
+            ),
+            'melt_fe_raw_kg_hr': original_rate,
+            'melt_fe_residual_capacity_kg_hr': residual_capacity_kg_hr,
+            'melt_fe_applied_kg_hr': rates['Fe'],
+        }
 
     def _freeze_gate_liquid_fraction_factor(
         self,
