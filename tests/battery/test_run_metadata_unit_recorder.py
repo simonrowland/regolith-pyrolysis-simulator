@@ -101,7 +101,6 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                     "method": "fixture",
                     "relation": "identity",
                     "inputs": ["source"],
-                    "output_unit": "g",
                 }
             _seed, base_extract = _unitless_run_metadata_extract(
                 seed_root, field, home, payload
@@ -112,6 +111,22 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
             )
 
         base_payload = _run_metadata_field_payload(base_extract, field, home)
+        if shape == "unitless-with-inference":
+            baseline, baseline_errors = _parse_run_metadata_shape(
+                RUN_METADATA_FIELD_HOMES[field][0],
+                base_payload,
+                field=field,
+            )
+            if field == "charge_sequence":
+                assert baseline is None, (field, home, baseline)
+                assert any(
+                    "inference" in detail
+                    for _formula, _raw, detail in baseline_errors
+                )
+            else:
+                assert baseline_errors == (), (field, home, baseline_errors)
+                assert baseline.inference is not None, (field, home, baseline)
+
         for node_path in _run_metadata_mapping_paths(base_payload):
             for unit_key in _RUN_METADATA_UNIT_KEYS:
                 extract = deepcopy(base_extract)
