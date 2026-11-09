@@ -56,6 +56,7 @@ so minor versions may carry significant changes.
 
 ### Tooling and CI
 
+- The recipe optimizer (Optuna) now installs by default.
 - Optimizer fidelity timeouts use worker-reported elapsed time, and study
   artifacts record winner provenance.
 - Engine warning output is deduplicated; corpus indexes and store-validation
