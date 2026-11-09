@@ -4602,14 +4602,17 @@ def _open_resolved_backend(
                 "configured_vapor_transport_floor_bar"
             ),
         }
-        return resolve_backend(
+        backend = resolve_backend(
             name,
             BackendSelectionPolicy.RUNNER_STRICT,
             backend_config=backend_config,
         )
+        python_api_model = settings.get("python_api_model")
+        if python_api_model is not None and hasattr(backend, "_python_api_model"):
+            backend._python_api_model = tuple(python_api_model)
+        return backend
     if engine_settings is not None and name == "thermoengine":
         backend_config = {
-            "mode": settings.get("transport"),
             "model": settings.get("model"),
             "vapor_transport_pO2_bar": settings.get(
                 "configured_vapor_transport_pO2_bar"
@@ -4726,6 +4729,160 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     return _DEFAULT_FO2_LOG
 
 
+def _openimcc_effective_cache_settings(
+    backend: Any, _po2: Po2Request
+) -> dict[str, Any]:
+    return {
+        "pack": backend._pack_name,
+        "allow_extrapolation": True,
+        "allow_out_of_envelope": True,
+    }
+
+
+def _internal_analytical_effective_cache_settings(
+    backend: Any, po2: Po2Request
+) -> dict[str, Any]:
+    settings: dict[str, Any] = {"include_diagnostic_shadows": True}
+    if po2.mode != PO2_OXYGEN_BALANCE_EFFUSION:
+        return settings
+
+    oxygen_backend = None
+    resolve_backend = getattr(backend, "_oxygen_balance_backend_for", None)
+    if callable(resolve_backend):
+        try:
+            oxygen_backend = resolve_backend(po2)
+        except Exception:
+            # equilibrate() classifies an unavailable optional bridge as a
+            # refusal. Keep the configured pack in that same refusal key.
+            oxygen_backend = None
+    pack = getattr(oxygen_backend, "_pack_name", None)
+    if pack is None:
+        pack = getattr(backend, "_oxygen_balance_pack", None)
+    settings["oxygen_balance_backend"] = {
+        "engine": "openimcc",
+        "pack": pack,
+        "allow_extrapolation": True,
+        "allow_out_of_envelope": True,
+    }
+    return settings
+
+
+def _alphamelts_effective_cache_settings(
+    backend: Any, po2: Po2Request
+) -> dict[str, Any]:
+    model = getattr(backend, "_model", getattr(backend, "_raw_model_name", None))
+    python_api_model = None
+    if getattr(backend, "_mode", None) == "python_api":
+        python_api_model = getattr(backend, "_python_api_model", None)
+        worker = getattr(backend, "_pet_worker", None)
+        if worker is not None:
+            model_code = worker._bootstrap_args[0]
+            python_api_model = (model, int(model_code))
+    return {
+        "model": model,
+        "transport": getattr(backend, "_mode", None),
+        "python_api_model": python_api_model,
+        "redox_buffer": getattr(backend, "_redox_buffer", None),
+        "fO2_offset": getattr(backend, "_fo2_offset", None),
+        "Fe3Fet_ratio": getattr(backend, "_fe3fet_ratio", None),
+        "configured_vapor_transport_pO2_bar": getattr(
+            backend, "_configured_vapor_transport_pO2_bar", None
+        ),
+        "configured_vapor_transport_floor_bar": getattr(
+            backend, "_configured_vapor_transport_floor_bar", None
+        ),
+        # The isolated backend must resolve the same model that the active
+        # AlphaMELTS object currently executes, even if its startup alias was
+        # later changed.
+        "raw_model_name": model,
+        "ambient_calc_mode": os.environ.get("ALPHAMELTS_CALC_MODE"),
+        "vapor_transport_pO2_admission": (
+            "observation" if po2.mode == PO2_COMMANDED else "environment"
+        ),
+    }
+
+
+def _thermoengine_effective_cache_settings(
+    backend: Any, po2: Po2Request
+) -> dict[str, Any]:
+    transport = getattr(backend, "_thermoengine_transport", None)
+    model = getattr(transport, "_model_name", None)
+    if model is None:
+        from simulator.config import resolve_grid_engine_model
+
+        model = resolve_grid_engine_model(
+            getattr(backend, "_model", ""), "thermoengine"
+        )
+    return {
+        "model": model,
+        "configured_vapor_transport_pO2_bar": getattr(
+            backend, "_configured_vapor_transport_pO2_bar", None
+        ),
+        "configured_vapor_transport_floor_bar": getattr(
+            backend, "_configured_vapor_transport_floor_bar", None
+        ),
+        "vapor_transport_pO2_admission": (
+            "observation" if po2.mode == PO2_COMMANDED else "environment"
+        ),
+    }
+
+
+def _vaporock_effective_cache_settings(
+    backend: Any, _po2: Po2Request
+) -> dict[str, Any]:
+    from simulator.melt_backend.vaporock import _MELT_MODEL_ID
+
+    vapor_pressure_units = getattr(backend, "_vapor_pressure_units", "bar")
+    pool = getattr(backend, "_warm_pool", None)
+    if pool is not None and pool.workers:
+        vapor_pressure_units = pool.workers[0]._bootstrap_args[1]
+    return {
+        "model": _MELT_MODEL_ID,
+        "temperature_units": getattr(backend, "_temperature_units", "C"),
+        "pressure_units": getattr(backend, "_pressure_units", "bar"),
+        "vapor_pressure_units": vapor_pressure_units,
+        "include_oxide_activities": False,
+    }
+
+
+def _magemin_effective_cache_settings(
+    backend: Any, _po2: Po2Request
+) -> dict[str, Any]:
+    bridge = getattr(backend, "_bridge", None)
+    database = getattr(backend, "_database", None)
+    config = getattr(backend, "_config", {})
+    pool = getattr(backend, "_subprocess_pool", None)
+    if bridge == "subprocess" and pool is not None and pool.workers:
+        args = pool.workers[0]._bootstrap_args
+        database = args[1]
+        config = args[2]
+    return {
+        "database": database,
+        "fO2_buffer": dict(config or {}).get("fO2_buffer"),
+        # Python and Julia bridges invoke separate deterministic solvers.
+        "bridge": bridge,
+    }
+
+
+_ENGINE_EFFECTIVE_CACHE_SETTINGS = {
+    "openimcc": _openimcc_effective_cache_settings,
+    "internal-analytical": _internal_analytical_effective_cache_settings,
+    "alphamelts": _alphamelts_effective_cache_settings,
+    "thermoengine": _thermoengine_effective_cache_settings,
+    "vaporock": _vaporock_effective_cache_settings,
+    "magemin": _magemin_effective_cache_settings,
+}
+
+
+def _effective_engine_cache_settings(
+    handle: EngineHandle, po2: Po2Request
+) -> dict[str, Any] | None:
+    if handle.backend is None:
+        return None
+    builder = _ENGINE_EFFECTIVE_CACHE_SETTINGS.get(handle.name)
+    return None if builder is None else builder(handle.backend, po2)
+
+
 def _engine_cache_request_vector(
     handle: EngineHandle,
     pot: BinaryPot,
@@ -4749,7 +4906,9 @@ def _engine_cache_request_vector(
     fo2_log = _fo2_log_for_request(handle, po2)
     engine_id = handle.name
     options: dict[str, Any] = {}
-    engine_settings: dict[str, Any] = {}
+    engine_settings = _effective_engine_cache_settings(handle, po2)
+    if engine_settings is None:
+        return None
 
     try:
         parameters = inspect.signature(handle.backend.equilibrate).parameters
@@ -4762,11 +4921,6 @@ def _engine_cache_request_vector(
     if engine_id == "openimcc":
         composition = {"basis": "mol", "components": composition_mol}
         pressure = None
-        engine_settings = {
-            "pack": handle.backend._pack_name,
-            "allow_extrapolation": True,
-            "allow_out_of_envelope": True,
-        }
     elif engine_id == "internal-analytical":
         composition = {
             "composition_kg": composition_kg,
@@ -4774,31 +4928,6 @@ def _engine_cache_request_vector(
         }
         pressure = pressure_bar
         options["po2_request"] = po2.as_payload()
-        engine_settings = {"include_diagnostic_shadows": True}
-        if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
-            oxygen_backend = None
-            resolve_oxygen_backend = getattr(
-                handle.backend, "_oxygen_balance_backend_for", None
-            )
-            if callable(resolve_oxygen_backend):
-                try:
-                    oxygen_backend = resolve_oxygen_backend(po2)
-                except Exception:
-                    # The real call classifies a failed optional OpenIMCC
-                    # construction as a refusal. Its attempted pack remains
-                    # the configured pack because no backend was created.
-                    oxygen_backend = None
-            oxygen_pack = getattr(oxygen_backend, "_pack_name", None)
-            if oxygen_pack is None:
-                oxygen_pack = getattr(
-                    handle.backend, "_oxygen_balance_pack", None
-                )
-            engine_settings["oxygen_balance_backend"] = {
-                "engine": "openimcc",
-                "pack": oxygen_pack,
-                "allow_extrapolation": True,
-                "allow_out_of_envelope": True,
-            }
     else:
         # The four engine backends accept the submitted molar bulk as their
         # composition input; their adapters own any later projection.
@@ -4809,57 +4938,15 @@ def _engine_cache_request_vector(
                 alphamelts_condensed_phase_pressure_bar,
             )
 
-            backend = handle.backend
             pressure = alphamelts_condensed_phase_pressure_bar(
-                pressure_bar, transport=getattr(backend, "_mode", None)
+                pressure_bar, transport=engine_settings["transport"]
             )
-            engine_settings = {
-                "model": getattr(backend, "_model", None),
-                "transport": getattr(backend, "_mode", None),
-                "python_api_model": getattr(backend, "_python_api_model", None),
-                "redox_buffer": getattr(backend, "_redox_buffer", None),
-                "fO2_offset": getattr(backend, "_fo2_offset", None),
-                "Fe3Fet_ratio": getattr(backend, "_fe3fet_ratio", None),
-                "configured_vapor_transport_pO2_bar": getattr(
-                    backend, "_configured_vapor_transport_pO2_bar", None
-                ),
-                "configured_vapor_transport_floor_bar": getattr(
-                    backend, "_configured_vapor_transport_floor_bar", None
-                ),
-                "raw_model_name": getattr(backend, "_raw_model_name", None),
-                "ambient_calc_mode": os.environ.get("ALPHAMELTS_CALC_MODE"),
-                "vapor_transport_pO2_admission": (
-                    "observation"
-                    if po2.mode == PO2_COMMANDED
-                    else "environment"
-                ),
-            }
             if po2.mode == PO2_COMMANDED:
                 options.update(
                     vapor_transport_pO2_bar=po2.po2_bar,
                     vapor_transport_pO2_admission="observation",
                 )
         elif engine_id == "thermoengine":
-            from simulator.config import resolve_grid_engine_model
-
-            backend = handle.backend
-            engine_settings = {
-                "model": resolve_grid_engine_model(
-                    getattr(backend, "_model", ""), "thermoengine"
-                ),
-                "transport": getattr(backend, "_mode", None),
-                "configured_vapor_transport_pO2_bar": getattr(
-                    backend, "_configured_vapor_transport_pO2_bar", None
-                ),
-                "configured_vapor_transport_floor_bar": getattr(
-                    backend, "_configured_vapor_transport_floor_bar", None
-                ),
-                "vapor_transport_pO2_admission": (
-                    "observation"
-                    if po2.mode == PO2_COMMANDED
-                    else "environment"
-                ),
-            }
             if po2.mode == PO2_COMMANDED:
                 options.update(
                     vapor_transport_pO2_bar=po2.po2_bar,
@@ -4869,35 +4956,11 @@ def _engine_cache_request_vector(
             # The VapoRock adapter documents that pressure_bar is diagnostic
             # only and does not send total pressure to eval_gas_abundances.
             pressure = None
-            from simulator.melt_backend.vaporock import (
-                _MELT_MODEL_ID,
-            )
-
-            backend = handle.backend
-            engine_settings = {
-                "model": _MELT_MODEL_ID,
-                "temperature_units": getattr(backend, "_temperature_units", "C"),
-                "pressure_units": getattr(backend, "_pressure_units", "bar"),
-                "vapor_pressure_units": getattr(
-                    backend, "_vapor_pressure_units", "bar"
-                ),
-                "include_oxide_activities": False,
-            }
         elif engine_id == "magemin":
             backend = handle.backend
             pressure = float(
                 backend._GPa_to_kbar(backend._pressure_bar_to_GPa(pressure_bar)),
             )
-            bridge = getattr(backend, "_bridge", None)
-            engine_settings = {
-                "database": getattr(backend, "_database", None),
-                "fO2_buffer": getattr(backend, "_config", {}).get("fO2_buffer"),
-                # The Python and Julia bridges call separate deterministic
-                # implementations. Key their resolved kind, never a path.
-                "bridge": bridge,
-            }
-        elif engine_id not in {"alphamelts", "thermoengine", "vaporock", "magemin"}:
-            return None
         if po2.mode == PO2_NOT_AN_INPUT and engine_id in {
             "alphamelts",
             "thermoengine",
@@ -4934,7 +4997,7 @@ def _engine_cache_request_vector(
     }
     if engine_id != "openimcc" and not (
         engine_id == "alphamelts"
-        and getattr(handle.backend, "_mode", None) == "subprocess"
+        and engine_settings["transport"] == "subprocess"
     ):
         request["physical_pressure_bar"] = pressure_bar
     if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:

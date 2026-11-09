@@ -119,7 +119,7 @@ def _vector(
 def _path_value(value: Any, path: tuple[str, ...]) -> Any:
     current = value
     for part in path:
-        current = current[part] if isinstance(current, dict) else getattr(current, part)
+        current = current.get(part) if isinstance(current, dict) else getattr(current, part)
     return current
 
 
@@ -137,7 +137,7 @@ _INITIALIZED_SETTING_MUTATIONS: dict[str, tuple[tuple[Any, ...], ...]] = {
     "internal-analytical": (("_oxygen_balance_pack", ("oxygen_balance_backend", "pack"), "review-parent-pack", "review-parent-pack-2"),),
     "alphamelts": (
         ("_model", ("model",), "review-cache-model", "review-cache-model-2"),
-        ("_mode", ("transport",), "review-cache-transport", "review-cache-transport-2"),
+        ("_mode", ("transport",), "python_api", "subprocess"),
         ("_python_api_model", ("python_api_model",), ("review-model", 2), ("review-model-2", 3)),
         ("_redox_buffer", ("redox_buffer",), "NNO", "QFM"),
         ("_fo2_offset", ("fO2_offset",), 0.25, -0.25),
@@ -179,6 +179,13 @@ def _initialized_effective_setting(
         return backend._oxygen_balance_backend._pack_name
     if engine == "thermoengine" and key == "model":
         return backend._thermoengine_transport._model_name
+    if engine == "alphamelts" and key == "python_api_model":
+        if backend._mode != "python_api":
+            return None
+        worker = getattr(backend, "_pet_worker", None)
+        if worker is not None:
+            return (backend._model, int(worker._bootstrap_args[0]))
+        return backend._python_api_model
     if engine == "alphamelts" and key == "raw_model_name":
         return backend._model
     if engine == "vaporock" and key == "vapor_pressure_units":
@@ -263,6 +270,29 @@ def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
         else Po2Request("engine_default", None)
     )
     backend = handle.backend
+    original_alpha_state: tuple[Any, Any, Any] | None = None
+    if engine == "alphamelts":
+        # Exercise the warm Python API path even when the installed adapter
+        # selected its subprocess transport. The fake worker holds the model
+        # code captured at initialization, matching WarmEngineWorker's
+        # bootstrap contract without constructing native engine state.
+        original_alpha_state = (
+            backend._mode,
+            backend._python_api_model,
+            backend._pet_worker,
+        )
+        from simulator.melt_backend.alphamelts import resolve_alphamelts_python_api_model
+
+        python_api_model = backend._python_api_model or resolve_alphamelts_python_api_model(
+            backend._model
+        )
+        backend._mode = "python_api"
+        backend._python_api_model = python_api_model
+        if backend._pet_worker is None:
+            backend._pet_worker = SimpleNamespace(
+                _bootstrap_args=(python_api_model[1],),
+                close=lambda: None,
+            )
     worker_settings: dict[str, Any] = {}
     if engine == "magemin" and backend._subprocess_pool is not None:
         args = backend._subprocess_pool.workers[0]._bootstrap_args
@@ -382,6 +412,12 @@ def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
             assert direct.gas_partial_pressures_Pa == isolated.gas_partial_pressures_Pa
             _set_path_value(backend, parent_path, old_parent)
     finally:
+        if original_alpha_state is not None:
+            (
+                backend._mode,
+                backend._python_api_model,
+                backend._pet_worker,
+            ) = original_alpha_state
         close_battery_engine_handle(handle)
 
 
@@ -696,7 +732,9 @@ def test_real_isolated_magemin_unsupported_database_is_cached_stably(
         pytest.skip(f"magemin unavailable: {reason}")
 
     try:
-        handle.backend._database = "unsupported-db"
+        assert handle.backend.initialize(
+            {"database": "unsupported-db", "warm_worker": True}
+        )
         common = {
             "temperature_K": 1703.0,
             "po2": Po2Request("engine_default", None),
@@ -1055,7 +1093,6 @@ def test_alphamelts_calc_mode_conflict_matches_cache_off_and_warm(
     ("engine", "setting", "value"),
     [
         ("alphamelts", "_model", "model-b"),
-        ("alphamelts", "_raw_model_name", "raw-model-b"),
         ("alphamelts", "_mode", "subprocess"),
         ("alphamelts", "_redox_buffer", "NNO"),
         ("alphamelts", "_fo2_offset", 0.25),
@@ -1064,7 +1101,6 @@ def test_alphamelts_calc_mode_conflict_matches_cache_off_and_warm(
         ("alphamelts", "_configured_vapor_transport_pO2_bar", 1.0e-8),
         ("alphamelts", "_configured_vapor_transport_floor_bar", 1.0e-10),
         ("thermoengine", "_model", "model-b"),
-        ("thermoengine", "_mode", "alternate-transport"),
         ("thermoengine", "_configured_vapor_transport_pO2_bar", 1.0e-8),
         ("thermoengine", "_configured_vapor_transport_floor_bar", 1.0e-10),
         ("magemin", "_database", "mp"),
@@ -1091,12 +1127,14 @@ def test_request_vector_changes_when_engine_setting_changes(
 @pytest.mark.parametrize(
     ("engine", "setting", "value"),
     [
+        ("alphamelts", "_raw_model_name", "raw-model-b"),
         ("alphamelts", "_timeout_s", 42.0),
         ("alphamelts", "_pet_warm_enabled", True),
         ("alphamelts", "_pet_warm_timeout_s", 43.0),
         ("alphamelts", "_binary_path", "/other/alphamelts"),
         ("alphamelts", "_engine_path", "/other/alphamelts-engine"),
         ("thermoengine", "_health_timeout_s", 42.0),
+        ("thermoengine", "_mode", "alternate-transport"),
         (
             "thermoengine",
             "_thermoengine_transport",

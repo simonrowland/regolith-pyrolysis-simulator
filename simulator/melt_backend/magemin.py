@@ -94,6 +94,7 @@ library is called.
 from __future__ import annotations
 
 import builtins
+import copy
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
@@ -1378,6 +1379,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
+            worker_config = copy.deepcopy(self._config)
 
             def worker_factory(index: int) -> WarmEngineWorker:
                 return WarmEngineWorker(
@@ -1387,7 +1389,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     bootstrap_args=(
                         str(binary_path.resolve()),
                         self._database,
-                        self._config,
+                        worker_config,
                     ),
                     startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
