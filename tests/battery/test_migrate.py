@@ -6029,6 +6029,12 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     from tools.dump_hard_issues import dump_hard_issues
 
     extract = _model_derived_density_without_derivation()
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["derivation"] = {
+        "relation": "density model output",
+        "inputs": ["pdf:fixture-source"],
+        "output_unit": "kg_per_m3",
+    }
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
@@ -6068,7 +6074,7 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     assert actual_rows == expected_rows
     assert {
         row["field"] for row in rows if row["source_id"] == "fixture-source"
-    } == {"derivation.method", "derivation.references"}
+    } == {"derived_from", "derivation.method", "derivation.references"}
 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)

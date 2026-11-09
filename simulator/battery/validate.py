@@ -79,7 +79,6 @@ from simulator.battery.identity import (
 from simulator.battery.records import (
     Bench,
     Experiment,
-    Locator,
     Located,
     Notice,
     Observation,
@@ -1126,10 +1125,6 @@ def validate_observation(
     )
 
 
-def _locator_grounds_model_derived_method(locator: Locator | None) -> bool:
-    return locator is not None and locator.has_method_location()
-
-
 def _model_derived_method_is_backlogged(observation: Observation) -> bool:
     evidence = observation.evidence.class_
     if not (
@@ -1138,11 +1133,7 @@ def _model_derived_method_is_backlogged(observation: Observation) -> bool:
         and _value_has_numeric_value(observation.value)
     ):
         return False
-    derivation = observation.derivation
-    return derivation is None or (
-        not derivation.has_located_method
-        and not _locator_grounds_model_derived_method(observation.locator)
-    )
+    return observation.derivation is None
 
 
 def _validate_observation(
@@ -1265,6 +1256,7 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    model_derived_backlogged = _model_derived_method_is_backlogged(observation)
     method_located = derivation is not None and derivation.has_located_method
     model_references_declared = (
         derivation is not None and derivation.has_named_references
@@ -1375,8 +1367,7 @@ def _validate_observation(
             ev.value is EvidenceClass.MODEL_DERIVED
             and _value_has_numeric_value(observation.value)
             and not declares_unprinted_raw_inputs
-            and not _model_derived_method_is_backlogged(observation)
-            and not has_resolved_lineage
+            and not model_derived_backlogged
         ):
             if not method_located:
                 issues.append(
@@ -1474,7 +1465,13 @@ def _validate_observation(
                 )
             )
         )
-        if not figure_only_without_value:
+        model_derived_unavailable = (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and observation.value.kind is ValueKind.UNAVAILABLE
+        )
+        if not figure_only_without_value and not (
+            model_derived_backlogged or model_derived_unavailable
+        ):
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
             # measured_reduced, and for model_derived only with a located
