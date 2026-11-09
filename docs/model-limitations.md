@@ -304,6 +304,8 @@ points) through the engines and reports the residuals. At this release it evalua
 observations, 21 of them comparable**; the rest carry typed skip reasons. Mismatches are reported
 as findings, and tolerances are never widened to pass. The full generated residual tables, coverage
 breakdowns and findings are on [Validation battery rollup](validation-battery-rollup.md).
+The cross-engine scoring behind these residuals is described in
+[Validation Battery](validation-battery.md).
 
 ## Transition-metal monoxide gas carriers
 

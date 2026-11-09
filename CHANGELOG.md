@@ -77,6 +77,75 @@ About 8,400 commits since v0.6.4 (2026-08-28).
 - 0.6.6 brings optimizer gates measured at the melt boundary and an
   optimizer-driven hero run.
 
+## [0.6.4] — 2026-08-28
+
+7 commits since v0.6.3 (2026-08-28).
+
+- **Literature and test battery:** Added a batch of source extracts and tooling
+  to rebuild the JANAF compilation from its committed inputs.
+- **Scoring and engines:** Missing evaporation sticking data stays unavailable,
+  so it no longer reads as zero sticking.
+- **Physics and reporting:** Optimizer inputs keep an unknown furnace cost
+  distinct from zero, while measured never-fouling cases retain their cost.
+
+## [0.6.3] — 2026-08-28
+
+381 commits since v0.6.2 (2026-07-19).
+
+- **Literature and test battery:** New KEMS and vacuum-pyrolysis measurements
+  are now evaluated in a store-driven reproduction battery with pinned
+  residuals.
+- **Scoring and engines:** Added runtime vapor evaluators for NASA-7/9
+  polynomial and Shomate data, with broader species coverage and VapoRock
+  comparisons.
+- **Physics and reporting:** Wall-deposition estimates now use flowing-gas
+  partial pressure, and a liner-life diagnostic reports a furnace ceiling.
+- **Tooling:** Added a canonical plant flowsheet with a generated diagram and
+  unified terminal product classification for glass and refractory ceramic.
+
+## [0.6.2] — 2026-07-19
+
+221 commits since v0.6.1 (2026-07-13).
+
+- **Physics and reporting:** The cold-end oxygen train now estimates capacity
+  from compressor and refrigeration limits, with opt-in runtime enforcement
+  and cistern accumulation.
+- **Tooling:** Runs can be saved in a library and opened in a report viewer
+  with per-hour, mol-based ledger details.
+- **Physics:** Char is tracked as a reductant, including an oxygen-lance path
+  for reducing FeO to iron and carbon monoxide.
+- **Scoring and optimization:** Optimizer recipes carry sourced cost inputs
+  through saved studies and winner results.
+
+## [0.6.1] — 2026-07-13
+
+41 commits since v0.6.0 (2026-07-12).
+
+- **Scoring and engines:** Runtime pressure now follows gas partial pressures
+  and equipment settings through evaporation and condensation; retained
+  condensate carries across ticks into baffle chemistry.
+- **Physics and reporting:** The Thermal Train report estimates downstream
+  radiator, compression, and refrigeration needs, with a live summary of
+  oxygen and vapor loads against capacity.
+- **Tooling:** Optimizer recipes retain sourced cost assumptions, and live
+  run panels read named ledger views through a shared read-only API.
+
+## [0.6.0] — 2026-07-12
+
+678 commits since v0.5.4 (2026-05-28).
+
+- **Literature and test battery:** Added literature-based vacuum-pyrolysis
+  presets and a time-series KEMS/evaporation harness for comparing modeled
+  fluxes with experimental measurements.
+- **Scoring and engines:** Added a recipe optimizer that filters for feasible
+  runs and compares the remaining tradeoffs, with persistent equilibrium
+  caching for repeated evaluations.
+- **Physics and reporting:** Evaporation now accounts for gas- and melt-side
+  transport resistance; an opt-in calcium extraction campaign uses a
+  transport cap.
+- **Tooling:** The simulator UI now presents the product ledger, redox sources,
+  and Knudsen/vapor diagnostics.
+
 ## [0.5.4] — 2026-05-28
 
 D5/D6 cleanup wave: defensive hardening + historical-audit closures + post-push
