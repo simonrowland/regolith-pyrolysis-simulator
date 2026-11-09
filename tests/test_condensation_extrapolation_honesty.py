@@ -356,20 +356,23 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
-        transport = wall["evaporation_transport_notices_by_species"]
-        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
-        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        # b-858 restores the sourced Svehla Si Lennard-Jones row (t-1369), so
-        # this channel is a flagged prediction rather than a missing-input refusal.
-        assert transport["Si"]["evaporation"]["authority_level"] == "extrapolated"
+        # 13 mbar Ar at 2200 C is viscous (Kn = 3.927e-4, D = 0.12 m),
+        # under VISCOUS_KNUDSEN_MAX = 0.01. evaporation_flux.py sets
+        # continuum_extrapolation_notice only for an out-of-domain viscous
+        # refusal. evaporation.py copies this map only from that notice.
+        # condensation.py and diagnostics.py omit an empty map.
+        transport = wall.get("evaporation_transport_notices_by_species")
+        assert not transport
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["status"] == "unavailable"
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
-        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
-        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+        # diagnostics.py copies evaporation_transport_notices onto the
+        # pareto only from the wall map. The in-domain hour has none.
+        assert "evaporation_transport_notices" not in pareto["SiO"]
+        assert "evaporation_transport_notices" not in pareto["Si"]
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])
