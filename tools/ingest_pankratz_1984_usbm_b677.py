@@ -960,7 +960,13 @@ def main() -> None:
             "scoring_eligible": False,
             "battery_refusal": "assessed_compilation_not_runtime_observable",
         },
-        "source_files": [{"path": str(PDF), "sha256": pdf_sha, "storage": "external read-only regolith corpus"}],
+        "source_files": [
+            {
+                "path": PDF.relative_to(CORPUS).as_posix(),
+                "sha256": pdf_sha,
+                "storage": "external read-only regolith corpus",
+            }
+        ],
         "census": census,
         "summary": {
             "record_count": len(records),

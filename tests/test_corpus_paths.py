@@ -99,6 +99,22 @@ def test_harvest_and_mineru_defaults_honor_configured_roots(
     )
 
 
+def test_fastchem_default_uses_shared_root_and_preserves_raw_override(
+    monkeypatch, tmp_path
+):
+    from tools import harvest_fastchem_compilation as fastchem
+
+    configured_root = tmp_path / "configured-corpus"
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(configured_root))
+    monkeypatch.delenv("REGOLITH_CORPUS_RAW", raising=False)
+    fastchem_corpus = "fastchem-v3-1-3-gas-condensate-coefficients"
+    assert fastchem.default_corpus() == configured_root / "raw" / fastchem_corpus
+
+    raw_override = tmp_path / "raw-override"
+    monkeypatch.setenv("REGOLITH_CORPUS_RAW", str(raw_override))
+    assert fastchem.default_corpus() == raw_override / fastchem_corpus
+
+
 @pytest.mark.parametrize("override", ["custom-corpus", "relative-corpus"])
 def test_pankratz_cli_defaults_to_shared_root_and_keeps_explicit_argument(
     monkeypatch, tmp_path, override
