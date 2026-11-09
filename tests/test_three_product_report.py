@@ -886,15 +886,21 @@ def test_classifier_end_to_end_on_short_c2a_run():
     for _ in range(4):
         sim.step()
     result = classify_products(sim)
-    # All buckets present + finite.
-    assert all(
-        isinstance(result[bucket]['class_total_kg'], float)
-        and result[bucket]['class_total_kg'] >= 0.0
-        for bucket in (
-            'metals_plus_O2', 'pure_silica_glass',
-            'industrial_mixed_glass', 'refractory_ceramic_rump',
-        )
-    )
+    # A refused class is unavailable, not a numeric zero. Available classes
+    # retain finite totals; unavailable classes carry their refusal details.
+    for bucket in (
+        'metals_plus_O2', 'pure_silica_glass',
+        'industrial_mixed_glass', 'refractory_ceramic_rump',
+    ):
+        entry = result[bucket]
+        total = entry['class_total_kg']
+        if total is None:
+            assert entry['status'] == 'unavailable'
+            assert entry['flag']['status'] == 'unavailable'
+            assert entry['excluded']
+        else:
+            assert isinstance(total, float)
+            assert total >= 0.0
 
 
 def test_classifier_unclassified_bin_catches_unknown_species():

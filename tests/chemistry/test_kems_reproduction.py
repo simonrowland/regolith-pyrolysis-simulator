@@ -210,9 +210,11 @@ def test_kems_case_schema_rejects_unknown_fields() -> None:
             # MC-5 Ca (2026-08-07) option B: TE gas_rail demoted; Pref_GF path.
             # SIGN CHECK: high-T monatomic Ca pressure moves UP vs TE Pref_GR pin
             # (0.00078463 -> 0.18399 Pa at 2077 K / a=1-class Halwax conditions).
+            # The d-144 liquid-to-crystalline conversion multiplies the
+            # production-resolved CaO activity by 4.967367396770555 here.
             # PROVIDER-DRIFT TRIPWIRE only; not a literature re-fit.
             # docs-private/research/2026-08-07-mc5-ca-fix/report.md
-            0.18399149539451548,
+            0.9139533555057759,
         ),
         (
             "halwax_2024_mgo.yaml",
@@ -223,8 +225,10 @@ def test_kems_case_schema_rejects_unknown_fields() -> None:
             # (0.21516 -> 0.81977 Pa at 1926 K / a=1-class Halwax conditions;
             # +0.5809 dex = Pref_GF-Pref_GR at 1926 K). PROVIDER-DRIFT TRIPWIRE
             # only; not a literature re-fit.
+            # The d-144 liquid-to-crystalline conversion multiplies the
+            # production-resolved MgO activity by 5.512052099568086 here.
             # docs-private/research/2026-08-07-mgfix/report.md
-            0.8197707668768197,
+            4.518619176727914,
         ),
     ],
 )

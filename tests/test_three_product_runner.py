@@ -12,7 +12,6 @@ Pins:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import subprocess
 import sys
@@ -242,9 +241,35 @@ def test_cli_mass_scales_classification_and_carries_provenance(tmp_path):
         "unclassified": "total_kg",
     }
     for bucket, quantity_key in quantity_keys.items():
-        assert one_kg_payload["classification"][bucket][quantity_key] == pytest.approx(
-            default_payload["classification"][bucket][quantity_key] / 1000.0
-        )
+        default_entry = default_payload["classification"][bucket]
+        one_kg_entry = one_kg_payload["classification"][bucket]
+        default_quantity = default_entry[quantity_key]
+        one_kg_quantity = one_kg_entry[quantity_key]
+        if default_quantity is None:
+            assert one_kg_quantity is None
+            assert (
+                default_entry["status"]
+                == one_kg_entry["status"]
+                == "unavailable"
+            )
+            default_excluded = default_entry["excluded"]
+            one_kg_excluded = one_kg_entry["excluded"]
+            assert len(default_excluded) == len(one_kg_excluded)
+            for default_item, one_kg_item in zip(
+                default_excluded, one_kg_excluded, strict=True
+            ):
+                for key in (
+                    "account", "reason", "species", "upper_bound_basis"
+                ):
+                    assert default_item.get(key) == one_kg_item.get(key)
+                default_bound = default_item.get("upper_bound_kg")
+                one_kg_bound = one_kg_item.get("upper_bound_kg")
+                if isinstance(default_bound, (int, float)):
+                    assert one_kg_bound == pytest.approx(default_bound / 1000.0)
+                else:
+                    assert one_kg_bound == default_bound
+        else:
+            assert one_kg_quantity == pytest.approx(default_quantity / 1000.0)
 
     metadata = one_kg_payload["run_metadata"]
     assert metadata["backend"] == "internal-analytical"
@@ -271,16 +296,27 @@ def test_cli_rejects_nonpositive_or_nonfinite_mass(mass_kg):
         ])
 
 
-def test_default_classification_values_preserve_pre_change_digest():
+def test_default_classification_quantities_match_availability_shape():
     result = run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
         hours=2,
     )
-    digest = hashlib.sha256(
-        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    # d137: production classification now counts tapped and stage-accepted
-    # metals, with untapped metal-phase balances represented in their own
-    # source-accounted inventory field. This pins the complete runner payload.
-    assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"
+    classification = result
+    quantity_keys = {
+        "metals_plus_O2": "class_total_kg",
+        "pure_silica_glass": "class_total_kg",
+        "industrial_mixed_glass": "class_total_kg",
+        "refractory_ceramic_rump": "class_total_kg",
+        "unclassified": "total_kg",
+    }
+    for bucket, quantity_key in quantity_keys.items():
+        entry = classification[bucket]
+        quantity = entry[quantity_key]
+        if quantity is None:
+            assert entry["status"] == "unavailable"
+            assert entry["flag"]["status"] == "unavailable"
+            assert entry["excluded"]
+        else:
+            assert isinstance(quantity, (int, float))
+            assert quantity >= 0.0

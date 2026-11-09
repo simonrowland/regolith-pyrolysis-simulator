@@ -68,7 +68,7 @@ _PIN = {
         2.74738410411159e-10,
     ),
     (_STOLYAROVA, Engine.INTERNAL_ANALYTICAL): (
-        Decimal("0.00007054458263120522"),
+        Decimal("0.00042365128512004594"),
         1.99531976228266e-08,
     ),
     (_STOLYAROVA, Engine.OPENIMCC): (

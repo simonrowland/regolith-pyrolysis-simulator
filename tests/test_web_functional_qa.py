@@ -196,7 +196,7 @@ def headless_full_run_product_story(tmp_path_factory):
         (
             "lunar_mare_low_ti", 24, {},
             {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
-            0.0, 363.32,
+            None, 363.32,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
@@ -237,10 +237,18 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     assert runner["glass"]["species_kg"] == {}
     assert web_story["captured_volatiles"]["species_kg"] == {}
     assert runner["captured_volatiles"]["kg_by_species"] == {}
-    assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
-        oxygen_kg, abs=0.01
-    )
-    assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
+    if oxygen_kg is None:
+        for oxygen in (web_story["oxygen"], runner["oxygen"]):
+            assert oxygen["class_total_kg"] is None
+            assert oxygen["status"] == "unavailable"
+            assert oxygen["flag"]["status"] == "unavailable"
+            assert oxygen["excluded"]
+        assert runner["oxygen"]["O2_kg"] is None
+    else:
+        assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
+            oxygen_kg, abs=0.01
+        )
+        assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
         rump_kg, abs=0.01
     )

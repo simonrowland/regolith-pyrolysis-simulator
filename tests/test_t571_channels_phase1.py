@@ -1238,7 +1238,16 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                 a_oxide = oxide_activity.equivalent_parent_activity(
                     n_ox / n_M
                 )
-                if T_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K:
+                if species in {"Ca", "Mg"}:
+                    # d-349 converts CaO/MgO activity to the selected
+                    # crystalline vapor-K standard before evaluating this
+                    # Ellingham rail. Use the provider's resolved activity
+                    # for that standard when checking the emitted root.
+                    a_oxide = float(prov["vapor_activity_used_for_K"])
+                    if T_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K:
+                        assert prov["melt_activity_authority"] == "openimcc"
+                    assert math.isfinite(a_oxide) and a_oxide > 0.0
+                elif T_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K:
                     # Above the d-207 vapour-channel boundary the
                     # melt-activity authority is OpenIMCC; only the activity
                     # source changes, the Ellingham algebra does not.

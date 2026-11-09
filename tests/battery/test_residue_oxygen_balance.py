@@ -495,11 +495,14 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
         0.3003449996328013, rel=2.0e-5
     )
+    # d-144's CaO reference conversion shifts the internal-analytical
+    # closure; these values were re-read from the production pressure models
+    # and shared vacuum-balance resolver on the merged tip.
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
+        1.0635244514666136, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
+        0.38892559311613245, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's

@@ -160,7 +160,8 @@ def test_alphamelts_activity_diagnostic_antoine_reference_pins(
     for species, expected_hex in (
         ("Na", "0x1.0fc0c6cbb52d4p+14"),
         ("K", "0x1.59f4771222726p+16"),
-        ("Mg", "0x1.f42edd8a229dap+20"),
+        # MgO uses the selected crystalline-K reaction reference.
+        ("Mg", "0x1.6db597b067a52p-1"),
         ("SiO", "0x1.67e4168316334p+1"),
     ):
         assert result["species"][species]["P_reference_Antoine_Pa"].hex() == (
