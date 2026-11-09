@@ -151,25 +151,34 @@ def test_request_vector_omits_qualification_decoration() -> None:
     assert "qualification" not in ordinary
 
 
-def test_request_vector_ignores_isolation_policy() -> None:
-    handle = _handle("magemin")
+def test_isolation_policy_changes_reuse_cached_cell_outcome(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    backend = _Backend("magemin")
+    handle = _handle("magemin", backend)
+    cache = EngineCache(tmp_path / "magemin-isolation.sqlite")
     common = {
         "temperature_K": 1703.0,
         "po2": Po2Request("engine_default", None),
-        "physical_pressure_bar": 1.0,
-        "native_activity_formula": None,
+        "engine_cache": cache,
     }
 
-    ordinary = _engine_cache_request_vector(
-        handle, _pot(), isolated=False, **common
+    first = equilibrate_cell(handle, _pot(), isolated=False, **common)
+    monkeypatch.setattr(
+        battery,
+        "_run_cell_in_subprocess",
+        lambda *_args, **_kwargs: pytest.fail(
+            "cache miss unexpectedly started an isolated worker"
+        ),
     )
-    isolated = _engine_cache_request_vector(
-        handle, _pot(), isolated=True, **common
-    )
+    second = equilibrate_cell(handle, _pot(), isolated=True, **common)
 
-    assert ordinary is not None and isolated is not None
-    assert ordinary == isolated
-    assert "isolated" not in ordinary
+    assert first.status == second.status
+    assert backend.calls == 1
+    assert cache.counters["magemin"]["misses"] == 1
+    assert cache.counters["magemin"]["hits"] == 1
 
 
 def test_request_vector_tracks_ambient_alphamelts_calc_mode(
