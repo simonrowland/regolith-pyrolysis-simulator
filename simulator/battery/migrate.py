@@ -3000,18 +3000,12 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
-# The registry, equipment reader, and lab-parameter merge all use this mapping
-# for the run-metadata fields whose source shape differs from the older scalar
-# Sample fields.
-_SAMPLE_RUN_METADATA_FIELDS: dict[str, tuple[str, str]] = {
-    "final_mass_kg": (
-        "experiment.sample.final_mass_kg",
-        "located_value",
-    ),
-    "species_loss_fraction": (
-        "experiment.sample.species_loss_fraction",
-        "species_located_values",
-    ),
+# Registry parsing and equipment migration share the vocabulary destination
+# paths and their source shapes. Equipment aliases are taken from the matching
+# vocabulary entries rather than maintained as a second field list.
+_SAMPLE_RUN_METADATA_FIELDS: dict[str, str] = {
+    "experiment.sample.final_mass_kg": "located_value",
+    "experiment.sample.species_loss_fraction": "species_located_values",
 }
 
 
@@ -3100,7 +3094,8 @@ def _sample_from_plain(
             ),
         )
     sample_run_metadata = {}
-    for field, (_field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
+    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+        field = field_path.rsplit(".", 1)[-1]
         raw = payload.get(field)
         if raw is None:
             continue
@@ -15629,6 +15624,39 @@ def _unwrap_located_equipment_value(
     return value, parent_locator, value if isinstance(value, Mapping) else None
 
 
+def _species_loss_values_from_equipment(
+    payload: object,
+    parent_locator: Locator | None,
+) -> dict[str, Located[Value]] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    if "value" in payload and isinstance(payload.get("value"), Mapping):
+        values, field_locator, _mapping = _unwrap_located_equipment_value(
+            payload, parent_locator
+        )
+    else:
+        values = {
+            key: value for key, value in payload.items() if key != "locator"
+        }
+        field_locator = locator_from_mapping(payload.get("locator")) or parent_locator
+    if not isinstance(values, Mapping):
+        return None
+    located_values: dict[str, Located[Value]] = {}
+    for formula, raw_value in values.items():
+        if isinstance(raw_value, Mapping) and "state" in raw_value:
+            located = _located_from_plain(raw_value, _value_or_point_from_plain)
+        else:
+            value, value_locator, _mapping = _unwrap_located_equipment_value(
+                raw_value, field_locator
+            )
+            located = Located(
+                State.of(_value_or_point_from_plain(value)),
+                locator=value_locator,
+            )
+        located_values[str(formula)] = located
+    return located_values or None
+
+
 def _walk_lab_hits(
     obj: object,
     by_printed: Mapping[str, VocabEntry],
@@ -16524,7 +16552,8 @@ def _merge_experiment_lab_params(
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
     sample_run_metadata = {}
-    for field, (_field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
+    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+        field = field_path.rsplit(".", 1)[-1]
         old_value = getattr(existing.sample, field)
         new_value = getattr(sample, field)
         if shape == "located_value":
@@ -16624,6 +16653,8 @@ def sample_from_equipment(
     values: object = None,
     locator: Locator | None = None,
     composition_units: object = None,
+    _validation_issues: list[ValidationIssue] | None = None,
+    _experiment_id: str | None = None,
 ) -> Sample:
     """Transfer a stated sample payload; never invent mass, form, or units."""
 
@@ -16634,62 +16665,92 @@ def sample_from_equipment(
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
     sample_run_metadata = {}
-    raw_sample = equipment.get("sample") if isinstance(equipment, Mapping) else None
-    raw_sample, sample_locator, _sample_mapping = _unwrap_located_equipment_value(
-        raw_sample, locator
-    )
-    if isinstance(raw_sample, Mapping):
-        sample_locator = (
-            locator_from_mapping(raw_sample.get("locator")) or sample_locator
+    root_payloads = []
+    sample_payloads = []
+    for root_payload in (equipment, values):
+        if not isinstance(root_payload, Mapping) or any(
+            root_payload is existing for existing in root_payloads
+        ):
+            continue
+        root_payloads.append(root_payload)
+        raw_sample, sample_locator, _sample_mapping = (
+            _unwrap_located_equipment_value(root_payload.get("sample"), locator)
         )
-        for field, (field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
-            if shape == "located_value":
-                sample_run_metadata[field] = _unique_located(
-                    _hits_for(hits, field_path)
-                )
-                continue
-            raw_species_values = raw_sample.get(field)
-            if not isinstance(raw_species_values, Mapping):
-                sample_run_metadata[field] = None
-                continue
-            if (
-                "value" in raw_species_values
-                and isinstance(raw_species_values.get("value"), Mapping)
-            ):
-                species_values, species_locator, _mapping = (
-                    _unwrap_located_equipment_value(
-                        raw_species_values, sample_locator
-                    )
-                )
-            else:
-                species_locator = (
-                    locator_from_mapping(raw_species_values.get("locator"))
-                    or sample_locator
-                )
-                species_values = {
-                    key: value
-                    for key, value in raw_species_values.items()
-                    if key != "locator"
-                }
-            located_species_values = {}
-            if isinstance(species_values, Mapping):
-                for formula, raw_value in species_values.items():
-                    if isinstance(raw_value, Mapping) and "state" in raw_value:
-                        located = _located_from_plain(
-                            raw_value, _value_or_point_from_plain
-                        )
-                    else:
-                        value, value_locator, _mapping = (
-                            _unwrap_located_equipment_value(
-                                raw_value, species_locator
-                            )
-                        )
-                        located = Located(
-                            State.of(_value_or_point_from_plain(value)),
-                            locator=value_locator,
-                        )
-                    located_species_values[str(formula)] = located
-            sample_run_metadata[field] = located_species_values or None
+        if isinstance(raw_sample, Mapping):
+            sample_locator = (
+                locator_from_mapping(raw_sample.get("locator")) or sample_locator
+            )
+            sample_payloads.append((raw_sample, sample_locator))
+
+    def report_metadata_conflict(field_path: str, formula: str | None = None) -> None:
+        if _validation_issues is None:
+            return
+        field = field_path.removeprefix("experiment.")
+        issue_path = (
+            f"experiment[{_experiment_id}].{field}"
+            if _experiment_id is not None
+            else f"equipment.{field}"
+        )
+        if formula is not None:
+            issue_path += f"[{formula}]"
+        _validation_issues.append(
+            ValidationIssue(
+                path=issue_path,
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=f"conflicting equipment values for {field_path}"
+                + (f"[{formula}]" if formula is not None else ""),
+            )
+        )
+
+    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+        field = field_path.rsplit(".", 1)[-1]
+        if shape == "located_value":
+            field_hits = _hits_for(hits, field_path)
+            located = _unique_located(field_hits)
+            numeric_hits = [
+                hit
+                for hit in field_hits
+                if hit.amount is not None or hit.interval is not None
+            ]
+            if len(numeric_hits) > 1 and located is None:
+                report_metadata_conflict(field_path)
+            sample_run_metadata[field] = located
+            continue
+
+        source_payloads = [
+            (root[entry.printed], locator)
+            for entry in vocab
+            if entry.field == field_path
+            for root in root_payloads
+            if entry.printed in root
+        ]
+        source_payloads.extend(
+            (sample[field], sample_locator)
+            for sample, sample_locator in sample_payloads
+            if field in sample
+        )
+        species_values: dict[str, Located[Value]] = {}
+        conflicts: set[str] = set()
+        for raw_payload, parent_locator in source_payloads:
+            parsed = _species_loss_values_from_equipment(
+                raw_payload, parent_locator
+            )
+            for formula, located in (parsed or {}).items():
+                existing = species_values.get(formula)
+                if (
+                    existing is not None
+                    and existing.state.is_value
+                    and located.state.is_value
+                    and existing.state.value != located.state.value
+                ):
+                    if formula not in conflicts:
+                        report_metadata_conflict(field_path, formula)
+                    conflicts.add(formula)
+                else:
+                    species_values[formula] = _prefer_located(existing, located)
+        for formula in conflicts:
+            species_values.pop(formula, None)
+        sample_run_metadata[field] = species_values or None
     form_located = _unique_text_located(_hits_for(hits, "sample.form"))
     container_located = _unique_text_located(_hits_for(hits, "sample.container"))
     hard_form, hard_container = _form_and_container(equipment)
@@ -18936,6 +18997,8 @@ class Migrator:
             values=values,
             locator=locator,
             composition_units=composition_units,
+            _validation_issues=self.result.registry_issues,
+            _experiment_id=experiment_id,
         )
         if experiment_id in self._initial_composition_conflicts:
             sample = replace(sample, initial_composition=None)
