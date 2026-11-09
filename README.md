@@ -9,7 +9,8 @@ This package explores that control problem. It compares hard vacuum, Mars backpr
 It is a process-modeling workbench. It computes molten-regolith pyrolysis workflows from a
 built-in Ellingham/Antoine model, and can route silicate melt equilibria to external
 thermochemistry engines — alphaMELTS (directly or via PetThermoTools), ThermoEngine/VapoRock,
-and MAGEMin — when those are installed. See [Melt Chemistry Backends](#melt-chemistry-backends)
+MAGEMin, and our sister project [OpenIMCC](https://github.com/simonrowland/openimcc) for
+high-temperature melt activities — when those are installed. See [Melt Chemistry Backends](#melt-chemistry-backends)
 for which engine holds which role.
 
 Author: Simon Rowland, simon@directleap.com.
@@ -317,50 +318,27 @@ prove success.
 
 ## Melt Chemistry Backends
 
-The simulator runs without any external melt chemistry package. In that mode it uses the
-built-in Ellingham/Antoine model for comparative vapor-pressure estimates.
+The simulator runs out of the box on its built-in Ellingham/Antoine model. External engines add
+real melt thermodynamics where they are installed.
 
-**Selectable as the active melt backend** by the batch runner's `--backend`:
-
-| name | notes |
+| engine | role |
 |---|---|
-| `internal-analytical` | the built-in Ellingham/Antoine model. The default. |
-| `alphamelts` | alphaMELTS, via subprocess or the PetThermoTools Python API. |
-| `thermoengine` | ThermoEngine; delegates vapor-melt work to VapoRock when VapoRock is importable, and warns and falls back to activity × Antoine rows when it is not. |
+| `internal-analytical` | Built-in Ellingham/Antoine model. The default active backend. |
+| `alphamelts` | Active backend, through a subprocess or the PetThermoTools API. |
+| `thermoengine` | Active backend. Uses VapoRock for vapour–melt work when it is installed. |
+| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for 45 melt species (8 parent oxides and 37 complexes), whichever active backend is selected. If it is not installed, or it refuses a composition, the run uses the built-in activity table and records a notice. |
+| VapoRock, MAGEMin | Per-task providers and cross-checks. Not selectable as the active backend. |
 
-`stub` and `diagnostic_stub` are accepted input aliases for `internal-analytical`. They are
-folded at every name-keyed boundary, so a run started with either spelling records
-`internal-analytical` in its metadata and shares that cache identity. `internal-analytical` is
-the only spelling that is ever serialized; the `--help` text advertises only that spelling.
+Choose the active backend with `--backend` on the batch runner; batch runs always name one, so every
+stored result says which engine produced it. The web UI offers Auto (alphaMELTS preferred),
+alphaMELTS and Built-in analytical.
 
-`cached-real` — replaying cached real-engine results — is a fourth backend, but it is **not**
-reachable from the runner CLI (`--backend cached-real` is an argparse error). It is reached
-through the optimizer's `fast` fidelity tier. By contract it serves cached *real*-engine results
-only, and never analytical output dressed as real-engine evidence.
+Installing an engine does not hand it the ledger. Liquidus and freeze-path providers are
+diagnostic, and vapour-pressure authority stays with the built-in model. See
+[`docs/melt-backends.md`](docs/melt-backends.md) for the per-task authority table.
 
-The web UI's engine picker is deliberately narrower: `Auto (AlphaMELTS preferred)`,
-`AlphaMELTS (strict)`, and `Built-in analytical`. `auto` is accepted by that web autodetect path
-but **rejected** under runner-strict — a batch run must name the engine it wants, so that what
-produced a stored artifact is never ambiguous.
-
-**Not selectable as the active backend**, by design:
-
-- `VapoRock` and `MAGEMin` are per-intent providers and diagnostic evidence sources, not active
-  melt backends. They are listed in `simulator/backends.py::INELIGIBLE_ACTIVE_BACKENDS`.
-
-**What a backend is allowed to do.** Installing a real engine does not move ledger authority to
-it. Silicate liquidus and freeze-path providers, alphaMELTS included, are **diagnostic only** and
-may not mutate the ledger; vapor-pressure runtime authority stays with the built-in model until an
-explicit source-selection change. The per-intent authority table is in
-[`docs/developer-map.md`](docs/developer-map.md) ("Engine Source Trees"), with the operator-facing
-version in [`docs/melt-backends.md`](docs/melt-backends.md).
-
-The supported alphaMELTS path is `alphamelts_binary_path` in the generated,
-machine-local `engines/engines.local.toml`; it points to the locked app under
-`~/repos/engine-bin/alphaMELTS/<archive-sha>/`. `install-dependencies.py`
-downloads and verifies the release archive, then writes the base local config
-from the lock. `install-engines.py` refreshes it after the pinned source engines
-are built and publishes ThermoEngine's dylibs as symlinks in `~/lib`.
+`install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
+pinned source engines. OpenIMCC installs with the `imcc` extra.
 
 ## Model Status
 
