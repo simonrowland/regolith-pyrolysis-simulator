@@ -251,6 +251,41 @@ def test_isolated_worker_exit_cells_are_transient(
     assert cache.counters["alphamelts"]["transient_skips"] == 2
 
 
+def test_unavailable_refusal_cells_are_not_cached(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cache = EngineCache(tmp_path / "unavailable-cache.sqlite")
+    monkeypatch.setattr(
+        engine_cache,
+        "_from_cache_payload",
+        _Outcome.from_cache_payload,
+    )
+    outcome = _Outcome(
+        {
+            "status": "refusal",
+            "refusal_reason": "unavailable",
+            "engine_status": "ValueError",
+            "engine_reason": "fo2_outside_attainable_bracket",
+        }
+    )
+    calls = 0
+
+    def solve_again() -> _Outcome:
+        nonlocal calls
+        calls += 1
+        return outcome
+
+    request = {"call": "equilibrate_cell", "case": "unavailable-refusal"}
+    cached_solve(cache, "thermoengine", request, solve_again)
+    cached_solve(cache, "thermoengine", request, solve_again)
+
+    assert calls == 2
+    assert cache.counters["thermoengine"]["stores"] == 0
+    assert cache.counters["thermoengine"]["hits"] == 0
+    assert cache.counters["thermoengine"]["transient_skips"] == 2
+
+
 @pytest.mark.parametrize("disposition", ["environment", "resource", "worker_died"])
 def test_lifecycle_failure_dispositions_are_transient(disposition: str) -> None:
     class LifecycleOutcome(_Outcome):
