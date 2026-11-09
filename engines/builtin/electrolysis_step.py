@@ -105,7 +105,11 @@ from simulator.chemistry.ellingham_thermo import (
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.mre_ladder import (
-    DECOMP_VOLTAGES, mre_decomposition_voltage_reference, _mre_raw_graph_requirement,
+    DECOMP_VOLTAGES,
+    MRE_LIQUID_STANDARD_MISSING_INPUT,
+    _mre_raw_graph_requirement,
+    mre_decomposition_voltage_reference,
+    mre_liquid_standard_missing_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -565,6 +569,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic["mre_ellingham_phase_basis_by_oxide"][oxide] = (
                     voltage_reference.ellingham_phase_basis
                 )
+            missing_notice = mre_liquid_standard_missing_notice(voltage_reference)
+            if missing_notice is not None:
+                diagnostic.setdefault(
+                    "mre_liquid_standard_missing_targets", {}
+                )[oxide] = missing_notice
+                diagnostic["notices"] = tuple(
+                    diagnostic.get("notices", ()) or ()
+                ) + (missing_notice,)
+                continue
             metal, cations_per_oxide, _n_oxy = OXIDE_TO_METAL.get(
                 oxide, ("", 1, 0)
             )
@@ -737,6 +750,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if diagnostic.get("mre_liquid_standard_missing_targets"):
+                status = "refused"
+                diagnostic["reason_refused"] = MRE_LIQUID_STANDARD_MISSING_INPUT
             if status == "refused":
                 diagnostic = _without_mre_quantities(diagnostic)
             elif voltage_V > 0.0 and current_A > 0.0:

@@ -60,6 +60,7 @@ CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN = "canonical"
 MRE_REFERENCE_TEMPERATURE_K = 1873.15
 MRE_GRAPH_AUTHORITY = "ellingham_graph"
 MRE_GRAPH_FALLBACK_AUTHORITY = "ellingham_fallback"
+MRE_LIQUID_STANDARD_MISSING_INPUT = "mre_liquid_standard_missing_input"
 MRE_DECLARED_AUTHORITY = "operator_declared"
 MRE_MN_DIAGNOSTIC_STATUS = (
     "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
@@ -108,6 +109,7 @@ class MREDecompositionVoltageReference:
     raw_graph_voltage_V: float | None = None
     metal_product_phase: str | None = None
     ellingham_phase_basis: str | None = None
+    liquid_standard_missing: Mapping[str, Any] | None = None
 
 
 def _coerce_temperature_K(temperature_K: float | None) -> float:
@@ -232,20 +234,33 @@ def mre_decomposition_voltage_reference(
                                 f"tables={fusion.crystal_table}/{fusion.liquid_table}"
                             )
                 except ValueError as exc:
-                    # Evaluation-time import: electrolysis consumes this
-                    # owner, so importing its refusal class eagerly cycles.
-                    from simulator.electrolysis import MREElectrolysisRefusal
-
-                    raise MREElectrolysisRefusal(
-                        "mre_liquid_standard_missing_input",
-                        {
+                    # The liquid-standard term cannot be computed. d-019
+                    # refuses that quantity and does not invent a voltage,
+                    # including the static DECOMP_VOLTAGES anchor. NaN is
+                    # not a commitment. The step records the notice and
+                    # continues (d-356).
+                    return MREDecompositionVoltageReference(
+                        oxide=oxide,
+                        voltage=float("nan"),
+                        temperature_K=T_K,
+                        authority=MRE_GRAPH_AUTHORITY,
+                        authoritative=False,
+                        status=(
+                            f"{MRE_LIQUID_STANDARD_MISSING_INPUT};"
+                            "authority_level=refused;certified_band_K=none"
+                        ),
+                        ellingham_species=metal_species,
+                        raw_graph_voltage_V=raw_graph_voltage_V,
+                        metal_product_phase=metal_product_phase,
+                        ellingham_phase_basis=ellingham_phase_basis,
+                        liquid_standard_missing={
                             "oxide": oxide,
                             "temperature_K": T_K,
                             "source": "NIST-JANAF",
                             "fusion_key": fusion_key,
                             "missing_input": str(exc),
                         },
-                    ) from exc
+                    )
                 reason = _UNRESOLVED_STANDARD_STATE_REASON.get(oxide)
                 if reason is not None:
                     authoritative = False
@@ -286,6 +301,20 @@ def mre_decomposition_voltage_reference(
         metal_product_phase=metal_product_phase or ELLINGHAM_METAL_PHASE_CONDENSED,
         ellingham_phase_basis=ellingham_phase_basis,
     )
+
+
+def mre_liquid_standard_missing_notice(
+    reference: MREDecompositionVoltageReference | None,
+) -> dict[str, Any] | None:
+    """Per-oxide notice when the liquid-standard voltage cannot be computed."""
+    if reference is None or not reference.liquid_standard_missing:
+        return None
+    notice = {
+        "kind": MRE_LIQUID_STANDARD_MISSING_INPUT,
+        "reason": MRE_LIQUID_STANDARD_MISSING_INPUT,
+    }
+    notice.update(reference.liquid_standard_missing)
+    return notice
 
 
 def _mre_raw_graph_requirement(
@@ -351,7 +380,11 @@ def _fallback_ladder(
             species[0],
             temperature_K=temperature_K,
         )
-        if reference is None:
+        if (
+            reference is None
+            or reference.liquid_standard_missing
+            or not math.isfinite(reference.voltage)
+        ):
             continue
         entry = {
             'voltage': reference.voltage,
@@ -392,7 +425,13 @@ def canonical_mre_decomposition_voltage(
         species,
         temperature_K=temperature_K,
     )
-    return None if reference is None else reference.voltage
+    if (
+        reference is None
+        or reference.liquid_standard_missing
+        or not math.isfinite(reference.voltage)
+    ):
+        return None
+    return reference.voltage
 
 
 def coerce_mre_decomposition_voltage(value: Any) -> float | None:
@@ -493,7 +532,7 @@ def parse_mre_voltage_sequence_yaml(
             voltage = None if reference is None else reference.voltage
         else:
             voltage = coerce_mre_decomposition_voltage(raw_voltage)
-        if voltage is None:
+        if voltage is None or not math.isfinite(voltage):
             continue
         raw_hold = entry.get('min_hold_hours', MRE_DEFAULT_MIN_HOLD_HOURS)
         try:

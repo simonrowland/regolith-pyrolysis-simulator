@@ -1778,6 +1778,7 @@ class ExtractionMixin:
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
         )
+        from simulator.mre_ladder import MRE_LIQUID_STANDARD_MISSING_INPUT
         from simulator.mre_reproduction import (
             MREReproductionInterval,
             PlantMREIntervalControl,
@@ -2016,6 +2017,7 @@ class ExtractionMixin:
                 MRE_MULTI_OXIDE_PARTITION_REFUSAL,
                 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
                 MRE_RAW_MARGIN_REFUSAL,
+                MRE_LIQUID_STANDARD_MISSING_INPUT,
             )
 
             def restore_pre_attempt_mre_state() -> None:

@@ -286,19 +286,25 @@ def test_already_liquid_mre_segments_need_no_fusion_correction(oxide):
 
 
 def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
-    from simulator.electrolysis import MREElectrolysisRefusal
+    import math
 
     def missing(*_args):
         raise ValueError("Cr-015: JANAF table values are missing")
 
     monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
-    with pytest.raises(MREElectrolysisRefusal) as caught:
-        mre_ladder.mre_decomposition_voltage_reference("Cr2O3", temperature_K=1773.15)
-    assert caught.value.terminal_refusal is True
-    assert caught.value.reason == "mre_liquid_standard_missing_input"
-    assert caught.value.diagnostic["missing_input"] == "Cr-015: JANAF table values are missing"
-    assert caught.value.diagnostic["oxide"] == "Cr2O3"
-    assert caught.value.diagnostic["source"] == "NIST-JANAF"
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "Cr2O3", temperature_K=1773.15,
+    )
+    assert ref is not None
+    assert math.isnan(ref.voltage)
+    assert ref.authority == mre_ladder.MRE_GRAPH_AUTHORITY
+    assert ref.authoritative is False
+    assert ref.voltage != pytest.approx(mre_ladder.DECOMP_VOLTAGES["Cr2O3"])
+    assert ref.status.startswith(mre_ladder.MRE_LIQUID_STANDARD_MISSING_INPUT)
+    missing_input = ref.liquid_standard_missing
+    assert missing_input["missing_input"] == "Cr-015: JANAF table values are missing"
+    assert missing_input["oxide"] == "Cr2O3"
+    assert missing_input["source"] == "NIST-JANAF"
 
 
 @pytest.mark.parametrize("temperature_K", [1100.0, 1200.0, 1300.0, 1400.0, 1405.2, 1473.15])
@@ -319,7 +325,6 @@ def test_na_mre_uses_existing_liquid_activity_standard(temperature_K):
 
 
 def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypatch):
-    from simulator.electrolysis import MREElectrolysisRefusal
     from simulator.physical_constants import FARADAY
 
     monkeypatch.setattr(ellingham_thermo, "_na_activity_reference_standard_delta_g_kj_per_mol_o2",
@@ -331,11 +336,11 @@ def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypat
         raise ValueError("Na-015: JANAF liquid rows missing")
 
     monkeypatch.setattr(ellingham_thermo, "_na_activity_reference_standard_delta_g_kj_per_mol_o2", missing)
-    with pytest.raises(MREElectrolysisRefusal) as caught:
-        mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
-    assert caught.value.reason == "mre_liquid_standard_missing_input"
-    assert caught.value.diagnostic["oxide"] == "Na2O"
-    assert "Na-015" in caught.value.diagnostic["missing_input"]
+    refused = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
+    assert refused.authority != mre_ladder.MRE_GRAPH_FALLBACK_AUTHORITY
+    assert refused.voltage != pytest.approx(mre_ladder.DECOMP_VOLTAGES["Na2O"])
+    assert refused.liquid_standard_missing["oxide"] == "Na2O"
+    assert "Na-015" in refused.liquid_standard_missing["missing_input"]
 
 
 @pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
@@ -419,7 +424,6 @@ def test_mre_voltage_notices_restore_on_terminal_refusal():
 def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
     import subprocess
     import sys
-    from simulator.electrolysis import MREElectrolysisRefusal
     import engines.builtin.electrolysis_step as provider_module
 
     def missing(*_args):
@@ -428,6 +432,7 @@ def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
     proc = subprocess.run(
         [sys.executable, "-c", """
 import importlib
+import math
 from unittest.mock import patch
 import simulator.mre_ladder as ladder
 import engines.builtin.electrolysis_step as provider
@@ -435,13 +440,13 @@ with patch('simulator.reference_data.janaf.janaf_fusion_energy',
            side_effect=ValueError('Cr-015: JANAF table values are missing')):
     importlib.reload(ladder)
     importlib.reload(provider)
-    try:
-        ladder.mre_decomposition_voltage_reference('Cr2O3', temperature_K=1773.15)
-    except Exception as exc:
-        assert exc.terminal_refusal
-        assert exc.reason == 'mre_liquid_standard_missing_input'
-    else:
-        raise AssertionError('missing input was accepted')
+    ref = ladder.mre_decomposition_voltage_reference('Cr2O3', temperature_K=1773.15)
+    assert ref is not None
+    assert math.isnan(ref.voltage)
+    assert ref.authority != 'ellingham_fallback'
+    assert ref.liquid_standard_missing['oxide'] == 'Cr2O3'
+    assert ref.liquid_standard_missing['missing_input'] == 'Cr-015: JANAF table values are missing'
+    assert ref.status.startswith('mre_liquid_standard_missing_input')
 """], capture_output=True, text=True,
     )
     assert proc.returncode == 0, proc.stderr
@@ -457,10 +462,37 @@ with patch('simulator.reference_data.janaf.janaf_fusion_energy',
             species_formula_registry={},
         ),
     )
-    with pytest.raises(MREElectrolysisRefusal) as caught:
-        provider_module.BuiltinElectrolysisStepProvider().dispatch(request)
-    assert caught.value.reason == "mre_liquid_standard_missing_input"
-    assert "Cr-015" in caught.value.diagnostic["missing_input"]
+    result = provider_module.BuiltinElectrolysisStepProvider().dispatch(request)
+    assert result.status == "refused"
+    assert result.transition is None
+    notices = list(result.diagnostic.get("notices") or ())
+    assert any(
+        notice.get("reason") == mre_ladder.MRE_LIQUID_STANDARD_MISSING_INPUT
+        and "Cr-015" in str(notice.get("missing_input"))
+        for notice in notices
+    )
+    assert (
+        result.diagnostic["mre_decomposition_voltage_authority_by_oxide"]["Cr2O3"]
+        == mre_ladder.MRE_GRAPH_AUTHORITY
+    )
+    sim = _sim({"campaigns": {}})
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1500.0
+    sim._commanded_pO2_bar = lambda: 1.0
+    sim._mre_voltage_sequence = [
+        {"voltage": 3.0, "species": ["Cr2O3"], "min_hold_hours": 0},
+    ]
+    _seed_cleaned_melt_kg(sim, {"Cr2O3": 10.0})
+    cr_before = sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Cr2O3", 0.0)
+    assert sim._step_mre() == pytest.approx(0.0)
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "Cr2O3", 0.0,
+    ) == pytest.approx(cr_before)
+    step_notices = sim._mre_ellingham_ladder_diagnostic["notices"]
+    assert any(
+        notice.get("reason") == mre_ladder.MRE_LIQUID_STANDARD_MISSING_INPUT
+        for notice in step_notices
+    )
 
 
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():

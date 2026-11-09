@@ -89,9 +89,11 @@ from simulator.core import (
 )
 from simulator.mre_ladder import (
     DECOMP_VOLTAGES,
+    MRE_LIQUID_STANDARD_MISSING_INPUT,
     MREDecompositionVoltageReference,
     _mre_raw_graph_requirement,
     mre_decomposition_voltage_reference,
+    mre_liquid_standard_missing_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -944,6 +946,15 @@ class ElectrolysisModel:
                 result['mre_ellingham_phase_basis_by_oxide'][oxide] = (
                     reference.ellingham_phase_basis
                 )
+            missing_notice = mre_liquid_standard_missing_notice(reference)
+            if missing_notice is not None:
+                result.setdefault(
+                    'mre_liquid_standard_missing_targets', {}
+                )[oxide] = missing_notice
+                result['notices'] = tuple(
+                    result.get('notices', ()) or ()
+                ) + (missing_notice,)
+                continue
             E_nernst = self.nernst_voltage(
                 oxide,
                 T_C,
@@ -1038,6 +1049,8 @@ class ElectrolysisModel:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
             if result['mre_phase_refused_targets']:
                 result['reason_refused'] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if result.get('mre_liquid_standard_missing_targets'):
+                result['reason_refused'] = MRE_LIQUID_STANDARD_MISSING_INPUT
             if 'reason_refused' in result:
                 return _without_mre_quantities(result)
             if voltage_V > 0.0 and current_A > 0.0:
@@ -1215,6 +1228,8 @@ class ElectrolysisModel:
                     gas_product_fugacity_bar[metal]
                 ) if metal in gas_product_fugacity_bar else None,
             )
+            if not math.isfinite(E):
+                continue
             sequence.append((oxide, E))
 
         sequence.sort(key=lambda x: x[1])
@@ -1252,7 +1267,11 @@ class ElectrolysisModel:
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
-            if reference is None:
+            if (
+                reference is None
+                or reference.liquid_standard_missing
+                or not math.isfinite(reference.voltage)
+            ):
                 continue
             E0 = reference.voltage
             if E0 > max_voltage_V:
