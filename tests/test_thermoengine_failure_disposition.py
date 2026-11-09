@@ -528,4 +528,4 @@ def test_thermoengine_ca_vapor_rows_keep_the_green_endmember_projection():
         backend.close()
 
     for name, _, _, _, _, expected in cases:
-        assert predictions[name] == pytest.approx(expected, rel=5e-5), name
+        assert predictions[name] == pytest.approx(expected, rel=1e-12), name
