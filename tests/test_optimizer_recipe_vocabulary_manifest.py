@@ -28,9 +28,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # and the pressure-held carrier-feed knobs added to each conditional
     # subspace.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "f62cd083c0a22ef406090c50119207b0755f37d0b2bdc3af11696d709ead1640"
+        "dda939ecce603a8173f5e7b9c02ac1900677152a75e29f7b13a34e5c3e08b5a5"
     )
-    assert digest == "1fde70e0e14b6e88f36ebd64229fb53e6541d3ee25290647628d7978d6f4579a"
+    assert digest == "740fce5b693cf5befd900f827be0b09fe1808e016cd084f03aebc6bd754dc647"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

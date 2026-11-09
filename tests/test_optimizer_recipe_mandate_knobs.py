@@ -250,15 +250,21 @@ def test_pressure_held_carrier_feed_knob_uses_pipe_capacity_bounds() -> None:
     path = _path("campaigns.C2B.carrier_feed_mol_s")
     spec = schema.spec_for(path)
     campaign = setpoints["campaigns"]["C2B"]
-    p_total_mbar = campaign["p_total_mbar_default"]
+    total_pressure = schema.spec_for(
+        _path("campaigns.C2B.p_total_mbar_default")
+    )
+    p_total_mbar = total_pressure.low
     temperature_C = max(campaign["temp_range_C"])
     carrier = campaign["carrier_feed_gas"]
-    capacity_kg_s = OverheadGasModel()._pipe_conductance(
+    capacity_kg_s = OverheadGasModel(
+        condenser_geometry_config=setpoints["condenser_geometry"]
+    )._pipe_conductance(
         p_total_mbar * 100.0,
         temperature_C,
         species_kg_for_M_avg={carrier: 1.0},
     )
 
+    assert p_total_mbar == pytest.approx(0.8)
     assert spec.low == 0.0
     assert spec.high == pytest.approx(
         capacity_kg_s / (MOLAR_MASS[carrier] / 1000.0), rel=1e-12
@@ -318,6 +324,23 @@ def test_pressure_held_carrier_feed_knob_uses_pipe_capacity_bounds() -> None:
         ):
             rendered = schema.to_setpoints_patch(patch.validated(schema))
             assert _lookup(rendered, spec.path) == _sample_value(spec)
+
+
+def test_pressure_held_carrier_feed_bound_uses_configured_throat_area() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    base_schema = RecipeSchema(setpoints=setpoints)
+    path = _path("campaigns.C2B.carrier_feed_mol_s")
+    base_bound = base_schema.spec_for(path).high
+
+    changed_setpoints = dict(setpoints)
+    changed_geometry = dict(setpoints["condenser_geometry"])
+    changed_geometry["initial_throat_area_m2"] *= 0.5
+    changed_setpoints["condenser_geometry"] = changed_geometry
+    changed_schema = RecipeSchema(setpoints=changed_setpoints)
+
+    assert changed_schema.spec_for(path).high == pytest.approx(
+        base_bound * 0.25, rel=1e-12
+    )
 
 
 def test_c2a_staged_depletion_log_slope_mandate_knob_is_runtime_live() -> None:

@@ -2052,9 +2052,23 @@ def _setpoint_sourced_allowlist(
                 "pipe-capacity:"
             )
             campaign_key = campaign_path.removeprefix("campaigns.")
+            tunable_pressure_lows = [
+                float(candidate.low)
+                for candidate in resolved
+                if candidate.path[:2] == ("campaigns", campaign_key)
+                and candidate.path[-1]
+                in {"p_total_mbar", "p_total_mbar_default"}
+                and candidate.search_enabled
+                and candidate.low is not None
+            ]
             high = _carrier_feed_pipe_capacity_mol_s(
                 setpoints,
                 campaign_key,
+                minimum_tunable_pressure_mbar=(
+                    min(tunable_pressure_lows)
+                    if tunable_pressure_lows
+                    else None
+                ),
             )
             resolved.append(
                 replace(
@@ -2124,6 +2138,8 @@ def _setpoint_sourced_allowlist(
 def _carrier_feed_pipe_capacity_mol_s(
     setpoints: Mapping[str, Any],
     campaign_key: str,
+    *,
+    minimum_tunable_pressure_mbar: float | None = None,
 ) -> float:
     """Derive the campaign feed ceiling from its pressure and gas window."""
     campaigns = setpoints.get("campaigns")
@@ -2138,7 +2154,9 @@ def _carrier_feed_pipe_capacity_mol_s(
         )
 
     raw_pressure = campaign.get("p_total_mbar")
-    if isinstance(raw_pressure, (list, tuple)) and raw_pressure:
+    if minimum_tunable_pressure_mbar is not None:
+        pressure_mbar = float(minimum_tunable_pressure_mbar)
+    elif isinstance(raw_pressure, (list, tuple)) and raw_pressure:
         pressure_mbar = min(float(value) for value in raw_pressure)
     elif raw_pressure is not None:
         pressure_mbar = float(raw_pressure)
@@ -2173,13 +2191,15 @@ def _carrier_feed_pipe_capacity_mol_s(
         campaign.get("carrier_feed_gas") or "Kr"
     )
     molar_mass_kg_mol = float(MOLAR_MASS[carrier_gas]) / 1000.0
-    # Premise: the existing pipe-capacity function returns the mass flow a
-    # pure carrier stream can pass at P_total. The setpoint is mol/s, so
-    # F_max = m_dot_pipe / M_carrier. Unit check: (kg/s)/(kg/mol)=mol/s.
-    # Use the campaign's lowest held pressure and hottest gas temperature,
-    # which bound that capacity from below; as P_total tends to zero, both
-    # capacity and its feed-rate bound tend to zero.
-    capacity_kg_s = OverheadGasModel()._pipe_conductance(
+    # Premise: a circular throat has D²=4A/π, and Poiseuille conductance is
+    # proportional to D⁴, so the carrier bound scales as A²; halving A
+    # quarters the bound. Dividing pipe capacity in kg/s by molar mass in
+    # kg/mol gives mol/s. As A→0 or P_total→P_downstream, the bound→0.
+    # Use configured geometry and the campaign's lowest tunable pressure at
+    # its hottest gas temperature to keep this ceiling inside its envelope.
+    capacity_kg_s = OverheadGasModel(
+        condenser_geometry_config=setpoints.get("condenser_geometry") or {}
+    )._pipe_conductance(
         pressure_mbar * 100.0,
         temperature_C,
         p_downstream_Pa=0.0,
