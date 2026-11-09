@@ -294,12 +294,20 @@ def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
                 close=lambda: None,
             )
     worker_settings: dict[str, Any] = {}
-    if engine == "magemin" and backend._subprocess_pool is not None:
-        args = backend._subprocess_pool.workers[0]._bootstrap_args
-        worker_settings = {
-            "database": str(args[1]),
-            "fO2_buffer": copy.deepcopy(args[2]).get("fO2_buffer"),
-        }
+    if engine == "magemin":
+        pool = getattr(backend, "_subprocess_pool", None)
+        if pool is not None and pool.workers:
+            args = pool.workers[0]._bootstrap_args
+            worker_config = copy.deepcopy(args[2])
+            worker_settings = {
+                "database": str(args[1]),
+                "fO2_buffer": worker_config.get("fO2_buffer"),
+            }
+        else:
+            worker_settings = {
+                "database": backend._database,
+                "fO2_buffer": backend._config.get("fO2_buffer"),
+            }
     baseline = battery._engine_cache_request_vector(
         handle,
         _pot(),
