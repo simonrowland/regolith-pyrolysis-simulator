@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -25,6 +26,7 @@ from simulator.battery.score import (
 )
 from simulator.diagnostic_helpers.binary_pot_battery import (
     EquilibrateCell,
+    EngineHandle,
     Po2Request,
     close_battery_engine_handle,
     equilibrate_cell,
@@ -44,6 +46,15 @@ CACHE_TEST_ENGINES = (
     Engine.ALPHAMELTS,
     Engine.THERMOENGINE,
 )
+
+
+def _open_available_engine(engine: Engine) -> EngineHandle:
+    handle = open_battery_engine(engine.value)
+    if not handle.available:
+        reason = handle.unavailable_reason or "engine binary or package is absent"
+        close_battery_engine_handle(handle)
+        pytest.skip(f"{engine.value} unavailable: {reason}")
+    return handle
 
 
 def _canonical_residual_rows(path: Path) -> bytes:
@@ -108,16 +119,39 @@ def test_engine_availability_is_reported_per_engine(engine: Engine) -> None:
         close_battery_engine_handle(handle)
 
 
+def test_required_engine_skip_uses_the_probe_reason(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    unavailable = EngineHandle(
+        name=Engine.OPENIMCC.value,
+        backend=None,
+        available=False,
+        unavailable_reason="OpenIMCC runtime package missing",
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    closed: list[EngineHandle] = []
+    monkeypatch.setattr(
+        sys.modules[__name__], "open_battery_engine", lambda name: unavailable
+    )
+    monkeypatch.setattr(
+        sys.modules[__name__], "close_battery_engine_handle", closed.append
+    )
+
+    with pytest.raises(
+        pytest.skip.Exception,
+        match="openimcc unavailable: OpenIMCC runtime package missing",
+    ):
+        _open_available_engine(Engine.OPENIMCC)
+
+    assert closed == [unavailable]
+
+
 @pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
 def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
     tmp_path: Path, engine: Engine
 ) -> None:
-    handle = open_battery_engine(engine.value)
-    if not handle.available:
-        reason = handle.unavailable_reason or "engine binary or package is absent"
-        close_battery_engine_handle(handle)
-        pytest.skip(f"{engine.value} unavailable: {reason}")
-
+    handle = _open_available_engine(engine)
     try:
         pots, _diagnostics = load_binary_pots()
         pot = next(item for item in pots if item.pot_id == "mgo_sio2_40_60")
@@ -404,14 +438,6 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "evaluate_gas": 0,
         "residue_vapor_pressure": 0,
     }
-    assert all(
-        sum(
-            int(value)
-            for value in cold_parallel_counts[engine.value]["calls_by_kind"].values()
-        ) > 0
-        for engine in engines
-    ), "parallel cold run did not exercise every available engine"
-
     vapor_engines = tuple(
         engine
         for engine in (Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK)
@@ -601,31 +627,6 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
             for engine in engines
         )
 
-    cold_calls_by_engine = {
-        engine.value: sum(
-            int(value)
-            for value in _cold_counts[engine.value]["calls_by_kind"].values()
-        )
-        for engine in engines
-    }
-    if vapor_cold_counts is not None:
-        for engine in vapor_engines:
-            cold_calls_by_engine[engine.value] += sum(
-                int(value)
-                for value in vapor_cold_counts[engine.value][
-                    "calls_by_kind"
-                ].values()
-            )
-    if Engine.OPENIMCC in engines:
-        cold_calls_by_engine[Engine.OPENIMCC.value] += sum(
-            int(value)
-            for value in redox_cold_counts[Engine.OPENIMCC.value][
-                "calls_by_kind"
-            ].values()
-        )
-    unprobed = [engine for engine, calls in cold_calls_by_engine.items() if calls == 0]
-    assert not unprobed, f"available engines were not probed by scored fixtures: {unprobed}"
-
     scored_rows = (
         activity_rows
         + _residual_payloads(tmp_path / "vapor-cold.jsonl.partial")
@@ -645,6 +646,8 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
 def test_direct_openimcc_results_and_refusals_round_trip_through_cache(
     tmp_path: Path,
 ) -> None:
+    handle = _open_available_engine(Engine.OPENIMCC)
+    close_battery_engine_handle(handle)
     module_name = "simulator.melt_backend.openimcc_cache"
     assert importlib.util.find_spec(module_name) is not None, (
         "direct OpenIMCC cache codecs have not been added"

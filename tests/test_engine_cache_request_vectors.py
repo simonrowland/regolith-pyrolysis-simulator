@@ -13,7 +13,9 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EngineHandle,
     Po2Request,
     _engine_cache_request_vector,
+    close_battery_engine_handle,
     equilibrate_cell,
+    open_battery_engine,
 )
 from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, EngineCache
 
@@ -333,6 +335,59 @@ def test_magemin_ctypes_failure_has_environment_disposition() -> None:
     assert raised.value.failure_disposition == "environment"
 
 
+def test_real_isolated_magemin_unsupported_database_is_cached_stably(
+    tmp_path: Path,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    handle = open_battery_engine("magemin")
+    if not handle.available or handle.backend is None:
+        reason = handle.unavailable_reason or "MAGEMin binary or package is absent"
+        close_battery_engine_handle(handle)
+        pytest.skip(f"magemin unavailable: {reason}")
+
+    try:
+        handle.backend._database = "unsupported-db"
+        common = {
+            "temperature_K": 1703.0,
+            "po2": Po2Request("engine_default", None),
+            "physical_pressure_bar": 1.0,
+        }
+        off = equilibrate_cell(
+            handle, _pot(), isolated=False, **common
+        )
+        isolated_off = equilibrate_cell(
+            handle, _pot(), isolated=True, **common
+        )
+        cache = EngineCache(tmp_path / "magemin-real-isolated.sqlite")
+        cold = equilibrate_cell(
+            handle, _pot(), isolated=True, engine_cache=cache, **common
+        )
+        warm = equilibrate_cell(
+            handle, _pot(), isolated=True, engine_cache=cache, **common
+        )
+
+        assert (
+            off.status
+            == isolated_off.status
+            == cold.status
+            == warm.status
+            == "refusal"
+        )
+        assert (
+            off.refusal_reason
+            == isolated_off.refusal_reason
+            == cold.refusal_reason
+            == warm.refusal_reason
+            == "out_of_basis"
+        )
+        assert cache.counters["magemin"]["stores"] == 1
+        assert cache.counters["magemin"]["hits"] == 1
+    finally:
+        battery._close_isolated_cell_workers()
+        close_battery_engine_handle(handle)
+
+
 def test_internal_analytical_oxygen_balance_tracks_openimcc_epoch(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -397,7 +452,17 @@ def test_internal_analytical_oxygen_pack_uses_parent_setting_off_cold_and_warm(
                 and po2_request.mode == "oxygen_balance_effusion"
                 and self._oxygen_balance_pack == pack_name
             ):
-                raise ValueError(f"unknown oxygen balance pack {self._oxygen_balance_pack}")
+                return SimpleNamespace(
+                    status="out_of_domain",
+                    diagnostics={
+                        "backend_status_reason": "unsupported_oxygen_balance_pack"
+                    },
+                    warnings=[],
+                    activity_coefficients={},
+                    vapor_pressures_Pa={},
+                    liquid_fraction=None,
+                    phase_assemblage_available=False,
+                )
             return SimpleNamespace(
                 status="ok",
                 diagnostics={},
