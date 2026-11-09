@@ -719,11 +719,11 @@ def test_chemistry_data_dependency_names_a_real_path(
             setup_thermoengine_dylib_path,
         )
 
-        if reference == "magemin/ref_database":
+        if reference == "magemin/binary":
             binary = resolve_magemin_binary_path()
             if binary is None:
-                pytest.skip(f"{nodeid}: MAGEMin database runtime binary is not installed")
-            path = binary.resolve().parent / "ref_database"
+                pytest.skip(f"{nodeid}: MAGEMin runtime binary is not installed")
+            path = binary
         elif reference == "alphamelts/model":
             binary = find_alphamelts_binary()
             if binary is None:
