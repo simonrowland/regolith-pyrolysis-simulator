@@ -979,6 +979,16 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             ),
         )
 
+    def unresolved_sampling_evidence():
+        return {
+            'sampled_roots_g': [],
+            'scan_evaluations': 0,
+            'evaluation_count': evaluations,
+            'last_bracket': (
+                list(last_bracket) if last_bracket is not None else None
+            ),
+        }
+
     if (
         closed_line_equilibrium_pressures_Pa is not None
         and closed_line_total_pressure_Pa is not None
@@ -1221,17 +1231,17 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             last_partials,
             converged=False,
             status='unresolved_budget_exhausted',
-            sampling_evidence={
-                'sampled_roots_g': [],
-                'scan_evaluations': 0,
-                'evaluation_count': evaluations,
-                'last_bracket': (
-                    list(last_bracket) if last_bracket is not None else None
-                ),
-            },
+            sampling_evidence=unresolved_sampling_evidence(),
             value_is_unresolved_last_iterate=True,
         )
-    return result(rates, last_partials, converged=False)
+    return result(
+        rates,
+        last_partials,
+        converged=False,
+        status='unresolved_nonconvergence',
+        sampling_evidence=unresolved_sampling_evidence(),
+        value_is_unresolved_last_iterate=True,
+    )
 
 
 def _pressure_held_closed_line_total_pressure_Pa(

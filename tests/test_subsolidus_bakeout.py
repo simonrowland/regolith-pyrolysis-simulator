@@ -822,6 +822,25 @@ def test_c0_transformed_subboiling_budget_exhaustion_is_typed():
     assert diagnostic["value_is_unresolved_last_iterate"] is True
 
 
+def test_c0_nonconverged_last_iterate_is_typed_and_keeps_evidence():
+    result = _solve_c0_joint_solid_host_bakeout_closure(
+        {"A": 1.0},
+        lambda partials: {"A": partials.get("A", 0.0) + 1.0},
+        lambda rates: {"A": rates.get("A", 0.0)},
+    )
+
+    assert not result.converged
+    assert result.status == "unresolved_nonconvergence"
+    assert result.value_is_unresolved_last_iterate
+    assert result.sampling_evidence["sampled_roots_g"] == []
+    assert result.sampling_evidence["scan_evaluations"] == 0
+    assert result.sampling_evidence["evaluation_count"] == result.iterations
+    assert "last_bracket" in result.sampling_evidence
+    diagnostic = result.as_diagnostic()
+    assert diagnostic["status"] == "unresolved_nonconvergence"
+    assert diagnostic["value_is_unresolved_last_iterate"] is True
+
+
 def test_c0_evaporation_uses_same_hour_source_pressure():
     """C0 flux uses the source pressure projected from its own rates."""
     backend = InternalAnalyticalBackend()
