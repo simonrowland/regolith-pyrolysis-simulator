@@ -422,7 +422,9 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     from simulator.vapour_rail.nasa_cea import NasaCeaError
     monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
     monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter",
-                        lambda **kwargs: SimpleNamespace(vapor_pressures_Pa={}))
+                        lambda **kwargs: SimpleNamespace(
+                            vapor_pressures_Pa={}, diagnostics={}
+                        ))
     def fail(*args, **kwargs):
         raise (NasaCeaError("CEA domain") if failure_kind == "domain" else OSError("CEA extract"))
     monkeypatch.setattr(offgas_fo2, "_oxygen_atom_partial_pressure_bar", fail)
