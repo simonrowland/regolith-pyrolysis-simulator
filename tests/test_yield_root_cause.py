@@ -403,7 +403,7 @@ def test_c5_present_rung_unreachable_at_cap_advances_after_minimum_hold():
     assert sim._mre_hold_hours == 0
 
 
-def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
+def test_c5_declared_ladder_hold_scopes_shared_voltage_species_with_raw_margin_veto():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -435,8 +435,26 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
 
     sim._step_mre()
 
-    assert sim.melt.composition_kg.get("Na2O", 0.0) < na2o_before
-    assert not hasattr(sim, "_last_mre_refusal_diagnostic")
+    # 25 °C load_batch (298.15 K): crystalline NIST-JANAF Na2O ΔfG° = −379.090 kJ/mol
+    # gives E° = −ΔfG°/(2F) = 379090 J/mol ÷ (2 × 96485 C/mol) = 1.964 J/C = 1.964 V.
+    # Runtime raw graph uses liquid Na2O (−338.890 kJ/mol → 1.756 V); a = 7.605e−6
+    # and pO₂ = 1e−9 bar add ~0.170 V, giving the recorded 1.926 V. At standard
+    # state those Nernst terms vanish; ellingham_extrapolation_refused:extrapolation_limited
+    # means this asserts a refusal, not an authoritative threshold.
+    assert sim.melt.composition_kg.get("Na2O", 0.0) == pytest.approx(na2o_before)
+    snapshot = sim._make_snapshot()
+    notices = snapshot.mre_ellingham_ladder_diagnostic["notices"]
+    assert notices
+    veto = notices[0]
+    assert veto["kind"] == "mre_raw_margin_veto"
+    assert veto["oxide"] == "Na2O"
+    assert veto["applied_voltage_V"] == pytest.approx(0.75)
+    assert veto["raw_requirement_V"] > veto["applied_voltage_V"]
+    assert veto["raw_margin_V"] == pytest.approx(
+        veto["applied_voltage_V"] - veto["raw_requirement_V"]
+    )
+    assert veto["raw_margin_V"] < 0.0
+    assert veto["reference_status"]
     electrolysis_controls = [c for c in captured if "voltage_V" in c]
     assert electrolysis_controls
     # Rung-scoped selectivity: the first hold is the declared Na2O rung only,

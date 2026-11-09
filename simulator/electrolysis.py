@@ -88,7 +88,10 @@ from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
 from simulator.mre_ladder import (
-    DECOMP_VOLTAGES, mre_decomposition_voltage_reference, _mre_raw_graph_requirement,
+    DECOMP_VOLTAGES,
+    MREDecompositionVoltageReference,
+    _mre_raw_graph_requirement,
+    mre_decomposition_voltage_reference,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -117,25 +120,49 @@ MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
+MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
+MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
-MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
-    MRE_INVALID_CONTROL_REFUSAL,
-    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-    MRE_RAW_MARGIN_REFUSAL,
-    MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
-})
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
-# C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
-# oxides keep their existing policy until their margins are independently
-# validated; their raw requirements are still surfaced in diagnostics below.
-MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
+
+
+def _mre_raw_margin_assessment(
+    *,
+    voltage_V: float,
+    fallback_requirement_V: float,
+    fallback_margin_V: float,
+    reference: MREDecompositionVoltageReference | None,
+) -> tuple[float | None, float | None, dict[str, object] | None]:
+    if reference is None or reference.raw_graph_voltage_V is None:
+        return None, None, None
+
+    raw_requirement_V = _mre_raw_graph_requirement(
+        reference,
+        fallback_requirement_V,
+    )
+    if raw_requirement_V is None:
+        return None, None, None
+    raw_margin_V = voltage_V - raw_requirement_V
+    refusal = None
+    if (
+        fallback_margin_V > 0.0
+        and not reference.authoritative
+        and raw_margin_V <= 0.0
+    ):
+        refusal = {
+            'fallback_requirement_V': fallback_requirement_V,
+            'fallback_margin_V': fallback_margin_V,
+            'raw_requirement_V': raw_requirement_V,
+            'raw_margin_V': raw_margin_V,
+            'voltage_status': reference.status,
+        }
+    return raw_requirement_V, raw_margin_V, refusal
 
 
 def mre_control_domain_assessment(
@@ -326,19 +353,9 @@ def _faraday_reduced_extent(
 
 
 class MREElectrolysisRefusal(RuntimeError):
-    """Typed terminal refusal for a classified MRE physics limitation.
+    """Base typed refusal for invalid run-level MRE inputs."""
 
-    Constructed for the classified reasons in
-    ``MRE_TERMINAL_PHYSICS_REFUSAL_REASONS``. ``core.step`` uses
-    ``terminal_refusal`` to restore the attempted hour instead of poisoning
-    a simulator that already committed an earlier transition during that
-    hour. Invalid temperature, activity, oxide, or fugacity inputs retain
-    their ValueError/TypeError behavior. Invalid MRE controls use the
-    MREElectrolysisInvalidInput subclass so RuntimeError and ValueError
-    handlers both retain their contract.
-    """
-
-    terminal_refusal = True
+    terminal_refusal = False
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         self.reason = str(reason)
@@ -348,6 +365,8 @@ class MREElectrolysisRefusal(RuntimeError):
 
 class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
     """Typed invalid-control refusal caught as both RuntimeError and ValueError."""
+
+    terminal_refusal = True
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         super().__init__(reason, diagnostic)
@@ -362,10 +381,6 @@ class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
         self.args = (
             f"{self.reason}: {detail}" if detail else self.reason,
         )
-
-
-class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
-    """Typed terminal refusal for an uncertified MRE current partition."""
 
 
 def _require_finite_real(
@@ -963,33 +978,22 @@ class ElectrolysisModel:
                 )
 
             fallback_margin_V = voltage_V - E_nernst
-            raw_margin_V = None
-            if (
-                reference is not None
-                and reference.raw_graph_voltage_V is not None
-            ):
-                raw_requirement_V = _mre_raw_graph_requirement(reference, E_nernst)
-                raw_margin_V = voltage_V - raw_requirement_V
+            raw_requirement_V, raw_margin_V, raw_margin_refusal = (
+                _mre_raw_margin_assessment(
+                    voltage_V=voltage_V,
+                    fallback_requirement_V=E_nernst,
+                    fallback_margin_V=fallback_margin_V,
+                    reference=reference,
+                )
+            )
+            if raw_margin_V is not None:
                 result['mre_raw_graph_requirement_V_by_oxide'][oxide] = (
                     raw_requirement_V
                 )
                 result['mre_raw_voltage_margin_V_by_oxide'][oxide] = raw_margin_V
 
-            if (
-                fallback_margin_V > 0.0
-                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
-                and reference is not None
-                and not reference.authoritative
-                and raw_margin_V is not None
-                and raw_margin_V <= 0.0
-            ):
-                result['mre_raw_margin_refused_targets'][oxide] = {
-                    'fallback_requirement_V': E_nernst,
-                    'fallback_margin_V': fallback_margin_V,
-                    'raw_requirement_V': raw_requirement_V,
-                    'raw_margin_V': raw_margin_V,
-                    'voltage_status': reference.status,
-                }
+            if raw_margin_refusal is not None:
+                result['mre_raw_margin_refused_targets'][oxide] = raw_margin_refusal
                 continue
 
             if fallback_margin_V > 0.0:
