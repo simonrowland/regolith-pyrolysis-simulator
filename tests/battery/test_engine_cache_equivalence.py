@@ -189,7 +189,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         Decimal(str(value)) for value in (100000, 100000, 0.1, 0.09, 1, 100000)
     )
     oxygen_Pa = tuple(
-        Decimal(str(value)) for value in (0.1, 1, 10, 1000, 100000, 0.1)
+        Decimal(str(value)) for value in (0.1, 1, 10, 100, 100000, 0.1)
     )
     experiments = {}
     observations = {}
