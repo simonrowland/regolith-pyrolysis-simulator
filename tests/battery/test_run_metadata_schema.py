@@ -26,6 +26,9 @@ _RUN_METADATA_VALUE_HOMES = tuple(
     if shape in {"located_value", "species_located_values"}
     for home in homes
 )
+_RUN_METADATA_SPECIES_LOSS_HOMES = tuple(
+    home for field, home in _RUN_METADATA_VALUE_HOMES if field == "species_loss_fraction"
+)
 
 _RUN_METADATA_VALUE_SHAPES = (
     ("scalar", True),
@@ -81,6 +84,8 @@ def _plain_located_point(point: str, *, table: str, page: int) -> dict:
 
 
 def _run_metadata_value_shape(shape: str, point: str) -> object:
+    if shape == "empty-species-map":
+        return {}
     if shape == "scalar":
         return point
     if shape == "point-wrapper":
@@ -105,7 +110,13 @@ def _run_metadata_shape_extract(
     extract = deepcopy(FIXTURE_EXTRACT)
     point = "0.0008" if field == "final_mass_kg" else "0.25"
     leaf = _run_metadata_value_shape(value_shape, point)
-    field_value = {"Na": leaf} if field == "species_loss_fraction" else leaf
+    field_value = (
+        {}
+        if field == "species_loss_fraction" and value_shape == "empty-species-map"
+        else {"Na": leaf}
+        if field == "species_loss_fraction"
+        else leaf
+    )
     experiment = {"experiment_id": "run-1", "sample": {}}
     observation = extract["species"]["Na"]["observations"][0]
     observation["experiment"] = "run-1"
@@ -656,3 +667,29 @@ def test_run_metadata_value_shapes_validate_and_round_trip_at_every_home(
         assert located.locator == Locator(table="equipment", page=1)
     else:
         assert located.locator is None
+
+
+@pytest.mark.parametrize("home", _RUN_METADATA_SPECIES_LOSS_HOMES)
+def test_empty_species_loss_mapping_is_rejected_at_every_home(
+    tmp_path: Path,
+    home: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, "species_loss_fraction", home, "empty-species-map"
+    )
+
+    errors = validate_extract_document(extract)
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in errors
+    ), errors
+
+    result = migrate(root, write=False)
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.species_loss_fraction")
+        and "{}" in issue.detail
+        for issue in result.validation.issues
+    ), result.validation.issues
