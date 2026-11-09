@@ -1940,6 +1940,7 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
 ) -> None:
     mutations = 0
     seeds = 0
+    unconsumed_inference_units: list[str] = []
     fields = (
         "mass_kg",
         "final_mass_kg",
@@ -2042,6 +2043,17 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                                     in issue.detail
                                     for issue in field_issues
                                 ), context
+                        elif (
+                            (
+                                field in {"mass_kg", "final_mass_kg"}
+                                and shape == "wrapped-inference"
+                            )
+                            or (
+                                field in {"charge_sequence", "vaporization_statement"}
+                                and shape == "unitless-with-inference"
+                            )
+                        ) and node_path == ("inference",) and unit_key == "output_unit":
+                            unconsumed_inference_units.append(context)
                         else:
                             assert field in {"mass_kg", "final_mass_kg"}, context
                             assert loaded is not None and loaded.state.is_value, context
@@ -2079,6 +2091,10 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                                     f"{context}"
                                 )
                         mutations += 1
+    assert not unconsumed_inference_units, (
+        "output_unit was accepted where the shape reader drops inference: "
+        f"{unconsumed_inference_units}"
+    )
 
 
 _RUN_METADATA_INFERENCE_LOSS_CASES = tuple(
