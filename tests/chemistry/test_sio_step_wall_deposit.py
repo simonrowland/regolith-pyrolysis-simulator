@@ -240,8 +240,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # With t-1217 causal capture and b-850 parent-oxide alkali-dimer
         # activity both active, the merged unavailable-MAGEMin run measures
         # 8.42832285937e-06 kg at 1050 C.
+        # Pumped closure holds SiO P_bulk near P_eq, so the 1050 C Si+SiO2
+        # wall product is the closed supply, not the old P_bulk=0 integral.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.42832285937e-06, rel=1e-9
+            7.28880995449e-07, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
