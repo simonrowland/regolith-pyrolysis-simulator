@@ -16,6 +16,8 @@ from types import MappingProxyType
 import pytest
 
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.chemistry.kernel import ProposalRejected
+from simulator.core import PoisonedHourError, PoisonedHourState
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
 from simulator.optimize.determinism import THREAD_ENV_VARS, deterministic_result_view, pin_worker_env
@@ -28,6 +30,7 @@ from simulator.optimize.pool import (
     evaluate_batch,
     resolve_eval_timeout_seconds,
 )
+from simulator.optimize.profiles import load_profile
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 
@@ -575,6 +578,87 @@ def test_engine_worker_pool_timeout_evicts_only_hung_slot(tmp_path: Path) -> Non
 
     assert results[0].run_reference.backend_status_reason == 'optimizer_eval_timeout'
     assert results[1].candidate_id == 'fast'
+
+
+def test_engine_worker_pool_records_poisoned_candidate_and_runs_healthy_one(
+    tmp_path: Path,
+) -> None:
+    profile = load_profile("data/optimize_profiles/hero/lunar_mare_low_ti.yaml")
+    poisoned = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary="ProposalRejected: partial mixed-origin withdrawal",
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+    tasks = (
+        replace(
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            profile=profile,
+            candidate_id="poisoned",
+            output_dir=str(tmp_path / "poisoned"),
+        ),
+        replace(
+            _pool_task(
+                1,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            profile=profile,
+            candidate_id="healthy",
+            output_dir=str(tmp_path / "healthy"),
+        ),
+    )
+
+    class ImmediatePool:
+        def submit(self, request: object, *, timeout_s: float) -> Future[object]:
+            task, evaluate_fn = request
+            future: Future[object] = Future()
+            if task.candidate_id == "poisoned":
+                future.set_exception(poisoned)
+            else:
+                result = evaluate_fn(
+                    task.patch,
+                    task.feedstock_id,
+                    task.fidelity,
+                    profile=task.profile,
+                    candidate_id=task.candidate_id,
+                    output_dir=task.output_dir,
+                )
+                future.set_result(
+                    {"kind": "result", "index": task.index, "result": result}
+                )
+            return future
+
+        def close(self, *, cancel_pending: bool) -> None:
+            assert cancel_pending is False
+
+    results = pool_module._evaluate_tasks_in_engine_worker_pool(
+        tasks,
+        _fake_evaluate,
+        max_workers=2,
+        per_eval_timeout_seconds=5.0,
+        warm_runtime_spec=pool_module._WarmRuntimeSpec(
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        engine_worker_pool=ImmediatePool(),
+    )
+
+    assert results[0].candidate_id == "poisoned"
+    assert results[0].failure_category is FailureCategory.PHYSICS_REFUSED
+    assert results[0].failing_gates == ("physics_refusal",)
+    assert "partial mixed-origin withdrawal" in results[0].feasibility_margins[
+        "physics_refusal"
+    ].detail
+    assert results[1].candidate_id == "healthy"
+    assert results[1].feasible
 
 
 def _grandchild_then_hang_evaluate(

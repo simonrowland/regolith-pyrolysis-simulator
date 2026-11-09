@@ -3945,6 +3945,99 @@ def test_backend_unavailable_aborts_distinct_from_engine_bug() -> None:
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
 
 
+@pytest.mark.parametrize(
+    "exc",
+    [
+        ProposalRejected(
+            "partial withdrawal from mixed-origin process.overhead_gas.Na"
+        ),
+        PoisonedHourError(
+            PoisonedHourState(
+                hour=160,
+                committed_transition_count=3,
+                aborting_exception_summary=(
+                    "ProposalRejected: partial withdrawal from mixed-origin "
+                    "process.overhead_gas.Na"
+                ),
+                aborting_exception_type=ProposalRejected,
+            )
+        ),
+    ],
+    ids=("proposal-rejected", "poisoned-hour"),
+)
+def test_candidate_simulator_failures_are_typed_and_keep_detail(
+    exc: Exception,
+) -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(exc=exc),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.failing_gates == ("physics_refusal",)
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+    assert "process.overhead_gas.Na" in result.feasibility_margins[
+        "physics_refusal"
+    ].detail
+
+
+def test_poisoned_candidate_run_overrides_unavailable_carrier_status() -> None:
+    error_message = (
+        "ProposalRejected: partial withdrawal from mixed-origin "
+        "process.overhead_gas.Na; PoisonedHourError: simulator hour 160 is poisoned"
+    )
+    execution = _execution(
+        status="failed",
+        error_message=error_message,
+        backend_status="unavailable",
+    )
+    execution.failure_exception = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary="ProposalRejected: partial withdrawal",
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.failing_gates == ("physics_refusal",)
+    assert result.feasibility_margins["physics_refusal"].detail == error_message
+
+
+def test_poisoned_backend_outage_still_aborts_as_unavailable() -> None:
+    exc = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary="BackendUnavailableError: missing engine",
+            aborting_exception_type=BackendUnavailableError,
+        )
+    )
+
+    with pytest.raises(BackendUnavailableAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=exc),
+        )
+
+
 def test_backend_unavailable_green_path_accepts_available_real_backend() -> None:
     result = _backend_availability_fixture(available=True)
 

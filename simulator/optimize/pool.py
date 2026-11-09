@@ -38,13 +38,17 @@ from simulator.optimize.evaluate import (
     FailureCategory,
     RunReference,
     ScoredResult,
+    _build_eval_inputs,
+    _candidate_simulator_failure_detail,
+    _candidate_simulator_failure_result,
     evaluate,
     _is_stale_profile_refusal,
     _stale_profile_result,
 )
+from simulator.optimize.evalspec import cache_key
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.worker_runtime import (
     clear_worker_runtime,
@@ -577,6 +581,13 @@ def _evaluate_tasks_in_engine_worker_pool(
                     )
                     continue
                 except BaseException as exc:
+                    candidate_failure = _candidate_simulator_failure_for_task(
+                        task,
+                        exc,
+                    )
+                    if candidate_failure is not None:
+                        results[task.index] = candidate_failure
+                        continue
                     raise RuntimeError(
                         f'engine worker evaluation failed for {_task_label(task)}'
                     ) from exc
@@ -603,6 +614,34 @@ def _evaluate_tasks_in_engine_worker_pool(
     if len(completed) != len(tasks):
         raise RuntimeError('engine worker pool ended without all results')
     return completed
+
+
+def _candidate_simulator_failure_for_task(
+    task: _PoolTask,
+    exc: BaseException,
+) -> ScoredResult | None:
+    detail = _candidate_simulator_failure_detail(exc)
+    if detail is None:
+        return None
+    evaluator_kwargs = dict(task.evaluator_kwargs or {})
+    spec, _ = _build_eval_inputs(
+        task.patch,
+        task.feedstock_id,
+        task.fidelity,
+        task.profile,
+        task.schema or RecipeSchema(),
+        constraints=task.constraints,
+        cost_parameters=evaluator_kwargs.get("cost_parameters"),
+        conditional_context=evaluator_kwargs.get("conditional_context"),
+    )
+    return _candidate_simulator_failure_result(
+        task.candidate_id,
+        spec,
+        cache_key(spec),
+        exc,
+        error_message=detail,
+        detail=detail,
+    )
 
 
 def _evaluate_tasks_serial(

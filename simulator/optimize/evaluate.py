@@ -864,6 +864,30 @@ def evaluate(
             key,
             exc,
         )
+    except PoisonedHourError as exc:
+        if _is_malformed_recipe_error(exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                str(exc),
+                profile=profile,
+            )
+        candidate_failure = _candidate_simulator_failure_result(
+            candidate_id,
+            spec,
+            key,
+            exc,
+        )
+        if candidate_failure is not None:
+            return candidate_failure
+        raise BackendUnavailableAbort(
+            str(exc),
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        ) from exc
     except RunnerError as exc:
         if _is_backend_unavailable(exc):
             raise BackendUnavailableAbort(
@@ -902,24 +926,26 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     except (ProposalRejected, OverdraftError) as exc:
-        # b-285: discriminate here too. b-281 taught the RETURNED-RUN consumer
-        # below (:909-962) to stop reading the broad ProposalRejected class name
-        # as evidence of an overdraw, but this DIRECT-exception branch never
-        # consulted that discriminator at all -- it returned INVALID_RECIPE with
-        # failing_gates=("inventory_overdraw",) for anything the planner wrapped.
-        #
-        # The planner wraps arbitrary apply failures: account-policy violations,
-        # origin-resolution failures, projected-conservation failures, and plain
-        # implementation bugs. So identical underlying failures were getting
-        # OPPOSITE trust treatment depending only on which executor boundary
-        # carried them -- pruned as a bad recipe if the exception escaped
-        # directly, correctly aborted as an engine bug if it arrived as a failed
-        # RunExecution. Same failure, same run, different verdict.
-        #
-        # Fixing the discriminator was not enough because a consumer bypassed it.
-        # Trace every consumer of a predicate, not just the predicate.
+        # b-285 keeps broad ProposalRejected wrappers from becoming inventory
+        # overdraws. b-1154 scores other proposal rejections as candidate failures.
         message = f"{type(exc).__name__}: {exc}"
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                message,
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         if not _is_inventory_overdraw_message(message):
+            candidate_failure = _candidate_simulator_failure_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
+            if candidate_failure is not None:
+                return candidate_failure
             raise EngineBugAbort(
                 message,
                 patch=validated_patch,
@@ -984,6 +1010,17 @@ def evaluate(
                 run_execution=run_execution,
                 profile=profile,
             )
+        candidate_failure = _candidate_simulator_failure_result(
+            candidate_id,
+            spec,
+            key,
+            failure_exc,
+            run_execution=run_execution,
+            profile=profile,
+            error_message=error_message,
+        )
+        if candidate_failure is not None:
+            return candidate_failure
         if _is_backend_unavailable(failure_exc, carrier=run_execution):
             raise BackendUnavailableAbort(
                 error_message or "backend unavailable",
@@ -1326,6 +1363,44 @@ def _typed_physics_refusal_result(
         reason=reason,
         error_message=str(exc) or reason,
         diagnostic=getattr(exc, "diagnostic", None),
+    )
+
+
+def _candidate_simulator_failure_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    exc: BaseException | None,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+    error_message: str | None = None,
+    detail: str | None = None,
+) -> ScoredResult | None:
+    detail = detail or _candidate_simulator_failure_detail(exc)
+    if detail is None:
+        return None
+    reason = (
+        "poisoned_hour"
+        if isinstance(exc, PoisonedHourError)
+        else "proposal_rejected"
+    )
+    message = str(error_message or detail)
+    refused = _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=message,
+        run_execution=run_execution,
+        profile=profile,
+    )
+    margin = refused.feasibility_margins[PHYSICS_REFUSAL_GATE]
+    return replace(
+        refused,
+        feasibility_margins={
+            PHYSICS_REFUSAL_GATE: replace(margin, detail=message),
+        },
     )
 
 
@@ -6668,6 +6743,16 @@ def _is_backend_unavailable(
         seen.add(id(current))
         if isinstance(current, _TYPED_ABSENCE_EXCEPTION_CLASSES):
             return True
+        aborting_type = getattr(
+            getattr(current, "state", None),
+            "aborting_exception_type",
+            None,
+        )
+        if (
+            isinstance(aborting_type, type)
+            and issubclass(aborting_type, _TYPED_ABSENCE_EXCEPTION_CLASSES)
+        ):
+            return True
         reason = getattr(current, "reason_code", None)
         if reason in _ABSENCE_REASON_CODES:
             return True
@@ -6684,6 +6769,16 @@ def _is_backend_unavailable(
         or getattr(carrier, "backend_failure_reason_code", None)
     )
     return carrier_reason in _ABSENCE_REASON_CODES
+
+
+def _candidate_simulator_failure_detail(
+    exc: BaseException | None,
+) -> str | None:
+    if not isinstance(exc, (ProposalRejected, PoisonedHourError)):
+        return None
+    if _is_backend_unavailable(exc):
+        return None
+    return f"{type(exc).__name__}: {exc}"
 
 
 def _is_non_finite_payload_message(message: str) -> bool:
