@@ -295,11 +295,11 @@ def diagnose_compartment_hour(
                 applicable_known.add(species)
             except (TypeError, ValueError):
                 applicable_segments = [segments[name] for name in candidate_segment_names if name in segments]
-        elif candidate_segment_names:
-            applicable_segments = [segments[name] for name in candidate_segment_names if name in segments]
-            applicable_known.add(species)
         else:
-            applicable_segments = []
+            # Candidate names identify supplied rows, not the complete wall
+            # route. Keep any rows that can be projected, but withhold the
+            # species balance until route applicability is established.
+            applicable_segments = [segments[name] for name in candidate_segment_names if name in segments]
 
         for segment in applicable_segments:
             segment_name = str(getattr(segment, "name", ""))
@@ -326,6 +326,10 @@ def diagnose_compartment_hour(
 
             route_by_segment = route_partials.get(segment_name, {})
             route_by_segment = route_by_segment if isinstance(route_by_segment, Mapping) else {}
+            route_pO2_pa = _number(route_by_segment.get("O2"))
+            route_pO2_bar = (
+                route_pO2_pa / 100_000.0 if route_pO2_pa is not None else None
+            )
             pressure = (
                 _number(record.get("species_partial_pressure_pa"))
                 if record is not None
@@ -335,7 +339,18 @@ def diagnose_compartment_hour(
             refusal = _route_refusal(
                 operating_snapshot, condensation_model, species, segment_name
             )
-            if wall_K is None or wall_K <= 0.0:
+            route_pressure_notice = (
+                record.get("wall_saturation_pressure_notice")
+                if record is not None
+                else None
+            )
+            if refusal is not None:
+                psat, psat_status, pressure_notice = (
+                    None,
+                    "route_owner_refused_wall_pressure",
+                    dict(refusal),
+                )
+            elif wall_K is None or wall_K <= 0.0:
                 psat, psat_status, pressure_notice = (
                     None,
                     "wall_temperature_unavailable",
@@ -347,14 +362,15 @@ def diagnose_compartment_hour(
                     "segment_partial_pressure_unavailable",
                     None,
                 )
+            elif species == "SiO" and route_pO2_bar is None:
+                psat, psat_status, pressure_notice = (
+                    None,
+                    "segment_oxygen_partial_pressure_unavailable",
+                    None,
+                )
             else:
                 psat, psat_status, pressure_notice = _wall_pressure(
-                    species, wall_K, pO2_bar, vapor_pressure_data
-                )
-                route_pressure_notice = (
-                    record.get("wall_saturation_pressure_notice")
-                    if record is not None
-                    else None
+                    species, wall_K, route_pO2_bar, vapor_pressure_data
                 )
                 if isinstance(route_pressure_notice, Mapping):
                     pressure_notice = {
@@ -377,11 +393,7 @@ def diagnose_compartment_hour(
             elif psat is None:
                 reason = psat_status
             elif record is None:
-                if pressure is not None and pressure <= psat:
-                    deposit = 0.0
-                    row_status = "proven_zero_below_wall_saturation"
-                else:
-                    reason = "applicable_segment_candidate_missing"
+                reason = "applicable_segment_candidate_missing"
             else:
                 mol_s = _number(record.get("mol_s"))
                 if mol_s is not None and mol_s >= 0.0:
@@ -416,7 +428,12 @@ def diagnose_compartment_hour(
                 "deposition_propensity_margin_notice": (
                     None if margin is None else {
                         "status": "computed",
-                        "pressure_source": "same_route_local_state",
+                        "pressure_source": "route_segment_hour_partial_pressure",
+                        "pO2_source": (
+                            "route_segment_hour_partial_pressure"
+                            if species == "SiO"
+                            else None
+                        ),
                         "wall_saturation_pressure_notice": pressure_notice,
                     }
                 ),
