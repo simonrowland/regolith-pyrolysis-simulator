@@ -388,6 +388,60 @@ def test_real_isolated_magemin_unsupported_database_is_cached_stably(
         close_battery_engine_handle(handle)
 
 
+def test_isolated_backend_reconstruction_disables_nested_pools(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.backends as backends
+    import simulator.melt_backend.vaporock as vaporock
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _open_resolved_backend,
+    )
+
+    configs: dict[str, dict[str, object]] = {}
+
+    class FakeVapoRockBackend:
+        def initialize(self, config: dict[str, object]) -> bool:
+            configs["vaporock"] = config
+            return True
+
+    def fake_try_backend(_factory: object, config: dict[str, object]) -> object:
+        configs["magemin"] = config
+        return object()
+
+    def fake_resolve_backend(
+        name: str, _policy: object, *, backend_config: dict[str, object]
+    ) -> object:
+        configs[name] = backend_config
+        return object()
+
+    monkeypatch.setattr(vaporock, "VapoRockBackend", FakeVapoRockBackend)
+    monkeypatch.setattr(backends, "_try_backend", fake_try_backend)
+    monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "subprocess")
+
+    _open_resolved_backend("vaporock", {})
+    _open_resolved_backend(
+        "magemin", {"database": "db", "fO2_buffer": "FMQ", "bridge": "subprocess"}
+    )
+    _open_resolved_backend(
+        "alphamelts",
+        {
+            "ambient_calc_mode": "subprocess",
+            "transport": "subprocess",
+            "raw_model_name": "MELTS",
+            "redox_buffer": "FMQ",
+            "fO2_offset": 0.0,
+            "Fe3Fet_ratio": None,
+            "configured_vapor_transport_pO2_bar": None,
+            "configured_vapor_transport_floor_bar": None,
+        },
+    )
+
+    assert configs["magemin"]["warm_worker"] is False
+    assert configs["vaporock"]["warm_worker"] is False
+    assert configs["alphamelts"]["warm_worker"] is False
+
+
 def test_internal_analytical_oxygen_balance_tracks_openimcc_epoch(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
