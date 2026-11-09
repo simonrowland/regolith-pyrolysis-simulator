@@ -3000,6 +3000,21 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
+# The registry, equipment reader, and lab-parameter merge all use this mapping
+# for the run-metadata fields whose source shape differs from the older scalar
+# Sample fields.
+_SAMPLE_RUN_METADATA_FIELDS: dict[str, tuple[str, str]] = {
+    "final_mass_kg": (
+        "experiment.sample.final_mass_kg",
+        "located_value",
+    ),
+    "species_loss_fraction": (
+        "experiment.sample.species_loss_fraction",
+        "species_located_values",
+    ),
+}
+
+
 def _sample_from_plain(
     payload: object,
     *,
@@ -3009,7 +3024,6 @@ def _sample_from_plain(
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
-    final_mass = payload.get("final_mass_kg")
     volume = payload.get("volume_m3")
     form = payload.get("form")
     container = payload.get("container")
@@ -3019,7 +3033,6 @@ def _sample_from_plain(
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
-    species_loss_fraction = payload.get("species_loss_fraction")
     issues = registry_issues if registry_issues is not None else []
 
     def parse_registry_value(field: str, raw: object, parse):
@@ -3086,31 +3099,32 @@ def _sample_from_plain(
                 )
             ),
         )
-    final_mass_located = (
-        None
-        if final_mass is None
-        else parse_registry_located(
-            "final_mass_kg",
-            final_mass,
-            lambda value: _located_from_plain(value, _value_or_point_from_plain),
-        )
-    )
-    species_loss_located = None
-    if species_loss_fraction is not None:
-        species_loss_fraction = parse_registry_value(
-            "species_loss_fraction",
-            species_loss_fraction,
-            require_species_loss_mapping,
-        )
-        species_loss_located = {
-            str(formula): parse_registry_located(
-                f"species_loss_fraction.{formula}",
+    sample_run_metadata = {}
+    for field, (_field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
+        raw = payload.get(field)
+        if raw is None:
+            continue
+        if shape == "located_value":
+            sample_run_metadata[field] = parse_registry_located(
+                field,
                 raw,
                 lambda value: _located_from_plain(
                     value, _value_or_point_from_plain
                 ),
             )
-            for formula, raw in species_loss_fraction.items()
+            continue
+        species_values = parse_registry_value(
+            field, raw, require_species_loss_mapping
+        )
+        sample_run_metadata[field] = {
+            str(formula): parse_registry_located(
+                f"{field}.{formula}",
+                value,
+                lambda item: _located_from_plain(
+                    item, _value_or_point_from_plain
+                ),
+            )
+            for formula, value in species_values.items()
         }
     initial_located = (
         None
@@ -3142,7 +3156,7 @@ def _sample_from_plain(
         mass_kg=None
         if mass is None
         else _located_from_plain(mass, _value_or_point_from_plain),
-        final_mass_kg=final_mass_located,
+        **sample_run_metadata,
         volume_m3=None
         if volume is None
         else _located_from_plain(volume, _value_or_point_from_plain),
@@ -3162,7 +3176,6 @@ def _sample_from_plain(
         pretreatment=None
         if pretreatment is None
         else _located_from_plain(pretreatment, str),
-        species_loss_fraction=species_loss_located,
     )
 
 
@@ -16510,16 +16523,22 @@ def _merge_experiment_lab_params(
             )
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
-    species_loss_fraction = dict(existing.sample.species_loss_fraction or {})
-    for formula, located in (sample.species_loss_fraction or {}).items():
-        species_loss_fraction[formula] = _prefer_located(
-            species_loss_fraction.get(formula), located
-        )
+    sample_run_metadata = {}
+    for field, (_field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
+        old_value = getattr(existing.sample, field)
+        new_value = getattr(sample, field)
+        if shape == "located_value":
+            sample_run_metadata[field] = _prefer_located(old_value, new_value)
+            continue
+        merged_values = dict(old_value or {})
+        for formula, located in (new_value or {}).items():
+            merged_values[formula] = _prefer_located(
+                merged_values.get(formula), located
+            )
+        sample_run_metadata[field] = merged_values or None
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
-        final_mass_kg=_prefer_located(
-            existing.sample.final_mass_kg, sample.final_mass_kg
-        ),
+        **sample_run_metadata,
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
         initial_composition=initial_composition,
         printed_composition=printed_composition,
@@ -16537,7 +16556,6 @@ def _merge_experiment_lab_params(
         pretreatment=_prefer_located(
             existing.sample.pretreatment, sample.pretreatment
         ),
-        species_loss_fraction=species_loss_fraction or None,
     )
     return replace(
         existing,
@@ -16615,6 +16633,63 @@ def sample_from_equipment(
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
+    sample_run_metadata = {}
+    raw_sample = equipment.get("sample") if isinstance(equipment, Mapping) else None
+    raw_sample, sample_locator, _sample_mapping = _unwrap_located_equipment_value(
+        raw_sample, locator
+    )
+    if isinstance(raw_sample, Mapping):
+        sample_locator = (
+            locator_from_mapping(raw_sample.get("locator")) or sample_locator
+        )
+        for field, (field_path, shape) in _SAMPLE_RUN_METADATA_FIELDS.items():
+            if shape == "located_value":
+                sample_run_metadata[field] = _unique_located(
+                    _hits_for(hits, field_path)
+                )
+                continue
+            raw_species_values = raw_sample.get(field)
+            if not isinstance(raw_species_values, Mapping):
+                sample_run_metadata[field] = None
+                continue
+            if (
+                "value" in raw_species_values
+                and isinstance(raw_species_values.get("value"), Mapping)
+            ):
+                species_values, species_locator, _mapping = (
+                    _unwrap_located_equipment_value(
+                        raw_species_values, sample_locator
+                    )
+                )
+            else:
+                species_locator = (
+                    locator_from_mapping(raw_species_values.get("locator"))
+                    or sample_locator
+                )
+                species_values = {
+                    key: value
+                    for key, value in raw_species_values.items()
+                    if key != "locator"
+                }
+            located_species_values = {}
+            if isinstance(species_values, Mapping):
+                for formula, raw_value in species_values.items():
+                    if isinstance(raw_value, Mapping) and "state" in raw_value:
+                        located = _located_from_plain(
+                            raw_value, _value_or_point_from_plain
+                        )
+                    else:
+                        value, value_locator, _mapping = (
+                            _unwrap_located_equipment_value(
+                                raw_value, species_locator
+                            )
+                        )
+                        located = Located(
+                            State.of(_value_or_point_from_plain(value)),
+                            locator=value_locator,
+                        )
+                    located_species_values[str(formula)] = located
+            sample_run_metadata[field] = located_species_values or None
     form_located = _unique_text_located(_hits_for(hits, "sample.form"))
     container_located = _unique_text_located(_hits_for(hits, "sample.container"))
     hard_form, hard_container = _form_and_container(equipment)
@@ -16671,10 +16746,12 @@ def sample_from_equipment(
         and container_located is None
         and printed is None
         and initial is None
+        and all(value is None for value in sample_run_metadata.values())
     ):
         return Sample()
     return Sample(
         mass_kg=mass_located,
+        **sample_run_metadata,
         volume_m3=volume_located,
         form=form_located,
         container=container_located,
