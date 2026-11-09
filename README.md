@@ -130,7 +130,7 @@ chain has to be walked by hand, one run at a time.
 
 **"How much does overhead pO2 suppress SiO boiloff?"**
 `python -m simulator.runner.sio_tsweep` and `sio_yield` drive the temperature/ramp grids directly;
-two worked sweeps are checked in under `docs/sio_tsweep_*.md`.
+two historical sweeps from an earlier release are checked in under `docs/sio_tsweep_*.md`.
 
 **"How does Mars CO2 backpressure change the first stage?"**
 Mars feedstocks carrying `surface_pressure_mbar` run Stage 0 against a CO2 pressure floor instead
@@ -352,9 +352,9 @@ produced a stored artifact is never ambiguous.
 **What a backend is allowed to do.** Installing a real engine does not move ledger authority to
 it. Silicate liquidus and freeze-path providers, alphaMELTS included, are **diagnostic only** and
 may not mutate the ledger; vapor-pressure runtime authority stays with the built-in model until an
-explicit source-selection change. The per-intent authority table is in `AGENTS.md`
-§"Chemistry-engine policy", with the operator-facing version in
-[`docs/melt-backends.md`](docs/melt-backends.md).
+explicit source-selection change. The per-intent authority table is in
+[`docs/developer-map.md`](docs/developer-map.md) ("Engine Source Trees"), with the operator-facing
+version in [`docs/melt-backends.md`](docs/melt-backends.md).
 
 The supported alphaMELTS path is `alphamelts_binary_path` in the generated,
 machine-local `engines/engines.local.toml`; it points to the locked app under
@@ -420,7 +420,7 @@ Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not
 - [Process Model](docs/process-model.md) · [Chemistry Methods](docs/chemistry-methods.md)
 - [Feedstocks](docs/feedstocks.md)
 - [Citation Policy](docs/citation-policy.md) · [Lab Validation Whitepaper](docs/lab-validation-whitepaper.md)
-- [IMCC SF-04 (retired)](docs/imcc-sf04-spec.md) · [MD Target List](docs/md-target-list.md)
+- IMCC melt-activity model: [openimcc](https://github.com/simonrowland/openimcc) · [Validation Battery Rollup](docs/validation-battery-rollup.md)
 
 **Running it**
 
@@ -431,14 +431,14 @@ Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not
 **Internals and engines**
 
 - [Architecture](docs/architecture.md) — interactive Flask + Socket.IO plane
-- [Eval-Runtime Architecture](docs/architecture-eval-runtime-2026-06.md) — batch eval, warm workers, caches
+- [Eval-Runtime Architecture](docs/architecture-eval-runtime.md) — batch eval, warm workers, caches
 - [Developer Map](docs/developer-map.md) · [Melt Backends](docs/melt-backends.md)
-- [ThermoEngine Patches](docs/thermoengine-patches.md) · [CI/Local Divergence](docs/ci-local-divergence.md) · [Performance Ratchet](docs/performance-ratchet.md)
+- [ThermoEngine Patches](docs/thermoengine-patches.md) · [Performance Ratchet](docs/performance-ratchet.md)
 
 **Reference registry and campaign analyses**
 
 - [`docs/references/`](docs/references/) — the `REF-NNN` registry, source PDFs, and generated pages
-- SiO temperature sweeps: [lunar mare, low-Ti](docs/sio_tsweep_lunar_mare_low_ti_2026-05-19.md) · [Mars basalt](docs/sio_tsweep_mars_basalt_2026-05-19.md)
+- Historical SiO temperature sweeps (2026-05-19): [lunar mare, low-Ti](docs/sio_tsweep_lunar_mare_low_ti_2026-05-19.md) · [Mars basalt](docs/sio_tsweep_mars_basalt_2026-05-19.md)
 
 ## Source Layout
 

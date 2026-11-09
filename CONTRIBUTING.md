@@ -1,94 +1,107 @@
-# Contributing — Regolith Pyrolysis Simulator
+# Contributing to the Regolith Pyrolysis Simulator
 
-This is a private research workbench for solar-thermal regolith refining. The
-primary contributors are coding agents (Claude Code, Codex, review subagents)
-and the project author. This document codifies the workflow those contributors
-should follow so the simulator stays scientifically defensible and the codebase
-stays in a state where any agent can pick it up cold.
+The Regolith Pyrolysis Simulator is an open research workbench for
+solar-thermal regolith refining. Contributions are welcome: bug reports,
+literature data, physics corrections, tests, documentation and code. This
+guide covers how to propose changes so the simulator stays scientifically
+defensible.
 
-`AGENTS.md` is the operating instructions — the invariants, file map, and
-chemistry-engine authority matrix. `CONTRIBUTING.md` (this file) is the
-workflow. Read `AGENTS.md` first.
+## Before you start
 
-## Before you touch code
+Read these first. They describe the model and the rules the code enforces:
 
-1. **Read `AGENTS.md`.** Hard invariants there are load-bearing — mol-native
-   ledger, atom conservation per transition, mass balance to 0.000%, Stage 0
-   separation, separate O2 outlet bins. If you don't internalise these, you
-   will introduce a regression that `tests/test_artifact_guards.py` or
-   `tests/test_mass_balance.py` will catch — but the agent that wrote the
-   regression will have already burned dispatch tokens.
+- [`docs/concepts.md`](docs/concepts.md) — the process, the control levers and
+  the product classes.
+- [`docs/architecture.md`](docs/architecture.md) and
+  [`docs/developer-map.md`](docs/developer-map.md) — where the code lives and
+  how chemistry is routed through the kernel.
+- [`docs/chemistry-methods.md`](docs/chemistry-methods.md) — the physics and
+  each engine's authority.
+- [`docs/citation-policy.md`](docs/citation-policy.md) — how values are sourced
+  and cited.
 
-2. **Read the chemistry-engine policy section of `AGENTS.md`.** The per-intent
-   authority matrix (AlphaMELTS / FactSAGE / builtin) is binding. Do not
-   silently widen an engine's authority. AlphaMELTS does not emit
-   `LedgerTransitionProposal`. FactSAGE without explicit strict gate stays
-   diagnostic. No provider mutates `AtomLedger` directly — the kernel commit
-   path is the sole writer.
+The core invariants are load-bearing, and the test suite enforces them:
 
-3. **Find the plan of record.** For chemistry-engine work that's
-   `docs-private/chemistry-engine-refactor-plan-2026-05-10.md` plus the
-   coverage matrix at `docs-private/chemistry-engine-feature-coverage-
-   checklist-2026-05-10.md`. For other work, look in `docs-private/` for the
-   most recent plan or refactor doc on your topic; if none exists, this work
-   may need an `office-hours` interrogation before scoping.
+- The ledger is mol-native. Atoms are conserved in every transition, and mass
+  balance closes to numerical precision.
+- Every chemistry intent has a bounded, declared engine authority (builtin,
+  AlphaMELTS, ThermoEngine, MAGEMin, VapoRock). Do not silently widen an
+  engine's authority.
+- No provider mutates the ledger directly. Providers return proposals, and the
+  kernel commit path (`ChemistryKernel.commit_batch`) is the sole writer.
+- Stage 0 output stays separate, and the O₂ outlet keeps its own bins.
 
-4. **Check `docs-private/RESUME-NOTES-<latest>.md`** if it exists. That's the
-   last controller's handoff state — what landed, what's in flight, what's
-   blocked. Don't restart work that's already in progress in a sibling
-   worktree.
+## Setting up
 
-## How the work happens
+```bash
+python3 install-dependencies.py     # base environment in .venv
+python3 install-engines.py          # optional: pinned chemistry engines
+python3 install-engines.py --check  # read-only lock drift report
+```
 
-The simulator is large enough that work is usually staged through the
-[goal-flight](https://github.com/simonrowland/goal-flight) controller pattern.
-The skill is installed at `~/.claude/skills/goal-flight`. Workflow for a
-substantial change:
+Python 3.12 is required. The simulator runs on its built-in analytical model
+without the optional engines; see [`docs/getting-started.md`](docs/getting-started.md)
+and [`docs/melt-backends.md`](docs/melt-backends.md) for details.
 
-1. **`/goal-flight init <topic>`** — audits the repo, scaffolds AGENTS.md
-   patches if needed, builds the RAG corpus at `docs-private/rag/` if the
-   project meets the size threshold (it does; the corpus is already present).
-2. **`/goal-flight decompose-plan <plan-file>`** — breaks the plan into
-   numbered `\goal` chunks with SCOPE / CHECKLIST / ACCEPTANCE / FORBIDDEN.
-   Adversarial review pass (Claude + codex) before the queue is finalised.
-3. **`/goal-flight ask-questions`** — surfaces chunk-level ambiguities before
-   dispatch. Address these inline, not mid-execute.
-4. **`/goal-flight execute`** — runs the per-chunk dispatch loop. Sequential
-   by default; `--parallel N` for `[parallel-safe:<group>]`-tagged chunks
-   that touch disjoint modules. Embedded self-review per chunk; milestone
-   codex+claude review every 5 commits (configurable via `--review-every`).
+## Running the tests
 
-For trivial one-shot changes (typo, version bump, single-constant rename,
-known-good test addition) — skip goal-flight. Direct edit + commit is the
-right tool. Goal-flight's overhead doesn't pay for chunks under ~30 LoC
-with no cross-module coupling.
+Tests use `pytest` with `pytest-xdist` and live under `tests/`. Before you open
+a pull request, run at least the invariant guards and the tests for the
+modules you touched:
+
+```bash
+# Fast invariant guards.
+.venv/bin/python -m pytest tests/test_artifact_guards.py tests/test_mass_balance.py -q
+
+# The module(s) you touched.
+.venv/bin/python -m pytest tests/test_<module>.py -q
+```
+
+For changes that span several modules, run the full suite
+(`.venv/bin/python -m pytest -q`). It runs in parallel by default.
+
+`tests/test_artifact_guards.py` and `tests/test_mass_balance.py` enforce the
+core invariants. Do not skip or weaken them without stating the reason in your
+pull request.
+
+**Ground truth, not self-parity.** A new physics test must assert against
+external reality (published data, a standards body, a physical definition),
+not against the simulator's own previous output. A test that only pins today's
+number to yesterday's number locks in any error already present. Keep
+literature anchors in a sidecar separate from the runtime value (for example
+`data/vapor_pressures.yaml::pure_component_antoine`); see
+`tests/test_physics_ground_truth.py` for the pattern. If a ground-truth test
+fails, investigate the physics. Do not retune a coefficient to make it pass.
+
+Engine-sensitive golden fixtures should be regenerated on the reference
+engine build (see `scripts/regenerate_runner_goldens.py`). Small differences
+in those fixtures between machines with different engine builds are expected.
 
 ## Code style
 
-- **Python**: PEP-8 with these project-specific rules:
-  - Imports are top-of-module unless lazy imports are required by an explicit
-    contract documented in `docs-private/rag/patterns/`. The pattern slice
-    `lazy-import-rule.md` (if present) is canonical when lazy imports apply.
-  - Type hints on every public function in `simulator/`. Optional on private
-    helpers and test fixtures.
-  - Dataclasses for state structures (see `simulator/state.py`). Frozen
-    dataclasses for anything immutable per the binding-spec.
+- **Python**: PEP 8, plus these project rules:
+  - Imports go at the top of the module unless a lazy import is required (for
+    example to keep an optional engine optional). Say why in a comment.
+  - Type hints on every public function in `simulator/`. They are optional on
+    private helpers and test fixtures.
+  - Use dataclasses for state structures (see `simulator/state.py`), and frozen
+    dataclasses for anything immutable.
   - Errors are first-class. Domain errors (`UnbalancedTransitionError`,
-    `MeltStateError`, etc.) are defined alongside the module that raises
-    them and re-exported via the module's `__init__.py` if cross-module.
-  - No catching `Exception:` broadly. If you don't know which exception
-    matters, the binding-spec or the patterns slice tells you.
-
-- **Tests**: `pytest`. Tests live under `tests/`. Mirror the source layout:
-  `simulator/foo.py` → `tests/test_foo.py`. Integration tests can live at
-  the top level (`tests/test_mass_balance.py`, `tests/test_artifact_guards.py`).
-  These two are load-bearing — they enforce invariants documented in
-  `AGENTS.md`. Do not skip or weaken them without an explicit decision
-  recorded in `docs-private/rag/decisions.md` (oldest-first append).
-
-- **Web layer** (`web/`, `app.py`): Flask + Socket.IO. Routes are thin —
-  business logic lives in `simulator/`. Socket events are documented in
-  `web/events.py`'s module docstring.
+    `BackendUnavailableError` and so on) are defined next to the module that raises
+    them, and re-exported from the package `__init__.py` when other modules
+    need them.
+  - Do not catch `Exception` broadly. Catch the specific exception that
+    matters.
+  - Missing or invalid input refuses with a typed reason. Out-of-domain
+    physics predicts and flags (see `docs/chemistry-methods.md`); it never
+    returns a silent zero.
+  - When you change non-obvious arithmetic, put the derivation in a comment:
+    premise, algebra, a unit check, and a sanity check.
+- **Tests** mirror the source layout: `simulator/foo.py` → `tests/test_foo.py`.
+  Integration tests can live at the top level of `tests/`.
+- **Web layer** (`web/`, `app.py`): Flask + Socket.IO. Routes are thin, and
+  business logic lives in `simulator/`. Socket events are documented in the
+  `web/events.py` module docstring.
 
 ## Where things go
 
@@ -97,128 +110,47 @@ with no cross-module coupling.
 | Simulation engine logic | `simulator/<area>.py` |
 | State / dataclasses | `simulator/state.py` |
 | Mol-native ledger | `simulator/accounting/` |
-| Chemistry-engine adapters | `simulator/melt_backend/` (AlphaMELTS, FactSAGE) |
+| Chemistry-engine adapters | `simulator/melt_backend/` (AlphaMELTS, ThermoEngine, MAGEMin, VapoRock, openIMCC bridge) |
+| Builtin chemistry providers | `engines/builtin/` |
 | Decision routing | `simulator/decision_tree.py` |
 | Web routes / events | `web/routes.py`, `web/events.py` |
 | Dashboard front-end | `web/static/` |
-| Process docs (public) | `docs/` |
-| Plans, reviews, RAG corpus | `docs-private/` (gitignored) |
+| Data (feedstocks, setpoints, vapour pressures, literature extracts) | `data/` |
+| Documentation | `docs/` |
 | Tests | `tests/test_<module>.py` |
-| Engine binaries / checkouts | `~/repos/engine-bin/<engine>/<pin>/` (managed by the locked installers) |
 | Engine adapters and lock | `engines/` |
 
-If you're not sure where something goes, the `file-map.md` slice in
-`docs-private/rag/` is the source of truth — it's regenerated from the
-current code at corpus-build time.
+[`docs/developer-map.md`](docs/developer-map.md) has the detailed file map.
 
-## Testing
+## How to propose a change
 
-Before committing any non-trivial change, run at minimum:
-
-```bash
-# Fast invariant guards — under 5 s, always run.
-uv run pytest tests/test_artifact_guards.py tests/test_mass_balance.py -q
-
-# The module(s) you touched.
-uv run pytest tests/test_<module>.py -q
-```
-
-For changes that span multiple modules, run the full suite:
-
-```bash
-uv run pytest -q
-```
-
-The goal-flight controller embeds a self-review step in every executor
-dispatch — agents are expected to run the relevant subset and self-fix
-P0/P1 findings BEFORE reporting a chunk done. Surface P2/P3 as TODO
-comments in the diff or as goal-queue follow-ups; do not commit them
-silently.
-
-**Ground-truth, not self-parity** (AGENTS.md Hard invariant 7). A new physics
-test must assert against external reality — published data, standards bodies, a
-physical definition — not against the simulator's own output. A test that only
-pins today's number to yesterday's number locks in any error already present
-(that is how the HKL flux units bug and stale atomic weights passed CI for so
-long). Put literature anchors in a sidecar separate from the runtime value
-(`data/vapor_pressures.yaml::pure_component_antoine`), and see
-`tests/test_physics_ground_truth.py` for the pattern. If a ground-truth test
-fails, investigate the physics — do not retune a coefficient to make it pass.
+1. **Open an issue** describing the change and the physics or data it rests
+   on. Cite the source for any new value.
+2. **Create a branch** from the default branch.
+3. **For a bug**: reproduce it with a failing test first, then find and fix the
+   root cause rather than patching around it.
+4. **Run the tests** described above.
+5. **Open a pull request.** Explain why the change is needed, what invariant it
+   preserves, and anything that surprised you. Every pull request gets at least
+   one review focused on chemistry and accounting correctness.
 
 ## Commits
 
-- **One chunk per commit.** Subject line: imperative mood, < 70 chars,
-  ends with `(chunk N/M)` suffix when running goal-flight, or just the
-  imperative for one-off changes.
-- **Body** (optional but encouraged for substantive changes): the *why*,
-  not the *what*. Diff shows the what. The why is: what plan-of-record
-  is this chunk consuming, what invariant is it preserving, what was
-  the surprise that made it harder than expected.
-- **Trailers**: `Co-Authored-By:` for agent-pair work; `Refs:` to
-  `docs-private/...` plan files.
-- **Never** amend a published commit (`git commit --amend` after `git push`
-  rewrites history other worktrees depend on). If a fix is needed, make
-  a new commit.
+- Keep each commit to one logical change. Write the subject line in the
+  imperative mood, under 70 characters.
+- Use the body for the *why*. The diff already shows the *what*.
+- Do not amend or force-push commits that others may already have pulled.
+  Make a new commit instead.
 
-## Code review
+## Questions
 
-Solo project; review happens via:
-
-- **Embedded self-review** inside every executor dispatch (mandatory).
-- **Milestone reviews** every 5 commits via `goal-flight execute`'s
-  `--review-every K` mechanism. Two reviewers run in parallel — typically
-  one Claude (concern: chemistry/accounting correctness) and one codex
-  (concern: code quality + consistency). Findings dedupe; P0/P1 must
-  resolve before the next milestone.
-- **Pre-landing pass** via gstack's `/review <range>` skill when shipping
-  a substantive change.
-
-Outside agents reviewing this repo: prefer concern-split reviewers (chemistry
-correctness + code quality) over model-diversity reviewers (Claude + codex on
-the same concern), per `~/Repos/goal-flight/reference/pattern.md`'s
-"more load-bearing for 12-hour refactor runs" guidance.
-
-## Working with `docs-private/`
-
-`docs-private/` is gitignored. It holds: plan-of-record files, review
-artifacts, RESUME-NOTES, the RAG corpus, lessons-learned, and the
-goal-queue files goal-flight emits. None of this is shared via git;
-it's local working state for the controller.
-
-If you find yourself wanting to commit something from `docs-private/`,
-ask why. Plans of record can be moved to `docs/` if they're stable
-references. Most things should stay private.
-
-## When you find a bug
-
-1. Reproduce it with a failing test FIRST (add the test to `tests/`
-   in the appropriate file). The test failure pins the behavior.
-2. Find the root cause. Don't patch around it. Read the binding-spec
-   slice for the affected intent (in `docs-private/rag/binding-spec/`)
-   to confirm the expected behavior.
-3. Fix it. Re-run the test. Run the invariant guards.
-4. Commit with the *why* in the body — what was the surprise, what was
-   the wrong assumption.
-
-If the bug exposes a missing invariant: add the invariant to the AGENTS.md
-hard-invariants list. If it exposes a missing test: add a guard test that
-would have caught it.
-
-## Questions / ambiguity
-
-If a chunk's SCOPE is unclear, an invariant is ambiguous, or the chemistry-
-engine authority for an intent isn't obvious — STOP and surface the question.
-The asking-discipline in `~/Repos/goal-flight/SKILL.md` applies: interrupt
-the user only for decisions that affect the north star (code quality +
-first-principles scientific integrity), not for trivia. But when in doubt
-on scientific correctness, ask. A wrong invariant baked in is more expensive
-than a 30-second clarification.
+If an invariant or an engine's authority is unclear, ask in the issue before
+writing code. A wrong invariant baked into the code costs more than a short
+discussion.
 
 ## North star
 
-Quoting AGENTS.md indirectly: this is a process-modeling workbench, not
-flight hardware. Optimize for scientific defensibility (every claim
-traceable to a citation, model, or first-principles derivation) over
-shipping velocity. Mass balance closes to 0.000% per transition. Every
-provider's authority is bounded. The simulator runs locally and tells
-the truth about regolith.
+This is a process-modelling workbench, not flight hardware. Optimise for
+scientific defensibility over shipping speed: every claim should be traceable
+to a citation, a model or a first-principles derivation. Mass balance closes in
+every transition, and every provider's authority is bounded.

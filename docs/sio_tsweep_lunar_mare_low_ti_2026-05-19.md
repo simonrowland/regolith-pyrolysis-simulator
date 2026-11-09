@@ -1,10 +1,12 @@
 # SiO T-Window Sweep - lunar_mare_low_ti
 
+> **Historical output (2026-05-19, pre-v0.6).** Generated with an earlier SiO evaporation coefficient and a narrower C2A envelope; its `stage3_silica_kg` column reads zero throughout. Rerun `python -m simulator.runner.sio_tsweep` for current values.
+
 Date: 2026-05-19
 
-Scope: Phase 3 Stage 3 SiO setpoint characterization for `data/setpoints.yaml` C2A_continuous operator review. Engine-only outputs stay inside the [1323, 2400 K] authority band and the recipe [1050, 1600 C] envelope.
+Scope: Stage 3 SiO setpoint characterization for `data/setpoints.yaml` C2A_continuous. Engine-only outputs stay inside the [1323, 2400 K] authority band and the recipe [1050, 1600 C] envelope.
 
-Caveat: historical pre-alpha_s(T) sweep. These numbers used alpha_SiO = 0.04 from the Phase 1 alpha surface (commit `fc2d40b`); current runtime uses Wetzel/Gail alpha_s_SiO(T)=0.52*exp(-3685/T_K). Stage 3 is post-Cr v2 (commit `bb52c62`) and reports `stage_3_sio_zone_product`.
+Caveat: historical pre-alpha_s(T) sweep. These numbers used alpha_SiO = 0.04 from the Phase 1 alpha surface (commit `fc2d40b`); current runtime uses Wetzel/Gail alpha_s_SiO(T)=0.52*exp(-3685/T_K). Stage 3 is as of commit `bb52c62` and reports `stage_3_sio_zone_product`.
 
 ## Recommendation
 
@@ -58,4 +60,4 @@ Mass balance error: 1.81898940355e-13%.
 
 Coverage gap checked: 1200-1673K low-T extrapolation.
 
-WARNING sticker: not fired for this recommendation. Tickler #4 remains a monitor for any future recommended T_hold in Gap A.
+WARNING sticker: not fired for this recommendation.
