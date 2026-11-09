@@ -2442,6 +2442,31 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
     )
     ctx = _context(F.work(), exp, reference)
 
+    # The readiness probe must follow the activity request created from the
+    # transformed alpha×Gamma identity, while retaining the printed alpha row.
+    vaporock_probe = score_mod._probe_residual_readiness(
+        reference, Engine.VAPOROCK, context=ctx
+    )
+    assert vaporock_probe.not_applicable
+    assert vaporock_probe.request is None
+
+    melts_probe = score_mod._probe_residual_readiness(
+        reference, Engine.ALPHAMELTS, context=ctx
+    )
+    assert melts_probe.residual.refusal is not None
+    assert melts_probe.residual.refusal.detail["reason"] == "reference_state_mismatch"
+
+    openimcc_probe = score_mod._probe_residual_readiness(
+        reference, Engine.OPENIMCC, context=ctx
+    )
+    assert openimcc_probe.residual.status is ResidualStatus.NO_BAND
+    assert openimcc_probe.residual.rail is Rail.ALKALI_SHUTTLE
+    assert openimcc_probe.request is not None
+    assert openimcc_probe.request.payload is not None
+    assert openimcc_probe.request.payload["reference_state"] == (
+        "raoultian_pure_liquid_endmember"
+    )
+
     def predict(engine, observation, **_kwargs):
         return EnginePrediction(
             engine=engine,
