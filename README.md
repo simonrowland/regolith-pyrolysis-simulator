@@ -286,14 +286,14 @@ integration rather than exposing the development server.
 
 `install-dependencies.py` installs the Python stack from `requirements.txt`: Flask and
 Flask-SocketIO (web UI), PyYAML, Plotly, NumPy (pinned `<2`, because VapoRock needs `np.bool8`),
-SciPy, pandas, psutil, threadpoolctl, optuna (recipe optimizer), and the pytest plugins the test
-configuration requires. It also installs the locked alphaMELTS app.
+SciPy, pandas, psutil, threadpoolctl, optuna (recipe optimizer), OpenIMCC (high-temperature melt
+activities), and the pytest plugins the test configuration requires. It also installs the locked alphaMELTS app.
 
 `install-engines.py` builds the pinned chemistry engines: MAGEMin, PySulfSat, ThermoEngine,
 VapoRock, PetThermoTools and Thermobar. Run it after the base install. A later exact `uv sync`
 removes them, so provision the engines again after any sync.
 
-Optional extras (`pip install -e ".[<name>]"`): `imcc` (OpenIMCC) and `e2e` (browser tests).
+The one optional extra is `e2e` (browser tests): `pip install -e ".[e2e]"`.
 
 ## Melt Chemistry Backends
 
@@ -305,7 +305,7 @@ real melt thermodynamics where they are installed.
 | `internal-analytical` | Built-in Ellingham/Antoine model. The default active backend. |
 | `alphamelts` | Active backend, through a subprocess or the PetThermoTools API. |
 | `thermoengine` | Active backend. Uses VapoRock for vapour–melt work when it is installed. |
-| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for 45 melt species (8 parent oxides and 37 complexes), whichever active backend is selected. If it is not installed, or it refuses a composition, the run uses the built-in activity table and records a notice. |
+| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for 45 melt species (8 parent oxides and 37 complexes), whichever active backend is selected. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
 | VapoRock, MAGEMin | Per-task providers and cross-checks. Not selectable as the active backend. |
 
 Choose the active backend with `--backend` on the batch runner; batch runs always name one, so every
@@ -317,7 +317,7 @@ diagnostic, and vapour-pressure authority stays with the built-in model. See
 [`docs/melt-backends.md`](docs/melt-backends.md) for the per-task authority table.
 
 `install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
-pinned source engines. OpenIMCC installs with the `imcc` extra.
+pinned source engines.
 
 ## Model Status
 
@@ -325,15 +325,13 @@ The simulator includes a built-in Ellingham/Antoine thermodynamic model and can 
 external melt backends. **Results should be read as comparative process estimates, not validated
 engineering predictions.**
 
-[`docs/model-limitations.md`](docs/model-limitations.md) is the honest accounting, and it is the
-document to read before quoting any number out of this simulator. It carries the per-domain error
-budget, the known model disagreements, and the reproduction battery: the engine is scored against
-published experimental measurements, and **most of the corpus does not score**. The current
-measurement is 570 in-scope observations, of which 67 are comparable, producing 105 comparable
-residual points and 532 explicit gap records. The gaps are not hidden — every skipped observation
-carries a typed refusal reason (missing melt-activity coefficient, not-comparable condensed form,
-no numeric rate in the source, and so on), and those reasons are tabulated in that document.
-Regenerate the numbers rather than trusting this paragraph:
+[`docs/model-limitations.md`](docs/model-limitations.md) is the document to read before quoting a
+number from the simulator: it carries the per-domain error budget and the known model
+disagreements. The validation battery holds 101,709 experimental observations from the published
+literature and scores each engine against them rail by rail. An observation an engine cannot yet score carries a
+typed reason, never a silent gap. The extract-reproduction rollup is generated into
+[`docs/validation-battery-rollup.md`](docs/validation-battery-rollup.md); regenerate it rather than
+quoting fixed numbers:
 
 ```python
 from simulator.diagnostic_helpers.extract_reproduction import evaluate_all, coverage_summary
