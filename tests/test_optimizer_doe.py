@@ -74,7 +74,10 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [59, 65] * 4
+    # t-1679 adds carrier_feed_mol_s on the six pressure-held campaigns.
+    # Those knobs are searchable in both C5 subspaces, so each dimension
+    # grows by 6: 59 -> 65 (C5 off) and 65 -> 71 (C5 on).
+    assert [len(item.patch.values) for item in batch] == [65, 71] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -96,13 +99,12 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
-    # The Stage-4 split bounds stage_4_to_stage_5 at the 250 C Na/Mg
-    # collector (the downstream K trap is 40 C), replacing the former 700 C
-    # search ceiling. That single knob bound changes the sampled stream digest;
-    # the 59/65 conditional subspace dimensions remain fixed.
+    # t-1679 carrier_feed_mol_s on C0b, C2B, C3, C4, C5, and C6 enters both
+    # conditional subspaces (+6). The stream digest moves with those bounds;
+    # the C5 on/off alternation is unchanged.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "ca8aab1fcef51d118585f967f9bc589d54e70cfb22e06447e489e5b57ad83eea"
+    ).hexdigest() == "952e6d038784bc5241be6d37c7e7099704aa4b286d738f173de2cd67f81ee257"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -124,11 +126,10 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         }
         for item in batch
     ]
-    # The same Stage-4 interface bound change moves the deterministic LHC
-    # samples; it leaves the C5-on/off subspace dimensions unchanged.
+    # Same six carrier_feed_mol_s knobs move the deterministic LHC stream.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "3f4dbcca0c21e68c142e83ac2c1e83bdb1fd2b27e07b55b53432c892bf933a03"
+    ).hexdigest() == "b931ade7702743458fffe33a23345360d27ceb6ec776296d848b68598e842495"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

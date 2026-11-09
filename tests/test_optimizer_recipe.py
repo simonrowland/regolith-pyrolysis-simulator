@@ -124,13 +124,18 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
+    # t-1679: each pressure-held campaign (C0b, C2B, C3, C4, C5, C6) gains
+    # carrier_feed_mol_s: null and carrier_feed_gas: Kr. No other setpoint
+    # leaf changed relative to bf0d2fb48. Empty patch bytes stay [].
     assert hashlib.sha256(resolved).hexdigest() == (
-        "8bc00e196df6dc085f3833b82404824067138e07011e9d304fde64f20691817a"
+        "cc273efe0f3a42c17fcd96058b8a0b80fe9805eed6338a91e63e66424972552d"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # The same six knobs enter the bounds digest. Vocabulary manifest
+    # data/optimizer_recipe_vocabulary.json carries this digest.
     assert schema.bounds_digest == (
-        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
+        "f462f07c858471ba7921468980db4e5f792e7e8e283d6f244317899ead892e98"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -139,7 +144,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
+        "0300c20fa85364264c0780961b233030b072691be37e9c11f43eacaae4551100"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -152,7 +157,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
+        "e16681c4db71f3dff176845542c0cf29ec371e45efa27153e73bdf48c0478d45"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -599,10 +604,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    # Six searchable carrier_feed_mol_s knobs: 65 -> 71.
+    assert len(paths) == 71
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "3f9d60a36c09c6bbc288ce96b89ef713a0498f9a57146f4ab30537785c648940"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -1746,7 +1752,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # 2026-09-29 for C2 loader-scalar pressure coupling.
     assert (
         first.recipe_id()
-                == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"
+                == "3d050a1ffbb7b0fe9ab0f1fc64c98eaee0c346ac8e92ceb28677d1419aa00cc9"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -2151,7 +2157,7 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             )
             converted_setpoint_ranges += 1
         elif spec.bounds_source.startswith(
-            ("hot_wall_invariant:", "condensation_train ")
+            ("hot_wall_invariant:", "condensation_train ", "pipe-capacity:")
         ):
             assert spec.low is not None
             assert spec.high is not None

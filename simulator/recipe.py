@@ -2046,42 +2046,15 @@ def _setpoint_sourced_allowlist(
         for name, band in _condensation_train_downstream_segment_bounds(setpoints).items()
     }
     resolved: list[KnobSpec] = []
+    # Pipe-capacity ceilings read the campaign's resolved pressure lows.
+    # Those lows are filled in this same pass, so defer the feed knobs
+    # until every other knob has its bounds. Resolving them in allowlist
+    # order makes a reversed allowlist miss the lows and change the digest.
+    deferred_feed: list[tuple[int, KnobSpec]] = []
     for spec in template_allowlist:
         if spec.bounds_source.startswith("pipe-capacity:"):
-            campaign_path = spec.bounds_source.removeprefix(
-                "pipe-capacity:"
-            )
-            campaign_key = campaign_path.removeprefix("campaigns.")
-            tunable_pressure_lows = [
-                float(candidate.low)
-                for candidate in resolved
-                if candidate.path[:2] == ("campaigns", campaign_key)
-                and candidate.path[-1]
-                in {"p_total_mbar", "p_total_mbar_default"}
-                and candidate.search_enabled
-                and candidate.low is not None
-            ]
-            high = _carrier_feed_pipe_capacity_mol_s(
-                setpoints,
-                campaign_key,
-                minimum_tunable_pressure_mbar=(
-                    min(tunable_pressure_lows)
-                    if tunable_pressure_lows
-                    else None
-                ),
-            )
-            resolved.append(
-                replace(
-                    spec,
-                    low=0.0,
-                    high=high,
-                    bounds_source=(
-                        f"pipe-capacity:{campaign_path}; existing pipe "
-                        "capacity at the campaign's minimum total pressure "
-                        "and maximum gas temperature, converted to mol/s"
-                    ),
-                )
-            )
+            deferred_feed.append((len(resolved), spec))
+            resolved.append(spec)
             continue
         if spec.path in downstream_bounds:
             low, high = downstream_bounds[spec.path]
@@ -2131,6 +2104,45 @@ def _setpoint_sourced_allowlist(
             high = spec._bound_types[1](high)
         resolved.append(
             replace(spec, low=low, high=high, bounds_source=bounds_source)
+        )
+    for index, spec in deferred_feed:
+        # Resolution rewrites bounds_source to
+        # "pipe-capacity:<path>; <derivation>". A later schema build must
+        # parse the path only. Taking the annotation as the campaign key
+        # raises "require campaigns.C0b_p_cleanup; existing pipe capacity...".
+        campaign_path = (
+            spec.bounds_source.removeprefix("pipe-capacity:")
+            .split(";", 1)[0]
+            .strip()
+        )
+        campaign_key = campaign_path.removeprefix("campaigns.")
+        tunable_pressure_lows = [
+            float(candidate.low)
+            for candidate in resolved
+            if candidate.path[:2] == ("campaigns", campaign_key)
+            and candidate.path[-1]
+            in {"p_total_mbar", "p_total_mbar_default"}
+            and candidate.search_enabled
+            and candidate.low is not None
+        ]
+        high = _carrier_feed_pipe_capacity_mol_s(
+            setpoints,
+            campaign_key,
+            minimum_tunable_pressure_mbar=(
+                min(tunable_pressure_lows)
+                if tunable_pressure_lows
+                else None
+            ),
+        )
+        resolved[index] = replace(
+            spec,
+            low=0.0,
+            high=high,
+            bounds_source=(
+                f"pipe-capacity:{campaign_path}; existing pipe "
+                "capacity at the campaign's minimum total pressure "
+                "and maximum gas temperature, converted to mol/s"
+            ),
         )
     return tuple(resolved)
 
