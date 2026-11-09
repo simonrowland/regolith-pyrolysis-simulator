@@ -128,7 +128,7 @@ def test_request_vector_keeps_pressure_seen_by_adapter(
     assert first_vector != second_vector
 
 
-def test_request_vector_distinguishes_qualification_calls() -> None:
+def test_request_vector_omits_qualification_decoration() -> None:
     handle = _handle("thermoengine")
 
     ordinary = _engine_cache_request_vector(
@@ -138,7 +138,6 @@ def test_request_vector_distinguishes_qualification_calls() -> None:
         po2=Po2Request("engine_default", None),
         physical_pressure_bar=1.0,
         native_activity_formula=None,
-        qualification=False,
     )
     qualification = _engine_cache_request_vector(
         handle,
@@ -147,11 +146,11 @@ def test_request_vector_distinguishes_qualification_calls() -> None:
         po2=Po2Request("engine_default", None),
         physical_pressure_bar=1.0,
         native_activity_formula=None,
-        qualification=True,
     )
 
     assert ordinary is not None and qualification is not None
-    assert ordinary != qualification
+    assert ordinary == qualification
+    assert "qualification" not in ordinary
 
 
 def test_request_vector_tracks_ambient_alphamelts_calc_mode(
@@ -588,7 +587,6 @@ def test_qualification_cells_share_engine_result_and_rebuild_decorations(
         pot,
         temperature_K=1703.0,
         po2=Po2Request("engine_default", None),
-        qualification=True,
         isolated=False,
         engine_cache=cache,
     )
@@ -603,7 +601,8 @@ def test_qualification_cells_share_engine_result_and_rebuild_decorations(
     )
 
     assert backend.calls == 1
-    assert assessment_calls == 2
+    assert assessment_calls == 1
     assert first.pot_id != second.pot_id
-    assert first.notices == second.notices
+    assert not first.notices
+    assert any(notice.get("kind") == "melts_domain_gate" for notice in second.notices)
     assert cache.counters["alphamelts"]["hits"] == 1
