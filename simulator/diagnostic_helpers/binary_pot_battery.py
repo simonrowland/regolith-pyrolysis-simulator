@@ -4587,7 +4587,6 @@ def _engine_cache_request_vector(
     po2: Po2Request,
     physical_pressure_bar: float | None,
     native_activity_formula: str | None,
-    isolated: bool | None = None,
 ) -> dict[str, Any] | None:
     """Describe cell inputs that can affect chemistry or admission."""
 
@@ -4763,17 +4762,21 @@ def _engine_cache_request_vector(
         "composition": composition,
         "temperature_C": temperature_C,
         "pressure_bar": pressure,
-        "physical_pressure_bar": pressure_bar,
         "oxygen": oxygen,
         "solver_options": options,
         "engine_settings": engine_settings,
-        "isolated": None if isolated is None else bool(isolated),
     }
+    if engine_id != "openimcc":
+        request["physical_pressure_bar"] = pressure_bar
     if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         request["oxygen"]["cell_material"] = po2.cell_material
     if any(
         isinstance(value, float) and not math.isfinite(value)
-        for value in (temperature_C, pressure_bar, fo2_log)
+        for value in (
+            temperature_C,
+            pressure_bar if engine_id != "openimcc" else None,
+            fo2_log,
+        )
         if value is not None
     ):
         return None
@@ -4856,7 +4859,6 @@ def equilibrate_cell(
             po2=po2,
             physical_pressure_bar=physical_pressure_bar,
             native_activity_formula=native_activity_formula,
-            isolated=use_isolated,
         )
         if request_vector is not None:
             from simulator.engine_cache import cached_solve
