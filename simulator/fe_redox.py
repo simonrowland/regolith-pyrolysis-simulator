@@ -399,10 +399,10 @@ FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
     ),
 }
 
-# Redox v3 Step C authority switch: Kress & Carmichael 1991 ferric split above
-# IW(pure-FeO)+1; Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 central
-# stoichiometric-FeO(l) band at/below IW(pure-FeO); Ban-ya1993 ISIJ Int. 33:2-11 carries
-# the regular-solution composition-transfer diagnostic.
+# Redox v3 Step C authority switch: Holzheid's central stoichiometric-FeO(l)
+# activity is fully authoritative at/below the self-consistent melt metal-
+# saturation anchor; Kress91 takes over across this one-log transition.
+# Ban-ya1993 ISIJ Int. 33:2-11 carries the composition-transfer diagnostic.
 CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10 = 1.0
 
 
@@ -1139,6 +1139,103 @@ def kress91_ferrous_feo_activity(
     return max(0.0, float(components.get('a_FeO_authoritative', 0.0) or 0.0))
 
 
+def _solve_calphad_metal_saturation_anchor(
+    *,
+    comp_wt: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+    liquid_domain: LiquidFeODomain | None = None,
+) -> dict[str, float | bool | None]:
+    pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+
+    def anchor_result(
+        log10_fO2_bar: float,
+        activity: float | None,
+        fallback: bool = False,
+    ) -> dict[str, float | bool | None]:
+        return {
+            'log10_fO2_bar': log10_fO2_bar,
+            'a_FeO': activity,
+            'anchor_fallback_pure_iw': fallback,
+        }
+
+    def residual(log10_fO2_bar: float) -> tuple[float, float] | None:
+        evaluated = _calphad_feo_activity_components(
+            comp_wt=comp_wt,
+            fO2_log=log10_fO2_bar,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+            floor_bar=floor_bar,
+            liquid_domain=liquid_domain,
+            _anchor_probe=True,
+        )
+        band = evaluated.get('a_FeO_calphad')
+        if not isinstance(band, Mapping):
+            return None
+        try:
+            activity = float(band.get('central'))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(activity) or activity < 0.0:
+            return None
+        if activity == 0.0:
+            return math.inf, activity
+
+        # For Fe + 1/2 O2 = FeO(l), K = a_FeO/(a_Fe*sqrt(fO2)). At metal
+        # saturation a_Fe=1, so log10(fO2/bar) = 2 log10(a_FeO) - 2 log10(K).
+        # Pure-FeO IW is -2 log10(K), leaving ell = IW_pure + 2 log10(a_FeO).
+        # Activities are dimensionless and fugacity is relative to the 1-bar
+        # standard state; both logs are base-10, so the coordinate is in dex.
+        # a_FeO=1 recovers pure IW. At fixed composition, T, and P,
+        # KRESS91_LN_FO2_COEFFICIENT=0.196 > 0 makes the Fe3+/Fe2+ ratio
+        # nondecreasing in ell. Since x_FeO=FeOt/(1+2*ratio) and central
+        # Holzheid gamma depends only on T, a_FeO is nonincreasing and this
+        # residual is strictly increasing. A sign-changing bracket confirms
+        # the unique root numerically.
+        return (
+            log10_fO2_bar - pure_iw - 2.0 * math.log10(activity),
+            activity,
+        )
+
+    span = 1.0
+    for _ in range(32):
+        low_log = pure_iw - span
+        high_log = pure_iw + span
+        low = residual(low_log)
+        high = residual(high_log)
+        if low is None or high is None:
+            return anchor_result(pure_iw, None, True)
+        if low[0] <= 0.0 <= high[0]:
+            break
+        span *= 2.0
+    else:
+        return anchor_result(pure_iw, None, True)
+
+    if low[0] == 0.0:
+        return anchor_result(low_log, low[1])
+    if high[0] == 0.0:
+        return anchor_result(high_log, high[1])
+
+    for _ in range(48):
+        mid_log = (low_log + high_log) / 2.0
+        mid = residual(mid_log)
+        if mid is None:
+            return anchor_result(pure_iw, None, True)
+        if mid[0] == 0.0:
+            return anchor_result(mid_log, mid[1])
+        if mid[0] < 0.0:
+            low_log = mid_log
+        else:
+            high_log = mid_log
+
+    anchor_log = (low_log + high_log) / 2.0
+    anchor = residual(anchor_log)
+    if anchor is None:
+        return anchor_result(pure_iw, None, True)
+    return anchor_result(anchor_log, anchor[1])
+
+
 def _calphad_feo_activity_components(
     *,
     comp_wt: Mapping[str, float],
@@ -1147,6 +1244,7 @@ def _calphad_feo_activity_components(
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
     liquid_domain: LiquidFeODomain | None = None,
+    _anchor_probe: bool = False,
 ) -> dict[str, object]:
     feot = feot_equivalent_wt_pct(comp_wt)
     mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
@@ -1208,6 +1306,9 @@ def _calphad_feo_activity_components(
         'central': x_feo_ferrous * gamma_central,
         'high': x_feo_ferrous * gamma_high,
     }
+    if _anchor_probe:
+        return {'status': 'ok', 'a_FeO_calphad': activity}
+
     central = float(activity['central'])
     low = float(activity['low'])
     high = float(activity['high'])
@@ -1226,7 +1327,17 @@ def _calphad_feo_activity_components(
     )
     pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
     delta_iw_pure_feo = float(fO2_log) - pure_feo_iw
-    calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
+    anchor = _solve_calphad_metal_saturation_anchor(
+        comp_wt=comp_wt,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+        floor_bar=floor_bar,
+        liquid_domain=liquid_domain,
+    )
+    anchor_log10_fO2 = float(anchor['log10_fO2_bar'])
+    anchor_fallback_pure_iw = bool(anchor['anchor_fallback_pure_iw'])
+    delta_metal_saturation_anchor = float(fO2_log) - anchor_log10_fO2
+    calphad_weight = _calphad_authority_weight(delta_metal_saturation_anchor)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
     # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
@@ -1249,11 +1360,11 @@ def _calphad_feo_activity_components(
         else None
     )
     if calphad_weight >= 1.0:
-        regime = 'calphad_metal_saturated_below_iw_pure_feo'
+        regime = 'calphad_metal_saturated_below_melt_anchor'
     elif calphad_weight <= 0.0:
-        regime = 'kress91_ferric_limb_above_iw_pure_feo_plus_1'
+        regime = 'kress91_ferric_limb_above_melt_anchor_plus_1'
     else:
-        regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
+        regime = 'melt_anchor_to_melt_anchor_plus_1_smooth_blend'
 
     return _with_liquid_model_below_liquidus_notice({
         'status': 'ok',
@@ -1288,8 +1399,9 @@ def _calphad_feo_activity_components(
         },
         'authority': {
             'regime': regime,
-            'iw_basis': 'IW(pure-FeO)',
+            'iw_basis': 'IW(pure-FeO) with self-consistent melt-saturation anchor',
             'relative_to_iw_pure_feo_log10': delta_iw_pure_feo,
+            'anchor_fallback_pure_iw': anchor_fallback_pure_iw,
             'calphad_weight': calphad_weight,
             'kress91_weight': kress91_weight,
             'blend_width_log10': CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10,
@@ -1346,9 +1458,9 @@ def _calphad_feo_activity_components(
                 2.0 * math.log10(max(kress91_activity, 1.0e-300))
             ),
             'iw_basis_note': (
-                'IW axis is pure FeO(l), a_FeO=1. A melt with a_FeO<1 reaches '
-                'a_Fe=1 at log10(fO2) lower by 2*log10(a_FeO_melt); the '
-                'self-consistent melt-a_FeO saturation anchor is deferred.'
+                'Pure FeO(l) IW is the standard-state reference. The authority '
+                'weight uses the self-consistent Fe-saturation root, evaluating '
+                'CALPHAD a_FeO at each trial fO2; a_FeO=1 recovers pure IW.'
             ),
             'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
         },

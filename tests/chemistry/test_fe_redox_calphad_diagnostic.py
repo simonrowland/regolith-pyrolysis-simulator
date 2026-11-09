@@ -5,10 +5,10 @@ import math
 
 import pytest
 
+import simulator.fe_redox as fe_redox_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-import simulator.fe_redox as fe_redox_module
 from simulator.fe_redox import (
     LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
@@ -65,8 +65,8 @@ def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
     feedstocks_data: dict,
 ):
     cases = (
-        ("lunar_mare_low_ti", 1.3e-12, 1.3e-12, 0.237741),
-        ("mars_basalt", 6.1e-3, 1.0e-9, 0.314005),
+        ("lunar_mare_lms1", 1.3e-12, 1.3e-12, 0.237741),
+        ("mars_global_mgs1", 6.1e-3, 1.0e-9, 0.314005),
     )
 
     for feedstock_id, pressure_bar, floor_bar, expected_activity in cases:
@@ -78,6 +78,10 @@ def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
         )
 
         assert anchor["a_FeO"] == pytest.approx(expected_activity, abs=2e-6)
+        assert anchor["log10_fO2_bar"] == pytest.approx(
+            feo_iw_log10_fO2_bar(_T_K, a_feo=expected_activity),
+            abs=2e-6,
+        )
         assert anchor["anchor_fallback_pure_iw"] is False
 
 
@@ -144,10 +148,16 @@ def test_metal_saturation_anchor_no_bracket_falls_back_and_is_flagged(
         floor_bar=1.3e-12,
     )
     assert diagnostic["authority"]["anchor_fallback_pure_iw"] is True
+    assert diagnostic["authority"]["calphad_weight"] == pytest.approx(0.5)
 
 
-def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():
-    fO2_log = feo_iw_log10_fO2_bar(_T_K) + 0.5
+def test_calphad_feo_activity_is_banded_above_melt_saturation_anchor():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    fO2_log = anchor["log10_fO2_bar"] + 0.5
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,
         fO2_log=fO2_log,
@@ -165,7 +175,7 @@ def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():
     assert band["low"] <= current <= band["high"]
     assert diagnostic["current_within_calphad_band"] is True
     assert diagnostic["authority"]["regime"] == (
-        "iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend"
+        "melt_anchor_to_melt_anchor_plus_1_smooth_blend"
     )
     assert diagnostic["authority"]["calphad_weight"] == pytest.approx(0.5)
     assert diagnostic["gamma_FeO"]["central"] == pytest.approx(3.298, rel=1e-3)
@@ -196,8 +206,13 @@ def test_banya_quadratic_status_is_ok_when_all_pairs_are_ocr_clean():
     assert banya["excluded_or_missing_pairs"] == []
 
 
-def test_calphad_feo_activity_central_diverges_below_iw_and_carries_tiepoint():
-    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
+def test_calphad_feo_activity_central_diverges_below_anchor_and_carries_tiepoint():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    fO2_log = anchor["log10_fO2_bar"] - 0.25
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,
         fO2_log=fO2_log,
@@ -213,7 +228,7 @@ def test_calphad_feo_activity_central_diverges_below_iw_and_carries_tiepoint():
     assert current == pytest.approx(central)
     assert central / kress91 > 2.5
     assert diagnostic["authority"]["regime"] == (
-        "calphad_metal_saturated_below_iw_pure_feo"
+        "calphad_metal_saturated_below_melt_anchor"
     )
     assert diagnostic["comparison"]["central_over_current"] == pytest.approx(1.0)
     assert diagnostic["comparison"][
@@ -493,8 +508,13 @@ def test_builtin_vapor_pressure_refuses_a_mistyped_liquid_domain(
         provider.dispatch(request)
 
 
-def test_feo_activity_uses_kress91_authority_above_iw_plus_one():
-    fO2_log = feo_iw_log10_fO2_bar(_T_K) + 1.25
+def test_feo_activity_uses_kress91_authority_above_anchor_plus_one():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    fO2_log = anchor["log10_fO2_bar"] + 1.25
     activity = kress91_ferrous_feo_activity(
         comp_wt=_BASALTIC_FE_MELT_WT,
         fO2_log=fO2_log,
@@ -516,7 +536,7 @@ def test_feo_activity_uses_kress91_authority_above_iw_plus_one():
 
     assert activity == pytest.approx(split["x_feo"], rel=0, abs=1e-15)
     assert diagnostic["authority"]["regime"] == (
-        "kress91_ferric_limb_above_iw_pure_feo_plus_1"
+        "kress91_ferric_limb_above_melt_anchor_plus_1"
     )
     assert diagnostic["authority"]["calphad_weight"] == 0.0
     assert diagnostic["a_FeO_current"] == pytest.approx(diagnostic["a_FeO_kress91"])
@@ -525,8 +545,13 @@ def test_feo_activity_uses_kress91_authority_above_iw_plus_one():
     )
 
 
-def test_feo_activity_uses_central_calphad_authority_below_iw():
-    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 0.25
+def test_feo_activity_uses_central_calphad_authority_below_anchor():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    fO2_log = anchor["log10_fO2_bar"] - 0.25
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,
         fO2_log=fO2_log,
@@ -546,16 +571,21 @@ def test_feo_activity_uses_central_calphad_authority_below_iw():
     ) == pytest.approx(expected, rel=0, abs=1e-15)
     assert diagnostic["a_FeO_current"] == pytest.approx(expected, rel=0, abs=1e-15)
     assert diagnostic["authority"]["regime"] == (
-        "calphad_metal_saturated_below_iw_pure_feo"
+        "calphad_metal_saturated_below_melt_anchor"
     )
     assert diagnostic["authority"]["central_band_is_authoritative"] is True
     assert diagnostic["authority"]["low_high_band_is_diagnostic"] is True
 
 
-def test_feo_activity_blend_is_continuous_at_iw_boundaries():
-    iw = feo_iw_log10_fO2_bar(_T_K)
+def test_feo_activity_blend_is_continuous_at_melt_anchor_boundaries():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    anchor_log = anchor["log10_fO2_bar"]
     eps = 1e-8
-    for boundary in (iw, iw + 1.0):
+    for boundary in (anchor_log, anchor_log + 1.0):
         below = kress91_ferrous_feo_activity(
             comp_wt=_BASALTIC_FE_MELT_WT,
             fO2_log=boundary - eps,
@@ -579,11 +609,16 @@ def test_feo_activity_blend_is_continuous_at_iw_boundaries():
         assert abs(above - at_boundary) < 1e-8
 
 
-def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
+def test_feo_activity_anchor_basis_documents_melt_offset():
     iw = feo_iw_log10_fO2_bar(_T_K)
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,
-        fO2_log=iw,
+        fO2_log=anchor["log10_fO2_bar"],
         T_K=_T_K,
         pressure_bar=1e-6,
     )
@@ -593,10 +628,13 @@ def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
         "central_melt_saturation_offset_from_iw_pure_feo_log10_fO2"
     ]
 
-    assert diagnostic["authority"]["iw_basis"] == "IW(pure-FeO)"
-    assert diagnostic["authority"]["relative_to_iw_pure_feo_log10"] == (
-        pytest.approx(0.0)
+    assert diagnostic["authority"]["iw_basis"] == (
+        "IW(pure-FeO) with self-consistent melt-saturation anchor"
     )
+    assert diagnostic["authority"]["relative_to_iw_pure_feo_log10"] == (
+        pytest.approx(anchor["log10_fO2_bar"] - iw)
+    )
+    assert diagnostic["authority"]["anchor_fallback_pure_iw"] is False
     assert diagnostic["a_FeO_current"] == pytest.approx(central)
     assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(iw)
     assert offset == pytest.approx(2.0 * math.log10(central))
