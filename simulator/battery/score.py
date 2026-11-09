@@ -4794,7 +4794,7 @@ def _convert_uncertainty_width(
                 # Premise: ppm and wt% share mass-fraction dimension. Algebra:
                 # wt% = ppm / 10^4. Unit check: ppm/10^4 = mass fraction × 100.
                 # Sanity: 27 ppm = 0.0027 wt%.
-                return width / Decimal("10000"), "mass_percent", None
+                return ppm_mass_to_wt_percent(width), "mass_percent", None
             if declared_scale == "mass_fraction":
                 # Premise: ppm is one part in 10^6 by mass. Algebra: mass
                 # fraction = ppm / 10^6. Unit check: parts/parts is dimensionless.
