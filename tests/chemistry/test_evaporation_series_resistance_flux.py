@@ -756,6 +756,7 @@ def test_pressure_held_mixture_root_is_sampled_when_downstream_equals_total():
         closed_line_total_pressure_Pa=100.0,
         transformed_equilibrium_pressures_Pa={name: 60.0 for name in species},
         downstream_pressure_Pa=100.0,
+        pipe_conductance_positive=True,
     )
 
     # N=120/(1+g) and g=100/N, so the physical root is g=5 and n_i=10.
@@ -775,6 +776,7 @@ def test_pressure_held_feed_root_is_sampled_when_downstream_equals_total():
         transformed_equilibrium_pressures_Pa={"A": 40.0},
         downstream_pressure_Pa=100.0,
         carrier_feed_mol_s=1.0e-6,
+        pipe_conductance_positive=True,
     )
 
     # Independent Brent solve of g=100/(0.0036+40/(1+g)).
