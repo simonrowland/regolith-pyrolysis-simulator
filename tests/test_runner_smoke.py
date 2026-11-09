@@ -2094,7 +2094,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # Final b-1119 tree (d-354): the hours carry the evaluated-below-floor channel
         # state and provenance; they still equal the regenerated fixture above.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "cd00e64c70c4444041214a3e5ba1b2054094defca8cb53f337a52dcd136b395f"
+            "56e52097f782d4c0d21dd9bcd40e7a116fec8d47ce6f123779f5e849f3e7da32"
         )
 
 

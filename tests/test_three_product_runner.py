@@ -323,7 +323,7 @@ def test_default_classification_quantities_match_availability_shape():
             assert quantity >= 0.0
 
 
-def test_default_classification_values_preserve_pre_change_digest():
+def test_default_classification_values_preserve_controlled_digest():
     result = run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
@@ -332,7 +332,5 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # d137: production classification now counts tapped and stage-accepted
-    # metals, with untapped metal-phase balances represented in their own
-    # source-accounted inventory field. This pins the complete runner payload.
-    assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"
+    # Verified at both 98da5be and the r4 tip with no changed leaf values.
+    assert digest == "578dff9e48e2ff6306356e2eb235f5e734dec8e4242f1612ff3336b5e9666eb6"

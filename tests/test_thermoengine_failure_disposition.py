@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
@@ -16,9 +18,11 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineTimeoutError,
     thermoengine_failure_disposition_from_exception,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from simulator.melt_backend import thermoengine as thermoengine_module
 
@@ -458,3 +462,70 @@ def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
     assert calls[0]['fO2_log'] is None
     assert result.fO2_log == pytest.approx(-8.25)
     assert result.diagnostics['fO2_transport'] == 'thermoengine_intrinsic_closed'
+
+
+def test_thermoengine_ca_vapor_rows_keep_the_green_endmember_projection():
+    cases = (
+        (
+            'Shornikov 2026 table 3 row 1',
+            1751.0,
+            {'CaO': 1.0, 'SiO2': 1.0},
+            0.00000060896325,
+            0.52752382009207333,
+            0.001995506676425428,
+        ),
+        (
+            'Stolyarova 1991 table 2, 1993 K',
+            1993.0,
+            {'CaO': 0.5, 'SiO2': 0.5},
+            0.00199531976228266,
+            0.44958972929159385,
+            0.019110657483490886,
+        ),
+        (
+            'Stolyarova 1996 table 2, 1933 K',
+            1933.0,
+            {'CaO': 0.384615384615, 'Al2O3': 0.115384615385, 'SiO2': 0.5},
+            0.000007682655606569848,
+            9.6595271291872162,
+            0.037419331627354224,
+        ),
+    )
+    backend = ThermoEngineBackend()
+    backend.initialize({'mode': 'thermoengine'})
+    backend._vaporock_available = False
+    try:
+        predictions = {}
+        for (
+            name,
+            temperature_K,
+            oxide_moles,
+            oxygen_Pa,
+            total_pressure_Pa,
+            _,
+        ) in cases:
+            composition_kg = {
+                oxide: moles * resolve_species_formula(
+                    oxide
+                ).molar_mass_kg_per_mol()
+                for oxide, moles in oxide_moles.items()
+            }
+            result = backend.equilibrate(
+                temperature_C=temperature_K - 273.15,
+                composition_kg=composition_kg,
+                fO2_log=math.log10(oxygen_Pa / PA_PER_BAR),
+                pressure_bar=total_pressure_Pa / PA_PER_BAR,
+            )
+            assert 'Ca' in result.vapor_pressures_Pa, (
+                name,
+                result.status,
+                result.diagnostics.get('vapor_pressure_refusal'),
+                result.liquid_composition_wt_pct,
+                result.activity_coefficients,
+            )
+            predictions[name] = result.vapor_pressures_Pa['Ca']
+    finally:
+        backend.close()
+
+    for name, _, _, _, _, expected in cases:
+        assert predictions[name] == pytest.approx(expected, rel=5e-5), name
