@@ -1029,18 +1029,20 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     snapshot = sim.step()
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
-    # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
-    # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
-    # threshold here, so it is absent from snapshot flux/status and is a
-    # legitimate no-flux carrier for this pin.
-    ceiling_flux_species = {"Ca", "CaO_gas", "TiO", "TiO2_gas"}
+    # 1600 C to 1400 C. The P_bulk=0 seed at that state is
+    # 0.06423670196107581 kg/hr. The pumped same-hour closure then finds
+    # a root at 0.002077414004290261 kg/hr (29 iterations): the evolved
+    # vapor's own partial pressure, on top of the Ar-film resistance,
+    # cuts the net rate by a factor of 30.9. Default-off still does not
+    # run the capacity shadow. CaO_gas and TiO close to no positive rate;
+    # Ca and TiO2_gas remain analytical-upper-bound ceiling flux. Ti stays
+    # under the 1e-12 kg/hr floor (physics seq 1003).
+    ceiling_flux_species = {"Ca", "TiO2_gas"}
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.002077414004290261, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1068,22 +1070,21 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # Closed root at 1400 C under the 1 mbar Ar cover. Saturation is
+        # 0.07775% of pipe capacity; the pre-closure seed was 2.47%.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.002077414004290261,
+            0.07774907162271655,
+            998.7693953130298,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
     # The split adds Na/Mg collector and K-trap captures after their matching
     # evaporations. Generic C0 Ca has no designated collector in that split;
-    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
+    # this trace sends its residual (2.242199538160246e-11 kg) to terminal
     # offgas instead of the former mixed-stage condense_Ca transition.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
@@ -1098,19 +1099,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_Na",
         "evaporate_K",
         "condense_K",
-        "evaporate_AlO",
         "evaporate_Ca",
-        "evaporate_CaO_gas",
         "evaporate_Cr",
         "evaporate_CrO",
-        "evaporate_K2",
-        "evaporate_K2O_gas",
         "evaporate_MgO_gas",
         "evaporate_Mn",
         "evaporate_Na2",
         "evaporate_Na2O_gas",
         "evaporate_SiO2_gas",
-        "evaporate_TiO",
         "evaporate_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
@@ -1151,17 +1147,21 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     snapshot = sim.step()
 
     # Default-off skips the optional shadow. This step still hits the
-    # mandatory C0 pipe cap: one estimate is over capacity, and the
-    # admitted release matches that estimate within the flux floor.
+    # mandatory C0 pipe cap. The joint same-hour closure also estimates
+    # transport on each candidate, and those probes are over capacity on
+    # this vacuum pipe. The admitted cap is the last over-capacity
+    # estimate: the cap runs after the solve, and later estimates see
+    # the scaled release.
     binding = [
         call
         for call in transport_calls
         if call["demand_kg_hr"] > call["capacity_kg_hr"]
     ]
-    assert len(binding) == 1
-    demand_kg_hr = binding[0]["demand_kg_hr"]
-    capacity_kg_hr = binding[0]["capacity_kg_hr"]
-    demand_species = binding[0]["species_kg_hr"]
+    assert len(binding) > 1
+    admitted = binding[-1]
+    demand_kg_hr = admitted["demand_kg_hr"]
+    capacity_kg_hr = admitted["capacity_kg_hr"]
+    demand_species = admitted["species_kg_hr"]
     cap_record = sim._last_subsolidus_bakeout["transport_cap"]
     assert cap_record["demand_kg_hr"] == pytest.approx(
         demand_kg_hr, rel=0.0, abs=0.0
@@ -1296,14 +1296,19 @@ def test_default_off_c0_cover_does_not_apply_pipe_cap():
     snapshot = sim.step()
 
     assert transport_calls
-    owner_demand_kg_hr = transport_calls[0]["demand_kg_hr"]
-    for owner_result in transport_calls:
-        assert owner_result["demand_kg_hr"] == pytest.approx(owner_demand_kg_hr)
-        assert owner_result["demand_kg_hr"] < owner_result["capacity_kg_hr"]
+    # Closure probes do not share one demand. None of them exceeds the
+    # pipe, so the C0 cap stays off. The first demand is the P_bulk=0
+    # seed; the committed flux is the pumped root.
+    assert all(
+        call["demand_kg_hr"] <= call["capacity_kg_hr"] for call in transport_calls
+    )
+    assert transport_calls[0]["demand_kg_hr"] == pytest.approx(
+        0.06423670196107581
+    )
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
     assert snapshot.evap_flux.total_kg_hr == pytest.approx(
-        owner_demand_kg_hr
+        0.002077414004290261
     )
 
 
@@ -1381,13 +1386,20 @@ def test_unscaled_c0_commits_reversible_si_condensation():
     snapshot = sim.step()
 
     assert transport_calls
-    owner_demand_kg_hr = transport_calls[0]["demand_kg_hr"]
     assert all(
         call["demand_kg_hr"] <= call["capacity_kg_hr"]
         for call in transport_calls
     )
+    # P_bulk=0 seed is the first estimate. The pumped closure finds a
+    # root below it: at vacuum with a 10 m² throat the evolved-vapor
+    # backpressure takes 1.5051971831599937 kg/hr down to
+    # 1.459762122833529 kg/hr (relative drop 0.030186). The pipe cap
+    # stays off because every estimate is inside that enlarged throat.
+    assert transport_calls[0]["demand_kg_hr"] == pytest.approx(
+        1.5051971831599937
+    )
     assert snapshot.evap_flux.total_kg_hr == pytest.approx(
-        owner_demand_kg_hr
+        1.459762122833529
     )
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
