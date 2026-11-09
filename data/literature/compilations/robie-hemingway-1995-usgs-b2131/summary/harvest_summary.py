@@ -9,9 +9,13 @@ import math
 from pathlib import Path
 import re
 import subprocess
+from simulator.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = Path('/Users/simonrowland/Repos/regolith-corpus-ctl/raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf')
+SOURCE = (
+    regolith_corpus_root().with_name("regolith-corpus-ctl")
+    / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
+)
 TMP = Path('/private/tmp/b2131-summary-raster')
 NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z')
 # Mineral names occupying their own OCR line, with the numeric row below.

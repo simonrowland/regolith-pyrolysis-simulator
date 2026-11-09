@@ -19,12 +19,13 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.harvest_atct_compilation import feedstock_coverage
+from simulator.corpus_paths import regolith_corpus_root
 
 
 SOURCE_ID = "pankratz-1984-usbm-b677"
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / "data/literature/compilations" / SOURCE_ID
-CORPUS = Path("/Users/simonrowland/Repos/regolith-corpus")
+CORPUS = regolith_corpus_root()
 MINERU = CORPUS / "text" / SOURCE_ID / "mineru"
 PDF = CORPUS / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 SIDECAR = CORPUS / "raw" / SOURCE_ID / "sidecar.yaml"

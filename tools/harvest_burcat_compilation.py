@@ -50,16 +50,16 @@ from simulator.reference_data.burcat import (  # noqa: E402
     peer_formula_sets,
     record_document,
 )
+from simulator.corpus_paths import regolith_corpus_root  # noqa: E402
 
-BRIEF_THR = Path(
-    "/Users/simonrowland/Repos/regolith-corpus-ctl/raw/burcat-third-millennium/BURCAT.THR.txt"
+BURCAT_SOURCE = (
+    regolith_corpus_root().with_name("regolith-corpus-ctl")
+    / "raw"
+    / "burcat-third-millennium"
 )
-BRIEF_XML = Path(
-    "/Users/simonrowland/Repos/regolith-corpus-ctl/raw/burcat-third-millennium/BURCAT_THR.xml"
-)
-BRIEF_SIDECAR = Path(
-    "/Users/simonrowland/Repos/regolith-corpus-ctl/raw/burcat-third-millennium/sidecar.yaml"
-)
+BRIEF_THR = BURCAT_SOURCE / "BURCAT.THR.txt"
+BRIEF_XML = BURCAT_SOURCE / "BURCAT_THR.xml"
+BRIEF_SIDECAR = BURCAT_SOURCE / "sidecar.yaml"
 OFFICIAL_URL = "https://respecth.elte.hu/burcat.php"
 
 

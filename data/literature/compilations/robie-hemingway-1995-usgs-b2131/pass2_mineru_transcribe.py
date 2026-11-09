@@ -15,10 +15,11 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 import yaml
+from simulator.corpus_paths import regolith_corpus_root
 
 
 ROOT = Path(__file__).resolve().parent
-MINERU = Path("/Users/simonrowland/Repos/regolith-corpus/text/robie-hemingway-1995-usgs-b2131/mineru")
+MINERU = regolith_corpus_root() / "text/robie-hemingway-1995-usgs-b2131/mineru"
 TESS = Path("/private/tmp/b2131-pass2-pages")
 NUMBER = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z")
 ROLE = {
