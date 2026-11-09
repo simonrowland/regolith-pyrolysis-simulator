@@ -6618,8 +6618,16 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
             headspace_temperature_K=0.0,
             pressure_mbar=0.0,
         ),
-        overhead_model=types.SimpleNamespace(pipe_diameter_m=0.12),
+        overhead_model=types.SimpleNamespace(
+            pipe_diameter_m=0.12,
+            estimate_transport_state=lambda *args, **kwargs: {
+                'vapor_pressure_mbar': 0.0,
+            },
+            species_partial_pressures=lambda *args, **kwargs: {},
+        ),
         setpoints={'chemistry_kernel': {'allow_fallback_vapor': True}},
+        species_formula_registry={},
+        _freeze_gate_config={'enabled': False},
         vapor_pressures={
             'metals': {'Na': {'evaporation_alpha': {'value': 1.0}}},
             'oxide_vapors': {},
@@ -6640,6 +6648,23 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         PyrolysisSimulator._resolve_evaporation_batch_flux_state,
         sim,
     )
+    sim._evaporation_overhead_total_pressure_Pa = types.MethodType(
+        PyrolysisSimulator._evaporation_overhead_total_pressure_Pa,
+        sim,
+    )
+    sim._freeze_gate_enabled = types.MethodType(
+        PyrolysisSimulator._freeze_gate_enabled,
+        sim,
+    )
+    sim._apply_analytic_evaporation_depletion = types.MethodType(
+        PyrolysisSimulator._apply_analytic_evaporation_depletion,
+        sim,
+    )
+    sim._apply_native_fe_residual_capacity = types.MethodType(
+        PyrolysisSimulator._apply_native_fe_residual_capacity,
+        sim,
+    )
+    sim._headspace_downstream_pressure_bar = lambda _override: 0.0
 
     PyrolysisSimulator._calculate_evaporation(sim, result)
 

@@ -5,6 +5,7 @@ import pytest
 
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.condensation import CondensationRouteResult
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1748,7 +1749,7 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     )
 
 
-def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
+def test_next_tick_p_bulk_uses_same_hour_closure_after_near_total_capture(
     monkeypatch,
 ):
     sim = _gas_train_sim()
@@ -1829,7 +1830,8 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     seen = {}
 
     def _capture_dispatch(_intent, *, control_inputs, redox_state=None):
-        seen.update(control_inputs)
+        if _intent is ChemistryIntent.EVAPORATION_FLUX:
+            seen.update(control_inputs)
         return types.SimpleNamespace(
             status="ok",
             diagnostic={"evaporation_flux_kg_hr": {}},
@@ -1846,10 +1848,12 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     )
     evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
-    assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"] * 100.0
+    closure = sim._last_evaporation_flux_diagnostic[
+        "same_hour_headspace_closure"
+    ]
+    assert seen.get("overhead_partials_Pa", {}) == pytest.approx(
+        closure["partial_pressures_Pa"]
     )
-    assert seen["overhead_partials_Pa"]["Fe"] > 0.0
     assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
 
 

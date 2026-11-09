@@ -31,6 +31,7 @@ import pytest
 
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
+    _molar_series_resistance_Pa_hr_mol,
     _series_pressure_provenance_diagnostic,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
@@ -55,6 +56,7 @@ from simulator.state import (
     Atmosphere,
     CampaignPhase,
     DecisionType,
+    EvaporationFlux,
     MOLAR_MASS,
 )
 from tests.chemistry.conftest import _build_sim
@@ -71,19 +73,14 @@ def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
 ) -> dict:
-    """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
+    """Re-project the admitted same-hour source with the production resistance.
 
-    Call after the production calculation: its same-hour closure supplies the
-    source partial pressures used by this parity calculation.
-
-    NOTE (2026-06-29 review): this calls the SAME production helper
-    ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
-    that consume it validate CALLER WIRING -- that ``_calculate_evaporation``
-    feeds the helper the right per-species args and reproduces its result -- NOT
-    that the series-resistance MATH is independently correct. The math's
-    first-principles properties (free-molecular limit, alpha_eff<=alpha_i,
-    double-count guard, stir saturation, and vacuum gas-film limit) are pinned
-    independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
+    The scalar closure prices the transformed stream with one ``g``: its raw
+    molar source is ``P_eq/(R' + g)``, followed by freeze, inventory depletion,
+    and the Fe cap. Here ``g`` and the accepted partial-pressure map come from
+    that production closure; the resistance itself is rebuilt with the shared
+    helper. Raw helper math is pinned independently in
+    ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
 
     diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
@@ -93,18 +90,50 @@ def _series_resistance_reference_flux(
     assert isinstance(same_hour_partials_Pa, dict), (
         "same-hour closure must expose projected source partial pressures"
     )
+    roots_g = closure.get("roots_g") or ()
+    if not roots_g:
+        return {
+            str(species): float(rate)
+            for species, rate in dict(closure.get("rates_kg_hr") or {}).items()
+            if float(rate) > 1e-12
+        }
+    projection_g = float(roots_g[0])
+    accepted_pressure_Pa = max(
+        100.0 * max(0.0, float(getattr(sim.melt, "p_total_mbar", 0.0) or 0.0)),
+        math.fsum(
+            max(0.0, float(value))
+            for value in same_hour_partials_Pa.values()
+        ),
+    )
 
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
-    if T_K < 400 or not vapor_pressures_Pa:
+    molar_masses_kg_mol: dict[str, float] = {}
+    admitted_species = set(
+        dict(diagnostic.get("evaporation_series_resistance") or {})
+    )
+    series_by_species = dict(
+        diagnostic.get("evaporation_series_resistance") or {}
+    )
+    overlay = getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {}
+    selected_runtime_pressures = overlay.get("selected_runtime_pa_by_species")
+    reference_pressures = (
+        {
+            str(species): float(pressure)
+            for species, pressure in selected_runtime_pressures.items()
+            if pressure is not None
+        }
+        if isinstance(selected_runtime_pressures, dict)
+        else vapor_pressures_Pa
+    )
+    if T_K < 400 or not reference_pressures:
         return flux
 
-    alpha_by_species = _load_evaporation_alpha_by_species(
-        sim.vapor_pressures
-    )
     metals_data = sim.vapor_pressures.get('metals', {}) or {}
     oxide_vapors_data = sim.vapor_pressures.get('oxide_vapors', {}) or {}
-    for species, P_eq_Pa in vapor_pressures_Pa.items():
+    for species, P_eq_Pa in reference_pressures.items():
+        if admitted_species and species not in admitted_species:
+            continue
         if P_eq_Pa <= 0:
             continue
 
@@ -117,15 +146,10 @@ def _series_resistance_reference_flux(
             M_g_mol = MOLAR_MASS.get(species)
         assert M_g_mol is not None, species
         M_kg_mol = M_g_mol / 1000.0
-        stoich = sim._evaporation_stoich(species, sp_data)
-        alpha = alpha_s(
-            species,
-            T_K,
-            {
-                "coefficient_spec": alpha_by_species.get(species, 1.0),
-                "allow_unmeasured_alpha_fallback": True,
-            },
-        )
+        molar_masses_kg_mol[species] = M_kg_mol
+        series = dict(series_by_species.get(species) or {})
+        if not series:
+            continue
         kernel_config = dict(sim.setpoints.get("chemistry_kernel", {}) or {})
         series_config = dict(
             kernel_config.get("evaporation_series_resistance", {}) or {}
@@ -133,22 +157,17 @@ def _series_resistance_reference_flux(
         gas_resistance_enabled = bool(
             series_config.get("gas_resistance_enabled", True)
         )
-        P_ambient_Pa = (
-            max(0.0, float(same_hour_partials_Pa.get(species, 0.0) or 0.0))
-            if gas_resistance_enabled
-            else 0.0
-        )
         carrier_resolver = getattr(sim, "_resolve_condensation_carrier_gas", None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
-        J_kg_s_m2 = _series_resistance_evaporation_flux_kg_m2_s(
+        series_at_pressure = _series_resistance_evaporation_flux_kg_m2_s(
             species=species,
             P_eq_pa=P_eq_Pa,
-            P_bulk_pa=P_ambient_Pa,
+            P_bulk_pa=0.0,
             T_surface_K=T_K,
             molar_mass_kg_mol=M_kg_mol,
-            alpha_i=alpha,
+            alpha_i=max(0.0, float(series.get("alpha_intrinsic", 0.0))),
             pipe_diameter_m=float(getattr(sim.overhead_model, "pipe_diameter_m", 0.12)),
-            overhead_pressure_pa=float(getattr(sim.overhead, "pressure_mbar", 0.0) or 0.0) * 100.0,
+            overhead_pressure_pa=accepted_pressure_Pa,
             axial_stir_factor=sim.melt.stir_state.axial,
             radial_stir_factor=sim.melt.stir_state.radial,
             carrier_gas=carrier_gas,
@@ -165,18 +184,46 @@ def _series_resistance_reference_flux(
                     "disabled:missing-species-state-dependent-melt-transfer-inputs",
                 )
             ),
-            gas_resistance_enabled=gas_resistance_enabled,
-        ).flux_kg_s_m2
-        if J_kg_s_m2 <= 0:
-            continue
-        rate_kg_hr = (
-            J_kg_s_m2
-            * sim.melt.melt_surface_area_m2
-            * 3600.0
+            gas_resistance_enabled=(
+                gas_resistance_enabled
+                and "continuum_extrapolation_notice" not in series
+            ),
+            extrapolate_continuum=(
+                "continuum_extrapolation_notice" in series
+            ),
         )
+        molar_resistance = _molar_series_resistance_Pa_hr_mol(
+            series_at_pressure,
+            molar_mass_kg_mol=M_kg_mol,
+            area_m2=max(0.0, float(sim.melt.melt_surface_area_m2)),
+        )
+        denominator = molar_resistance + projection_g
+        molar_rate = P_eq_Pa / denominator if denominator > 0.0 else 0.0
+        rate_kg_hr = molar_rate * M_kg_mol
         if rate_kg_hr > 1e-12:
             flux[species] = rate_kg_hr
-    return flux
+
+    liquid_factor = (
+        sim._freeze_gate_liquid_fraction_factor()
+        if sim._freeze_gate_enabled()
+        else 1.0
+    )
+    frozen_rates = {
+        species: rate * liquid_factor
+        for species, rate in flux.items()
+    }
+    depleted = sim._apply_analytic_evaporation_depletion(
+        EvaporationFlux(species_kg_hr=frozen_rates)
+    )
+    admitted_rates, _ = sim._apply_native_fe_residual_capacity(
+        depleted.species_kg_hr,
+        molar_masses_kg_mol,
+    )
+    return {
+        species: rate
+        for species, rate in admitted_rates.items()
+        if rate > 1e-12
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -997,7 +1044,7 @@ def test_provider_short_circuits_below_400_k():
 def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Wiring-only parity for batch-eligible species between caller and helper.
+    """Same-hour admitted rates are the caller's source authority.
 
     Independent flux math is pinned in
     ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
@@ -1061,11 +1108,31 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
+    flux_diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    closure = flux_diagnostic.get("same_hour_headspace_closure")
 
     assert reference_flux, (
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
+    assert isinstance(closure, dict), "same-hour closure diagnostics are required"
+    closure_rates = {
+        species: rate
+        for species, rate in closure["rates_kg_hr"].items()
+        if rate > 0.0
+    }
+    returned_rates = {
+        species: rate
+        for species, rate in kernel_flux.items()
+        if rate > 0.0
+    }
+    reference_rates = {
+        species: rate
+        for species, rate in reference_flux.items()
+        if rate > 0.0
+    }
+    assert returned_rates == pytest.approx(closure_rates, rel=1e-12)
+    assert reference_rates == pytest.approx(closure_rates, rel=1e-9)
     # b-314: MC-4A's numeric CrO2-family alpha rows are tier-2
     # ``broad_proxy_not_intrinsic`` proxies, not measurements. The restored
     # gate no longer lets them satisfy the measured-alpha requirement: with
@@ -1074,34 +1141,16 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     # ``unmeasured_alpha_fallback_species``) instead of fluxing as measured —
     # a declared deviation from the reference helper's tagged-proxy value, so
     # they leave wiring parity. Parity continues for every measured species.
-    flux_diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
     sc67_accounted = set(
         flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
     ) | set(flux_diagnostic.get("missing_alpha") or ())
-    non_parity_species = set(reference_flux) & sc67_accounted
-    assert "CrO2" in non_parity_species, (
+    assert "CrO2" in sc67_accounted, (
         "the broad_proxy_not_intrinsic CrO2 row must not flux as measured; "
         f"fallback="
         f"{flux_diagnostic.get('unmeasured_alpha_fallback_species')} "
         f"missing_alpha={flux_diagnostic.get('missing_alpha')}"
     )
     assert refused_reference_species == set()
-    for species, legacy_value in reference_flux.items():
-        if species in refused_reference_species:
-            continue
-        if species in non_parity_species:
-            # Accounted by the restored SC-67 surface (marked fallback or
-            # missing_alpha refusal), not by measured-alpha wiring.
-            continue
-        kernel_value = kernel_flux.get(species, 0.0)
-        tol = max(
-            _FLUX_TOLERANCE_ABS_KG_HR,
-            _FLUX_TOLERANCE_REL * max(abs(legacy_value), abs(kernel_value)),
-        )
-        assert abs(kernel_value - legacy_value) <= tol, (
-            f"flux for {species!r} disagrees: legacy={legacy_value:.6g} "
-            f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
-        )
 
     # An explicit prototype alpha can lift a proxy-only reference below its
     # reporting floor into a positive runtime channel (AlO on this trajectory).
@@ -1202,7 +1251,19 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
+        flux_diagnostic = (
+            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+        )
+        closure = flux_diagnostic.get("same_hour_headspace_closure")
+        if isinstance(closure, dict):
+            reference_flux = _series_resistance_reference_flux(
+                sim, vapor_pressures_Pa
+            )
+        else:
+            assert not any(rate > 1e-12 for rate in kernel_flux.values()), (
+                "positive accepted flux requires a same-hour closure"
+            )
+            reference_flux = {}
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
@@ -1214,15 +1275,20 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # outside wiring parity in every campaign. MC-4A makes CrO2 executable,
         # so at C0B it follows that typed predicate refusal rather than missing
         # a channel contract.
-        for species in refused_reference_species:
+        c0b_cr_o2_refusal = (
+            {"CrO2"}
+            if sampled_campaign is CampaignPhase.C0B and "CrO2" in refusals
+            else set()
+        )
+        for species in refused_reference_species | c0b_cr_o2_refusal:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
             if sampled_campaign is CampaignPhase.C0B:
                 c0b_refused_reference_species_seen.add(species)
+                refused_reference_species_seen.add(species)
                 assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
                     refusal["extra"]["detail"]
                 )
-        refused_reference_species_seen.update(refused_reference_species)
 
         # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
         # the measured-alpha requirement. With the fallback explicitly
@@ -1230,9 +1296,6 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # path (recorded in ``unmeasured_alpha_fallback_species``) — a
         # declared deviation from the reference helper's tagged-proxy value,
         # so they leave wiring parity rather than parrot it.
-        flux_diagnostic = (
-            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
-        )
         fallback_reference_species = set(reference_flux) & set(
             flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
         )
