@@ -4,137 +4,147 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
-## [Unreleased]
+## [0.6.5] — 2026-11-08
 
-Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
-release boundary; commits land on `main` between pushes. 20 commits in
-the range, all reviewed by codex / `gstack /review` per chunk-review
-protocol + midflight cumulative review (HOLD-MAJOR → fixed inline) +
-post-batch morning review (HOLD, V2O5 P1 → fixed inline).
+About 8,400 commits since v0.6.4 (2026-08-28).
 
-### Changed — runner schema 1.9.0
+### Literature and test battery
 
-- Bumped the runner output contract from 1.8.0 to 1.9.0 for the unconditional
-  top-level vapour-rail instrumentation/refusal fields and required per-hour
-  vapour-batch summary/flux-overlay fields.
+- The migrated battery now holds 186,644 observations, 84,935 of them in the
+  compilation shards (969 shards). New source batches add alkali and ferrite
+  thermochemistry, melt activities, redox measurements, and silicate
+  properties. Observations an engine cannot yet score stay visible as typed
+  refusals instead of being dropped.
+- Store validation, extract provenance, composition identity, and uncertainty
+  handling have broader regression coverage. Superseded rows keep their
+  evidence lineage.
 
-### Added — defensive guards + structured seams
+### Scoring, uncertainty, and engines
 
-- **A2** — `simulator/overhead.py::OverheadGasModel._pipe_conductance`
-  fail-closed on `T_K <= 0`, `L <= 0`, `d <= 0`, negative `p_mean_Pa`.
-  Closes the 0.5.4 codex /challenge P3.
-- **B3 / M1** — `simulator/chemistry/kernel/registry.py::ProviderRegistry.replace_for_test`
-  public test-seam replacing direct `_authoritative` mutation.
-  `tests/test_extraction_ledger.py` migrated.
-- **B5 / CW1** — `simulator/extraction.py::_build_mre_voltage_sequence`
-  wired through `data/setpoints.yaml § mre_voltage_sequence.sequence`
-  with the canonical fallback ladder. Midflight P1: hardened YAML with
-  explicit `min_hold_hours` per species matching legacy hardcoded values.
-  Published YAML now adds Na2O / K2O to the default ladder — Q1 documents
-  the choice. V2O5 was initially added but removed in the morning P1
-  fix (see "Fixed" section) because V is absent from the supporting
-  simulator tables.
-- **B1-tunable / CW3** — `simulator/condensation.py::apply_setpoints_condensation_temperature_overrides`
-  merges operator-supplied per-species condensation temperatures from
-  `data/setpoints.yaml § condensation_train.condensation_temperatures_C`
-  into the in-source fallback dict. Idempotent on first sim build.
-  SiO=1050 °C is now explicitly documented as the engineering midpoint
-  of the documented 900-1200 °C zone, NOT a literature-derived constant
-  (per codex /review corpus scan).
-- **E3** — `HourSnapshot.knudsen_regime_summary` field carrying per-tick
-  Knudsen-regime visibility from the latest condensation route
-  (`status` / `knudsen_number` / `knudsen_regime` / `regime_factor` /
-  `warnings`). Complements the F3 hard refusal at `Kn ≥ 10` with
-  earlier-warning visibility.
+- Scoring uses source composition and condition evidence more consistently,
+  carries uncertainty through eligible comparisons, and keeps missing evidence
+  distinct from a numeric zero. More experimental rows are scoreable after
+  oxygen-condition and phase-identity repairs.
+- OpenIMCC is pinned to the declared 66ec4a3 source, with new redox,
+  melt-activity, vapour, and SiO comparisons wherever the input contract is
+  met.
+- VapoRock predicts outside its 1350–1950 K evidence band and flags those
+  points; oxide-activity output is opt-in. alphaMELTS reports signal-death
+  diagnostics and projects oxygen balance at the requested fugacity.
+- ThermoEngine and the other native engine workers capture and summarize
+  their output, close cleanly after warm calls, and recover from worker
+  failure. MAGEMin timeout handling is tighter.
+- Knudsen-cell rows use oxygen-condition precedence and a derived,
+  self-consistent total pressure, recorded in the score evidence.
 
-### Fixed — post-push review findings
+### Physics, redox, and reporting
 
-- **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** —
-  moved to the END of the dataclass to preserve positional-constructor
-  ABI. Post-push codex /review P2.
-- **Midflight P1 — B5 hold-hours**: published YAML now carries explicit
-  `min_hold_hours` per species so the YAML-driven ladder reproduces
-  the historical hardcoded MRE_BASELINE step-advance behavior
-  (Al2O3=8, MgO=5, CaO=10 vs the default-3 silent shift).
-- **Milestone P1 — `simulator/campaigns.py:172`**: future-campaign
-  `campaign_override pO2_mbar` was being applied at
-  `configure_campaign()` transition time without the W5 atmosphere
-  switch. Now mirrors the active-path fix.
+- FeO activity comparisons use the JANAF FeO(l) standard. Below-liquidus
+  activity estimates and deterministic melt repairs carry explicit notices.
+- Redox and melt-activity comparisons have wider source coverage and clearer
+  refusal reasons.
+- The README hero reports how much of each element leaves the melt, plus the
+  refractory ceramic rump. Refreshed charts show shared comparison
+  populations, mark uncalibrated points, and include methods and data
+  exports.
+- Runner output contract 1.9.0 adds top-level vapour-rail fields and per-hour
+  vapour-batch summaries. `HourSnapshot.knudsen_regime_summary` reports the
+  flow regime each hour.
+- New product-class report (`python -m simulator.three_product_runner`) maps a
+  run onto metals + O₂, pure silica glass, industrial mixed glass, and the
+  refractory ceramic rump, in markdown or JSON.
+- The MRE voltage ladder and per-species condensation temperatures are read
+  from `data/setpoints.yaml`, so operators can tune them without code changes.
 
-### Added — coverage
+### Tooling and CI
 
-- **A1** — W5 + W7 + W8 live-path integration tests
-  (`tests/test_0_5_4_live_path_integration.py`)
-- **W4** — Phase A atmosphere × headspace branch-test matrix
-  (`tests/test_overhead_accounting.py`, parametrized; partition guard)
-- **E1a** — north-star recipe-correctness baseline diagnostic harness
-  (`tests/test_north_star_baseline.py`; mass-balance hard gate;
-  threshold tightening deferred to E1b post-Phase-D)
-- **E7** — `web/events.py` pO2 cross-layer integration tests
-  (direct `session.adjust("pO2_mbar")` lever)
-- **B1-tunable tests** — apply/restore round-trip + defensive paths
-  + end-to-end simulator construction
-  (`tests/test_condensation_temperature_overrides.py`)
-- **W3** — evap-engine defensive axial-clamp on dict input + bool
-- **W2** — `clamp_stir_state` UserWarning on unknown dict keys
-- **B5 / MRE voltage sequence YAML** parsing + fallback tests
-  (`tests/test_mre_voltage_sequence_yaml.py`)
+- The recipe optimizer (Optuna) and OpenIMCC now install by default.
+- Optimizer fidelity timeouts use worker-reported elapsed time, and study
+  artifacts record winner provenance.
+- Engine warning output is deduplicated; corpus indexes and store-validation
+  records are regenerated with each data landing.
+- Defensive guards on pipe conductance, pO₂ atmosphere switching, and the MRE
+  ladder, with new live-path integration tests.
 
-### Hygiene — docs
+### Notes
 
-- **W1 / F1** — `tests/test_sio_yield_regression.py` Stage 4 SiO routing
-  invariant rewritten honest to post-Phase-A flip (Stage 4 > Stage 3
-  under default `radial=1.0` per CHANGELOG 0.5.3 "Known limitation")
-- **B2 / CW4** — `simulator/condensation.py` Stage 3 docstring polish
-  for post-0.5.3 routing (uses canonical `StirState(axial=6.0, radial=1.0)`
-  vocabulary; honest about the routing trade-off)
-- **E8 partial** — `docs/output-interpretation.md` documents the new
-  W8 + E3 HourSnapshot diagnostic surfaces
-- **B4 / CJ2015** — already-tracked corpus fixture confirmed has
-  `intents_exercised` field (closure)
+- Na, K, Mg, Fe, Si, and Cr melt-departure fractions in the README hero
+  carry a flagged hour-to-hour flux artefact while carrier-gas feed rates are
+  being added to the model. CrO evaporation is not yet modelled.
 
-### Added — north-star product classifier (E6)
+### Coming next
 
-- **E6a** — `simulator/three_product_report.py::classify_products(sim)`
-  projects `PyrolysisSimulator.product_ledger()` output onto the four
-  north-star product classes documented in `CLAUDE.md § 5`: metals + O₂,
-  pure silica glass (Stage 3 capture), industrial mixed glass
-  (cleaned_melt residual), refractory ceramic rump (by physics). 5-bucket
-  output dict with `unclassified` future-proofing bin.
-- **E6b** — `simulator/three_product_report_markdown.py::format_three_product_markdown`
-  human-readable markdown report wrapping the E6a classifier. 1-line
-  totals snapshot + per-class expansion + per-species kg breakdown.
-  Operator-noise reduction: unclassified section appears only when
-  non-empty; sub-noise values render as `—`; values <1 kg use scientific
-  notation. 13+13 tests across the E6 series.
-- **E6c** — `simulator/three_product_runner.py` runner CLI wrapping E6a +
-  E6b. Argparse entry point `python -m simulator.three_product_runner
-  --feedstock <id> --campaign <label> --hours <N> --output <path>
-  --format {markdown,json}`. Programmatic `run(...)` entry point for
-  test + library use. JSON output carries metadata header
-  (`feedstock_id`, `campaign`). 8 tests covering markdown / JSON
-  output, subprocess invocation, `--hours 0` baseline, argparse
-  rejection of invalid formats.
+- 0.6.6 brings optimizer gates measured at the melt boundary and an
+  optimizer-driven hero run.
 
-### Fixed — morning review findings (post-batch HOLD)
+## [0.6.4] — 2026-08-28
 
-- **Morning P1 — `data/setpoints.yaml`**: V2O5 had been included in the
-  published MRE voltage ladder via B5, but V is absent from
-  `simulator/state.py::OXIDE_SPECIES` / `OXIDE_TO_METAL` / `MOLAR_MASS`
-  + `simulator/electrolysis.py` energy tables. `_step_mre` was silently
-  no-op'ing on V2O5 — operator-visible "running" lie with zero output.
-  V2O5 removed; YAML carries an explicit comment explaining the
-  prerequisite work for re-adding.
-- **Morning P2 — `tests/test_mre_voltage_sequence_yaml.py`**: NEW
-  YAML-vs-tables support matrix test (`test_yaml_ladder_species_all_
-  supported_by_simulator_tables`) guards future YAML edits — adding a
-  species to the YAML now requires landing the matching simulator
-  tables, fail-loud at test time before the recipe ships a silent no-op.
-- **Morning P2 — `tests/test_condensation_temperature_overrides.py`**:
-  NEW end-to-end propagation test refutes the reviewer's concern that
-  B1-tunable's YAML override didn't flow through to
-  `_species_condensation_temperature_C`; documents the canonical
-  read path through the mutated `CONDENSATION_TEMPS_C` module dict.
+7 commits since v0.6.3 (2026-08-28).
+
+- **Literature and test battery:** Added a batch of source extracts and tooling
+  to rebuild the JANAF compilation from its committed inputs.
+- **Scoring and engines:** Missing evaporation sticking data stays unavailable,
+  so it no longer reads as zero sticking.
+- **Physics and reporting:** Optimizer inputs keep an unknown furnace cost
+  distinct from zero, while measured never-fouling cases retain their cost.
+
+## [0.6.3] — 2026-08-28
+
+381 commits since v0.6.2 (2026-07-19).
+
+- **Literature and test battery:** New KEMS and vacuum-pyrolysis measurements
+  are now evaluated in a store-driven reproduction battery with pinned
+  residuals.
+- **Scoring and engines:** Added runtime vapor evaluators for NASA-7/9
+  polynomial and Shomate data, with broader species coverage and VapoRock
+  comparisons.
+- **Physics and reporting:** Wall-deposition estimates now use flowing-gas
+  partial pressure, and a liner-life diagnostic reports a furnace ceiling.
+- **Tooling:** Added a canonical plant flowsheet with a generated diagram and
+  unified terminal product classification for glass and refractory ceramic.
+
+## [0.6.2] — 2026-07-19
+
+221 commits since v0.6.1 (2026-07-13).
+
+- **Physics and reporting:** The cold-end oxygen train now estimates capacity
+  from compressor and refrigeration limits, with opt-in runtime enforcement
+  and cistern accumulation.
+- **Tooling:** Runs can be saved in a library and opened in a report viewer
+  with per-hour, mol-based ledger details.
+- **Physics:** Char is tracked as a reductant, including an oxygen-lance path
+  for reducing FeO to iron and carbon monoxide.
+- **Scoring and optimization:** Optimizer recipes carry sourced cost inputs
+  through saved studies and winner results.
+
+## [0.6.1] — 2026-07-13
+
+41 commits since v0.6.0 (2026-07-12).
+
+- **Scoring and engines:** Runtime pressure now follows gas partial pressures
+  and equipment settings through evaporation and condensation; retained
+  condensate carries across ticks into baffle chemistry.
+- **Physics and reporting:** The Thermal Train report estimates downstream
+  radiator, compression, and refrigeration needs, with a live summary of
+  oxygen and vapor loads against capacity.
+- **Tooling:** Optimizer recipes retain sourced cost assumptions, and live
+  run panels read named ledger views through a shared read-only API.
+
+## [0.6.0] — 2026-07-12
+
+678 commits since v0.5.4 (2026-05-28).
+
+- **Literature and test battery:** Added literature-based vacuum-pyrolysis
+  presets and a time-series KEMS/evaporation harness for comparing modeled
+  fluxes with experimental measurements.
+- **Scoring and engines:** Added a recipe optimizer that filters for feasible
+  runs and compares the remaining tradeoffs, with persistent equilibrium
+  caching for repeated evaluations.
+- **Physics and reporting:** Evaporation now accounts for gas- and melt-side
+  transport resistance; an opt-in calcium extraction campaign uses a
+  transport cap.
+- **Tooling:** The simulator UI now presents the product ledger, redox sources,
+  and Knudsen/vapor diagnostics.
 
 ## [0.5.4] — 2026-05-28
 

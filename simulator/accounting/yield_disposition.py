@@ -58,7 +58,6 @@ YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION = YieldDispositionMeltBoundaryPartitio
     ),
     cleanup_sequestered=("cleanup_sequestered",),
 )
-
 MELT_RETAINED_SUBDISPOSITIONS: tuple[str, ...] = (
     "oxide_unextracted",
     "refractory_rump",

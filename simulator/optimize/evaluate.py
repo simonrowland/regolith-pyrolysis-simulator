@@ -2622,11 +2622,20 @@ def _with_extraction_not_attempted_verdicts(
     feasibility: FeasibilityResult,
     trace: Any,
 ) -> FeasibilityResult:
-    gates = tuple(
-        gate
-        for gate in EXTRACTION_CLASS_GATES
-        if gate in feasibility.margins and not feasibility.margins[gate].feasible
-    )
+    gates: list[str] = []
+    for gate in EXTRACTION_CLASS_GATES:
+        margin = feasibility.margins.get(gate)
+        if margin is None:
+            continue
+        if gate == "extraction_completeness" and margin.status == "unavailable":
+            continue
+        diagnostic_purity = (
+            gate == "delivered_stream_purity"
+            and margin.status == "warning"
+            and margin.output_status == "provisional"
+        )
+        if not margin.feasible or diagnostic_purity:
+            gates.append(gate)
     if not gates:
         return feasibility
     evidence = _no_volatilization_evidence(trace)
@@ -2653,7 +2662,7 @@ def _not_attempted_extraction_margin(
         status="not-attempted",
         output_status="not_attempted",
         status_reason=EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION,
-        status_payload=evidence,
+        status_payload={**margin.status_payload, **evidence},
     )
 
 
