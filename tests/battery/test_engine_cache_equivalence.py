@@ -38,6 +38,10 @@ import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import EngineCache, cached_solve
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
+from tests.battery.cache_test_support import (
+    missing_engine_reason,
+    skip_if_engine_missing,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -53,10 +57,9 @@ CACHE_TEST_ENGINES = (
 
 def _open_available_engine(engine: Engine) -> EngineHandle:
     handle = open_battery_engine(engine.value)
-    if not handle.available:
-        reason = handle.unavailable_reason or "engine binary or package is absent"
+    if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        pytest.skip(f"{engine.value} unavailable: {reason}")
+        skip_if_engine_missing(handle, engine.value)
     return handle
 
 
@@ -116,8 +119,8 @@ def _residual_payloads(path: Path) -> list[dict[str, object]]:
 def test_engine_availability_is_reported_per_engine(engine: Engine) -> None:
     handle = open_battery_engine(engine.value)
     try:
-        if not handle.available:
-            pytest.skip(f"{engine.value} unavailable: {handle.unavailable_reason}")
+        if not handle.available or handle.backend is None:
+            skip_if_engine_missing(handle, engine.value)
     finally:
         close_battery_engine_handle(handle)
 
@@ -394,12 +397,13 @@ def test_scored_activity_runs_other_engines_when_openimcc_is_missing(
     for engine in CACHE_TEST_ENGINES:
         handle = open_without_openimcc(engine.value)
         try:
-            if handle.available:
+            missing_reason = missing_engine_reason(handle, engine.value)
+            if missing_reason is None:
                 engines.append(engine)
             else:
                 unavailable[engine.value] = (
                     f"typed-skip:engine_unavailable:{engine.value}:"
-                    f"{handle.unavailable_reason or 'engine returned unavailable'}"
+                    f"{missing_reason}"
                 )
         finally:
             close_battery_engine_handle(handle)
@@ -526,12 +530,13 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     for engine in CACHE_TEST_ENGINES:
         handle = open_battery_engine(engine.value)
         try:
-            if handle.available:
+            missing_reason = missing_engine_reason(handle, engine.value)
+            if missing_reason is None:
                 engines.append(engine)
             else:
                 unavailable[engine.value] = (
                     f"typed-skip:engine_unavailable:{engine.value}:"
-                    f"{handle.unavailable_reason or 'engine returned unavailable'}"
+                    f"{missing_reason}"
                 )
         finally:
             close_battery_engine_handle(handle)

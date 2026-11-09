@@ -23,6 +23,10 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 )
 import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, EngineCache
+from tests.battery.cache_test_support import (
+    missing_engine_reason,
+    skip_if_engine_missing,
+)
 
 
 class _Backend:
@@ -257,13 +261,14 @@ def _cell_for_marker(engine: str, po2: Po2Request, marker: float) -> Equilibrate
         "magemin",
     ),
 )
-def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
+def test_supplementary_marker_adapter_setting_mutations_match_cache_vectors(
     engine: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Cheap vector-only coverage; real adapters are exercised separately."""
     handle = open_battery_engine(engine)
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        pytest.skip(handle.unavailable_reason or f"{engine} unavailable")
+        skip_if_engine_missing(handle, engine)
     po2 = (
         Po2Request("oxygen_balance_effusion", None, "W")
         if engine == "internal-analytical"
@@ -429,13 +434,23 @@ def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
         close_battery_engine_handle(handle)
 
 
+def test_engine_initialization_timeout_is_failure_not_missing_dependency() -> None:
+    failed = SimpleNamespace(
+        available=False,
+        backend=None,
+        unavailable_reason="TimeoutError: VapoRock warm pool startup timed out",
+    )
+    with pytest.raises(pytest.fail.Exception, match="initialization failed"):
+        missing_engine_reason(failed, "vaporock")
+
+
 def test_real_thermoengine_transport_model_matches_spawned_cache_paths(
     tmp_path: Path,
 ) -> None:
     handle = open_battery_engine("thermoengine")
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        pytest.skip(handle.unavailable_reason or "thermoengine unavailable")
+        skip_if_engine_missing(handle, "thermoengine")
     try:
         backend = handle.backend
         transport_model = backend._thermoengine_transport._model_name
@@ -735,9 +750,8 @@ def test_real_isolated_magemin_unsupported_database_is_cached_stably(
 
     handle = open_battery_engine("magemin")
     if not handle.available or handle.backend is None:
-        reason = handle.unavailable_reason or "MAGEMin binary or package is absent"
         close_battery_engine_handle(handle)
-        pytest.skip(f"magemin unavailable: {reason}")
+        skip_if_engine_missing(handle, "magemin")
 
     try:
         assert handle.backend.initialize(
@@ -778,6 +792,109 @@ def test_real_isolated_magemin_unsupported_database_is_cached_stably(
         )
         assert cache.counters["magemin"]["stores"] == 1
         assert cache.counters["magemin"]["hits"] == 1
+    finally:
+        battery._close_isolated_cell_workers()
+        close_battery_engine_handle(handle)
+
+
+def test_real_magemin_parent_database_matches_spawned_cache_paths(
+    tmp_path: Path,
+) -> None:
+    handle = open_battery_engine("magemin")
+    if not handle.available or handle.backend is None:
+        close_battery_engine_handle(handle)
+        skip_if_engine_missing(handle, "magemin")
+
+    try:
+        backend = handle.backend
+        pool = getattr(backend, "_subprocess_pool", None)
+        assert pool is not None and pool.workers, (
+            "MAGEMin warm worker failed to initialize; this is an engine "
+            "initialization failure, not an unavailable-engine skip"
+        )
+        initialized_database = str(pool.workers[0]._bootstrap_args[1])
+        assert initialized_database == "ig"
+        backend._database = "review-nonexistent-db"
+        common = {
+            "temperature_K": 1703.0,
+            "po2": Po2Request("engine_default", None),
+            "physical_pressure_bar": 1.0,
+            "timeout_s": 90.0,
+        }
+
+        def stable(cell: EquilibrateCell) -> dict[str, Any]:
+            return replace(
+                cell, wall_s=0.0, cpu_s=0.0, hostname="fixture"
+            ).to_cache_payload()
+
+        direct_off = equilibrate_cell(
+            handle, _pot(), isolated=False, **common
+        )
+        isolated_off = equilibrate_cell(
+            handle, _pot(), isolated=True, **common
+        )
+        direct_cache = EngineCache(tmp_path / "magemin-direct.sqlite")
+        isolated_cache = EngineCache(tmp_path / "magemin-isolated.sqlite")
+        direct_cold = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=False,
+            engine_cache=direct_cache,
+            **common,
+        )
+        direct_warm = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=False,
+            engine_cache=direct_cache,
+            **common,
+        )
+        direct_cache_isolated_hit = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=True,
+            engine_cache=direct_cache,
+            **common,
+        )
+        isolated_cold = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=True,
+            engine_cache=isolated_cache,
+            **common,
+        )
+        isolated_warm = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=True,
+            engine_cache=isolated_cache,
+            **common,
+        )
+        isolated_cache_direct_hit = equilibrate_cell(
+            handle,
+            _pot(),
+            isolated=False,
+            engine_cache=isolated_cache,
+            **common,
+        )
+
+        expected = stable(direct_off)
+        assert stable(isolated_off) == expected
+        assert all(
+            stable(cell) == expected
+            for cell in (
+                direct_cold,
+                direct_warm,
+                direct_cache_isolated_hit,
+                isolated_cold,
+                isolated_warm,
+                isolated_cache_direct_hit,
+            )
+        )
+        assert direct_cache.counters["magemin"]["stores"] == 1
+        assert direct_cache.counters["magemin"]["hits"] == 2
+        assert isolated_cache.counters["magemin"]["stores"] == 1
+        assert isolated_cache.counters["magemin"]["hits"] == 2
     finally:
         battery._close_isolated_cell_workers()
         close_battery_engine_handle(handle)
