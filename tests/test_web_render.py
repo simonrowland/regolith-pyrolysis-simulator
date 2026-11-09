@@ -499,15 +499,17 @@ def test_oxygen_out_renders_d364_flagged_zero_notice():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     reason = (
         "Flagged structural 0.0 kg: stored, vented, and captured O2 ledger "
-        "entries are all 0.0 kg. Class B activity ladder: do not treat a=1 "
-        "as an upper bound when gamma>1; use provider activity, then "
-        "published gamma*x, then ideal-mixing a=x as an extrapolated "
-        "estimate; SiO activity 0.436 lacks its evidence link. Class C: "
-        "MnO_gas at 313 K is outside its certified 1519-2273 K band and "
-        "requires flagged extrapolation. Class E: P4O10/P4O6/PO/PO2 are "
-        "gated to Stage 0 although lunar mare contains ~0.1 wt% P2O5; use "
-        "phase-independent K or flag out-of-domain. Pending d-359 "
-        "follow-ups: B, C, E."
+        "entries are all 0.0 kg. Class B activity ladder: refusals cite "
+        "missing_evidence (no assemblage/potential evidence; Henrian upper "
+        "bound disabled); do not treat a=1 as an upper bound when gamma>1; "
+        "use provider activity, then published gamma*x, then ideal-mixing "
+        "a=x as an extrapolated estimate; SiO activity 0.436 lacks its "
+        "evidence link. Class C: MnO_gas is outside its certified "
+        "1519-2273 K evaluator band; conservative continuation is not "
+        "admitted, so use flagged extrapolation. Class E: the stage0_only "
+        "predicate is inactive outside Stage 0 for P4O10/P4O6/PO/PO2 while "
+        "P2O5 is present; use phase-independent K or flag out-of-domain. "
+        "Pending d-359 follow-ups: B, C, E."
     )
     rendered = _render_advisory_dom(
         html=html,
