@@ -21,11 +21,14 @@ Every listed phrase was searched page by page in the pdftotext layer with `pdfto
 | Target | Proof string found by page search | Physical PDF page | PDF index | Published page |
 | --- | --- | ---: | ---: | ---: |
 | Figure 1 candidate | `Fig. 1 Activity coefficient` | 3 | 2 | 913 |
+| Eq. 4 FeO model fit and literature basis | `83 data from the literature` | 4 | 3 | 914 |
 | Figure 2 candidate | `Fig. 2 Activity coefficient` | 5 | 4 | 915 |
 | Figure 3 candidate | `Fig. 3 Activity coefficient` | 6 | 5 | 916 |
 | Figure 4 candidate | `Fig. 4 Activity coefficient` | 7 | 6 | 917 |
 | Run pressure and temperature | `1.5 GPa and 1,650 °C` | 8 | 7 | 918 |
 | Table 1 composition and BW1102 | `Compositions of phases produced at 1.5 GPa/1,650 °C` | 8 | 7 | 918 |
+| BW1102 FeO activity calculation | `calculated to be 0.92 from Eq. (4)` | 8 | 7 | 918 |
+| InO1.5 exchange-constant entropy assumption | `26.25 J.K-1` | 8 | 7 | 918 |
 | Starting recipe and its unstated basis/sum | `starting silicate composition of Diopside28–Forsterite22–Anorthite50` | 8 | 7 | 918 |
 | Starting trace dopants and absent initial amounts | `doped with a mixture of trace elements (Cu, Ag, In, Pb predominantly)` | 8 | 7 | 918 |
 | Capsule material | `The capsule was made of SiO2 glass` | 8 | 7 | 918 |
@@ -42,9 +45,11 @@ The coefficient locators point to their derivation sentences in prose, not to Ta
 
 ## Values, derivations, standard state, and limits
 
-- PbO: 0.22 at 1,923 K. The located sentence says the value follows by applying the Pb result and the printed Pb–Fe exchange `log K`.
-- CuO0.5: 3.5 at 1,923 K. The located sentence applies the Cu activity coefficient in Fe to the Cu metal–silicate partitioning data. The paper extrapolates the cited liquid-Fe gamma of 11.0 at 1,823 K to 9.7 at 1,923 K by assuming constant `RT ln gamma`.
-- InO1.5: 0.02 at 1,923 K. The located sentence applies the In partitioning data. The authors first assume regular-solution behavior for dilute Fe–In alloys, adopt `W_In = 52 kJ mol-1`, and calculate a liquid-Fe gamma of 25.8 at 1,923 K. Since the final value depends on that model-derived input, this row is `model_derived`.
+- PbO: 0.22 at 1,923 K. The located sentence applies the measured BW1102 Pb partition data and the printed Pb–Fe exchange `log K`. The calculation also uses gamma FeO = 0.92, which the authors say was calculated from Eq. 4; because Eq. 4 is a fit to 83 literature data, this output is `model_derived`.
+- CuO0.5: 3.5 at 1,923 K. The located sentence applies the Cu activity coefficient in Fe to the measured BW1102 partition data. The calculation also uses the Eq. 4 model-derived gamma FeO = 0.92. The paper extrapolates the cited liquid-Fe gamma of 11.0 at 1,823 K to 9.7 at 1,923 K by assuming constant `RT ln gamma`. This output is `model_derived` because it depends on the fitted FeO activity input.
+- InO1.5: 0.02 at 1,923 K. The located sentence applies the In partition data. The authors assume regular-solution behavior for dilute Fe–In alloys, adopt `W_In = 52 kJ mol-1`, and calculate a liquid-Fe gamma of 25.8 at 1,923 K. They also derive the In exchange `log K` using an assumed InO1.5 melting entropy of 26.25 J.K-1 at 2,183 K, by analogy with GaO1.5 and VO1.5. This output is `model_derived` from both the Fe–In regular-solution treatment and the fitted Eq. 4 FeO activity input.
+
+The class and assumption check covers every extracted coefficient: PbO and CuO0.5 are reclassified from `measured_reduced` to `model_derived`; InO1.5 was already `model_derived`. The other assumptions behind the printed constants are retained: the author-selected Pb gamma of 1,100, the constant-`RT ln gamma` extrapolation for Cu, the Fe–In regular-solution model with `W_In = 52 kJ mol-1`, and the InO1.5 melting-entropy assumption. No other extracted row depends on Eq. 4 or omits a stated assumption.
 
 The standard-state sentence says all components have the standard state of pure liquid at 1 bar and the temperature of interest. The rows carry a typed Raoultian pure-liquid endmember for their oxide formula, with reference pressure 1 bar. That is a reference state, not the experiment's chamber pressure.
 
@@ -60,7 +65,7 @@ No separate binary supplement is available for this source; no supplementary dat
 
 ## Other printed and figure-only quantities
 
-Table 1's gamma FeO value 0.92 is calculated from Eq. 4 and retained as a partitioning input, not treated as a trace-oxide output. The table reports Ag metal and silicate concentrations but no Ag melt activity coefficient. The liquid-Fe gamma inputs for Pb, Cu, and In are retained in the method context and are not silicate-melt outputs.
+Table 1's gamma FeO value 0.92 is calculated from Eq. 4 and retained as a model-derived partitioning input, not treated as a trace-oxide output. On published page 914, the authors describe Eq. 4 as a best-fit equation based on 83 literature data; the fit provenance and page-checked locator are retained in the method/constants context. The table reports Ag metal and silicate concentrations but no Ag melt activity coefficient. The liquid-Fe gamma inputs for Pb, Cu, and In are retained in the method context and are not silicate-melt outputs.
 
 The authors quote approximately 4.2 at 1,573 K and approximately 3.2 at 1,923 K from a graph by Holzheid and Lodders (2001) as a CuO0.5 comparator. These are figure-read candidates, not values derived from this paper's BW1102 partitioning experiment, and are not extracted. Figures 1–4 contain activity-coefficient curves/contours for FeO, NiO, MoO2, and WO3; their numerical values are figure-only and were not digitized.
 
@@ -81,3 +86,5 @@ The focused test runs the isolated migration and pins all three values, quantity
 ## Verification results
 
 The required remote gate ran `tests/test_wood_wade_2013_trace_activities.py`, `tests/test_yaml_flow_scalar_commas.py`, and `tests/test_literature_extracts.py` on the Studio runner. It reported 955 passed and 3 failed in 2,643.55 seconds, with no collection or import errors. The extraction test and YAML comma guard passed. The three failures were `test_repo_extracts_validate_green`, `test_coverage_pending_stubs_not_found`, and `test_pilot_extract_count_exact_and_merge_smoke`; each reported `wall-clock hang guard exceeded (1800.0s)`. The wrapper reported no local fallback. The remote wrapper rejected the focused node-ID command, so the isolated migration node was run locally under the specified environment and passed (1 passed). That test also mutates the pinned Pb coefficient from 0.22 to 0.23 and confirms the independent source-value assertion fails.
+
+After the provenance fixes, the review-requested local checks each completed under 300 seconds: `tests/test_wood_wade_2013_trace_activities.py` (2 passed in 18.82 seconds), `tests/test_yaml_flow_scalar_commas.py` (17 passed in 196.19 seconds), and the isolated real-migrator node `test_wood_wade_2013_isolated_migration_reaches_required_identity_axes` (1 passed in 13.80 seconds). The focused source-value test retains the 0.22-to-0.23 mutation check.

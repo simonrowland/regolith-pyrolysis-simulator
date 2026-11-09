@@ -46,13 +46,13 @@ EXPECTED_OBSERVATIONS = {
         "species": "PbO",
         "value": "0.22",
         "proof": "0.22 at 1,923 K",
-        "method_class": EvidenceClass.MEASURED_REDUCED,
+        "method_class": EvidenceClass.MODEL_DERIVED,
     },
     "wood_wade_2013_cuo05_activity_coefficient": {
         "species": "CuO0.5",
         "value": "3.5",
         "proof": "3.5 in the silicate melt at 1,923 K",
-        "method_class": EvidenceClass.MEASURED_REDUCED,
+        "method_class": EvidenceClass.MODEL_DERIVED,
     },
     "wood_wade_2013_ino15_activity_coefficient": {
         "species": "InO1.5",
@@ -155,6 +155,18 @@ def _table_input_context(document: dict) -> dict:
     return matches[0]
 
 
+def _method_constants_context(document: dict) -> dict:
+    contexts = document["species"]["PbO"]["context"]
+    matches = [
+        context
+        for context in contexts
+        if context["observation_id"]
+        == "wood_wade_2013_metal_silicate_method_and_constants"
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
 def _stored_table_cells(document: dict) -> dict[tuple[int, str, str], str]:
     values = _table_input_context(document)["values"]
     cells: dict[tuple[int, str, str], str] = {}
@@ -223,6 +235,9 @@ def _assert_source_value_pins(document: dict) -> None:
         assert row["values"]["experimental_T_C_as_printed"] == "1650"
         assert row["values"]["method_class"] == expected["method_class"].value
         assert row["values"]["evidence_class"] == expected["method_class"].value
+        assert "gamma_FeO = 0.92 calculated from Eq. (4)" in row["derivation"]["relation"]
+        if observation_id == "wood_wade_2013_ino15_activity_coefficient":
+            assert "26.25 J.K-1 at 2,183 K" in row["derivation"]["relation"]
         assert row["experiment"] == "wood_wade_2013_bw1102"
         assert row["units"] == "dimensionless"
         assert row["standard_state"]["state"]["value"]["convention"] == (
@@ -344,10 +359,53 @@ def test_wood_wade_2013_pins_three_prose_coefficients_and_table_census() -> None
     assert mapping["tables"][0]["table_row_count"] == 21
     table_context = _table_input_context(document)
     assert table_context["values"]["experiment_id_as_printed"] == "BW1102"
+    assert table_context["values"]["gamma_FeO_as_printed"] == "0.92"
+    assert "Calculated from Eq. 4" in table_context["values"]["gamma_FeO_note"]
     assert table_context["values"]["table_input_uncertainty_confidence_level"] == "one_sigma"
     assert table_context["values"]["table_footnote_as_printed"] == (
         "Value in brackets is 1 std dev."
     )
+    method_values = _method_constants_context(document)["values"]
+    assert method_values["gamma_FeO_activity_calculation_as_printed"] == (
+        "The activity coefficient of FeO in this experiment at 1,650 °C "
+        "is calculated to be 0.92 from Eq. (4)."
+    )
+    calculated_page = _page_from_grep("calculated to be 0.92 from Eq. (4)")
+    assert (
+        method_values["gamma_FeO_activity_calculation_locator"]["page"],
+        method_values["gamma_FeO_activity_calculation_locator"]["pdf_page_index"],
+        method_values["gamma_FeO_activity_calculation_locator"]["published_page"],
+    ) == calculated_page
+    model_fit = method_values["gamma_FeO_model_fit_provenance"]
+    assert model_fit["literature_data_count_as_printed"] == (
+        "83 data from the literature"
+    )
+    assert model_fit["fit_description_as_printed"] == (
+        "The best-fit equation, excluding terms which are not significant"
+    )
+    assert model_fit["fitted_composition_range_as_printed"] == (
+        "39 to 64 % SiO2, 0.3 to 30 % FeO and 0 to14.8 % Na2O"
+    )
+    model_fit_page = _page_from_grep("83 data from the literature")
+    assert (
+        model_fit["locator"]["page"],
+        model_fit["locator"]["pdf_page_index"],
+        model_fit["locator"]["published_page"],
+    ) == model_fit_page
+    in_entropy = method_values["inO1.5_logK_melting_entropy_assumption"]
+    assert in_entropy["assumption_as_printed"] == (
+        "assume an entropy of melting of InO1.5 at the melting point of 2,183 K"
+    )
+    assert in_entropy["value_as_printed"] == "26.25 J.K-1"
+    assert in_entropy["analogues_as_printed"] == (
+        "GaO1.5 (26.3) and VO1.5 (25.05)"
+    )
+    entropy_page = _page_from_grep("26.25 J.K-1")
+    assert (
+        in_entropy["locator"]["page"],
+        in_entropy["locator"]["pdf_page_index"],
+        in_entropy["locator"]["published_page"],
+    ) == entropy_page
     expected_cells = {
         (row, phase, label): value
         for row, phase, label, value in EXPECTED_TABLE_CELLS

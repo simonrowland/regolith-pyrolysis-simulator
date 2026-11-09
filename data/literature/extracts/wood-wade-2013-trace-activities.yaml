@@ -208,7 +208,7 @@ species:
           sigma: '0.3'
         silicate_major_oxide_components_not_listed_in_table: No other major-oxide components are listed under Silicate.
         gamma_FeO_as_printed: '0.92'
-        gamma_FeO_note: Calculated from Eq. 4; this is an input to the trace-component activity derivation, not a trace-oxide output.
+        gamma_FeO_note: Calculated from Eq. 4; this model-derived activity coefficient is an input to all three trace-component activity derivations, not a trace-oxide output.
         trace_concentrations:
           units_as_printed: ppm
           uncertainty_confidence_level: one_sigma
@@ -266,10 +266,37 @@ species:
       values:
         method_class: method_only
         method_as_printed: "The paper derives the melt activity coefficients from high-pressure Fe-rich metal and silicate partitioning data, using the exchange reactions and log K values printed on this page."
+        gamma_FeO_activity_calculation_as_printed: "The activity coefficient of FeO in this experiment at 1,650 °C is calculated to be 0.92 from Eq. (4)."
+        gamma_FeO_activity_calculation_locator:
+          page: 8
+          published_page: 918
+          pdf_page_index: 7
+          note: "Proof string: ‘calculated to be 0.92 from Eq. (4)’; Table 1 stores the resulting gamma_FeO value."
+        gamma_FeO_model_fit_provenance:
+          melt_system_as_printed: anhydrous silicate melts at 1 atm pressure
+          literature_data_count_as_printed: "83 data from the literature"
+          fit_description_as_printed: "The best-fit equation, excluding terms which are not significant"
+          fitted_composition_range_as_printed: "39 to 64 % SiO2, 0.3 to 30 % FeO and 0 to14.8 % Na2O"
+          literature_sources_as_printed: Borisov et al. (2006); Borisov (2007); Holzheid et al. (1997); O’Neill and Eggins (2002)
+          locator:
+            page: 4
+            published_page: 914
+            pdf_page_index: 3
+            note: "Proof string: ‘83 data from the literature’."
         exchange_reactions_and_logK_as_printed:
           PbO: PbO + Fe = Pb + FeO; log K_Pb = 0.61 + 4144/T
           CuO0.5: CuO0.5 + 0.5Fe = Cu + 0.5FeO; log K_Cu = -0.26 + 3490/T
           InO1.5: InO1.5 + 1.5Fe = In + 1.5FeO; log K_In = 2.58 - 764/T
+        inO1.5_logK_melting_entropy_assumption:
+          purpose_as_printed: "to derive the free energy and log K of the indium exchange reaction"
+          assumption_as_printed: "assume an entropy of melting of InO1.5 at the melting point of 2,183 K"
+          value_as_printed: "26.25 J.K-1"
+          analogues_as_printed: "GaO1.5 (26.3) and VO1.5 (25.05)"
+          locator:
+            page: 8
+            published_page: 918
+            pdf_page_index: 7
+            note: "Proof string: ‘26.25 J.K-1’."
         thermodynamic_data_reference_as_printed: Barin et al. (1989)
         standard_state_as_printed: with all components having standard state of pure liquid at 1 bar and the temperature of interest
         pressure_effect_as_printed: The paper says pressure effects on the Pb–Fe, Cu–Fe and In–Fe exchange reactions are small enough to be neglected.
@@ -341,8 +368,8 @@ species:
           note: "Proof string: ‘standard state of pure liquid at 1 bar’."
       values:
         quantity: activity_coefficient
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: model_derived
+        evidence_class: model_derived
         gamma: '0.22'
         gamma_as_printed: '0.22'
         component_as_printed: PbO
@@ -414,7 +441,7 @@ species:
       - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
       - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
       derivation:
-        relation: Author-calculated PbO melt activity coefficient from the BW1102 metal-silicate partitioning data, the printed PbO–Fe exchange equilibrium constant, gamma FeO and the author-selected Pb activity coefficient in liquid Fe.
+        relation: "Author model-derived PbO melt activity coefficient from the measured BW1102 phase-partition data, gamma_FeO = 0.92 calculated from Eq. (4), the printed PbO–Fe exchange equilibrium constant and the author-selected Pb activity coefficient in liquid Fe."
         inputs:
         - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
         - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
@@ -455,8 +482,8 @@ species:
           note: "Proof string: ‘standard state of pure liquid at 1 bar’."
       values:
         quantity: activity_coefficient
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: model_derived
+        evidence_class: model_derived
         gamma: '3.5'
         gamma_as_printed: '3.5'
         component_as_printed: CuO0.5
@@ -528,7 +555,7 @@ species:
       - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
       - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
       derivation:
-        relation: Author-calculated CuO0.5 melt activity coefficient from the BW1102 metal-silicate partitioning data, the printed CuO0.5–Fe exchange equilibrium constant, gamma FeO and the extrapolated infinite-dilution Cu activity coefficient in liquid Fe.
+        relation: "Author model-derived CuO0.5 melt activity coefficient from the measured BW1102 phase-partition data, gamma_FeO = 0.92 calculated from Eq. (4), the printed CuO0.5–Fe exchange equilibrium constant and the extrapolated infinite-dilution Cu activity coefficient in liquid Fe."
         inputs:
         - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
         - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
@@ -642,7 +669,7 @@ species:
       - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
       - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
       derivation:
-        relation: "Author model-based reduction of the BW1102 In metal-silicate partitioning data using the printed regular-solution treatment for dilute Fe-In alloys and the InO1.5–Fe exchange equilibrium constant."
+        relation: "Author model-derived reduction of the measured BW1102 In metal-silicate partition data using gamma_FeO = 0.92 calculated from Eq. (4), the printed regular-solution treatment for dilute Fe-In alloys, and the InO1.5–Fe exchange constant derived using the assumed InO1.5 melting entropy of 26.25 J.K-1 at 2,183 K."
         inputs:
         - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
         - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
