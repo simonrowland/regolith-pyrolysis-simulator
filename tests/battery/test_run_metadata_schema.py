@@ -194,6 +194,21 @@ def _run_metadata_value_shape(shape: str, point: str) -> object:
             ],
         }
         return located_point
+    if shape == "misplaced-as-published":
+        stored = Decimal(point)
+        return {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": str(stored),
+                    "as_published": {
+                        "value": str(stored * Decimal(1000)),
+                        "units": "g",
+                    },
+                },
+            },
+        }
     if shape == "malformed-point":
         return {"kind": "point"}
     if shape == "unknown-kind":
@@ -1934,6 +1949,7 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                     "as-published-point",
                     "as-published-interval",
                     "nested-combination",
+                    "misplaced-as-published",
                 )
             elif field == "species_loss_fraction":
                 shapes = (
@@ -2000,6 +2016,12 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                         )
                         if field_issues:
                             assert loaded is None, context
+                            if shape == "misplaced-as-published":
+                                assert any(
+                                    "as_published is only valid on the Located value"
+                                    in issue.detail
+                                    for issue in field_issues
+                                ), context
                         else:
                             assert field in {"mass_kg", "final_mass_kg"}, context
                             assert loaded is not None and loaded.state.is_value, context
