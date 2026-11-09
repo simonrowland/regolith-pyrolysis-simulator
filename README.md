@@ -12,7 +12,7 @@ thermochemistry engines — alphaMELTS (directly or via PetThermoTools), ThermoE
 and MAGEMin — when those are installed. See [Melt Chemistry Backends](#melt-chemistry-backends)
 for which engine holds which role.
 
-Author: Simon Rowland, simon@simonrowland.com.
+Author: Simon Rowland, simon@directleap.com.
 
 ## Why This Exists
 
