@@ -24,19 +24,21 @@ from simulator.chemistry.sgte_unary import (  # noqa: E402
 )
 from simulator.corpus_paths import regolith_corpus_ctl_root  # noqa: E402
 
-DEFAULT_SOURCE = regolith_corpus_ctl_root() / "raw" / "sgte-unary-5.0"
+
+def default_source() -> Path:
+    return regolith_corpus_ctl_root() / "raw" / "sgte-unary-5.0"
 
 
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCE)
+    parser.add_argument("--source-dir", type=Path)
     parser.add_argument("--output-root", type=Path, default=COMPILATION_ROOT)
     return parser.parse_args()
 
 
 def main() -> int:
     args = cli()
-    source_dir: Path = args.source_dir
+    source_dir: Path = args.source_dir or default_source()
     output_root: Path = args.output_root
     source_tdb = source_dir / "unary50.tdb"
     source_sidecar = source_dir / "sidecar.yaml"

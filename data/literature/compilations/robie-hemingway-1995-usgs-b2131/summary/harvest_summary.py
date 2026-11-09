@@ -12,10 +12,13 @@ import subprocess
 from simulator.corpus_paths import regolith_corpus_ctl_root
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = (
-    regolith_corpus_ctl_root()
-    / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
-)
+
+
+def source_pdf() -> Path:
+    return (
+        regolith_corpus_ctl_root()
+        / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
+    )
 TMP = Path('/private/tmp/b2131-summary-raster')
 NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z')
 # Mineral names occupying their own OCR line, with the numeric row below.
@@ -96,7 +99,15 @@ def attach_detached_name_headers(lines, header_idx, first_numeric, cp, starts):
 def raster(page):
     stem = TMP / str(page)
     if not stem.with_suffix('.txt').exists() or not stem.with_suffix('.txt').stat().st_size:
-        subprocess.run(['pdftoppm', '-f', str(page), '-l', str(page), '-r', '120', '-singlefile', '-png', str(SOURCE), str(stem)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            [
+                'pdftoppm', '-f', str(page), '-l', str(page), '-r', '120',
+                '-singlefile', '-png', str(source_pdf()), str(stem),
+            ],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         subprocess.run(['tesseract', str(stem.with_suffix('.png')), str(stem), '--psm', '6'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return stem.with_suffix('.txt').read_text()
 

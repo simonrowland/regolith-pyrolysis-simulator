@@ -52,10 +52,18 @@ from simulator.reference_data.burcat import (  # noqa: E402
 )
 from simulator.corpus_paths import regolith_corpus_ctl_root  # noqa: E402
 
-BURCAT_SOURCE = regolith_corpus_ctl_root() / "raw" / "burcat-third-millennium"
-BRIEF_THR = BURCAT_SOURCE / "BURCAT.THR.txt"
-BRIEF_XML = BURCAT_SOURCE / "BURCAT_THR.xml"
-BRIEF_SIDECAR = BURCAT_SOURCE / "sidecar.yaml"
+
+def default_source() -> Path:
+    return regolith_corpus_ctl_root() / "raw" / "burcat-third-millennium"
+
+
+def default_inputs() -> tuple[Path, Path, Path]:
+    source = default_source()
+    return (
+        source / "BURCAT.THR.txt",
+        source / "BURCAT_THR.xml",
+        source / "sidecar.yaml",
+    )
 OFFICIAL_URL = "https://respecth.elte.hu/burcat.php"
 
 
@@ -189,17 +197,18 @@ def main() -> int:
     records_dir = output_root / "records"
     source_dir.mkdir(parents=True, exist_ok=True)
     records_dir.mkdir(parents=True, exist_ok=True)
+    brief_thr, brief_xml, brief_sidecar = default_inputs()
 
     thr_src = resolve_existing(
-        [p for p in (args.thr, source_dir / "BURCAT.THR.txt", BRIEF_THR) if p],
+        [p for p in (args.thr, source_dir / "BURCAT.THR.txt", brief_thr) if p],
         "BURCAT.THR.txt",
     )
     xml_src = resolve_existing(
-        [p for p in (args.xml, source_dir / "BURCAT_THR.xml", BRIEF_XML) if p],
+        [p for p in (args.xml, source_dir / "BURCAT_THR.xml", brief_xml) if p],
         "BURCAT_THR.xml",
     )
     sidecar_src = resolve_existing(
-        [p for p in (args.sidecar, source_dir / "sidecar.yaml", BRIEF_SIDECAR) if p],
+        [p for p in (args.sidecar, source_dir / "sidecar.yaml", brief_sidecar) if p],
         "sidecar.yaml",
     )
     dest_thr = source_dir / "BURCAT.THR.txt"

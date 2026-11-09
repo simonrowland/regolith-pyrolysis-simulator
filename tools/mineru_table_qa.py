@@ -32,7 +32,10 @@ from tools import mineru_table_draft as draft
 from simulator.corpus_paths import regolith_corpus_root
 
 
-_DEFAULT_CORPUS_ROOT = regolith_corpus_root()
+def default_corpus_root() -> Path:
+    return regolith_corpus_root()
+
+
 _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])(?:[+\-−–—])?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
@@ -518,11 +521,15 @@ def _table_row(
 
 
 def rank_corpus(
-    corpus_root: str | Path = _DEFAULT_CORPUS_ROOT,
+    corpus_root: str | Path | None = None,
     sids: list[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Return ranked table records and per-source counts without writing files."""
-    root = Path(corpus_root).expanduser()
+    root = (
+        Path(corpus_root).expanduser()
+        if corpus_root is not None
+        else default_corpus_root()
+    )
     if not root.is_dir():
         raise FileNotFoundError(f"corpus root does not exist: {root}")
     roots_by_sid = _source_roots(root)
@@ -621,7 +628,7 @@ def write_tsv(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("corpus_root", nargs="?", default=str(_DEFAULT_CORPUS_ROOT))
+    parser.add_argument("corpus_root", nargs="?")
     parser.add_argument("--sids", nargs="*", help="limit the scan to these source IDs")
     args = parser.parse_args(argv)
     try:

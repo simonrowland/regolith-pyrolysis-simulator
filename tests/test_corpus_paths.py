@@ -1,4 +1,3 @@
-import importlib
 import runpy
 from pathlib import Path
 
@@ -55,11 +54,10 @@ def test_corpus_consumers_honor_configured_roots(monkeypatch, tmp_path, override
     else:
         monkeypatch.setenv("REGOLITH_CORPUS_ROOT", override)
 
-    importlib.reload(b1544)
-    assert b1544.PDF_CANDIDATES[0] == (
+    assert b1544.pdf_candidates()[0] == (
         expected_root / "raw" / b1544.SOURCE_ID / b1544.SOURCE_PDF_NAME
     )
-    assert b1544.PDF_CANDIDATES[1] == b1544.PDF_CANDIDATES[0]
+    assert b1544.pdf_candidates()[1] == b1544.pdf_candidates()[0]
     assert b1259._pdf_paths()[0] == (
         expected_root / "raw" / b1259.SOURCE_ID / f"{b1259.SOURCE_ID}.pdf"
     )
@@ -85,14 +83,10 @@ def test_harvest_and_mineru_defaults_honor_configured_roots(
         mineru_table_qa as qa,
     )
 
-    importlib.reload(burcat)
-    importlib.reload(sgte)
-    importlib.reload(draft)
-    importlib.reload(qa)
-    assert burcat.BURCAT_SOURCE == configured_root / "raw/burcat-third-millennium"
-    assert sgte.DEFAULT_SOURCE == configured_root / "raw/sgte-unary-5.0"
-    assert draft._DEFAULT_CORPUS_ROOT == configured_root / "raw"
-    assert qa._DEFAULT_CORPUS_ROOT == configured_root
+    assert burcat.default_source() == configured_root / "raw/burcat-third-millennium"
+    assert sgte.default_source() == configured_root / "raw/sgte-unary-5.0"
+    assert draft.default_corpus_root() == configured_root / "raw"
+    assert qa.default_corpus_root() == configured_root
 
     summary = runpy.run_path(
         str(
@@ -101,7 +95,7 @@ def test_harvest_and_mineru_defaults_honor_configured_roots(
         ),
         run_name="corpus_path_test",
     )
-    assert summary["SOURCE"] == (
+    assert summary["source_pdf"]() == (
         configured_root
         / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
     )
@@ -172,13 +166,11 @@ def test_consumer_defaults_preserve_legacy_owner_paths(monkeypatch, tmp_path):
     corpus_root = tmp_path / "Repos/regolith-corpus"
     ctl_root = regolith_corpus_ctl_root()
 
-    for module in (burcat, sgte, draft, qa, b1544):
-        importlib.reload(module)
-    assert burcat.BURCAT_SOURCE == ctl_root / "raw/burcat-third-millennium"
-    assert sgte.DEFAULT_SOURCE == ctl_root / "raw/sgte-unary-5.0"
-    assert draft._DEFAULT_CORPUS_ROOT == corpus_root / "raw"
-    assert qa._DEFAULT_CORPUS_ROOT == corpus_root
-    assert b1544.PDF_CANDIDATES == (
+    assert burcat.default_source() == ctl_root / "raw/burcat-third-millennium"
+    assert sgte.default_source() == ctl_root / "raw/sgte-unary-5.0"
+    assert draft.default_corpus_root() == corpus_root / "raw"
+    assert qa.default_corpus_root() == corpus_root
+    assert b1544.pdf_candidates() == (
         corpus_root / "raw" / b1544.SOURCE_ID / b1544.SOURCE_PDF_NAME,
         ctl_root / "raw" / b1544.SOURCE_ID / b1544.SOURCE_PDF_NAME,
     )
@@ -195,7 +187,7 @@ def test_consumer_defaults_preserve_legacy_owner_paths(monkeypatch, tmp_path):
         ),
         run_name="corpus_path_default_test",
     )
-    assert summary["SOURCE"] == (
+    assert summary["source_pdf"]() == (
         ctl_root
         / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
     )

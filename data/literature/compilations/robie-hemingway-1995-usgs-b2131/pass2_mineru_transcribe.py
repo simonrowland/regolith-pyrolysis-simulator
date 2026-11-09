@@ -19,7 +19,10 @@ from simulator.corpus_paths import regolith_corpus_root
 
 
 ROOT = Path(__file__).resolve().parent
-MINERU = regolith_corpus_root() / "text/robie-hemingway-1995-usgs-b2131/mineru"
+
+
+def mineru_root() -> Path:
+    return regolith_corpus_root() / "text/robie-hemingway-1995-usgs-b2131/mineru"
 TESS = Path("/private/tmp/b2131-pass2-pages")
 NUMBER = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z")
 ROLE = {
@@ -188,7 +191,7 @@ def cell(raw, tess, *, high_temp=False):
 def load_chunks():
     chunks = []
     for start, end in ((1, 90), (91, 180), (181, 270)):
-        directory = MINERU / f"chunk-p{start:03}-p{end:03}"
+        directory = mineru_root() / f"chunk-p{start:03}-p{end:03}"
         path = next(p for p in directory.glob("*_content_list.json") if "_v2" not in p.name)
         chunks.append((json.loads(path.read_text()), start))
     return chunks
