@@ -1732,6 +1732,7 @@ def _assert_schema_shape(payload: dict) -> None:
             "species_physical_zeros",
             "notices",
             "iterations_by_consumer",
+            "carrier_feed_consumption",
         }
         assert isinstance(headspace_diagnostics["regime"], str)
         assert isinstance(headspace_diagnostics["closure"], dict)
@@ -1739,6 +1740,60 @@ def _assert_schema_shape(payload: dict) -> None:
         assert isinstance(headspace_diagnostics["species_physical_zeros"], dict)
         assert isinstance(headspace_diagnostics["notices"], list)
         assert isinstance(headspace_diagnostics["iterations_by_consumer"], dict)
+        carrier_feed = headspace_diagnostics["carrier_feed_consumption"]
+        assert set(carrier_feed) == {
+            "status",
+            "species",
+            "feed_rate_mol_s",
+            "mol_per_hour",
+            "kg_per_hour",
+            "mol_per_run",
+            "kg_per_run",
+            "known_mol_per_run",
+            "known_kg_per_run",
+            "run_totals_status",
+            "by_species_per_run",
+        }
+        assert carrier_feed["status"] in {"inactive", "setpoint", "unset"}
+        assert carrier_feed["species"] is None or isinstance(
+            carrier_feed["species"], str
+        )
+        for field in (
+            "feed_rate_mol_s",
+            "mol_per_hour",
+            "kg_per_hour",
+            "mol_per_run",
+            "kg_per_run",
+            "known_mol_per_run",
+            "known_kg_per_run",
+        ):
+            value = carrier_feed[field]
+            assert value is None or isinstance(value, (int, float)), field
+        assert carrier_feed["run_totals_status"] in {
+            "complete",
+            "incomplete_unspecified_setpoint",
+        }
+        assert isinstance(carrier_feed["by_species_per_run"], dict)
+        for amounts in carrier_feed["by_species_per_run"].values():
+            assert set(amounts) == {"mol", "kg"}
+            assert all(
+                isinstance(value, (int, float)) for value in amounts.values()
+            )
+        if carrier_feed["status"] == "unset":
+            assert carrier_feed["feed_rate_mol_s"] is None
+            assert carrier_feed["mol_per_hour"] is None
+            assert carrier_feed["kg_per_hour"] is None
+            assert carrier_feed["run_totals_status"] == (
+                "incomplete_unspecified_setpoint"
+            )
+        if (
+            carrier_feed["run_totals_status"]
+            == "incomplete_unspecified_setpoint"
+        ):
+            assert carrier_feed["mol_per_run"] is None
+            assert carrier_feed["kg_per_run"] is None
+            assert isinstance(carrier_feed["known_mol_per_run"], (int, float))
+            assert isinstance(carrier_feed["known_kg_per_run"], (int, float))
 
     assert isinstance(payload["shadow_trace"], list)
     for event in payload["shadow_trace"]:
@@ -2135,14 +2190,22 @@ def test_runner_is_deterministic(scenario):
 
 
 def test_runner_schema_shape_contract():
-    """The shape contract is pinned by the simplest passing scenario.
+    """Pin output shape and unknown feed accounting on a pressure-held run.
 
     Lives separately so a future scenario removal still keeps the
-    shape-checker live.
+    shape-checker live. C2B leaves carrier feed unset, so this also pins the
+    unknown-value contract rather than only checking present-value types.
     """
 
-    payload = _run_scenario(SCENARIOS[0])
+    payload = _run_scenario({**SCENARIOS[2], "hours": 1})
     _assert_schema_shape(payload)
+    assert any(
+        entry["same_hour_headspace_diagnostics"]["carrier_feed_consumption"][
+            "status"
+        ]
+        == "unset"
+        for entry in payload["per_hour_summary"]
+    )
 
 
 @pytest.mark.parametrize(
