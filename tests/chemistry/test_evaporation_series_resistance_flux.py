@@ -937,6 +937,38 @@ def test_scalar_narrow_bump_reports_the_smallest_found_root_with_carrier_feed():
     assert diagnostic["sampling_evidence"] == result.sampling_evidence
 
 
+def test_multibump_scalar_scan_budget_exhaustion_is_typed():
+    def total_rate_mol_hr(g):
+        return 0.01 / (1.0 + g) + math.fsum(
+            2.0 / center
+            * math.exp(
+                -0.5
+                * (
+                    math.log((g + 1.0e-100) / center) / 0.8
+                )
+                ** 2
+            )
+            for center in (10.0 ** (3 * index) for index in range(9))
+        )
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": total_rate_mol_hr(0.0)},
+        lambda g, _pressure: {"A": total_rate_mol_hr(g)},
+        lambda _rates: {"A": 0.01},
+        {"A": 1.0},
+        closed_line_total_pressure_Pa=1.0,
+    )
+
+    assert result.status == "unresolved_budget_exhausted"
+    assert result.value_is_unresolved_last_iterate
+    assert "scan_evaluations" in result.sampling_evidence
+    assert "sampled_roots_g" in result.sampling_evidence
+    assert "last_bracket_g" in result.sampling_evidence
+    diagnostic = result.as_diagnostic()
+    assert diagnostic["status"] == "unresolved_budget_exhausted"
+    assert diagnostic["value_is_unresolved_last_iterate"] is True
+
+
 def _pressure_held_sim(
     vapor_pressure_data,
     feedstocks_data,

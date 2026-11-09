@@ -113,6 +113,7 @@ class SameHourHeadspaceClosureResult:
     roots_g: tuple[float, ...] = ()
     multiple_closure_roots: bool = False
     sampling_evidence: Mapping[str, Any] = field(default_factory=dict)
+    value_is_unresolved_last_iterate: bool = False
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -133,6 +134,9 @@ class SameHourHeadspaceClosureResult:
             'roots_g': list(self.roots_g),
             'multiple_closure_roots': self.multiple_closure_roots,
             'sampling_evidence': dict(self.sampling_evidence),
+            'value_is_unresolved_last_iterate': (
+                self.value_is_unresolved_last_iterate
+            ),
         }
 
 
@@ -189,7 +193,9 @@ def _solve_same_hour_headspace_closure(
     sign-changing roots, selects the smallest found root, and retains all
     found roots for the multiple-root flag. The scan cannot certify that it
     found every root or that no root exists; a completed scan with no found
-    root returns a flagged zero with its grid and tail evidence.
+    root returns a flagged zero with its grid and tail evidence. Evaluation-
+    budget exhaustion returns the last iterate as unresolved_budget_exhausted
+    and marks that value explicitly.
 
     For Poiseuille transport, the live mean molar mass converts mdot to molar
     flow N, so at fixed T and geometry ``P²=P_down²+C*N``; changing mixture
@@ -229,6 +235,7 @@ def _solve_same_hour_headspace_closure(
         scan_evaluations=0,
         roots_g=(),
         sampling_evidence=None,
+        value_is_unresolved_last_iterate=False,
     ):
         return SameHourHeadspaceClosureResult(
             rates_kg_hr=dict(rates),
@@ -241,6 +248,9 @@ def _solve_same_hour_headspace_closure(
             roots_g=tuple(roots_g),
             multiple_closure_roots=len(roots_g) > 1,
             sampling_evidence=dict(sampling_evidence or {}),
+            value_is_unresolved_last_iterate=(
+                value_is_unresolved_last_iterate
+            ),
         )
 
     equilibrium_pressures: dict[str, float] = {}
@@ -347,7 +357,7 @@ def _solve_same_hour_headspace_closure(
         }
 
     def evaluate_at_pressure(g, pressure):
-        nonlocal evaluations
+        nonlocal evaluations, last_evaluation
         if evaluations >= evaluation_cap:
             raise _ClosureEvaluationCapReached
         evaluations += 1
@@ -399,7 +409,13 @@ def _solve_same_hour_headspace_closure(
                 projected_pressure_Pa / molar_flow if molar_flow > 0.0 else 0.0
             )
             pressure_residual = max(pressure_floor, projected_pressure_Pa) - pressure
-        return candidate_rates, partials, projected_g - g, pressure_residual
+        last_evaluation = (
+            candidate_rates,
+            partials,
+            projected_g - g,
+            pressure_residual,
+        )
+        return last_evaluation
 
     def evaluate(g):
         nonlocal last_pressure_root
@@ -856,13 +872,27 @@ def _solve_same_hour_headspace_closure(
             sampling_evidence=sampling_evidence,
         )
     except _ClosureEvaluationCapReached:
-        if last_evaluation is None:
-            return result({}, {}, converged=False, status='nonconverged')
+        partial_evidence = dict(sampling_evidence)
+        partial_evidence['scan_evaluations'] = len(sampled_g_points)
+        partial_evidence['sampled_roots_g'] = list(sampled_root_g_values)
+        partial_evidence['last_bracket_g'] = (
+            list(last_bracket_g) if last_bracket_g is not None else None
+        )
+        rates = (
+            last_evaluation[0]
+            if last_evaluation is not None
+            else dict(initial_rates_kg_hr)
+        )
+        partials = last_evaluation[1] if last_evaluation is not None else {}
         return result(
-            last_evaluation[0],
-            last_evaluation[1],
+            rates,
+            partials,
             converged=False,
-            status='nonconverged',
+            status='unresolved_budget_exhausted',
+            scan_evaluations=len(sampled_g_points),
+            roots_g=tuple(sampled_root_g_values),
+            sampling_evidence=partial_evidence,
+            value_is_unresolved_last_iterate=True,
         )
 
 
@@ -890,6 +920,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
     evaluation_cap = 2000
     species_names = set(rates)
     evaluations = 0
+    last_bracket: tuple[float, float] | None = None
 
     def evaluate(candidate_rates):
         nonlocal evaluations
@@ -925,6 +956,9 @@ def _solve_c0_joint_solid_host_bakeout_closure(
         converged,
         status='converged',
         zero_flow_criterion=None,
+        scan_evaluations=0,
+        sampling_evidence=None,
+        value_is_unresolved_last_iterate=False,
     ):
         return SameHourHeadspaceClosureResult(
             rates_kg_hr=dict(candidate_rates),
@@ -933,6 +967,11 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             converged=converged,
             status=status,
             zero_flow_criterion=dict(zero_flow_criterion or {}),
+            scan_evaluations=scan_evaluations,
+            sampling_evidence=dict(sampling_evidence or {}),
+            value_is_unresolved_last_iterate=(
+                value_is_unresolved_last_iterate
+            ),
         )
 
     if (
@@ -1107,6 +1146,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             low = 0.0
             low_residual = zero_flux
             high = max(rates.get(species, 0.0), zero_flux)
+            last_bracket = (low, high)
             high_candidate = dict(rates)
             high_candidate[species] = high
             high_evaluation = evaluate(high_candidate)
@@ -1154,6 +1194,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
                     low, low_residual = root, residual
                 else:
                     high, high_residual = root, residual
+                last_bracket = (low, high)
                 if high - low <= 1.0e-9 * max(abs(low), abs(high), 1.0e-300):
                     root = 0.5 * (low + high)
                     break
@@ -1169,6 +1210,22 @@ def _solve_c0_joint_solid_host_bakeout_closure(
         if evaluations >= evaluation_cap:
             break
 
+    if evaluations >= evaluation_cap:
+        return result(
+            rates,
+            last_partials,
+            converged=False,
+            status='unresolved_budget_exhausted',
+            sampling_evidence={
+                'sampled_roots_g': [],
+                'scan_evaluations': 0,
+                'evaluation_count': evaluations,
+                'last_bracket': (
+                    list(last_bracket) if last_bracket is not None else None
+                ),
+            },
+            value_is_unresolved_last_iterate=True,
+        )
     return result(rates, last_partials, converged=False)
 
 

@@ -803,6 +803,25 @@ def test_c0_joint_closure_reports_closed_line_zero_flow_boundary():
     }
 
 
+def test_c0_transformed_subboiling_budget_exhaustion_is_typed():
+    result = _solve_c0_joint_solid_host_bakeout_closure(
+        {"A": 75.0},
+        lambda partials: {"A": max(0.0, 75.0 - 100.0 * partials.get("A", 0.0))},
+        lambda rates: {"A": 1.0} if sum(rates.values()) > 0.0 else {},
+        closed_line_equilibrium_pressures_Pa={"A": 150.0},
+        closed_line_total_pressure_Pa=100.0,
+    )
+
+    assert result.status == "unresolved_budget_exhausted"
+    assert result.value_is_unresolved_last_iterate
+    assert result.sampling_evidence["sampled_roots_g"] == []
+    assert "evaluation_count" in result.sampling_evidence
+    assert "last_bracket" in result.sampling_evidence
+    diagnostic = result.as_diagnostic()
+    assert diagnostic["status"] == "unresolved_budget_exhausted"
+    assert diagnostic["value_is_unresolved_last_iterate"] is True
+
+
 def test_c0_evaporation_uses_same_hour_source_pressure():
     """C0 flux uses the source pressure projected from its own rates."""
     backend = InternalAnalyticalBackend()
