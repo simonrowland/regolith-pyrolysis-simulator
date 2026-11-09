@@ -608,10 +608,13 @@ def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch, inherit):
         call_timeout_s=30.0,
     )
     child_pid = None
+    launch = None
     try:
         child_pid = worker.start()
         wrapper = worker.process
+        launch = worker._launch_owner
         assert wrapper is not None
+        assert launch is not None
         child_group = os.getpgid(child_pid)
         if inherit:
             assert child_group == caller_pgid
@@ -623,6 +626,7 @@ def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch, inherit):
 
         wrapper.join(timeout=3.0)
         assert not wrapper.is_alive()
+        assert launch.finished.wait(timeout=3.0)
         if inherit:
             # Shared-group children are not owned by this worker; their fate
             # follows the caller's group owner. Closing the worker must leave
