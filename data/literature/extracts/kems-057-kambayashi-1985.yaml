@@ -1410,7 +1410,7 @@ species:
         output_unit: dimensionless
         method:
           state: {tag: value, value: P2O5 activity from P4O10(g) pressure and the JANAF P4O10(s) standard free energy}
-          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 6, equation: '14', section: 4.3.3}
         references:
         - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: activity_coefficient
@@ -1739,7 +1739,7 @@ species:
         output_unit: dimensionless
         method:
           state: {tag: value, value: Conversion from P2O5(s) to P2O5(l) standard state using the reported standard free-energy change}
-          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: 'P2O5(s) = P2O5(l)', section: 4.3.3}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 6, equation: 'P2O5(s) = P2O5(l)', section: 4.3.3}
         references:
         - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
       type: activity_coefficient
@@ -2011,7 +2011,7 @@ species:
         output_unit: atm
         method:
           state: {tag: value, value: 'Partial-pressure reduction of ion-current ratios with isotope, ionization-cross-section and SEM-gain corrections'}
-          locator: {page: 6, published_page: 1916, pdf_page_index: 6, equation: '10', section: 4.3.2}
+          locator: {page: 6, published_page: 1916, pdf_page_index: 5, equation: '10', section: 4.3.2}
         references:
         - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
         - J. F. Mann, J. Chem. Phys. 46 (1967), 1646, ref. 12
@@ -2730,10 +2730,10 @@ species:
         output_unit: atm
         raw_inputs:
           state: {tag: value, value: not_printed}
-          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3, note: JANAF standard free-energy values above 1500 K are not printed in this paper.}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 6, equation: '14', section: 4.3.3, note: JANAF standard free-energy values above 1500 K are not printed in this paper.}
         method:
           state: {tag: value, value: Extrapolation of JANAF P4O10(s) standard free energy to the measurement temperatures and solution of equation (14)}
-          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 6, equation: '14', section: 4.3.3}
         references:
         - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: psat_series
@@ -2946,37 +2946,37 @@ deepening:
   table_inventory:
   - table: '1'
     published_page: 1913
-    pdf_page_index: 3
+    pdf_page_index: 2
     completeness: full
     note: Ionic species for both melts
   - table: '2'
     published_page: 1913
-    pdf_page_index: 3
+    pdf_page_index: 2
     completeness: full
     note: Appearance potentials this work vs literature
   - table: '3'
     published_page: 1913
-    pdf_page_index: 3
+    pdf_page_index: 2
     completeness: full
     note: Three PbO-P2O5 melts at 1300 C
   - table: '4'
     published_page: 1914
-    pdf_page_index: 4
+    pdf_page_index: 3
     completeness: full
     note: Eight FetO-P2O5 compositions
   - table: '5'
     published_page: 1915
-    pdf_page_index: 5
+    pdf_page_index: 4
     completeness: full
     note: Ion current ratios; sample 5 at 1370 C only; asterisk 0.3 mm orifice rows on 4 and 7
   - table: '6'
     published_page: 1917
-    pdf_page_index: 7
+    pdf_page_index: 6
     completeness: full
     note: Partial pressures and Delta-G; sample 5 at 1370 C only
   - table: '7'
     published_page: 1917
-    pdf_page_index: 7
+    pdf_page_index: 6
     completeness: full
     note: Raoultian a_P2O5 x 10^17; sample 5 at 1370 C only
   class_ledger:
