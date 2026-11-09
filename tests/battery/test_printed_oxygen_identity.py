@@ -5,8 +5,8 @@ O'Neill and Eggins 2002 Table 7 are the rows that print a log fO2 on
 activity-coefficient observations. The log stays on point conditions.
 identity.fO2_Pa is the same conversion used for redox rows.
 
-A named buffer offset is not converted. There is no buffer curve in this
-owner. A row with no printed oxygen stays unknown.
+A named buffer offset uses its cited calibration when available. A row with
+no printed oxygen or buffer offset stays unknown.
 """
 
 from __future__ import annotations
@@ -24,6 +24,10 @@ from simulator.battery.migrate import (
     _log_fO2_to_pa,
 )
 from simulator.battery.records import Located, Value
+from simulator.oxygen_buffers import (
+    oneill_1987_qfm_log10_fO2_bar,
+    oneill_iw_log10_fO2_bar,
+)
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -348,7 +352,7 @@ def test_unitless_log_without_temperature_stays_unknown(tmp_path: Path) -> None:
     assert "fO2_Pa" in outcome.fields
 
 
-def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
+def test_activity_buffer_offset_uses_canonical_qfm(tmp_path: Path) -> None:
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
@@ -373,15 +377,16 @@ def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
     ]
     assert len(matches) == 1
     oxygen = matches[0].identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason is not None
-    assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "FMQ+2.7" in oxygen.reason
+    assert oxygen is not None and oxygen.is_value
+    expected_log = (
+        Decimal(str(oneill_1987_qfm_log10_fO2_bar(1673))) + Decimal("2.7")
+    )
+    assert oxygen.value == _log_fO2_to_pa(expected_log)
     assert matches[0].point_conditions["fO2_control"].state.value == "FMQ+2.7"
 
 
 def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
-    # Parent log -9 bar is 1e-4 Pa. The child's named buffer is a refusal.
+    # The child's buffer-relative value takes precedence over parent fallback.
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
@@ -409,10 +414,9 @@ def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
     ]
     assert len(matches) == 1
     oxygen = matches[0].identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason is not None
-    assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "IW+2" in oxygen.reason
+    assert oxygen is not None and oxygen.is_value
+    expected_log = Decimal(str(oneill_iw_log10_fO2_bar(1673))) + Decimal("2")
+    assert oxygen.value == _log_fO2_to_pa(expected_log)
 
 
 def test_child_typed_pressure_beats_parent_log(tmp_path: Path) -> None:
