@@ -2468,6 +2468,37 @@ def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
         sorted((100.0 * raw_activity, 100.0 * crystalline_activity))
     )
 
+    unavailable_state = replace(
+        state,
+        source_reaction_activities={},
+        source_reaction_activity_provider=None,
+        source_reaction_activity_evidence_refs={},
+    )
+    peer_rule = _selector_rule("peer")
+    peer_species = _selector_catalog_species("peer")
+    unavailable_batch = resolve_vapour_batch(
+        rules=(rule, peer_rule),
+        ledger_snapshot={
+            "process.cleaned_melt": {parent_oxide: 1.0, "P": 1.0}
+        },
+        state=unavailable_state,
+        catalog_species={
+            species_id: SimpleNamespace(
+                species_id=species_id,
+                evaluator=Evaluator(),
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            ),
+            **peer_species,
+        },
+        flux_activation_context=_pre_rg_activation_context(species_id, "peer"),
+    )
+    unavailable_channel = unavailable_batch.channel(species_id)
+    assert unavailable_channel.is_refused
+    assert unavailable_channel.refusal_code == ActivityRefusalCode.MISSING_EVIDENCE.value
+    assert isinstance(unavailable_batch.channel("peer").flux, FluxEligible)
+
 
 def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
     from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair

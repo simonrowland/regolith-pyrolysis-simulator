@@ -1479,6 +1479,7 @@ def test_d354_fe_without_activity_refuses_and_marks_ledger_unavailable(
     diagnostic["activities"].pop("Fe", None)
     diagnostic["vapor_pressure_numerator_provenance"].pop("Fe", None)
     assert "Fe" in diagnostic["vapor_pressures_Pa"]
+    assert diagnostic["vapor_pressures_Pa"]["Fe"] > 0.0
     equilibrium.activity_coefficients = diagnostic["activities"]
     equilibrium.vapor_pressures_Pa = diagnostic["vapor_pressures_Pa"]
     effective_source = EffectivePressureSource(
