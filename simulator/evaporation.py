@@ -1253,6 +1253,7 @@ class EvaporationMixin:
         native_fe_capacity_allocation = None
         if overhead_partials_override_Pa is None:
             from simulator.overhead import (
+                _o2_coproduct_exclusion_notice,
                 _pressure_held_closed_line_total_pressure_Pa,
                 _solve_same_hour_headspace_closure,
             )
@@ -1488,12 +1489,40 @@ class EvaporationMixin:
                         ),
                         closed_line_equilibrium_pressures_Pa=vapor_pressures,
                         closed_line_total_pressure_Pa=pressure_held_total_Pa,
+                        carrier_feed_mol_s=getattr(
+                            self.melt, 'carrier_feed_mol_s', None
+                        ),
                     )
                     lower_rates = dict(lower_closure.rates_kg_hr)
                     lower_native_fe_capacity_allocation = (
                         native_fe_capacity_allocation
                     )
-                    if PRESSURE_HELD_FLUX_BOUND == 'upper':
+                    carrier_feed_mol_s = getattr(
+                        self.melt, 'carrier_feed_mol_s', None
+                    )
+                    if carrier_feed_mol_s is not None:
+                        selected_rates = lower_rates
+                        native_fe_capacity_allocation = (
+                            lower_native_fe_capacity_allocation
+                        )
+                        selected_partials_Pa = {
+                            str(species): max(0.0, float(pressure)) * 100.0
+                            for species, pressure in (
+                                lower_closure.partial_pressures_mbar.items()
+                            )
+                        }
+                        selected_bound_converged = lower_closure.converged
+                        kernel_result = seed_result
+                        closure_record = {
+                            'regime': 'pressure_held',
+                            'iterations': lower_closure.iterations,
+                            'converged': lower_closure.converged,
+                            'rates_kg_hr': selected_rates,
+                            'partial_pressures_Pa': selected_partials_Pa,
+                            'value_authority': 'sweep_flow_from_setpoint',
+                            'carrier_feed_mol_s': float(carrier_feed_mol_s),
+                        }
+                    elif PRESSURE_HELD_FLUX_BOUND == 'upper':
                         selected_rates = upper_rates
                         native_fe_capacity_allocation = (
                             seed_native_fe_capacity_allocation
@@ -1531,57 +1560,63 @@ class EvaporationMixin:
                         raise ValueError(
                             'PRESSURE_HELD_FLUX_BOUND must be upper, lower, or mid'
                         )
-                    closure_rates_are_admitted = True
-                    selected_bound_converged = (
-                        PRESSURE_HELD_FLUX_BOUND == 'upper'
-                        or lower_closure.converged
-                    )
-                    equilibrium_pressure_sum_Pa = math.fsum(
-                        max(0.0, float(pressure))
-                        for pressure in vapor_pressures.values()
-                    )
-                    sweep_notices = []
-                    for species in sorted(
-                        set(vapor_pressures) | set(upper_rates) | set(lower_rates)
-                    ):
-                        sweep_notices.append({
-                            'type': 'typed_notice',
-                            'kind': 'sweep_flow_unspecified',
-                            'species': species,
-                            'authority': f'{PRESSURE_HELD_FLUX_BOUND}_bound',
+                    if carrier_feed_mol_s is None:
+                        closure_rates_are_admitted = True
+                        selected_bound_converged = (
+                            PRESSURE_HELD_FLUX_BOUND == 'upper'
+                            or lower_closure.converged
+                        )
+                        equilibrium_pressure_sum_Pa = math.fsum(
+                            max(0.0, float(pressure))
+                            for pressure in vapor_pressures.values()
+                        )
+                        sweep_notices = []
+                        for species in sorted(
+                            set(vapor_pressures)
+                            | set(upper_rates)
+                            | set(lower_rates)
+                        ):
+                            sweep_notices.append({
+                                'type': 'typed_notice',
+                                'kind': 'sweep_flow_unspecified',
+                                'species': species,
+                                'authority': f'{PRESSURE_HELD_FLUX_BOUND}_bound',
+                                'selected_bound': PRESSURE_HELD_FLUX_BOUND,
+                                'upper_bound_kg_hr': upper_rates.get(species, 0.0),
+                                'lower_bound_kg_hr': lower_rates.get(species, 0.0),
+                                'sum_P_eq_Pa': equilibrium_pressure_sum_Pa,
+                                'P_total_Pa': pressure_held_total_Pa,
+                                'lower_bound_converged': lower_closure.converged,
+                                'lower_bound_iterations': lower_closure.iterations,
+                            })
+                        pressure_held_bounds_record = {
                             'selected_bound': PRESSURE_HELD_FLUX_BOUND,
-                            'upper_bound_kg_hr': upper_rates.get(species, 0.0),
-                            'lower_bound_kg_hr': lower_rates.get(species, 0.0),
                             'sum_P_eq_Pa': equilibrium_pressure_sum_Pa,
                             'P_total_Pa': pressure_held_total_Pa,
+                            'upper_rates_kg_hr': upper_rates,
+                            'lower_rates_kg_hr': lower_rates,
+                            'lower_bound_partial_pressures_Pa': {
+                                str(species): max(0.0, float(pressure)) * 100.0
+                                for species, pressure in (
+                                    lower_closure.partial_pressures_mbar.items()
+                                )
+                            },
                             'lower_bound_converged': lower_closure.converged,
                             'lower_bound_iterations': lower_closure.iterations,
-                        })
-                    pressure_held_bounds_record = {
-                        'selected_bound': PRESSURE_HELD_FLUX_BOUND,
-                        'sum_P_eq_Pa': equilibrium_pressure_sum_Pa,
-                        'P_total_Pa': pressure_held_total_Pa,
-                        'upper_rates_kg_hr': upper_rates,
-                        'lower_rates_kg_hr': lower_rates,
-                        'lower_bound_partial_pressures_Pa': {
-                            str(species): max(0.0, float(pressure)) * 100.0
-                            for species, pressure in (
-                                lower_closure.partial_pressures_mbar.items()
-                            )
-                        },
-                        'lower_bound_converged': lower_closure.converged,
-                        'lower_bound_iterations': lower_closure.iterations,
-                        'notices': sweep_notices,
-                    }
-                    kernel_result = seed_result
-                    closure_record = {
-                        'regime': 'pressure_held',
-                        'iterations': lower_closure.iterations,
-                        'converged': selected_bound_converged,
-                        'rates_kg_hr': selected_rates,
-                        'partial_pressures_Pa': selected_partials_Pa,
-                        'pressure_held_sweep_bounds': True,
-                    }
+                            'notices': sweep_notices,
+                        }
+                        kernel_result = seed_result
+                        closure_record = {
+                            'regime': 'pressure_held',
+                            'iterations': lower_closure.iterations,
+                            'converged': selected_bound_converged,
+                            'rates_kg_hr': selected_rates,
+                            'partial_pressures_Pa': selected_partials_Pa,
+                            'pressure_held_sweep_bounds': True,
+                            'value_authority': 'sweep_flow_unspecified',
+                        }
+                    else:
+                        closure_rates_are_admitted = True
                 else:
                     closure = _solve_same_hour_headspace_closure(
                         seed_rates,
@@ -1614,6 +1649,12 @@ class EvaporationMixin:
         diagnostic = dict(kernel_result.diagnostic or {})
         if closure_record is not None:
             diagnostic['same_hour_headspace_closure'] = closure_record
+            if closure_record.get('regime') == 'pressure_held':
+                notices = diagnostic.setdefault('notices', [])
+                if not isinstance(notices, list):
+                    notices = []
+                    diagnostic['notices'] = notices
+                notices.append(_o2_coproduct_exclusion_notice())
             iterations_by_hour = getattr(
                 self, '_same_hour_headspace_closure_iterations_by_hour', None
             )

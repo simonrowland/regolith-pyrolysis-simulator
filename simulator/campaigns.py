@@ -153,6 +153,19 @@ class CampaignSetpointMissingRefusal(ValueError):
         )
 
 
+class CampaignCarrierFeedSetpointRefusal(ValueError):
+    """Typed invalid-input refusal for a carrier feed setpoint."""
+
+    reason = 'invalid_input'
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        super().__init__(f'{self.reason}: {self.diagnostic}')
+
+
 def _runtime_pressure_override_refusal(
     reason_code: str,
     path: str,
@@ -574,6 +587,10 @@ class CampaignManager:
         'thermal_window_ramp_C_per_hr',
     })
     _PHASE_OVERRIDE_FIELDS = {
+        CampaignPhase.C0B: frozenset({
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
+        }),
         CampaignPhase.C2A: frozenset({
             'carrier_gas',
             'threshold_kg_hr',
@@ -589,11 +606,15 @@ class CampaignManager:
             'pn2_mbar',
         }),
         CampaignPhase.C2B: frozenset({
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
             'threshold_kg_hr',
         }),
         CampaignPhase.C3_K: frozenset({
             'alkali_dosing',
             'bakeout_target_C',
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
             'dosing',
             'inject_target_C',
             'staged_duration_h',
@@ -601,16 +622,26 @@ class CampaignManager:
         CampaignPhase.C3_NA: frozenset({
             'alkali_dosing',
             'bakeout_target_C',
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
             'dosing',
             'inject_target_C',
             'staged_duration_h',
         }),
         CampaignPhase.C4: frozenset({
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
             'hold_temp_C',
             'hold_temperature_C',
             'threshold_kg_hr',
         }),
+        CampaignPhase.C5: frozenset({
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
+        }),
         CampaignPhase.C6: frozenset({
+            'carrier_feed_mol_s',
+            'carrier_feed_gas',
             'hold_temp_C',
             'hold_temperature_C',
         }),
@@ -845,6 +876,24 @@ class CampaignManager:
                 raise _runtime_pressure_override_refusal(
                     f'{reason_prefix}_negative', path, 'must be >= 0'
                 )
+        if 'carrier_feed_mol_s' in fields:
+            cls._validated_carrier_feed_mol_s(
+                fields['carrier_feed_mol_s'],
+                f'runtime_campaign_overrides.{campaign_name}.'
+                'carrier_feed_mol_s',
+            )
+        if 'carrier_feed_gas' in fields:
+            try:
+                _canonical_carrier_gas_key(fields['carrier_feed_gas'])
+            except ValueError as exc:
+                raise CampaignCarrierFeedSetpointRefusal({
+                    'path': (
+                        f'runtime_campaign_overrides.{campaign_name}.'
+                        'carrier_feed_gas'
+                    ),
+                    'value': repr(fields['carrier_feed_gas']),
+                    'detail': str(exc),
+                }) from exc
         if 'pO2_mbar' not in fields:
             return
         pO2_mbar = float(fields['pO2_mbar'])
@@ -879,6 +928,54 @@ class CampaignManager:
                     'oxygen partial pressure cannot exceed total pressure'
                 ),
             )
+
+    @staticmethod
+    def _validated_carrier_feed_mol_s(
+        raw_value: object,
+        path: str,
+    ) -> float | None:
+        if raw_value is None:
+            return None
+        if not is_declared_real_scalar(raw_value):
+            raise CampaignCarrierFeedSetpointRefusal({
+                'path': path,
+                'value': repr(raw_value),
+                'detail': 'must be a declared real scalar or null',
+            })
+        value = float(raw_value)
+        if not math.isfinite(value) or value < 0.0:
+            raise CampaignCarrierFeedSetpointRefusal({
+                'path': path,
+                'value': repr(raw_value),
+                'detail': 'must be finite and non-negative',
+            })
+        return value
+
+    def _carrier_feed_setpoint(
+        self,
+        campaign: CampaignPhase,
+    ) -> tuple[float | None, str]:
+        config_key = self._campaign_config_key(campaign)
+        config = self._campaign_config(campaign)
+        overrides = self._campaign_overrides(campaign)
+        raw_feed = (
+            overrides['carrier_feed_mol_s']
+            if 'carrier_feed_mol_s' in overrides
+            else config.get('carrier_feed_mol_s')
+        )
+        feed_mol_s = self._validated_carrier_feed_mol_s(
+            raw_feed,
+            f'campaigns.{config_key}.carrier_feed_mol_s',
+        )
+        raw_gas = (
+            overrides.get('carrier_feed_gas')
+            if 'carrier_feed_gas' in overrides
+            else config.get('carrier_feed_gas')
+        )
+        carrier_gas = _canonical_carrier_gas_key(
+            raw_gas if raw_gas not in (None, '') else 'Kr'
+        )
+        return feed_mol_s, carrier_gas
 
     def runtime_po2_ceiling_mbar(
         self,
@@ -2018,6 +2115,42 @@ class CampaignManager:
                 melt.atmosphere = Atmosphere.CONTROLLED_O2
         self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)
         self.apply_c2a_staged_gas_controls(melt, campaign)
+        carrier_feed_mol_s, carrier_feed_gas = self._carrier_feed_setpoint(
+            campaign
+        )
+        if (
+            carrier_feed_mol_s is not None
+            and carrier_feed_mol_s > 0.0
+            and carrier_feed_gas == 'Ar'
+            and not math.isclose(
+                float(melt.pO2_mbar), 0.0, rel_tol=0.0, abs_tol=1.0e-12
+            )
+        ):
+            raise CampaignCarrierFeedSetpointRefusal({
+                'path': (
+                    f'campaigns.{self._campaign_config_key(campaign)}.'
+                    'carrier_feed_gas'
+                ),
+                'value': carrier_feed_gas,
+                'pO2_mbar': float(melt.pO2_mbar),
+                'detail': 'Ar carrier feed requires pO2 approximately zero',
+            })
+        if (
+            carrier_feed_mol_s is not None
+            and carrier_feed_mol_s > 0.0
+            and carrier_feed_gas == 'N2'
+            and campaign in {CampaignPhase.C4, CampaignPhase.C6}
+        ):
+            raise CampaignCarrierFeedSetpointRefusal({
+                'path': (
+                    f'campaigns.{self._campaign_config_key(campaign)}.'
+                    'carrier_feed_gas'
+                ),
+                'value': carrier_feed_gas,
+                'detail': 'N2 carrier feed is excluded for hot Mg/Al campaigns',
+            })
+        melt.carrier_feed_mol_s = carrier_feed_mol_s
+        melt.carrier_feed_gas = carrier_feed_gas
         # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis
         # merge precedence. Before this fix, when an operator passed
         # BOTH ``{stir_factor: 6, stir_state: {radial: 8}}``, the whole-

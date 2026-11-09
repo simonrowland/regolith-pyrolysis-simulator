@@ -546,6 +546,8 @@ class MeltState:
     background_gas_species: str = ''
     # Lab/preset carrier gas species used to populate overhead gas state.
     background_gas_mole_fraction: float = 0.0
+    carrier_feed_mol_s: float | None = None
+    carrier_feed_gas: str = 'Kr'
 
     # --- Process state ---
     campaign: CampaignPhase = CampaignPhase.IDLE

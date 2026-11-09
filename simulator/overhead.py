@@ -109,6 +109,22 @@ class SameHourHeadspaceClosureResult:
     converged: bool
 
 
+def _carrier_feed_mol_hr(carrier_feed_mol_s: float) -> float:
+    """Convert the declared feed setpoint to the closure/output hour basis."""
+    # Premise: the setpoint is mol/s and closure flows are mol/hr. Algebra:
+    # F_hr = F_s * 3600 s/hr. Unit check: mol/s * s/hr = mol/hr.
+    return float(carrier_feed_mol_s) * 3600.0
+
+
+def _o2_coproduct_exclusion_notice() -> dict[str, object]:
+    return {
+        'type': 'typed_notice',
+        'kind': 'o2_coproduct_excluded_pending_b1141',
+        'source': 'pressure_held_headspace_closure',
+        'n_o2_coproduct_mol_hr': 0.0,
+    }
+
+
 def _solve_same_hour_headspace_closure(
     initial_rates_kg_hr: Mapping[str, float],
     rates_at_projection_g: Callable[[float, float], Mapping[str, float]],
@@ -118,6 +134,8 @@ def _solve_same_hour_headspace_closure(
     pressure_floor_Pa: float = 0.0,
     closed_line_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
     closed_line_total_pressure_Pa: float | None = None,
+    carrier_feed_mol_s: float | None = None,
+    n_o2_coproduct_mol_hr: float = 0.0,
 ) -> SameHourHeadspaceClosureResult:
     """Close ordinary source rates on their single projected pressure scalar.
 
@@ -140,14 +158,25 @@ def _solve_same_hour_headspace_closure(
     the transformed total N(g) non-increasing. Group-scaled species retain
     their raw-rate proportions. Thus h(0)>0 for a positive source and
     h tends to -infinity as g grows. The scalar bracket therefore contains the
-    pumped root. On a pressure-held no-feed line, the sub-boiling case returns
-    the explicit zero-flow boundary. When T is the identity (no admission,
-    depletion, or inventory cap binds), the positive-flow species equations
-    reduce to ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ.
-    Its right side strictly decreases from ΣP_eq/P_total to zero, so there is
-    exactly one positive root iff ΣP_eq>P_total; otherwise the physical root
-    is zero. With T active, the same scalar callback evaluates the complete
-    transformed vector at each bracket point.
+    pumped root. For a pressure-held carrier feed, convert F from mol/s to the
+    solver's mol/hr basis: ``G(N)=P_total/(3600*F + N + n_O2)``. Here
+    ``n_o2_coproduct_mol_hr`` is the one future O2-outflow term; it is zero
+    while b-1141 routes that coproduct to the melt buffer. G remains decreasing
+    in N. As N(g) decreases, G is bounded below by zero and above by its
+    finite-flow limit, while the residual ``G(N(g))-g`` is positive at g=0
+    and negative for sufficiently large g. With F=0 and n_O2=0, the
+    sub-boiling case returns the explicit zero-flow boundary and the positive
+    root is exactly the existing lower bracket. As F tends to infinity,
+    G tends to zero and the root tends to the existing upper bracket. For one
+    species, ``J=J_max*beta/(1+beta)`` exactly with
+    ``beta=(3600*F+J)*R'/P_total``; the evolved flow J is part of the stated
+    F+N outflow. When T is the identity (no admission, depletion, or inventory
+    cap binds), the no-feed positive-flow species equations reduce to
+    ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ. Its right
+    side strictly decreases from ΣP_eq/P_total to zero, so there is exactly
+    one positive root iff ΣP_eq>P_total; otherwise the physical root is zero.
+    With T active, the same scalar callback evaluates the complete transformed
+    vector at each bracket point.
 
     R'_i and g both have units Pa·hr/mol: R'_i=R_i*M_i/(A*3600), converting
     the existing pressure-area-time-per-mass resistance from kg/hr to mol/hr.
@@ -158,6 +187,12 @@ def _solve_same_hour_headspace_closure(
     evaluation_cap = 200
     relative_tolerance = 1.0e-12
     pressure_floor = max(0.0, float(pressure_floor_Pa))
+    carrier_feed_mol_hr = (
+        _carrier_feed_mol_hr(carrier_feed_mol_s)
+        if carrier_feed_mol_s is not None
+        else 0.0
+    )
+    o2_coproduct_mol_hr = max(0.0, float(n_o2_coproduct_mol_hr))
     species_names = {str(species) for species in initial_rates_kg_hr}
     evaluations = 0
 
@@ -177,8 +212,11 @@ def _solve_same_hour_headspace_closure(
             str(species): max(0.0, float(pressure))
             for species, pressure in closed_line_equilibrium_pressures_Pa.items()
         }
-        if math.fsum(equilibrium_pressures.values()) <= max(
-            0.0, float(closed_line_total_pressure_Pa)
+        if (
+            carrier_feed_mol_hr + o2_coproduct_mol_hr == 0.0
+            and math.fsum(equilibrium_pressures.values()) <= max(
+                0.0, float(closed_line_total_pressure_Pa)
+            )
         ):
             zero_species = species_names | set(equilibrium_pressures)
             return result(
@@ -202,20 +240,47 @@ def _solve_same_hour_headspace_closure(
         species_names.update(candidate_rates)
         for species in species_names:
             candidate_rates.setdefault(species, 0.0)
-        partials = {
-            str(species): max(0.0, float(value))
-            for species, value in partials_at_rates(candidate_rates).items()
-        }
         molar_flow = math.fsum(
             candidate_rates[species] / float(molar_masses_kg_mol[species])
             for species in species_names
             if candidate_rates[species] > 0.0
         )
-        projected_pressure_Pa = 100.0 * math.fsum(partials.values())
-        projected_g = (
-            projected_pressure_Pa / molar_flow if molar_flow > 0.0 else 0.0
-        )
-        pressure_residual = max(pressure_floor, projected_pressure_Pa) - pressure
+        if (
+            carrier_feed_mol_s is not None
+            and closed_line_total_pressure_Pa is not None
+        ):
+            # P_bulk,i = n_i*g, with n_i in mol/hr. F enters only through
+            # G=P_total/(3600*F+N+n_O2); the 3600 converts the declared mol/s
+            # carrier setpoint to the root's mol/hr basis. The no-feed limit
+            # reduces to P_total/N, while F→∞ gives g→0.
+            partials = {
+                species: (
+                    candidate_rates[species]
+                    / float(molar_masses_kg_mol[species])
+                    * g
+                    / 100.0
+                )
+                for species in species_names
+            }
+            total_outflow_mol_hr = (
+                carrier_feed_mol_hr + molar_flow + o2_coproduct_mol_hr
+            )
+            projected_g = (
+                float(closed_line_total_pressure_Pa) / total_outflow_mol_hr
+                if total_outflow_mol_hr > 0.0
+                else 0.0
+            )
+            pressure_residual = 0.0
+        else:
+            partials = {
+                str(species): max(0.0, float(value))
+                for species, value in partials_at_rates(candidate_rates).items()
+            }
+            projected_pressure_Pa = 100.0 * math.fsum(partials.values())
+            projected_g = (
+                projected_pressure_Pa / molar_flow if molar_flow > 0.0 else 0.0
+            )
+            pressure_residual = max(pressure_floor, projected_pressure_Pa) - pressure
         return candidate_rates, partials, projected_g - g, pressure_residual
 
     def evaluate(g):
@@ -278,10 +343,27 @@ def _solve_same_hour_headspace_closure(
             for species in species_names
             if low_rates[species] > 0.0
         )
-        high = max(
-            1.0e-300,
-            100.0 * math.fsum(low_partials.values()) / low_molar_flow,
-        )
+        if (
+            carrier_feed_mol_s is not None
+            and closed_line_total_pressure_Pa is not None
+        ):
+            initial_outflow_mol_hr = (
+                carrier_feed_mol_hr
+                + low_molar_flow
+                + o2_coproduct_mol_hr
+            )
+            high = max(
+                1.0e-300,
+                float(closed_line_total_pressure_Pa)
+                / initial_outflow_mol_hr
+                if initial_outflow_mol_hr > 0.0
+                else 1.0,
+            )
+        else:
+            high = max(
+                1.0e-300,
+                100.0 * math.fsum(low_partials.values()) / low_molar_flow,
+            )
         high_evaluation = evaluate(high)
         last_evaluation = high_evaluation
         last_g = high

@@ -23,7 +23,7 @@ from simulator.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v12"
+allowlist_version = "allowlist-v13"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
@@ -500,6 +500,29 @@ def _o2_bubbler_rate_knob(path: str, *, bounds_source: str) -> KnobSpec:
         search_enabled=False,
         runtime_enabled=False,
         scale="zero-inflated",
+    )
+
+
+PRESSURE_HELD_CARRIER_FEED_CAMPAIGNS = (
+    "C0b_p_cleanup",
+    "C2B",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+)
+
+
+def _carrier_feed_knobs() -> tuple[KnobSpec, ...]:
+    return tuple(
+        _knob(
+            f"campaigns.{campaign}.carrier_feed_mol_s",
+            low=0.0,
+            high=0.0,
+            units="mol/s",
+            bounds_source=f"pipe-capacity:campaigns.{campaign}",
+        )
+        for campaign in PRESSURE_HELD_CARRIER_FEED_CAMPAIGNS
     )
 
 
@@ -1313,6 +1336,7 @@ class RecipeSchema:
                 "setpoints.yaml condensation_train.metals_train bands"
             ),
         ),
+        *_carrier_feed_knobs(),
     )
 
     FORBIDDEN_PREFIXES: tuple[str, ...] = (
@@ -1714,6 +1738,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C0b_p_cleanup.pO2_mbar_default",
         "campaigns.C0b_p_cleanup.p_total_mbar_default",
         "campaigns.C0b_p_cleanup.duration_hr",
+        "campaigns.C0b_p_cleanup.carrier_feed_mol_s",
         "campaigns.C2A_continuous.temp_range_C",
         "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
         "campaigns.C2A_continuous.p_total_mbar",
@@ -1758,8 +1783,10 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2B.pO2_mbar",
         "campaigns.C2B.pO2_mbar_default",
         "campaigns.C2B.p_total_mbar_default",
+        "campaigns.C2B.carrier_feed_mol_s",
         "campaigns.C3.pO2_mbar_default",
         "campaigns.C3.p_total_mbar_default",
+        "campaigns.C3.carrier_feed_mol_s",
         "campaigns.C3.K_phase.pO2_bakeout_mbar",
         "campaigns.C3.Na_phase.pO2_bakeout_mbar",
         "campaigns.C3.alkali_dosing.Na_kg",
@@ -1772,11 +1799,13 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C4.pO2_mbar",
         "campaigns.C4.pO2_mbar_default",
         "campaigns.C4.p_total_mbar_default",
+        "campaigns.C4.carrier_feed_mol_s",
         "campaigns.C4.optional_Ca_harvest.pO2_mbar",
         "campaigns.C5.temp_range_C",
         "campaigns.C5.pO2_bar",
         "campaigns.C5.pO2_mbar_default",
         "campaigns.C5.p_total_mbar_default",
+        "campaigns.C5.carrier_feed_mol_s",
         "campaigns.C5.allow_mre_voltage_cap_V",
         "campaigns.C5.target_delta_below_ceiling_C",
         "campaigns.C5.max_hold_hr.branch_one",
@@ -1787,6 +1816,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C6.pO2_mbar",
         "campaigns.C6.pO2_mbar_default",
         "campaigns.C6.p_total_mbar_default",
+        "campaigns.C6.carrier_feed_mol_s",
         "overhead_headspace.temperature_offset_K",
         "overhead_headspace.liner_temperature_C.default_C",
         "overhead_headspace.pipe_segment_temperatures_C.default_C",
@@ -2017,6 +2047,28 @@ def _setpoint_sourced_allowlist(
     }
     resolved: list[KnobSpec] = []
     for spec in template_allowlist:
+        if spec.bounds_source.startswith("pipe-capacity:"):
+            campaign_path = spec.bounds_source.removeprefix(
+                "pipe-capacity:"
+            )
+            campaign_key = campaign_path.removeprefix("campaigns.")
+            high = _carrier_feed_pipe_capacity_mol_s(
+                setpoints,
+                campaign_key,
+            )
+            resolved.append(
+                replace(
+                    spec,
+                    low=0.0,
+                    high=high,
+                    bounds_source=(
+                        f"pipe-capacity:{campaign_path}; existing pipe "
+                        "capacity at the campaign's minimum total pressure "
+                        "and maximum gas temperature, converted to mol/s"
+                    ),
+                )
+            )
+            continue
         if spec.path in downstream_bounds:
             low, high = downstream_bounds[spec.path]
             resolved.append(replace(spec, low=low, high=high))
@@ -2067,6 +2119,73 @@ def _setpoint_sourced_allowlist(
             replace(spec, low=low, high=high, bounds_source=bounds_source)
         )
     return tuple(resolved)
+
+
+def _carrier_feed_pipe_capacity_mol_s(
+    setpoints: Mapping[str, Any],
+    campaign_key: str,
+) -> float:
+    """Derive the campaign feed ceiling from its pressure and gas window."""
+    campaigns = setpoints.get("campaigns")
+    campaign = (
+        campaigns.get(campaign_key)
+        if isinstance(campaigns, Mapping)
+        else None
+    )
+    if not isinstance(campaign, Mapping):
+        raise ValueError(
+            f"carrier feed bounds require campaigns.{campaign_key}"
+        )
+
+    raw_pressure = campaign.get("p_total_mbar")
+    if isinstance(raw_pressure, (list, tuple)) and raw_pressure:
+        pressure_mbar = min(float(value) for value in raw_pressure)
+    elif raw_pressure is not None:
+        pressure_mbar = float(raw_pressure)
+    else:
+        pressure_mbar = float(campaign["p_total_mbar_default"])
+
+    raw_temperature = campaign.get("temp_range_C")
+    if isinstance(raw_temperature, (list, tuple)) and raw_temperature:
+        temperature_C = max(float(value) for value in raw_temperature)
+    elif raw_temperature is not None:
+        temperature_C = float(raw_temperature)
+    elif campaign_key == "C3":
+        bakeout_ranges = (
+            campaign["K_phase"]["T_bakeout_C"],
+            campaign["Na_phase"]["T_bakeout_C"],
+        )
+        temperature_C = max(
+            float(value)
+            for temperature_range in bakeout_ranges
+            for value in temperature_range
+        )
+    else:
+        raise ValueError(
+            f"carrier feed bounds require campaigns.{campaign_key}.temp_range_C"
+        )
+
+    from simulator.condensation import _canonical_carrier_gas_key
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import MOLAR_MASS
+
+    carrier_gas = _canonical_carrier_gas_key(
+        campaign.get("carrier_feed_gas") or "Kr"
+    )
+    molar_mass_kg_mol = float(MOLAR_MASS[carrier_gas]) / 1000.0
+    # Premise: the existing pipe-capacity function returns the mass flow a
+    # pure carrier stream can pass at P_total. The setpoint is mol/s, so
+    # F_max = m_dot_pipe / M_carrier. Unit check: (kg/s)/(kg/mol)=mol/s.
+    # Use the campaign's lowest held pressure and hottest gas temperature,
+    # which bound that capacity from below; as P_total tends to zero, both
+    # capacity and its feed-rate bound tend to zero.
+    capacity_kg_s = OverheadGasModel()._pipe_conductance(
+        pressure_mbar * 100.0,
+        temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={carrier_gas: 1.0},
+    )
+    return max(0.0, float(capacity_kg_s) / molar_mass_kg_mol)
 
 
 @lru_cache(maxsize=8)

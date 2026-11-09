@@ -1422,6 +1422,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._same_hour_headspace_closure_iterations_by_hour: Dict[
             int, Dict[str, int]
         ] = {}
+        self._carrier_feed_known_mol_by_run = 0.0
+        self._carrier_feed_known_kg_by_run = 0.0
+        self._carrier_feed_run_complete = True
+        self._carrier_feed_by_species_run: Dict[str, Dict[str, float]] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
         self._silent_zero_notes: list = []
@@ -1836,6 +1840,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._same_hour_headspace_closure_iterations_by_hour.setdefault(
             int(getattr(self.melt, 'hour', 0)), {}
         )
+        self._carrier_feed_known_mol_by_run = 0.0
+        self._carrier_feed_known_kg_by_run = 0.0
+        self._carrier_feed_run_complete = True
+        self._carrier_feed_by_species_run = {}
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
         self._last_melt_redox_liquidus_gate_diagnostic = {}
@@ -8218,6 +8226,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
         from simulator.overhead import (
+            _o2_coproduct_exclusion_notice,
             _pressure_held_closed_line_total_pressure_Pa,
             _solve_same_hour_headspace_closure,
         )
@@ -8327,6 +8336,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 },
                 'closed_line_total_pressure_Pa': pressure_held_total_Pa,
             }
+            carrier_feed_mol_s = getattr(
+                self.melt, 'carrier_feed_mol_s', None
+            )
+            if carrier_feed_mol_s is not None:
+                closed_line_boundary['carrier_feed_mol_s'] = float(
+                    carrier_feed_mol_s
+                )
         closure = _solve_same_hour_headspace_closure(
             {'Fe': vacuum_rate},
             native_rate_at_projection_g,
@@ -8376,6 +8392,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species, value in closure.partial_pressures_mbar.items()
             },
         }
+        if pressure_held_total_Pa is not None:
+            closure_record['value_authority'] = (
+                'sweep_flow_from_setpoint'
+                if getattr(self.melt, 'carrier_feed_mol_s', None) is not None
+                else 'sweep_flow_unspecified'
+            )
+            if getattr(self.melt, 'carrier_feed_mol_s', None) is not None:
+                closure_record['carrier_feed_mol_s'] = float(
+                    self.melt.carrier_feed_mol_s
+                )
         iterations_by_hour = getattr(
             self, '_same_hour_headspace_closure_iterations_by_hour', None
         )
@@ -8469,6 +8495,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'series_resistance': series_diag,
             'same_hour_headspace_closure': closure_record,
         }
+        if pressure_held_total_Pa is not None:
+            diagnostic['notices'] = [_o2_coproduct_exclusion_notice()]
         if P_reference_Pa > 0.0 and P_bulk_Pa >= P_reference_Pa:
             diagnostic['species_physical_zeros'] = {
                 'Fe': {
@@ -15911,6 +15939,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
         self._sync_c2a_staged_overhead_gas_control()
         self.melt.validate_melt_pressures()
+        from simulator.overhead import (
+            _carrier_feed_mol_hr,
+            _pressure_held_closed_line_total_pressure_Pa,
+        )
+
+        hour_carrier_feed_mol_s = getattr(
+            self.melt, 'carrier_feed_mol_s', None
+        )
+        hour_carrier_feed_gas = str(
+            getattr(self.melt, 'carrier_feed_gas', 'Kr') or 'Kr'
+        )
+        pressure_held_total_Pa_this_hour = (
+            _pressure_held_closed_line_total_pressure_Pa(
+                str(getattr(self.melt.atmosphere, 'name', '')),
+                self.melt.p_total_mbar,
+                self._headspace_downstream_pressure_bar(None),
+            )
+        )
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
@@ -16586,6 +16632,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'sweep_flow_unspecified',
             'same_hour_headspace_closure_nonconvergence',
             'same_hour_headspace_closure_not_applied',
+            'o2_coproduct_excluded_pending_b1141',
         }
         for source_diagnostic in source_diagnostics:
             physical_zeros = source_diagnostic.get('species_physical_zeros')
@@ -16607,6 +16654,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         sweep_bounds = evaporation_diagnostic.get(
             'pressure_held_sweep_bounds', {}
         )
+        carrier_feed_status = 'inactive'
+        carrier_feed_mol_per_hour = 0.0
+        carrier_feed_kg_per_hour = 0.0
+        carrier_feed_species = None
+        if pressure_held_total_Pa_this_hour is not None:
+            carrier_feed_species = hour_carrier_feed_gas
+            if hour_carrier_feed_mol_s is None:
+                carrier_feed_status = 'unset'
+                carrier_feed_mol_per_hour = None
+                carrier_feed_kg_per_hour = None
+                self._carrier_feed_run_complete = False
+            else:
+                carrier_feed_status = 'setpoint'
+                carrier_feed_mol_per_hour = _carrier_feed_mol_hr(
+                    hour_carrier_feed_mol_s
+                )
+                carrier_feed_kg_per_hour = (
+                    carrier_feed_mol_per_hour
+                    * float(MOLAR_MASS[hour_carrier_feed_gas])
+                    / 1000.0
+                )
+                self._carrier_feed_known_mol_by_run += (
+                    carrier_feed_mol_per_hour
+                )
+                self._carrier_feed_known_kg_by_run += (
+                    carrier_feed_kg_per_hour
+                )
+                by_species = self._carrier_feed_by_species_run.setdefault(
+                    hour_carrier_feed_gas,
+                    {'mol': 0.0, 'kg': 0.0},
+                )
+                by_species['mol'] += carrier_feed_mol_per_hour
+                by_species['kg'] += carrier_feed_kg_per_hour
         snapshot.same_hour_headspace_diagnostics = {
             'regime': str(closure_diagnostic.get('regime') or 'not_run'),
             'closure': (
@@ -16624,6 +16704,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     completed_hour, {}
                 )
             ),
+            'carrier_feed_consumption': {
+                'status': carrier_feed_status,
+                'species': carrier_feed_species,
+                'feed_rate_mol_s': (
+                    float(hour_carrier_feed_mol_s)
+                    if hour_carrier_feed_mol_s is not None
+                    else None
+                ),
+                'mol_per_hour': carrier_feed_mol_per_hour,
+                'kg_per_hour': carrier_feed_kg_per_hour,
+                'mol_per_run': (
+                    self._carrier_feed_known_mol_by_run
+                    if self._carrier_feed_run_complete
+                    else None
+                ),
+                'kg_per_run': (
+                    self._carrier_feed_known_kg_by_run
+                    if self._carrier_feed_run_complete
+                    else None
+                ),
+                'known_mol_per_run': self._carrier_feed_known_mol_by_run,
+                'known_kg_per_run': self._carrier_feed_known_kg_by_run,
+                'run_totals_status': (
+                    'complete'
+                    if self._carrier_feed_run_complete
+                    else 'incomplete_unspecified_setpoint'
+                ),
+                'by_species_per_run': {
+                    species: dict(amounts)
+                    for species, amounts in (
+                        self._carrier_feed_by_species_run.items()
+                    )
+                },
+            },
         }
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.partial_melt_offgassing_diagnostic = dict(

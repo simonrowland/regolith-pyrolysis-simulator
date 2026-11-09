@@ -816,7 +816,7 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
     # bound values meant a failure named none of them -- the diff said only "at
     # index 2", and an epoch drift and a bounds drift were indistinguishable.
     # One assertion per fact, so the failure names the fact.
-    assert schema.allowlist_version == "allowlist-v12"
+    assert schema.allowlist_version == "allowlist-v13"
     assert O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION == "allowlist-v12"
     # The knob's bounds ARE the furnace envelope -- that identity is the claim
     # worth pinning here. The envelope's own VALUE is owned by the catalog and

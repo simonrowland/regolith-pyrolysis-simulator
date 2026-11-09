@@ -777,7 +777,7 @@ def _single_species_pressure_held_closure(carrier_feed_mol_s=None):
 def test_carrier_feed_zero_is_closed_line_and_large_feed_approaches_upper():
     lower = _single_species_pressure_held_closure()
     zero_feed = _single_species_pressure_held_closure(0.0)
-    large_feed = _single_species_pressure_held_closure(1.0e5)
+    large_feed = _single_species_pressure_held_closure(1.0e6)
     mass_kg_mol = MOLAR_MASS["K"] / 1000.0
     upper_mol_hr = 250.0 / 5.0
 
@@ -832,6 +832,10 @@ def test_unset_carrier_feed_keeps_the_pressure_held_bracket_authority(
     assert diagnostic["same_hour_headspace_closure"]["value_authority"] == (
         "sweep_flow_unspecified"
     )
+    assert any(
+        notice["kind"] == "o2_coproduct_excluded_pending_b1141"
+        for notice in diagnostic["notices"]
+    )
     assert all(
         flux.species_kg_hr.get(species, 0.0)
         == bounds["upper_rates_kg_hr"].get(species, 0.0)
@@ -865,6 +869,13 @@ def test_carrier_feed_consumption_is_reported_per_hour_and_run(
     assert consumption["kg_per_hour"] == pytest.approx(expected_kg)
     assert consumption["mol_per_run"] == pytest.approx(expected_mol)
     assert consumption["kg_per_run"] == pytest.approx(expected_kg)
+    assert sim._last_evaporation_flux_diagnostic[
+        "same_hour_headspace_closure"
+    ]["value_authority"] == "sweep_flow_from_setpoint"
+    assert any(
+        notice["kind"] == "o2_coproduct_excluded_pending_b1141"
+        for notice in snapshot.same_hour_headspace_diagnostics["notices"]
+    )
 
 
 def test_pumped_closure_prices_the_admitted_depleted_stream(

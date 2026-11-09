@@ -24,6 +24,7 @@ from simulator.optimize.recipe import (
     RecipeValidationError,
 )
 from simulator.overhead import OverheadGasModel
+from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.state import (
     MOLAR_MASS,
     BatchRecord,
@@ -89,7 +90,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v12" == schema.allowlist_version
+    assert "allowlist-v13" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -246,10 +247,10 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
 def test_pressure_held_carrier_feed_knob_uses_pipe_capacity_bounds() -> None:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     schema = RecipeSchema(setpoints=setpoints)
-    path = _path("campaigns.C2A_continuous.carrier_feed_mol_s")
+    path = _path("campaigns.C2B.carrier_feed_mol_s")
     spec = schema.spec_for(path)
-    campaign = setpoints["campaigns"]["C2A_continuous"]
-    p_total_mbar = min(campaign["p_total_mbar"])
+    campaign = setpoints["campaigns"]["C2B"]
+    p_total_mbar = campaign["p_total_mbar_default"]
     temperature_C = max(campaign["temp_range_C"])
     carrier = campaign["carrier_feed_gas"]
     capacity_kg_s = OverheadGasModel()._pipe_conductance(
@@ -265,6 +266,25 @@ def test_pressure_held_carrier_feed_knob_uses_pipe_capacity_bounds() -> None:
     assert spec.search_enabled is True
     assert "pipe-capacity" in spec.bounds_source
     assert path in MANDATE_LEVER_PATHS
+    for campaign_name in ("C0b_p_cleanup", "C3", "C4", "C5", "C6"):
+        pressure_held_path = _path(
+            f"campaigns.{campaign_name}.carrier_feed_mol_s"
+        )
+        assert schema.spec_for(pressure_held_path).search_enabled is True
+        assert schema.spec_for(pressure_held_path).high > 0.0
+
+    saturation = compute_knob_saturation(
+        RecipePatch({path: spec.high}),
+        schema,
+        active_objective_metrics=("oxygen_kg",),
+    )
+    feed_row = next(
+        row for row in saturation["knobs"]
+        if row["key"] == ".".join(path)
+    )
+    assert feed_row["pinned"] == "high"
+    assert feed_row["has_opposing_cost"] is False
+    assert saturation["red_flag"] is True
 
     # pO2 defaults are jointly constrained with their campaign's total-pressure
     # default (partial <= total, validate-don't-derive): tuning one above the
