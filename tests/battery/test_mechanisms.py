@@ -1496,7 +1496,7 @@ def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
-def test_model_derived_resolved_parent_keeps_legacy_lineage_route() -> None:
+def test_model_derived_resolved_parent_requires_method_and_references() -> None:
     experiment = F.tabulation_experiment()
     parent = F.observation(
         "raw-1",
@@ -1526,7 +1526,14 @@ def test_model_derived_resolved_parent_keeps_legacy_lineage_route() -> None:
 
     report = validate_corpus([F.work()], [experiment], [parent, observation])
 
-    assert report.hard_issues == ()
+    assert len(report.hard_issues) == 2
+    assert {
+        issue.path.rsplit(".", 1)[-1] for issue in report.hard_issues
+    } == {"method", "references"}
+    assert all(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in report.hard_issues
+    )
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 

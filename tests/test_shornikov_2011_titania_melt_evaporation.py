@@ -380,7 +380,4 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     # 5.0e-5 atm = 5.06625 Pa. The store keeps pascals.
     assert pressure.value.point == Decimal("5.066250")
     assert pressure.identity.temperature_K.value == Decimal("2300")
-    # The d-351 validator change is on a separate branch; this source test
-    # allows its pending strict issues only on the printed Gibbs table rows.
-    gibbs_ids = {row.observation_id for row in gibbs}
-    assert set(result.validation.hard_issues_by_observation) <= gibbs_ids
+    assert not result.validation.hard_issues
