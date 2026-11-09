@@ -37,12 +37,14 @@ def _assert_cache_round_trip(cell: EquilibrateCell) -> None:
 
 
 @pytest.mark.parametrize("engine_name", _ENGINE_NAMES)
-def test_cache_payload_round_trips_real_engine_cells(engine_name: str) -> None:
+def test_cache_payload_round_trips_real_engine_cells(
+    engine_name: str, request: pytest.FixtureRequest
+) -> None:
     handle = open_battery_engine(engine_name)
     if not handle.available:
         reason = handle.unavailable_reason or "engine binary or package is absent"
         close_battery_engine_handle(handle)
-        pytest.skip(f"{engine_name} unavailable: {reason}")
+        pytest.skip(f"{request.node.nodeid}: {engine_name} unavailable: {reason}")
 
     try:
         for pot in _REAL_POTS:
