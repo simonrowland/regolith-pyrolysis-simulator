@@ -34,8 +34,15 @@ The core invariants are load-bearing, and the test suite enforces them:
 ## Setting up
 
 ```bash
+pip install -e ".[dev]"
+```
+
+That is enough to develop and run the tests on the built-in analytical model. For the full
+environment, including the locked alphaMELTS app and the pinned chemistry engines:
+
+```bash
 python3 install-dependencies.py     # base environment in .venv
-python3 install-engines.py          # optional: pinned chemistry engines
+python3 install-engines.py          # pinned chemistry engines (MAGEMin, PySulfSat, ThermoEngine, ...)
 python3 install-engines.py --check  # read-only lock drift report
 ```
 
@@ -76,6 +83,10 @@ fails, investigate the physics. Do not retune a coefficient to make it pass.
 Engine-sensitive golden fixtures should be regenerated on the reference
 engine build (see `scripts/regenerate_runner_goldens.py`). Small differences
 in those fixtures between machines with different engine builds are expected.
+
+Keep the `--timeout=300` default from `pyproject.toml`. The staged-freeze mass-balance test runs a
+MAGEMin liquidus search that takes minutes, and a shorter timeout kills it mid-subprocess in a way
+that looks like a hang.
 
 ## Code style
 

@@ -700,6 +700,7 @@ dependencies = [
     { name = "flask" },
     { name = "flask-socketio" },
     { name = "numpy" },
+    { name = "optuna" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "pandas", version = "3.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
     { name = "plotly" },
@@ -721,9 +722,6 @@ e2e = [
 imcc = [
     { name = "openimcc" },
 ]
-optimize = [
-    { name = "optuna" },
-]
 
 [package.metadata]
 requires-dist = [
@@ -731,7 +729,7 @@ requires-dist = [
     { name = "flask-socketio", specifier = ">=5.3" },
     { name = "numpy", specifier = ">=1.26,<2" },
     { name = "openimcc", marker = "extra == 'imcc'", git = "https://github.com/simonrowland/openimcc?rev=66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84" },
-    { name = "optuna", marker = "extra == 'optimize'", specifier = "==4.8.0" },
+    { name = "optuna", specifier = "==4.8.0" },
     { name = "pandas" },
     { name = "playwright", marker = "extra == 'e2e'", specifier = ">=1.61,<2" },
     { name = "plotly", specifier = ">=5.18" },

@@ -32,6 +32,8 @@ dependencies = [
     # Reads and limits the BLAS thread pool when NumPy was loaded before the
     # simulator package (the thread policy cannot use the environment then).
     "threadpoolctl>=3.1",
+    # Recipe optimizer strategies (python -m simulator.optimize); a default install.
+    "optuna==4.8.0",
     # PetThermoTools and the other engine distributions are installed
     # editable by install-engines.py after the base environment sync.
     # vaporock (VAPOR_PRESSURE diagnostic overlay) is intentionally NOT a pip dependency.
@@ -47,7 +49,8 @@ dependencies = [
 [project.optional-dependencies]
 # Optional extras for paths NOT required by the default operational chain.
 imcc = ["openimcc @ git+https://github.com/simonrowland/openimcc@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"]
-optimize = ["optuna==4.8.0"]
+# optuna is a core dependency; the extra name is kept so existing ".[optimize]" installs still resolve.
+optimize = []
 e2e = ["playwright>=1.61,<2"]
 # MAGEMin (https://github.com/ComputationalThermodynamics/MAGEMin) is a
 # compiled C/Fortran Gibbs-energy minimiser. There is NO pure-PyPI MAGEMin

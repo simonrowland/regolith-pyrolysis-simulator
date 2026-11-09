@@ -284,37 +284,16 @@ integration rather than exposing the development server.
 
 ## Installed Dependencies
 
-`pip install -r requirements.txt` installs:
+`install-dependencies.py` installs the Python stack from `requirements.txt`: Flask and
+Flask-SocketIO (web UI), PyYAML, Plotly, NumPy (pinned `<2`, because VapoRock needs `np.bool8`),
+SciPy, pandas, psutil, threadpoolctl, optuna (recipe optimizer), and the pytest plugins the test
+configuration requires. It also installs the locked alphaMELTS app.
 
-- `flask` — web server and templates.
-- `flask-socketio` — live simulation updates.
-- `pyyaml` — feedstock, setpoint, and vapor-pressure data files.
-- `plotly` — browser-side charts.
-- `numpy` — numerical helpers. Pinned `<2`: VapoRock imports `np.bool8`, removed in NumPy 2.0.
-- `scipy` — scientific calculations.
-- `pandas` — IMCC gas-model tables.
-- `psutil` — optimizer child-process identity checks.
-- `pytest`, `pytest-xdist`, `pytest-timeout` — required by the `addopts` in `pyproject.toml`;
-  without them `pytest` aborts during argument parsing before any test runs.
+`install-engines.py` builds the pinned chemistry engines: MAGEMin, PySulfSat, ThermoEngine,
+VapoRock, PetThermoTools and Thermobar. Run it after the base install. A later exact `uv sync`
+removes them, so provision the engines again after any sync.
 
-Optional extras declared in `pyproject.toml` (`pip install -e ".[<name>]"`):
-
-| extra | contents |
-|---|---|
-| `dev` | `pytest`, `pytest-xdist`, `pytest-timeout` |
-| `optimize` | `optuna` (pinned) — the recipe-optimizer strategies |
-| `sulfur` | marker only; PySulfSat comes from `install-engines.py` |
-| `magemin` | marker only; the MAGEMin binary itself comes from `install-engines.py` |
-
-There is no `melts` extra. PetThermoTools is required for its melt-equilibria
-path and comes from `install-engines.py`; the alphaMELTS binary is installed
-by `install-dependencies.py`. The base lock excludes installer-owned engines.
-An exact `uv sync` removes those installations: sync first, then provision
-engines again. After provisioning, use `.venv/bin/python` or `uv run --no-sync`.
-A fresh uv venv needs `.venv/bin/python -m ensurepip --upgrade` before the
-pip-based engine installer. The engine lock records the validated source pins;
-check engine imports explicitly because installer exit status alone does not
-prove success.
+Optional extras (`pip install -e ".[<name>]"`): `imcc` (OpenIMCC) and `e2e` (browser tests).
 
 ## Melt Chemistry Backends
 
@@ -372,17 +351,7 @@ Two literature stores back that, and the split is load-bearing:
 
 ## Development
 
-```bash
-pip install -e ".[dev]"
-python3 -m pytest tests/ -v
-```
-
-`pyproject.toml` sets `addopts = -n auto --dist loadgroup --no-loadscope-reorder --timeout=300`.
-Those defaults are load-bearing, not cosmetic. The staged-freeze mass-balance case spawns the real
-MAGEMin binary for a bracket-and-bisect liquidus search that takes minutes; lowering `--timeout`
-below ~200 s clips a legitimate run and pytest-timeout fires SIGALRM inside a subprocess poll,
-which the xdist gateway cannot recover from. It looks like a hang or a silent die, not a timeout.
-Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not freeze'`).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Public Docs
 

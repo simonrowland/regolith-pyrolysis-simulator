@@ -42,7 +42,7 @@ the binary from that versioned directory in the checkout's generated
 
 The `numpy>=1.26,<2` upper bound in `[project.dependencies]` is load-bearing for the same stack: VapoRock imports `np.bool8`, removed in numpy 2.0, so an unbounded spec silently breaks `import vaporock`.
 
-The optional extras are `[optimize]` (Optuna, for the recipe optimizer), `[magemin]` (a documented build path — the MAGEMin binary is compiled from source; the only pip-installable piece is the optional `juliacall` bridge, commented out by default), `[sulfur]` (a marker for installer-owned PySulfSat), and `[dev]` (the pytest plugins the project `addopts` depend on). None of these are on the production hot path.
+Optuna (the recipe optimizer) is a core dependency. MAGEMin and PySulfSat are built by `install-engines.py` as part of the standard install. The remaining optional extras are `[imcc]` (OpenIMCC), `[e2e]` (browser tests) and `[dev]` (the pytest plugins the project `addopts` depend on).
 
 ## VapoRock adapter notes
 
