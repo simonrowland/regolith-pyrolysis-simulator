@@ -1940,7 +1940,7 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
 ) -> None:
     mutations = 0
     seeds = 0
-    unconsumed_inference_units: list[str] = []
+    unconsumed_inference_units: set[str] = set()
     fields = (
         "mass_kg",
         "final_mass_kg",
@@ -1948,153 +1948,176 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
         "charge_sequence",
         "vaporization_statement",
     )
-    for field in fields:
-        for home in RUN_METADATA_FIELD_HOMES[field][1]:
-            if field in {"mass_kg", "final_mass_kg"}:
-                shapes = (
-                    "scalar",
-                    "point",
-                    "located-state",
-                    "series",
-                    "interval",
-                    "bound",
-                    "inference-with-parameters",
-                    "wrapped-inference",
-                    "as-published-point",
-                    "as-published-interval",
-                    "nested-combination",
-                    "misplaced-as-published",
-                )
-            elif field == "species_loss_fraction":
-                shapes = (
-                    "scalar",
-                    "point",
-                    "located-state",
-                    "series",
-                    "interval",
-                    "bound",
-                    "inference-with-parameters",
-                )
-            else:
-                shapes = ("unitless", "unitless-with-inference")
-            for shape in shapes:
-                seed_root = tmp_path / f"seed-{seeds}"
-                seeds += 1
-                if shape.startswith("unitless"):
-                    payload = (
-                        {"charge_id": "charge-a", "run_index": 1,
-                         "locator": {"table": "unit-matrix", "page": 1}}
-                        if field == "charge_sequence"
-                        else {
-                            "state": {"tag": "value", "value": "congruent"},
-                            "locator": {"table": "unit-matrix", "page": 1},
-                        }
-                    )
-                    if shape == "unitless-with-inference":
-                        payload["inference"] = {
-                            "method": "fixture",
-                            "relation": "identity",
-                            "inputs": ["source"],
-                            "output_unit": "g",
-                        }
-                    _seed, base_extract = _unitless_run_metadata_extract(
-                        seed_root, field, home, payload
-                    )
-                else:
-                    _seed, base_extract = _run_metadata_shape_extract(
-                        seed_root, field, home, shape
-                    )
-
-                base_payload = _run_metadata_field_payload(
-                    base_extract, field, home
-                )
-                for node_path in _run_metadata_mapping_paths(base_payload):
-                    for unit_key in _RUN_METADATA_UNIT_KEYS:
-                        extract = deepcopy(base_extract)
-                        field_payload = _run_metadata_field_payload(
-                            extract, field, home
-                        )
-                        _run_metadata_mapping_at(field_payload, node_path)[unit_key] = "g"
-                        root = _write_min_tree(
-                            tmp_path / f"mutation-{mutations}", extract
-                        )
-                        result = migrate(root, write=True)
-                        assert result.validation is not None
-                        experiment_id = "10.1234/fixture::experiment::run-1"
-                        _works, experiments, _observations = load_migrated_store(root)
-                        loaded = _loaded_run_metadata_value(
-                            experiments[experiment_id], field
-                        )
-                        field_issues = [
-                            issue
-                            for issue in result.validation.issues
-                            if issue.reason is RefusalReason.INVALID_SOURCE
-                            and field in issue.path
-                        ]
-                        context = (
-                            f"field={field}, home={home}, shape={shape}, "
-                            f"node={node_path}, key={unit_key}"
-                        )
-                        if field_issues:
-                            assert loaded is None, context
-                            if shape == "misplaced-as-published":
-                                assert any(
-                                    "as_published is only valid on the Located value"
-                                    in issue.detail
-                                    for issue in field_issues
-                                ), context
-                        elif (
-                            (
-                                field in {"mass_kg", "final_mass_kg"}
-                                and shape == "wrapped-inference"
-                            )
-                            or (
-                                field in {"charge_sequence", "vaporization_statement"}
-                                and shape == "unitless-with-inference"
-                            )
-                        ) and node_path == ("inference",) and unit_key == "output_unit":
-                            unconsumed_inference_units.append(context)
-                        else:
-                            assert field in {"mass_kg", "final_mass_kg"}, context
-                            assert loaded is not None and loaded.state.is_value, context
-                            if (
-                                node_path == ("inference",)
-                                and unit_key == "output_unit"
-                            ):
-                                assert loaded.inference is not None, context
-                                assert loaded.inference.output_unit == "g", context
-                            elif (
-                                node_path == ("as_published",)
-                                and unit_key in {"units", "low_units", "high_units"}
-                            ):
-                                assert loaded.inference is not None, context
-                                assert loaded.inference.relation == "g_to_kg", context
-                            elif (
-                                node_path
-                                in {
-                                    (),
-                                    ("value",),
-                                    ("state", "value"),
-                                    ("value", "state", "value"),
-                                }
-                                and unit_key in {"unit", "units"}
-                            ):
-                                printed = Decimal(
-                                    "0.0008" if field == "final_mass_kg" else "0.25"
-                                )
-                                assert loaded.state.value == Value.point_of(
-                                    printed / Decimal(1000)
-                                ), context
-                            else:
-                                pytest.fail(
-                                    "unit-like key was accepted without a consuming reader: "
-                                    f"{context}"
-                                )
-                        mutations += 1
-    assert not unconsumed_inference_units, (
-        "output_unit was accepted where the shape reader drops inference: "
-        f"{unconsumed_inference_units}"
+    located_value_shapes = (
+        "scalar",
+        "point",
+        "located-state",
+        "series",
+        "interval",
+        "bound",
+        "inference-with-parameters",
+        "wrapped-inference",
+        "as-published-point",
+        "as-published-interval",
+        "nested-combination",
+        "misplaced-as-published",
     )
+    shapes_by_field = {
+        "mass_kg": located_value_shapes,
+        "final_mass_kg": located_value_shapes,
+        "species_loss_fraction": (
+            "scalar",
+            "point",
+            "located-state",
+            "series",
+            "interval",
+            "bound",
+            "inference-with-parameters",
+        ),
+        "charge_sequence": ("unitless", "unitless-with-inference"),
+        "vaporization_statement": ("unitless", "unitless-with-inference"),
+    }
+    cases = [
+        (field, home, shape)
+        for field in fields
+        for home in RUN_METADATA_FIELD_HOMES[field][1]
+        for shape in shapes_by_field[field]
+    ]
+    priority_cases = [
+        case
+        for case in cases
+        if (
+            case[0] in {"mass_kg", "final_mass_kg"}
+            and case[2] == "wrapped-inference"
+        )
+        or (
+            case[0] in {"charge_sequence", "vaporization_statement"}
+            and case[2] == "unitless-with-inference"
+        )
+    ]
+    priority_case_set = set(priority_cases)
+    ordered_cases = priority_cases + [
+        case for case in cases if case not in priority_case_set
+    ]
+    for case_index, (field, home, shape) in enumerate(ordered_cases):
+        seed_root = tmp_path / f"seed-{seeds}"
+        seeds += 1
+        if shape.startswith("unitless"):
+            payload = (
+                {"charge_id": "charge-a", "run_index": 1,
+                 "locator": {"table": "unit-matrix", "page": 1}}
+                if field == "charge_sequence"
+                else {
+                    "state": {"tag": "value", "value": "congruent"},
+                    "locator": {"table": "unit-matrix", "page": 1},
+                }
+            )
+            if shape == "unitless-with-inference":
+                payload["inference"] = {
+                    "method": "fixture",
+                    "relation": "identity",
+                    "inputs": ["source"],
+                    "output_unit": "g",
+                }
+            _seed, base_extract = _unitless_run_metadata_extract(
+                seed_root, field, home, payload
+            )
+        else:
+            _seed, base_extract = _run_metadata_shape_extract(
+                seed_root, field, home, shape
+            )
+
+        base_payload = _run_metadata_field_payload(
+            base_extract, field, home
+        )
+        for node_path in _run_metadata_mapping_paths(base_payload):
+            for unit_key in _RUN_METADATA_UNIT_KEYS:
+                extract = deepcopy(base_extract)
+                field_payload = _run_metadata_field_payload(
+                    extract, field, home
+                )
+                _run_metadata_mapping_at(field_payload, node_path)[unit_key] = "g"
+                root = _write_min_tree(
+                    tmp_path / f"mutation-{mutations}", extract
+                )
+                result = migrate(root, write=True)
+                assert result.validation is not None
+                experiment_id = "10.1234/fixture::experiment::run-1"
+                _works, experiments, _observations = load_migrated_store(root)
+                loaded = _loaded_run_metadata_value(
+                    experiments[experiment_id], field
+                )
+                field_issues = [
+                    issue
+                    for issue in result.validation.issues
+                    if issue.reason is RefusalReason.INVALID_SOURCE
+                    and field in issue.path
+                ]
+                context = (
+                    f"field={field}, home={home}, shape={shape}, "
+                    f"node={node_path}, key={unit_key}"
+                )
+                if field_issues:
+                    assert loaded is None, context
+                    if shape == "misplaced-as-published":
+                        assert any(
+                            "as_published is only valid on the Located value"
+                            in issue.detail
+                            for issue in field_issues
+                        ), context
+                elif (
+                    (
+                        field in {"mass_kg", "final_mass_kg"}
+                        and shape == "wrapped-inference"
+                    )
+                    or (
+                        field in {"charge_sequence", "vaporization_statement"}
+                        and shape == "unitless-with-inference"
+                    )
+                ) and node_path == ("inference",) and unit_key == "output_unit":
+                    unconsumed_inference_units.add(f"{field} at {home} ({shape})")
+                else:
+                    assert field in {"mass_kg", "final_mass_kg"}, context
+                    assert loaded is not None and loaded.state.is_value, context
+                    if (
+                        node_path == ("inference",)
+                        and unit_key == "output_unit"
+                    ):
+                        assert loaded.inference is not None, context
+                        assert loaded.inference.output_unit == "g", context
+                    elif (
+                        node_path == ("as_published",)
+                        and unit_key in {"units", "low_units", "high_units"}
+                    ):
+                        assert loaded.inference is not None, context
+                        assert loaded.inference.relation == "g_to_kg", context
+                    elif (
+                        node_path
+                        in {
+                            (),
+                            ("value",),
+                            ("state", "value"),
+                            ("value", "state", "value"),
+                        }
+                        and unit_key in {"unit", "units"}
+                    ):
+                        printed = Decimal(
+                            "0.0008" if field == "final_mass_kg" else "0.25"
+                        )
+                        assert loaded.state.value == Value.point_of(
+                            printed / Decimal(1000)
+                        ), context
+                    else:
+                        pytest.fail(
+                            "unit-like key was accepted without a consuming reader: "
+                            f"{context}"
+                        )
+                mutations += 1
+        if case_index + 1 == len(priority_cases):
+            assert not unconsumed_inference_units, (
+                "output_unit was accepted where the shape reader drops inference: "
+                f"{sorted(unconsumed_inference_units)}"
+            )
 
 
 _RUN_METADATA_INFERENCE_LOSS_CASES = tuple(
