@@ -51,6 +51,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
     liquid_model_subsolidus_sample_notice,
+    _printed_uncertainty_band,
     predict_with_engine,
 )
 from simulator.battery.migrate import (
@@ -5594,7 +5595,7 @@ def test_renggli_printed_ppm_widths_bind_to_selected_residue_values(
         if observation.value.point == Decimal("5874")
     )
     assert first.uncertainty.value == Decimal("110")
-    assert first.uncertainty.basis == "absolute"
+    assert first.uncertainty.basis == "ppm"
     assert first.uncertainty.verbatim["parent"].endswith(
         "::renggli_2022_table1_residue_te"
     )
@@ -5608,7 +5609,16 @@ def test_wang_printed_ppm_widths_bind_to_selected_residue_values(
 
     widths = _legacy_width_observations(result, "uncertainty_ppm")
     assert len(widths) == 221
-    assert all(observation.uncertainty.basis == "absolute" for observation in widths)
+    assert all(observation.uncertainty.basis == "ppm" for observation in widths)
+    sc12_la = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("80.3")
+        and observation.uncertainty.verbatim["parent"].endswith(
+            "::wang_2001_table1_la_residue_concentration"
+        )
+    )
+    assert Decimal(str(sc12_la.uncertainty.verbatim["sigma"])) == Decimal("4.1")
 
 
 def test_wang_printed_permil_widths_bind_to_selected_isotope_values(
@@ -5619,7 +5629,29 @@ def test_wang_printed_permil_widths_bind_to_selected_isotope_values(
 
     widths = _legacy_width_observations(result, "uncertainty_permil")
     assert len(widths) == 30
-    assert all(observation.uncertainty.basis == "absolute" for observation in widths)
+    assert all(observation.uncertainty.basis == "per_mil" for observation in widths)
+    sc12_delta25 = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("-1.6")
+        and observation.uncertainty.verbatim["parent"].endswith(
+            "::wang_2001_table4_25Mg_24Mg_relative_to_starting_material"
+        )
+    )
+    sc12_delta26 = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("0.4")
+        and observation.uncertainty.verbatim["parent"].endswith(
+            "::wang_2001_table4_26Mg_24Mg_relative_to_starting_material"
+        )
+    )
+    assert Decimal(str(sc12_delta25.uncertainty.verbatim["sigma"])) == Decimal(
+        "0.2"
+    )
+    assert Decimal(str(sc12_delta26.uncertainty.verbatim["sigma"])) == Decimal(
+        "0.5"
+    )
 
 
 def test_florin_printed_two_sigma_widths_bind_to_both_selected_isotope_fields(
@@ -5641,6 +5673,84 @@ def test_florin_printed_two_sigma_widths_bind_to_both_selected_isotope_fields(
         "florin_2025_table_3_cu_isotope_delta_sc": 24,
     }
     assert all(observation.uncertainty.verbatim["k"] == 2 for observation in widths)
+    assert all(
+        observation.uncertainty.verbatim["units"] == "per_mil"
+        for observation in widths
+    )
+    cu12_delta65 = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("0.39")
+        and observation.uncertainty.verbatim["parent"].endswith(
+            "::florin_2025_table_3_cu_isotope_delta_erm633"
+        )
+    )
+    cu12_delta65_sc = next(
+        observation
+        for observation in widths
+        if observation.value.point == Decimal("0.23")
+        and observation.uncertainty.verbatim["parent"].endswith(
+            "::florin_2025_table_3_cu_isotope_delta_sc"
+        )
+    )
+    assert Decimal(str(cu12_delta65.uncertainty.verbatim["sigma"])) == Decimal(
+        "0.08"
+    )
+    assert Decimal(str(cu12_delta65_sc.uncertainty.verbatim["sigma"])) == Decimal(
+        "0.08"
+    )
+
+
+@pytest.mark.parametrize(
+    ("filename", "width_key", "expected_count"),
+    [
+        ("renggli-2022-te-evaporation.yaml", "uncertainty_ppm", 36),
+        (
+            "wang-2001-solar-melt-evaporation-residues.yaml",
+            "uncertainty_ppm",
+            221,
+        ),
+        (
+            "wang-2001-solar-melt-evaporation-residues.yaml",
+            "uncertainty_permil",
+            30,
+        ),
+        (
+            "florin-2025-cu-silicate-evaporation.yaml",
+            "two_sigma_permil",
+            48,
+        ),
+        (
+            "ozawa-2012-forsterite-vacuum-evaporation.yaml",
+            "uncertainty_permil",
+            6,
+        ),
+    ],
+)
+def test_recovered_real_extract_widths_produce_printed_bands(
+    tmp_path: Path, filename: str, width_key: str, expected_count: int
+) -> None:
+    result = _migrate_real_extract(tmp_path, filename)
+
+    widths = _legacy_width_observations(result, width_key)
+    assert len(widths) == expected_count
+    resolutions = [
+        _printed_uncertainty_band(
+            quantity_token(observation.identity),
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+        for observation in widths
+    ]
+    assert sum(
+        resolution.band is not None for resolution in resolutions
+    ) == expected_count, [
+        (resolution.refusal or {}).get("reason")
+        for resolution in resolutions
+        if resolution.band is None
+    ]
+    assert all(resolution.refusal is None for resolution in resolutions)
 
 
 @pytest.mark.parametrize(
@@ -5778,7 +5888,10 @@ def test_two_sigma_width_rejects_parent_confidence_mismatch(tmp_path: Path) -> N
     ) == 24
 
 
-def test_two_sigma_width_copies_only_parent_confidence_level(tmp_path: Path) -> None:
+@pytest.mark.parametrize("confidence_level", ["95%", "two_sigma", "ci95"])
+def test_two_sigma_width_copies_only_parent_confidence_level(
+    tmp_path: Path, confidence_level: str
+) -> None:
     source_id = "florin-2025-cu-silicate-evaporation"
     doc = yaml.safe_load(
         (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
@@ -5788,7 +5901,7 @@ def test_two_sigma_width_copies_only_parent_confidence_level(tmp_path: Path) -> 
     parent, row = _legacy_width_row(doc, "two_sigma_permil")
     parent["uncertainty"] = {
         "two_sigma": 0.03,
-        "confidence_level": "95%",
+        "confidence_level": confidence_level,
         "units": "per mil",
     }
     row["confidence_level"] = "68%"
@@ -5804,7 +5917,7 @@ def test_two_sigma_width_copies_only_parent_confidence_level(tmp_path: Path) -> 
             "::florin_2025_table_3_cu_isotope_delta_erm633"
         )
     )
-    assert observation.uncertainty.verbatim["confidence_level"] == "95%"
+    assert observation.uncertainty.verbatim["confidence_level"] == confidence_level
     assert "row_confidence_level" not in observation.uncertainty.verbatim
 
 

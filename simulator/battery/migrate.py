@@ -93,6 +93,7 @@ from simulator.battery.enums import (
     Authority,
     BoundDirection,
     BoundInclusivity,
+    CONFIDENCE_LEVEL_BAND_KINDS,
     EvidenceClass,
     ExperimentKind,
     FUSION_QUANTITIES,
@@ -10883,22 +10884,31 @@ class _LegacyPointWidthDiagnostic(str, Enum):
     MULTIPLE_WIDTHS = "legacy_point_width.multiple_widths"
 
 
-# These are source-proven sibling/value pairs. The exact target fields keep
-# similarly named widths from attaching to another quantity on the same row.
-# A width binds only when select_declared_source chooses its paired value field;
-# the width key alone does not identify which printed value it describes.
-_LEGACY_POINT_WIDTH_VALUE_FIELDS: Mapping[str, frozenset[str]] = {
-    "uncertainty_ppm": frozenset({"residue_ppm"}),
-    "uncertainty_permil": frozenset({"isotope_delta_isotope_delta"}),
-    "two_sigma_permil": frozenset(
-        {
-            "isotope_delta_delta65CuERM633_permil",
-            "isotope_delta_Delta65CuSC_permil",
-        }
+# These source-proven sibling/value/unit triples bind only when
+# select_declared_source chooses the paired value field on that row. The
+# allowlisted units come from the width columns' printed conventions; the key
+# alone never identifies which of several row values the width describes.
+# ``as_published`` keeps a generic width explicitly unresolved for scoring.
+_LEGACY_POINT_WIDTH_VALUE_FIELDS: Mapping[
+    str, tuple[frozenset[str], str]
+] = {
+    "uncertainty_ppm": (frozenset({"residue_ppm"}), "ppm"),
+    "uncertainty_permil": (
+        frozenset({"isotope_delta_isotope_delta"}),
+        "per_mil",
     ),
-    "uncertainty_wt_pct": frozenset({"Cl_wt_pct"}),
-    "Cl_uncertainty_wt_pct": frozenset({"Cl_wt_pct"}),
-    "uncertainty_width_as_printed": frozenset({"value"}),
+    "two_sigma_permil": (
+        frozenset(
+            {
+                "isotope_delta_delta65CuERM633_permil",
+                "isotope_delta_Delta65CuSC_permil",
+            }
+        ),
+        "per_mil",
+    ),
+    "uncertainty_wt_pct": (frozenset({"Cl_wt_pct"}), "%"),
+    "Cl_uncertainty_wt_pct": (frozenset({"Cl_wt_pct"}), "%"),
+    "uncertainty_width_as_printed": (frozenset({"value"}), "as_published"),
 }
 
 
@@ -10947,7 +10957,7 @@ def _point_uncertainty_from_row(
             None,
             (_LegacyPointWidthDiagnostic.NON_NUMERIC,),
         )
-    if selection.field_name not in _LEGACY_POINT_WIDTH_VALUE_FIELDS[width_key]:
+    if selection.field_name not in _LEGACY_POINT_WIDTH_VALUE_FIELDS[width_key][0]:
         return (
             explicit if has_explicit else None,
             None,
@@ -10959,25 +10969,39 @@ def _point_uncertainty_from_row(
         parent = parent_uncertainty.verbatim
         if isinstance(parent, Mapping):
             confidence = parent.get("confidence_level")
-            confidence_text = str(confidence).strip().removesuffix("%")
-            confidence_value = _as_dec_or_none(confidence_text)
-            if confidence is not None and confidence_value is None:
-                return (
-                    explicit if has_explicit else None,
-                    None,
-                    None,
-                    (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+            if confidence is not None:
+                confidence_text = str(confidence).strip()
+                canonical_kind = CONFIDENCE_LEVEL_BAND_KINDS.get(
+                    confidence_text
                 )
-            if confidence_value is not None:
-                if Decimal(0) < confidence_value <= Decimal(1):
-                    confidence_value *= Decimal(100)
-                if confidence_value != Decimal(95):
-                    return (
-                        explicit if has_explicit else None,
-                        None,
-                        None,
-                        (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                if canonical_kind is not None:
+                    if canonical_kind != "printed_2sigma":
+                        return (
+                            explicit if has_explicit else None,
+                            None,
+                            None,
+                            (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                        )
+                else:
+                    confidence_value = _as_dec_or_none(
+                        confidence_text.removesuffix("%")
                     )
+                    if confidence_value is None:
+                        return (
+                            explicit if has_explicit else None,
+                            None,
+                            None,
+                            (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                        )
+                    if Decimal(0) < confidence_value <= Decimal(1):
+                        confidence_value *= Decimal(100)
+                    if confidence_value != Decimal(95):
+                        return (
+                            explicit if has_explicit else None,
+                            None,
+                            None,
+                            (_LegacyPointWidthDiagnostic.PARENT_CONVENTION_MISMATCH,),
+                        )
             if parent.get("one_sigma") not in (None, ""):
                 return (
                     explicit if has_explicit else None,
@@ -24585,6 +24609,9 @@ class Migrator:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
             if extra_unc_key is not None:
                 verbatim["legacy_width_key"] = extra_unc_key
+                width_unit = _LEGACY_POINT_WIDTH_VALUE_FIELDS[extra_unc_key][1]
+                if extra_unc_k is not None:
+                    verbatim["units"] = width_unit
             if isinstance(uncertainty.verbatim, Mapping):
                 confidence_level = uncertainty.verbatim.get("confidence_level")
                 if confidence_level is not None:
@@ -24614,7 +24641,11 @@ class Migrator:
                         if extra_unc_key is not None
                         else None
                     ),
-                    basis=("absolute" if extra_unc_key is not None else None),
+                    basis=(
+                        _LEGACY_POINT_WIDTH_VALUE_FIELDS[extra_unc_key][1]
+                        if extra_unc_key is not None
+                        else None
+                    ),
                 )
             if value_sel is not None and value_sel.printed_form is not None:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)

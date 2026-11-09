@@ -646,6 +646,13 @@ MEASURED_EVIDENCE = frozenset(
     }
 )
 
+CONFIDENCE_LEVEL_BAND_KINDS: dict[str, str] = {
+    "two_sigma": "printed_2sigma",
+    "ci95": "printed_2sigma",
+    "one_sigma": "printed_1sigma",
+    "range_half_width": "printed_range",
+}
+
 FORMATION_QUANTITIES = frozenset(
     {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
 )

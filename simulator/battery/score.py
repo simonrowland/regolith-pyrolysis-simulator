@@ -38,6 +38,7 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
+    CONFIDENCE_LEVEL_BAND_KINDS,
     EQUILIBRIUM_FIT_QUANTITIES,
     Engine,
     EvidenceClass,
@@ -4666,13 +4667,25 @@ def _convert_uncertainty_width(
     quantity: Quantity,
     width: Decimal,
     source_unit: str,
+    source_observation: Observation | None = None,
 ) -> tuple[Decimal | None, str | None]:
     unit = re.sub(r"\s+", "", source_unit).casefold()
     expected = QUANTITY_UNITS[quantity]
     if unit in {expected.casefold(), "1", "fraction", "relative"}:
         return width, "fraction" if unit in {"fraction", "relative"} else expected
+    if quantity is Quantity.ISOTOPE_DELTA and unit in {"permil", "‰"}:
+        return width, expected
     if unit in {"%", "percent", "percentage"}:
         return width / Decimal(100), "fraction"
+    if (
+        unit == "ppm"
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and source_observation is not None
+        and source_observation.identity.subtype is not None
+        and source_observation.identity.subtype.is_value
+        and source_observation.identity.subtype.value == "element_ppm_by_mass"
+    ):
+        return width, "ppm"
     if unit == "dex":
         return width, "dex"
     if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE, Quantity.FUGACITY}:
@@ -4856,19 +4869,14 @@ def _printed_uncertainty_band(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
     )
-    if confidence_level in {"two_sigma", "ci95"}:
-        kind = "printed_2sigma"
-    elif confidence_level == "one_sigma":
-        kind = "printed_1sigma"
-    elif confidence_level == "range_half_width":
-        kind = "printed_range"
-    elif re.search(
+    kind = CONFIDENCE_LEVEL_BAND_KINDS.get(confidence_level)
+    if kind is None and re.search(
         r"\b(?:range|limits?|maximum error|maximum deviation|bounding)\b",
         raw_text,
         re.IGNORECASE,
     ):
         kind = "printed_range"
-    else:
+    elif kind is None:
         kind = "printed_unstated"
     if isinstance(source_value, tuple):
         lower, upper = source_value
@@ -4876,7 +4884,7 @@ def _printed_uncertainty_band(
     else:
         width = source_value
     converted, converted_unit = _convert_uncertainty_width(
-        quantity, width, source_unit
+        quantity, width, source_unit, source_observation
     )
     if converted is None:
         return _PrintedBandResolution(
