@@ -37,6 +37,7 @@ from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
+    WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE,
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
@@ -4304,6 +4305,18 @@ def _aggregate_campaigns_to_resinter(
     )["aggregate_campaigns_to_resinter"]
 
 
+def _authority_names_uncertified_wall_zero(authority: Mapping[str, Any]) -> bool:
+    codes = authority.get("codes")
+    named = (
+        authority.get("code") == WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE
+        or (
+            isinstance(codes, (list, tuple, set, frozenset))
+            and WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE in codes
+        )
+    )
+    return named and not authority.get("deposited_species")
+
+
 def _coating_lifetime_projection(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
@@ -4386,6 +4399,18 @@ def _coating_lifetime_projection(
             unavailable = True
 
     if unavailable:
+        campaigns_to_resinter = None
+        aggregate_campaigns_to_resinter = None
+        lifetime = None
+        has_positive_fouling = None
+    elif (
+        has_positive_fouling is False
+        and isinstance(authority, Mapping)
+        and _authority_names_uncertified_wall_zero(authority)
+    ):
+        # The vapour-carrier authority already says a sampled zero cannot be
+        # certified. Publishing that zero as a measured load prices a coating
+        # the ledger did not qualify.
         campaigns_to_resinter = None
         aggregate_campaigns_to_resinter = None
         lifetime = None

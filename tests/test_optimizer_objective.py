@@ -1277,6 +1277,72 @@ def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference()
     )
 
 
+def test_uncertified_empty_deposit_is_not_a_measured_lifespan_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_deposit_vapour_carrier_non_authoritative",
+        "message": (
+            "zero wall deposition cannot be certified from that evidence"
+        ),
+        "vapour_carrier_authority_by_species": {
+            "Cr2O3_gas": {
+                "species_id": "Cr2O3_gas",
+                "is_refused": True,
+                "pressure": {"kind": "refusal"},
+                "flux": {"kind": "refusal"},
+            }
+        },
+    }
+    empty = SimpleNamespace(
+        simulator=SimpleNamespace(),
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={},
+            wall_deposit_sticking_authority=authority,
+        ),
+    )
+    summary = objective_module._furnace_lifespan_cost_summary(empty, empty.simulator)
+    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+    assert summary["wall_deposit_total_kg"] is None
+    assert summary["wall_deposit_kg_by_species"] is None
+
+    positive = SimpleNamespace(
+        simulator=SimpleNamespace(),
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                ("stage_0_to_stage_1", "Na"): 0.05,
+            },
+            wall_deposit_sticking_authority=authority,
+        ),
+    )
+    kept = objective_module._furnace_lifespan_cost_summary(
+        positive,
+        positive.simulator,
+    )
+    assert kept["lifespan_cost_status"] == "threshold_unavailable"
+    assert kept["wall_deposit_total_kg"] == pytest.approx(0.05)
+
+    proven_zero = SimpleNamespace(
+        simulator=SimpleNamespace(),
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                ("stage_0_to_stage_1", "Na"): 0.0,
+            },
+            wall_deposit_sticking_authority={
+                "authoritative_for_deposit_mass": True,
+            },
+        ),
+    )
+    measured = objective_module._furnace_lifespan_cost_summary(
+        proven_zero,
+        proven_zero.simulator,
+    )
+    assert measured["lifespan_cost_status"] == "threshold_unavailable"
+    assert measured["wall_deposit_total_kg"] == pytest.approx(0.0)
+
+
 def test_finite_threshold_refused_empty_deposit_is_unavailable_for_lifespan_cost(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
