@@ -92,6 +92,27 @@ def test_partial_melt_offgassing_diagnostic_warns_on_partition_fallback(
     flux = sim._calculate_evaporation(equilibrium)
 
     assert flux.species_kg_hr == {'Na': 0.01, 'K': 0.002}
+    flux_diagnostic = sim._last_evaporation_flux_diagnostic
+    closure = flux_diagnostic['same_hour_headspace_closure']
+    # The fake dispatch has rates and no series rows, so the scalar
+    # projection cannot run. The provider rates stay as an unclosed
+    # P_bulk=0 estimate; they are not admitted as a closed partition.
+    assert closure['status'] == 'projection_unavailable'
+    assert closure['value_authority'] == 'unclosed_provider_estimate'
+    assert closure['partial_pressures_Pa'] == {}
+    assert closure['rates_kg_hr'] == {'K': 0.002, 'Na': 0.01}
+    assert flux_diagnostic.get('evaporation_flux_rates_are_admitted') is not True
+    missing = {
+        row['species']: row['missing'] for row in closure['missing_inputs']
+    }
+    assert missing == {
+        'K': ['series_resistance_row'],
+        'Na': ['series_resistance_row'],
+    }
+    assert any(
+        notice.get('kind') == 'projection_unavailable'
+        for notice in flux_diagnostic['notices']
+    )
     diagnostic = sim._last_partial_melt_offgassing_diagnostic
     assert diagnostic['status'] == 'UNCERTIFIED_PARAMETERIZED_ESTIMATE'
     assert diagnostic['melt_regime'] == 'partial'
@@ -103,6 +124,42 @@ def test_partial_melt_offgassing_diagnostic_warns_on_partition_fallback(
     ] == 'analytical_batch_partition_fallback'
     assert diagnostic['p_ratio_partial_over_bulk']['Na'] > 1.0
     assert diagnostic['p_ratio_partial_over_bulk']['K'] > 1.0
+
+
+def test_projection_unavailable_omits_a_missing_molar_mass(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
+    _install_flux_dispatch(
+        monkeypatch, sim, {'Na': 0.01, 'Unobtainium': 0.5}
+    )
+    _install_eligible_vapour_batch(sim)
+    equilibrium = EquilibriumResult(
+        temperature_C=1150.0,
+        pressure_bar=1e-8,
+        liquid_fraction=0.2,
+        vapor_pressures_Pa={'Na': 1.0},
+        diagnostics={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
+    )
+
+    flux = sim._calculate_evaporation(equilibrium)
+
+    assert 'Unobtainium' not in flux.species_kg_hr
+    assert flux.species_kg_hr['Na'] == pytest.approx(0.01)
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    assert diagnostic['missing_molar_mass']['Unobtainium']['policy'] == (
+        'fail_loud_missing_molar_mass'
+    )
+    closure = diagnostic['same_hour_headspace_closure']
+    assert closure['value_authority'] == 'unclosed_provider_estimate'
+    assert 'Unobtainium' not in closure['rates_kg_hr']
+    missing = {
+        row['species']: row['missing'] for row in closure['missing_inputs']
+    }
+    assert 'molar_mass' in missing['Unobtainium']
 
 
 def test_partial_melt_offgassing_diagnostic_uses_phase_engine_liquid_comp(

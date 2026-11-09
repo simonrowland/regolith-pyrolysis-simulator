@@ -1499,7 +1499,79 @@ class EvaporationMixin:
                         projection_covers_admitted = False
                         break
                 if admitted_species and not projection_covers_admitted:
+                    missing_inputs = []
+                    missing_molar_mass_refusal: dict[str, dict[str, str]] = {}
+                    for species in sorted(admitted_species):
+                        series = seed_series.get(species)
+                        try:
+                            molar_mass = float(molar_masses_kg_mol[species])
+                        except (KeyError, TypeError, ValueError):
+                            molar_mass = None
+                        missing = []
+                        if (
+                            molar_mass is None
+                            or not math.isfinite(molar_mass)
+                            or molar_mass <= 0.0
+                        ):
+                            missing.append('molar_mass')
+                            missing_molar_mass_refusal[species] = {
+                                'policy': 'fail_loud_missing_molar_mass',
+                                'control': 'molar_mass_kg_mol',
+                            }
+                        if not isinstance(series, Mapping):
+                            missing.append('series_resistance_row')
+                        if missing:
+                            missing_inputs.append({
+                                'species': species,
+                                'missing': missing,
+                            })
+                    provider_rates = rates_from_result(seed_result)
+                    # A missing molar mass is not an emitted number. A missing
+                    # series row keeps the provider rate as an unclosed
+                    # P_bulk=0 estimate, labelled below.
+                    for species in missing_molar_mass_refusal:
+                        provider_rates.pop(species, None)
+                    base_diagnostic = seed_result.diagnostic
+                    if isinstance(base_diagnostic, dict):
+                        if missing_molar_mass_refusal:
+                            base_diagnostic['missing_molar_mass'] = (
+                                missing_molar_mass_refusal
+                            )
+                            kept_rates = dict(
+                                base_diagnostic.get('evaporation_flux_kg_hr')
+                                or {}
+                            )
+                            for species in missing_molar_mass_refusal:
+                                kept_rates.pop(species, None)
+                            base_diagnostic['evaporation_flux_kg_hr'] = (
+                                kept_rates
+                            )
                     kernel_result = seed_result
+                    closure_record = {
+                        'regime': 'projection_unavailable',
+                        'status': 'projection_unavailable',
+                        'converged': False,
+                        'iterations': 0,
+                        'value_authority': 'unclosed_provider_estimate',
+                        'missing_inputs': missing_inputs,
+                        'rates_kg_hr': {
+                            species: provider_rates[species]
+                            for species in sorted(provider_rates)
+                        },
+                        'partial_pressures_Pa': {},
+                        'notices': [{
+                            'type': 'typed_notice',
+                            'kind': 'projection_unavailable',
+                            'authority': 'unclosed_provider_estimate',
+                            'missing_inputs': missing_inputs,
+                            'detail': (
+                                'Same-hour closure was not projected. '
+                                'Retained provider rates are an unclosed '
+                                'P_bulk=0 estimate, not a closed partition. '
+                                'A missing molar mass is omitted.'
+                            ),
+                        }],
+                    }
                 elif pressure_held_total_Pa is not None:
                     seed_rates = admit_rates(rates_from_result(seed_result))
                     # admit_rates writes the native-Fe allocation as a side
@@ -1742,19 +1814,31 @@ class EvaporationMixin:
                 iterations_by_hour.setdefault(hour, {})[
                     'ordinary_evaporation'
                 ] = int(closure_record['iterations'])
+            unclosed_provider_estimate = (
+                closure_record.get('value_authority')
+                == 'unclosed_provider_estimate'
+            )
             if (
                 pressure_held_bounds_record is None
                 and str(kernel_result.status) == 'ok'
+                and not unclosed_provider_estimate
             ):
                 diagnostic['evaporation_flux_kg_hr'] = dict(
                     closure_record['rates_kg_hr']
                 )
                 diagnostic['evaporation_flux_rates_are_admitted'] = True
                 closure_rates_are_admitted = True
+            if unclosed_provider_estimate:
+                notices = diagnostic.setdefault('notices', [])
+                if not isinstance(notices, list):
+                    notices = []
+                    diagnostic['notices'] = notices
+                notices.extend(closure_record.get('notices') or [])
             if (
                 not closure_record['converged']
                 and pressure_held_bounds_record is None
                 and str(kernel_result.status) == 'ok'
+                and not unclosed_provider_estimate
             ):
                 diagnostic.setdefault('notices', []).append({
                     'type': 'typed_notice',
