@@ -2776,15 +2776,62 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
 def _run_metadata_located_value_from_plain(
     payload: object,
     *,
+    field: str | None = None,
     parent_locator: Locator | None = None,
     equipment_source: bool = False,
 ) -> Located[Value]:
     raw_value = payload
     value_locator = parent_locator
     if equipment_source:
-        raw_value, value_locator, _mapping = _unwrap_located_equipment_value(
+        raw_value, value_locator, wrapper = _unwrap_located_equipment_value(
             payload, parent_locator
         )
+        unit_annotations: list[object] = []
+        seen_mappings: set[int] = set()
+        for candidate in (wrapper, raw_value):
+            if not isinstance(candidate, Mapping) or id(candidate) in seen_mappings:
+                continue
+            seen_mappings.add(id(candidate))
+            for key, unit in candidate.items():
+                normalized_key = str(key).casefold()
+                if "unit" not in normalized_key:
+                    continue
+                if normalized_key not in {"unit", "units"}:
+                    raise ValueError(f"unsupported unit annotation key {key!r}")
+                unit_annotations.append(unit)
+
+        if unit_annotations:
+            if field not in {"mass_kg", "final_mass_kg"}:
+                raise ValueError(f"units are unsupported for {field!r}")
+            if len(unit_annotations) > 1:
+                raise ValueError("specify only one unit annotation")
+            point_mapping = (
+                raw_value
+                if isinstance(raw_value, Mapping)
+                and str(raw_value.get("kind") or "").casefold()
+                == ValueKind.POINT.value
+                else None
+            )
+            amount_source = (
+                point_mapping.get("point") if point_mapping is not None else raw_value
+            )
+            amount = _as_dec_or_none(amount_source)
+            if amount is None:
+                raise ValueError(f"unit-bearing {field} must be a numeric point")
+            converted, derivation = _convert_lab_value(
+                f"sample.{field}", amount, str(unit_annotations[0] or "")
+            )
+            if converted is None:
+                raise ValueError(derivation or f"unmapped units for {field}")
+            if point_mapping is None:
+                raw_value = Value.point_of(converted)
+            else:
+                converted_mapping = dict(point_mapping)
+                for key in tuple(converted_mapping):
+                    if str(key).casefold() in {"unit", "units"}:
+                        converted_mapping.pop(key)
+                converted_mapping["point"] = converted
+                raw_value = converted_mapping
 
     if (
         isinstance(raw_value, Mapping)
@@ -2843,6 +2890,7 @@ def _parse_run_metadata_shape(
         try:
             parsed = _run_metadata_located_value_from_plain(
                 payload,
+                field=field,
                 parent_locator=parent_locator,
                 equipment_source=equipment_source,
             )
@@ -2873,6 +2921,7 @@ def _parse_run_metadata_shape(
             try:
                 located = _run_metadata_located_value_from_plain(
                     raw_value,
+                    field=field,
                     parent_locator=field_locator,
                     equipment_source=equipment_source,
                 )
@@ -4398,6 +4447,8 @@ def convert_mass_to_kg(
     amount = _as_dec_or_none(value)
     if amount is None:
         return None, "mass value is not numeric"
+    if not amount.is_finite():
+        return None, "mass value must be finite"
     if units is None or not str(units).strip():
         return None, "missing mass unit"
     lowered = str(units).strip().lower().replace(" ", "")
