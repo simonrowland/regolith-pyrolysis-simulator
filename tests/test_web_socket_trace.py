@@ -1,8 +1,17 @@
 import json
+from pathlib import Path
 
 import app as app_module
 import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
+
+
+GOLDEN_TRACE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "web_trace"
+    / "lunar_mare_low_ti_short_operator_decision.json"
+)
 
 
 VOLATILE_KEYS = {
@@ -198,3 +207,6 @@ def test_socket_trace_is_repeatable_and_complete(monkeypatch):
         "post_decision_no_tick_resume": True,
     }
     assert _canonical_bytes(first_trace) == _canonical_bytes(second_trace)
+    actual = _canonical_bytes(first_trace)
+    expected = GOLDEN_TRACE.read_bytes()
+    assert actual == expected

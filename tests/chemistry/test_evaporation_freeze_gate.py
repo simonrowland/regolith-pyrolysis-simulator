@@ -1076,7 +1076,7 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         setpoints_data,
         enabled=False,
     )
-    sim.melt.temperature_C = 900.0
+    sim.melt.temperature_C = 1500.0
     calls = []
 
     def fake_dispatch(intent, *args, **kwargs):
@@ -1095,7 +1095,12 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    flux = sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
+    equilibrium = _equilibrium(sim, vapor_pressure_data)
+    equilibrium.vapor_pressures_Pa = dict(
+        sim._last_vapor_pressure_diagnostic["vapor_pressures_Pa"]
+    )
+    assert equilibrium.vapor_pressures_Pa["Fe"] > 0.0
+    flux = sim._calculate_evaporation(equilibrium)
 
     assert sim._freeze_gate_enabled() is False
     # 0.5.3 Phase A1: under finite-headspace default-on, the dispatch list

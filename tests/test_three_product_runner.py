@@ -13,6 +13,7 @@ Pins:
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -320,3 +321,18 @@ def test_default_classification_quantities_match_availability_shape():
         else:
             assert isinstance(quantity, (int, float))
             assert quantity >= 0.0
+
+
+def test_default_classification_values_preserve_pre_change_digest():
+    result = run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=2,
+    )
+    digest = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    # d137: production classification now counts tapped and stage-accepted
+    # metals, with untapped metal-phase balances represented in their own
+    # source-accounted inventory field. This pins the complete runner payload.
+    assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"

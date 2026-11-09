@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from types import SimpleNamespace
 
 from simulator.core import PyrolysisSimulator
@@ -91,16 +92,17 @@ def test_in_range_sulfsat_leaves_run_notice_absent(monkeypatch) -> None:
 
 def test_out_of_range_sulfsat_accumulates_and_does_not_change_numbers() -> None:
     run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=1,
+        feedstock_id="mars_basalt",
+        campaign="C2A",
+        hours=12,
+        additives_kg={"C": 30.0},
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
     )
     session = run._start_session()
-    execution = RunExecutor().execute_session(session, hours=1)
+    execution = RunExecutor().execute_session(session, hours=12)
     sim = execution.simulator
-    profile = load_profile("lunar_mare_low_ti")
+    profile = load_profile("mars_basalt")
 
     clean = run._build_output(execution)
     # A live C0 hour may already stamp an unavailable/out_of_range SulfSat
@@ -117,6 +119,9 @@ def test_out_of_range_sulfsat_accumulates_and_does_not_change_numbers() -> None:
     assert "sulfur_saturation_notice" not in clean_reference.trace
     assert "sulfur_saturation_notice" not in clean_reference.product_summary
     clean_objectives = compute_objectives(profile, execution).as_mapping()
+    for objective in ("oxygen_kg", "metals_total_kg"):
+        assert clean_objectives[objective] is not None
+        assert math.isfinite(float(clean_objectives[objective]))
     clean_summary = _summary_numbers(clean_reference.product_summary)
 
     saved_hour = sim.melt.hour

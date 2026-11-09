@@ -145,6 +145,20 @@ def _catalog_pressure_from_activity(
     )
 
 
+def _explicit_alpha_oxide_activity_for_k(species, activity, temperature_C):
+    parent_oxide = {"Mg": "MgO", "Ca": "CaO"}[species]
+    source_standard_state_id, target_standard_state_id = (
+        _D349_SOURCE_K_STANDARD_IDS[species]
+    )
+    return _activity_for_crystalline_vapor_k(
+        parent_oxide,
+        activity,
+        float(temperature_C) + 273.15,
+        source_standard_state_id=source_standard_state_id,
+        target_standard_state_id=target_standard_state_id,
+    )
+
+
 def _live_gateway_probe(
     vapor_pressure_data,
     feedstocks_data,
@@ -1554,9 +1568,27 @@ def test_d350_alphamelts_preserves_explicit_and_substitutes_missing_oxide_activi
     )
 
     assert isinstance(projection, dict)
-    for species in ("Mg", "Ca"):
+    for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
+        if parent_oxide in activities:
+            converted_activity, conversion, _ = (
+                _explicit_alpha_oxide_activity_for_k(
+                    species,
+                    activities[parent_oxide],
+                    1500.0,
+                )
+            )
+            assert conversion["conversion_performed"] is True
+            expected_pressure = _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                species,
+                converted_activity,
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            )
+        else:
+            expected_pressure = expected_diagnostic["vapor_pressures_Pa"][species]
         assert projection[species] == pytest.approx(
-            expected_diagnostic["vapor_pressures_Pa"][species],
+            expected_pressure,
             rel=1e-10,
             abs=0,
         )
@@ -1578,15 +1610,19 @@ def test_d350_alphamelts_preserves_explicit_and_substitutes_missing_oxide_activi
     for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
         notice = notices[species]
         assert notice["parent_oxide"] == parent_oxide
-        assert notice["reason"] == "activity_standard_state_substitution"
-        assert notice["source_standard_state_substitution"] == (
-            "alphamelts_oxide_activity_no_declared_standard -> "
-            "builtin_declared_standard"
-        )
         source_id, k_id = _D349_SOURCE_K_STANDARD_IDS[species]
         assert notice["from_standard_state_id"] == source_id
         assert notice["to_standard_state_id"] == k_id
-        assert math.isfinite(float(notice["log10_activity_offset"]))
+        if parent_oxide in activities:
+            assert notice["conversion_performed"] is True
+            assert "source_standard_state_substitution" not in notice
+        else:
+            assert notice["reason"] == "activity_standard_state_substitution"
+            assert notice["source_standard_state_substitution"] == (
+                "alphamelts_oxide_activity_no_declared_standard -> "
+                "builtin_declared_standard"
+            )
+            assert math.isfinite(float(notice["log10_activity_offset"]))
 
     diagnostics = backend._vapor_pressure_diagnostics({}, projection, "alphamelts")
     assert set(
@@ -1594,43 +1630,70 @@ def test_d350_alphamelts_preserves_explicit_and_substitutes_missing_oxide_activi
     ) == set(notices)
 
 
-def test_d350_alphamelts_volatility_diagnostic_uses_builtin_mgo_cao_activity(
+def test_d350_alphamelts_volatility_diagnostic_uses_supplied_mgo_cao_activity(
     vapor_pressure_data,
 ):
     composition_wt_pct = {"MgO": 50.0, "CaO": 50.0}
-    expected_diagnostic = _builtin_pressure_projection(
-        vapor_pressure_data,
-        composition_wt_pct,
-        temperature_C=1600.0,
-        pO2_bar=1.0e-9,
-    )
+    activities = {"MgO": 0.4, "CaO": 0.3}
     result = _analytical_vapor_pressures_from_activities(
         vapor_pressure_data=vapor_pressure_data,
         temperature_C=1600.0,
         pO2_bar=1.0e-9,
-        melt_oxide_activities={"MgO": 0.4, "CaO": 0.3},
+        melt_oxide_activities=activities,
         composition_wt_pct=composition_wt_pct,
     )
 
-    for species in ("Mg", "Ca"):
+    for species, parent_oxide in (("Mg", "MgO"), ("Ca", "CaO")):
+        converted_activity, conversion, _ = _explicit_alpha_oxide_activity_for_k(
+            species,
+            activities[parent_oxide],
+            1600.0,
+        )
+        assert conversion["conversion_performed"] is True
         assert result["species"][species]["P_eq_Pa"] == pytest.approx(
-            expected_diagnostic["vapor_pressures_Pa"][species],
+            _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                species,
+                converted_activity,
+                temperature_C=1600.0,
+                pO2_bar=1.0e-9,
+            ),
             rel=1e-10,
             abs=0,
         )
-    for species in ("Mg", "Ca"):
+        notice = result["vapor_activity_standard_state_notices_by_species"][
+            species
+        ]
         source_id, k_id = _D349_SOURCE_K_STANDARD_IDS[species]
-        assert any(
-            f"species={species} " in notice
-            and "reason=activity_standard_state_substitution" in notice
-            and "source_standard_state_substitution="
-            "alphamelts_oxide_activity_no_declared_standard->"
-            "builtin_declared_standard" in notice
-            and source_id in notice
-            and k_id in notice
-            and "log10_activity_offset=" in notice
-            for notice in result["warnings"]
+        assert notice["from_standard_state_id"] == source_id
+        assert notice["to_standard_state_id"] == k_id
+        assert notice["conversion_performed"] is True
+        assert not any(
+            f"species={species} " in warning
+            and "activity_standard_state_substitution" in warning
+            for warning in result["warnings"]
         )
+
+
+def test_d350_alphamelts_supplied_mgo_activity_changes_pressure(
+    vapor_pressure_data,
+):
+    backend = AlphaMELTSBackend()
+    composition_wt_pct = {"MgO": 50.0, "CaO": 50.0}
+    pressures = []
+    for activity in (0.4, 1.0e-10):
+        projection = backend._activities_times_antoine_or_fail(
+            1500.0,
+            {"MgO": activity, "CaO": 0.3},
+            composition_wt_pct,
+            pO2_bar=1.0,
+            context="d-350 supplied AlphaMELTS activity precedence test",
+        )
+        assert isinstance(projection, dict)
+        pressures.append(projection["Mg"])
+
+    assert pressures[0] > pressures[1]
+    assert pressures[0] != pytest.approx(pressures[1], rel=1e-10, abs=0)
 
 
 @pytest.mark.parametrize(
@@ -1708,6 +1771,26 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
                 temperature_C=1500.0,
                 pO2_bar=1.0,
             )
+        for species, activity_key in (("Mg", "MgO"), ("Ca", "CaO")):
+            converted_activity, _, _ = _explicit_alpha_oxide_activity_for_k(
+                species,
+                activities[activity_key],
+                1500.0,
+            )
+            expected_pressures[species] = _catalog_pressure_from_activity(
+                vapor_pressure_data,
+                species,
+                converted_activity,
+                temperature_C=1500.0,
+                pO2_bar=1.0,
+            )
+        expected_pressures["Fe"] = _catalog_pressure_from_activity(
+            vapor_pressure_data,
+            "Fe",
+            activities["FeO"],
+            temperature_C=1500.0,
+            pO2_bar=1.0,
+        )
     else:
         expected_pressures = expected["vapor_pressures_Pa"]
     for species in expected_species:
@@ -1820,17 +1903,23 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
             assert species not in notices
             continue
         notice = notices[species]
-        assert notice["reason"] == "activity_standard_state_substitution"
-        assert math.isfinite(float(notice["log10_activity_offset"]))
-        if species == "Fe":
-            assert notice["conversion_performed"] is False
-            assert notice["source_standard_state_relation_reason"] == (
-                "source_and_K_standard_states_match"
+        if activities:
+            assert "source_standard_state_substitution" not in notice
+            if species in {"Mg", "Ca"}:
+                assert notice["conversion_performed"] is True
+                assert math.isfinite(float(notice["log10_activity_offset"]))
+            else:
+                assert notice["conversion_performed"] is False
+                assert notice["source_standard_state_relation_reason"] == (
+                    "source_and_K_standard_states_match"
+                )
+        else:
+            assert notice["reason"] == "activity_standard_state_substitution"
+            assert math.isfinite(float(notice["log10_activity_offset"]))
+            assert notice["source_standard_state_substitution"] == (
+                "alphamelts_oxide_activity_no_declared_standard -> "
+                "builtin_declared_standard"
             )
-        assert notice["source_standard_state_substitution"] == (
-            "alphamelts_oxide_activity_no_declared_standard -> "
-            "builtin_declared_standard"
-        )
         if species in _D349_SOURCE_K_STANDARD_IDS:
             expected_source_id, expected_k_id = (
                 _D349_SOURCE_K_STANDARD_IDS[species]

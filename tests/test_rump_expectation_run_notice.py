@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 from simulator.optimize.evaluate import _run_reference
 from simulator.optimize.objective import compute_objectives
@@ -53,16 +54,17 @@ def test_absent_rump_warnings_omit_run_notice() -> None:
 
 def test_rump_warning_reaches_run_and_optimizer_without_changing_numbers() -> None:
     run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=1,
+        feedstock_id="mars_basalt",
+        campaign="C2A",
+        hours=12,
+        additives_kg={"C": 30.0},
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
     )
     session = run._start_session()
-    execution = RunExecutor().execute_session(session, hours=1)
+    execution = RunExecutor().execute_session(session, hours=12)
     sim = execution.simulator
-    profile = load_profile("lunar_mare_low_ti")
+    profile = load_profile("mars_basalt")
 
     clean = run._build_output(execution)
     assert "rump_expectation_notice" not in clean["run_metadata"]
@@ -74,6 +76,9 @@ def test_rump_warning_reaches_run_and_optimizer_without_changing_numbers() -> No
     assert "rump_expectation_notice" not in clean_reference.trace
     assert "rump_expectation_notice" not in clean_reference.product_summary
     clean_objectives = compute_objectives(profile, execution).as_mapping()
+    for objective in ("oxygen_kg", "metals_total_kg"):
+        assert clean_objectives[objective] is not None
+        assert math.isfinite(float(clean_objectives[objective]))
     clean_summary = _summary_numbers(clean_reference.product_summary)
 
     warning = "C4 rump FeO below campaign expectation (0.12 wt% vs >= 1.0 wt%)"
