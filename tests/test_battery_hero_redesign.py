@@ -128,7 +128,9 @@ def _write_archive(path: Path, rows: list[dict[str, object]]) -> None:
         archive.addfile(member, io.BytesIO(residuals))
 
 
-def _scorecard_pair_archive(path: Path, count: int = 25) -> None:
+def _scorecard_pair_archive(
+    path: Path, count: int = 25
+) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = [
         {"kind": "battery_store_stamp", "revision": "scorecard-pair"}
     ]
@@ -144,6 +146,7 @@ def _scorecard_pair_archive(path: Path, count: int = 25) -> None:
     refused["execution"] = {"call_evidence": True}
     rows.append(refused)
     _write_archive(path, rows)
+    return rows
 
 
 def _scorecard_layout_archive(path: Path) -> None:
@@ -1356,9 +1359,10 @@ def test_interactive_empty_error_and_fingerprint_plots_skip_axes() -> None:
             "const ctx={clearRect(){},fillRect(){},stroke(){stats.strokes++;},strokeRect(){stats.frames++;},fillText(value){stats.labels.push(String(value));},beginPath(){},moveTo(){},lineTo(){},setLineDash(){},save(){},translate(){},rotate(){},restore(){},arc(){},fill(){}};",
             "const errorCanvas={style:{display:''},_plot:{old:true}},mapCanvas={style:{display:''},_plot:{old:true}};",
             "const errorEmpty={hidden:true,textContent:''},mapEmpty={hidden:true,textContent:''};",
-            "const document={getElementById(id){return {'error-empty':errorEmpty,'map-empty':mapEmpty}[id];}};",
+            "const document={documentElement:{},getElementById(id){return {'error-empty':errorEmpty,'map-empty':mapEmpty}[id];}};",
             "const railSelect={value:'vapour'},engineSelect={value:'openimcc'};",
             "const cellData={rails:['vapour'],engines:['openimcc']},PALETTE={openimcc:'#000'},BANDS={good:'#000'};",
+            "const TEMPERATURE_FLOOR_K=1473.15,TEMPERATURE_BIN_K=50,SIO2_BIN_WIDTH=.05;",
             "let rows=[],cells=[],windowHasRows=true;",
             "function size(){stats.sizeCalls++;return {ctx,w:800,h:400};}",
             "function windowValues(){return [15,16,3,6];}",
@@ -1973,7 +1977,7 @@ def test_scorecard_all_rows_rms_matches_scorer_headline_metrics(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     archive = tmp_path / "scorecard-metrics.tgz"
-    _scorecard_pair_archive(archive)
+    fixture_rows = _scorecard_pair_archive(archive)
 
     data, figure, _files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
 
@@ -1984,11 +1988,25 @@ def test_scorecard_all_rows_rms_matches_scorer_headline_metrics(
         if collection.get_gid()
     }
     for engine in ("openimcc", "internal-analytical"):
+        fixture_values = [
+            float(row["numeric"]["value"])
+            for row in fixture_rows
+            if row.get("rail") == "vapour"
+            and row.get("status") == "match"
+            and row.get("candidate_request", {}).get("engine") == engine
+            and row.get("numeric", {}).get("operation") == "dex"
+        ]
+        fixture_n = len(fixture_values)
+        fixture_rms = math.sqrt(
+            math.fsum(value * value for value in fixture_values) / fixture_n
+        )
         all_rows = data.hero_all_numeric_metrics[("vapour", engine)]["views"]["all"]
         marker = markers[f"all-rows-rms:vapour:{engine}"]
         plotted_rms = float(marker.get_offsets()[0][0])
-        assert plotted_rms == float(Decimal(str(all_rows["rms_dex"])))
-        assert f"n={all_rows['n']}" in "\n".join(
+        assert int(all_rows["n"]) == fixture_n
+        assert float(Decimal(str(all_rows["rms_dex"]))) == fixture_rms
+        assert plotted_rms == fixture_rms
+        assert f"n={fixture_n}" in "\n".join(
             text.get_text() for axis in figure.axes for text in axis.texts
         )
 
