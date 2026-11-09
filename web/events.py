@@ -51,7 +51,7 @@ from simulator.cost_parameters import (
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
-from simulator.electrolysis import MREElectrolysisRefusal
+from simulator.electrolysis import MREElectrolysisInvalidInput
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -3142,7 +3142,7 @@ def _start_background_loop(
                 except (
                     KnudsenRegimeRefusal,
                     EvaporationFluxRefusal,
-                    MREElectrolysisRefusal,
+                    MREElectrolysisInvalidInput,
                 ) as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {

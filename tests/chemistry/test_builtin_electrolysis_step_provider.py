@@ -1435,6 +1435,20 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
     assert diagnostic["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
     assert diagnostic["mre_decomposition_voltage_authoritative_by_oxide"]["FeO"] is False
     refusal = diagnostic["mre_raw_margin_refused_targets"]["FeO"]
+    assert tuple(
+        refusal[key].hex()
+        for key in (
+            "fallback_requirement_V",
+            "fallback_margin_V",
+            "raw_requirement_V",
+            "raw_margin_V",
+        )
+    ) == (
+        "0x1.0db594231c1e0p-1",
+        "0x1.1c39ce03926c0p-2",
+        "0x1.0383fc7a5579ap+0",
+        "-0x1.acd5f73f167d0p-3",
+    )
     assert refusal["fallback_margin_V"] > 0.0
     assert refusal["raw_margin_V"] <= 0.0
     assert refusal["raw_requirement_V"] > held_voltage_V
@@ -1484,6 +1498,63 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
     assert not {
         "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
     }.intersection(legacy)
+
+
+@pytest.mark.parametrize("oxide", ["Cr2O3", "SiO2"])
+def test_non_authoritative_oxide_fallback_cannot_erase_negative_raw_margin(
+    oxide, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    oxide_mol = 100.0 / (MOLAR_MASS[oxide] / 1000.0)
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {oxide: oxide_mol},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    held_voltage_V = mre_decomposition_voltage_reference(oxide).voltage
+    temperature_C = 500.0 - 273.15
+    pO2_bar = 1.0e-9
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=temperature_C,
+            pressure_bar=pO2_bar,
+            control_inputs={
+                "voltage_V": held_voltage_V,
+                "current_A": 100.0,
+                "dt_hr": 1.0,
+                "pO2_bar": pO2_bar,
+                "allowed_oxides": [oxide],
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert (
+        diagnostic["mre_decomposition_voltage_authoritative_by_oxide"][oxide]
+        is False
+    )
+    assert diagnostic["mre_raw_voltage_margin_V_by_oxide"][oxide] <= 0.0
+    assert result.status == "refused"
+    assert result.transition is None
+    assert diagnostic["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
+    assert (
+        diagnostic["mre_raw_margin_refused_targets"][oxide]["raw_margin_V"]
+        <= 0.0
+    )
+    assert not {
+        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
+    }.intersection(diagnostic)
 
 
 def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
