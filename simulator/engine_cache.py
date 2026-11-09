@@ -74,7 +74,8 @@ ENGINE_CHEMISTRY_DATA_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "vaporock": (
         "package:vaporock/data/JANAF-vapor-data-full.csv",
     ),
-    "magemin": ("engine:magemin/ref_database",),
+    # MAGEMin databases are compiled into the configured executable.
+    "magemin": ("engine:magemin/binary",),
     # The configured AlphaMELTS executable ships the MELTS model runtime.
     "alphamelts": ("engine:alphamelts/model",),
     "thermoengine": (
