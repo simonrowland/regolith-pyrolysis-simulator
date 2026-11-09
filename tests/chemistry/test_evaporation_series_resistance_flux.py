@@ -990,6 +990,8 @@ def test_native_fe_closure_uses_pressure_held_zero_boundary(
     assert closure["converged"]
     assert closure["iterations"] == 0
     assert closure["rates_kg_hr"]["Fe"] == 0.0
+    assert diagnostic["native_fe_vapor_mol"] == 0.0
+    assert diagnostic["native_fe_tap_mol"] == pytest.approx(1.0)
     assert sim._same_hour_headspace_closure_iterations_by_hour[
         sim.melt.hour
     ]["native_fe"] == 0

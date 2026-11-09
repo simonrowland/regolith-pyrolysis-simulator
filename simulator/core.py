@@ -8409,20 +8409,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iterations_by_hour.setdefault(
                 int(getattr(self.melt, 'hour', 0)), {}
             )['native_fe'] = int(closure.iterations)
-        _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
-            _flux_kg_s_m2 = 0.0
-        if not closure.converged and not continuum_validity_refuses(domain_diag):
-            capacity_kg_hr = max(
-                0.0, float(closure.rates_kg_hr.get('Fe', 0.0))
-            )
-        else:
-            capacity_kg_hr = max(
-                0.0,
-                _flux_kg_s_m2
-                * max(0.0, float(self.melt.melt_surface_area_m2))
-                * 3600.0,
-            )
+        capacity_kg_hr = (
+            0.0
+            if continuum_validity_refuses(domain_diag)
+            else max(0.0, float(closure.rates_kg_hr.get('Fe', 0.0)))
+        )
         capacity_mol_hr = capacity_kg_hr / molar_mass_kg_mol
         vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
         tap_mol = native_fe_available_mol - vapor_mol
