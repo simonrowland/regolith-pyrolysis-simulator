@@ -1231,6 +1231,8 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
     assert ferric_notice["temperature_C"] == pytest.approx(1575.0)
     assert ferric_notice["applied_voltage_V"] == pytest.approx(5.0)
     assert math.isfinite(ferric_notice["fallback_requirement_V"])
+    # Its model-predicted magnitude comes from the finite activity floor for absent FeO, not grounded data.
+    assert ferric_notice["fallback_requirement_V"] < 0.0
     assert ferric_notice["authority"] == "fallback_heuristic"
     assert ferric_notice["heuristic_reference_V"] == pytest.approx(0.65)
     assert diagnostic["metals_produced_mol"] == {}
