@@ -9278,7 +9278,7 @@ def test_real_vaporock_path_does_not_warn_for_pseudo_fallback_rows():
     assert source == 'vaporock'
 
 
-def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
+def test_vaporock_empty_antoine_fallback_uses_activity_ladder_with_notices():
     class EmptyVapoRock:
         def is_available(self):
             return True
@@ -9294,18 +9294,30 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
     backend._vaporock_helper = EmptyVapoRock()
 
     with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
-        pressures, refusal = backend._vapor_pressures_via_vaporock_or_antoine(
-            T_C=1600.0,
-            solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
-            liquid_fraction=1.0,
-            fO2_log=-9.0,
-            pressure_bar=1.0,
-            activities={},
+        pressures, source_by_species = (
+            backend._vapor_pressures_via_vaporock_or_antoine(
+                T_C=1600.0,
+                solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
+                liquid_fraction=1.0,
+                fO2_log=-9.0,
+                pressure_bar=1.0,
+                activities={},
+            )
         )
 
-    assert pressures == {}
-    assert isinstance(refusal, VaporPressureActivityRefusal)
-    assert refusal.missing_precursor_species == ('Na', 'Si', 'SiO')
+    assert set(pressures) == {'Na', 'Si', 'SiO'}
+    assert all(
+        math.isfinite(value) and value > 0.0
+        for value in pressures.values()
+    )
+    assert isinstance(source_by_species, dict)
+    assert set(source_by_species) == set(pressures)
+    activity_sources = backend._antoine_activity_source_notices
+    assert set(pressures) <= set(activity_sources)
+    assert all(
+        {'rung', 'source', 'reason'} <= set(activity_sources[species])
+        for species in pressures
+    )
 
 
 def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
