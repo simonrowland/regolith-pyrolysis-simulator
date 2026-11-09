@@ -172,6 +172,41 @@ def test_activity_source_is_reported_when_kernel_fallback_retains_pressure():
     assert report['activity_sources'] == {'Na': activity_source}
 
 
+def test_activity_source_is_reported_when_sub_400k_refresh_retains_pressure():
+    from simulator.runner import _vapor_pressure_source_report
+
+    activity_source = {
+        'rung': 'published_gamma',
+        'source': 'Sossi & Fegley 2018 Table 2',
+        'x': 0.25,
+        'reason': 'alphaMELTS supplied no oxide-component activity',
+    }
+    sim, calls = _sim_with_vapor_dispatch({})
+    sim.melt.temperature_C = 100.0
+    sim._allow_fallback_vapor = True
+    sim._last_backend_diagnostics = {
+        'activity_source_by_species': {'Na': activity_source}
+    }
+    result = EquilibriumResult(
+        temperature_C=100.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={'Na': 3.0},
+        vapor_pressures_source={'Na': 'builtin_authoritative'},
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    assert calls == []
+    assert result.vapor_pressures_Pa == {'Na': 3.0}
+    assert sim._last_backend_diagnostics['activity_source_by_species'] == {
+        'Na': activity_source
+    }
+    report = _vapor_pressure_source_report(sim)
+    assert report['species'] == {'Na': 'builtin_authoritative'}
+    assert report['activity_sources'] == {'Na': activity_source}
+
+
 def test_kernel_replacement_drops_backend_activity_source_from_report():
     from simulator.runner import _vapor_pressure_source_report
 
