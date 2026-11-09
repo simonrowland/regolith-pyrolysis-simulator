@@ -434,7 +434,8 @@ PHASE_MAP: dict[str, Phase] = {
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
-    # Published parenthetical spellings (Kelley / Pankratz tables).
+    # Printed phase abbreviations used by Kelley and Pankratz tables.
+    "c": Phase.CR,
     "(g)": Phase.G,
     "(c)": Phase.CR,
 }
