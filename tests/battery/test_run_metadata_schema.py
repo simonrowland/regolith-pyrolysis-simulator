@@ -142,6 +142,16 @@ def _run_metadata_value_shape(shape: str, point: str) -> object:
             ],
         }
         return located_point
+    if shape == "wrapped-inference":
+        return {
+            "value": {"kind": "point", "point": point},
+            "inference": {
+                "method": "fixture",
+                "relation": "identity",
+                "inputs": ["source"],
+                "output_unit": "g",
+            },
+        }
     if shape == "as-published-point":
         stored = Decimal(point)
         printed = stored * Decimal(1000)
@@ -265,6 +275,8 @@ def _run_metadata_shape_extract(
                     "locator": locator,
                 }
             }
+        elif value_shape == "wrapped-inference":
+            observation["equipment"] = {field: field_value}
         elif isinstance(raw_value, Mapping) and any(
             "unit" in str(key).casefold() for key in raw_value
         ):
@@ -1946,6 +1958,7 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                     "interval",
                     "bound",
                     "inference-with-parameters",
+                    "wrapped-inference",
                     "as-published-point",
                     "as-published-interval",
                     "nested-combination",
@@ -1962,11 +1975,11 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                     "inference-with-parameters",
                 )
             else:
-                shapes = ("unitless",)
+                shapes = ("unitless", "unitless-with-inference")
             for shape in shapes:
                 seed_root = tmp_path / f"seed-{seeds}"
                 seeds += 1
-                if shape == "unitless":
+                if shape.startswith("unitless"):
                     payload = (
                         {"charge_id": "charge-a", "run_index": 1,
                          "locator": {"table": "unit-matrix", "page": 1}}
@@ -1976,6 +1989,13 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                             "locator": {"table": "unit-matrix", "page": 1},
                         }
                     )
+                    if shape == "unitless-with-inference":
+                        payload["inference"] = {
+                            "method": "fixture",
+                            "relation": "identity",
+                            "inputs": ["source"],
+                            "output_unit": "g",
+                        }
                     _seed, base_extract = _unitless_run_metadata_extract(
                         seed_root, field, home, payload
                     )
@@ -2059,6 +2079,68 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                                     f"{context}"
                                 )
                         mutations += 1
+
+
+_RUN_METADATA_INFERENCE_LOSS_CASES = tuple(
+    ("mass_kg", home) for home in RUN_METADATA_FIELD_HOMES["mass_kg"][1]
+) + tuple(
+    (field, home)
+    for field in ("charge_sequence", "vaporization_statement")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home"),
+    _RUN_METADATA_INFERENCE_LOSS_CASES,
+    ids=[f"{field}-{home}" for field, home in _RUN_METADATA_INFERENCE_LOSS_CASES],
+)
+def test_run_metadata_inference_is_rejected_when_the_shape_reader_drops_it(
+    tmp_path: Path,
+    field: str,
+    home: str,
+) -> None:
+    if field == "mass_kg":
+        raw_value = _run_metadata_value_shape("wrapped-inference", "0.0005")
+        root, extract = _run_metadata_shape_extract(
+            tmp_path / field / home.replace("/", "_"),
+            field,
+            home,
+            "wrapped-inference",
+            raw_value=raw_value,
+        )
+        if home == "species.*.observations[].equipment.mass_kg":
+            assert extract["species"]["Na"]["observations"][0]["equipment"][
+                field
+            ] == raw_value
+    else:
+        payload = (
+            {"charge_id": "charge-a", "run_index": 1}
+            if field == "charge_sequence"
+            else {"state": {"tag": "value", "value": "congruent"}}
+        )
+        payload["inference"] = {
+            "method": "fixture",
+            "relation": "identity",
+            "inputs": ["source"],
+            "output_unit": "g",
+        }
+        root, _extract = _unitless_run_metadata_extract(
+            tmp_path / field / home.replace("/", "_"), field, home, payload
+        )
+
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and field in issue.path
+        and "inference" in issue.detail
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert _loaded_run_metadata_value(experiment, field) is None
 
 
 @pytest.mark.parametrize(
