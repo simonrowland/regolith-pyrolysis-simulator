@@ -37,7 +37,14 @@ def _without_cache_counters(value: Any) -> Any:
         return {
             str(key): _without_cache_counters(item)
             for key, item in value.items()
-            if str(key) not in {"engine_cache", "cache_counters"}
+            if str(key)
+            not in {
+                "engine_cache",
+                "cache_counters",
+                "wall_s",
+                "cpu_s",
+                "elapsed_s",
+            }
         }
     if isinstance(value, list):
         return [_without_cache_counters(item) for item in value]
@@ -73,6 +80,7 @@ def _run_slice(
     rail: str | None,
     work: str | None,
     limit: int,
+    workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
     cache = None if cache_path is None else EngineCache(cache_path)
@@ -84,6 +92,7 @@ def _run_slice(
         rail=None if rail is None else canonicalize_rail(rail),
         work_id=work,
         limit=limit,
+        workers=workers,
         engine_cache=cache,
     )
     residuals_path = output_path.with_name(output_path.name + ".partial")
@@ -116,6 +125,9 @@ def main(argv: list[str] | None = None) -> int:
     limit = int(spec.get("limit", 334))
     if limit <= 0:
         parser.error("slice spec limit must be positive")
+    workers = int(spec.get("workers", 3))
+    if workers < 1:
+        parser.error("slice spec workers must be at least 1")
 
     context = load_score_context(root)
     tmp_parent = os.environ.get("TMPDIR")
@@ -126,7 +138,12 @@ def main(argv: list[str] | None = None) -> int:
         cache_path = scratch_path / "engine-cache.sqlite"
         outputs: dict[str, list[str]] = {}
         counters: dict[str, dict[str, dict[str, int]]] = {}
-        for name, use_cache in (("off", False), ("cold", True), ("warm", True)):
+        for name, use_cache, run_workers in (
+            ("off", False, 1),
+            ("cold", True, 1),
+            ("warm", True, 1),
+            ("parallel-warm", True, workers),
+        ):
             rows, counts = _run_slice(
                 context,
                 scratch_path / f"{name}.jsonl",
@@ -135,6 +152,7 @@ def main(argv: list[str] | None = None) -> int:
                 rail=rail,
                 work=work,
                 limit=limit,
+                workers=run_workers,
                 cache_path=cache_path if use_cache else None,
             )
             outputs[name] = rows
@@ -143,13 +161,44 @@ def main(argv: list[str] | None = None) -> int:
     if not outputs["off"]:
         print("slice produced no canonical residual rows", file=sys.stderr)
         return 2
-    warm_misses = sum(row["misses"] for row in counters["warm"].values())
-    warm_calls = sum(
-        sum(row["calls_by_kind"].values()) for row in counters["warm"].values()
+    warm_names = ("warm", "parallel-warm")
+    warm_misses = sum(
+        row["misses"]
+        for name in warm_names
+        for row in counters[name].values()
     )
-    if outputs["off"] != outputs["cold"] or outputs["off"] != outputs["warm"]:
+    warm_calls = sum(
+        sum(row["calls_by_kind"].values())
+        for name in warm_names
+        for row in counters[name].values()
+    )
+    cold_calls_by_engine = {
+        engine.value: sum(counters["cold"][engine.value]["calls_by_kind"].values())
+        for engine in engines
+    }
+    warm_hits_by_engine = {
+        engine.value: min(
+            counters[name][engine.value]["hits"] for name in warm_names
+        )
+        for engine in engines
+    }
+    unexercised = [
+        engine.value
+        for engine in engines
+        if cold_calls_by_engine[engine.value] <= 0
+        or warm_hits_by_engine[engine.value] <= 0
+        or any(
+            counters[name][engine.value]["misses"]
+            or any(counters[name][engine.value]["calls_by_kind"].values())
+            for name in warm_names
+        )
+    ]
+    if any(
+        outputs[name] != outputs["off"]
+        for name in ("cold", "warm", "parallel-warm")
+    ):
         expected = outputs["off"]
-        for name in ("cold", "warm"):
+        for name in ("cold", "warm", "parallel-warm"):
             if outputs[name] != expected:
                 print(
                     "\n".join(
@@ -164,11 +213,19 @@ def main(argv: list[str] | None = None) -> int:
                     file=sys.stderr,
                 )
         return 1
+    if unexercised:
+        print(
+            "slice did not exercise every requested engine through cold and warm "
+            f"calls: {', '.join(unexercised)}",
+            file=sys.stderr,
+        )
+        return 1
     print(
         f"equivalent rows={len(outputs['off'])} engines={len(engines)} "
         f"cold_misses={sum(row['misses'] for row in counters['cold'].values())} "
         f"warm_misses={warm_misses} warm_calls={warm_calls} "
-        f"warm_hits={sum(row['hits'] for row in counters['warm'].values())}"
+        f"warm_hits={sum(row['hits'] for row in counters['warm'].values())} "
+        f"parallel_workers={workers}"
     )
     return 0 if warm_misses == 0 and warm_calls == 0 else 1
 

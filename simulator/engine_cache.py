@@ -41,7 +41,13 @@ ENGINE_CHEMISTRY_VERSION: Mapping[str, int] = {
 _BUSY_TIMEOUT_MS = 60_000
 _TABLE_NAME = "engine_outputs"
 _COUNTER_NAMES = ("hits", "misses", "stores", "transient_skips")
-_CALL_KINDS = ("equilibrate_cell", "evaluate", "evaluate_redox")
+_CALL_KINDS = (
+    "equilibrate_cell",
+    "evaluate",
+    "evaluate_redox",
+    "evaluate_gas",
+    "residue_vapor_pressure",
+)
 _LOGGER = logging.getLogger(__name__)
 _ENGINE_RUNTIME_MODULES = {
     "openimcc": ("openimcc", "openimcc"),
@@ -79,7 +85,11 @@ _TRANSIENT_CELL_ENGINE_STATUSES = frozenset(
         "BlockingIOError",
         "ConnectionError",
         "BrokenPipeError",
+        "unavailable",
     }
+)
+_TRANSIENT_BACKEND_FAILURE_DISPOSITIONS = frozenset(
+    {"environment", "resource", "worker_died", "timeout", "transient"}
 )
 
 
@@ -225,10 +235,29 @@ def is_transient_failure(outcome: object) -> bool:
 
     if not isinstance(outcome, _CellOutcome):
         return False
+    disposition = getattr(outcome, "backend_failure_disposition", None)
+    if disposition is None:
+        diagnostics = getattr(outcome, "diagnostics", None)
+        if isinstance(diagnostics, Mapping):
+            disposition = diagnostics.get("backend_failure_disposition")
+    if str(disposition or "").lower() in _TRANSIENT_BACKEND_FAILURE_DISPOSITIONS:
+        return True
+    exit_code = getattr(outcome, "exit_code", None)
+    exit_signal = getattr(outcome, "exit_signal", None)
+    engine_reason = str(outcome.engine_reason or "")
     return (
         outcome.refusal_reason == "engine_timeout"
+        or outcome.refusal_reason == "unavailable"
         or outcome.engine_status in _TRANSIENT_CELL_ENGINE_STATUSES
         or outcome.engine_reason == "subprocess_died"
+        or (
+            outcome.refusal_reason == "engine_crash"
+            and (
+                exit_code is not None
+                or exit_signal is not None
+                or engine_reason.startswith("isolated worker exit_code=")
+            )
+        )
     )
 
 
@@ -419,6 +448,16 @@ def _from_cache_call_payload(payload: Any, call_kind: str) -> Any:
         from simulator.melt_backend.openimcc_cache import OpenImccRedoxOutcome
 
         return OpenImccRedoxOutcome.from_cache_payload(payload)
+    if call_kind == "evaluate_gas":
+        from simulator.melt_backend.openimcc_cache import OpenImccGasOutcome
+
+        return OpenImccGasOutcome.from_cache_payload(payload)
+    if call_kind == "residue_vapor_pressure":
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            InternalAnalyticalVaporPressureOutcome,
+        )
+
+        return InternalAnalyticalVaporPressureOutcome.from_cache_payload(payload)
     raise ValueError(f"unknown engine call kind {call_kind!r}")
 
 

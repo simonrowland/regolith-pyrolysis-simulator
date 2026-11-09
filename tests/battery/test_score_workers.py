@@ -150,9 +150,18 @@ def test_jsonl_merge_keeps_engine_order_for_tied_rows(
                 "rail": "liquid",
                 "reference": "observation-1",
                 "key": "same-key",
-                "candidate_request": {"engine": engine.value},
-            }
-            for engine in (Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK)
+                "candidate_request": {
+                    "engine": Engine.INTERNAL_ANALYTICAL.value
+                },
+            },
+            {
+                "rail": "liquid",
+                "reference": "observation-1",
+                "key": "same-key",
+                "candidate_observation": {
+                    "engine": {"name": Engine.VAPOROCK.value}
+                },
+            },
         ]
         for payload in reversed(payloads):
             stream.append_payload_line(
@@ -169,7 +178,13 @@ def test_jsonl_merge_keeps_engine_order_for_tied_rows(
     finally:
         stream.close()
 
-    assert [row["candidate_request"]["engine"] for row in rows] == [
+    engine_names = [
+        row["candidate_request"]["engine"]
+        if "candidate_request" in row
+        else row["candidate_observation"]["engine"]["name"]
+        for row in rows
+    ]
+    assert engine_names == [
         Engine.INTERNAL_ANALYTICAL.value,
         Engine.VAPOROCK.value,
     ]

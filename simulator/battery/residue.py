@@ -1379,13 +1379,26 @@ def _make_residue_pressure_model(
                         "openimcc_version": state.openimcc_version,
                     }
                 )
-                base_pressure_bar = evaluate_gas(
-                    state.parent_oxide_activities,
-                    temperature_K,
-                    1.0,
-                    gas_pack,
+                from simulator.melt_backend.openimcc_cache import (
+                    cached_openimcc_evaluate_gas,
+                )
+
+                base_pressure_bar = cached_openimcc_evaluate_gas(
+                    engine_cache,
+                    parent_oxide_activities=state.parent_oxide_activities,
+                    temperature_K=temperature_K,
+                    pressure_bar=1.0,
+                    gas_pack=gas_pack,
                     parent_oxides=state.parent_oxides,
                     allow_extrapolation=True,
+                    solve_fn=lambda: evaluate_gas(
+                        state.parent_oxide_activities,
+                        temperature_K,
+                        1.0,
+                        gas_pack,
+                        parent_oxides=state.parent_oxides,
+                        allow_extrapolation=True,
+                    ),
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
@@ -1407,7 +1420,7 @@ def _make_residue_pressure_model(
             _InternalAnalyticalInputRefusal,
             _OxygenBalanceRefusal,
             _gas_formula_for_oxygen_balance,
-            _internal_analytical_vapor_pressure_adapter,
+            cached_internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
         )
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
@@ -1435,7 +1448,8 @@ def _make_residue_pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
         ) -> Mapping[str, float]:
             try:
-                response = _internal_analytical_vapor_pressure_adapter(
+                response = cached_internal_analytical_residue_vapor_pressure(
+                    engine_cache,
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / 100_000.0,
@@ -1450,7 +1464,7 @@ def _make_residue_pressure_model(
                 )
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
-            pressures = {}
+            pressures: dict[str, float] = {}
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:
                     formula = _gas_formula_for_oxygen_balance(channel)
@@ -3611,14 +3625,27 @@ def _predict_sossi_residue_cohort(
                                 "activity_provenance": mno_activity.provenance(),
                             },
                         )
-                    gas_result = evaluate_gas(
-                        gas_parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=gas_parent_oxides,
-                        allow_extrapolation=True,
-                    )
+                        from simulator.melt_backend.openimcc_cache import (
+                            cached_openimcc_evaluate_gas,
+                        )
+
+                        gas_result = cached_openimcc_evaluate_gas(
+                            engine_cache,
+                            parent_oxide_activities=gas_parent_oxide_activities,
+                            temperature_K=temperature_K,
+                            pressure_bar=1.0,
+                            gas_pack=gas_pack,
+                            parent_oxides=gas_parent_oxides,
+                            allow_extrapolation=True,
+                            solve_fn=lambda: evaluate_gas(
+                                gas_parent_oxide_activities,
+                                temperature_K,
+                                1.0,
+                                gas_pack,
+                                parent_oxides=gas_parent_oxides,
+                                allow_extrapolation=True,
+                            ),
+                        )
                     melt_pack_identity.update(
                         {
                             "model_id": str(state.pack_model_id),
@@ -3641,7 +3668,7 @@ def _predict_sossi_residue_cohort(
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 PO2_COMMANDED,
                 Po2Request,
-                _internal_analytical_vapor_pressure_adapter,
+                cached_internal_analytical_residue_vapor_pressure,
                 _new_internal_analytical_core,
             )
 
@@ -3650,7 +3677,8 @@ def _predict_sossi_residue_cohort(
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
             ) -> Mapping[str, float]:
-                response = _internal_analytical_vapor_pressure_adapter(
+                response = cached_internal_analytical_residue_vapor_pressure(
+                    engine_cache,
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / 100_000.0,

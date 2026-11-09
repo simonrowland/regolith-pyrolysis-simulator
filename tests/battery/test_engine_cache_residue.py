@@ -58,10 +58,7 @@ def test_openimcc_residue_gas_calls_are_cached_across_pressure_models(
 
     monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
     monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", evaluate_bridge)
-    gas_pack = SimpleNamespace(
-        _gas_digest="gas-content-digest",
-        _condensate_digest="condensate-content-digest",
-    )
+    gas_pack = SimpleNamespace()
     common = {
         "engine": "openimcc",
         "gas_channels": (("SiO(g)", ("SiO2", 1.0, 0.0)),),
@@ -101,7 +98,9 @@ def test_internal_analytical_residue_calls_are_cached_across_pressure_models(
     def evaluate_vapor_pressure(**_kwargs: Any) -> Any:
         nonlocal calls
         calls += 1
-        return SimpleNamespace(vapor_pressures_Pa={"SiO(g)": 5.0})
+        return SimpleNamespace(
+            vapor_pressures_Pa={"SiO(g)": 5.0}, diagnostics={}
+        )
 
     monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
     monkeypatch.setattr(

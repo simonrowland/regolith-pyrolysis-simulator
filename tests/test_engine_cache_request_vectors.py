@@ -40,6 +40,7 @@ class _Backend:
         self._vapor_pressure_units = "bar"
         self._vapor_transport_floor_bar = 1.0e-12
         self._configured_vapor_transport_floor_bar = 1.0e-12
+        self._configured_vapor_transport_pO2_bar = 1.0e-9
         self._vapor_transport_pO2_admission = "environment"
 
     def equilibrate(self, **_kwargs: Any) -> Any:
@@ -124,6 +125,32 @@ def test_request_vector_keeps_pressure_seen_by_adapter(
     assert first_vector != second_vector
 
 
+def test_request_vector_distinguishes_qualification_calls() -> None:
+    handle = _handle("thermoengine")
+
+    ordinary = _engine_cache_request_vector(
+        handle,
+        _pot(),
+        temperature_K=1703.0,
+        po2=Po2Request("engine_default", None),
+        physical_pressure_bar=1.0,
+        native_activity_formula=None,
+        qualification=False,
+    )
+    qualification = _engine_cache_request_vector(
+        handle,
+        _pot(),
+        temperature_K=1703.0,
+        po2=Po2Request("engine_default", None),
+        physical_pressure_bar=1.0,
+        native_activity_formula=None,
+        qualification=True,
+    )
+
+    assert ordinary is not None and qualification is not None
+    assert ordinary != qualification
+
+
 @pytest.mark.parametrize(
     ("engine", "setting", "value"),
     [
@@ -133,17 +160,19 @@ def test_request_vector_keeps_pressure_seen_by_adapter(
         ("alphamelts", "_fo2_offset", 0.25),
         ("alphamelts", "_fe3fet_ratio", 0.2),
         ("alphamelts", "_python_api_model", ("model-b", 2)),
+        ("alphamelts", "_configured_vapor_transport_pO2_bar", 1.0e-8),
+        ("alphamelts", "_configured_vapor_transport_floor_bar", 1.0e-10),
         ("thermoengine", "_model", "model-b"),
         ("thermoengine", "_mode", "alternate-transport"),
+        ("thermoengine", "_configured_vapor_transport_pO2_bar", 1.0e-8),
+        ("thermoengine", "_configured_vapor_transport_floor_bar", 1.0e-10),
         ("magemin", "_bridge", "julia"),
         ("magemin", "_database", "mp"),
-        ("magemin", "_binary_path", Path("/selected/magemin")),
         ("openimcc", "_pack_name", "published-core"),
         ("vaporock", "_temperature_units", "K"),
         ("vaporock", "_pressure_units", "Pa"),
         ("vaporock", "_vapor_pressure_units", "Pa"),
-        ("alphamelts", "_vapor_transport_floor_bar", 1.0e-10),
-        ("thermoengine", "_vapor_transport_floor_bar", 1.0e-10),
+        ("vaporock", "_reuse_system", True),
     ],
 )
 def test_request_vector_changes_when_engine_setting_changes(
@@ -165,6 +194,44 @@ def test_request_vector_changes_when_magemin_buffer_setting_changes() -> None:
     first = _vector(handle)
 
     backend._config["fO2_buffer"] = "nno"
+    second = _vector(handle)
+
+    assert first != second
+
+
+def test_request_vector_changes_when_magemin_native_activity_changes() -> None:
+    handle = _handle("magemin")
+    common = {
+        "temperature_K": 1703.0,
+        "po2": Po2Request("engine_default", None),
+        "physical_pressure_bar": 1.0,
+    }
+
+    without_activity = _engine_cache_request_vector(
+        handle,
+        _pot(),
+        **common,
+        native_activity_formula=None,
+    )
+    with_activity = _engine_cache_request_vector(
+        handle,
+        _pot(),
+        **common,
+        native_activity_formula="SiO2",
+    )
+
+    assert without_activity is not None and with_activity is not None
+    assert without_activity != with_activity
+
+
+def test_request_vector_changes_when_vaporock_model_changes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.melt_backend.vaporock as vaporock
+
+    handle = _handle("vaporock")
+    first = _vector(handle)
+    monkeypatch.setattr(vaporock, "_MELT_MODEL_ID", "MELTS-v2")
     second = _vector(handle)
 
     assert first != second

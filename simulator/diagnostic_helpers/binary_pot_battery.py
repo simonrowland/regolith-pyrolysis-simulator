@@ -3583,6 +3583,80 @@ def _internal_analytical_vapor_pressure_adapter(
     )
 
 
+@dataclass(frozen=True)
+class InternalAnalyticalVaporPressureOutcome:
+    """The pressure mapping consumed by direct residue predictions."""
+
+    vapor_pressures_Pa: Mapping[str, float]
+    diagnostics: Mapping[str, Any]
+
+    def to_cache_payload(self) -> dict[str, Any]:
+        return {
+            "vapor_pressures_Pa": _encode_cell_cache_value(
+                dict(self.vapor_pressures_Pa)
+            ),
+            "diagnostics": _encode_cell_cache_value(dict(self.diagnostics)),
+        }
+
+    @classmethod
+    def from_cache_payload(
+        cls, payload: Mapping[str, Any]
+    ) -> InternalAnalyticalVaporPressureOutcome:
+        pressures = _decode_cell_cache_value(payload["vapor_pressures_Pa"])
+        diagnostics = _decode_cell_cache_value(payload["diagnostics"])
+        if not isinstance(pressures, Mapping) or not isinstance(diagnostics, Mapping):
+            raise ValueError("internal analytical cache pressures must be a mapping")
+        return cls(vapor_pressures_Pa=pressures, diagnostics=diagnostics)
+
+
+def cached_internal_analytical_residue_vapor_pressure(
+    cache: Any | None,
+    *,
+    core: Any,
+    temperature_C: float,
+    pressure_bar: float,
+    composition_kg: Mapping[str, float] | None,
+    composition_mol: Mapping[str, float] | None,
+    fO2_log: float | None,
+    po2_request: Po2Request,
+    include_diagnostic_shadows: bool,
+) -> InternalAnalyticalVaporPressureOutcome:
+    """Cache the direct internal-analytical call used by residue adapters."""
+    from simulator.engine_cache import cached_solve
+
+    request = {
+        "call": "residue_vapor_pressure",
+        "temperature_C": temperature_C,
+        "pressure_bar": pressure_bar,
+        "composition_kg": composition_kg,
+        "composition_mol": composition_mol,
+        "fO2_log": fO2_log,
+        "po2_request": po2_request.as_payload(),
+        "include_diagnostic_shadows": include_diagnostic_shadows,
+    }
+
+    def solve() -> InternalAnalyticalVaporPressureOutcome:
+        response = _internal_analytical_vapor_pressure_adapter(
+            core=core,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            fO2_log=fO2_log,
+            po2_request=po2_request,
+            include_diagnostic_shadows=include_diagnostic_shadows,
+        )
+        return InternalAnalyticalVaporPressureOutcome(
+            vapor_pressures_Pa=dict(response.vapor_pressures_Pa or {}),
+            diagnostics=dict(response.diagnostics or {}),
+        )
+
+    outcome = cached_solve(
+        cache, "internal-analytical", request, solve
+    )
+    return outcome
+
+
 class _InternalAnalyticalBatteryBackend:
     """Battery adapter for the simulator core's own analytical vapor path."""
 
@@ -3932,6 +4006,9 @@ def run_isolated_cell_worker(
             qualification=bool(payload.get("qualification")),
             isolated=False,
             arm=str(payload.get("arm") or ARM_HEADLINE),
+            _defer_qualification_decoration=bool(
+                payload.get("_defer_qualification_decoration")
+            ),
         )
         return cell.as_payload()
     finally:
@@ -4208,6 +4285,7 @@ def _run_cell_in_subprocess(
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    defer_qualification_decoration: bool = False,
 ) -> EquilibrateCell:
     hostname = _hostname()
     wall0 = time.perf_counter()
@@ -4224,6 +4302,7 @@ def _run_cell_in_subprocess(
         "qualification": bool(qualification),
         "arm": arm,
         "simulate_crash": simulate_crash,
+        "_defer_qualification_decoration": defer_qualification_decoration,
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
@@ -4453,8 +4532,9 @@ def _engine_cache_request_vector(
     po2: Po2Request,
     physical_pressure_bar: float | None,
     native_activity_formula: str | None,
+    qualification: bool = False,
 ) -> dict[str, Any] | None:
-    """Describe the engine-bound cell inputs, after adapter pressure policy."""
+    """Describe the exact cell request and the adapter settings it consumes."""
 
     composition_kg, composition_mol = composition_kg_and_mol(
         pot.composition_wt_pct
@@ -4468,6 +4548,7 @@ def _engine_cache_request_vector(
     fo2_log = _fo2_log_for_request(handle, po2)
     engine_id = handle.name
     options: dict[str, Any] = {}
+    engine_settings: dict[str, Any] = {}
     try:
         parameters = inspect.signature(handle.backend.equilibrate).parameters
     except (TypeError, ValueError):
@@ -4478,35 +4559,13 @@ def _engine_cache_request_vector(
 
     if engine_id == "openimcc":
         bridge = handle.backend._bridge
-        if composition_mol:
-            engine_composition, _notices = bridge.fold_ferric_to_feot(
-                composition_mol
-            )
-            composition = {"basis": "mol", "components": engine_composition}
-        elif composition_kg is not None:
-            if bridge.positive_fe2o3(composition_kg):
-                batch_mol = composition_kg_and_mol(
-                    {
-                        str(name): float(amount) * 100.0
-                        for name, amount in composition_kg.items()
-                    }
-                )[1]
-                engine_composition, _notices = bridge.fold_ferric_to_feot(
-                    batch_mol
-                )
-                composition = {"basis": "mol", "components": engine_composition}
-            else:
-                composition = {"basis": "kg", "components": composition_kg}
-        else:
-            composition = {"basis": "mol", "components": composition_mol}
+        composition = {"basis": "mol", "components": composition_mol}
         pressure = None
-        options.update(
-            {
-                "pack": handle.backend._pack_name,
-                "allow_extrapolation": True,
-                "allow_out_of_envelope": True,
-            }
-        )
+        engine_settings = {
+            "pack": handle.backend._pack_name,
+            "allow_extrapolation": True,
+            "allow_out_of_envelope": True,
+        }
     elif engine_id == "internal-analytical":
         composition = {
             "composition_kg": composition_kg,
@@ -4514,6 +4573,16 @@ def _engine_cache_request_vector(
         }
         pressure = pressure_bar
         options["po2_request"] = po2.as_payload()
+        engine_settings = {"include_diagnostic_shadows": True}
+        if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+            from simulator.melt_backend import openimcc_bridge
+
+            engine_settings["oxygen_balance_backend"] = {
+                "engine": "openimcc",
+                "pack": openimcc_bridge.DEFAULT_BACKEND_PACK_NAME,
+                "allow_extrapolation": True,
+                "allow_out_of_envelope": True,
+            }
     else:
         # The four engine backends accept the submitted molar bulk as their
         # composition input; their adapters own any later projection.
@@ -4521,23 +4590,58 @@ def _engine_cache_request_vector(
         pressure = pressure_bar
         if engine_id == "alphamelts":
             from simulator.alphamelts_reference_pressure import (
-                alphamelts_effective_pressure_policy,
+                alphamelts_condensed_phase_pressure_bar,
             )
 
-            pressure, _label = alphamelts_effective_pressure_policy(
-                pressure_bar, transport=getattr(handle.backend, "_mode", None)
+            backend = handle.backend
+            pressure = alphamelts_condensed_phase_pressure_bar(
+                pressure_bar, transport=getattr(backend, "_mode", None)
             )
+            engine_settings = {
+                "model": getattr(backend, "_model", None),
+                "transport": getattr(backend, "_mode", None),
+                "python_api_model": getattr(backend, "_python_api_model", None),
+                "redox_buffer": getattr(backend, "_redox_buffer", None),
+                "fO2_offset": getattr(backend, "_fo2_offset", None),
+                "Fe3Fet_ratio": getattr(backend, "_fe3fet_ratio", None),
+                "configured_vapor_transport_pO2_bar": getattr(
+                    backend, "_configured_vapor_transport_pO2_bar", None
+                ),
+                "configured_vapor_transport_floor_bar": getattr(
+                    backend, "_configured_vapor_transport_floor_bar", None
+                ),
+                "vapor_transport_pO2_admission": (
+                    "observation"
+                    if po2.mode == PO2_COMMANDED
+                    else "environment"
+                ),
+            }
             if po2.mode == PO2_COMMANDED:
                 options.update(
                     vapor_transport_pO2_bar=po2.po2_bar,
                     vapor_transport_pO2_admission="observation",
                 )
         elif engine_id == "thermoengine":
-            from simulator.melt_backend.thermoengine import (
-                thermoengine_effective_pressure_policy,
-            )
+            from simulator.config import resolve_grid_engine_model
 
-            pressure, _label = thermoengine_effective_pressure_policy(pressure_bar)
+            backend = handle.backend
+            engine_settings = {
+                "model": resolve_grid_engine_model(
+                    getattr(backend, "_model", ""), "thermoengine"
+                ),
+                "transport": getattr(backend, "_mode", None),
+                "configured_vapor_transport_pO2_bar": getattr(
+                    backend, "_configured_vapor_transport_pO2_bar", None
+                ),
+                "configured_vapor_transport_floor_bar": getattr(
+                    backend, "_configured_vapor_transport_floor_bar", None
+                ),
+                "vapor_transport_pO2_admission": (
+                    "observation"
+                    if po2.mode == PO2_COMMANDED
+                    else "environment"
+                ),
+            }
             if po2.mode == PO2_COMMANDED:
                 options.update(
                     vapor_transport_pO2_bar=po2.po2_bar,
@@ -4547,12 +4651,31 @@ def _engine_cache_request_vector(
             # The VapoRock adapter documents that pressure_bar is diagnostic
             # only and does not send total pressure to eval_gas_abundances.
             pressure = None
+            from simulator.melt_backend.vaporock import (
+                _MELT_MODEL_ID,
+            )
+
+            backend = handle.backend
+            engine_settings = {
+                "model": _MELT_MODEL_ID,
+                "temperature_units": getattr(backend, "_temperature_units", "C"),
+                "pressure_units": getattr(backend, "_pressure_units", "bar"),
+                "vapor_pressure_units": getattr(
+                    backend, "_vapor_pressure_units", "bar"
+                ),
+                "reuse_system": bool(getattr(backend, "_reuse_system", False)),
+                "include_oxide_activities": False,
+            }
         elif engine_id == "magemin":
             backend = handle.backend
-            pressure = format(
+            pressure = float(
                 backend._GPa_to_kbar(backend._pressure_bar_to_GPa(pressure_bar)),
-                ".6f",
             )
+            engine_settings = {
+                "database": getattr(backend, "_database", None),
+                "bridge": getattr(backend, "_bridge", None),
+                "fO2_buffer": getattr(backend, "_config", {}).get("fO2_buffer"),
+            }
         elif engine_id not in {"alphamelts", "thermoengine", "vaporock", "magemin"}:
             return None
         if po2.mode == PO2_NOT_AN_INPUT and engine_id in {
@@ -4585,8 +4708,11 @@ def _engine_cache_request_vector(
         "composition": composition,
         "temperature_C": temperature_C,
         "pressure_bar": pressure,
+        "physical_pressure_bar": pressure_bar,
         "oxygen": oxygen,
         "solver_options": options,
+        "engine_settings": engine_settings,
+        "qualification": bool(qualification),
     }
     if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         request["oxygen"]["cell_material"] = po2.cell_material
@@ -4632,15 +4758,28 @@ def equilibrate_cell(
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
     engine_cache: Any | None = None,
+    _defer_qualification_decoration: bool = False,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
+
+    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
+    use_isolated = isolated
+    if use_isolated is None:
+        use_isolated = bool(
+            simulate_crash
+            or (qualification and handle.name in MELTS_FAMILY_ENGINES)
+        )
+    # MAGEMin's native-activity fields are carried by its existing bounded
+    # binary call. Keep that request on this process so it does not need a
+    # second private-worker payload shape.
+    if handle.name == "magemin" and native_activity_formula is not None:
+        use_isolated = False
 
     if (
         engine_cache is not None
         and handle.available
         and handle.backend is not None
         and simulate_crash is None
-        and not qualification
         and not (
             po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
             and po2.cell_material not in {None, "W", "Mo"}
@@ -4653,9 +4792,10 @@ def equilibrate_cell(
             po2=po2,
             physical_pressure_bar=physical_pressure_bar,
             native_activity_formula=native_activity_formula,
+            qualification=qualification,
         )
         if request_vector is not None:
-            from simulator.engine_cache import cached_solve
+            from simulator.engine_cache import cached_solve, is_transient_failure
 
             started_wall = time.perf_counter()
             started_cpu = time.process_time()
@@ -4673,13 +4813,47 @@ def equilibrate_cell(
                     po2=po2,
                     timeout_s=timeout_s,
                     qualification=qualification,
-                    isolated=isolated,
-                    arm=arm,
+                    isolated=use_isolated,
+                    arm=ARM_HEADLINE if qualification else arm,
                     simulate_crash=simulate_crash,
                     physical_pressure_bar=physical_pressure_bar,
                     native_activity_formula=native_activity_formula,
+                    _defer_qualification_decoration=True,
                 ),
             )
+            if qualification and handle.name in MELTS_FAMILY_ENGINES:
+                gate = assess_qualification_gate(
+                    pot.composition_wt_pct, temperature_K
+                )
+                gate_name = cell.engine_reason or cell.refusal_reason
+                if (
+                    cell.status == "refusal"
+                    and cell.refusal_reason
+                    not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
+                    and not is_transient_failure(cell)
+                ):
+                    cell = replace(
+                        cell,
+                        refusal_reason=REFUSAL_GATE_REFUSED_IN_ADAPTER,
+                        engine_reason=gate_name,
+                        engine_annotation=None,
+                    )
+                notices = [
+                    qualification_notice(gate),
+                    *(
+                        dict(notice)
+                        for notice in cell.notices
+                        if notice.get("kind") != "melts_domain_gate"
+                    ),
+                ]
+                cell = replace(
+                    cell,
+                    notices=notices,
+                    authority=cell.authority or AUTHORITY_EXTRAPOLATED,
+                    certified_band=(
+                        cell.certified_band or dict(gate["certified_band"])
+                    ),
+                )
             return replace(
                 cell,
                 pot_id=pot.pot_id,
@@ -4696,7 +4870,11 @@ def equilibrate_cell(
     notices: list[dict[str, Any]] = []
     authority: str | None = None
     certified_band: dict[str, Any] | None = None
-    if qualification and handle.name in MELTS_FAMILY_ENGINES:
+    if (
+        qualification
+        and handle.name in MELTS_FAMILY_ENGINES
+        and not _defer_qualification_decoration
+    ):
         gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
         notices.append(qualification_notice(gate))
         authority = AUTHORITY_EXTRAPOLATED
@@ -4737,18 +4915,6 @@ def equilibrate_cell(
             liquid_fraction=None,
         )
 
-    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
-    use_isolated = isolated
-    if use_isolated is None:
-        use_isolated = bool(
-            simulate_crash
-            or (qualification and handle.name in MELTS_FAMILY_ENGINES)
-        )
-    # MAGEMin's native-activity fields are carried by its existing bounded
-    # binary call. Keep that request on this process so it does not need a
-    # second private-worker payload shape.
-    if handle.name == "magemin" and native_activity_formula is not None:
-        use_isolated = False
     if use_isolated:
         return _run_cell_in_subprocess(
             handle,
@@ -4763,6 +4929,7 @@ def equilibrate_cell(
             certified_band=certified_band,
             simulate_crash=simulate_crash,
             physical_pressure_bar=physical_pressure_bar,
+            defer_qualification_decoration=_defer_qualification_decoration,
         )
 
     if not handle.available or handle.backend is None:
@@ -4846,6 +5013,7 @@ def equilibrate_cell(
         engine_annotation = crash_floor_engine_annotation(diagnostics)
         if (
             qualification
+            and not _defer_qualification_decoration
             and status == "refusal"
             and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
         ):
@@ -4881,7 +5049,7 @@ def equilibrate_cell(
         exit_signal = None
         if exit_code is not None and exit_code < 0:
             exit_signal = -exit_code
-        return _done(
+        cell = _done(
             status=status,
             refusal_reason=refusal,
             engine_status=str(getattr(result, "status", None) or status),
@@ -4917,6 +5085,10 @@ def equilibrate_cell(
                 getattr(result, "fe_redox_split", None)
             ),
         )
+        failure_disposition = diagnostics.get("backend_failure_disposition")
+        if failure_disposition is not None:
+            cell.backend_failure_disposition = str(failure_disposition)
+        return cell
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
         # A domain refusal is a row. Closing the handle would stamp every
@@ -4930,7 +5102,7 @@ def equilibrate_cell(
         if is_timeout or not battery_engine_handle_is_live(handle):
             retire_battery_engine_handle(handle)
             handle.unavailable_reason = engine_reason
-        return _done(
+        cell = _done(
             status=status,
             refusal_reason=refusal,
             engine_status=type(exc).__name__,
@@ -4939,6 +5111,10 @@ def equilibrate_cell(
             gas_partial_pressures_Pa={},
             liquid_fraction=None,
         )
+        failure_disposition = getattr(exc, "failure_disposition", None)
+        if failure_disposition is not None:
+            cell.backend_failure_disposition = str(failure_disposition)
+        return cell
 
 
 @dataclass(frozen=True)

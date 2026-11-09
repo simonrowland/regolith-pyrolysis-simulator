@@ -87,6 +87,23 @@ class OpenImccEvaluationOutcome:
 
 
 @dataclass(frozen=True)
+class OpenImccGasOutcome:
+    """Gas-speciation pressures produced by one direct OpenIMCC call."""
+
+    pressures: Mapping[str, Any]
+
+    def to_cache_payload(self) -> dict[str, Any]:
+        return {"pressures": _encode_value(dict(self.pressures))}
+
+    @classmethod
+    def from_cache_payload(cls, payload: Mapping[str, Any]) -> OpenImccGasOutcome:
+        pressures = _decode_value(payload["pressures"])
+        if not isinstance(pressures, Mapping):
+            raise ValueError("OpenIMCC gas cache pressures must be a mapping")
+        return cls(pressures=pressures)
+
+
+@dataclass(frozen=True)
 class OpenImccRedoxOutcome:
     """Exact redox result or typed refusal at the battery adapter boundary."""
 
@@ -162,6 +179,8 @@ def _is_typed_bridge_refusal(error: RuntimeError) -> bool:
     if not message.startswith(prefix) or ":" not in message:
         return False
     refusal_name = message[len(prefix) :].split(":", 1)[0].rsplit(".", 1)[-1]
+    if refusal_name in {"ImccNonconvergenceError", "RedoxNumericalError"}:
+        return False
     import openimcc
 
     for module_name in ("openimcc", "openimcc.kernel", "openimcc.redox", "openimcc.gas"):
@@ -256,9 +275,43 @@ def cached_openimcc_redox(
     return outcome.result
 
 
+def cached_openimcc_evaluate_gas(
+    cache: Any,
+    *,
+    parent_oxide_activities: Mapping[str, float],
+    temperature_K: float,
+    pressure_bar: float,
+    gas_pack: Any,
+    parent_oxides: tuple[str, ...],
+    allow_extrapolation: bool,
+    solve_fn: Callable[[], Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Cache one gas-layer solve for OpenIMCC's selected default gas pack."""
+    from simulator.engine_cache import cached_solve
+
+    request = {
+        "call": "evaluate_gas",
+        "parent_oxide_activities": parent_oxide_activities,
+        "temperature_K": temperature_K,
+        "pressure_bar": pressure_bar,
+        "gas_pack_selection": "default",
+        "parent_oxides": parent_oxides,
+        "allow_extrapolation": allow_extrapolation,
+    }
+    outcome = cached_solve(
+        cache,
+        "openimcc",
+        request,
+        lambda: OpenImccGasOutcome(pressures=dict(solve_fn())),
+    )
+    return outcome.pressures
+
+
 __all__ = (
     "OpenImccEvaluationOutcome",
+    "OpenImccGasOutcome",
     "OpenImccRedoxOutcome",
+    "cached_openimcc_evaluate_gas",
     "cached_openimcc_evaluate",
     "cached_openimcc_redox",
 )
