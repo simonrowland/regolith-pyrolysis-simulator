@@ -6,6 +6,8 @@ so minor versions may carry significant changes.
 
 ## [0.6.5] — 2026-11-08
 
+About 8,400 commits since v0.6.4 (2026-08-28).
+
 ### Literature and test battery
 
 - The migrated battery now holds 186,644 observations, 84,935 of them in the
