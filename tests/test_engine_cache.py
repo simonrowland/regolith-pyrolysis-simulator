@@ -692,8 +692,9 @@ def test_every_chemistry_version_has_a_changelog_entry() -> None:
     ],
 )
 def test_chemistry_data_dependency_names_a_real_path(
-    engine_id: str, dependency: str
+    engine_id: str, dependency: str, request: pytest.FixtureRequest
 ) -> None:
+    nodeid = request.node.nodeid
     kind, reference = dependency.split(":", 1)
     if kind == "repo":
         path = Path(engine_cache.__file__).resolve().parents[1] / reference
@@ -701,7 +702,9 @@ def test_chemistry_data_dependency_names_a_real_path(
         package, relative = reference.split("/", 1)
         spec = importlib.util.find_spec(package)
         if spec is None:
-            pytest.skip(f"{engine_id} data package {package!r} is not installed")
+            pytest.skip(
+                f"{nodeid}: {engine_id} data package {package!r} is not installed"
+            )
         roots = tuple(spec.submodule_search_locations or ())
         if not roots and spec.origin:
             roots = (str(Path(spec.origin).parent),)
@@ -719,18 +722,18 @@ def test_chemistry_data_dependency_names_a_real_path(
         if reference == "magemin/ref_database":
             binary = resolve_magemin_binary_path()
             if binary is None:
-                pytest.skip("MAGEMin database runtime binary is not installed")
+                pytest.skip(f"{nodeid}: MAGEMin database runtime binary is not installed")
             path = binary.resolve().parent / "ref_database"
         elif reference == "alphamelts/model":
             binary = find_alphamelts_binary()
             if binary is None:
-                pytest.skip("AlphaMELTS model runtime binary is not installed")
+                pytest.skip(f"{nodeid}: AlphaMELTS model runtime binary is not installed")
             path = binary
         elif reference == "thermoengine/native-libraries":
             try:
                 path = setup_thermoengine_dylib_path()
             except ImportError as exc:
-                pytest.skip(f"ThermoEngine native data is not installed: {exc}")
+                pytest.skip(f"{nodeid}: ThermoEngine native data is not installed: {exc}")
         else:
             pytest.fail(f"unknown engine data dependency {reference!r}")
     else:
