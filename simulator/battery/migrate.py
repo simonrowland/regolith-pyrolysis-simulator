@@ -13071,6 +13071,7 @@ def _convert_compilation_amount(
             token
             in {
                 "j/mol/k",
+                "j/mol-k",
                 "j/molk",
                 "j/deg-mole",
                 "j/degmole",

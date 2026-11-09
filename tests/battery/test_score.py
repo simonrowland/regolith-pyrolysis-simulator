@@ -1671,6 +1671,25 @@ def _resolve_migrated_printed_width(observation):
     )
 
 
+def test_mcgill_entropy_j_per_mol_k_width_resolves_on_entropy_scale() -> None:
+    observation = _printed_width_observation(
+        "mcgill-na-fe-o-critical-assessment",
+        "mcgill16_nafeo2_quoted_entropy",
+    )
+
+    resolved = _resolve_migrated_printed_width(observation)
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.84")
+    assert resolved.band.unit == QUANTITY_UNITS[Quantity.S]
+    assert resolved.notice is not None
+    assert resolved.notice.reason == "confidence_level_not_stated"
+    assert score_mod._convert_compilation_amount(
+        Decimal("0.84"), Quantity.DELTA_FH, "J/mol-K"
+    ) is None
+
+
 def test_migrated_abdeyazdan_mol_percent_width_uses_mole_fraction_scale() -> None:
     observation = _printed_width_observation(
         "abdeyazdan-2026-na-sn-si-phase-thermodynamics",

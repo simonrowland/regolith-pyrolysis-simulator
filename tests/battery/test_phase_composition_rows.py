@@ -34,6 +34,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    UncertaintyKind,
     ppm_mass_to_wt_percent,
 )
 from simulator.battery.identity import Identity, celsius_to_kelvin, profile_for
@@ -46,6 +47,7 @@ from simulator.battery.records import (
     ResidualRefusal,
     Species,
     State,
+    Uncertainty,
 )
 from simulator.battery.score import (
     DECISION_BAND_RATCHET_RELATIVE_PATH,
@@ -99,7 +101,17 @@ def test_mass_ppm_phase_reference_converts_to_wt_percent() -> None:
     ) == Decimal("250")
 
 
-def test_mass_ppm_phase_residual_compiles_against_converted_reference() -> None:
+@pytest.mark.parametrize(
+    ("width_ppm", "expected_band"),
+    (
+        (None, None),
+        ("25", Decimal("0.04575749056067512540994419347")),
+        ("0.001", Decimal("0.000001737181401978127513361342043")),
+    ),
+)
+def test_mass_ppm_phase_residual_compiles_against_converted_reference(
+    width_ppm: str | None, expected_band: Decimal | None
+) -> None:
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
     identity = _phase_identity(
@@ -116,6 +128,20 @@ def test_mass_ppm_phase_residual_compiles_against_converted_reference() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="ppm-phase-source",
     )
+    if width_ppm is not None:
+        reference = replace(
+            reference,
+            uncertainty=Uncertainty(
+                kind=UncertaintyKind.PRINTED,
+                verbatim={
+                    "value": width_ppm,
+                    "units": "ppm",
+                    "confidence_level": "not_stated",
+                },
+                value=Decimal(width_ppm),
+                basis="ppm",
+            ),
+        )
     context = ScoreContext(
         works={work.work_id: work},
         experiments={experiment.experiment_id: experiment},
@@ -150,6 +176,13 @@ def test_mass_ppm_phase_residual_compiles_against_converted_reference() -> None:
     assert residual.numeric.value == compute_metric(
         MetricOperation.DEX, Decimal("0.05"), Decimal("0.025")
     )
+    if expected_band is None:
+        assert residual.numeric.decision_band is None
+    else:
+        assert residual.numeric.decision_band is not None
+        assert abs(residual.numeric.decision_band.value - expected_band) < Decimal(
+            "1e-32"
+        )
 
 
 def _located(value: object, *, table: str, page: int) -> dict:

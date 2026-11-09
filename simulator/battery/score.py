@@ -73,6 +73,7 @@ from simulator.battery.enums import (
     ValenceValueForm,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
+    ppm_mass_to_wt_percent,
     residual_status_token,
 )
 from simulator.battery.identity import (
@@ -1591,7 +1592,7 @@ def _phase_component_reference_wt_percent(
         and subtype == "element_ppm_by_mass"
     ):
         # 1 ppm = 1e-6 mass fraction = 1e-4 wt%; 250 ppm = 0.025 wt%.
-        return reference / Decimal("10000")
+        return ppm_mass_to_wt_percent(reference)
     return reference
 
 
@@ -12999,6 +13000,19 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
+    printed_band_point = ref_point
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and isinstance(source_reference.identity, Identity)
+        and source_reference.identity.subtype is not None
+        and source_reference.identity.subtype.is_value
+        and source_reference.identity.subtype.value == "element_ppm_by_mass"
+    ):
+        # The residual compares against engine wt%, but the printed point and
+        # its width both remain on the published ppm scale for band resolution.
+        source_point = point_magnitude(source_reference.value)
+        if source_point is not None:
+            printed_band_point = source_point
     ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
@@ -13067,7 +13081,7 @@ def compile_residual(
             printed = _printed_uncertainty_band(
                 quantity,
                 band_uncertainty,
-                ref_point,
+                printed_band_point,
                 source_observation=source_reference,
                 method=(
                     experiment.method.value
