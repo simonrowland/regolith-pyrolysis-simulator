@@ -128,6 +128,30 @@ def _write_archive(path: Path, rows: list[dict[str, object]]) -> None:
         archive.addfile(member, io.BytesIO(residuals))
 
 
+def _scorecard_pair_archive(path: Path, count: int = 25) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "scorecard-pair"}
+    ]
+    for engine, residual in (("openimcc", 0.1), ("internal-analytical", 0.3)):
+        rows.extend(
+            _residual(engine, "vapour", f"pair-{index}", 1500, residual)
+            for index in range(count)
+        )
+    _write_archive(path, rows)
+
+
+def _scorecard_empty_rail_archive(path: Path) -> None:
+    refused = _residual("magemin", "vapour", "refused-only", 1500, 0.1)
+    refused["status"] = "refused"
+    refused["numeric"] = None
+    refused["refusal"] = {"reason": "unsupported_species"}
+    refused["execution"] = {"call_evidence": True}
+    _write_archive(
+        path,
+        [{"kind": "battery_store_stamp", "revision": "scorecard-empty"}, refused],
+    )
+
+
 def _csv_rows(rows: list[dict[str, object]]) -> list[dict[str, str]]:
     return [{key: str(value) for key, value in row.items()} for row in rows]
 
@@ -165,6 +189,29 @@ def _capture_collection_figures(monkeypatch: pytest.MonkeyPatch) -> list[object]
         lambda figure, _path: figures.append(figure),
     )
     return figures
+
+
+def _render_vapour_scorecard(
+    archive: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> tuple[object, object, dict[str, Path]]:
+    data = hero_plot.read_scores(archive, rails=("vapour",), _collection_mode=True)
+    figures: list[object] = []
+    save_collection_png = hero_plot._save_collection_png
+
+    def capture_and_save(figure: object, path: Path) -> None:
+        figures.append(figure)
+        save_collection_png(figure, path)
+
+    monkeypatch.setattr(hero_plot, "_save_collection_png", capture_and_save)
+    files = hero_plot.render_hero_collection(
+        data,
+        archive,
+        tmp_path / "collection",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-09",
+    )
+    return data, figures[0], files
 
 
 def _collection_csv_round_trip(
@@ -1633,10 +1680,6 @@ def test_empty_collection_panels_explain_missing_rows(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     figures = _capture_collection_figures(monkeypatch)
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", [])
-    scorecard_text = [text.get_text() for axis in figures[-1].axes for text in axis.texts]
-    assert scorecard_text.count("no shared rows") >= 2
-
     hero_plot._draw_temperature_png(
         tmp_path / "b.png",
         "vapour",
@@ -1664,6 +1707,119 @@ def test_empty_collection_panels_explain_missing_rows(
     hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", [], ["magemin"])
     fingerprint_text = [text.get_text() for text in figures[-1].axes[0].texts]
     assert "no scored rows" in fingerprint_text
+
+
+def test_empty_collection_chart_facets_explain_missing_data(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    figures = _capture_collection_figures(monkeypatch)
+    observables = (("vapour", "Vapour pressure"),)
+    hero_plot._draw_temperature_png(
+        tmp_path / "empty-b.png", "vapour", [], [], [], []
+    )
+    hero_plot._draw_component_png(tmp_path / "empty-c.png", "vapour", [])
+    hero_plot._draw_fingerprint_png(tmp_path / "empty-d.png", "vapour", [], [])
+    hero_plot._draw_coverage_png(tmp_path / "empty-e.png", [], observables)
+    hero_plot._draw_progress_png(tmp_path / "empty-f.png", [], observables)
+    hero_plot._draw_exposure_png(tmp_path / "empty-g.png", [], observables)
+
+    expected = (
+        "no coverage data",
+        "no shared-row component comparisons",
+        "no scored rows",
+        "no coverage data",
+        "no landing history",
+        "no exposure data",
+    )
+    for figure, label in zip(figures, expected, strict=True):
+        rendered = "\n".join(
+            [text.get_text() for text in figure.texts]
+            + [
+                text.get_text()
+                for axis in figure.axes
+                for text in axis.texts
+            ]
+        ).casefold()
+        assert label in rendered
+
+
+def test_scorecard_shows_internal_analytical_pair_and_separate_all_rows_summary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive = tmp_path / "scorecard-pair.tgz"
+    _scorecard_pair_archive(archive)
+
+    _data, figure, files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
+
+    labels = [text.get_text() for text in figure.texts]
+    labels.extend(text.get_text() for axis in figure.axes for text in axis.texts)
+    labels.extend(
+        text.get_text()
+        for legend in figure.legends
+        for text in legend.get_texts()
+    )
+    if figure._suptitle is not None:
+        labels.append(figure._suptitle.get_text())
+    rendered = "\n".join(labels).casefold()
+    assert "internal-analytical" in rendered
+    assert "shared rows, n=25" in rendered
+    assert "each engine on its own rows; not a like-for-like comparison" in rendered
+    assert "no shared rows" not in rendered
+    assert "interim" in files["methods"].read_text(encoding="utf-8").casefold()
+
+
+def test_scorecard_drops_empty_rail_axis_and_lists_refusal_mix(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive = tmp_path / "scorecard-empty.tgz"
+    _scorecard_empty_rail_archive(archive)
+
+    _data, figure, _files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
+
+    assert figure.axes == []
+    footer = "\n".join(text.get_text() for text in figure.texts).casefold()
+    assert "vapour: no engine produced a scored prediction" in footer
+    assert "refusal mix:" in footer
+
+
+def test_scorecard_all_rows_rms_matches_scorer_headline_metrics(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive = tmp_path / "scorecard-metrics.tgz"
+    _scorecard_pair_archive(archive)
+
+    data, figure, _files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
+
+    markers = {
+        collection.get_gid(): collection
+        for axis in figure.axes
+        for collection in axis.collections
+        if collection.get_gid()
+    }
+    for engine in ("openimcc", "internal-analytical"):
+        all_rows = data.hero_all_numeric_metrics[("vapour", engine)]["views"]["all"]
+        marker = markers[f"all-rows-rms:vapour:{engine}"]
+        plotted_rms = float(marker.get_offsets()[0][0])
+        assert plotted_rms == float(Decimal(str(all_rows["rms_dex"])))
+        assert f"n={all_rows['n']}" in "\n".join(
+            text.get_text() for axis in figure.axes for text in axis.texts
+        )
+
+
+def test_scorecard_low_count_pair_is_text_with_both_shared_row_rms_values(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive = tmp_path / "scorecard-small-pair.tgz"
+    _scorecard_pair_archive(archive, count=10)
+
+    _data, figure, _files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
+
+    labels = "\n".join(
+        text.get_text() for axis in figure.axes for text in axis.texts
+    ).casefold()
+    assert "internal-analytical" in labels
+    assert "shared rows, n=10" in labels
+    assert "both rms" in labels or ("0.1" in labels and "0.3" in labels)
 
 
 def test_temperature_hexagons_are_regular_in_display_space(
