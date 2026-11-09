@@ -116,6 +116,14 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
 # 2026-10-13 b-850 round 2: same CLI regenerated pin after corrected alkali
 # dimer source activity; kept equal to BASELINE_SIO_EVOLVED_KG.
+# 2026-11-09 condenser branch: lunar 1.04099076417e-05 -> 7.73192177231e-06 kg
+# (-25.73 %). Attributed (constackfix3 round 2) to a phase flip of the
+# lagged-headspace period-2 latch, NOT an equilibrium change: in-band SiO
+# P_eq, T, surface pO2 (1e-9 bar) and melt SiO2 match the parent to <=3.3e-9
+# relative on all 24 hours. A 2.66e-10 kg flagged sub-band SiO debit
+# (vapour merge 9c40012d5) flipped which hour of each pair SiO evolves on,
+# so the same P_eq is sampled on the cooler hour. b-1146 (same-hour
+# headspace closure) removes the latch and is expected to move this again.
 PHASE3BIS_SIO_EVOLVED_KG = sio_evolved_baseline("lunar_mare_low_ti")
 
 
