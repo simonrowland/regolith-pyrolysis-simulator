@@ -18,6 +18,7 @@ from simulator.chemistry.sgte_unary import (
     RECORDS_DIR,
     SOURCE_TDB,
     ROUND_TRIP_REL_TOL,
+    MissingSgteUnaryInputError,
     SgteUnaryError,
     TemperatureOutOfIntervalError,
     UnresolvedFunctionError,
@@ -34,6 +35,7 @@ from simulator.chemistry.sgte_unary import (
     parse_tdb,
     build_records,
     coverage_table,
+    ensure_source_tdb,
     sha256_file,
 )
 
@@ -50,17 +52,50 @@ def record_functions():
             for fn in load_record_yaml(path).get("functions", [])}
 
 
-def test_source_tdb_sha256_matches_sidecar_and_corpus():
-    assert SOURCE_TDB.is_file()
-    digest = sha256_file(SOURCE_TDB)
+@pytest.fixture
+def source_tdb():
+    if not SOURCE_TDB.is_file():
+        pytest.skip(
+            "SGTE unary50.tdb is not cached; run `python -m simulator.chemistry.sgte_unary fetch`"
+        )
+    return SOURCE_TDB
+
+
+def test_source_cache_checksum_mismatch_refuses(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_DATA_CACHE", str(tmp_path))
+    path = tmp_path / "sgte" / "unary50.tdb"
+    path.parent.mkdir()
+    path.write_text("not the SGTE database", encoding="utf-8")
+    with pytest.raises(MissingSgteUnaryInputError) as caught:
+        ensure_source_tdb()
+    assert str(path) in str(caught.value)
+    assert "https://www.sgte.net/" in str(caught.value)
+
+
+def test_missing_cache_download_failure_is_typed_and_names_url_and_path(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_DATA_CACHE", str(tmp_path))
+
+    def offline(*args, **kwargs):
+        raise OSError("offline")
+
+    monkeypatch.setattr("simulator.chemistry.sgte_unary.urllib.request.urlopen", offline)
+    with pytest.raises(MissingSgteUnaryInputError) as caught:
+        ensure_source_tdb()
+    message = str(caught.value)
+    assert "https://www.sgte.net/en/free-pure-elements-database?file=" in message
+    assert str(tmp_path / "sgte" / "unary50.tdb") in message
+
+
+def test_source_tdb_sha256_matches_sidecar_and_corpus(source_tdb):
+    digest = sha256_file(source_tdb)
     assert digest == EXPECTED_SHA256
     sidecar = yaml.safe_load((COMPILATION_ROOT / "source" / "sidecar.yaml").read_text(encoding="utf-8"))
     assert sidecar["sha256"] == EXPECTED_SHA256
     assert sidecar["files"][0]["sha256"] == EXPECTED_SHA256
 
 
-def test_every_function_interval_midpoint_round_trips_to_expression_string():
-    database = load_tdb()
+def test_every_function_interval_midpoint_round_trips_to_expression_string(source_tdb):
+    database = load_tdb(source_tdb)
     assert database.functions, "unary50.tdb published FUNCTION statements"
     assert [(fn.name, i.t_low, i.t_high) for fn in database.functions.values()
             for i in fn.intervals if i.t_low > i.t_high] == [("GHCPHG", 298.15, 234.32)]
@@ -79,8 +114,8 @@ def test_every_function_interval_midpoint_round_trips_to_expression_string():
             assert abs(parsed - string) <= ROUND_TRIP_REL_TOL * scale
 
 
-def test_manifest_records_parse_back_to_tdb_numbers(record_functions):
-    database = load_tdb(SOURCE_TDB)
+def test_manifest_records_parse_back_to_tdb_numbers(record_functions, source_tdb):
+    database = load_tdb(source_tdb)
     parsed_records = {record.record_id: record for record in build_records(database)}
     manifest = load_manifest()
     entries = manifest["entries"]
@@ -130,8 +165,8 @@ def test_manifest_records_parse_back_to_tdb_numbers(record_functions):
                 assert expression_from_interval_dict(loaded_interval) == parsed_interval.expression
 
 
-def test_feedstock_element_coverage_is_complete_except_pinned_halogens_and_hydrogen():
-    database = load_tdb()
+def test_feedstock_element_coverage_is_complete_except_pinned_halogens_and_hydrogen(source_tdb):
+    database = load_tdb(source_tdb)
     records = build_records(database)
     elements = feedstock_elements()
     assert elements, "data/feedstocks.yaml must declare elements"
@@ -149,8 +184,8 @@ def test_feedstock_element_coverage_is_complete_except_pinned_halogens_and_hydro
         assert coverage[element]["present"], element
 
 
-def test_ingest_is_complete_not_curated():
-    database = load_tdb()
+def test_ingest_is_complete_not_curated(source_tdb):
+    database = load_tdb(source_tdb)
     records = build_records(database)
     assert len(database.elements) == 80
     assert len(database.functions) == 305
@@ -201,8 +236,8 @@ def test_nothing_is_typed_measured():
         assert payload["compilation_role"]["validation_measurement"] is False
 
 
-def test_liquid_suffix_is_not_a_sublattice():
-    database = load_tdb(SOURCE_TDB)
+def test_liquid_suffix_is_not_a_sublattice(source_tdb):
+    database = load_tdb(source_tdb)
     suffixes = {phase.name_as_published.split(":", 1)[1]
                 for phase in database.phases.values() if ":" in phase.name_as_published}
     assert suffixes == {"L"}
@@ -223,17 +258,17 @@ def test_liquid_suffix_is_not_a_sublattice():
     assert {"AG-LIQUID", "FE-LIQUID"} <= set(liquids)
 
 
-def test_source_phase_sublattice_count_mismatch_refuses():
-    source = SOURCE_TDB.read_text(encoding="utf-8")
+def test_source_phase_sublattice_count_mismatch_refuses(source_tdb):
+    source = source_tdb.read_text(encoding="utf-8")
     declaration = "PHASE LIQUID:L % 1 1 !"
     malformed = source.replace(declaration, "PHASE LIQUID:L % 2 1 1 !", 1)
     assert malformed != source
     with pytest.raises(SgteUnaryError, match="LIQUID:L: constituent group count"):
-        parse_tdb(malformed, source_path=SOURCE_TDB.as_posix(), source_sha256=EXPECTED_SHA256)
+        parse_tdb(malformed, source_path=source_tdb.as_posix(), source_sha256=EXPECTED_SHA256)
 
 
-def test_source_function_intervals_and_element_reference_phase_are_structural():
-    database = load_tdb(SOURCE_TDB)
+def test_source_function_intervals_and_element_reference_phase_are_structural(source_tdb):
+    database = load_tdb(source_tdb)
     ghserfe = database.functions["GHSERFE"]
     assert len(ghserfe.intervals) == 2
     assert [(interval.t_low, interval.t_high) for interval in ghserfe.intervals] == [
@@ -245,8 +280,8 @@ def test_source_function_intervals_and_element_reference_phase_are_structural():
 
 
 @pytest.mark.parametrize("temperature", [100, 2000, 10000])
-def test_chosen_interval_refuses_extrapolation(temperature):
-    database = load_tdb(SOURCE_TDB)
+def test_chosen_interval_refuses_extrapolation(temperature, source_tdb):
+    database = load_tdb(source_tdb)
     expression = database.functions["GHSERFE"].intervals[0].expression
     assert expression.evaluate(1000) == pytest.approx(-41450.417956569676, rel=1e-9)
     with pytest.raises(TemperatureOutOfIntervalError) as caught:
@@ -255,8 +290,8 @@ def test_chosen_interval_refuses_extrapolation(temperature):
     assert caught.value.certified_band == ((298.15, 1811.0),)
 
 
-def test_function_selects_interval_and_refuses_outside_union():
-    database = load_tdb(SOURCE_TDB)
+def test_function_selects_interval_and_refuses_outside_union(source_tdb):
+    database = load_tdb(source_tdb)
     functions = {name: function.as_dict() for name, function in database.functions.items()}
     for temperature in (100, 10000):
         with pytest.raises(TemperatureOutOfIntervalError) as caught:
@@ -294,8 +329,8 @@ def test_missing_interval_bound_refuses(record_functions):
         expression_from_interval_dict(interval)
 
 
-def test_published_reversed_mercury_interval_refuses():
-    database = load_tdb(SOURCE_TDB)
+def test_published_reversed_mercury_interval_refuses(source_tdb):
+    database = load_tdb(source_tdb)
     function = database.functions["GHCPHG"]
     expression = function.intervals[0].expression
     with pytest.raises(TemperatureOutOfIntervalError):

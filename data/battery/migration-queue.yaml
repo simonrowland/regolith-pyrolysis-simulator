@@ -221856,7 +221856,7 @@ entries:
       table: '8'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: declared quantity is unknown; unsupported quantity 'delta_rH'; refusing to pick a number
+  why: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_of_named_reaction'; refusing to pick a number
   axes:
   - value
   observations:
@@ -221867,7 +221867,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -221876,10 +221876,10 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: declared quantity is unknown; unsupported quantity 'delta_rS'; refusing to pick a number
+  why: declared quantity is unknown; unsupported quantity 'reaction_entropy_of_named_reaction'; refusing to pick a number
   axes:
   - value
   observations:
@@ -221890,7 +221890,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -221898,7 +221898,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1751, 1817] is a temperature domain, not the observable
@@ -221912,7 +221912,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=5
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_low
     locator:
       page: 13
@@ -221920,7 +221920,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=14
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_low
     locator:
       page: 13
@@ -221928,7 +221928,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=3
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_low
     locator:
       page: 13
@@ -221936,7 +221936,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=1
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_low
     locator:
       page: 13
@@ -221944,7 +221944,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=12
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_low
     locator:
       page: 13
@@ -221952,7 +221952,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=10
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_low
     locator:
       page: 13
@@ -221960,7 +221960,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=8
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1817, 2087] is a temperature domain, not the observable
@@ -221974,7 +221974,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=6
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_high
     locator:
       page: 13
@@ -221982,7 +221982,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=15
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_high
     locator:
       page: 13
@@ -221990,7 +221990,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=4
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_high
     locator:
       page: 13
@@ -221998,7 +221998,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=2
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_high
     locator:
       page: 13
@@ -222006,7 +222006,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=13
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_high
     locator:
       page: 13
@@ -222014,7 +222014,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=11
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_high
     locator:
       page: 13
@@ -222022,7 +222022,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=9
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1910, 2087] is a temperature domain, not the observable
@@ -222036,7 +222036,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=7
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: regime 'Calculation based on the phase diagram' is not a closed method token (kems_effusion alone is insufficient)
@@ -222240,7 +222240,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=5
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_low
     locator:
       page: 13
@@ -222248,7 +222248,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=14
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_low
     locator:
       page: 13
@@ -222256,7 +222256,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=3
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_low
     locator:
       page: 13
@@ -222264,7 +222264,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=1
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_low
     locator:
       page: 13
@@ -222272,7 +222272,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=12
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_low
     locator:
       page: 13
@@ -222280,7 +222280,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=10
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_low
     locator:
       page: 13
@@ -222288,7 +222288,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=8
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1751, 2087]; no midpoint invented
@@ -222362,7 +222362,7 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222370,7 +222370,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1817, 2087]; no midpoint invented
@@ -222384,7 +222384,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=6
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_high
     locator:
       page: 13
@@ -222392,7 +222392,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=15
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_high
     locator:
       page: 13
@@ -222400,7 +222400,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=4
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_high
     locator:
       page: 13
@@ -222408,7 +222408,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=2
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_high
     locator:
       page: 13
@@ -222416,7 +222416,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=13
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_high
     locator:
       page: 13
@@ -222424,7 +222424,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=11
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_high
     locator:
       page: 13
@@ -222432,7 +222432,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=9
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1910, 2087]; no midpoint invented
@@ -222454,7 +222454,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=7
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1910, 2187]; no midpoint invented
@@ -222468,7 +222468,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_dissociation_entropy
     locator:
       page: 14
@@ -222476,7 +222476,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source does not state a numeric total_pressure_Pa
@@ -222573,7 +222573,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_dissociation_entropy
     locator:
       page: 14
@@ -222581,7 +222581,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -222590,7 +222590,7 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222598,10 +222598,10 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: unsupported quantity 'delta_rH'
+  why: unsupported quantity 'reaction_enthalpy_of_named_reaction'
   axes:
   - quantity
   observations:
@@ -222612,7 +222612,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -222621,10 +222621,10 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: unsupported quantity 'delta_rS'
+  why: unsupported quantity 'reaction_entropy_of_named_reaction'
   axes:
   - quantity
   observations:
@@ -222635,7 +222635,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222643,7 +222643,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0020168517050077
   source: data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml
   why: regime 'Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
