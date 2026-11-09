@@ -317,7 +317,8 @@ diagnostic, and vapour-pressure authority stays with the built-in model. See
 [`docs/melt-backends.md`](docs/melt-backends.md) for the per-task authority table.
 
 `install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
-pinned source engines.
+pinned source engines. Our [engine patches](patches/README.md) are applied on top with
+`scripts/enginepatch.sh apply`.
 
 ## Model Status
 
@@ -377,11 +378,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - [Architecture](docs/architecture.md) — interactive Flask + Socket.IO plane
 - [Eval-Runtime Architecture](docs/architecture-eval-runtime.md) — batch eval, warm workers, caches
 - [Developer Map](docs/developer-map.md) · [Melt Backends](docs/melt-backends.md)
+- [Engine Patches](patches/README.md) — our fixes to the third-party engines, pending upstream adoption
 - [ThermoEngine Patches](docs/thermoengine-patches.md) · [Performance Ratchet](docs/performance-ratchet.md)
 
 **Reference registry and campaign analyses**
 
-- [`docs/references/`](docs/references/) — the `REF-NNN` registry, source PDFs, and generated pages
+- [`docs/references/`](docs/references/) — the `REF-NNN` reference registry and generated bibliography pages
 
 ## Source Layout
 
