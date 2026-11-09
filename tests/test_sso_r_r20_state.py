@@ -3197,7 +3197,16 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
     assert after["native_fe_frac"] <= 2.0e-12
 
 
-def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:
+def test_native_fe_vacuum_command_keeps_finite_outlet_closure() -> None:
+    # A commanded vacuum is not an infinitely conducting outlet. At 1700 C
+    # the 100 mol pool's P_bulk=0 HKL rate is 0.49551383845456703 kg/hr;
+    # the pipe forward pressure at that rate is 32.69745676313603 Pa and
+    # Kn is 0.01083361438108784 (transitional). That rate is an unclosed
+    # upper bound. The same-hour closure solves 0.24956473231274315 kg/hr
+    # at P_bulk=23.204792348202464 Pa (Kn 0.015265451743701922). Continuum
+    # validity refuses that transitional state, so the ledger does not
+    # vaporize the pool. The 0.5 mol cap is the same refusal at
+    # 0.0279225 kg/hr and 7.761813978128352 Pa.
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 0.0
@@ -3210,17 +3219,58 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
         "0x1.76017513f6704p+5"
     )
 
+    def bound(diagnostic):
+        return next(
+            notice for notice in diagnostic["notices"]
+            if notice["kind"] == "unclosed_vacuum_hkl_upper_bound"
+        )
+
+    small_closure = vacuum_small["same_hour_headspace_closure"]
+    pool_closure = vacuum_pool["same_hour_headspace_closure"]
+    small_bound = bound(vacuum_small)
+    pool_bound = bound(vacuum_pool)
+
+    assert small_closure["status"] == "roots_found_by_sampling"
+    assert small_closure["converged"] is True
+    assert vacuum_small["native_fe_vapor_mol"] == pytest.approx(0.0)
+    assert vacuum_small["native_fe_tap_mol"] == pytest.approx(0.5)
+    assert vacuum_small["P_bulk_Pa"] == pytest.approx(7.761813978128352)
+    assert vacuum_small["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert small_bound["authority"] == "unclosed_upper_bound"
+    assert small_bound["selected_partition"] == "same_hour_headspace_closure"
+    assert small_bound["upper_bound_kg_hr"] == pytest.approx(0.0279225)
+    assert small_bound["forward_pressure_Pa"] == pytest.approx(
+        7.761813978128352
+    )
+
+    assert pool_closure["status"] == "roots_found_by_sampling"
+    assert pool_closure["rates_kg_hr"]["Fe"] == pytest.approx(
+        0.24956473231274315
+    )
+    assert vacuum_pool["P_bulk_Pa"] == pytest.approx(23.204792348202464)
+    assert vacuum_pool["native_fe_vapor_mol"] == pytest.approx(0.0)
+    assert vacuum_pool["knudsen_number"] == pytest.approx(0.015265451743701922)
+    assert pool_bound["upper_bound_kg_hr"] == pytest.approx(
+        0.49551383845456703
+    )
+    assert pool_bound["forward_pressure_Pa"] == pytest.approx(
+        32.69745676313603
+    )
+    assert pool_bound["forward_knudsen_number"] == pytest.approx(
+        0.01083361438108784
+    )
+    assert pool_bound["selected_partition"] == "same_hour_headspace_closure"
+
     sim.melt.p_total_mbar = 10.0
     sim.overhead.pressure_mbar = 10.0
     sim.overhead.composition = {"N2": 10.0, "Fe": 0.0}
     sim.melt.background_gas_species = "N2"
     pn2_pool = sim._native_fe_partition_diagnostic(100.0)
 
-    assert vacuum_small["native_fe_vapor_mol"] == pytest.approx(0.5)
-    assert vacuum_small["native_fe_tap_mol"] == pytest.approx(0.0)
-    assert vacuum_pool["native_fe_vapor_escape_fraction_of_pool"] > pn2_pool[
-        "native_fe_vapor_escape_fraction_of_pool"
-    ]
+    assert pn2_pool["native_fe_vapor_mol"] > 0.0
+    assert "unclosed_vacuum_hkl_upper_bound" not in {
+        notice.get("kind") for notice in pn2_pool.get("notices") or []
+    }
 
 
 def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:

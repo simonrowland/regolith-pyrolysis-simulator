@@ -8271,26 +8271,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if math.isfinite(molar_resistance)
                 else 0.0
             )
-            projected_bulk_Pa = candidate_mol_hr * float(g)
-            projected_total_Pa = reference_pressure_Pa
-            candidate_domain = viscous_p_bulk_out_of_domain_diagnostic(
-                knudsen_number=float(
-                    series_flux_at(
-                        projected_bulk_Pa, projected_total_Pa
-                    ).knudsen_number
-                ),
-                overhead_pressure_pa=projected_total_Pa,
-                pipe_diameter_m=pipe_diameter_m,
-                gas_temperature_K=gas_temperature_K,
-                carrier_gas=str(carrier_gas),
-                campaign_name=str(
-                    getattr(getattr(self.melt, 'campaign', None), 'name', '')
-                    or ''
-                ) or None,
-                asking_site='core.native_fe_vapor_partition',
-            )
-            if continuum_validity_refuses(candidate_domain):
-                return {'Fe': 0.0}
+            # Domain validity belongs to the solved state. Returning zero
+            # inside the transitional band makes the finite-outlet residual
+            # unsatisfiable and is not a pressure solution.
             candidate_rate = max(0.0, candidate_mol_hr) * molar_mass_kg_mol
             candidate_rate = min(
                 candidate_rate,
@@ -8391,47 +8374,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=campaign_name,
             asking_site='core.native_fe_vapor_partition',
         )
-        # True vacuum (P <= 0) and free-molecular flow (Kn >= 10) are the
-        # HKL limit P_bulk -> 0. The continuum closure's rate callback
-        # returns 0 inside the transitional band, and a sampled zero from
-        # that scan must not erase the vacuum capacity. Continuum refusal
-        # at the commanded pressure still suppresses capacity below.
+        # A vacuum command is not an infinitely conducting outlet. The
+        # selected partition is the finite-outlet closure. The P_bulk=0
+        # HKL rate is only an unclosed upper bound, recorded below with
+        # the forward pressure that rate would actually produce.
         commanded_free_molecular = (
             commanded_overhead_pa <= 0.0
             or math.isinf(vacuum_kn)
             or vacuum_kn >= FREE_MOLECULAR_KNUDSEN_MIN
         )
-        if (
-            commanded_free_molecular
-            and not continuum_validity_refuses(vacuum_domain)
-        ):
-            series_flux = vacuum_flux
-            P_bulk_Pa = 0.0
-            overhead_pressure_pa = commanded_overhead_pa
-            domain_diag = vacuum_domain
-            # Premise: one hour of vacuum HKL, capped by the pool.
-            # capacity_kg/hr = min(J(P_bulk=0) * A * 3600 s/hr, n_pool * M).
-            # Unit: (kg m^-2 s^-1) * m^2 * s/hr = kg/hr. A pool smaller
-            # than that capacity vaporizes completely; a larger pool keeps
-            # the rest as liquid metal.
-            capacity_kg_hr = vacuum_rate
-        else:
-            series_flux = series_flux_at(P_bulk_Pa, overhead_pressure_pa)
-            # Transitional Kn domain: this bounded native-Fe projection
-            # suppresses capacity under its diagnostic-limited policy when
-            # continuum transport is load-bearing (pyrolysis). Stage 0
-            # bakeout marks and keeps the computed HKL capacity. The
-            # authoritative EVAPORATION_FLUX provider refuses the pyrolysis
-            # case; t-379 lifts this suppression.
-            domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
-                knudsen_number=float(series_flux.knudsen_number),
-                overhead_pressure_pa=overhead_pressure_pa,
-                pipe_diameter_m=pipe_diameter_m,
-                gas_temperature_K=gas_temperature_K,
-                carrier_gas=str(carrier_gas),
-                campaign_name=campaign_name,
-                asking_site='core.native_fe_vapor_partition',
-            )
+        series_flux = series_flux_at(P_bulk_Pa, overhead_pressure_pa)
+        # Transitional Kn domain: this bounded native-Fe projection
+        # suppresses capacity under its diagnostic-limited policy when
+        # continuum transport is load-bearing (pyrolysis). Stage 0
+        # bakeout marks and keeps the computed HKL capacity. The
+        # authoritative EVAPORATION_FLUX provider refuses the pyrolysis
+        # case; t-379 lifts this suppression.
+        domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
+            knudsen_number=float(series_flux.knudsen_number),
+            overhead_pressure_pa=overhead_pressure_pa,
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=str(carrier_gas),
+            campaign_name=campaign_name,
+            asking_site='core.native_fe_vapor_partition',
+        )
         closure_record = {
             'regime': (
                 'pressure_held'
@@ -8457,15 +8424,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iterations_by_hour.setdefault(
                 int(getattr(self.melt, 'hour', 0)), {}
             )['native_fe'] = int(closure.iterations)
-        if not (
+        capacity_kg_hr = (
+            0.0
+            if continuum_validity_refuses(domain_diag)
+            else max(0.0, float(closure.rates_kg_hr.get('Fe', 0.0)))
+        )
+        unclosed_hkl_upper_bound = None
+        if (
             commanded_free_molecular
             and not continuum_validity_refuses(vacuum_domain)
+            and vacuum_rate > 0.0
         ):
-            capacity_kg_hr = (
-                0.0
-                if continuum_validity_refuses(domain_diag)
-                else max(0.0, float(closure.rates_kg_hr.get('Fe', 0.0)))
-            )
+            forward_partials = native_partials_at_rates({'Fe': vacuum_rate})
+            forward_pressure_Pa = max(
+                0.0, float(forward_partials.get('Fe', 0.0))
+            ) * 100.0
+            forward_total_Pa = max(commanded_overhead_pa, forward_pressure_Pa)
+            forward_flux = series_flux_at(forward_pressure_Pa, forward_total_Pa)
+            unclosed_hkl_upper_bound = {
+                'type': 'typed_notice',
+                'kind': 'unclosed_vacuum_hkl_upper_bound',
+                'species': 'Fe',
+                'authority': 'unclosed_upper_bound',
+                'selected_partition': 'same_hour_headspace_closure',
+                'upper_bound_kg_hr': vacuum_rate,
+                'forward_pressure_Pa': forward_pressure_Pa,
+                'forward_knudsen_number': float(forward_flux.knudsen_number),
+                'detail': (
+                    'Vacuum HKL at P_bulk=0 is an unclosed upper bound. '
+                    'A finite outlet does not hold the source at the '
+                    'commanded pressure. The same-hour closure is the '
+                    'selected partition.'
+                ),
+            }
         capacity_mol_hr = capacity_kg_hr / molar_mass_kg_mol
         vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
         tap_mol = native_fe_available_mol - vapor_mol
@@ -8559,6 +8550,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'iterations': closure.iterations,
                 'authority': 'extrapolated',
             }]
+        if unclosed_hkl_upper_bound is not None:
+            diagnostic.setdefault('notices', []).append(
+                unclosed_hkl_upper_bound
+            )
         if domain_diag is not None:
             diagnostic.update(
                 {
