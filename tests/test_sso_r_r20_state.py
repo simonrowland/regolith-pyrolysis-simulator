@@ -636,7 +636,6 @@ def test_references_registry_carries_sso_r_r20_redox_citations() -> None:
     expected_notes = {
         "REF-001": "Kress91 ln(XFe2O3/XFeO) relation",
         "REF-035": "log10(fO2/bar) = 8.58 - 25050/T",
-        "REF-036": "log10(fO2/bar) = -27215/T + 6.57",
         "REF-037": "graphite-CO-CO2 point formula",
         "REF-038": "IW-2 .. IW",
         "REF-039": "reduced vs terrestrial",
@@ -645,6 +644,13 @@ def test_references_registry_carries_sso_r_r20_redox_citations() -> None:
     for ref_id, expected in expected_notes.items():
         assert ref_id in references
         assert expected in references[ref_id]["coefficient_note"]
+
+    assert references["REF-036"]["coefficient_note"] == (
+        "Runtime IW uses O'Neill (1988) eq. 11, calibrated 833–1450 K and "
+        "extrapolated-and-flagged outside that range. Frost (1991) Table 1 IW "
+        "is log10(fO2/bar) = -27489/T + 6.702, kept as FROST_IW_COEFFICIENTS "
+        "for printed Frost calibrations."
+    )
 
 
 def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:

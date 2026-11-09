@@ -514,7 +514,7 @@ references:
     role: THEORY
     topic: redox-fo2
     status: current
-    coefficient_note: "IW buffer grounding for the in-repo convention: log10(fO2/bar) = -27215/T + 6.57; standard iron-wustite redox-buffer assemblage."
+    coefficient_note: "Runtime IW uses O'Neill (1988) eq. 11, calibrated 833–1450 K and extrapolated-and-flagged outside that range. Frost (1991) Table 1 IW is log10(fO2/bar) = -27489/T + 6.702, kept as FROST_IW_COEFFICIENTS for printed Frost calibrations."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []
