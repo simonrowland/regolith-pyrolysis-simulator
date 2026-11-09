@@ -577,13 +577,29 @@ def test_stale_stop_pair_cannot_cancel_same_worker_replacement(
         worker.close()
 
 
-def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch):
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch, inherit):
     from tests.test_remote_stdio_engine_worker import _assert_pids_gone
 
-    monkeypatch.delenv(
-        engine_pool_module.INHERIT_PROCESS_GROUP_ENV,
-        raising=False,
-    )
+    if inherit:
+        monkeypatch.setenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, '1')
+    else:
+        monkeypatch.delenv(
+            engine_pool_module.INHERIT_PROCESS_GROUP_ENV,
+            raising=False,
+        )
+    caller_pgid = os.getpgrp()
+    real_killpg = os.killpg
+    killpg_calls = []
+
+    if inherit:
+        def record_killpg(group_id, signum):
+            killpg_calls.append((group_id, signum))
+
+        # If cleanup regresses, record the dangerous signal without sending it
+        # to pytest's process group.
+        monkeypatch.setattr(engine_pool_module.os, 'killpg', record_killpg)
+
     worker = WarmEngineWorker(
         name='graceful descendant cleanup worker',
         bootstrap=_bootstrap_worker_with_same_group_child,
@@ -596,13 +612,28 @@ def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch):
         child_pid = worker.start()
         wrapper = worker.process
         assert wrapper is not None
-        assert os.getpgid(child_pid) == wrapper.pid
+        child_group = os.getpgid(child_pid)
+        if inherit:
+            assert child_group == caller_pgid
+            assert os.getpgid(wrapper.pid) == caller_pgid
+        else:
+            assert child_group == wrapper.pid
 
         worker.close()
 
         wrapper.join(timeout=3.0)
         assert not wrapper.is_alive()
-        _assert_pids_gone((child_pid,))
+        if inherit:
+            # Shared-group children are not owned by this worker; their fate
+            # follows the caller's group owner. Closing the worker must leave
+            # both that child and the caller's group alone.
+            assert os.getpgrp() == caller_pgid
+            real_killpg(caller_pgid, 0)
+            assert killpg_calls == []
+            assert os.getpgid(child_pid) == caller_pgid
+            os.kill(child_pid, 0)
+        else:
+            _assert_pids_gone((child_pid,))
     finally:
         worker.close()
         if child_pid is not None:
