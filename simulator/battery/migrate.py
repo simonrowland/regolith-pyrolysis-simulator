@@ -2773,65 +2773,171 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
     return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
+def _normalize_run_metadata_unit_annotations(
+    payload: object,
+    *,
+    field: str | None,
+    parent_locator: Locator | None = None,
+) -> tuple[object | None, tuple[str | None, str] | None]:
+    """Normalize unit annotations before parsing any declared run-metadata shape."""
+
+    annotations: list[tuple[tuple[str | int, ...], str, object]] = []
+
+    def strip_annotations(
+        value: object,
+        path: tuple[str | int, ...] = (),
+    ) -> object:
+        if isinstance(value, Mapping):
+            cleaned: dict[object, object] = {}
+            changed = False
+            for key, child in value.items():
+                key_text = str(key)
+                key_casefolded = key_text.casefold()
+                if "unit" in key_casefolded:
+                    annotations.append((path, key_text, child))
+                    changed = True
+                    continue
+                if key_casefolded in {"locator", "inference"}:
+                    cleaned[key] = child
+                    continue
+                normalized_child = strip_annotations(
+                    child,
+                    (*path, key_text),
+                )
+                cleaned[key] = normalized_child
+                changed = changed or normalized_child is not child
+            return cleaned if changed else value
+        if isinstance(value, list):
+            cleaned_items = [
+                strip_annotations(child, (*path, index))
+                for index, child in enumerate(value)
+            ]
+            return (
+                cleaned_items
+                if any(cleaned is not original for cleaned, original in zip(cleaned_items, value))
+                else value
+            )
+        if isinstance(value, tuple):
+            cleaned_items = tuple(
+                strip_annotations(child, (*path, index))
+                for index, child in enumerate(value)
+            )
+            return (
+                cleaned_items
+                if any(cleaned is not original for cleaned, original in zip(cleaned_items, value))
+                else value
+            )
+        return value
+
+    cleaned_payload = strip_annotations(payload)
+    if not annotations:
+        return cleaned_payload, None
+
+    formula = None
+    if field == "species_loss_fraction":
+        raw_species, _field_locator, _wrapper = _unwrap_located_equipment_value(
+            payload, parent_locator
+        )
+        if isinstance(raw_species, Mapping):
+            formula = next(
+                (
+                    str(species)
+                    for species in raw_species
+                    if any(
+                        str(species) == str(part)
+                        for path, _key, _unit in annotations
+                        for part in path
+                    )
+                ),
+                None,
+            )
+
+    for _path, key, _unit in annotations:
+        if key.casefold() not in {"unit", "units"}:
+            return None, (formula, f"unsupported unit annotation key {key!r}")
+    if len(annotations) > 1:
+        return None, (formula, "specify only one unit annotation")
+    if field not in {"mass_kg", "final_mass_kg"}:
+        return None, (formula, f"units are unsupported for {field!r}")
+
+    unit = annotations[0][2]
+    raw_value, _value_locator, _wrapper = _unwrap_located_equipment_value(
+        cleaned_payload, parent_locator
+    )
+
+    def convert_point(value: object) -> object:
+        if isinstance(value, Mapping):
+            if "state" in value:
+                state = value.get("state")
+                if not isinstance(state, Mapping) or state.get("tag") != StateTag.VALUE.value:
+                    raise ValueError(f"unit-bearing {field} must be a numeric point")
+                if "value" not in state:
+                    raise ValueError(f"unit-bearing {field} must be a numeric point")
+                converted_state = dict(state)
+                converted_state["value"] = convert_point(state["value"])
+                converted_value = dict(value)
+                converted_value["state"] = converted_state
+                return converted_value
+
+            if value.get("kind") is not None:
+                if str(value.get("kind")).casefold() != ValueKind.POINT.value:
+                    raise ValueError(f"unit-bearing {field} must be a numeric point")
+                amount = _as_dec_or_none(value.get("point"))
+                if amount is None:
+                    raise ValueError(f"unit-bearing {field} must be a numeric point")
+                converted, derivation = _convert_lab_value(
+                    f"sample.{field}", amount, str(unit or "")
+                )
+                if converted is None:
+                    raise ValueError(derivation or f"unmapped units for {field}")
+                converted_value = dict(value)
+                converted_value["point"] = converted
+                return converted_value
+
+            if "value" in value and value.get("value") is not None:
+                converted_value = dict(value)
+                converted_value["value"] = convert_point(value["value"])
+                return converted_value
+
+            raise ValueError(f"unit-bearing {field} must be a numeric point")
+
+        amount = _as_dec_or_none(value)
+        if amount is None:
+            raise ValueError(f"unit-bearing {field} must be a numeric point")
+        converted, derivation = _convert_lab_value(
+            f"sample.{field}", amount, str(unit or "")
+        )
+        if converted is None:
+            raise ValueError(derivation or f"unmapped units for {field}")
+        return converted
+
+    try:
+        converted_raw_value = convert_point(raw_value)
+    except (ArithmeticError, TypeError, ValueError) as exc:
+        return None, (formula, str(exc))
+
+    if (
+        isinstance(cleaned_payload, Mapping)
+        and "state" not in cleaned_payload
+        and cleaned_payload.get("value") is not None
+    ):
+        converted_payload = dict(cleaned_payload)
+        converted_payload["value"] = converted_raw_value
+        return converted_payload, None
+    return converted_raw_value, None
+
+
 def _run_metadata_located_value_from_plain(
     payload: object,
     *,
     field: str | None = None,
     parent_locator: Locator | None = None,
-    equipment_source: bool = False,
 ) -> Located[Value]:
     raw_value = payload
     value_locator = parent_locator
-    if equipment_source:
-        raw_value, value_locator, wrapper = _unwrap_located_equipment_value(
-            payload, parent_locator
-        )
-        unit_annotations: list[object] = []
-        seen_mappings: set[int] = set()
-        for candidate in (wrapper, raw_value):
-            if not isinstance(candidate, Mapping) or id(candidate) in seen_mappings:
-                continue
-            seen_mappings.add(id(candidate))
-            for key, unit in candidate.items():
-                normalized_key = str(key).casefold()
-                if "unit" not in normalized_key:
-                    continue
-                if normalized_key not in {"unit", "units"}:
-                    raise ValueError(f"unsupported unit annotation key {key!r}")
-                unit_annotations.append(unit)
-
-        if unit_annotations:
-            if field not in {"mass_kg", "final_mass_kg"}:
-                raise ValueError(f"units are unsupported for {field!r}")
-            if len(unit_annotations) > 1:
-                raise ValueError("specify only one unit annotation")
-            point_mapping = (
-                raw_value
-                if isinstance(raw_value, Mapping)
-                and str(raw_value.get("kind") or "").casefold()
-                == ValueKind.POINT.value
-                else None
-            )
-            amount_source = (
-                point_mapping.get("point") if point_mapping is not None else raw_value
-            )
-            amount = _as_dec_or_none(amount_source)
-            if amount is None:
-                raise ValueError(f"unit-bearing {field} must be a numeric point")
-            converted, derivation = _convert_lab_value(
-                f"sample.{field}", amount, str(unit_annotations[0] or "")
-            )
-            if converted is None:
-                raise ValueError(derivation or f"unmapped units for {field}")
-            if point_mapping is None:
-                raw_value = Value.point_of(converted)
-            else:
-                converted_mapping = dict(point_mapping)
-                for key in tuple(converted_mapping):
-                    if str(key).casefold() in {"unit", "units"}:
-                        converted_mapping.pop(key)
-                converted_mapping["point"] = converted
-                raw_value = converted_mapping
+    raw_value, value_locator, _wrapper = _unwrap_located_equipment_value(
+        payload, parent_locator
+    )
 
     if (
         isinstance(raw_value, Mapping)
@@ -2859,14 +2965,10 @@ def _run_metadata_species_payload_from_plain(
     payload: object,
     *,
     parent_locator: Locator | None = None,
-    equipment_source: bool = False,
 ) -> tuple[Mapping[str, Any], Locator | None]:
-    raw_values = payload
-    field_locator = parent_locator
-    if equipment_source:
-        raw_values, field_locator, _mapping = _unwrap_located_equipment_value(
-            payload, parent_locator
-        )
+    raw_values, field_locator, _mapping = _unwrap_located_equipment_value(
+        payload, parent_locator
+    )
     if not isinstance(raw_values, Mapping):
         raise ValueError("species_loss_fraction must be a mapping")
     if not raw_values:
@@ -2879,10 +2981,19 @@ def _parse_run_metadata_shape(
     payload: object,
     *,
     field: str | None = None,
-    equipment_source: bool = False,
     parent_locator: Locator | None = None,
 ) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
     """Parse one declared run-metadata shape through the registry Value parser."""
+
+    source_payload = payload
+    payload, annotation_error = _normalize_run_metadata_unit_annotations(
+        source_payload,
+        field=field,
+        parent_locator=parent_locator,
+    )
+    if annotation_error is not None:
+        formula, detail = annotation_error
+        return None, ((formula, source_payload, detail),)
 
     if shape in {"located_value", "located_positive_value"}:
         if shape == "located_positive_value" and field != "mass_kg":
@@ -2892,7 +3003,6 @@ def _parse_run_metadata_shape(
                 payload,
                 field=field,
                 parent_locator=parent_locator,
-                equipment_source=equipment_source,
             )
             range_error = (
                 None
@@ -2910,7 +3020,6 @@ def _parse_run_metadata_shape(
             raw_values, field_locator = _run_metadata_species_payload_from_plain(
                 payload,
                 parent_locator=parent_locator,
-                equipment_source=equipment_source,
             )
         except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
             return None, ((None, payload, str(exc)),)
@@ -2923,7 +3032,6 @@ def _parse_run_metadata_shape(
                     raw_value,
                     field=field,
                     parent_locator=field_locator,
-                    equipment_source=equipment_source,
                 )
                 range_error = (
                     None
@@ -2982,11 +3090,9 @@ def _run_metadata_shape_error(
     field: str,
     shape: str,
     payload: object,
-    *,
-    equipment_source: bool = False,
 ) -> str | None:
     _parsed, errors = _parse_run_metadata_shape(
-        shape, payload, field=field, equipment_source=equipment_source
+        shape, payload, field=field
     )
     if not errors:
         return None
@@ -17024,7 +17130,6 @@ def sample_from_equipment(
                     shape,
                     raw_payload,
                     field=field,
-                    equipment_source=True,
                     parent_locator=parent_locator,
                 )
                 report_metadata_shape_errors(field_path, path, shape, errors)
@@ -17051,7 +17156,6 @@ def sample_from_equipment(
                 shape,
                 raw_payload,
                 field=field,
-                equipment_source=True,
                 parent_locator=parent_locator,
             )
             report_metadata_shape_errors(field_path, path, shape, errors)

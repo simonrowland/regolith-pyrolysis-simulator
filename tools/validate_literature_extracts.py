@@ -343,9 +343,6 @@ def _run_metadata_location_errors(doc: Mapping[str, Any], label: str) -> list[st
                             field,
                             shape,
                             value,
-                            equipment_source=any(
-                                ".equipment." in home for home in matching_homes
-                            ),
                         )
                         if shape_error is not None:
                             errors.append(
