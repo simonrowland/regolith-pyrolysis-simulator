@@ -146,6 +146,25 @@ def _scorecard_pair_archive(path: Path, count: int = 25) -> None:
     _write_archive(path, rows)
 
 
+def _scorecard_layout_archive(path: Path) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "scorecard-layout"}
+    ]
+    for rail, _label in hero_plot.COLLECTION_OBSERVABLES:
+        for engine_index, engine in enumerate(ENGINE_ORDER):
+            rows.extend(
+                _residual(
+                    engine,
+                    rail,
+                    f"layout-{rail}-{index}",
+                    1500,
+                    0.1 + engine_index / 100,
+                )
+                for index in range(25)
+            )
+    _write_archive(path, rows)
+
+
 def _scorecard_empty_rail_archive(path: Path) -> None:
     refused = _residual("magemin", "vapour", "refused-only", 1500, 0.1)
     refused["status"] = "refused"
@@ -1313,6 +1332,69 @@ def test_window_filters_use_snapped_half_open_bin_indices() -> None:
     }
 
 
+def test_interactive_empty_error_and_fingerprint_plots_skip_axes() -> None:
+    script = hero_plot._COLLECTION_INTERACTIVE_SCRIPT
+
+    def function_source(name: str, next_name: str) -> str:
+        start = script.index(f"function {name}(")
+        end = script.index(f"\nfunction {next_name}(", start)
+        return script[start:end]
+
+    unavailable_start = script.find("function setPlotUnavailable(")
+    unavailable_helpers = (
+        ""
+        if unavailable_start < 0
+        else script[
+            unavailable_start : script.index("\nfunction plotError(", unavailable_start)
+        ]
+    )
+    plot_error = function_source("plotError", "plotMap")
+    plot_map = function_source("plotMap", "showTip")
+    node_script = "\n".join(
+        (
+            "const stats={strokes:0,frames:0,labels:[],sizeCalls:0};",
+            "const ctx={clearRect(){},fillRect(){},stroke(){stats.strokes++;},strokeRect(){stats.frames++;},fillText(value){stats.labels.push(String(value));},beginPath(){},moveTo(){},lineTo(){},setLineDash(){},save(){},translate(){},rotate(){},restore(){},arc(){},fill(){}};",
+            "const errorCanvas={style:{display:''},_plot:{old:true}},mapCanvas={style:{display:''},_plot:{old:true}};",
+            "const errorEmpty={hidden:true,textContent:''},mapEmpty={hidden:true,textContent:''};",
+            "const document={getElementById(id){return {'error-empty':errorEmpty,'map-empty':mapEmpty}[id];}};",
+            "const railSelect={value:'vapour'},engineSelect={value:'openimcc'};",
+            "const cellData={rails:['vapour'],engines:['openimcc']},PALETTE={openimcc:'#000'},BANDS={good:'#000'};",
+            "let rows=[],cells=[],windowHasRows=true;",
+            "function size(){stats.sizeCalls++;return {ctx,w:800,h:400};}",
+            "function windowValues(){return [15,16,3,6];}",
+            "function inWindow(row){return windowHasRows&&row.inWindow;}",
+            "function enabled(){return true;}",
+            "function getComputedStyle(){return {getPropertyValue(){return '#000';}};}",
+            unavailable_helpers,
+            plot_error,
+            plot_map,
+            "function run(inputRows,inputCells,hasWindowRows){rows=inputRows;cells=inputCells;windowHasRows=hasWindowRows;Object.assign(stats,{strokes:0,frames:0,labels:[],sizeCalls:0});errorCanvas.style.display='';mapCanvas.style.display='';errorCanvas._plot={old:true};mapCanvas._plot={old:true};errorEmpty.hidden=true;mapEmpty.hidden=true;errorEmpty.textContent='';mapEmpty.textContent='';plotError();plotMap();return {strokes:stats.strokes,frames:stats.frames,labels:stats.labels,sizeCalls:stats.sizeCalls,error:{hidden:errorEmpty.hidden,text:errorEmpty.textContent,canvas:errorCanvas.style.display,plot:errorCanvas._plot},map:{hidden:mapEmpty.hidden,text:mapEmpty.textContent,canvas:mapCanvas.style.display,plot:mapCanvas._plot}};}",
+            "const filteredRows=[{rail:'vapour',engine:'openimcc',inWindow:false,temperature_K:5000,residual_dex:'0.2'}],filteredCells=[[0,0,50,3,3,'0','0','0.2',1,false]];",
+            "console.log(JSON.stringify([run([],[],true),run(filteredRows,filteredCells,false)]));",
+        )
+    )
+    result = subprocess.run(
+        ["node", "-e", node_script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    cases = json.loads(result.stdout)
+    assert len(cases) == 2
+    for case in cases:
+        assert case["strokes"] == 0
+        assert case["frames"] == 0
+        assert case["labels"] == []
+        assert case["error"]["hidden"] is False
+        assert "No scored rows" in case["error"]["text"]
+        assert case["error"]["canvas"] == "none"
+        assert case["error"]["plot"] is None
+        assert case["map"]["hidden"] is False
+        assert "No fingerprint cells" in case["map"]["text"]
+        assert case["map"]["canvas"] == "none"
+        assert case["map"]["plot"] is None
+
+
 def test_collection_sample_uses_scorer_temperature_bin_at_custom_chart_width(
     tmp_path: Path,
 ) -> None:
@@ -1546,6 +1628,107 @@ def test_scorecard_pairs_lead_the_separate_all_rows_summary(
     assert any(text.get_text() == "All rows" for text in axis.texts)
 
 
+def test_scorecard_multi_rail_labels_and_markers_do_not_overlap(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from matplotlib.collections import PathCollection
+    from matplotlib.transforms import Affine2D, Bbox
+
+    archive = tmp_path / "scorecard-layout.tgz"
+    _scorecard_layout_archive(archive)
+    data = hero_plot.read_scores(
+        archive,
+        rails=tuple(rail for rail, _label in hero_plot.COLLECTION_OBSERVABLES),
+        _collection_mode=True,
+    )
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_scorecard_png(
+        tmp_path / "scorecard-layout.png",
+        data,
+        hero_plot._scorecard_table_rows(data),
+        _csv_rows(hero_plot._coverage_table_rows(data)),
+    )
+
+    figure = figures[-1]
+    _assert_chart_header_text_does_not_overlap(figure)
+    renderer = figure.canvas.get_renderer()
+    assert len(figure.axes) == len(hero_plot.COLLECTION_OBSERVABLES)
+    pair_labels_by_axis = []
+    count_labels_by_axis = []
+    for axis in figure.axes:
+        pair_lines = [
+            line
+            for line in axis.lines
+            if str(line.get_gid()).startswith("shared-row-pair:")
+        ]
+        all_row_markers = [
+            collection
+            for collection in axis.collections
+            if str(collection.get_gid()).startswith("all-rows-rms:")
+        ]
+        pair_labels = [text for text in axis.texts if " vs " in text.get_text()]
+        count_labels = [
+            text
+            for text in axis.texts
+            if text.get_text().startswith(("shared rows, n=", "all rows, n="))
+        ]
+        assert len(pair_lines) == len(ENGINE_ORDER) - 1
+        assert len(pair_labels) == len(pair_lines)
+        assert len(all_row_markers) == len(ENGINE_ORDER)
+        assert len(count_labels) == len(pair_lines) + len(all_row_markers)
+        assert all(
+            min(float(marker.get_offsets()[0][1]) for marker in all_row_markers)
+            > max(float(line.get_ydata()[0]) for line in pair_lines)
+            for marker in all_row_markers
+        )
+
+        marker_boxes = []
+        for collection in axis.collections:
+            if not isinstance(collection, PathCollection) or not len(
+                collection.get_offsets()
+            ):
+                continue
+            marker_box = collection.get_window_extent(renderer)
+            if all(math.isfinite(value) for value in marker_box.extents):
+                marker_boxes.append(marker_box)
+                continue
+            path_box = collection.get_paths()[0].get_extents(
+                Affine2D(collection.get_transforms()[0])
+            )
+            stroke = renderer.points_to_pixels(collection.get_linewidths()[0]) / 2
+            for center_x, center_y in collection.get_offset_transform().transform(
+                collection.get_offsets()
+            ):
+                marker_boxes.append(
+                    Bbox.from_extents(
+                        center_x + path_box.x0 - stroke,
+                        center_y + path_box.y0 - stroke,
+                        center_x + path_box.x1 + stroke,
+                        center_y + path_box.y1 + stroke,
+                    )
+                )
+        summary_engine_labels = [
+            text
+            for text in axis.texts
+            if text.get_text() in ENGINE_ORDER
+        ]
+        protected_text = pair_labels + count_labels + summary_engine_labels
+        for text in protected_text:
+            text_box = text.get_window_extent(renderer)
+            assert all(
+                not text_box.overlaps(marker_box) for marker_box in marker_boxes
+            ), f"{text.get_text()} overlaps a scorecard marker"
+        pair_labels_by_axis.append(pair_labels)
+        count_labels_by_axis.append(count_labels)
+
+    for index in range(len(figure.axes) - 1):
+        for count in count_labels_by_axis[index]:
+            for label in pair_labels_by_axis[index + 1]:
+                assert not count.get_window_extent(renderer).overlaps(
+                    label.get_window_extent(renderer)
+                ), "neighboring rail count overlaps a pair label"
+
+
 def test_empty_temperature_panel_does_not_draw_zero_line_through_message(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -1638,7 +1821,23 @@ def test_empty_collection_chart_facets_explain_missing_data(
             for engine in ("openimcc", "vaporock")
         ],
     )
-    hero_plot._draw_fingerprint_png(tmp_path / "empty-d.png", "vapour", [], [])
+    hero_plot._draw_fingerprint_png(
+        tmp_path / "empty-d.png",
+        "vapour",
+        [
+            {
+                "rail": "vapour",
+                "engine": "magemin",
+                "temperature_lower_K": "1500",
+                "temperature_upper_K": "1600",
+                "sio2_lower": "0.2",
+                "sio2_upper": "0.25",
+                "n": "1",
+                "median_abs_dex": "0.2",
+            }
+        ],
+        ["magemin"],
+    )
     hero_plot._draw_coverage_png(tmp_path / "empty-e.png", [], observables)
     hero_plot._draw_progress_png(tmp_path / "empty-f.png", [], observables)
     hero_plot._draw_exposure_png(
@@ -1657,7 +1856,7 @@ def test_empty_collection_chart_facets_explain_missing_data(
     expected = (
         "no coverage data",
         "no shared-row component comparisons",
-        "no scored rows",
+        "no fingerprint cells with n ≥ 3",
         "no coverage data",
         "no landing history",
         "no exposure data",
@@ -1674,6 +1873,56 @@ def test_empty_collection_chart_facets_explain_missing_data(
         assert label in rendered
         assert figure.axes
         assert all(not axis.axison for axis in figure.axes)
+
+
+def test_temperature_panel_with_scores_but_no_temperature_shows_coverage(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    row = _residual("openimcc", "vapour", "missing-temperature", 1500, 0.25)
+    row["candidate_observation"]["identity"].pop("temperature_K")
+    archive = tmp_path / "missing-temperature.tgz"
+    _write_archive(
+        archive,
+        [{"kind": "battery_store_stamp", "revision": "missing-temperature"}, row],
+    )
+    data = hero_plot.read_scores(
+        archive, rails=("vapour",), _collection_mode=True
+    )
+    database = sqlite3.connect(":memory:")
+    hero_plot._collection_row_database(
+        archive, database, bin_width_K=data.bin_width_K
+    )
+    tables = hero_plot._collection_raw_tables(
+        database, data, bin_width_K=data.bin_width_K
+    )
+    database.close()
+    panel = next(
+        row
+        for row in tables["panels"]
+        if row["rail"] == "vapour" and row["engine"] == "openimcc"
+    )
+    assert panel["n"] == 1
+    assert panel["plotted_n"] == 0
+    assert data.hero_all_numeric_metrics[("vapour", "openimcc")]["views"][
+        "all"
+    ]["n"] == 1
+
+    figures = _capture_collection_figures(monkeypatch)
+    hero_plot._draw_temperature_png(
+        tmp_path / "missing-temperature.png",
+        "vapour",
+        _csv_rows([panel]),
+        [],
+        [],
+        [],
+    )
+    axis = figures[-1].axes[0]
+    assert not axis.axison
+    assert "1 scored, 0 with temperature" in " ".join(
+        text.get_text() for text in axis.texts
+    )
+    assert not axis.lines
+    assert not axis.collections
 
 
 def test_scorecard_shows_internal_analytical_pair_and_separate_all_rows_summary(

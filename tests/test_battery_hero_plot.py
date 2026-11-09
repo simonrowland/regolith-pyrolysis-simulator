@@ -1683,7 +1683,7 @@ def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
     }
     fig, axis = plt.subplots()
     try:
-        assert _draw_hero_sweet_spot(
+        assert not _draw_hero_sweet_spot(
             axis,
             "openimcc",
             [cell],
@@ -1691,6 +1691,7 @@ def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
             temperature_limits=(1900, 2000),
         )
         assert not axis.patches
+        assert not axis.axison
     finally:
         plt.close(fig)
 
