@@ -147,6 +147,37 @@ def test_alphamelts_subprocess_keys_its_effective_pressure() -> None:
     assert subbar_first != one_bar
 
 
+def test_alphamelts_subprocess_subbar_pressure_reuses_cached_result(
+    tmp_path: Path,
+) -> None:
+    backend = _Backend("alphamelts")
+    backend._mode = "subprocess"
+    handle = _handle("alphamelts", backend)
+    cache = EngineCache(tmp_path / "alphamelts-effective-pressure.sqlite")
+
+    def solve(pressure_bar: float) -> Any:
+        return equilibrate_cell(
+            handle,
+            _pot(),
+            temperature_K=1703.0,
+            po2=Po2Request("engine_default", None),
+            physical_pressure_bar=pressure_bar,
+            isolated=False,
+            engine_cache=cache,
+        )
+
+    subbar = solve(1.0e-6)
+    same_effective_pressure = solve(1.0e-9)
+    one_bar = solve(1.0)
+
+    assert backend.calls == 2
+    assert subbar.to_cache_payload() == same_effective_pressure.to_cache_payload()
+    assert not hasattr(subbar, "physical_pressure_bar")
+    assert one_bar.to_cache_payload() == subbar.to_cache_payload()
+    assert cache.counters["alphamelts"]["hits"] == 1
+    assert cache.counters["alphamelts"]["misses"] == 2
+
+
 def test_request_vector_omits_qualification_decoration() -> None:
     handle = _handle("thermoengine")
 
@@ -222,7 +253,7 @@ def test_isolated_cell_uses_parent_magemin_database_for_off_cold_and_warm(
             del timeout_s
             settings = payload["engine_settings"]
             resource, _worker_name = battery._bootstrap_isolated_cell_engine(
-                (str(payload["engine"]), dict(settings))
+                str(payload["engine"]), dict(settings)
             )
             try:
                 return battery.run_isolated_cell_worker(
