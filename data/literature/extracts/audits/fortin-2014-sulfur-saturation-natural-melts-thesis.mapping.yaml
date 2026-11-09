@@ -1,0 +1,65 @@
+source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
+source:
+  citation: Fortin, Marc-Antoine (2014), The effect of water on the sulphur concentration at sulphide saturation (SCSS) in natural melts. M.Sc. thesis, McGill University.
+extraction:
+  method: MinerU table draft mapping; p38 Table 3 compared; remaining tables and p39 continuation audited against pdftotext and renders.
+  date: '2026-11-08'
+  worker: codex-resume-68270-1794134074
+review_status: draft
+tables:
+- page: 38
+  table_index: 3
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: glass
+  regime: quench_equilibration
+  values:
+  - column: 2
+    species: SiO2
+    unit: '%'
+  - column: 3
+    species: TiO2
+    unit: '%'
+  - column: 4
+    species: Al2O3
+    unit: '%'
+  - column: 5
+    species: FeO
+    unit: '%'
+  - column: 6
+    species: MnO
+    unit: '%'
+  - column: 7
+    species: MgO
+    unit: '%'
+  - column: 8
+    species: CaO
+    unit: '%'
+  - column: 9
+    species: Na2O
+    unit: '%'
+  - column: 10
+    species: K2O
+    unit: '%'
+  - column: 11
+    species: P2O5
+    unit: '%'
+  - column: 12
+    species: S
+    unit: ppm
+  - column: 15
+    species: H2O
+    evidence_class: measured_reduced
+    unit: '%'
+  render_verified:
+  - row: 3
+    column: 2
+    text: 47.7 (3)
+  - row: 3
+    column: 12
+    text: 874 (48)
+  - row: 3
+    column: 15
+    text: 3.1 (5)
