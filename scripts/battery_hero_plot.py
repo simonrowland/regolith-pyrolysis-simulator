@@ -3084,6 +3084,7 @@ def _draw_hero_sweet_spot(
     axis_height_pixels = position.height * axis.figure.get_figheight() * dpi
     x_gap = 2 * (x_limits[1] - x_limits[0]) / max(axis_width_pixels, 1)
     y_gap = 2 * (temperature_limits[1] - temperature_limits[0]) / max(axis_height_pixels, 1)
+    drew_cell = False
 
     for cell in cells:
         x_low = _finite_float(cell.get("sio2_lower"))
@@ -3104,18 +3105,23 @@ def _draw_hero_sweet_spot(
             cell.get("colour")
             or FINGERPRINT_COLOURS[_battery_hero_fingerprint_band(value)]
         )
+        width = max(0.0, x_high - x_low - x_gap)
+        height = max(0.0, y_high - y_low - y_gap)
+        if width <= 0 or height <= 0:
+            continue
         axis.add_patch(
             Rectangle(
                 (x_low + x_gap / 2, y_low + y_gap / 2),
-                max(0.0, x_high - x_low - x_gap),
-                max(0.0, y_high - y_low - y_gap),
+                width,
+                height,
                 facecolor=fill,
                 edgecolor="none",
                 linewidth=0,
             )
         )
+        drew_cell = True
 
-    if not any(int(cell.get("n") or 0) for cell in cells):
+    if not drew_cell:
         axis.set_axis_off()
         return False
     axis.set_xticks([index / 10 for index in range(11)])
@@ -4525,24 +4531,32 @@ def _draw_temperature_png(
         )
         clipped_low = int(panel.get("clipped_low_n") or 0)
         clipped_high = int(panel.get("clipped_high_n") or 0)
-        count_label = f"{plotted_n} plotted of {n} scored"
-        if n == 0:
+        if plotted_n == 0:
             axis.set_axis_off()
+            if n == 0:
+                message = f"{engine}: no scored rows"
+                if uncalibrated_kems_flagged:
+                    message += (
+                        f" · {uncalibrated_kems_flagged} flagged "
+                        "(uncalibrated KEMS)"
+                    )
+            else:
+                message = (
+                    f"{engine}: {n} scored, 0 with temperature · "
+                    f"all-scored RMS {rms} dex"
+                )
             axis.text(
                 0.5,
                 0.5,
-                f"{engine}: no scored rows",
+                message,
                 transform=axis.transAxes,
                 ha="center",
                 va="center",
                 fontsize=8,
                 color="#64748b",
             )
-            title = f"{engine} · no scored rows"
-            if uncalibrated_kems_flagged:
-                title += f" · {uncalibrated_kems_flagged} flagged (uncalibrated KEMS)"
-            axis.set_title(title, loc="left", fontsize=7.5)
             continue
+        count_label = f"{plotted_n} plotted of {n} scored"
         axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
         axis.axvline(
@@ -4851,22 +4865,15 @@ def _draw_fingerprint_png(
             for row in rail_rows
             if row["engine"] == engine
         ]
-        displayable_cells = [
-            cell
-            for cell in cells
-            if cell["n"] >= 3
-            and _finite_float(cell.get("median_abs_dex")) is not None
-            and all(
-                _finite_float(cell.get(field_name)) is not None
-                for field_name in (
-                    "temperature_lower_K",
-                    "temperature_upper_K",
-                    "sio2_lower",
-                    "sio2_upper",
-                )
-            )
-        ]
-        if not displayable_cells:
+        drew_cells = _draw_hero_sweet_spot(
+            axis,
+            engine,
+            cells,
+            x_limits=x_limits,
+            temperature_limits=limits,
+            export_dpi=COLLECTION_EXPORT_DPI,
+        )
+        if not drew_cells:
             axis.set_axis_off()
             axis.text(
                 0.5,
@@ -4880,14 +4887,6 @@ def _draw_fingerprint_png(
             )
             axis.set_title(engine, loc="left", fontsize=6.5)
             continue
-        _draw_hero_sweet_spot(
-            axis,
-            engine,
-            displayable_cells,
-            x_limits=x_limits,
-            temperature_limits=limits,
-            export_dpi=COLLECTION_EXPORT_DPI,
-        )
         axis.set_title(engine, loc="left", fontsize=6.5)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
     figure.suptitle(f"Where does {observable.lower()} meet the target?", fontsize=10, y=0.99)
@@ -5320,8 +5319,8 @@ def _write_collection_html(
             "<label>Temperature range (K)<span class=\"range\"><input id=\"temperature-min\" type=\"number\" aria-label=\"Minimum temperature\"><input id=\"temperature-max\" type=\"number\" aria-label=\"Maximum temperature\"></span></label>"
             "<label>SiO₂ range<span class=\"range\"><input id=\"sio2-min\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Minimum SiO2\"><input id=\"sio2-max\" type=\"number\" min=\"0\" max=\"1\" step=\"0.01\" aria-label=\"Maximum SiO2\"></span></label>"
             "<label>Fingerprint engine<select id=\"fingerprint-engine\"></select></label></div>"
-            "<div class=\"toggles\" id=\"engine-toggles\"></div><h3>Signed residual versus temperature</h3><canvas id=\"error-canvas\"></canvas>"
-            "<h3>Temperature × SiO₂ fingerprint</h3><canvas id=\"fingerprint-canvas\"></canvas></section>"
+            "<div class=\"toggles\" id=\"engine-toggles\"></div><h3>Signed residual versus temperature</h3><canvas id=\"error-canvas\"></canvas><p id=\"error-empty\" aria-live=\"polite\" hidden></p>"
+            "<h3>Temperature × SiO₂ fingerprint</h3><canvas id=\"fingerprint-canvas\"></canvas><p id=\"map-empty\" aria-live=\"polite\" hidden></p></section>"
         )
         output.write(
             "<details><summary>Rows with unavailable SiO₂ (included only for the full 0–1 range)</summary>"
@@ -5430,7 +5429,7 @@ const TEMPERATURE_BIN_K=__TEMPERATURE_BIN_K__,SIO2_BIN_WIDTH=__SIO2_BIN_WIDTH__,
 const railSelect=document.getElementById('observable-select'), engineSelect=document.getElementById('fingerprint-engine');
 const toggles=document.getElementById('engine-toggles'), tMin=document.getElementById('temperature-min'),tMax=document.getElementById('temperature-max');
 const sMin=document.getElementById('sio2-min'),sMax=document.getElementById('sio2-max');
-const errorCanvas=document.getElementById('error-canvas'),mapCanvas=document.getElementById('fingerprint-canvas'),tip=document.getElementById('tooltip');
+const errorCanvas=document.getElementById('error-canvas'),mapCanvas=document.getElementById('fingerprint-canvas'),errorEmpty=document.getElementById('error-empty'),mapEmpty=document.getElementById('map-empty'),tip=document.getElementById('tooltip');
 const engines=Object.keys(PALETTE);
 for(const rail of rails)railSelect.add(new Option(labels[rail],rail));
 for(const engine of engines){
@@ -5463,8 +5462,12 @@ function updateWindowRms(){
 }
 function size(canvas){const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height};}
 function lighten(hex,amount){const n=parseInt(hex.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return 'rgb('+Math.round(r+(255-r)*amount)+','+Math.round(g+(255-g)*amount)+','+Math.round(b+(255-b)*amount)+')';}
+function setPlotUnavailable(canvas,empty,message){const unavailable=!!message;canvas.style.display=unavailable?'none':'';canvas._plot=null;empty.textContent=message;empty.hidden=!unavailable;}
 function plotError(){
-  const {ctx,w,h}=size(errorCanvas),rail=railSelect.value,m={l:54,r:14,t:18,b:38},pw=w-m.l-m.r,ph=h-m.t-m.b,[lo,hi]=windowValues();
+  const rail=railSelect.value,plottedRows=rows.filter(row=>row.rail===rail&&enabled(row.engine)&&inWindow(row));
+  if(!plottedRows.length){setPlotUnavailable(errorCanvas,errorEmpty,'No scored rows for '+rail+' in this application window.');return;}
+  setPlotUnavailable(errorCanvas,errorEmpty,'');
+  const {ctx,w,h}=size(errorCanvas),m={l:54,r:14,t:18,b:38},pw=w-m.l-m.r,ph=h-m.t-m.b,[lo,hi]=windowValues();
   ctx.clearRect(0,0,w,h);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--page');ctx.fillRect(0,0,w,h);
   const x=v=>m.l+(v-lo)/(hi-lo||1)*pw,y=v=>m.t+(3-Math.max(-3,Math.min(3,v)))/6*ph;
   ctx.fillStyle='rgba(12,163,12,.12)';ctx.fillRect(m.l,y(.5),pw,y(-.5)-y(.5));ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--grid');
@@ -5472,15 +5475,18 @@ function plotError(){
   ctx.strokeStyle='#263238';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m.l,y(0));ctx.lineTo(w-m.r,y(0));ctx.stroke();
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(TEMPERATURE_FLOOR_K),m.t);ctx.lineTo(x(TEMPERATURE_FLOOR_K),h-m.b);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('Temperature (K)',w/2-42,h-8);ctx.save();ctx.translate(14,h/2+38);ctx.rotate(-Math.PI/2);ctx.fillText('Signed error (dex)',0,0);ctx.restore();
-  for(const row of rows){if(row.rail!==rail||!enabled(row.engine)||!inWindow(row))continue;const flagged=Number(row.flagged)===1,px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=flagged?.72:.35;ctx.fillStyle=flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
+  for(const row of plottedRows){const flagged=Number(row.flagged)===1,px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=flagged?.72:.35;ctx.fillStyle=flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
   ctx.globalAlpha=1;errorCanvas._plot={x,y,m,pw,ph,lo,hi,rail};
 }
 function plotMap(){
-  const {ctx,w,h}=size(mapCanvas),rail=railSelect.value,engine=engineSelect.value,m={l:54,r:14,t:18,b:36},pw=w-m.l-m.r,ph=h-m.t-m.b;
-  const railCells=cells.filter(c=>!c[9]&&cellData.rails[c[0]]===rail&&cellData.engines[c[1]]===engine),[tlo,thi,slo,shi]=windowValues();let lo=Infinity,hi=-Infinity;
+  const rail=railSelect.value,engine=engineSelect.value,[tlo,thi,slo,shi]=windowValues(),railCells=cells.filter(c=>!c[9]&&cellData.rails[c[0]]===rail&&cellData.engines[c[1]]===engine),plottedCells=[];
+  if(enabled(engine))for(const cell of railCells){if(cell[4]<3||!cell[8])continue;const xl=Math.max(slo,cell[3]*SIO2_BIN_WIDTH),xh=Math.min(shi,(cell[3]+1)*SIO2_BIN_WIDTH),yl=Math.max(tlo,cell[2]*TEMPERATURE_BIN_K),yh=Math.min(thi,(cell[2]+1)*TEMPERATURE_BIN_K);if(xh<=xl||yh<=yl)continue;plottedCells.push({cell,xl,xh,yl,yh});}
+  if(!plottedCells.length){setPlotUnavailable(mapCanvas,mapEmpty,'No fingerprint cells for '+engine+' on '+rail+' in this application window.');return;}
+  setPlotUnavailable(mapCanvas,mapEmpty,'');
+  const {ctx,w,h}=size(mapCanvas),m={l:54,r:14,t:18,b:36},pw=w-m.l-m.r,ph=h-m.t-m.b;let lo=Infinity,hi=-Infinity;
   for(const cell of railCells){lo=Math.min(lo,cell[2]*TEMPERATURE_BIN_K);hi=Math.max(hi,(cell[2]+1)*TEMPERATURE_BIN_K);}if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=0;hi=1;}
   ctx.clearRect(0,0,w,h);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--page');ctx.fillRect(0,0,w,h);const x=v=>m.l+(v-slo)/(shi-slo||1)*pw,y=v=>m.t+(hi-v)/(hi-lo||1)*ph;
-  for(const cell of railCells){if(!enabled(engine)||cell[4]<3||!cell[8])continue;const xl=Math.max(slo,cell[3]*SIO2_BIN_WIDTH),xh=Math.min(shi,(cell[3]+1)*SIO2_BIN_WIDTH),yl=Math.max(tlo,cell[2]*TEMPERATURE_BIN_K),yh=Math.min(thi,(cell[2]+1)*TEMPERATURE_BIN_K);if(xh<=xl||yh<=yl)continue;ctx.fillStyle=BANDS[['','good','okay','needs work'][cell[8]]];ctx.fillRect(x(xl)+1,y(yh)+1,Math.max(0,x(xh)-x(xl)-2),Math.max(0,y(yl)-y(yh)-2));}
+  for(const {cell,xl,xh,yl,yh} of plottedCells){ctx.fillStyle=BANDS[['','good','okay','needs work'][cell[8]]];ctx.fillRect(x(xl)+1,y(yh)+1,Math.max(0,x(xh)-x(xl)-2),Math.max(0,y(yl)-y(yh)-2));}
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.strokeRect(m.l,m.t,pw,ph);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('SiO₂ mole fraction',w/2-58,h-8);ctx.save();ctx.translate(14,h/2+30);ctx.rotate(-Math.PI/2);ctx.fillText('Temperature (K)',0,0);ctx.restore();mapCanvas._plot={x,y,m,pw,ph,lo,hi,rail,engine};
 }
 function showTip(event,kind){
