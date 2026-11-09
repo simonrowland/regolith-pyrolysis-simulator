@@ -18,7 +18,12 @@ PART_I_EXTRACT = (
 )
 RENDER_PINS = {
     ("CaO", "greig1927_cao_silica_rich_cao"): ("0.6", 21, None),
+    ("CaO", "greig1927_cao_less_siliceous_cao"): ("27.5", 21, None),
     ("MgO", "greig1927_mgo_less_siliceous_mgo"): ("31", 21, None),
+    ("SiO2", "greig1927_cao_less_siliceous_sio2"): ("72.5", 21, None),
+    ("SiO2", "greig1927_mgo_less_siliceous_sio2"): ("70", 21, None),
+    ("SiO2", "greig1927_sro_less_siliceous_sio2"): ("69", 21, None),
+    ("SrO", "greig1927_sro_less_siliceous_sro"): ("30", 21, None),
     ("FeO", "greig1927_table8_feo_rich_a_feo"): ("38.3", 3, "VIII"),
     ("SiO2", "greig1927_table8_feo_rich_a_sio2"): ("55.8", 3, "VIII"),
     ("SiO2", "greig1927_table8_feo_rich_b_sio2"): ("55.3", 3, "VIII"),
@@ -61,6 +66,49 @@ INTERPOLATED = {
         "1693",
     ),
 }
+EXTRAPOLATED_LESS_SILICEOUS = {
+    "greig1927_cao_less_siliceous_cao": (
+        "CaO",
+        "27.5",
+        {"CaO": "27.5", "SiO2": "72.5"},
+        "1698",
+    ),
+    "greig1927_cao_less_siliceous_sio2": (
+        "SiO2",
+        "72.5",
+        {"CaO": "27.5", "SiO2": "72.5"},
+        "1698",
+    ),
+    "greig1927_mgo_less_siliceous_mgo": (
+        "MgO",
+        "31",
+        {"MgO": "31", "SiO2": "70"},
+        "1695",
+    ),
+    "greig1927_mgo_less_siliceous_sio2": (
+        "SiO2",
+        "70",
+        {"MgO": "31", "SiO2": "70"},
+        "1695",
+    ),
+    "greig1927_sro_less_siliceous_sro": (
+        "SrO",
+        "30",
+        {"SrO": "30", "SiO2": "69"},
+        "1693",
+    ),
+    "greig1927_sro_less_siliceous_sio2": (
+        "SiO2",
+        "69",
+        {"SrO": "30", "SiO2": "69"},
+        "1693",
+    ),
+}
+EXTRAPOLATION_METHOD = (
+    "By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the "
+    "quenches of Table III, the composition of the less siliceous of the two liquids which can coexist in "
+    "equilibrium with cristobalite is found. In each case the extrapolation is short."
+)
 
 
 def _document() -> dict:
@@ -90,7 +138,7 @@ def _record_rows(document: dict) -> dict[str, tuple[str, dict]]:
 def _assert_render_pins(document: dict) -> None:
     observations = _source_rows(document)
     records = _record_rows(document)
-    assert len(observations) == 17
+    assert len(observations) == 11
     assert len(document["fidelity_samples"]) == 20
     for (formula, observation_id), (expected, page, table) in RENDER_PINS.items():
         actual_formula, row = records[observation_id]
@@ -125,6 +173,45 @@ def _assert_table9_binding(document: dict) -> None:
     assert "Render confirms PbSiO3¹" in table9["pb_formula_render_check"]
 
 
+def _assert_less_siliceous_extrapolation_evidence(document: dict) -> None:
+    contexts = _context_rows(document)
+    part_i = yaml.safe_load(PART_I_EXTRACT.read_text(encoding="utf-8"))
+    method = _context_rows(part_i)["greig1927_less_siliceous_liquid_method"][1]
+    method_values = method["values"]
+    assert method_values["less_siliceous_liquid_as_printed"] == EXTRAPOLATION_METHOD
+    assert method["locator"]["page"] == 16
+
+    extrapolated_ids = set(EXTRAPOLATED_LESS_SILICEOUS)
+    assert extrapolated_ids <= set(contexts)
+    assert not (extrapolated_ids & set(_source_rows(document)))
+    for observation_id, (formula, amount, composition, temperature) in (
+        EXTRAPOLATED_LESS_SILICEOUS.items()
+    ):
+        actual_formula, record = contexts[observation_id]
+        values = record["values"]
+        assert actual_formula == formula
+        assert record["locator"]["page"] == 21
+        assert values["component_amount"] == amount
+        assert values["composition_as_printed"] == composition
+        assert values["method_class"] == "author_derived"
+        assert values["extrapolation_method_as_published"] == EXTRAPOLATION_METHOD
+        assert values["method_source_id"] == (
+            "greig-1927-ajs-immiscibility-silicate-melts-part1"
+        )
+        assert values["method_source_observation_id"] == (
+            "greig1927_less_siliceous_liquid_method"
+        )
+        assert values["method_source_locator_as_printed"] == (
+            'Part I physical and published p. 16, section '
+            '"Immiscibility in the binary systems".'
+        )
+        assert values["phase_assignment_as_published"] == "less-siliceous liquid"
+        assert values["T_C_as_assigned"] == temperature
+        assert "phase" not in record
+        assert "phase_as_analyzed" not in values
+        assert "phase_label" not in values
+
+
 def test_render_transcriptions_and_row_counts_are_pinned() -> None:
     document = _document()
     _assert_render_pins(document)
@@ -142,6 +229,10 @@ def test_render_transcriptions_and_row_counts_are_pinned() -> None:
     assert table10["values"]["rows"][2]["heat_treatment_steps"][1][
         "duration_hours_as_published"
     ] == "1¼"
+
+
+def test_less_siliceous_compositions_keep_located_extrapolation_evidence() -> None:
+    _assert_less_siliceous_extrapolation_evidence(_document())
 
 
 def test_interpolation_repeats_and_transition_repeats_keep_part_i_provenance() -> None:
@@ -285,6 +376,24 @@ def test_interpolation_and_pb_treatment_mutations_are_detected() -> None:
     with pytest.raises(AssertionError):
         _assert_table9_binding(changed)
 
+    changed = copy.deepcopy(document)
+    extrapolated = _context_rows(changed)[
+        "greig1927_cao_less_siliceous_cao"
+    ][1]["values"]
+    extrapolated["method_class"] = "measured_direct"
+    with pytest.raises(AssertionError):
+        _assert_less_siliceous_extrapolation_evidence(changed)
+
+    changed = copy.deepcopy(document)
+    extrapolated = _context_rows(changed)[
+        "greig1927_cao_less_siliceous_cao"
+    ][1]["values"]
+    extrapolated["extrapolation_method_as_published"] = (
+        "Direct chemical analysis."
+    )
+    with pytest.raises(AssertionError):
+        _assert_less_siliceous_extrapolation_evidence(changed)
+
 
 def test_isolated_migration_binds_temperature_conditions_and_evidence() -> None:
     document = _document()
@@ -301,7 +410,7 @@ def test_isolated_migration_binds_temperature_conditions_and_evidence() -> None:
     assert result.validation is not None
     assert len(result.validation.hard_issues) == 0
     assert not result.queue
-    assert len(result.observations) == len(source_rows) == 17
+    assert len(result.observations) == len(source_rows) == 11
     migrated = {
         observation_id.removeprefix(f"{SOURCE_ID}::"): observation
         for observation_id, observation in result.observations.items()

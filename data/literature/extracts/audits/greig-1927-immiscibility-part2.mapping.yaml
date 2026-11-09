@@ -43,10 +43,10 @@ tables:
     type: equilibrium_phase_composition
     quantity: equilibrium_phase_composition
     unit: wt%
-    phase: glass
+    phase: l
     rows: [1, 2, 3, 4]
     species_form: printed_formula
-    source_layout_note: The CaO and MgO less-siliceous compositions occupy the opposite rows from their system temperatures; the extract preserves this printed layout and documents its independent Part I pairing basis.
+    source_layout_note: The CaO and MgO less-siliceous compositions occupy the opposite rows from their system temperatures; the extract preserves this printed layout and documents its independent Part I pairing basis. The less-siliceous compositions are liquid results derived by the Part I p. 16 extrapolation method.
     value_pairs:
       - species_column: 1
         value_column: 2
@@ -58,11 +58,11 @@ tables:
         value_column: 8
     cell_evidence:
       row_1_columns_1_2: Part I Table V interpolation; repeated in Part II at a summary temperature of 1698 C.
-      row_1_columns_3_4: MgO less-siliceous composition; its MgO-SiO2 temperature is independently identified by Part I observation greig1927_t3_mgo_sio2_cristobalite_two_liquids_T.
+      row_1_columns_3_4: MgO less-siliceous liquid composition; Part I p. 16 identifies the method as a short liquidus extrapolation, and the MgO-SiO2 temperature is independently identified by Part I observation greig1927_t3_mgo_sio2_cristobalite_two_liquids_T.
       row_2_columns_1_2: Part I Table V interpolation; repeated in Part II at a summary temperature of 1695 C.
-      row_2_columns_3_4: CaO less-siliceous composition; its CaO-SiO2 temperature is independently identified by Part I observation greig1927_t3_cao_sio2_cristobalite_two_liquids_T.
+      row_2_columns_3_4: CaO less-siliceous liquid composition; Part I p. 16 identifies the method as a short liquidus extrapolation, and the CaO-SiO2 temperature is independently identified by Part I observation greig1927_t3_cao_sio2_cristobalite_two_liquids_T.
       row_3_columns_1_2: Part I Table V interpolation; repeated in Part II.
-      row_3_columns_3_4: SrO less-siliceous composition as printed.
+      row_3_columns_3_4: SrO less-siliceous liquid composition by the short liquidus extrapolation described in Part I p. 16; the printed values are not normalized.
       row_4_columns_1_4: Tentative FeO-SiO2 immiscibility limits, not definitive measured phase assays.
     temperature_evidence:
       row_1: Repeated Part I CaO transition observation greig1927_t3_cao_sio2_cristobalite_two_liquids_T.

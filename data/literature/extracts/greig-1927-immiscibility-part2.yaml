@@ -249,88 +249,7 @@ fidelity_samples:
     note: Independent 300 dpi render; closure from the printed FeO and Fe2O3 assays.
 species:
   CaO:
-    observations:
-    - observation_id: greig1927_cao_less_siliceous_cao
-      type: composition_series
-      regime: quench_equilibration
-      locator:
-        page: 21
-        pdf_page_index: 20
-        published_page: 153
-        note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: CaO; less_siliceous liquid; CaO
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1698'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            row: '1'
-            column: temperature
-            note: 'Printed row 1 temperature; Part I Table III observation greig1927_t3_cao_sio2_cristobalite_two_liquids_T supports the CaO-SiO2 pairing.'
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                CaO: '27.5'
-                SiO2: '72.5'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid; CaO
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid; CaO
-      units: wt_percent
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '27.5'
-        component_amount_as_published: '27.5'
-        method_class: measured_direct
-        T_C: '1698'
-        temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
-        system_as_printed: CaO-SiO2
-        limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
+    observations: []
     context:
     - observation_id: greig1927_cao_silica_rich_cao
       type: phase_equilibrium_run_products
@@ -354,6 +273,35 @@ species:
         originating_part_i_observation_id: greig1927_t5_cao_siliceous_glass
         originating_temperature_C: '1710'
         part_ii_summary_temperature_C: '1698'
+    - observation_id: greig1927_cao_less_siliceous_cao
+      type: author_derived_composition_context
+      locator:
+        page: 21
+        pdf_page_index: 20
+        published_page: 153
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+        row: CaO; less_siliceous liquid; CaO
+      units: wt_percent
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        component_amount: '27.5'
+        component_amount_as_published: '27.5'
+        composition_as_printed:
+          CaO: '27.5'
+          SiO2: '72.5'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
+        system_as_printed: CaO-SiO2
+        limb_as_published: less-siliceous
+        T_C_as_assigned: '1698'
+        temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
   Fe2O3:
     observations:
     - observation_id: greig1927_table8_feo_rich_a_fe2o3
@@ -845,88 +793,7 @@ species:
         sample_id_as_published: B
         measurement_note: A and B are the two liquid analyses; post-quench microscopy is recorded separately.
   MgO:
-    observations:
-    - observation_id: greig1927_mgo_less_siliceous_mgo
-      type: composition_series
-      regime: quench_equilibration
-      locator:
-        page: 21
-        pdf_page_index: 20
-        published_page: 153
-        note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: MgO; less_siliceous liquid; MgO
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1695'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            row: '2'
-            column: temperature
-            note: 'Printed row 2 temperature; Part I Table III observation greig1927_t3_mgo_sio2_cristobalite_two_liquids_T supports the MgO-SiO2 pairing.'
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                MgO: '31'
-                SiO2: '70'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid; MgO
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid; MgO
-      units: wt_percent
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '31'
-        component_amount_as_published: '31'
-        method_class: measured_direct
-        T_C: '1695'
-        temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
-        system_as_printed: MgO-SiO2
-        limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
+    observations: []
     context:
     - observation_id: greig1927_mgo_silica_rich_mgo
       type: phase_equilibrium_run_products
@@ -950,249 +817,37 @@ species:
         originating_part_i_observation_id: greig1927_t5_mgo_siliceous_glass
         originating_temperature_C: '1710'
         part_ii_summary_temperature_C: '1695'
-  SiO2:
-    observations:
-    - observation_id: greig1927_cao_less_siliceous_sio2
-      type: composition_series
-      regime: quench_equilibration
+    - observation_id: greig1927_mgo_less_siliceous_mgo
+      type: author_derived_composition_context
       locator:
         page: 21
         pdf_page_index: 20
         published_page: 153
         note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: CaO; less_siliceous liquid; SiO2
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1698'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            row: '1'
-            column: temperature
-            note: 'Printed row 1 temperature; Part I Table III observation greig1927_t3_cao_sio2_cristobalite_two_liquids_T supports its CaO-SiO2 pairing.'
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                CaO: '27.5'
-                SiO2: '72.5'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid; SiO2
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: CaO; less_siliceous liquid; SiO2
+        row: MgO; less_siliceous liquid; MgO
       units: wt_percent
       values:
         quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '72.5'
-        component_amount_as_published: '72.5'
-        method_class: measured_direct
-        T_C: '1698'
-        temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
-        system_as_printed: CaO-SiO2
-        limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
-    - observation_id: greig1927_mgo_less_siliceous_sio2
-      type: composition_series
-      regime: quench_equilibration
-      locator:
-        page: 21
-        pdf_page_index: 20
-        published_page: 153
-        note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: MgO; less_siliceous liquid; SiO2
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1695'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            row: '2'
-            column: temperature
-            note: 'Printed row 2 temperature; Part I Table III observation greig1927_t3_mgo_sio2_cristobalite_two_liquids_T supports its MgO-SiO2 pairing.'
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                MgO: '31'
-                SiO2: '70'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid; SiO2
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: MgO; less_siliceous liquid; SiO2
-      units: wt_percent
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '70'
-        component_amount_as_published: '70'
-        method_class: measured_direct
-        T_C: '1695'
-        temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+        formula: MgO
+        component_amount: '31'
+        component_amount_as_published: '31'
+        composition_as_printed:
+          MgO: '31'
+          SiO2: '70'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
         system_as_printed: MgO-SiO2
         limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
-    - observation_id: greig1927_sro_less_siliceous_sio2
-      type: composition_series
-      regime: quench_equilibration
-      locator:
-        page: 21
-        pdf_page_index: 20
-        published_page: 153
-        note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: SrO; less_siliceous liquid; SiO2
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1693'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SiO2
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                SrO: '30'
-                SiO2: '69'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SiO2
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SiO2
-      units: wt_percent
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '69'
-        component_amount_as_published: '69'
-        method_class: measured_direct
-        T_C: '1693'
-        system_as_printed: SrO-SiO2
-        limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
+        T_C_as_assigned: '1695'
+        temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+  SiO2:
+    observations:
     - observation_id: greig1927_sro_cristobalite_two_liquids_transition_1693
       type: transition_point
       regime: quench_equilibration
@@ -2107,87 +1762,94 @@ species:
         composition_discrepancy_note: The prose gives 3.7FeO (as oxalate), 97SiO2 for the quenched C charge; Table
           VIII prints 3FeO, 97SiO2. Both are retained as printed.
         temperature_effect_as_published: Increase in the amount of Fe2O3 appears to lower this temperature somewhat.
-  SrO:
-    observations:
-    - observation_id: greig1927_sro_less_siliceous_sro
-      type: composition_series
-      regime: quench_equilibration
+    - observation_id: greig1927_cao_less_siliceous_sio2
+      type: author_derived_composition_context
       locator:
         page: 21
         pdf_page_index: 20
         published_page: 153
         note: Unnumbered inline summary; compositions are printed as weight per cent.
-        row: SrO; less_siliceous liquid; SrO
-      phase: glass
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1693'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SrO
-        composition:
-          state:
-            tag: value
-            value:
-              amount_basis: mass_percent
-              components:
-                SrO: '30'
-                SiO2: '69'
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid composition
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: Oxygen fugacity is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SrO
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: Total pressure is not printed for this experiment.
-          locator:
-            page: 21
-            pdf_page_index: 20
-            published_page: 153
-            note: Unnumbered inline summary; compositions are printed as weight per cent.
-            row: SrO; less_siliceous liquid; SrO
+        row: CaO; less_siliceous liquid; SiO2
       units: wt_percent
       values:
         quantity: equilibrium_phase_composition
-        formula: SrO
-        phase_label: glass
-        basis: wt_percent
-        component_amount: '30'
-        component_amount_as_published: '30'
-        method_class: measured_direct
-        T_C: '1693'
+        formula: SiO2
+        component_amount: '72.5'
+        component_amount_as_published: '72.5'
+        composition_as_printed:
+          CaO: '27.5'
+          SiO2: '72.5'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
+        system_as_printed: CaO-SiO2
+        limb_as_published: less-siliceous
+        T_C_as_assigned: '1698'
+        temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+    - observation_id: greig1927_mgo_less_siliceous_sio2
+      type: author_derived_composition_context
+      locator:
+        page: 21
+        pdf_page_index: 20
+        published_page: 153
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+        row: MgO; less_siliceous liquid; SiO2
+      units: wt_percent
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: '70'
+        component_amount_as_published: '70'
+        composition_as_printed:
+          MgO: '31'
+          SiO2: '70'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
+        system_as_printed: MgO-SiO2
+        limb_as_published: less-siliceous
+        T_C_as_assigned: '1695'
+        temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+    - observation_id: greig1927_sro_less_siliceous_sio2
+      type: author_derived_composition_context
+      locator:
+        page: 21
+        pdf_page_index: 20
+        published_page: 153
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+        row: SrO; less_siliceous liquid; SiO2
+      units: wt_percent
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: '69'
+        component_amount_as_published: '69'
+        composition_as_printed:
+          SrO: '30'
+          SiO2: '69'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
         system_as_printed: SrO-SiO2
         limb_as_published: less-siliceous
-        phase_assemblage_as_printed: cristobalite and two liquids
-        phase_as_analyzed: quenched glass
-        quench_status: asserted_altered
-        quench_status_locator:
-          page: 21
-          pdf_page_index: 20
-          published_page: 153
-          note: Summary discussion of rapid cristobalite crystallization on cooling.
-        quench_provenance_as_printed: Cristobalite crystallizes rapidly from the less-siliceous liquid on cooling,
-          making quenching to a clear glass exceedingly difficult even in a small quantity.
-        measurement_note: Printed summary value retained without reconciling component totals; the MgO-rich limb
-          prints 31 + 70 = 101 wt% and the SrO-rich limb prints 30 + 69 = 99 wt%.
+        T_C_as_assigned: '1693'
+  SrO:
+    observations: []
     context:
     - observation_id: greig1927_sro_silica_rich_sro
       type: phase_equilibrium_run_products
@@ -2211,3 +1873,32 @@ species:
         originating_part_i_observation_id: greig1927_t5_sro_siliceous_glass
         originating_temperature_C: '1710'
         part_ii_summary_temperature_C: '1693'
+
+    - observation_id: greig1927_sro_less_siliceous_sro
+      type: author_derived_composition_context
+      locator:
+        page: 21
+        pdf_page_index: 20
+        published_page: 153
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+        row: SrO; less_siliceous liquid; SrO
+      units: wt_percent
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SrO
+        component_amount: '30'
+        component_amount_as_published: '30'
+        composition_as_printed:
+          SrO: '30'
+          SiO2: '69'
+        method_class: author_derived
+        extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined by the quenches of Table III, the composition of
+          the less siliceous of the two liquids which can coexist in equilibrium with cristobalite is found. In each case the extrapolation is short.
+        method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+        method_source_observation_id: greig1927_less_siliceous_liquid_method
+        method_source_locator_as_printed: 'Part I physical and published p. 16, section "Immiscibility in the binary systems".'
+        source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition as found by extrapolating the liquidus curve.
+        phase_assignment_as_published: less-siliceous liquid
+        system_as_printed: SrO-SiO2
+        limb_as_published: less-siliceous
+        T_C_as_assigned: '1693'
