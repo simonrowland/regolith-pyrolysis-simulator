@@ -726,6 +726,109 @@ def test_scalar_scan_treats_late_species_as_zero_in_earlier_samples():
     assert result.rates_kg_hr["CrO3"] == 0.0
 
 
+def test_review_shared_depletion_examples_are_nonmonotone(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    cases = (
+        (
+            "Al",
+            {"Al2": 1000.0, "Al": 1.0},
+            ("Al2", "Al"),
+            "Al2O3",
+            (0.009807809383814018, 0.009808250708756574),
+        ),
+        (
+            "Fe",
+            {"Fe": 1000.0, "FeO_association_gas": 1.0},
+            ("Fe", "FeO_association_gas"),
+            "FeO",
+            (1.3918907634597167e-7, 1.3917655058167698e-6),
+        ),
+    )
+
+    for primary, raw_molar_coefficients, species_names, parent, expected in cases:
+        molar_masses = {
+            species: resolve_species_formula(
+                species, sim.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for species in species_names
+        }
+        if primary == "Fe":
+            sim._native_fe_vapor_residual_capacity_mol_this_hr = 0.0
+        transformed_totals = []
+        for g in (0.0, 10.0):
+            raw_rates = {
+                species: (
+                    raw_molar_coefficients[species]
+                    / ((1.0 + g) if species in {"Al2", "Fe"} else (100.0 + g))
+                    * molar_masses[species]
+                )
+                for species in species_names
+            }
+            transformed = sim._analytic_evaporation_depletion_rates(
+                raw_rates,
+                dt_hr=1.0,
+                phase_scalar=1.0,
+                cleaned_melt_kg={parent: 0.001},
+                available_o2_kg=1.0,
+            )
+            if primary == "Fe":
+                transformed, _ = sim._apply_native_fe_residual_capacity(
+                    transformed, molar_masses
+                )
+            transformed_totals.append(
+                math.fsum(
+                    transformed.get(species, 0.0) / molar_masses[species]
+                    for species in species_names
+                )
+            )
+
+        assert transformed_totals == pytest.approx(expected, rel=1e-12)
+        assert transformed_totals[1] > transformed_totals[0]
+
+
+def test_scalar_closure_reports_all_roots_for_nonmonotone_stream():
+    pressure_pa = 1.0
+    carrier_feed_mol_hr = 1.0e-6
+
+    def total_rate_mol_hr(g):
+        # A smooth admitted-stream bump creates two additional crossings in
+        # G(N)=P/(F+N). This isolates the solver's all-roots contract.
+        log_offset = math.log((g + 1.0e-20) / 100.0)
+        return 0.01 / (1.0 + g) + 2.0 * math.exp(
+            -0.5 * (log_offset / 1.5) ** 2
+        )
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": total_rate_mol_hr(0.0)},
+        lambda g, _pressure: {"A": total_rate_mol_hr(g)},
+        lambda _rates: {},
+        {"A": 1.0},
+        carrier_feed_mol_s=carrier_feed_mol_hr / 3600.0,
+        closed_line_total_pressure_Pa=pressure_pa,
+    )
+
+    assert result.converged
+    assert result.multiple_closure_roots
+    assert len(result.roots_g) == 3
+    assert tuple(sorted(result.roots_g)) == result.roots_g
+    assert result.iterations < 200
+    assert result.rates_kg_hr["A"] == pytest.approx(
+        total_rate_mol_hr(result.roots_g[0]), rel=1e-12
+    )
+    assert all(
+        pressure_pa / (carrier_feed_mol_hr + total_rate_mol_hr(g)) - g
+        == pytest.approx(0.0, abs=1e-8)
+        for g in result.roots_g
+    )
+
+
 def _pressure_held_sim(
     vapor_pressure_data,
     feedstocks_data,
