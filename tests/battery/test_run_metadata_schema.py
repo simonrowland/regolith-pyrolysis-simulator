@@ -472,7 +472,21 @@ def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
             },
         },
     ]
-    root = _extract_with_experiments(tmp_path, experiments)
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = experiments
+    root = _write_min_tree(tmp_path, extract)
+
+    extract_errors = validate_extract_document(extract)
+    assert any(
+        "experiments[0].charge_sequence" in error
+        and "[run-metadata-shape]" in error
+        for error in extract_errors
+    ), extract_errors
+    assert any(
+        "experiments[2].vaporization_statement" in error
+        and "[run-metadata-shape]" in error
+        for error in extract_errors
+    ), extract_errors
 
     result = migrate(root, write=False)
 
