@@ -99,9 +99,33 @@ def test_key_uses_chemistry_version_and_only_accepts_request_vector(
     after = key("vaporock", request)
 
     assert before != after
-    assert list(inspect.signature(key).parameters) == ["engine_id", "request_vector"]
+    assert list(inspect.signature(key).parameters) == [
+        "engine_id",
+        "request_vector",
+        "depends_on",
+    ]
     with pytest.raises(TypeError):
         key("vaporock", request, observation_id="not-an-engine-input")  # type: ignore[call-arg]
+
+
+def test_key_includes_only_declared_dependency_chemistry_versions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = {"temperature_K": 1700.0, "oxygen": {"mode": "balance"}}
+    without_balance = {"temperature_K": 1700.0, "oxygen": {"mode": "default"}}
+
+    balanced_before = key(
+        "internal-analytical", request, depends_on=("openimcc",)
+    )
+    ordinary_before = key("internal-analytical", without_balance)
+    monkeypatch.setitem(
+        ENGINE_CHEMISTRY_VERSION,
+        "openimcc",
+        ENGINE_CHEMISTRY_VERSION["openimcc"] + 1,
+    )
+
+    assert key("internal-analytical", request, depends_on=("openimcc",)) != balanced_before
+    assert key("internal-analytical", without_balance) == ordinary_before
 
 
 def test_concurrent_process_writes_preserve_same_and_different_keys(
@@ -343,6 +367,78 @@ def test_runtime_identity_tripwire_logs_once_and_keeps_the_hit(
         "ENGINE_CHEMISTRY_VERSION['thermoengine'] ONLY if this change affects "
         "chemistry; leave it for non-chemistry patches."
     ) == notices[0].getMessage()
+
+
+@pytest.mark.parametrize("change", ["mtime", "path"])
+def test_thermoengine_native_library_change_notices_without_changing_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    change: str,
+    request: pytest.FixtureRequest,
+) -> None:
+    request.addfinalizer(engine_cache.runtime_identity.cache_clear)
+    first_library = tmp_path / "first" / "libphaseobjc.dylib"
+    first_library.parent.mkdir()
+    first_library.write_bytes(b"phaseobjc")
+    selected_library = [first_library]
+    monkeypatch.setattr(
+        engine_cache,
+        "_thermoengine_native_library_path",
+        lambda: selected_library[0],
+    )
+    engine_cache.runtime_identity.cache_clear()
+    monkeypatch.setattr(
+        engine_cache,
+        "_from_cache_payload",
+        _Outcome.from_cache_payload,
+    )
+    cache = EngineCache(tmp_path / f"thermoengine-{change}.sqlite3")
+    request = {"temperature_K": 1700.0}
+    unchanged_key = key("thermoengine", request)
+    original = _Outcome({"status": "ok", "value": 7})
+
+    assert cached_solve(cache, "thermoengine", request, lambda: original) is original
+    stored_identity = engine_cache.runtime_identity("thermoengine")
+
+    if change == "mtime":
+        stat = first_library.stat()
+        first_library.write_bytes(b"phaseobjc changed")
+        os.utime(
+            first_library,
+            ns=(stat.st_atime_ns, stat.st_mtime_ns + 2_000_000_000),
+        )
+    else:
+        second_library = tmp_path / "second" / "libphaseobjc.dylib"
+        second_library.parent.mkdir()
+        second_library.write_bytes(b"phaseobjc")
+        selected_library[0] = second_library
+    engine_cache.runtime_identity.cache_clear()
+    current_identity = engine_cache.runtime_identity("thermoengine")
+
+    with caplog.at_level("INFO", logger=engine_cache.__name__):
+        warm = cached_solve(
+            cache,
+            "thermoengine",
+            request,
+            lambda: pytest.fail("runtime metadata change must keep the hit"),
+        )
+
+    notices = [
+        record
+        for record in caplog.records
+        if getattr(record, "notice", {}).get("kind")
+        == "engine_cache_runtime_changed"
+    ]
+    assert key("thermoengine", request) == unchanged_key
+    assert stored_identity["native_library"] != current_identity["native_library"]
+    assert warm.value == original.value
+    assert len(notices) == 1
+    assert (
+        notices[0].notice["stored"]["native_library"]
+        != notices[0].notice["current"]["native_library"]
+    )
+    engine_cache.runtime_identity.cache_clear()
 
 
 def test_cached_solve_tracks_per_engine_work_unit_counters(

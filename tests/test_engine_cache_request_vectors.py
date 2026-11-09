@@ -15,7 +15,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _engine_cache_request_vector,
     equilibrate_cell,
 )
-from simulator.engine_cache import EngineCache
+from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, EngineCache
 
 
 class _Backend:
@@ -135,6 +135,18 @@ def test_openimcc_request_vector_ignores_unused_physical_pressure() -> None:
     assert first == second
 
 
+def test_alphamelts_subprocess_keys_its_effective_pressure() -> None:
+    handle = _handle("alphamelts")
+    handle.backend._mode = "subprocess"
+
+    subbar_first = _vector(handle, pressure_bar=1.0e-6)
+    subbar_second = _vector(handle, pressure_bar=1.0e-9)
+    one_bar = _vector(handle, pressure_bar=1.0)
+
+    assert subbar_first == subbar_second
+    assert subbar_first != one_bar
+
+
 def test_request_vector_omits_qualification_decoration() -> None:
     handle = _handle("thermoengine")
 
@@ -160,34 +172,203 @@ def test_request_vector_omits_qualification_decoration() -> None:
     assert "qualification" not in ordinary
 
 
-def test_isolation_policy_changes_reuse_cached_cell_outcome(
+def test_isolated_cell_uses_parent_magemin_database_for_off_cold_and_warm(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
-    backend = _Backend("magemin")
+    class DatabaseBackend(_Backend):
+        def __init__(self, database: str) -> None:
+            super().__init__("magemin")
+            self._database = database
+
+        def equilibrate(self, **_kwargs: Any) -> Any:
+            self.calls += 1
+            supported = self._database == "ig"
+            return SimpleNamespace(
+                status="ok" if supported else "out_of_domain",
+                diagnostics=(
+                    {}
+                    if supported
+                    else {"backend_status_reason": "unsupported_database"}
+                ),
+                warnings=[],
+                activity_coefficients={"SiO2": 0.5} if supported else {},
+                vapor_pressures_Pa={},
+                liquid_fraction=0.9 if supported else None,
+                phase_assemblage_available=supported,
+            )
+
+    backend = DatabaseBackend("unsupported-db")
     handle = _handle("magemin", backend)
     cache = EngineCache(tmp_path / "magemin-isolation.sqlite")
     common = {
         "temperature_K": 1703.0,
         "po2": Po2Request("engine_default", None),
+    }
+
+    opened_settings: list[dict[str, Any]] = []
+
+    def open_resolved(name: str, engine_settings: dict[str, Any] | None = None) -> Any:
+        assert name == "magemin"
+        settings = dict(engine_settings or {})
+        opened_settings.append(settings)
+        return DatabaseBackend(str(settings.get("database") or "ig"))
+
+    monkeypatch.setattr(battery, "_open_resolved_backend", open_resolved)
+
+    class InlineWorker:
+        def request(self, payload: dict[str, Any], *, timeout_s: float) -> dict[str, Any]:
+            del timeout_s
+            settings = payload["engine_settings"]
+            resource, _worker_name = battery._bootstrap_isolated_cell_engine(
+                (str(payload["engine"]), dict(settings))
+            )
+            try:
+                return battery.run_isolated_cell_worker(
+                    payload, handle=resource.handle
+                )
+            finally:
+                resource.close()
+
+        def retire(self) -> None:
+            pass
+
+    monkeypatch.setattr(
+        battery, "_isolated_cell_worker", lambda *_args: InlineWorker()
+    )
+
+    direct = equilibrate_cell(handle, _pot(), isolated=False, **common)
+    cold = equilibrate_cell(
+        handle,
+        _pot(),
+        isolated=True,
+        engine_cache=cache,
+        **common,
+    )
+    warm = equilibrate_cell(
+        handle,
+        _pot(),
+        isolated=False,
+        engine_cache=cache,
+        **common,
+    )
+
+    assert direct.status == cold.status == warm.status == "refusal"
+    assert direct.engine_reason == cold.engine_reason == warm.engine_reason
+    assert opened_settings == [
+        _vector(handle)["engine_settings"]
+    ]
+    assert cache.counters["magemin"]["misses"] == 1
+    assert cache.counters["magemin"]["hits"] == 1
+
+
+def test_magemin_ctypes_failure_has_environment_disposition() -> None:
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _MAGEMinEngineCallError,
+    )
+
+    backend = MAGEMinBackend()
+    backend._bridge = "ctypes"
+    with pytest.raises(_MAGEMinEngineCallError) as raised:
+        backend._call_magemin(
+            None,
+            temperature_C=1000.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+        )
+
+    assert raised.value.failure_disposition == "environment"
+
+
+def test_internal_analytical_oxygen_balance_tracks_openimcc_epoch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    oxygen_backend = _Backend("internal-analytical")
+    oxygen_handle = _handle("internal-analytical", oxygen_backend)
+    oxygen_cache = EngineCache(tmp_path / "oxygen-balance.sqlite")
+    oxygen_request = Po2Request("oxygen_balance_effusion", None, "W")
+
+    def call(handle: EngineHandle, request: Po2Request, cache: EngineCache) -> Any:
+        return equilibrate_cell(
+            handle,
+            _pot(),
+            temperature_K=1703.0,
+            po2=request,
+            isolated=False,
+            engine_cache=cache,
+        )
+
+    call(oxygen_handle, oxygen_request, oxygen_cache)
+    monkeypatch.setitem(
+        ENGINE_CHEMISTRY_VERSION,
+        "openimcc",
+        ENGINE_CHEMISTRY_VERSION["openimcc"] + 1,
+    )
+    call(oxygen_handle, oxygen_request, oxygen_cache)
+
+    ordinary_backend = _Backend("internal-analytical")
+    ordinary_handle = _handle("internal-analytical", ordinary_backend)
+    ordinary_cache = EngineCache(tmp_path / "ordinary-cell.sqlite")
+    ordinary_request = Po2Request("engine_default", None)
+    call(ordinary_handle, ordinary_request, ordinary_cache)
+    monkeypatch.setitem(
+        ENGINE_CHEMISTRY_VERSION,
+        "openimcc",
+        ENGINE_CHEMISTRY_VERSION["openimcc"] + 1,
+    )
+    call(ordinary_handle, ordinary_request, ordinary_cache)
+
+    assert oxygen_backend.calls == 2
+    assert oxygen_cache.counters["internal-analytical"]["misses"] == 2
+    assert ordinary_backend.calls == 1
+    assert ordinary_cache.counters["internal-analytical"]["hits"] == 1
+
+
+def test_magemin_bridge_change_does_not_reuse_subprocess_cell(
+    tmp_path: Path,
+) -> None:
+    class BridgeBackend(_Backend):
+        def equilibrate(self, **_kwargs: Any) -> Any:
+            self.calls += 1
+            if self._bridge == "ctypes":
+                return SimpleNamespace(
+                    status="not_converged",
+                    diagnostics={"backend_failure_disposition": "environment"},
+                    warnings=[],
+                    activity_coefficients={},
+                    vapor_pressures_Pa={},
+                    liquid_fraction=None,
+                )
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"SiO2": 0.5},
+                vapor_pressures_Pa={},
+                liquid_fraction=0.9,
+            )
+
+    backend = BridgeBackend("magemin")
+    handle = _handle("magemin", backend)
+    cache = EngineCache(tmp_path / "magemin-bridge.sqlite")
+    common = {
+        "temperature_K": 1703.0,
+        "po2": Po2Request("engine_default", None),
+        "isolated": False,
         "engine_cache": cache,
     }
 
-    first = equilibrate_cell(handle, _pot(), isolated=False, **common)
-    monkeypatch.setattr(
-        battery,
-        "_run_cell_in_subprocess",
-        lambda *_args, **_kwargs: pytest.fail(
-            "cache miss unexpectedly started an isolated worker"
-        ),
-    )
-    second = equilibrate_cell(handle, _pot(), isolated=True, **common)
+    subprocess_result = equilibrate_cell(handle, _pot(), **common)
+    backend._bridge = "ctypes"
+    ctypes_result = equilibrate_cell(handle, _pot(), **common)
 
-    assert first.status == second.status
-    assert backend.calls == 1
-    assert cache.counters["magemin"]["misses"] == 1
-    assert cache.counters["magemin"]["hits"] == 1
+    assert subprocess_result.engine_status == "ok"
+    assert ctypes_result.engine_status == "not_converged"
+    assert ctypes_result.backend_failure_disposition == "environment"
+    assert backend.calls == 2
+    assert cache.counters["magemin"]["hits"] == 0
 
 
 def test_request_vector_tracks_ambient_alphamelts_calc_mode(
@@ -284,6 +465,7 @@ def test_alphamelts_calc_mode_conflict_matches_cache_off_and_warm(
         ("thermoengine", "_configured_vapor_transport_pO2_bar", 1.0e-8),
         ("thermoengine", "_configured_vapor_transport_floor_bar", 1.0e-10),
         ("magemin", "_database", "mp"),
+        ("magemin", "_bridge", "julia"),
         ("openimcc", "_pack_name", "published-core"),
         ("vaporock", "_temperature_units", "K"),
         ("vaporock", "_pressure_units", "Pa"),
@@ -317,7 +499,6 @@ def test_request_vector_changes_when_engine_setting_changes(
             "_thermoengine_transport",
             SimpleNamespace(equilibrate_timeout_s=43.0),
         ),
-        ("magemin", "_bridge", "julia"),
         ("magemin", "_binary_path", "/other/MAGEMin"),
         ("vaporock", "_database_path", "/other/vaporock"),
         ("vaporock", "_reuse_system", True),

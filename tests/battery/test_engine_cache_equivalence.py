@@ -10,8 +10,14 @@ from typing import Mapping
 
 import pytest
 
-from simulator.battery.enums import AmountBasis, Engine, EvidenceClass, Rail
-from simulator.battery.records import Composition
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    EvidenceClass,
+    Quantity,
+    Rail,
+)
+from simulator.battery.records import Composition, State
 from simulator.battery.score import (
     ScoreContext,
     _score_store_to_jsonl,
@@ -76,6 +82,20 @@ def _canonical_residual_rows(path: Path) -> bytes:
                 ).encode("utf-8")
             )
     return b"\n".join(rows) + (b"\n" if rows else b"")
+
+
+def _residual_payloads(path: Path) -> list[dict[str, object]]:
+    with path.open(encoding="utf-8") as stream:
+        return [
+            payload
+            for line in stream
+            if line.strip()
+            and isinstance(
+                payload := json.loads(line),
+                dict,
+            )
+            and not is_store_stamp_payload(payload)
+        ]
 
 
 @pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
@@ -146,15 +166,20 @@ def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
 
 def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> None:
     engines = []
+    unavailable: dict[str, str] = {}
     for engine in CACHE_TEST_ENGINES:
         handle = open_battery_engine(engine.value)
         try:
             if handle.available:
                 engines.append(engine)
+            else:
+                unavailable[engine.value] = (
+                    handle.unavailable_reason or "engine returned unavailable"
+                )
         finally:
             close_battery_engine_handle(handle)
     if not engines:
-        pytest.skip("no battery engines are available in this seat")
+        pytest.skip(f"all scored engines unavailable: {unavailable}")
 
     work = F.work()
     compositions = (
@@ -228,20 +253,62 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         observations=observations,
     )
 
+    vapor_experiment = F.tabulation_experiment(
+        experiment_id="cache-equivalence-vapor-exp",
+        work_id=work.work_id,
+        T_K=Decimal("1703"),
+        total_P=Decimal("100000"),
+    )
+    vapor_activity_identity = F.activity_identity(
+        T_K=Decimal("1703"),
+        composition=compositions[0],
+        fO2_Pa=Decimal("0.1"),
+        total_P=Decimal("100000"),
+    )
+    vapor_identity = replace(
+        F.pref_identity(T_K=Decimal("1703"), fO2_Pa=Decimal("0.1")),
+        quantity=Quantity.P_PARTIAL,
+        composition=vapor_activity_identity.composition,
+        total_pressure_Pa=vapor_activity_identity.total_pressure_Pa,
+    )
+    vapor_observation = F.observation(
+        "cache-equivalence-vapor-pressure",
+        vapor_experiment.experiment_id,
+        vapor_identity,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    vapor_context = replace(
+        context,
+        experiments={
+            **context.experiments,
+            vapor_experiment.experiment_id: vapor_experiment,
+        },
+        observations={
+            **context.observations,
+            vapor_observation.observation_id: vapor_observation,
+        },
+    )
+
     def score(
         name: str,
         cache: EngineCache | None = None,
         *,
         workers: int = 1,
+        score_context: ScoreContext | None = None,
+        score_engines: tuple[Engine, ...] | None = None,
+        score_rail: Rail = Rail.MELT_ACTIVITY,
+        score_limit: int = 6,
     ) -> tuple[bytes, Mapping[str, Mapping[str, object]] | None]:
         path = tmp_path / f"{name}.jsonl"
         _row_count, metadata = _score_store_to_jsonl(
-            context,
+            score_context or context,
             path,
             root=ROOT,
-            engines=engines,
-            rail=Rail.MELT_ACTIVITY,
-            limit=6,
+            engines=score_engines or tuple(engines),
+            rail=score_rail,
+            limit=score_limit,
             include_diagnostics=False,
             workers=workers,
             engine_cache=cache,
@@ -290,12 +357,15 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     assert warm_counts is not None
     assert parallel_counts is not None
     assert _cold_counts is not None
-    # Some engines are not probed on this rail; require this fixture to exercise
-    # the cache overall while checking zero calls separately for every engine.
-    assert sum(
-        sum(_cold_counts[engine.value]["calls_by_kind"].values())
-        for engine in engines
-    ) > 0
+    activity_rows = _residual_payloads(tmp_path / "cold.jsonl.partial")
+    assert any(
+        any(
+            isinstance(notice, dict)
+            and notice.get("kind") == "out_of_certified_band"
+            for notice in (row.get("notices") or [])
+        )
+        for row in activity_rows
+    ), "scored fixture did not include a MELTS qualification row"
     warm_misses = {
         engine.value: {
             "serial": warm_counts[engine.value],
@@ -327,6 +397,74 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "residue_vapor_pressure": 0,
     }
 
+    vapor_engines = tuple(
+        engine
+        for engine in (Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK)
+        if engine in engines
+    )
+    if not vapor_engines:
+        pytest.skip(
+            "vapor fixture engines unavailable: "
+            + json.dumps(
+                {
+                    engine.value: unavailable[engine.value]
+                    for engine in (Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK)
+                    if engine.value in unavailable
+                },
+                sort_keys=True,
+            )
+        )
+    vapor_off, _vapor_off_counts = score(
+        "vapor-off",
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_cache_path = tmp_path / "vapor-engine-cache.sqlite"
+    vapor_cache_path.touch()
+    vapor_cold, vapor_cold_counts = score(
+        "vapor-cold",
+        EngineCache(vapor_cache_path),
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_warm, vapor_warm_counts = score(
+        "vapor-warm",
+        EngineCache(vapor_cache_path),
+        workers=1,
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_parallel, vapor_parallel_counts = score(
+        "vapor-parallel-warm",
+        EngineCache(vapor_cache_path),
+        workers=3,
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    assert_rows_equal("vapor cold cache vs cache off", vapor_cold, vapor_off)
+    assert_rows_equal("vapor warm cache vs cache off", vapor_warm, vapor_off)
+    assert_rows_equal(
+        "vapor parallel warm cache vs serial warm", vapor_parallel, vapor_warm
+    )
+    assert vapor_cold_counts is not None
+    assert vapor_warm_counts is not None
+    assert vapor_parallel_counts is not None
+    for engine in vapor_engines:
+        assert vapor_cold_counts[engine.value]["calls_by_kind"][
+            "equilibrate_cell"
+        ] > 0, f"{engine.value} was not called in the scored vapor fixture"
+        assert not any(vapor_warm_counts[engine.value]["calls_by_kind"].values())
+        assert not any(
+            vapor_parallel_counts[engine.value]["calls_by_kind"].values()
+        )
     from tests.battery.test_redox_extract_scoring import (
         _sossi_aithala_redox_context,
     )
@@ -401,6 +539,59 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "evaluate_gas": 0,
         "residue_vapor_pressure": 0,
     }
+
+    for counts in (
+        warm_counts,
+        parallel_counts,
+        vapor_warm_counts,
+        vapor_parallel_counts,
+        redox_warm_counts,
+        redox_parallel_counts,
+    ):
+        assert all(
+            not any(counts[engine.value]["calls_by_kind"].values())
+            for engine in engines
+        )
+
+    cold_calls_by_engine = {
+        engine.value: sum(
+            int(value)
+            for value in _cold_counts[engine.value]["calls_by_kind"].values()
+        )
+        for engine in engines
+    }
+    if vapor_cold_counts is not None:
+        for engine in vapor_engines:
+            cold_calls_by_engine[engine.value] += sum(
+                int(value)
+                for value in vapor_cold_counts[engine.value][
+                    "calls_by_kind"
+                ].values()
+            )
+    if Engine.OPENIMCC in engines:
+        cold_calls_by_engine[Engine.OPENIMCC.value] += sum(
+            int(value)
+            for value in redox_cold_counts[Engine.OPENIMCC.value][
+                "calls_by_kind"
+            ].values()
+        )
+    unprobed = [engine for engine, calls in cold_calls_by_engine.items() if calls == 0]
+    assert not unprobed, f"available engines were not probed by scored fixtures: {unprobed}"
+
+    scored_rows = (
+        activity_rows
+        + _residual_payloads(tmp_path / "vapor-cold.jsonl.partial")
+        + _residual_payloads(tmp_path / "redox-cold.jsonl.partial")
+    )
+    stable_refusals = [
+        row
+        for row in scored_rows
+        if row.get("status") == "refused"
+        and isinstance(row.get("refusal"), dict)
+        and row["refusal"].get("reason")
+        not in {"engine_timeout", "engine_crash", "attempted_unavailable"}
+    ]
+    assert stable_refusals, "scored fixtures did not include a stable refusal row"
 
 
 def test_direct_openimcc_results_and_refusals_round_trip_through_cache(
