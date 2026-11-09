@@ -1375,7 +1375,7 @@ def test_model_derived_unprinted_inputs_accepts_located_prose_method() -> None:
     assert issues == ()
 
 
-def test_model_derived_prose_method_without_equation_passes() -> None:
+def test_model_derived_prose_method_without_equation_still_requires_parent() -> None:
     observation = _model_derived_without_raw_parent(
         method=Located(
             State.of("Gibbs energy minimisation with the authors' model"),
@@ -1386,7 +1386,25 @@ def test_model_derived_prose_method_without_equation_passes() -> None:
     issues = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
-    assert issues == ()
+    assert [issue.path for issue in issues] == [
+        f"observation[{observation.observation_id}].derived_from"
+    ]
+
+
+def test_model_derived_table_method_is_located() -> None:
+    observation = _model_derived_without_raw_parent(
+        method=Located(
+            State.of("The Table 2 pressure was converted from atm to Pa."),
+            locator=F.loc(page=136, table="2"),
+        ),
+        references=("Source citation",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert [issue.path for issue in issues] == [
+        f"observation[{observation.observation_id}].derived_from"
+    ]
 
 
 def test_model_derived_prose_method_without_named_references_fails() -> None:

@@ -3548,6 +3548,20 @@ species:
         note: Authors estimate ±0.15 in log a_SiO2, inherited from a_Na2O error.
         log10_a_SiO2: 0.15
       values:
+        derivation:
+          relation: "Gibbs-Duhem integration of Fig. 4 a_Na2O"
+          inputs:
+          - "pdf:ts1985"
+          output_unit: "dimensionless"
+          method:
+            state:
+              tag: value
+              value: "Gibbs-Duhem integration of Fig. 4 a_Na2O"
+            locator:
+              page: 7
+              paragraph: "Gibbs-Duhem integration of Fig. 4 a_Na2O"
+          references:
+          - "Tsukihashi, F. & Sano, N. (1985), \"Measurement of the Activity of Na2O in Na2O-SiO2 Melts by Chemical Equilibration Method\" / 「化学平衡法による Na2O-SiO2 系融体中の Na2O の活量の測定」, Tetsu-to-Hagane (鉄と鋼) 71(7), 815-822."
         quantity: activity_gibbs_duhem_from_Na2O
         oxide_formula_as_published: SiO2
         system: Na2O-SiO2

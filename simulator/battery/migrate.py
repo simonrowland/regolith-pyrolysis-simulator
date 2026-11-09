@@ -31875,7 +31875,8 @@ class Migrator:
             },
         )
         self.result.validation = ValidationReport(
-            validation.issues + tuple(self.result.registry_issues)
+            validation.issues + tuple(self.result.registry_issues),
+            validation.notices,
         )
 
     def run(self) -> MigrationResult:
@@ -32413,6 +32414,20 @@ def write_report(result: MigrationResult, path: Path) -> None:
         )
         for kind, n in sorted(census.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{kind}` | {n} |")
+    if result.validation is not None and result.validation.notices:
+        lines.extend(
+            [
+                "",
+                "## Notices",
+                "",
+                "| code | source | count |",
+                "|---|---|---:|",
+            ]
+        )
+        for notice in result.validation.notices:
+            lines.append(
+                f"| `{notice.code}` | `{notice.source_id}` | {notice.count} |"
+            )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

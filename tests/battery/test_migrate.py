@@ -5814,7 +5814,7 @@ def _model_derived_density_without_derivation() -> dict:
     return extract
 
 
-def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
+def test_model_derived_without_derivation_is_a_counted_notice(tmp_path: Path) -> None:
     extract = _model_derived_density_without_derivation()
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
@@ -5827,20 +5827,114 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    paths = [i.path for i in report.hard_issues]
-    assert set(paths) == {
-        f"observation[{obs.observation_id}].derivation.method",
-        f"observation[{obs.observation_id}].derivation.references",
-    }, report.hard_issues
-    assert len(report.hard_issues) == 2
-    assert all(i.reason.value == "conditional_field" for i in report.hard_issues)
-    assert any(
-        i.detail == "model_derived requires named references"
-        for i in report.hard_issues
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
     )
+    assert [(notice.code, notice.source_id, notice.count) for notice in report.notices] == [
+        ("model_derived_method_unrecorded", "fixture-source", 1)
+    ]
+    assert result.validation is not None
+    assert result.validation.notices == report.notices
     assert any(
         "derivation" in (e.axes or ())
         for e in result.queue
+    )
+
+
+def test_new_model_derived_derivation_without_method_fails_hard(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_density_without_derivation()
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["derivation"] = {
+        "relation": "density model output",
+        "inputs": ["pdf:fixture-source"],
+        "output_unit": "kg_per_m3",
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.derivation is not None
+    assert result.validation is not None
+    missing = {
+        issue.path.rsplit(".", 1)[-1]
+        for issue in result.validation.hard_issues
+        if issue.path.startswith(f"observation[{observation.observation_id}].derivation.")
+    }
+    assert {"method", "references"} <= missing
+    assert result.validation.notices == ()
+
+
+def test_grounded_model_derived_methods_survive_extract_migration() -> None:
+    source_ids = (
+        "arxiv-2509-sio-flame-nucleation",
+        "kems-184-behrens-1979",
+        "sublimation-kinetics-2023-minerals",
+        "ts1985",
+    )
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    for source_id in source_ids:
+        migrator._migrate_extract(
+            REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+        )
+    migrator.finalize()
+
+    source_observation_ids = {
+        "arxiv-2509-sio-flame-nucleation": {"haugen_2025_sio2_particle_density"},
+        "kems-184-behrens-1979": {
+            "behrens_1979_table2_si_this_work",
+            "behrens_1979_table2_si_reference_10",
+            "behrens_1979_table2_si2c_this_work",
+            "behrens_1979_table2_si2c_reference_10",
+            "behrens_1979_table2_sic2_this_work",
+            "behrens_1979_table2_sic2_reference_10",
+        },
+        "sublimation-kinetics-2023-minerals": {
+            "shaw_2023_table2_fe_psat_factsage_feo",
+            "shaw_2023_table2_k_psat_factsage_al2o3_k2o",
+            "shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o",
+        },
+        "ts1985": {"ts1985_sio2_gibbs_duhem_1200C_X0500"},
+    }
+    grounded = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id in source_observation_ids
+        and any(
+            observation.observation_id.split("::", 1)[-1] == source_id
+            or observation.observation_id.split("::", 1)[-1].startswith(
+                f"{source_id}::"
+            )
+            for source_id in source_observation_ids[observation.source_id]
+        )
+    ]
+    assert len(grounded) == 41
+    citations = {
+        source_id: yaml.safe_load(
+            (
+                REPO_ROOT
+                / "data"
+                / "literature"
+                / "extracts"
+                / f"{source_id}.yaml"
+            ).read_text(encoding="utf-8")
+        )["source"]["citation"]
+        for source_id in source_ids
+    }
+    for observation in grounded:
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert observation.derivation.references == (citations[observation.source_id],)
+    assert migrator.result.validation is not None
+    grounded_ids = {observation.observation_id for observation in grounded}
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        and any(
+            f"observation[{observation_id}]" in issue.path
+            for observation_id in grounded_ids
+        )
+        for issue in migrator.result.validation.hard_issues
     )
 
 

@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
@@ -78,6 +79,7 @@ from simulator.battery.identity import (
 from simulator.battery.records import (
     Bench,
     Experiment,
+    Locator,
     Located,
     Notice,
     Observation,
@@ -123,6 +125,15 @@ class ValidationIssue:
     detail: str
 
 
+@dataclass(frozen=True)
+class ValidationNotice:
+    """A counted, non-failing validation item attributed to one source."""
+
+    code: str
+    source_id: str
+    count: int
+
+
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
 _DERIVATION_EVIDENCE_CLASSES = frozenset(
     {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}
@@ -150,6 +161,7 @@ _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
 @dataclass(frozen=True)
 class ValidationReport:
     issues: tuple[ValidationIssue, ...]
+    notices: tuple[ValidationNotice, ...] = ()
 
     @property
     def ok(self) -> bool:
@@ -1114,6 +1126,25 @@ def validate_observation(
     )
 
 
+def _locator_grounds_model_derived_method(locator: Locator | None) -> bool:
+    return locator is not None and locator.has_method_location()
+
+
+def _model_derived_method_is_backlogged(observation: Observation) -> bool:
+    evidence = observation.evidence.class_
+    if not (
+        evidence.is_value
+        and evidence.value is EvidenceClass.MODEL_DERIVED
+        and _value_has_numeric_value(observation.value)
+    ):
+        return False
+    derivation = observation.derivation
+    return derivation is None or (
+        not derivation.has_located_method
+        and not _locator_grounds_model_derived_method(observation.locator)
+    )
+
+
 def _validate_observation(
     observation: Observation,
     experiments: Mapping[str, Experiment],
@@ -1344,6 +1375,7 @@ def _validate_observation(
             ev.value is EvidenceClass.MODEL_DERIVED
             and _value_has_numeric_value(observation.value)
             and not declares_unprinted_raw_inputs
+            and not _model_derived_method_is_backlogged(observation)
             and not has_resolved_lineage
         ):
             if not method_located:
@@ -1442,14 +1474,7 @@ def _validate_observation(
                 )
             )
         )
-        claims_parent_lineage = (
-            ev.value is EvidenceClass.MEASURED_REDUCED
-            or bool(observation.derived_from)
-            or bool(derivation is not None and derivation.inputs)
-        )
-        if not figure_only_without_value and claims_parent_lineage:
-            # d-351 keeps lineage checks when a record names parents; prose
-            # method plus references alone does not claim parent derivation.
+        if not figure_only_without_value:
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
             # measured_reduced, and for model_derived only with a located
@@ -2522,6 +2547,11 @@ def validate_corpus(
         )
     source_owners = _source_owners(work_map)
     context_ids = frozenset(context_map or ())
+    method_notices_by_source: Counter[str] = Counter(
+        observation.source_id or "(no source_id)"
+        for observation in obs_map.values()
+        if _model_derived_method_is_backlogged(observation)
+    )
     for observation in obs_map.values():
         issues.extend(
             _validate_observation(
@@ -2590,4 +2620,12 @@ def validate_corpus(
                     ),
                 )
             )
-    return ValidationReport(tuple(issues))
+    notices = tuple(
+        ValidationNotice(
+            code="model_derived_method_unrecorded",
+            source_id=source_id,
+            count=count,
+        )
+        for source_id, count in sorted(method_notices_by_source.items())
+    )
+    return ValidationReport(tuple(issues), notices)

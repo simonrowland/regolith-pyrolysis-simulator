@@ -172,6 +172,23 @@ class Locator:
             return True
         return False
 
+    def has_method_location(self) -> bool:
+        """A physical page plus a section, paragraph, equation, or table anchor."""
+
+        page = self.page
+        has_physical_page = (
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+        ) or (isinstance(page, str) and bool(page.strip())) or (
+            isinstance(self.pdf_page_index, int)
+            and not isinstance(self.pdf_page_index, bool)
+            and self.pdf_page_index >= 0
+        )
+        has_method_anchor = any(
+            isinstance(value, str) and bool(value.strip())
+            for value in (self.section, self.paragraph, self.equation, self.table)
+        )
+        return has_physical_page and has_method_anchor
+
 
 @dataclass(frozen=True)
 class Located(Generic[T]):
@@ -601,23 +618,13 @@ class Derivation:
     @property
     def has_located_method(self) -> bool:
         locator = self.method.locator if self.method is not None else None
-        page = locator.page if locator is not None else None
-        has_physical_page = (
-            isinstance(page, int) and not isinstance(page, bool) and page > 0
-        ) or (isinstance(page, str) and bool(page.strip()))
-        # d-351 admits a located prose method; an equation is not required.
-        has_section_or_equation = locator is not None and any(
-            isinstance(value, str) and bool(value.strip())
-            for value in (locator.section, locator.paragraph, locator.equation)
-        )
         return (
             self.method is not None
             and self.method.state.is_value
             and isinstance(self.method.state.value, str)
             and bool(self.method.state.value.strip())
             and locator is not None
-            and has_physical_page
-            and has_section_or_equation
+            and locator.has_method_location()
         )
 
     @property
