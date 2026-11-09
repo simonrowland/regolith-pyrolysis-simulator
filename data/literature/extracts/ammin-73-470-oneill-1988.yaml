@@ -80,11 +80,11 @@ species:
         reaction: 2 Fe + O2 = 2 "FeO"
         piecewise_relation:
         - T_range_K: [833.0, 1042.0]
-          relation: mu_O2 + 100 = -605812 + 1366.718 T - 182.7955 T ln(T) + 0.10359 T^2
+          relation: mu_O2 = -605812 + 1366.718 T - 182.7955 T ln(T) + 0.10359 T^2
         - T_range_K: [1042.0, 1184.0]
-          relation: mu_O2 + 100 = -519357 + 59.427 T + 8.9276 T ln(T)
+          relation: mu_O2 = -519357 + 59.427 T + 8.9276 T ln(T)
         - T_range_K: [1184.0, 1450.0]
-          relation: mu_O2 + 100 = -551159 + 269.404 T - 16.9484 T ln(T)
+          relation: mu_O2 = -551159 + 269.404 T - 16.9484 T ln(T)
         uncertainty_J_per_mol: 100.0
         uncertainty_convention: printed equation uncertainty; regression difference from earlier measurements is separately reported as 90 J mol^-1 standard deviation
         measured_table: Table 2 and Table 3, published pages 476-477
