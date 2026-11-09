@@ -849,7 +849,7 @@ def test_fegley_table5_distribution_coefficients_have_model_lineage():
         assert observation.derivation.method is not None
         assert observation.derivation.method.state.is_value
         assert observation.derivation.method.locator is not None
-        assert observation.derivation.method.locator.page == 13
+        assert observation.derivation.method.locator.page == 14
         assert observation.derivation.method.locator.section == "3"
         assert observation.derivation.has_named_references
         assert any(
