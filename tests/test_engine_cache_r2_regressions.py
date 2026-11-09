@@ -3,6 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 
+from engines.alphamelts.thermoengine import (
+    ThermoEngineOutOfDomainError,
+    ThermoEngineRefusalCause,
+)
 from simulator import engine_cache
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -169,3 +173,60 @@ def test_qualification_decoration_matches_cache_off_cold_and_warm(
     assert cold.backend_failure_disposition == "environment"
     assert warm.backend_failure_disposition == "environment"
     assert cache.counters["alphamelts"]["transient_skips"] == 2
+
+
+def test_typed_thermoengine_domain_refusal_is_cached(
+    tmp_path: Path,
+) -> None:
+    class ThermoBackend:
+        _model = "MELTSv1.0.2"
+        _mode = "thermoengine"
+        _configured_vapor_transport_pO2_bar = 1.0e-9
+        _configured_vapor_transport_floor_bar = 1.0e-9
+        _health_timeout_s = 30.0
+        _thermoengine_transport = SimpleNamespace(equilibrate_timeout_s=3.0)
+        _config = {}
+
+        def equilibrate(self, **_kwargs):
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED,
+                requested=-3.0,
+                solved=-3.0,
+            )
+
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=ThermoBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="thermoengine-row-local-refusal",
+        kato_1993_table4_system=None,
+        why="cache regression",
+        composition_wt_pct={"SiO2": 50.0, "FeO": 50.0},
+    )
+
+    def evaluate(cache: EngineCache | None = None) -> EquilibrateCell:
+        return equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request("commanded", 1.0e-3),
+            isolated=False,
+            engine_cache=cache,
+        )
+
+    cache = EngineCache(tmp_path / "thermoengine-refusal-cache.sqlite")
+    off = evaluate()
+    cold = evaluate(cache)
+    warm = evaluate(cache)
+
+    assert off.refusal_reason == cold.refusal_reason == warm.refusal_reason
+    assert cold.refusal_reason == "fo2_nonmonotonic_buffered"
+    assert cache.counters["thermoengine"]["misses"] == 1
+    assert cache.counters["thermoengine"]["stores"] == 1
+    assert cache.counters["thermoengine"]["hits"] == 1
+    assert cache.counters["thermoengine"]["transient_skips"] == 0
