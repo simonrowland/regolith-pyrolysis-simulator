@@ -7100,6 +7100,34 @@ def test_battery_score_script_runs_status_diff() -> None:
     assert "status_diff_rows" in called
 
 
+def test_studio_requires_host_environment_variable(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from scripts import battery_score
+
+    monkeypatch.delenv("REGOLITH_STUDIO_HOST", raising=False)
+    with pytest.raises(SystemExit) as exc_info:
+        battery_score.main(["--studio"])
+
+    assert exc_info.value.code == 2
+    assert "REGOLITH_STUDIO_HOST" in capsys.readouterr().err
+
+
+def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    from scripts import battery_score
+
+    monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
+    monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
+
+    def record_host(_engines: list[str], _extra: list[str], *, studio_host: str):
+        assert studio_host == "example-studio.invalid"
+        raise RuntimeError("dispatch host recorded")
+
+    monkeypatch.setattr(battery_score, "_run_studio", record_host)
+    with pytest.raises(RuntimeError, match="dispatch host recorded"):
+        battery_score.main(["--studio", "--engines", "magemin"])
+
+
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[2]
     literature = tmp_path / "data" / "literature"
@@ -7861,7 +7889,7 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
         },
         "execution": {
             "state": "unsupported",
-            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+            "call_evidence": "equilibrate_cell:magemin:host=example-host:exit=None",
         },
         "refusal": {
             "reason": RefusalReason.UNSUPPORTED.value,
