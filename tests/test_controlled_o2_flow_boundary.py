@@ -13,7 +13,10 @@ from engines.builtin.overhead_bleed import (
     controlled_flow_capacity,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.overhead import OverheadGasModel
+from simulator.overhead import (
+    OverheadGasModel,
+    _pressure_held_closed_line_total_pressure_Pa,
+)
 from simulator.state import Atmosphere, EvaporationFlux
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
@@ -136,3 +139,47 @@ def test_disabled_runtime_policy_stays_on_no_equipment_path():
     )
     assert math.isfinite(flow.saturation)
     assert flow.binding_cause == "controlled_o2_no_equipment"
+
+
+def test_held_line_recognizes_p2_equals_p1_at_9_mbar():
+    """9 mbar C0b is a held line after the bar-to-pascal conversion.
+
+    ``(9/1000)*1e5`` is 899.9999999999999 Pa and ``9*100`` is 900 Pa.
+    The predicate still returns the 900 Pa boundary. One millibar less
+    downstream stays pumped. A command below the 1 Pa floor stays pumped.
+    """
+    downstream_bar = 9.0 / 1000.0
+    assert _pressure_held_closed_line_total_pressure_Pa(
+        "CONTROLLED_O2_FLOW",
+        9.0,
+        downstream_bar,
+    ) == 900.0
+    assert _pressure_held_closed_line_total_pressure_Pa(
+        "O2_BACKPRESSURE",
+        0.03,
+        0.03 / 1000.0,
+    ) == 3.0
+    assert (
+        _pressure_held_closed_line_total_pressure_Pa(
+            "CONTROLLED_O2_FLOW",
+            9.0,
+            0.008,
+        )
+        is None
+    )
+    assert (
+        _pressure_held_closed_line_total_pressure_Pa(
+            "VACUUM",
+            9.0,
+            downstream_bar,
+        )
+        is None
+    )
+    assert (
+        _pressure_held_closed_line_total_pressure_Pa(
+            "CONTROLLED_O2",
+            1.0e-6,
+            1.0e-6 / 1000.0,
+        )
+        is None
+    )

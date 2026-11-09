@@ -1281,18 +1281,40 @@ def _pressure_held_closed_line_total_pressure_Pa(
     total_pressure_mbar: float,
     downstream_pressure_bar: float,
 ) -> float | None:
-    """Return the held-pressure no-feed boundary when this headspace has one."""
+    """Return the held-pressure no-feed boundary when this headspace has one.
+
+    The zero-flow downstream for these atmospheres is
+    ``p_total_mbar / 1000`` bar (P2 = P1). ``1 mbar = 100 Pa``, so that
+    identity is ``downstream_bar * 1e5`` against ``p_total_mbar * 100``.
+    ``1e5`` is not a power of two, and ``p/1000`` is not always a binary
+    endpoint: at the C0b default of 9 mbar, ``(9/1000)*1e5`` is
+    ``899.9999999999999`` Pa while ``9*100`` is ``900`` Pa. One ulp is
+    the whole gap on a 0.01 mbar grid above the 1 Pa floor. Treating that
+    as a pumped line certified zero flux whenever every equilibrium
+    pressure sat below the downstream total.
+    """
     total_pressure_Pa = max(
         1.0,
         max(0.0, float(total_pressure_mbar)) * 100.0,
     )
+    downstream_Pa = float(downstream_pressure_bar) * 1.0e5
+    held = downstream_Pa >= total_pressure_Pa
+    if (
+        not held
+        and math.isfinite(downstream_Pa)
+        and math.isfinite(total_pressure_Pa)
+        # nextafter steps one binary ulp. A real millibar of backpressure
+        # is many orders larger, so this only recovers the P2=P1 identity.
+        and math.nextafter(downstream_Pa, math.inf) >= total_pressure_Pa
+    ):
+        held = True
     if (
         atmosphere_name in {
             'CONTROLLED_O2',
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }
-        and float(downstream_pressure_bar) * 1.0e5 >= total_pressure_Pa
+        and held
     ):
         return total_pressure_Pa
     return None
