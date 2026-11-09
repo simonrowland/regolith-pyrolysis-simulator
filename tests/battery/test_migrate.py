@@ -86,6 +86,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
     map_phase,
+    _kelley_king_formula_phase_suffix,
     map_quantity,
     select_declared_source,
     parse_quantity_suffix,
@@ -14165,6 +14166,55 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert k_by_key["entropy_third_law"].value.kind is ValueKind.POINT
     assert k_by_key["entropy_third_law"].value.point == as_decimal("111.21072")
     assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
+
+
+@pytest.mark.parametrize(
+    ("formula", "printed_phase", "expected_formula", "expected_phase"),
+    (
+        ("AlCl3(c)", "(c)", "AlCl3", Phase.CR),
+        ("Ni(g)", "(g)", "Ni", Phase.G),
+        ("Na(l)", "(l)", "Na", Phase.L),
+        ("H2O(aq)", "(aq)", "H2O(aq)", None),
+        ("AlCl3(c)", "(l)", "AlCl3(c)", None),
+    ),
+)
+def test_kelley_king_phase_suffix_is_separated_using_closed_map(
+    formula: str,
+    printed_phase: str,
+    expected_formula: str,
+    expected_phase: Phase | None,
+) -> None:
+    normalized, phase = _kelley_king_formula_phase_suffix(formula, printed_phase)
+    assert normalized == expected_formula
+    if expected_phase is None:
+        assert phase is None
+    else:
+        assert phase is not None and phase.is_value and phase.value is expected_phase
+
+
+def test_kelley_king_phase_suffix_reaches_migrated_species(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "kelley-king-1961-usbm-b592", "table-006-0007.json"
+    )
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "table-006-0007" in observation.observation_id
+    ]
+    assert rows
+    assert {quantity_token(row.identity) for row in rows} == {
+        None,
+        Quantity.CP,
+        Quantity.S,
+    }
+    assert all(row.identity.species.formula == "AlCl3" for row in rows)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.CR
+        for row in rows
+    )
 
 
 def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
