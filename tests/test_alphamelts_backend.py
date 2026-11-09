@@ -6624,6 +6624,10 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
                 'vapor_pressure_mbar': 0.0,
             },
             species_partial_pressures=lambda *args, **kwargs: {},
+            # Same-hour closure asks whether the pipe can carry flow before
+            # it projects partials. This double has no pipe geometry; a
+            # non-positive answer keeps the closure off the Poiseuille root.
+            _has_positive_pipe_conductance=lambda _temperature_C: False,
         ),
         setpoints={'chemistry_kernel': {'allow_fallback_vapor': True}},
         species_formula_registry={},
