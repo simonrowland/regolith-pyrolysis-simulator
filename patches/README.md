@@ -67,10 +67,13 @@ interpreter does not load unless `--force-path` is supplied.
 
 ### vaporock — package `vaporock` @ `0159678`
 
-| # | patch | status | ref |
+| # | patch | STATUS | note |
 |---|---|---|---|
-| 0001 | `mn-ni-co-carriers` | local, not submitted | INVENTORY §2.3 |
-| 0002 | `janaf-multi-interval-closure` | local, **submit upstream** | `b-153` |
+| 0001 | `mn-ni-co-carriers` | **applied** | local, not submitted |
+| 0002 | `janaf-multi-interval-closure` | **applied** | local, **submit upstream** |
+| 0003 | `condensate-na2o-al2o3-liquid-rows` | **unapplied** | data-table correction |
+| 0004 | `gas-rows-from-openimcc-janaf` | **unapplied** | gas-table refresh |
+| 0005 | `na2o-liquid-janaf` | **unapplied** | supersedes the Na₂O(l) row of 0003 |
 
 **0001 — Mn/Ni/Co/NiO gas carriers.** Adds Mn/Ni/Co to `Vapor.atom_mass`, the four gas rows to
 all three JANAF CSVs, and MnO/NiO/CoO to `_get_melt_oxides_comp`. MELTS already carries
@@ -89,7 +92,22 @@ coefficients. Harmless for single-interval `JANAF0`; corrupting for the multi-in
 with default-argument capture. Also removes a leftover `Mg2(g)` debug `print`.
 
 Verified on all 11 multi-interval species (`O2, Mg, Mg2, AlO, AlO2, SiO, Si2, K, CrO, CrO2,
-CrO3`): 0 of 11 now evaluate to the wrong interval. Pre-fix `Mg2(g)` worst absolute error: **5.838 MJ/mol** (fresh 2026-08-09 re-verification; an earlier note said ~3.5).
+CrO3`): 0 of 11 now evaluate to the wrong interval. Pre-fix `Mg2(g)` worst absolute error: **5.838 MJ/mol** (re-verified 2026-08-09).
+
+**0003 — condensate Na₂O(l) and Al₂O₃(l) rows.** Fixes two transcription defects in
+VapoRock's `data/condensate-thermo-data.csv`. VapoRock's own solver does not read this file, so
+its results are unchanged; the correction matters to consumers that use the file as a
+Lamoreaux liquid-oxide table (for example openimcc's gas layer), where those rows set the Na and
+Al gas pressures.
+
+**0004 — gas rows from openimcc JANAF.** Replaces the JANAF-fitted gas rows for 35 species with
+openimcc's packaged JANAF Shomate rows, splitting the base rows at the source interval bounds.
+Na₂O(g) and K₂O(g) are excluded because their openimcc provenance is not JANAF.
+
+**0005 — Na₂O(l) from JANAF.** Replaces the Na₂O(l) row introduced by 0003 with the two JANAF
+(4th ed.) rows packaged by openimcc. The Al₂O₃(l) row from 0003 is unchanged.
+
+`patches/vaporock/tools/` holds the build and validation scripts for 0004 and 0005.
 
 ### thermoengine — package `thermoengine` @ `df7a5f4`
 
@@ -131,12 +149,13 @@ Clean. No local patches.
 ### magemin — v1.9.6 / upstream `40ed109`
 
 Three fixes held as patches pending upstream, with a draft pull-request description in
-`patches/magemin/UPSTREAM-PR.md` (owner-gated; not filed):
+`patches/magemin/UPSTREAM-PR.md` (not yet filed):
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
-  `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until b-1123 lands, regolith's MAGEMin
-  adapter takes that printed `aMgO` as is, so an unpatched build feeds the ~1e-21 value; b-1123
-  replaces it with a recompute from the same run's `Gamma_MgO` and periclase energy.
+  `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until the adapter-side recompute
+  ships, the simulator's MAGEMin adapter takes that printed `aMgO` as is, so an unpatched build
+  passes the ~1e-21 value through; the planned fix recomputes `aMgO` from the same run's
+  `Gamma_MgO` and periclase energy.
 - `0002` LP loop: the iteration cap also required `PC_checked == 2`, so the loop could fail to
   terminate and overrun its diagnostic arrays. Found as an unrecorded edit in the sibling
   `../MAGEMin` checkout and recorded here; not reproduced in a 164-point sweep.
@@ -154,24 +173,22 @@ from a separate, clean v1.9.6 tree, so none of these patches is in it; see `STAT
 The bundled executable crashes on Fe-free melts with an imposed absolute
 fO2 (the two-component Na2O-SiO2 / K2O-SiO2 files are one instance, not
 the predicate). `patches/alphamelts/` holds the pinned minimal reproduction
-and an owner-gated upstream bug-report draft. No engine patch exists: the
+and an upstream bug-report draft. No engine patch exists: the
 upstream source is public, but no source checkout is present beside this repo;
 the local install is the compiled `alphamelts-app-2.3.1-macos-arm64` bundle.
 The simulator refuses that measured crash family before launch (typed as
 engine-crash, not out-of-domain) and catches other signal exits as typed
 diagnostics.
 
-alphaMELTS is AGPL-3.0. If a patched executable or source fork is redistributed,
-the unresolved distribution-posture decision is `q-004`; this record does not
-decide it.
+alphaMELTS is AGPL-3.0. Redistribution of a patched alphaMELTS build is not
+planned for this release.
 
 ### mace — pip 0.3.16 (venv site-packages; no checkout)
 
 - `0001-mps-device-aware-energy-accumulation.patch` — MPS has no float64; the
-  energy-accumulation dtype follows the device. Verify per box with
+  energy-accumulation dtype follows the device. Verify per environment with
   `patches/mace/verify-applied.sh <venv-python>` (0 applied / 1 absent /
-  2 cannot-determine, and 2 refuses on purpose). Applied+verified:
-  studio-2 and studio-3 `imcc-md` venvs.
+  2 cannot-determine, and 2 refuses on purpose).
 
 ### sulfliq — `~/Repos/sulfliq` @ `89d345a`
 
@@ -181,13 +198,13 @@ decide it.
 
 **0001** fixes the ABI mismatch class (PyPI wheel / naive `pip install .` on multi-Python macOS hosts produces `SulfLiq.cpython-314` under a 3.12 site-packages tree). Same pain as ThermoEngine issues #9/#12/#27. Submit upstream to ENKI-portal/sulfliq.
 
-Provider status: **staged** — `simulator/melt_backend/sulfliq_matte.py` (a_FeS, r2 reviewed) has
-its named consumer in the in-fork S-track (t-549..t-551) and **zero runtime callers until that
-lands**; do not read its presence as a wired capability.
+Provider status: **staged** — `simulator/melt_backend/sulfliq_matte.py` (a_FeS) is ready for its
+consumer, sulfur routing, which is an upcoming feature. It has no runtime caller yet, so do not
+read its presence as a wired capability.
 
-## Two-install policy: reference vs production (owner ruling 2026-08-10)
+## Two-install policy: reference vs production
 
-Two VapoRock installs live side by side (t-603 / t-607):
+Two VapoRock installs live side by side:
 
 - **production** — the full high-T fork: all patches, the fitted mid-band tables, raised
   temperature bands. This is what the simulator runs; the whole point is useful numbers
@@ -207,23 +224,25 @@ Current classification (confirm at build time):
 | patch | install class | rationale |
 |---|---|---|
 | vaporock 0002 `janaf-multi-interval-closure` | reference | bugfix — mainline claims multi-interval evaluation |
-| vaporock 0003 `tmax-domain-check` (when adopted) | reference | makes mainline honest about its own limits; raises none |
-| thermoengine 0001 `comp-hashability` | **NEITHER as-is** (milestone sweep P1-4) | the classic `unsafe_hash=True` form is PROVEN BROKEN — `RecursionError` on `hash(OxideMolComp)`/`hash(ElemMolComp)` via the `elem_comp=self` self-reference (T1/port-status.md, verified live). Reference (and eventually production) needs a `0001b` explicit-`__hash__` variant mirroring the T1 TELite fix (hash the non-zero composition payload only). Classic 0001 stays applied locally as historical record but must not enter the reference build or the upstream bundle |
-| thermoengine 0002 `mu-lifetime` | reference, once ObjC rebuild unparked | bugfix |
-| thermoengine spinel-fix (W4) | reference | bugfix — silent infinite spin |
+| vaporock 0003 `condensate-na2o-al2o3-liquid-rows` | reference | bugfix — corrects two transcribed rows of a table mainline ships |
+| vaporock 0004 `gas-rows-from-openimcc-janaf` | not yet classified | source replacement of gas fits; classify before it enters either build |
+| vaporock 0005 `na2o-liquid-janaf` | not yet classified | source replacement of the 0003 Na₂O(l) row; classify with 0004 |
+| a future `tmax-domain-check` patch | reference | makes mainline enforce its own declared limits; raises none |
+| thermoengine 0001 `comp-hashability` | **neither as-is** | the classic `unsafe_hash=True` form raises `RecursionError` on `hash(OxideMolComp)`/`hash(ElemMolComp)` through the `elem_comp=self` self-reference (verified live). The reference (and eventually production) build needs a `0001b` explicit-`__hash__` variant that hashes the non-zero composition payload only. Classic 0001 stays applied locally as a historical record but must not enter the reference build or the upstream bundle |
+| thermoengine 0002 `mu-lifetime` | reference, once an ObjC rebuild is scheduled | bugfix |
+| thermoengine spinel fix | reference | bugfix — silent infinite spin |
 | sulfliq 0001 `cmake-python-executable` | reference | build fix |
 | vaporock 0001 `mn-ni-co-carriers` | **production-only** | adds species mainline does not have |
 | fitted mid-band tables (11 rock-formers) | **production-only** | capability extension |
 | `VAPOROCK_T_MAX_K` raises | **production-only** | capability extension |
 
-**A/B invariant — required artifact of every raise:** every H5 band raise (1950→2200→2500→3000)
+**A/B invariant — required artifact of every raise:** every VapoRock band raise (1950→2200→2500→3000)
 includes a fork-vs-reference A/B over 1350–1950 K on the rail crosscheck fixtures, proving the
 band we have always trusted did not move. Honest consequence of the classification: **Mn/Ni/Co
 cannot be A/B'd at all** — the reference has no such rows. The A/B artifact must state that
 limit explicitly, never report those species as silently agreeing.
 
-**Identity/isolation (OWNER SIMPLIFICATION 2026-08-10, seq 40 — supersedes two earlier designs):**
-register **ONE engine at a time** and diff the A/B **outside the software**: run the fork, capture
+**Identity/isolation:** register **one engine at a time** and diff the A/B **outside the software**: run the fork, capture
 artifacts; swap the registration in `engines/engines.local.toml`; run the reference; diff
 externally. This *deletes* the isolation problem rather than solving it — no dual registration,
 no namespaces, no in-software parity harness. (History, kept so neither error recurs: version
@@ -231,16 +250,16 @@ strings were first proposed as isolation — WRONG, the cache-identity contract 
 metadata and FORBIDDEN key material, so they isolate nothing; namespace/store separation was then
 proposed — correct but heavier than needed once single-registration retired dual installs.)
 
-**The one surviving constraint (runbook, not architecture — OWNER-FINAL FORM):** because the
+**The one surviving constraint (a runbook step, not architecture):** because the
 engine-result cache key is the melt input vector ONLY, *sequential* A/B legs sharing one cache
 store collide — the second leg gets served the first engine's cached rows and the A/B silently
-compares an engine against itself. **Owner-final procedure: before each A/B leg, DELETE the engine
+compares an engine against itself. **Procedure: before each A/B leg, delete the engine
 result cache by hand** — the store at `CachedRealConfig.db_path` (`simulator/backends.py`;
 `reduced_real_cache.db_path` in config, plus optional `read_only_base_db_path` layering) — then
 register the leg's engine, run, capture artifacts, and diff externally. (Pointing legs at separate
 db_paths achieves the same isolation and is acceptable where hand-deletion is impractical, e.g.
-scripted studio runs — but manual deletion is the canonical form.) Holds on the studios too.
-THIS SECTION IS THE CANONICAL A/B RUNBOOK; HT-PLAN and the task notes defer to it.
+scripted runs — but manual deletion is the canonical form.)
+This section is the canonical A/B runbook.
 
 ## Working rules
 
@@ -253,8 +272,7 @@ THIS SECTION IS THE CANONICAL A/B RUNBOOK; HT-PLAN and the task notes defer to i
    submission does not strand the rest.
 4. **Record submission status** in the table above. A patch that has been upstreamed and
    released gets deleted here, not left to rot.
-5. **Physics-affecting patches need a store task** (`b-`/`t-`) and the usual review gate. `0002`
-   is `b-153`.
+5. **Physics-affecting patches get their own tracked issue** and the usual review gate.
 
 ## Known gap this directory does not close
 
@@ -264,13 +282,13 @@ their Shomate polynomial silently — `O2(g)`, declared to 2000 K, returns a smo
 "fabricates, does not refuse" verdict, and it is why `VAPOROCK_T_MIN_K/T_MAX_K = 1350/1950`
 exists as an external gate in `simulator/melt_backend/vaporock.py`. A future patch should make
 out-of-domain evaluation typed rather than silent; until then the external gate is the only
-thing standing between us and confident nonsense.
+guard against silently extrapolated values.
 
-### openmolcas — v26.06 (built locally at `~/opt/openmolcas` on mac-studio-256-1)
+### openmolcas — v26.06 (local build)
 
 No patch. One **known gap** recorded here so nobody in this project reaches for the wrong tool.
 
-**RASSI silently computes cross-geometry overlaps in the wrong basis (b-196).** RASSI reads a
+**RASSI silently computes cross-geometry overlaps in the wrong basis.** RASSI reads a
 single `RUNFILE`, hence one geometry and one AO basis. Given `JobIph` files from *different*
 geometries it does not compare, warn, or refuse — it runs clean (`rc=0`, "Happy landing") and prints
 a plausible state-overlap matrix. Measured on this build: a cross-geometry overlap of `0.998` that
@@ -280,5 +298,4 @@ diagonal reaches `1.00005` — impossible for normalized orbitals under a consis
 
 This is the same **"fabricates, does not refuse"** class as the VapoRock `T_max` gap above. Do not
 use RASSI to measure state continuity across a potential-energy scan; the wavefunction overlap must
-be constructed with the cross-geometry AO overlap, which RASSI does not form. Evidence and exact
-reproduction: `docs-private/research/2026-08-09-upstream-mission/md-chunk2/RASSI-XGEOM-PROBE.md`.
+be constructed with the cross-geometry AO overlap, which RASSI does not form.

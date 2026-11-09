@@ -1,8 +1,7 @@
-# Eval runtime architecture (post G9.7)
+# Eval runtime architecture
 
-**Status:** implemented runtime — documents the optimizer / batch eval plane with G9.7 warm workers live in `simulator/optimize/worker_runtime.py` and injected by `simulator/optimize/pool.py`.  
-**As of:** 2026-06-05 design; updated to implemented code reality in 2026-07 live modules.  
-**Companion:** live web + interactive sim remain in [`architecture.md`](architecture.md). This doc covers **CLI optimizer, fidelity DOE, Mac Studio precompute, and Book full job** economics.
+**Status:** describes the batch evaluation runtime as of v0.6.5. Warm workers live in `simulator/optimize/worker_runtime.py` and are injected by `simulator/optimize/pool.py`.  
+**Companion:** live web + interactive sim remain in [`architecture.md`](architecture.md). This doc covers **CLI optimizer, fidelity DOE, large-memory precompute, and queued full optimizer job** economics.
 
 ---
 
@@ -15,7 +14,7 @@ High-fidelity evals spend wall time on:
 3. **Per-equilibrate model construction** — `ThermoEngineTransport.equilibrate()` builds a new `MELTSmodel()` each call.
 4. **Repeated physics** — same `(T, composition, fO₂)` along reference trajectories recomputed unless PT-1 hits.
 
-G9.7 addresses (1–3) with **warm worker processes**. PT-1 / `results_store` / staged prefix address (4) at output granularity.
+Warm worker processes address (1–3). PT-1 / `results_store` / staged prefix address (4) at output granularity.
 
 ---
 
@@ -52,14 +51,14 @@ PyrolysisSimulator (NEW each task) + AtomLedger (NEW each task)
   |
   +-- hourly step()
   |     +-- PT-1 lookup (cached-real / live-fill) --> equilibrium payload on HIT
-  |     +-- on MISS: MeltBackend.equilibrate()  --> warm transport, reused MELTSmodel (G9.7b)
+  |     +-- on MISS: MeltBackend.equilibrate()  --> warm transport, reused MELTSmodel
   |     +-- ChemistryKernel.commit_batch(...)   --> sole ledger writer (unchanged)
   |
   v
 ScoredResult  --> parent process writes results_store
 ```
 
-**Web UI (`web/events.py`)** is unchanged: one in-memory sim per Socket.IO client, no process pool. Book full job (W-B) enqueues the same `evaluate_batch` / CLI path asynchronously.
+**Web UI (`web/events.py`)** is unchanged: one in-memory sim per Socket.IO client, no process pool. A queued full optimizer job uses the same `evaluate_batch` / CLI path asynchronously.
 
 ---
 
@@ -70,9 +69,9 @@ ScoredResult  --> parent process writes results_store
 | **A — Warm model** | Worker RAM (`WorkerEvalContext`) | Worker PID + backend_name | No | Amortize ThermoEngine init across N evals in one batch |
 | **B — PT-1 equilibrium** | SQLite (`reduced_real_equilibrium_payloads`) | T, comp digest, fO₂, pressure, engine digest, … | Yes | Trajectory replay, `cached-real`, precompute grind |
 | **C — Full eval** | `results_store` SQLite | Full `EvalSpec` / recipe_id | Yes | Leaderboard, identical candidate re-run |
-| **D — Staged prefix** | `results_store` + prefix spec (G9.4a) | Prefix patch + stage depth | Yes | Staged beam suffix-only eval |
+| **D — Staged prefix** | `results_store` + prefix spec | Prefix patch + stage depth | Yes | Staged beam suffix-only eval |
 
-Canonical `EvalSpec` v1.1 is defined by `simulator/optimize/evalspec.py::EvalSpec`; the field table and `backend_fingerprints` disposition live in `docs-private/design-recipe-optimizer-2026-05-29.md` §4/§12.3.
+Canonical `EvalSpec` v1.1 is defined by `simulator/optimize/evalspec.py::EvalSpec`; that class is the reference for its fields and the `backend_fingerprints` disposition.
 
 **Trajectory replay:** prefer **B** (and **D** when staged) when states are known; use **A** when states are novel (search, cache miss fill). **C** when the entire recipe patch repeats.
 
@@ -154,7 +153,7 @@ and `evaluate` falls back to the same call when no explicit runtime is supplied.
 
 ---
 
-## Fidelity harness (G9.7c)
+## Fidelity harness
 
 **Before:** `fidelity._run_eval` → new `multiprocessing.Process` per eval → full cold start.
 
@@ -162,51 +161,49 @@ and `evaluate` falls back to the same call when no explicit runtime is supplied.
 
 ---
 
-## ThermoEngine transport (G9.7b)
+## ThermoEngine model reuse
 
 **Before:** `MELTSmodel()` constructed in `initialize()` and again on every `equilibrate()`.
 
 **After:** one `MELTSmodel` instance on `ThermoEngineTransport`; per call: `set_bulk_composition` + `equilibrate_tp`. Reset or replace model when composition basis changes discontinuously (test gate).
 
-Reuse applies only when `AlphaMELTSBackend._mode == "thermoengine"`.
+Reuse applies only to the ThermoEngine backend (`ThermoEngineBackend`, `_mode == "thermoengine"`).
 
 ---
 
-## Parallelism and RAM (Studio 256 GB)
+## Parallelism and memory
 
-**Key insight (owner, 2026-06-05):** warm workers do **not** share run state across evals. Each eval has a
+**Design note:** warm workers do **not** share run state across evals. Each eval has a
 different recipe / trajectory. If two runs hit the same equilibrium step, **PT-1 output cache (layer B)**
 is the right tool — not a second RAM-resident model.
 
 | Workload | Warm workers W | Why |
 |----------|----------------|-----|
-| Fidelity DOE, Book full job, high `@ hours:1` | **1** | Serial; one warm backend amortizes init across N evals in sequence |
+| Fidelity DOE, queued full optimizer job, high `@ hours:1` | **1** | Serial; one warm backend amortizes init across N evals in sequence |
 | Staged high eval | **configured `parallel`** | Staged strategies ask batches up to `config.parallel` (`study.py` clamps `batch_size = min(config.parallel, config.budget - evaluated)`); `study.py::_evaluate_candidates` receives that value as its `parallel=` argument and passes it to the worker pool, while staged-prefix replay preserves stage dependencies |
 | Internal-analytical (`stub`) / cached-real study `parallel>1` | **min(parallel, cpu)** | Embarrassingly parallel **different** evals; each worker holds one backend for **its** queue |
 | PT-1 precompute grind | **shard workers → merge** | Fill B-layer on miss; warm model only on cache miss path |
 
-**Do not** plan to fill 256 GB with many ThermoEngine instances for serial high-tier jobs. RAM headroom
+**Do not** plan to fill a large-memory host with many ThermoEngine instances for serial high-tier jobs. RAM headroom
 is for **one (or few) warm backends + OS cache**, not duplicate models for identical state.
 
 W>1 is a **throughput** knob for parallel fast-tier search, not a substitute for PT-1.
 
-**Pending grill-me Q7** before G9.7 architecture sign-off. **DECIDED 2026-06-05: Q7-A.**
-
 ---
 
-## PT-1 store hardening (G9.7e)
+## Equilibrium-cache store hardening
 
 Parallel precompute (`populate_reduced_real_cache`) with multiple workers on merged DB:
 
 - `PRAGMA journal_mode=WAL`
 - `busy_timeout` (e.g. 30 s)
-- Prefer **shard → merge** (G9.3c) over multi-writer single file
+- Prefer **shard → merge** over multi-writer single file
 
 Read-heavy `cached-real` evals remain safe; write contention is the risk during grind.
 
 ---
 
-## Invariants (unchanged from AGENTS.md)
+## Invariants
 
 1. **Mol-native ledger** — fresh `AtomLedger` per eval task.
 2. **Mass balance** ≤5e-12% — warm path must not skip commits or reuse ledger state.
@@ -216,38 +213,35 @@ Read-heavy `cached-real` evals remain safe; write contention is the risk during 
 
 ---
 
-## Lab Geometry Scope (REC-W0-05)
+## Lab Geometry Scope
 
-W0-04 added the gram-lab exposed-melt-area path: when
+The gram-lab exposed-melt-area path: when
 `lab_geometry.scale == gram_lab`, the lab geometry sample's
 `exposed_melt_area_m2` can flow to the run's effective
 `melt_surface_area_m2` for Robinot-style lab diagnostics and result-scope
 metadata. Runs without that gram-lab gate keep the industrial/default
-`melt_surface_area_m2` of `0.2 m2`; REC-W0-05 does not change that default.
+`melt_surface_area_m2` of `0.2 m2`.
 
 Gram-lab exposed melt area and industrial pot geometry are separate concepts.
 The gram-lab value is a lab diagnostic for a small exposed sample surface.
 Industrial pot geometry is the production area model for full-scale pot or
 vessel behavior; it is not inferred from the gram-lab sample field.
 
-Any future industrial-area runtime behavior is a separate owner-gated chunk. It
-is not part of the Robinot remediation, is not authorized by REC-W0-04 or
-REC-W0-05, and must not be wired into runtime behavior or hidden behind this
-spec.
+Industrial pot-geometry area modelling is an upcoming feature.
 
 ---
 
-## Verification gates (G9.7 acceptance)
+## Verification
 
 | Test | Gate |
 |------|------|
 | `tests/test_optimizer_pool.py` | Warm repeat ≡ cold; picklable guards unchanged |
 | `tests/test_mass_balance.py` | Feasible warm high eval closes balance |
 | `scripts/profile_eval_hotpath.py` | 2nd eval in worker: init time ≈ 0 |
-| `scripts/run_fidelity_doe.py` N=4 | Wall ↓ vs pre-G9.7c baseline; 0 drops |
+| `scripts/run_fidelity_doe.py` N=4 | Wall ↓ vs the cold-start baseline; 0 drops |
 | `REGOLITH_OPTIMIZER_WARM_WORKERS=0` | Bit-identical or within float tolerance vs warm |
 
-G9.7 runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerEvalContext` itself is intentionally limited to backend/transport state.
+Runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerEvalContext` itself is intentionally limited to backend/transport state.
 
 ---
 
@@ -258,6 +252,5 @@ G9.7 runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerE
 | [`architecture.md`](architecture.md) | Interactive Flask + Socket.IO sim (unchanged) |
 | [`melt-backends.md`](melt-backends.md) | Backend selection policy + ThermoEngine/subprocess |
 | [`process-model.md`](process-model.md) | Physics per hour (unchanged) |
-| `docs-private/optimizer-v1-ship-checklist.md` | G9.6, G9.7 gates + worker brief |
 
-G9.7 has shipped; `architecture.md` carries the pointer to this document under "Batch Eval Plane".
+`architecture.md` carries the pointer to this document under "Batch Eval Plane".
