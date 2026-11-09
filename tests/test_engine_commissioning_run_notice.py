@@ -139,7 +139,7 @@ def test_in_band_run_is_clean_and_the_notice_does_not_change_numbers() -> None:
     assert "engine_commissioning_notice" not in clean_reference.product_summary
     assert clean_reference.backend_status == "out_of_domain"
     clean_objectives = compute_objectives(profile, execution).as_mapping()
-    for objective in ("oxygen_kg", "metals_total_kg"):
+    for objective in ("oxygen_stored_kg", "metals_total_kg"):
         assert clean_objectives[objective] is not None
         assert math.isfinite(float(clean_objectives[objective]))
     clean_summary = _summary_numbers(clean_reference.product_summary)

@@ -347,6 +347,7 @@ def _analytical_vapor_pressures_from_activities(
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
         MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
+        _alphamelts_vapor_activity_on_k_basis,
         _builtin_vapor_activities_from_weight_composition,
     )
     builtin_vapor_activities = (
@@ -362,6 +363,30 @@ def _analytical_vapor_pressures_from_activities(
     has_catalog = catalog_payload.get("schema_version") == 2
 
     def selected_activity(species: str, parent_oxide: str) -> float | None:
+        explicit_activity = float(activities.get(parent_oxide, 0.0) or 0.0)
+        if (
+            parent_oxide in {"CaO", "MgO", "FeO"}
+            and explicit_activity > 0.0
+        ):
+            alpha_activity = _alphamelts_vapor_activity_on_k_basis(
+                parent_oxide,
+                explicit_activity,
+                T_K,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+            notice = dict(alpha_activity.notice)
+            notice.update(
+                {
+                    "species": str(species),
+                    "parent_oxide": parent_oxide,
+                }
+            )
+            activity_standard_state_notices[str(species)] = notice
+            warnings.append(
+                alpha_activity.warning + f"|species={species}"
+            )
+            return float(alpha_activity.activity)
+
         builtin_activity = builtin_vapor_activities.get(parent_oxide)
         if builtin_activity is None:
             if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:

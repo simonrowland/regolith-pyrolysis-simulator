@@ -76,7 +76,7 @@ def test_rump_warning_reaches_run_and_optimizer_without_changing_numbers() -> No
     assert "rump_expectation_notice" not in clean_reference.trace
     assert "rump_expectation_notice" not in clean_reference.product_summary
     clean_objectives = compute_objectives(profile, execution).as_mapping()
-    for objective in ("oxygen_kg", "metals_total_kg"):
+    for objective in ("oxygen_stored_kg", "metals_total_kg"):
         assert clean_objectives[objective] is not None
         assert math.isfinite(float(clean_objectives[objective]))
     clean_summary = _summary_numbers(clean_reference.product_summary)

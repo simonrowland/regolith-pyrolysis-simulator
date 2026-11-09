@@ -6723,6 +6723,10 @@ class _MELTSBackendSupport(MeltBackend):
             MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
+            _alphamelts_vapor_activity_on_k_basis,
+        )
+        explicit_oxide_activities, _ = _canonical_oxide_activity_map_with_notices(
+            activities
         )
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
@@ -6744,32 +6748,53 @@ class _MELTSBackendSupport(MeltBackend):
                 else None
             )
             raw_activity = self._activity_for_vapor_species(species, activities)
-            if builtin_vapor_activity is not None:
-                raw_activity = float(builtin_vapor_activity.activity)
-                notice = dict(builtin_vapor_activity.notice)
-                relation_reason = notice.get("reason")
-                notice.update(
-                    {
-                        'parent_oxide': parent_oxide,
-                        'source_standard_state_relation_reason': relation_reason,
-                        'source_standard_state_substitution': (
-                            'alphamelts_oxide_activity_no_declared_standard '
-                            '-> builtin_declared_standard'
-                        ),
-                    }
+            explicit_oxide_activity = explicit_oxide_activities.get(parent_oxide)
+            explicit_activity_selected = (
+                self._antoine_uses_reaction_pressure(spec)
+                and parent_oxide in {"CaO", "MgO", "FeO"}
+                and explicit_oxide_activity is not None
+            )
+            selected_vapor_activity = None
+            if explicit_activity_selected:
+                selected_vapor_activity = _alphamelts_vapor_activity_on_k_basis(
+                    parent_oxide,
+                    float(explicit_oxide_activity),
+                    T_K,
+                    vapor_pressure_data=getattr(
+                        self, "_vapor_pressure_catalog_payload", None
+                    ),
                 )
-                if relation_reason != "standard_mismatch_unconverted":
-                    notice["reason"] = "activity_standard_state_substitution"
+            elif builtin_vapor_activity is not None:
+                selected_vapor_activity = builtin_vapor_activity
+            if selected_vapor_activity is not None:
+                raw_activity = float(selected_vapor_activity.activity)
+                notice = dict(selected_vapor_activity.notice)
+                if explicit_activity_selected:
+                    notice['parent_oxide'] = parent_oxide
+                else:
+                    relation_reason = notice.get("reason")
+                    notice.update(
+                        {
+                            'parent_oxide': parent_oxide,
+                            'source_standard_state_relation_reason': relation_reason,
+                            'source_standard_state_substitution': (
+                                'alphamelts_oxide_activity_no_declared_standard '
+                                '-> builtin_declared_standard'
+                            ),
+                        }
+                    )
+                    if relation_reason != "standard_mismatch_unconverted":
+                        notice["reason"] = "activity_standard_state_substitution"
                 self._antoine_activity_standard_state_notices[
                     str(species)
                 ] = notice
                 self._antoine_activity_standard_state_activities[
                     str(species)
-                ] = float(builtin_vapor_activity.source_activity)
+                ] = float(selected_vapor_activity.source_activity)
                 activity_provenance = {
                     "activity_standard_state_conversion": dict(notice),
                     "melt_oxide_activity_reference_state": (
-                        builtin_vapor_activity.source_standard_state_id
+                        selected_vapor_activity.source_standard_state_id
                     ),
                     "melt_oxide_activity_reference_state_phase": (
                         notice.get("from_standard_state_phase")
@@ -6789,9 +6814,9 @@ class _MELTSBackendSupport(MeltBackend):
                         else notice["from_standard_state_id"]
                     ),
                 }
-                if builtin_vapor_activity.source_activity_diagnostic is not None:
+                if selected_vapor_activity.source_activity_diagnostic is not None:
                     activity_provenance["a_FeO_calphad"] = dict(
-                        builtin_vapor_activity.source_activity_diagnostic
+                        selected_vapor_activity.source_activity_diagnostic
                     )
                 if (
                     str(notice.get("to_standard_state_phase") or "").lower()

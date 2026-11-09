@@ -669,6 +669,62 @@ class _BuiltinVaporActivity:
     source_activity_diagnostic: dict[str, object] | None = None
 
 
+def _alphamelts_vapor_activity_on_k_basis(
+    parent_oxide: str,
+    activity: float,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> _BuiltinVaporActivity:
+    """Convert AlphaMELTS' declared liquid oxide activity onto its vapor K."""
+
+    parent = str(parent_oxide)
+    catalog_payload = getattr(
+        vapor_pressure_data, "catalog_payload", vapor_pressure_data
+    )
+    from simulator.vapour_rail.catalog import (
+        catalog_vapor_parent_standard_states,
+    )
+
+    catalog_standard_states = catalog_vapor_parent_standard_states(
+        catalog_payload
+    )
+    source_standard_state_id, source_standard_state_phase = (
+        _vapor_activity_source_standard_state(
+            parent,
+            _melt_oxide_activity_standard_state_id(parent),
+            catalog_standard_states,
+        )
+    )
+    target_standard_state_id, target_standard_state_phase = (
+        _vapor_k_standard_state(
+            parent,
+            temperature_K,
+            catalog_standard_states,
+        )
+    )
+    vapor_activity, notice, warning = _activity_for_crystalline_vapor_k(
+        parent,
+        activity,
+        temperature_K,
+        source_standard_state_id=source_standard_state_id,
+        target_standard_state_id=target_standard_state_id,
+        source_standard_state_phase=source_standard_state_phase,
+        target_standard_state_phase=target_standard_state_phase,
+    )
+    if notice is None or warning is None:
+        raise RuntimeError(
+            f"{parent}: AlphaMELTS activity standard was not reported"
+        )
+    return _BuiltinVaporActivity(
+        source_activity=float(activity),
+        activity=vapor_activity,
+        source_standard_state_id=source_standard_state_id,
+        notice=notice,
+        warning=warning,
+    )
+
+
 def _convert_melt_oxide_activity_reference_state(
     parent_oxide: str,
     activity: float,
@@ -1234,16 +1290,6 @@ def _builtin_vapor_activities_from_weight_composition(
         ).molar_mass_kg_per_mol()
         composition_mol[parent] = weight / molar_mass
 
-    catalog_payload = getattr(
-        vapor_pressure_data, "catalog_payload", vapor_pressure_data
-    )
-    from simulator.vapour_rail.catalog import (
-        catalog_vapor_parent_standard_states,
-    )
-
-    catalog_standard_states = catalog_vapor_parent_standard_states(
-        catalog_payload
-    )
     projected: dict[str, _BuiltinVaporActivity] = {}
     parents = {"CaO", "MgO"}.intersection(composition_mol)
     if "FeO" in composition_mol:
@@ -1274,9 +1320,6 @@ def _builtin_vapor_activities_from_weight_composition(
                     or 0.0
                 ),
             )
-            source_standard_state_id = _melt_oxide_activity_standard_state_id(
-                parent
-            )
         else:
             source = melt_oxide_activity(
                 parent,
@@ -1286,46 +1329,21 @@ def _builtin_vapor_activities_from_weight_composition(
             if source is None or source.activity <= 0.0:
                 continue
             source_activity = float(source.activity)
-            source_standard_state_id = str(
-                source.provenance()["melt_oxide_activity_reference_state"]
-            )
-        (
-            source_standard_state_id,
-            source_standard_state_phase,
-        ) = _vapor_activity_source_standard_state(
-            parent,
-            source_standard_state_id,
-            catalog_standard_states,
-        )
-        (
-            target_standard_state_id,
-            target_standard_state_phase,
-        ) = _vapor_k_standard_state(
-            parent,
-            temperature_K,
-            catalog_standard_states,
-        )
-        activity, notice, warning = _activity_for_crystalline_vapor_k(
+        resolved = _alphamelts_vapor_activity_on_k_basis(
             parent,
             source_activity,
             temperature_K,
-            source_standard_state_id=source_standard_state_id,
-            target_standard_state_id=target_standard_state_id,
-            source_standard_state_phase=source_standard_state_phase,
-            target_standard_state_phase=target_standard_state_phase,
+            vapor_pressure_data=vapor_pressure_data,
         )
+        activity = resolved.activity
         if activity <= 0.0:
             continue
-        if notice is None or warning is None:
-            raise RuntimeError(
-                f"{parent}: vapor activity basis was not reported"
-            )
         projected[parent] = _BuiltinVaporActivity(
             source_activity=source_activity,
             activity=activity,
-            source_standard_state_id=source_standard_state_id,
-            notice=notice,
-            warning=warning,
+            source_standard_state_id=resolved.source_standard_state_id,
+            notice=resolved.notice,
+            warning=resolved.warning,
             source_activity_diagnostic=source_activity_diagnostic,
         )
     return projected

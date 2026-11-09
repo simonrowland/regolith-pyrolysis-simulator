@@ -156,6 +156,8 @@ def _explicit_alpha_oxide_activity_for_k(species, activity, temperature_C):
         float(temperature_C) + 273.15,
         source_standard_state_id=source_standard_state_id,
         target_standard_state_id=target_standard_state_id,
+        source_standard_state_phase="liquid",
+        target_standard_state_phase="solid",
     )
 
 
@@ -1910,9 +1912,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
                 assert math.isfinite(float(notice["log10_activity_offset"]))
             else:
                 assert notice["conversion_performed"] is False
-                assert notice["source_standard_state_relation_reason"] == (
-                    "source_and_K_standard_states_match"
-                )
+                assert notice["reason"] == "source_and_K_standard_states_match"
         else:
             assert notice["reason"] == "activity_standard_state_substitution"
             assert math.isfinite(float(notice["log10_activity_offset"]))

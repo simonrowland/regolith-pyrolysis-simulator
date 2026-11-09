@@ -10828,15 +10828,18 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     assert source["SiO"] == (
         "antoine_fallback_from_vaporock:standard_reaction_term"
     )
-    # Mg uses the built-in liquid activity and d-144 conversion rather than
-    # AlphaMELTS's undeclared component proxy.
+    # The supplied AlphaMELTS liquid activity is converted onto the declared
+    # crystalline vapor K standard instead of being replaced by projection.
     assert pressures["Mg"] > 0.0
     assert source["Mg"] == (
         "antoine_fallback_from_vaporock:standard_reaction_term"
     )
-    assert backend._antoine_activity_standard_state_notices["Mg"]["reason"] == (
-        "activity_standard_state_substitution"
-    )
+    mg_notice = backend._antoine_activity_standard_state_notices["Mg"]
+    assert mg_notice["from_standard_state_id"] == "Mg-009"
+    assert mg_notice["from_standard_state_phase"] == "liquid"
+    assert mg_notice["to_standard_state_id"] == "Mg-010"
+    assert mg_notice["to_standard_state_phase"] == "solid"
+    assert mg_notice["conversion_performed"] is True
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
     # would zero the evaporation flux.
     assert pressures != {}

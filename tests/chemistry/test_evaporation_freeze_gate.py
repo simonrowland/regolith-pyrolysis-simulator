@@ -185,6 +185,12 @@ def _equilibrium(sim, vapor_pressure_data) -> EquilibriumResult:
         'solid',
         'liquid',
     }
+    conversion = fe_provenance['activity_standard_state_conversion']
+    assert conversion['authority_level'] in {
+        'identity',
+        'predict_and_flag',
+        'extrapolated',
+    }
     sim._last_vapor_pressure_diagnostic = diagnostic
     return EquilibriumResult(
         liquid_fraction=1.0,

@@ -119,7 +119,7 @@ def test_out_of_range_sulfsat_accumulates_and_does_not_change_numbers() -> None:
     assert "sulfur_saturation_notice" not in clean_reference.trace
     assert "sulfur_saturation_notice" not in clean_reference.product_summary
     clean_objectives = compute_objectives(profile, execution).as_mapping()
-    for objective in ("oxygen_kg", "metals_total_kg"):
+    for objective in ("oxygen_stored_kg", "metals_total_kg"):
         assert clean_objectives[objective] is not None
         assert math.isfinite(float(clean_objectives[objective]))
     clean_summary = _summary_numbers(clean_reference.product_summary)
