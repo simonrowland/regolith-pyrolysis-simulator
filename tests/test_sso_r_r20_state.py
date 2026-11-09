@@ -3245,10 +3245,15 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
-    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # from the bar form used with P[atm] to 0.0018583*sqrt(2). That
+    # P_bulk=0 series-resistance fraction is 0.0019750990648993625.
+    # Same-hour closure at this hour (T=1973.15 K, commanded overhead
+    # 1000 Pa, N2) sets P_bulk(Fe)=16.76989869501812 Pa against
+    # P_eq=46.750711589773374 Pa. Series flux is linear in (P_eq-P_bulk)
+    # at fixed total pressure (Kn=3.54e-4, viscous), so the fraction
+    # scales by (P_eq-P_bulk)/P_eq = 0.641291049381877.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0012666133519625342,
         rel=0.0,
         abs=1.0e-15,
     )
