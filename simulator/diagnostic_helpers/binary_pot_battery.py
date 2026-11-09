@@ -4587,10 +4587,9 @@ def _engine_cache_request_vector(
     po2: Po2Request,
     physical_pressure_bar: float | None,
     native_activity_formula: str | None,
-    timeout_s: float | None = None,
     isolated: bool | None = None,
 ) -> dict[str, Any] | None:
-    """Describe the exact cell request and the adapter settings it consumes."""
+    """Describe cell inputs that can affect chemistry or admission."""
 
     composition_kg, composition_mol = composition_kg_and_mol(
         pot.composition_wt_pct
@@ -4605,29 +4604,6 @@ def _engine_cache_request_vector(
     engine_id = handle.name
     options: dict[str, Any] = {}
     engine_settings: dict[str, Any] = {}
-    backend_config = getattr(handle.backend, "_config", {}) or {}
-
-    def selected_config(*names: str) -> dict[str, Any]:
-        if not isinstance(backend_config, Mapping):
-            return {}
-        return {
-            name: (
-                str(backend_config[name])
-                if isinstance(backend_config[name], os.PathLike)
-                else backend_config[name]
-            )
-            for name in names
-            if name in backend_config
-        }
-
-    def path_value(value: Any) -> str | None:
-        return None if value is None else str(value)
-
-    def library_search_path(variable: str) -> str | None:
-        value = os.environ.get(variable)
-        if value is None:
-            return None
-        return os.pathsep.join(dict.fromkeys(value.split(os.pathsep)))
 
     try:
         parameters = inspect.signature(handle.backend.equilibrate).parameters
@@ -4690,28 +4666,7 @@ def _engine_cache_request_vector(
                     backend, "_configured_vapor_transport_floor_bar", None
                 ),
                 "raw_model_name": getattr(backend, "_raw_model_name", None),
-                "pet_warm_worker": getattr(backend, "_pet_warm_enabled", None),
-                "pet_warm_timeout_s": getattr(backend, "_pet_warm_timeout_s", None),
-                "timeout_s": getattr(backend, "_timeout_s", None),
-                "engine_path": path_value(getattr(backend, "_engine_path", None)),
-                "binary_path": path_value(getattr(backend, "_binary_path", None)),
                 "ambient_calc_mode": os.environ.get("ALPHAMELTS_CALC_MODE"),
-                "config": selected_config(
-                    "mode",
-                    "python_bridge",
-                    "warm_worker",
-                    "petthermotools_warm_call_timeout_s",
-                    "fO2_buffer",
-                    "redox_buffer",
-                    "fO2_offset",
-                    "Fe3Fet_Liq",
-                    "fe3fet_ratio",
-                    "model",
-                    "timeout_s",
-                    "require_petthermotools",
-                    "vapor_transport_pO2_bar",
-                    "vapor_transport_floor_bar",
-                ),
                 "vapor_transport_pO2_admission": (
                     "observation"
                     if po2.mode == PO2_COMMANDED
@@ -4738,29 +4693,6 @@ def _engine_cache_request_vector(
                 "configured_vapor_transport_floor_bar": getattr(
                     backend, "_configured_vapor_transport_floor_bar", None
                 ),
-                "health_timeout_s": getattr(backend, "_health_timeout_s", None),
-                "equilibrate_timeout_s": getattr(
-                    getattr(backend, "_thermoengine_transport", None),
-                    "equilibrate_timeout_s",
-                    None,
-                ),
-                "thermoengine_library_search": {
-                    "DYLD_LIBRARY_PATH": library_search_path(
-                        "DYLD_LIBRARY_PATH"
-                    ),
-                    "DYLD_FALLBACK_LIBRARY_PATH": library_search_path(
-                        "DYLD_FALLBACK_LIBRARY_PATH"
-                    ),
-                    "home": str(Path.home()),
-                },
-                "config": selected_config(
-                    "mode",
-                    "model",
-                    "thermoengine_health_timeout_s",
-                    "thermoengine_equilibrate_timeout_s",
-                    "vapor_transport_pO2_bar",
-                    "vapor_transport_floor_bar",
-                ),
                 "vapor_transport_pO2_admission": (
                     "observation"
                     if po2.mode == PO2_COMMANDED
@@ -4783,38 +4715,12 @@ def _engine_cache_request_vector(
             backend = handle.backend
             engine_settings = {
                 "model": _MELT_MODEL_ID,
-                "database_path": path_value(
-                    getattr(backend, "_database_path", None)
-                ),
                 "temperature_units": getattr(backend, "_temperature_units", "C"),
                 "pressure_units": getattr(backend, "_pressure_units", "bar"),
                 "vapor_pressure_units": getattr(
                     backend, "_vapor_pressure_units", "bar"
                 ),
-                "reuse_system": bool(getattr(backend, "_reuse_system", False)),
                 "include_oxide_activities": False,
-                "warm_worker": getattr(backend, "_warm_worker_enabled", None),
-                "warm_pool_size": getattr(backend, "_warm_pool_size", None),
-                "warm_call_timeout_s": getattr(
-                    backend, "_warm_call_timeout_s", None
-                ),
-                "worker_startup_timeout_s": getattr(
-                    backend, "_worker_startup_timeout_s", None
-                ),
-                "session_warm_environment": os.environ.get(
-                    "REGOLITH_VAPOROCK_SESSION_WARM"
-                ),
-                "config": selected_config(
-                    "database_path",
-                    "temperature_units",
-                    "pressure_units",
-                    "vapor_pressure_units",
-                    "warm_worker",
-                    "reuse_system",
-                    "warm_pool_size",
-                    "warm_call_timeout_s",
-                    "worker_startup_timeout_s",
-                ),
             }
         elif engine_id == "magemin":
             backend = handle.backend
@@ -4823,21 +4729,7 @@ def _engine_cache_request_vector(
             )
             engine_settings = {
                 "database": getattr(backend, "_database", None),
-                "bridge": getattr(backend, "_bridge", None),
                 "fO2_buffer": getattr(backend, "_config", {}).get("fO2_buffer"),
-                "binary_path": path_value(getattr(backend, "_binary_path", None)),
-                "slots_environment": os.environ.get("REGOLITH_MAGEMIN_SLOTS", ""),
-                "config": selected_config(
-                    "database",
-                    "python_bridge",
-                    "binary_path",
-                    "warm_worker",
-                    "warm_call_timeout_s",
-                    "warm_pool_size",
-                    "worker_startup_timeout_s",
-                    "timeout_s",
-                    "fO2_buffer",
-                ),
             }
         elif engine_id not in {"alphamelts", "thermoengine", "vaporock", "magemin"}:
             return None
@@ -4875,9 +4767,6 @@ def _engine_cache_request_vector(
         "oxygen": oxygen,
         "solver_options": options,
         "engine_settings": engine_settings,
-        "timeout_s": float(
-            timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(engine_id, 30.0)
-        ),
         "isolated": None if isolated is None else bool(isolated),
     }
     if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
@@ -4967,7 +4856,6 @@ def equilibrate_cell(
             po2=po2,
             physical_pressure_bar=physical_pressure_bar,
             native_activity_formula=native_activity_formula,
-            timeout_s=timeout,
             isolated=use_isolated,
         )
         if request_vector is not None:

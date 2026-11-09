@@ -95,7 +95,6 @@ def _vector(
     *,
     pressure_bar: float = 1.0,
     po2: Po2Request | None = None,
-    timeout_s: float | None = None,
 ) -> dict[str, Any]:
     value = _engine_cache_request_vector(
         handle,
@@ -104,7 +103,6 @@ def _vector(
         po2=po2 or Po2Request("engine_default", None),
         physical_pressure_bar=pressure_bar,
         native_activity_formula=None,
-        timeout_s=timeout_s,
     )
     assert value is not None
     return value
@@ -352,13 +350,28 @@ def test_request_vector_ignores_operational_backend_config_changes(
     assert first == second, f"operational config {engine}.{setting} changed the cache key"
 
 
-def test_request_vector_ignores_caller_timeout_changes() -> None:
-    handle = _handle("magemin")
+def test_caller_timeout_changes_reuse_cached_cell_outcome(tmp_path: Path) -> None:
+    backend = _Backend("magemin")
+    handle = _handle("magemin", backend)
+    cache = EngineCache(tmp_path / "magemin-timeout.sqlite")
+    request = {
+        "temperature_K": 1703.0,
+        "po2": Po2Request("engine_default", None),
+        "isolated": False,
+        "engine_cache": cache,
+    }
 
-    ordinary = _vector(handle, timeout_s=30.0)
-    longer = _vector(handle, timeout_s=31.0)
+    first = equilibrate_cell(
+        handle, _pot(), timeout_s=30.0, **request
+    )
+    second = equilibrate_cell(
+        handle, _pot(), timeout_s=31.0, **request
+    )
 
-    assert ordinary == longer
+    assert first.status == second.status
+    assert backend.calls == 1
+    assert cache.counters["magemin"]["misses"] == 1
+    assert cache.counters["magemin"]["hits"] == 1
 
 
 def test_request_vector_ignores_magemin_slot_environment(

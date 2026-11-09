@@ -207,14 +207,13 @@ def cached_openimcc_evaluate(
     allow_out_of_envelope: bool = False,
     solve_fn: Callable[[], OpenImccBridgeResult],
 ) -> OpenImccBridgeResult:
-    """Cache one direct bridge evaluation while retaining caller timeout policy."""
+    """Cache bridge evaluation inputs; the caller still controls timeout policy."""
     from simulator.engine_cache import cached_solve
 
     request = {
         "call": "evaluate",
         "composition_mol": composition_mol,
         "temperature_K": temperature_K,
-        "timeout_s": timeout_s,
         "pack": pack,
         "allow_extrapolation": allow_extrapolation,
         "allow_out_of_envelope": allow_out_of_envelope,
