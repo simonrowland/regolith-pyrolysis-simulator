@@ -1925,6 +1925,7 @@ def test_run_metadata_as_published_conversion_bypasses_are_typed(
     (
         ("empty", {}),
         ("unsupported-unit-key", {"unit_code": "g"}),
+        ("unsupported-unit-alias", {"unit": "g"}),
     ),
 )
 def test_run_metadata_unconsumed_as_published_blocks_are_typed(
