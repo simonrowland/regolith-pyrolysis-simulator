@@ -84,7 +84,7 @@ The evaporation diagnostic includes `flux_uncertainty_pct`, a per-species map de
 
 `per_hour_summary[i].O2_yield_kg_cumulative` is a legacy serialized key. Read it as source-side O₂ potential: emitted O₂ counted by the simulator's O₂ bins before downstream sinks, capture efficiency, analyzer visibility, or recovery losses. `O2_source_side_potential_kg_cumulative` is the explicit alias with the same numeric value, and `O2_metric_label` carries the display label.
 
-Do not use either field as recovered/captured O₂ yield. Recovered-O₂ accounting is an upcoming feature. Current lab validation against Robinot et al. shows the source-side/free-O₂ calculation remains about `18.75×` above analyzer-visible O₂ after the area/alpha correction; see [`docs/lab-validation-whitepaper.md`](lab-validation-whitepaper.md) §4.1 and §5.
+Do not use either field as recovered/captured O₂ yield. Recovered-O₂ accounting is an upcoming feature. Current lab validation against Robinot et al. shows the source-side/free-O₂ calculation remains about `18.75×` above analyzer-visible O₂ after the area/alpha correction.
 
 ## Alkali product and condensation series
 

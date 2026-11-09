@@ -305,7 +305,7 @@ real melt thermodynamics where they are installed.
 | `internal-analytical` | Built-in Ellingham/Antoine model. The default active backend. |
 | `alphamelts` | Active backend, through a subprocess or the PetThermoTools API. |
 | `thermoengine` | Active backend. Uses VapoRock for vapour–melt work when it is installed. |
-| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for 45 melt species (8 parent oxides and 37 complexes), whichever active backend is selected. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
+| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for the eight major melt oxides (Si, Mg, Fe, Ca, Al, Ti, Na, K) through a 45-species associate model, plus Mn in its redox pack, whichever active backend is selected. Its gas database covers 311 species from 77 elements, and melt activities for more elements are on the way. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
 | VapoRock, MAGEMin | Per-task providers and cross-checks. Not selectable as the active backend. |
 
 Choose the active backend with `--backend` on the batch runner; batch runs always name one, so every
@@ -363,7 +363,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - [Model Limitations](docs/model-limitations.md) — error budget, known disagreements, reproduction battery
 - [Process Model](docs/process-model.md) · [Chemistry Methods](docs/chemistry-methods.md)
 - [Feedstocks](docs/feedstocks.md)
-- [Citation Policy](docs/citation-policy.md) · [Lab Validation Whitepaper](docs/lab-validation-whitepaper.md)
+- [Citation Policy](docs/citation-policy.md)
 - IMCC melt-activity model: [openimcc](https://github.com/simonrowland/openimcc) · [Validation Battery Rollup](docs/validation-battery-rollup.md)
 
 **Running it**
@@ -382,7 +382,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 **Reference registry and campaign analyses**
 
 - [`docs/references/`](docs/references/) — the `REF-NNN` registry, source PDFs, and generated pages
-- Historical SiO temperature sweeps (2026-05-19): [lunar mare, low-Ti](docs/sio_tsweep_lunar_mare_low_ti_2026-05-19.md) · [Mars basalt](docs/sio_tsweep_mars_basalt_2026-05-19.md)
 
 ## Source Layout
 
