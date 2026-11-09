@@ -94,6 +94,9 @@ def _set_document_path(doc: dict, path: tuple[str | int, ...], value) -> None:
             node[segment] = value
             return
         if isinstance(segment, int):
+            while len(node) <= segment:
+                next_segment = path[index + 1]
+                node.append([] if isinstance(next_segment, int) else {})
             node = node[segment]
             continue
         if segment not in node:
