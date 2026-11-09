@@ -1681,21 +1681,32 @@ def test_d350_alphamelts_supplied_mgo_activity_changes_pressure(
     vapor_pressure_data,
 ):
     backend = AlphaMELTSBackend()
-    composition_wt_pct = {"MgO": 50.0, "CaO": 50.0}
+    composition_wt_pct = {"MgO": 50.0, "CaO": 40.0, "Na2O": 10.0}
     pressures = []
+    diagnostic_pressures = []
     for activity in (0.4, 1.0e-10):
+        activities = {"MgO": activity, "CaO": 0.3, "Na2O": 0.2}
         projection = backend._activities_times_antoine_or_fail(
             1500.0,
-            {"MgO": activity, "CaO": 0.3},
+            activities,
             composition_wt_pct,
             pO2_bar=1.0,
             context="d-350 supplied AlphaMELTS activity precedence test",
         )
         assert isinstance(projection, dict)
         pressures.append(projection["Mg"])
+        diagnostic = _analytical_vapor_pressures_from_activities(
+            vapor_pressure_data=vapor_pressure_data,
+            temperature_C=1500.0,
+            pO2_bar=1.0,
+            melt_oxide_activities=activities,
+            composition_wt_pct=composition_wt_pct,
+        )
+        diagnostic_pressures.append(diagnostic["species"]["Mg"]["P_eq_Pa"])
 
     assert pressures[0] > pressures[1]
     assert pressures[0] != pytest.approx(pressures[1], rel=1e-10, abs=0)
+    assert diagnostic_pressures == pytest.approx(pressures, rel=1e-10, abs=0)
 
 
 @pytest.mark.parametrize(
