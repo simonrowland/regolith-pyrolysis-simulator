@@ -120,6 +120,14 @@ def test_out_of_range_iw_is_predicted_and_flagged_with_phase_boundary() -> None:
     assert "outside calibration range 833–1450 K" in decision.notice_band
 
 
+def test_iw_above_iron_melting_carries_both_phase_boundary_flags() -> None:
+    decision = _decision({"delta_IW": "+1.0"}, temperature_K=1812)
+
+    assert decision is not None and decision.state.is_value
+    assert "phase_boundary_extrapolation_above_1650_K_FeO_melting" in decision.notice_reason
+    assert "phase_boundary_extrapolation_above_1811_K_Fe_melting" in decision.notice_reason
+
+
 def test_ideal_ratio_definition_gets_the_named_notice() -> None:
     quoted_definition = "ΔIW = 2 log(x_FeO^sil / x_Fe^met)"
     assert _delta_iw_ideal_ratio_notice(quoted_definition) == (
