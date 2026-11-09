@@ -420,7 +420,7 @@ def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
     assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
 
 
-def test_jugo_sb5_uses_printed_frost_fmq_at_200_mpa() -> None:
+def test_jugo_sb5_uses_canonical_fmq_with_frost_pressure_correction() -> None:
     result = _migrated("jugo-2010-sulfur-xanes.yaml")
     matches = [
         observation
@@ -436,20 +436,25 @@ def test_jugo_sb5_uses_printed_frost_fmq_at_200_mpa() -> None:
     assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("200000000")
     oxygen = observation.identity.fO2_Pa
     assert oxygen is not None and oxygen.is_value
-    # Jugo et al. (2010), p. 5934, Eq. 6, defines ΔFMQ by subtracting the FMQ
-    # log fugacity at the run P–T. With the source's Frost (1991) calibration,
-    # the alpha-quartz branch is not used at 1323.15 K; beta-quartz gives
-    # the 1-bar base is 8.735 - 25096.3/T. Add [Frost(T,2000 bar) -
-    # Frost(T,1 bar)] = 0.110(2000-1)/T and the printed +2.7. Each pressure
-    # term is (K/bar)*bar/K; evaluating the printed coefficients gives this
-    # independent log literal, -7.365899369 log10(fO2/bar).
-    expected_log = Decimal("-7.365899369")
+    # O'Neill (1987) reaction (2) supplies the canonical 1-bar FMQ base at
+    # 1323.15 K. Frost's beta-quartz molar-volume term adds
+    # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex; the printed
+    # FMQ+2.7 then gives this independent nine-decimal log literal.
+    expected_log = Decimal("-7.491317884")
     assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
-    assert any(
-        "calibration=frost_1991_table_1" in notice.reason
-        and "pressure correction=Frost 1991 molar-volume ΔV term" in notice.reason
+    notices = [
+        notice.reason
         for notice in observation.notices
-    )
+        if notice.reason.startswith("buffer_relative_fO2_converted:")
+    ]
+    assert len(notices) == 1
+    reason = notices[0]
+    assert "offset_as_printed=FMQ+2.7" in reason
+    assert "calibration=oneill_1987_ammin_72_reaction2_emf" in reason
+    assert "band=±0.125419 dex" in reason
+    assert "band_basis=absolute canonical-to-Frost 1991 spread" in reason
+    assert "pressure=2000 bar" in reason
+    assert "pressure correction=Frost 1991 molar-volume ΔV term" in reason
 
 
 def test_mavrogenes_mav1_uses_pressure_delta_v_after_inheritance() -> None:

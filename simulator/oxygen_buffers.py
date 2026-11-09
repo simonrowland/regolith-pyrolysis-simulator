@@ -408,7 +408,8 @@ def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
     """Return absolute log10(fO2) of the Frost (1991) QFM buffer."""
     T_K = float(T_K)
     P_bar = float(P_bar)
-    # Jugo et al. (2010) defines deltaQFM against Frost (1991), not O'Neill.
+    # SulfSat passes this Frost QFM curve to PySulfSat's Jugo Eq. 10 helper;
+    # that adapter model is separate from canonical extract calibration.
     # Frost's log10(fO2) = A + B/T + C(P-1)/T, as reproduced by PySulfSat
     # 1.0.12 (s6_corrections.py:643-653): beta quartz uses A=8.735,
     # B=-25096.3 K, C=0.110 K/bar; alpha quartz uses A=10.344,
