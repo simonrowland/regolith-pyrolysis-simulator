@@ -6540,9 +6540,8 @@ def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
 
 
 def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
-    # The Antoine fallback projects endmember activities onto their oxide
-    # components, while the equilibrium/flux payload preserves the engine's
-    # original endmember namespace for provenance.
+    # Endmember activities do not define pure-oxide activities. The flux
+    # payload still preserves the engine's original namespace for provenance.
     from simulator.vapour_rail.batch import (
         FluxEligible,
         PressureValue,
@@ -6574,9 +6573,7 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         # callers thread it per the b-139 fix).
         pO2_bar=1.0e-9,
     )
-    assert projected_pressures['Na'] > 0.0
-    assert projected_pressures['Si'] > 0.0
-    assert projected_pressures['SiO'] > 0.0
+    assert projected_pressures == {}
 
     captured: dict[str, object] = {}
     na_answer = VapourAnswer(
