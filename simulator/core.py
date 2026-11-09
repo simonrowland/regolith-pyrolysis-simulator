@@ -8361,6 +8361,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             asking_site='core.native_fe_vapor_partition',
         )
         closure_record = {
+            'regime': (
+                'pressure_held'
+                if pressure_held_total_Pa is not None
+                else 'pumped'
+            ),
             'iterations': closure.iterations,
             'converged': closure.converged,
             'rates_kg_hr': dict(closure.rates_kg_hr),
@@ -16212,6 +16217,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 commit_release=False,
             )
             closure_record = {
+                'regime': 'pumped',
                 'iterations': bakeout_closure.iterations,
                 'converged': bakeout_closure.converged,
                 'rates_kg_hr': dict(bakeout_closure.rates_kg_hr),
@@ -16548,6 +16554,73 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar
         )
+        evaporation_diagnostic = dict(
+            getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
+        )
+        bakeout_diagnostic_for_headspace = dict(
+            getattr(self, '_last_subsolidus_bakeout', {}) or {}
+        )
+        native_fe_diagnostic = dict(
+            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
+        )
+        closure_diagnostic = (
+            evaporation_diagnostic.get('same_hour_headspace_closure')
+            or bakeout_diagnostic_for_headspace.get(
+                'same_hour_headspace_closure'
+            )
+            or native_fe_diagnostic.get('same_hour_headspace_closure')
+            or {}
+        )
+        source_diagnostics = (
+            evaporation_diagnostic,
+            bakeout_diagnostic_for_headspace,
+            native_fe_diagnostic,
+        )
+        species_physical_zeros = {}
+        closure_notices = []
+        closure_notice_kinds = {
+            'sweep_flow_unspecified',
+            'same_hour_headspace_closure_nonconvergence',
+            'same_hour_headspace_closure_not_applied',
+        }
+        for source_diagnostic in source_diagnostics:
+            physical_zeros = source_diagnostic.get('species_physical_zeros')
+            if isinstance(physical_zeros, Mapping):
+                species_physical_zeros.update({
+                    str(species): dict(notice)
+                    for species, notice in physical_zeros.items()
+                    if isinstance(notice, Mapping)
+                })
+            notices = source_diagnostic.get('notices')
+            if isinstance(notices, (list, tuple)):
+                for notice in notices:
+                    if (
+                        isinstance(notice, Mapping)
+                        and notice.get('kind') in closure_notice_kinds
+                        and dict(notice) not in closure_notices
+                    ):
+                        closure_notices.append(dict(notice))
+        sweep_bounds = evaporation_diagnostic.get(
+            'pressure_held_sweep_bounds', {}
+        )
+        snapshot.same_hour_headspace_diagnostics = {
+            'regime': str(closure_diagnostic.get('regime') or 'not_run'),
+            'closure': (
+                dict(closure_diagnostic)
+                if isinstance(closure_diagnostic, Mapping)
+                else {}
+            ),
+            'pressure_held_sweep_bounds': (
+                dict(sweep_bounds) if isinstance(sweep_bounds, Mapping) else {}
+            ),
+            'species_physical_zeros': species_physical_zeros,
+            'notices': closure_notices,
+            'iterations_by_consumer': dict(
+                self._same_hour_headspace_closure_iterations_by_hour.get(
+                    completed_hour, {}
+                )
+            ),
+        }
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic

@@ -903,6 +903,12 @@ def test_step_persists_the_selected_same_hour_source_map(
     assert snapshot.melt_headspace_composition_mbar == pytest.approx(
         expected_source_map_mbar
     )
+    hour_diagnostics = snapshot.same_hour_headspace_diagnostics
+    assert hour_diagnostics["closure"] == closure
+    assert hour_diagnostics["regime"] == closure["regime"]
+    assert hour_diagnostics["iterations_by_consumer"][
+        "ordinary_evaporation"
+    ] == closure["iterations"]
     if pressure_held:
         assert closure["partial_pressures_Pa"]
         assert all(
@@ -912,3 +918,10 @@ def test_step_persists_the_selected_same_hour_source_map(
         assert "lower_bound_partial_pressures_Pa" in diagnostic[
             "pressure_held_sweep_bounds"
         ]
+        assert hour_diagnostics["pressure_held_sweep_bounds"] == diagnostic[
+            "pressure_held_sweep_bounds"
+        ]
+        assert any(
+            notice["kind"] == "sweep_flow_unspecified"
+            for notice in hour_diagnostics["notices"]
+        )

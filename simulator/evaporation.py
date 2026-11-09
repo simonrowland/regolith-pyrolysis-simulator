@@ -1461,6 +1461,7 @@ class EvaporationMixin:
                     }
                     kernel_result = seed_result
                     closure_record = {
+                        'regime': 'pressure_held',
                         'iterations': lower_closure.iterations,
                         'converged': selected_bound_converged,
                         'rates_kg_hr': selected_rates,
@@ -1481,6 +1482,7 @@ class EvaporationMixin:
                     }
                     kernel_result = dispatch_at_partials(final_partials_Pa)
                     closure_record = {
+                        'regime': 'pumped',
                         'iterations': closure.iterations,
                         'converged': closure.converged,
                         'rates_kg_hr': dict(closure.rates_kg_hr),

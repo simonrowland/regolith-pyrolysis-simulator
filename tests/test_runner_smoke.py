@@ -736,6 +736,18 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
         evap_flux=SimpleNamespace(species_kg_hr={}),
         wall_deposit_by_segment_species_delta={},
         knudsen_regime_summary={},
+        same_hour_headspace_diagnostics={
+            "regime": "pressure_held",
+            "closure": {"converged": True, "iterations": 3},
+            "pressure_held_sweep_bounds": {
+                "selected_bound": "upper",
+                "upper_rates_kg_hr": {"Na": 2.0},
+                "lower_rates_kg_hr": {"Na": 0.0},
+            },
+            "species_physical_zeros": {"Fe": {"reason": "condensation_direction"}},
+            "notices": [{"kind": "sweep_flow_unspecified", "authority": "upper_bound"}],
+            "iterations_by_consumer": {"ordinary_evaporation": 3},
+        },
     )
 
     summary = build_per_hour_summary(
@@ -749,6 +761,9 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     assert summary["pO2_bar"] is None
     assert summary["mass_balance_pct"] is None
     assert summary["O2_yield_kg_cumulative"] is None
+    assert summary["same_hour_headspace_diagnostics"] == (
+        snapshot.same_hour_headspace_diagnostics
+    )
     json.dumps(summary, allow_nan=False)
 
 
@@ -1033,6 +1048,7 @@ PER_HOUR_KEYS = frozenset({
     "Kn",
     "regime",
     "transport_formula_id",
+    "same_hour_headspace_diagnostics",
 })
 PER_HOUR_OPTIONAL_KEYS = frozenset({
     "p_carrier_bar",
@@ -1520,7 +1536,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.9.0"
+    assert RUNNER_SCHEMA_VERSION == "1.10.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
@@ -1708,6 +1724,21 @@ def _assert_schema_shape(payload: dict) -> None:
         assert entry["Kn"] is None or isinstance(entry["Kn"], (int, float))
         assert isinstance(entry["regime"], str)
         assert entry["transport_formula_id"] == NOT_APPLICABLE_UNTIL_P0
+        headspace_diagnostics = entry["same_hour_headspace_diagnostics"]
+        assert set(headspace_diagnostics) == {
+            "regime",
+            "closure",
+            "pressure_held_sweep_bounds",
+            "species_physical_zeros",
+            "notices",
+            "iterations_by_consumer",
+        }
+        assert isinstance(headspace_diagnostics["regime"], str)
+        assert isinstance(headspace_diagnostics["closure"], dict)
+        assert isinstance(headspace_diagnostics["pressure_held_sweep_bounds"], dict)
+        assert isinstance(headspace_diagnostics["species_physical_zeros"], dict)
+        assert isinstance(headspace_diagnostics["notices"], list)
+        assert isinstance(headspace_diagnostics["iterations_by_consumer"], dict)
 
     assert isinstance(payload["shadow_trace"], list)
     for event in payload["shadow_trace"]:

@@ -157,7 +157,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.9.0"
+RUNNER_SCHEMA_VERSION = "1.10.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -2873,6 +2873,12 @@ def build_per_hour_summary(
         **_mre_uncertified_yield_observables(snapshot),
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
+        "same_hour_headspace_diagnostics": _json_safe(
+            dict(
+                getattr(snapshot, "same_hour_headspace_diagnostics", {})
+                or {}
+            )
+        ),
     }
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()

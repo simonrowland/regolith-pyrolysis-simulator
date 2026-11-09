@@ -6,7 +6,13 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.9.0`
+**Schema version:** `1.10.0`
+**Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.10.0 adds the required per-hour `same_hour_headspace_diagnostics`
+object. It carries the source closure regime and rates, pressure-held U/L
+bracket authority, physical-zero and sweep notices, and closure iteration
+counts by consumer.
 
 Schema 1.9.0 adds the unconditional top-level
 `vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
@@ -48,7 +54,8 @@ engine identity used for a computed C0 exit forecast (`internal-analytical`,
 `alphamelts`, `thermoengine`, or `cached-real`). Older run records without this
 nested field remain valid, and absence carries no meaning. This additive
 run-metadata field does not change the exact top-level runner envelope or the
-artifact envelope, so `RUNNER_SCHEMA_VERSION` remains `1.9.0` and
+artifact envelope, so that metadata addition left `RUNNER_SCHEMA_VERSION` at
+`1.9.0` and
 `ARTIFACT_SCHEMA_VERSION` remains `0.2.0`.
 
 Run the CLI as:
@@ -107,7 +114,7 @@ the in-process trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -295,7 +302,7 @@ omit it.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -756,6 +763,19 @@ mole, energy, pressure, or partition arithmetic.
     "Kn": 0.00035,                           // Knudsen number, or null
     "regime": "viscous",                    // named Knudsen regime, or ""
     "transport_formula_id": "not_applicable_until_p0",
+    "same_hour_headspace_diagnostics": {
+      "regime": "pressure_held",
+      "closure": {"converged": true, "rates_kg_hr": {"Na": 0.02}},
+      "pressure_held_sweep_bounds": {
+        "selected_bound": "upper",
+        "upper_rates_kg_hr": {"Na": 0.02},
+        "lower_rates_kg_hr": {"Na": 0.01},
+        "notices": [{"kind": "sweep_flow_unspecified", "authority": "upper_bound"}]
+      },
+      "species_physical_zeros": {},
+      "notices": [],
+      "iterations_by_consumer": {"ordinary_evaporation": 1}
+    },
     "redox_source_breakdown": {             // optional; present when melt redox source terms fired
       "terms_mol_o2_equiv_by_label": {
         "redox_source:c3_na_shuttle_reduction": -0.5
