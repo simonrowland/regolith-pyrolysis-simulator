@@ -27,7 +27,7 @@ benches:
       value: graphite-crucible chemical-equilibration apparatus in SiC resistance furnace
     locator: &id001
       published_page: 816
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: 3.2 Experimental method
   cell_material_and_liner:
     state:
@@ -46,7 +46,7 @@ benches:
         value: Pt-Pt13%Rh thermocouple beneath graphite crucible
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
   temperature_calibration:
     uncertainty:
@@ -55,7 +55,7 @@ benches:
         reason: not_published
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
         note: Set-temperature +/-0.5 C is control precision, not calibration uncertainty
   other_facts:
@@ -88,7 +88,7 @@ benches:
           bound_value: '0.5'
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
         note: Reaction-zone temperature controlled within set temperature +/-0.5 C
 experiments:
@@ -97,7 +97,7 @@ experiments:
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.40 at 1100 C
   sample:
@@ -107,7 +107,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -116,7 +116,7 @@ experiments:
         value: X_Na2O 0.40 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -125,7 +125,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -134,7 +134,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -143,7 +143,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -158,7 +158,7 @@ experiments:
             - '0.60'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.40 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -170,7 +170,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -179,7 +179,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -189,7 +189,7 @@ experiments:
         value: '1373.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1100 C; unit conversion only
   pressure_environment:
@@ -201,7 +201,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -217,7 +217,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -235,7 +235,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -247,7 +247,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -258,7 +258,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -267,14 +267,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p40-t1200
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.40 at 1200 C
   sample:
@@ -284,7 +284,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -293,7 +293,7 @@ experiments:
         value: X_Na2O 0.40 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -302,7 +302,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -311,7 +311,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -320,7 +320,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -335,7 +335,7 @@ experiments:
             - '0.60'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.40 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -347,7 +347,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -356,7 +356,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -366,7 +366,7 @@ experiments:
         value: '1473.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1200 C; unit conversion only
   pressure_environment:
@@ -378,7 +378,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -394,7 +394,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -412,7 +412,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -424,7 +424,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -435,7 +435,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -444,14 +444,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p40-t1300
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.40 at 1300 C
   sample:
@@ -461,7 +461,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -470,7 +470,7 @@ experiments:
         value: X_Na2O 0.40 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -479,7 +479,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -488,7 +488,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -497,7 +497,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -512,7 +512,7 @@ experiments:
             - '0.60'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.40 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -524,7 +524,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -533,7 +533,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -543,7 +543,7 @@ experiments:
         value: '1573.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1300 C; unit conversion only
   pressure_environment:
@@ -555,7 +555,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -571,7 +571,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -589,7 +589,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -601,7 +601,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -612,7 +612,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -621,14 +621,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p45-t1100
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.45 at 1100 C
   sample:
@@ -638,7 +638,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -647,7 +647,7 @@ experiments:
         value: X_Na2O 0.45 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -656,7 +656,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -665,7 +665,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -674,7 +674,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -689,7 +689,7 @@ experiments:
             - '0.55'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.45 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -701,7 +701,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -710,7 +710,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -720,7 +720,7 @@ experiments:
         value: '1373.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1100 C; unit conversion only
   pressure_environment:
@@ -732,7 +732,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -748,7 +748,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -766,7 +766,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -778,7 +778,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -789,7 +789,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -798,14 +798,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p45-t1200
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.45 at 1200 C
   sample:
@@ -815,7 +815,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -824,7 +824,7 @@ experiments:
         value: X_Na2O 0.45 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -833,7 +833,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -842,7 +842,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -851,7 +851,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -866,7 +866,7 @@ experiments:
             - '0.55'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.45 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -878,7 +878,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -887,7 +887,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -897,7 +897,7 @@ experiments:
         value: '1473.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1200 C; unit conversion only
   pressure_environment:
@@ -909,7 +909,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -925,7 +925,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -943,7 +943,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -955,7 +955,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -966,7 +966,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -975,14 +975,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p45-t1300
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.45 at 1300 C
   sample:
@@ -992,7 +992,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1001,7 +1001,7 @@ experiments:
         value: X_Na2O 0.45 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1010,7 +1010,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1019,7 +1019,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1028,7 +1028,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1043,7 +1043,7 @@ experiments:
             - '0.55'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.45 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1055,7 +1055,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1064,7 +1064,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1074,7 +1074,7 @@ experiments:
         value: '1573.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1300 C; unit conversion only
   pressure_environment:
@@ -1086,7 +1086,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1102,7 +1102,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -1120,7 +1120,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -1132,7 +1132,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -1143,7 +1143,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -1152,14 +1152,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p50-t1100
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.50 at 1100 C
   sample:
@@ -1169,7 +1169,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1178,7 +1178,7 @@ experiments:
         value: X_Na2O 0.50 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1187,7 +1187,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1196,7 +1196,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1205,7 +1205,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1220,7 +1220,7 @@ experiments:
             - '0.50'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.50 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1232,7 +1232,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1241,7 +1241,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1251,7 +1251,7 @@ experiments:
         value: '1373.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1100 C; unit conversion only
   pressure_environment:
@@ -1263,7 +1263,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1279,7 +1279,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -1297,7 +1297,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -1309,7 +1309,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -1320,7 +1320,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -1329,14 +1329,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p50-t1200
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.50 at 1200 C
   sample:
@@ -1346,7 +1346,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1355,7 +1355,7 @@ experiments:
         value: X_Na2O 0.50 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1364,7 +1364,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1373,7 +1373,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1382,7 +1382,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1397,7 +1397,7 @@ experiments:
             - '0.50'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.50 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1409,7 +1409,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1418,7 +1418,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1428,7 +1428,7 @@ experiments:
         value: '1473.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1200 C; unit conversion only
   pressure_environment:
@@ -1440,7 +1440,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1456,7 +1456,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -1474,7 +1474,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -1486,7 +1486,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -1497,7 +1497,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -1506,14 +1506,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p50-t1300
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.50 at 1300 C
   sample:
@@ -1523,7 +1523,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1532,7 +1532,7 @@ experiments:
         value: X_Na2O 0.50 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1541,7 +1541,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1550,7 +1550,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1559,7 +1559,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1574,7 +1574,7 @@ experiments:
             - '0.50'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.50 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1586,7 +1586,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1595,7 +1595,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1605,7 +1605,7 @@ experiments:
         value: '1573.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1300 C; unit conversion only
   pressure_environment:
@@ -1617,7 +1617,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1633,7 +1633,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -1651,7 +1651,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -1663,7 +1663,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -1674,7 +1674,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -1683,14 +1683,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p55-t1100
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.55 at 1100 C
   sample:
@@ -1700,7 +1700,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1709,7 +1709,7 @@ experiments:
         value: X_Na2O 0.55 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1718,7 +1718,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1727,7 +1727,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1736,7 +1736,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1751,7 +1751,7 @@ experiments:
             - '0.45'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.55 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1763,7 +1763,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1772,7 +1772,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1782,7 +1782,7 @@ experiments:
         value: '1373.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1100 C; unit conversion only
   pressure_environment:
@@ -1794,7 +1794,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1810,7 +1810,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -1828,7 +1828,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -1840,7 +1840,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -1851,7 +1851,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -1860,14 +1860,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p55-t1200
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.55 at 1200 C
   sample:
@@ -1877,7 +1877,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -1886,7 +1886,7 @@ experiments:
         value: X_Na2O 0.55 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1895,7 +1895,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -1904,7 +1904,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -1913,7 +1913,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -1928,7 +1928,7 @@ experiments:
             - '0.45'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.55 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -1940,7 +1940,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -1949,7 +1949,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -1959,7 +1959,7 @@ experiments:
         value: '1473.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1200 C; unit conversion only
   pressure_environment:
@@ -1971,7 +1971,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -1987,7 +1987,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -2005,7 +2005,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -2017,7 +2017,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -2028,7 +2028,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -2037,14 +2037,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-xna2o-0p55-t1300
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     note: Table 2 charge X_Na2O=0.55 at 1300 C
   sample:
@@ -2054,7 +2054,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Multiple coexisting charge masses are printed; no single sample mass applies
     printed_composition:
@@ -2063,7 +2063,7 @@ experiments:
         value: X_Na2O 0.55 Na2O-SiO2 melt
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -2072,7 +2072,7 @@ experiments:
         value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
     characterization:
       state:
@@ -2081,7 +2081,7 @@ experiments:
           carbon by combustion CO2 infrared absorption
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     pretreatment:
       state:
@@ -2090,7 +2090,7 @@ experiments:
           alloys prepared in graphite crucibles
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.3 Samples
     initial_composition:
       state:
@@ -2105,7 +2105,7 @@ experiments:
             - '0.45'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         table: '2'
         note: X_Na2O=0.55 as Table 2 column (printed spelling); SiO2=1-X_Na2O complement for the binary
           melt; not renormalised
@@ -2117,7 +2117,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: Gas-blowing hole is not an effusion orifice
       orifice_channel_length_m:
@@ -2126,7 +2126,7 @@ experiments:
           reason: not_applicable
         locator:
           published_page: 816
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: 3.2 Experimental method
           note: No effusion channel
   conditions:
@@ -2136,7 +2136,7 @@ experiments:
         value: '1573.15'
       locator:
         published_page: 821
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '7'
         note: Figure 7 isotherm at 1300 C; unit conversion only
   pressure_environment:
@@ -2148,7 +2148,7 @@ experiments:
           point: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Experimental principle / synopsis
         note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
     sweep_gas:
@@ -2164,7 +2164,7 @@ experiments:
             value: '101325'
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle
         note: Na2O activity series in graphite under CO; printed P_CO = 1 atm, converted to Pa.
           CO/Ar dilution in section 3.2 belongs to the separate Na-in-Pb calibration.
@@ -2182,7 +2182,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 2. Experimental principle / synopsis
         note: 'Graphite crucible under one atmosphere of carbon monoxide (synopsis: graphite crucible,
           CO 1 atm; p.816 「CO 分圧は 1 atm」). Token C-CO selects the graphite/C–CO oxygen_condition derivation;
@@ -2194,7 +2194,7 @@ experiments:
         value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
     total_duration_s:
       state:
@@ -2205,7 +2205,7 @@ experiments:
           interval_high: '7200'
       locator:
         published_page: 819
-        pdf_page_index: 5
+        pdf_page_index: 4
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
     cooling_or_quench:
@@ -2214,14 +2214,14 @@ experiments:
         value: Ar quench
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: 3.2 Experimental method
 - experiment_id: na2o-sio2-table1-xna2o-0p50-t1200
   bench_id: ts-graphite-co-equilibration
   method: melt_equilibration_quench
   locator:
     published_page: 817
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '1'
     note: Na2O.SiO2 calibration at 1200 C; source of the SiO2 integration anchor on p.821.
   sample:
@@ -2231,7 +2231,7 @@ experiments:
         value: Na2O.SiO2
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
     form:
       state:
@@ -2239,7 +2239,7 @@ experiments:
         value: Na2O-SiO2 melt equilibrated with Pb-Na alloy and carbon-saturated iron
       locator:
         published_page: 816
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: 3.1 Experimental principle
     initial_composition:
       state:
@@ -2254,7 +2254,7 @@ experiments:
             - '0.50'
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
         note: Printed Na2O.SiO2 specimen; equal oxide mole fractions from its stoichiometry.
   conditions:
@@ -2264,7 +2264,7 @@ experiments:
         value: '1473.15'
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
         note: 1200 C converted to K.
   pressure_environment:
@@ -2274,7 +2274,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
         note: Table 1 prints CO partial pressure, not total pressure.
     sweep_gas:
@@ -2310,7 +2310,7 @@ experiments:
               reason: not_published
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
         section: 3.2 Experimental method
         note: Na2O.SiO2 at 1200 C has printed P_CO = 0.1 atm, converted to Pa.
@@ -2329,7 +2329,7 @@ experiments:
         value: C-CO
       locator:
         published_page: 817
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '1'
         figure: '1'
         note: Graphite crucible with CO-Ar calibration atmosphere; numeric fO2 remains derived.
@@ -2521,7 +2521,7 @@ species:
       type: activity_coefficient
       locator:
         page: 2
-        published_page: 815
+        published_page: 816
         pdf_page_index: 1
         paragraph: English Synopsis + Japanese 結言 (2)
         note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table
@@ -3455,7 +3455,7 @@ species:
       type: activity_coefficient
       locator:
         page: 4
-        published_page: 817
+        published_page: 818
         pdf_page_index: 3
         table: '1'
         note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4).
