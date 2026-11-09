@@ -86,6 +86,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     backend_name = 'thermoengine'
     real_backend_family = RealBackendFamily.THERMOENGINE
     supports_intrinsic_fO2 = True
+    supplied_vapor_activity_basis = None
 
     def __init__(self) -> None:
         super().__init__()

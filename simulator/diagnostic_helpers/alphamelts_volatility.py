@@ -346,10 +346,11 @@ def _analytical_vapor_pressures_from_activities(
     )
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
         MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
         _alphamelts_vapor_activity_on_k_basis,
         _builtin_vapor_activities_from_weight_composition,
-        _select_alphamelts_vapor_activity,
+        _select_melt_backend_vapor_activity,
     )
     builtin_vapor_activities = (
         _builtin_vapor_activities_from_weight_composition(
@@ -366,8 +367,8 @@ def _analytical_vapor_pressures_from_activities(
     def selected_activity(species: str, parent_oxide: str) -> float | None:
         explicit_activity = activities.get(parent_oxide)
         builtin_activity = builtin_vapor_activities.get(parent_oxide)
-        selected_vapor_activity, explicit_activity_selected = (
-            _select_alphamelts_vapor_activity(
+        selected_vapor_activity, activity_selection = (
+            _select_melt_backend_vapor_activity(
                 parent_oxide,
                 explicit_activity,
                 (
@@ -375,9 +376,16 @@ def _analytical_vapor_pressures_from_activities(
                     if builtin_activity is not None
                     else None
                 ),
+                supplied_activity_basis=(
+                    MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+                ),
+                legacy_projected_activity=None,
             )
         )
-        if explicit_activity_selected and selected_vapor_activity is not None:
+        if (
+            activity_selection == "supplied_liquid"
+            and selected_vapor_activity is not None
+        ):
             alpha_activity = _alphamelts_vapor_activity_on_k_basis(
                 parent_oxide,
                 selected_vapor_activity,

@@ -71,6 +71,9 @@ from simulator.config import (
     resolve_alphamelts_python_api_model,
     resolve_alphamelts_subprocess_model,
 )
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
+)
 from simulator.melt_backend.base import (
     EquilibriumResult,
     FO2_GAS_ONLY_NOTICE,
@@ -1197,6 +1200,7 @@ class _MELTSBackendSupport(MeltBackend):
     """
 
     backend_name = 'alphamelts'
+    supplied_vapor_activity_basis: str | None
 
     def __init__(self, *, model_name: str = DEFAULT_ALPHAMELTS_MODEL):
         self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
@@ -6720,11 +6724,10 @@ class _MELTSBackendSupport(MeltBackend):
             validate_physical_pO2_bar, _pO2_evaluation_notice,
         )
         from simulator.chemistry.melt_activity import (
-            MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
             _alphamelts_vapor_activity_on_k_basis,
-            _select_alphamelts_vapor_activity,
+            _select_melt_backend_vapor_activity,
         )
         explicit_oxide_activities, _ = _canonical_oxide_activity_map_with_notices(
             activities
@@ -6751,8 +6754,8 @@ class _MELTSBackendSupport(MeltBackend):
             )
             raw_activity = self._activity_for_vapor_species(species, activities)
             explicit_oxide_activity = explicit_oxide_activities.get(parent_oxide)
-            selected_activity, explicit_activity_selected = (
-                _select_alphamelts_vapor_activity(
+            selected_activity, activity_selection = (
+                _select_melt_backend_vapor_activity(
                     parent_oxide,
                     explicit_oxide_activity if uses_reaction_pressure else None,
                     (
@@ -6760,11 +6763,15 @@ class _MELTSBackendSupport(MeltBackend):
                         if builtin_vapor_activity is not None
                         else None
                     ),
+                    supplied_activity_basis=(
+                        self.supplied_vapor_activity_basis
+                    ),
+                    legacy_projected_activity=raw_activity,
                 )
             )
             selected_vapor_activity = None
             if (
-                explicit_activity_selected
+                activity_selection == "supplied_liquid"
                 and selected_activity is not None
             ):
                 selected_vapor_activity = _alphamelts_vapor_activity_on_k_basis(
@@ -6776,14 +6783,15 @@ class _MELTSBackendSupport(MeltBackend):
                     ),
                 )
             elif (
-                builtin_vapor_activity is not None
+                activity_selection == "composition_projection"
+                and builtin_vapor_activity is not None
                 and selected_activity is not None
             ):
                 selected_vapor_activity = builtin_vapor_activity
             if selected_vapor_activity is not None:
                 raw_activity = float(selected_vapor_activity.activity)
                 notice = dict(selected_vapor_activity.notice)
-                if explicit_activity_selected:
+                if activity_selection == "supplied_liquid":
                     notice['parent_oxide'] = parent_oxide
                 else:
                     relation_reason = notice.get("reason")
@@ -7063,3 +7071,4 @@ class AlphaMELTSBackend(_MELTSBackendSupport, RealBackendAuthority):
 
     backend_name = 'alphamelts'
     real_backend_family = RealBackendFamily.ALPHAMELTS
+    supplied_vapor_activity_basis = MELT_OXIDE_ACTIVITY_REFERENCE_STATE

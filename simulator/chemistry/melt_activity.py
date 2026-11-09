@@ -13,7 +13,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from simulator.reference_data.janaf_fusion import (
     FusionDomainVerdict,
@@ -669,23 +669,41 @@ class _BuiltinVaporActivity:
     source_activity_diagnostic: dict[str, object] | None = None
 
 
-def _select_alphamelts_vapor_activity(
+_VaporActivitySelection = Literal[
+    "supplied_liquid",
+    "legacy_projection",
+    "composition_projection",
+]
+
+
+def _select_melt_backend_vapor_activity(
     parent_oxide: str,
     supplied_oxide_activity: float | None,
     projected_vapor_activity: float | None,
-) -> tuple[float | None, bool]:
-    """Select supplied canonical activity before the composition projection.
+    *,
+    supplied_activity_basis: str | None,
+    legacy_projected_activity: float | None,
+) -> tuple[float | None, _VaporActivitySelection]:
+    """Select the vapor activity using the backend's declared activity basis.
 
-    The boolean marks a supplied liquid activity that still needs conversion
-    onto its vapor K standard state.
+    AlphaMELTS reports canonical liquid oxide activities that this module
+    converts once to the vapor K standard state. A backend without that
+    declared basis retains its existing endmember-to-parent projection; that
+    proxy is not relabeled or converted as a pure parent-oxide activity.
     """
-    if (
-        parent_oxide in {"CaO", "MgO", "FeO"}
-        and supplied_oxide_activity is not None
-        and supplied_oxide_activity > 0.0
-    ):
-        return float(supplied_oxide_activity), True
-    return projected_vapor_activity, False
+    if parent_oxide in {"CaO", "MgO", "FeO"}:
+        if (
+            supplied_activity_basis == MELT_OXIDE_ACTIVITY_REFERENCE_STATE
+            and supplied_oxide_activity is not None
+            and supplied_oxide_activity > 0.0
+        ):
+            return float(supplied_oxide_activity), "supplied_liquid"
+        if (
+            supplied_activity_basis is None
+            and legacy_projected_activity is not None
+        ):
+            return float(legacy_projected_activity), "legacy_projection"
+    return projected_vapor_activity, "composition_projection"
 
 
 def _alphamelts_vapor_activity_on_k_basis(
