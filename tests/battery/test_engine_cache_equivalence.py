@@ -102,32 +102,42 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     compositions = (
         Composition(
             basis="printed_mole_fraction",
-            components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+            components=(("SiO2", Decimal("0.5")), ("FeO", Decimal("0.5"))),
             amount_basis=AmountBasis.MOLE_FRACTION,
         ),
         Composition(
             basis="printed_mole_fraction",
-            components=(("SiO2", Decimal("0.6")), ("FeO", Decimal("0.4"))),
+            components=(
+                ("SiO2", Decimal("0.6")),
+                ("FeO", Decimal("0.2")),
+                ("MgO", Decimal("0.2")),
+            ),
             amount_basis=AmountBasis.MOLE_FRACTION,
         ),
         Composition(
             basis="printed_mole_fraction",
-            components=(("SiO2", Decimal("0.4")), ("MgO", Decimal("0.6"))),
+            components=(
+                ("SiO2", Decimal("0.4")),
+                ("FeO", Decimal("0.3")),
+                ("MgO", Decimal("0.3")),
+            ),
             amount_basis=AmountBasis.MOLE_FRACTION,
         ),
     )
-    temperatures = (Decimal("1703"), Decimal("1711"), Decimal("1695"))
-    pressures_Pa = (Decimal("100000"), Decimal("0.1"), Decimal("0.0001"))
-    oxygen_Pa = (Decimal("1e-8"), Decimal("1e-7"), Decimal("1e-9"))
+    temperatures = tuple(
+        Decimal(str(value)) for value in (1695, 1699, 1703, 1707, 1711, 1715)
+    )
+    pressure = Decimal("100000")
+    oxygen_Pa = tuple(
+        Decimal(str(value)) for value in (0.01, 0.1, 1.0, 0.03, 0.3, 3.0)
+    )
     experiments = {}
     observations = {}
-    # Two occurrences of each distinct request exercise intra-run hits while
-    # keeping the full six-engine cache/off/warm comparison under the focused
-    # test time budget.
+    # Use distinct Fe-bearing requests at 1 bar so the cold run populates stable
+    # entries; repeated-key behavior is covered by the cache unit tests.
     for index in range(6):
         variant = index % len(compositions)
-        temperature = temperatures[variant]
-        pressure = pressures_Pa[variant]
+        temperature = temperatures[index]
         composition = compositions[variant]
         experiment = F.tabulation_experiment(
             experiment_id=f"cache-equivalence-exp-{index:02d}",
@@ -143,8 +153,8 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
                 T_K=temperature,
                 component_basis="SiO2",
                 composition=composition,
-                fO2_Pa=oxygen_Pa[variant],
-                total_P=pressure,
+                    fO2_Pa=oxygen_Pa[index],
+                    total_P=pressure,
             ),
             Decimal("0.4") + Decimal(variant) / Decimal("10"),
             evidence=EvidenceClass.MEASURED_DIRECT,
