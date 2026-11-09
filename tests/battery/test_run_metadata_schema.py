@@ -138,6 +138,82 @@ def test_equipment_sample_metadata_round_trips_with_locators(
     assert species_loss["Na"].locator == Locator(table="2", page=3)
 
 
+def test_top_level_equipment_sample_metadata_round_trips_with_locators(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "final_mass_kg": {
+            "value": 0.0008,
+            "locator": {"table": "1", "page": 2},
+        },
+        "species_loss_fraction": {
+            "value": {"Na": 0.25},
+            "locator": {"table": "2", "page": 3},
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+
+    migrate(root, write=True)
+    _works, experiments, observations = load_migrated_store(root)
+    observation = next(iter(observations.values()))
+    experiment = experiments[observation.experiment_id]
+
+    final_mass = experiment.sample.final_mass_kg
+    assert final_mass is not None and final_mass.state.is_value
+    assert final_mass.state.value == Value.point_of("0.0008")
+    assert final_mass.locator == Locator(table="1", page=2)
+    species_loss = experiment.sample.species_loss_fraction
+    assert species_loss is not None and species_loss["Na"].state.is_value
+    assert species_loss["Na"].state.value == Value.point_of("0.25")
+    assert species_loss["Na"].locator == Locator(table="2", page=3)
+
+
+def test_equipment_sample_metadata_conflicts_are_typed_validation_errors(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "final_mass_kg": {
+            "value": 0.0008,
+            "locator": {"table": "1", "page": 2},
+        },
+        "species_loss_fraction": {
+            "value": {"Na": 0.25},
+            "locator": {"table": "2", "page": 3},
+        },
+        "sample": {
+            "final_mass_kg": {
+                "value": 0.0009,
+                "locator": {"table": "3", "page": 4},
+            },
+            "species_loss_fraction": {
+                "Na": {
+                    "value": 0.5,
+                    "locator": {"table": "4", "page": 5},
+                },
+            },
+        },
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert result.validation is not None
+    issues = result.validation.issues
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.final_mass_kg")
+        and "conflicting equipment values" in issue.detail
+        for issue in issues
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.species_loss_fraction[Na]")
+        and "conflicting equipment values" in issue.detail
+        for issue in issues
+    )
+
+
 def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
     tmp_path: Path,
 ) -> None:
