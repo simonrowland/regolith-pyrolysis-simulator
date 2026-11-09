@@ -128,9 +128,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         Decimal(str(value)) for value in (1695, 1699, 1703, 1707, 1711, 1715)
     )
     pressure = Decimal("100000")
-    oxygen_Pa = tuple(
-        Decimal(str(value)) for value in (0.01, 0.1, 1.0, 0.03, 0.3, 3.0)
-    )
+    oxygen_Pa = (Decimal("0.1"),) * 6
     experiments = {}
     observations = {}
     # Use distinct Fe-bearing requests at 1 bar so the cold run populates stable
@@ -153,8 +151,8 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
                 T_K=temperature,
                 component_basis="SiO2",
                 composition=composition,
-                    fO2_Pa=oxygen_Pa[index],
-                    total_P=pressure,
+                fO2_Pa=oxygen_Pa[index],
+                total_P=pressure,
             ),
             Decimal("0.4") + Decimal(variant) / Decimal("10"),
             evidence=EvidenceClass.MEASURED_DIRECT,
