@@ -318,7 +318,7 @@ diagnostic, and vapour-pressure authority stays with the built-in model. See
 
 `install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
 pinned source engines. Our [engine patches](patches/README.md) are applied on top with
-`scripts/enginepatch.sh apply`.
+`patches/scripts/enginepatch.sh apply`.
 
 ## Model Status
 
