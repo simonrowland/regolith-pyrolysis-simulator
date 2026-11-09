@@ -1653,8 +1653,7 @@ def test_fingerprint_panels_leave_sparse_cells_blank(
 
     monkeypatch.setattr(plotter, "_draw_hero_sweet_spot", capture_limits)
     files = render_hero_charts(data, tmp_path / "sweet-spot-render")
-    assert len(rendered_limits) == 2
-    assert rendered_limits[0] == rendered_limits[1]
+    assert rendered_limits == [((0.0, 1.0), data.x_limits)]
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "fingerprint fill uses median |dex| traffic-light bands" in svg
     assert "n&lt;3 cells are blank" in svg
