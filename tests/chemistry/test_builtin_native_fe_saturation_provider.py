@@ -349,6 +349,24 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         0.5 * partition["native_fe_vapor_mol"], abs=1e-9
     )
     if feedstock_id == "lunar_mare_low_ti":
+        bound = next(
+            (
+                notice for notice in partition.get("notices") or []
+                if notice.get("kind") == "unclosed_vacuum_hkl_upper_bound"
+            ),
+            None,
+        )
+        closure = partition.get("same_hour_headspace_closure") or {}
+        assert partition["native_fe_vapor_mol"] == pytest.approx(0.0)
+        assert partition["P_bulk_Pa"] > 0.0
+        assert partition["reason"] == "viscous_p_bulk_transport_out_of_domain"
+        assert bound is not None
+        assert bound["upper_bound_kg_hr"] == pytest.approx(
+            golden["native_vapor_Fe_kg"],
+            abs=1e-9,
+        )
+        assert bound["authority"] == "unclosed_upper_bound"
+        assert closure["converged"] is True
         accounts = {
             account: sim.atom_ledger.kg_by_account(account)
             for account in (
@@ -362,8 +380,10 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
             float(species_kg.get("Fe", 0.0) or 0.0)
             for species_kg in accounts.values()
         )
-        assert routed_fe_kg == pytest.approx(
-            golden["native_vapor_Fe_kg"],
-            abs=1e-9,
+        # The old 0.168 kg pin is the labelled HKL upper bound above.
+        # The solved vacuum command is transitional, so the ledger commits none.
+        assert routed_fe_kg == pytest.approx(0.0, abs=1e-12)
+        assert sim.train.stages[1].collected_kg.get("Fe", 0.0) == pytest.approx(
+            0.0,
+            abs=1e-12,
         )
-        assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
