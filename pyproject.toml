@@ -89,11 +89,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-# `_attic/` holds backends removed from the live tree but preserved for
-# later re-integration. Its tests are NOT collected: they
-# require the backend to be wired into the live code. `testpaths` already
-# scopes default collection to `tests/`; `norecursedirs` additionally
-# blocks `_attic` if someone runs `pytest .` or `pytest _attic` directly.
+# `_attic/` is a local, gitignored archive; `norecursedirs` keeps pytest out of it.
 norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
 # Parallelize across cores via pytest-xdist + bound per-test wall time via
 # pytest-timeout. The 1800 s wall guard is six times the default 300 s
