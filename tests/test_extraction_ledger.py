@@ -325,6 +325,121 @@ def test_c5_fallback_voltage_commit_is_flagged_without_changing_amount():
     assert notice["authority"] == "fallback_heuristic"
 
 
+def test_successful_baseline_fallback_notice_survives_runner_and_web_summaries():
+    sim = _sim(
+        {
+            "feo": {
+                "label": "FeO",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        }
+    )
+    sim.load_batch("feo", mass_kg=1000.0)
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1600.0
+    sim._mre_voltage_sequence = [{
+        "voltage": 3.0,
+        "species": ["FeO"],
+        "min_hold_hours": 0,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        sim._step_mre()
+
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    assert summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert _per_hour_summary_entry(summary)[
+        "mre_ellingham_ladder_diagnostic"
+    ] == diagnostic
+    assert any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in diagnostic["notices"]
+    )
+
+
+def test_successful_reproduction_fallback_notice_survives_runner_and_web_summaries(
+    monkeypatch,
+):
+    from tests.mre_reproduction_fixtures import synthetic_program
+    from simulator.mre_reproduction import run_mre_reproduction
+
+    bundle = load_config_bundle()
+    feedstocks = dict(bundle.feedstocks)
+    feedstocks["pure_feo_notice_test"] = {
+        "label": "Pure FeO notice test",
+        "composition_wt_pct": {"FeO": 100.0},
+    }
+    program = synthetic_program("one_hour", max_interval_min=60.0)
+    program = replace(
+        program,
+        feedstock_id="pure_feo_notice_test",
+        mass_kg=1000.0,
+        current_program={**program.current_program, "current_A": 100.0},
+        voltage_program=tuple(
+            {**point, "voltage_V": 3.0}
+            for point in program.voltage_program
+        ),
+        gas_boundary={
+            **program.gas_boundary,
+            "runtime_inlet_pO2_bar": 1e-6,
+        },
+    )
+    executed = []
+    original_execute = PyrolysisSimulator._execute_mre_interval
+
+    def capture_execution(self, control, **kwargs):
+        outcome = original_execute(self, control, **kwargs)
+        executed.append((self, outcome))
+        return outcome
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_execute_mre_interval",
+        capture_execution,
+    )
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        result = run_mre_reproduction(
+            program,
+            feedstocks=feedstocks,
+            setpoints=bundle.setpoints,
+            vapor_pressures=bundle.vapor_pressures,
+            materials=bundle.materials,
+            backend_name="internal-analytical",
+        )
+
+    assert result["status"] == "ok"
+    assert executed
+    sim, outcome = executed[-1]
+    diagnostic = outcome["diagnostic"]["mre_ellingham_ladder_diagnostic"]
+    interval_diagnostic = result["mre_reproduction"]["intervals"][-1][
+        "mre_ellingham_ladder_diagnostic"
+    ]
+    assert interval_diagnostic == diagnostic
+
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    assert summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert _per_hour_summary_entry(summary)[
+        "mre_ellingham_ladder_diagnostic"
+    ] == diagnostic
+    assert any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in diagnostic["notices"]
+    )
+
+
 def _assert_product_matches_account(sim, account, species):
     account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
     assert account_kg > 0.0
