@@ -930,7 +930,15 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
     projected_future_loss_kg = feed_alkali_kg * budget_fraction * 0.2
 
-    def project_fixed_future_loss(_flux, *, dt_hr=1.0):
+    # Closure admission calls this with the default hour omitted. That
+    # vector must stay the real parent-limited flux: injecting only Na
+    # makes the solver index a molar mass it does not have (KeyError 'Na').
+    # The forecast integration is the caller that passes the hold explicitly.
+    original_depletion = sim._apply_analytic_evaporation_depletion
+
+    def project_fixed_future_loss(_flux, *, dt_hr=None):
+        if dt_hr is None:
+            return original_depletion(_flux)
         if dt_hr <= 0.0:
             return EvaporationFlux()
         integrated = EvaporationFlux(
@@ -1029,8 +1037,14 @@ def test_c0_zero_window_projects_no_future_alkali_loss(monkeypatch):
     sim.melt.temperature_C = float(round(sim.melt.temperature_C))
     current_temperature_C = sim.melt.temperature_C
     calls = []
+    # Same-hour admission depletes inside evaporation with the default
+    # hour omitted. A zero forecast window must not add a hold integration,
+    # so only an explicit dt_hr is a future-loss projection.
+    original_depletion = sim._apply_analytic_evaporation_depletion
 
-    def record_depletion_call(_flux, *, dt_hr=1.0):
+    def record_depletion_call(_flux, *, dt_hr=None):
+        if dt_hr is None:
+            return original_depletion(_flux)
         calls.append(dt_hr)
         return EvaporationFlux()
 
