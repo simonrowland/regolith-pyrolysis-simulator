@@ -951,6 +951,7 @@ def test_fingerprint_cell_gap_is_two_export_pixels(
             "sio2_lower": "0.0",
             "sio2_upper": "0.05",
             "n": "3",
+            "color_eligible": "True",
             "median_abs_dex": "0.2",
             "colour": "#1a9641",
         },
@@ -962,6 +963,7 @@ def test_fingerprint_cell_gap_is_two_export_pixels(
             "sio2_lower": "0.05",
             "sio2_upper": "0.1",
             "n": "3",
+            "color_eligible": "True",
             "median_abs_dex": "0.2",
             "colour": "#1a9641",
         },
@@ -1698,6 +1700,7 @@ def test_hero_chart_header_legends_and_panel_titles_do_not_overlap(
             "sio2_lower": "0.0",
             "sio2_upper": "0.05",
             "n": "3",
+            "color_eligible": "True",
             "median_abs_dex": "0.2",
             "colour": "#1a9641",
         }

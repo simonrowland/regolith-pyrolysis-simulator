@@ -507,6 +507,13 @@ def _finite_float(value: object) -> float | None:
     return parsed if math.isfinite(parsed) else None
 
 
+def _fingerprint_cell_is_color_eligible(cell: Mapping[str, object]) -> bool:
+    """Read the scorer's fingerprint eligibility flag from raw or CSV rows."""
+
+    value = cell.get("color_eligible")
+    return value is True or (isinstance(value, str) and value.casefold() == "true")
+
+
 def _decimal_key(value: object) -> str | None:
     try:
         parsed = Decimal(str(value))
@@ -3095,8 +3102,7 @@ def _draw_hero_sweet_spot(
             continue
         assert x_low is not None and x_high is not None
         assert y_low is not None and y_high is not None
-        count = int(cell.get("n") or 0)
-        if count < 3:
+        if not _fingerprint_cell_is_color_eligible(cell):
             continue
         value = _finite_float(cell.get("median_abs_dex"))
         if value is None:
@@ -3972,6 +3978,7 @@ _COLLECTION_TABLE_FIELDS = {
         "rail", "engine", "temperature_lower_K", "temperature_upper_K",
         "sio2_lower", "sio2_upper", "n", "sum_residual_dex",
         "sum_squared_residual_dex", "median_abs_dex", "band", "colour",
+        "color_eligible",
     ),
     "window_unknown": (
         "rail", "engine", "temperature_lower_K", "temperature_upper_K",
@@ -5376,6 +5383,7 @@ def _write_collection_html(
                 row.get("median_abs_dex", ""),
                 band_code,
                 sio2_unknown,
+                _fingerprint_cell_is_color_eligible(row),
             ]
 
         cell_payload = {
@@ -5480,7 +5488,7 @@ function plotError(){
 }
 function plotMap(){
   const rail=railSelect.value,engine=engineSelect.value,[tlo,thi,slo,shi]=windowValues(),railCells=cells.filter(c=>!c[9]&&cellData.rails[c[0]]===rail&&cellData.engines[c[1]]===engine),plottedCells=[];
-  if(enabled(engine))for(const cell of railCells){if(cell[4]<3||!cell[8])continue;const xl=Math.max(slo,cell[3]*SIO2_BIN_WIDTH),xh=Math.min(shi,(cell[3]+1)*SIO2_BIN_WIDTH),yl=Math.max(tlo,cell[2]*TEMPERATURE_BIN_K),yh=Math.min(thi,(cell[2]+1)*TEMPERATURE_BIN_K);if(xh<=xl||yh<=yl)continue;plottedCells.push({cell,xl,xh,yl,yh});}
+  if(enabled(engine))for(const cell of railCells){if(!cell[10]||!cell[8])continue;const xl=Math.max(slo,cell[3]*SIO2_BIN_WIDTH),xh=Math.min(shi,(cell[3]+1)*SIO2_BIN_WIDTH),yl=Math.max(tlo,cell[2]*TEMPERATURE_BIN_K),yh=Math.min(thi,(cell[2]+1)*TEMPERATURE_BIN_K);if(xh<=xl||yh<=yl)continue;plottedCells.push({cell,xl,xh,yl,yh});}
   if(!plottedCells.length){setPlotUnavailable(mapCanvas,mapEmpty,'No fingerprint cells for '+engine+' on '+rail+' in this application window.');return;}
   setPlotUnavailable(mapCanvas,mapEmpty,'');
   const {ctx,w,h}=size(mapCanvas),m={l:54,r:14,t:18,b:36},pw=w-m.l-m.r,ph=h-m.t-m.b;let lo=Infinity,hi=-Infinity;
@@ -5494,7 +5502,7 @@ function showTip(event,kind){
   if(kind==='map'){
     const [tlo,thi,slo,shi]=windowValues(),sx=slo+(mx-p.m.l)/p.pw*(shi-slo),temp=p.hi-(my-p.m.t)/p.ph*(p.hi-p.lo);
     if(!enabled(p.engine)){tip.style.display='none';return;}
-    cell=cells.find(c=>!c[9]&&cellData.rails[c[0]]===p.rail&&cellData.engines[c[1]]===p.engine&&c[4]>=3&&sx>=c[3]*SIO2_BIN_WIDTH&&sx<(c[3]+1)*SIO2_BIN_WIDTH&&temp>=c[2]*TEMPERATURE_BIN_K&&temp<(c[2]+1)*TEMPERATURE_BIN_K&&(c[2]*TEMPERATURE_BIN_K)<thi&&((c[2]+1)*TEMPERATURE_BIN_K)>tlo);
+    cell=cells.find(c=>!c[9]&&c[10]&&cellData.rails[c[0]]===p.rail&&cellData.engines[c[1]]===p.engine&&sx>=c[3]*SIO2_BIN_WIDTH&&sx<(c[3]+1)*SIO2_BIN_WIDTH&&temp>=c[2]*TEMPERATURE_BIN_K&&temp<(c[2]+1)*TEMPERATURE_BIN_K&&(c[2]*TEMPERATURE_BIN_K)<thi&&((c[2]+1)*TEMPERATURE_BIN_K)>tlo);
     if(cell)row=rows.find(r=>r.rail===p.rail&&r.engine===p.engine&&r.sio2!=null&&+r.sio2>=cell[3]*SIO2_BIN_WIDTH&&+r.sio2<(cell[3]+1)*SIO2_BIN_WIDTH&&+r.temperature_K>=cell[2]*TEMPERATURE_BIN_K&&+r.temperature_K<(cell[2]+1)*TEMPERATURE_BIN_K&&inWindow(r));
   }else{
     for(const r of rows){if(r.rail!==p.rail||!enabled(r.engine)||!inWindow(r))continue;const dx=p.x(+r.temperature_K)-mx,dy=p.y(+r.residual_dex)-my,d=dx*dx+dy*dy;if(d<best){best=d;row=r;}}
@@ -5900,9 +5908,10 @@ def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
             if count == 0:
                 continue
             value = cell.get("median_abs_dex")
+            color_eligible = _fingerprint_cell_is_color_eligible(cell)
             band = (
                 _battery_hero_fingerprint_band(value)
-                if count >= 3 and value is not None
+                if color_eligible and value is not None
                 else ""
             )
             colour = FINGERPRINT_COLOURS.get(band, "")
@@ -5922,6 +5931,7 @@ def _fingerprint_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
                     "median_abs_dex": value,
                     "band": band,
                     "colour": colour,
+                    "color_eligible": color_eligible,
                 }
             )
     return rows
