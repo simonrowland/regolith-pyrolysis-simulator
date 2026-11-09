@@ -246,7 +246,7 @@ def test_run_metadata_fields_outside_declared_homes_are_typed_errors(
     ), errors
 
 
-def test_run_metadata_equipment_home_in_context_is_valid() -> None:
+def test_run_metadata_equipment_home_in_context_is_rejected() -> None:
     doc = _document()
     doc["species"]["Fe"]["context"] = [
         {
@@ -274,7 +274,16 @@ def test_run_metadata_equipment_home_in_context_is_valid() -> None:
 
     errors = validator.validate_extract_document(doc)
 
-    assert not any("[run-metadata-location]" in error for error in errors), errors
+    assert any(
+        "species.Fe.context[0].equipment.final_mass_kg" in error
+        and "[run-metadata-location]" in error
+        for error in errors
+    ), errors
+    assert any(
+        "species.Fe.context[0].equipment.sample.value.species_loss_fraction" in error
+        and "[run-metadata-location]" in error
+        for error in errors
+    ), errors
 
 
 def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypatch):

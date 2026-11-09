@@ -289,6 +289,70 @@ def test_registry_equipment_species_loss_conflict_does_not_write_invalid_entry(
     )
 
 
+def test_legacy_charge_alias_run_metadata_is_loaded_alongside_sample(
+    tmp_path: Path,
+) -> None:
+    extract = _extract_with_experiments(
+        tmp_path,
+        [
+            {
+                "experiment_id": "run-2",
+                "sample": {
+                    "mass_kg": _located_point("0.001", table="1", page=1),
+                },
+                "charge": {
+                    "final_mass_kg": _located_point(
+                        "0.0008", table="2", page=2
+                    ),
+                },
+            }
+        ],
+    )
+
+    migrate(extract, write=True)
+    _works, experiments, _observations = load_migrated_store(extract)
+    experiment = experiments["10.1234/fixture::experiment::run-2"]
+
+    assert experiment.sample.mass_kg is not None
+    assert experiment.sample.mass_kg.state.value == Value.point_of("0.001")
+    assert experiment.sample.final_mass_kg is not None
+    assert experiment.sample.final_mass_kg.state.value == Value.point_of("0.0008")
+    assert experiment.sample.final_mass_kg.locator == Locator(table="2", page=2)
+
+
+def test_legacy_charge_alias_conflicts_are_typed_validation_errors(
+    tmp_path: Path,
+) -> None:
+    extract = _extract_with_experiments(
+        tmp_path,
+        [
+            {
+                "experiment_id": "run-2",
+                "sample": {
+                    "final_mass_kg": _located_point(
+                        "0.0009", table="1", page=1
+                    ),
+                },
+                "charge": {
+                    "final_mass_kg": _located_point(
+                        "0.0008", table="2", page=2
+                    ),
+                },
+            }
+        ],
+    )
+
+    result = migrate(extract, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.final_mass_kg")
+        and "source_disagreement" in issue.detail
+        for issue in result.validation.issues
+    )
+
+
 def test_run_metadata_invalid_extract_values_are_typed_validation_errors(
     tmp_path: Path,
 ) -> None:
