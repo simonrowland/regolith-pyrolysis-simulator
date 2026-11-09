@@ -218,9 +218,12 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
     # d-329 (owner 2026-11-03, all three approved): the d-137 capture law
     # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
-    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
-    # is the production value (train rpp nightly and the laptop run agree).
-    assert na2o_left == pytest.approx(0.07626529983087423, abs=1e-6)
+    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO.
+    # C4 is pressure-held at 0.2 mbar with carrier_feed_mol_s null, so the
+    # closure commits the vacuum upper rate (sweep_flow_unspecified,
+    # no_positive_root_boundary). That account removes 2.727311567926259 kg
+    # Na and leaves this Na2O. The 800 h, 50 mbar C5 hold evaporates none.
+    assert na2o_left == pytest.approx(0.025105638196592006, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
