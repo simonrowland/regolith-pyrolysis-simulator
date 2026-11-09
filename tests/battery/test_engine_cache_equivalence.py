@@ -106,7 +106,13 @@ def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
         )
         po2 = (
             Po2Request("commanded", 1.0e-8)
-            if engine in {Engine.OPENIMCC, Engine.MAGEMIN, Engine.ALPHAMELTS}
+            if engine
+            in {
+                Engine.OPENIMCC,
+                Engine.INTERNAL_ANALYTICAL,
+                Engine.MAGEMIN,
+                Engine.ALPHAMELTS,
+            }
             else Po2Request("engine_default", None)
         )
         common = {
@@ -290,12 +296,16 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         sum(_cold_counts[engine.value]["calls_by_kind"].values())
         for engine in engines
     ) > 0
-    assert all(
-        warm_counts[engine.value]["misses"]
-        == parallel_counts[engine.value]["misses"]
-        == 0
+    warm_misses = {
+        engine.value: {
+            "serial": warm_counts[engine.value],
+            "parallel": parallel_counts[engine.value],
+        }
         for engine in engines
-    )
+        if warm_counts[engine.value]["misses"]
+        or parallel_counts[engine.value]["misses"]
+    }
+    assert not warm_misses, f"warm engine cache misses: {warm_misses}"
     assert all(
         not any(warm_counts[engine.value]["calls_by_kind"].values())
         and not any(parallel_counts[engine.value]["calls_by_kind"].values())
