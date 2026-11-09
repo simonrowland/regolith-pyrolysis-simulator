@@ -507,6 +507,24 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     }
 
 
+def _feo_activity_to_wustite_basis(
+    activity_stoich: float,
+    *,
+    stoich_multiplier: float,
+) -> float:
+    # Premise: the code defines gamma_stoich = gamma_wustite * multiplier,
+    # while x_FeO is unchanged between bases. Algebra: a_stoich = x_FeO *
+    # gamma_wustite * multiplier, so a_wustite = a_stoich / multiplier.
+    # Unit check: activity and multiplier are dimensionless. Sanity: at
+    # 1673.15 K, 3.298 / 1.94 = 1.70, the stored wustite gamma.
+    multiplier = float(stoich_multiplier)
+    if not math.isfinite(multiplier) or multiplier <= 0.0:
+        raise Kress91InvalidControls(
+            'FeO stoichiometric-to-wustite multiplier must be finite and positive'
+        )
+    return float(activity_stoich) / multiplier
+
+
 def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
     T = float(T_K)
     if T <= 0.0 or not math.isfinite(T):
@@ -1148,6 +1166,7 @@ def _solve_calphad_metal_saturation_anchor(
     liquid_domain: LiquidFeODomain | None = None,
 ) -> dict[str, float | bool | None]:
     pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+    stoich_multiplier = 1.0
 
     def anchor_result(
         log10_fO2_bar: float,
@@ -1184,17 +1203,21 @@ def _solve_calphad_metal_saturation_anchor(
 
         # For Fe + 1/2 O2 = FeO(l), K = a_FeO/(a_Fe*sqrt(fO2)). At metal
         # saturation a_Fe=1, so log10(fO2/bar) = 2 log10(a_FeO) - 2 log10(K).
-        # Pure-FeO IW is -2 log10(K), leaving ell = IW_pure + 2 log10(a_FeO).
-        # Activities are dimensionless and fugacity is relative to the 1-bar
-        # standard state; both logs are base-10, so the coordinate is in dex.
-        # a_FeO=1 recovers pure IW. At fixed composition, T, and P,
+        # Pure-FeO IW is -2 log10(K), leaving ell = IW_pure +
+        # 2 log10(a_FeO,wustite). Activities are dimensionless and fugacity is
+        # relative to the 1-bar standard state; both logs are base-10, so the
+        # coordinate is in dex. At fixed composition, T, and P,
         # KRESS91_LN_FO2_COEFFICIENT=0.196 > 0 makes the Fe3+/Fe2+ ratio
         # nondecreasing in ell. Since x_FeO=FeOt/(1+2*ratio) and central
         # Holzheid gamma depends only on T, a_FeO is nonincreasing and this
         # residual is strictly increasing. A sign-changing bracket confirms
         # the unique root numerically.
+        activity_wustite = _feo_activity_to_wustite_basis(
+            activity,
+            stoich_multiplier=stoich_multiplier,
+        )
         return (
-            log10_fO2_bar - pure_iw - 2.0 * math.log10(activity),
+            log10_fO2_bar - pure_iw - 2.0 * math.log10(activity_wustite),
             activity,
         )
 

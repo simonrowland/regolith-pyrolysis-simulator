@@ -597,6 +597,7 @@ from simulator.fe_redox import (
     RedoxState,
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
+    _feo_activity_to_wustite_basis,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
@@ -7931,6 +7932,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_frac': 0.0,
                 'native_fe_activity_source': 'unavailable:no_positive_a_FeO',
             })
+        a_feo_wustite = _feo_activity_to_wustite_basis(
+            a_feo,
+            stoich_multiplier=1.0,
+        )
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
         # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
@@ -7941,10 +7946,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             a_feo_saturation = 0.0
         else:
             a_feo_saturation = 10.0 ** saturation_log10
-        if a_feo_saturation >= a_feo:
+        if a_feo_saturation >= a_feo_wustite:
             native = 0.0
         else:
-            native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
+            native = ferrous_available * (
+                1.0 - a_feo_saturation / a_feo_wustite
+            )
         native = min(ferrous_available, max(0.0, native))
         return _carry_liquidus_notice({
             'native_fe_saturation': native > 0.0,
