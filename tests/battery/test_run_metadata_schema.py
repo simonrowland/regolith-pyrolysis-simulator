@@ -92,6 +92,13 @@ def _plain_located_point(point: str, *, table: str, page: int) -> dict:
     )
 
 
+def _record_located_point(point: str, *, table: str, page: int) -> Located:
+    return Located(
+        State.of(Value.point_of(point)),
+        locator=Locator(table=table, page=page),
+    )
+
+
 def _run_metadata_value_shape(shape: str, point: str) -> object:
     if shape == "empty-species-map":
         return {}
@@ -848,9 +855,11 @@ def test_record_validation_rejects_out_of_range_sample_values(
     experiment = result.experiments[experiment_id]
     invalid_sample = replace(
         experiment.sample,
-        mass_kg=_located_point("0", table="1", page=2),
-        final_mass_kg=_located_point("-0.1", table="1", page=2),
-        species_loss_fraction={"Na": _located_point("1.1", table="2", page=3)},
+        mass_kg=_record_located_point("0", table="1", page=2),
+        final_mass_kg=_record_located_point("-0.1", table="1", page=2),
+        species_loss_fraction={
+            "Na": _record_located_point("1.1", table="2", page=3)
+        },
     )
     invalid_experiment = replace(experiment, sample=invalid_sample)
     experiments = dict(result.experiments)
