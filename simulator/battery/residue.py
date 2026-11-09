@@ -1340,6 +1340,7 @@ def _make_residue_pressure_model(
                     oxide: amount for oxide, amount in key if amount > 0.0
                 }
                 try:
+                    timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
                     from simulator.melt_backend.openimcc_cache import (
                         cached_openimcc_evaluate,
                     )
@@ -1348,12 +1349,13 @@ def _make_residue_pressure_model(
                         engine_cache,
                         composition_mol=current_composition,
                         temperature_K=temperature_K,
+                        timeout_s=timeout_s,
                         pack=None,
                         allow_extrapolation=True,
                         allow_out_of_envelope=True,
                         solve_fn=lambda: _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,
-                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                            timeout_s=timeout_s,
                             composition_mol=current_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
@@ -3554,6 +3556,7 @@ def _predict_sossi_residue_cohort(
                             openimcc_bridge._cleaned_melt_policy(composition)
                         )
                         melt_activity_input_policy.update(activity_input_policy)
+                        timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
                         from simulator.melt_backend.openimcc_cache import (
                             cached_openimcc_evaluate,
                         )
@@ -3562,12 +3565,13 @@ def _predict_sossi_residue_cohort(
                             engine_cache,
                             composition_mol=activity_composition,
                             temperature_K=temperature_K,
+                            timeout_s=timeout_s,
                             pack=None,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
                             solve_fn=lambda: _evaluate_openimcc_isolated(
                                 openimcc_bridge.evaluate,
-                                timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                                timeout_s=timeout_s,
                                 composition_mol=activity_composition,
                                 temperature_K=temperature_K,
                                 allow_extrapolation=True,
@@ -3625,27 +3629,27 @@ def _predict_sossi_residue_cohort(
                                 "activity_provenance": mno_activity.provenance(),
                             },
                         )
-                        from simulator.melt_backend.openimcc_cache import (
-                            cached_openimcc_evaluate_gas,
-                        )
+                    from simulator.melt_backend.openimcc_cache import (
+                        cached_openimcc_evaluate_gas,
+                    )
 
-                        gas_result = cached_openimcc_evaluate_gas(
-                            engine_cache,
-                            parent_oxide_activities=gas_parent_oxide_activities,
-                            temperature_K=temperature_K,
-                            pressure_bar=1.0,
-                            gas_pack=gas_pack,
+                    gas_result = cached_openimcc_evaluate_gas(
+                        engine_cache,
+                        parent_oxide_activities=gas_parent_oxide_activities,
+                        temperature_K=temperature_K,
+                        pressure_bar=1.0,
+                        gas_pack=gas_pack,
+                        parent_oxides=gas_parent_oxides,
+                        allow_extrapolation=True,
+                        solve_fn=lambda: evaluate_gas(
+                            gas_parent_oxide_activities,
+                            temperature_K,
+                            1.0,
+                            gas_pack,
                             parent_oxides=gas_parent_oxides,
                             allow_extrapolation=True,
-                            solve_fn=lambda: evaluate_gas(
-                                gas_parent_oxide_activities,
-                                temperature_K,
-                                1.0,
-                                gas_pack,
-                                parent_oxides=gas_parent_oxides,
-                                allow_extrapolation=True,
-                            ),
-                        )
+                        ),
+                    )
                     melt_pack_identity.update(
                         {
                             "model_id": str(state.pack_model_id),

@@ -84,7 +84,7 @@ def _run_slice(
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
     cache = None if cache_path is None else EngineCache(cache_path)
-    _score_store_to_jsonl(
+    _row_count, metadata = _score_store_to_jsonl(
         context,
         output_path,
         root=root,
@@ -96,7 +96,10 @@ def _run_slice(
         engine_cache=cache,
     )
     residuals_path = output_path.with_name(output_path.name + ".partial")
-    return _canonical_rows(residuals_path), {} if cache is None else cache.counters
+    counters = metadata.engine_cache_counters
+    if counters is None:
+        counters = {} if cache is None else cache.counters
+    return _canonical_rows(residuals_path), dict(counters)
 
 
 def main(argv: list[str] | None = None) -> int:

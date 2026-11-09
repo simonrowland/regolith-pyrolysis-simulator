@@ -425,6 +425,7 @@ class EquilibrateCell:
     # Copied from the equilibrium result. The scorer owns the battery ratio.
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
+    backend_failure_disposition: str | None = None
 
     def to_cache_payload(self) -> str:
         """Return canonical JSON that preserves this cell's Python value types."""
@@ -491,6 +492,7 @@ class EquilibrateCell:
             "model_id": self.model_id,
             "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
             "fe_redox_split": dict(self.fe_redox_split),
+            "backend_failure_disposition": self.backend_failure_disposition,
         }
 
     @classmethod
@@ -600,6 +602,11 @@ class EquilibrateCell:
                 payload.get("liquid_composition_wt_pct")
             ),
             fe_redox_split=_finite_component_map(payload.get("fe_redox_split")),
+            backend_failure_disposition=(
+                None
+                if payload.get("backend_failure_disposition") is None
+                else str(payload.get("backend_failure_disposition"))
+            ),
         )
 
 
@@ -733,6 +740,12 @@ def _decode_cell_cache_value(value: Any) -> Any:
                 raise ValueError("invalid dataclass field in cell cache payload")
             decoded_fields[pair[0]] = _decode_cell_cache_value(pair[1])
         expected_fields = {item.name for item in fields(value_type)}
+        if (
+            value_type is EquilibrateCell
+            and decoded_fields.keys()
+            == expected_fields - {"backend_failure_disposition"}
+        ):
+            decoded_fields["backend_failure_disposition"] = None
         if decoded_fields.keys() != expected_fields:
             raise ValueError(f"incomplete dataclass fields in {value_type.__name__} cache payload")
         return value_type(**decoded_fields)
@@ -1708,6 +1721,11 @@ def classify_equilibrate_outcome(
             "openimcc_oxygen_balance_unavailable",
         } or reason_code.startswith("imcc_gas_"):
             return "refusal", reason_code, engine_reason
+        typed_cause = getattr(error, "cause", None)
+        typed_cause_code = getattr(typed_cause, "value", typed_cause)
+        if category in {"out_of_domain", "refused"} and typed_cause_code:
+            cause_code = str(typed_cause_code)
+            return "refusal", cause_code, f"{cause_code}: {message}"
         bucket = _bucket_from_text(haystack) or REFUSAL_UNAVAILABLE
         return "refusal", bucket, engine_reason
 
@@ -3853,6 +3871,43 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _decorate_qualification_outcome(
+    cell: EquilibrateCell,
+    pot: BinaryPot,
+    temperature_K: float,
+) -> EquilibrateCell:
+    """Apply the MELTS qualification notice to an undecorated engine result."""
+
+    gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
+    refusal_reason = cell.refusal_reason
+    engine_reason = cell.engine_reason
+    engine_annotation = cell.engine_annotation
+    if cell.status == "refusal" and refusal_reason not in {
+        REFUSAL_TIMEOUT,
+        REFUSAL_ENGINE_CRASH,
+    }:
+        engine_reason = cell.engine_reason or refusal_reason
+        refusal_reason = REFUSAL_GATE_REFUSED_IN_ADAPTER
+        engine_annotation = None
+    notices = [
+        qualification_notice(gate),
+        *(
+            dict(notice)
+            for notice in cell.notices
+            if notice.get("kind") != "melts_domain_gate"
+        ),
+    ]
+    return replace(
+        cell,
+        refusal_reason=refusal_reason,
+        engine_reason=engine_reason,
+        engine_annotation=engine_annotation,
+        notices=notices,
+        authority=cell.authority or AUTHORITY_EXTRAPOLATED,
+        certified_band=cell.certified_band or dict(gate["certified_band"]),
+    )
+
+
 def scale_feo_mgo_for_sio2(
     sio2_wt_pct: float,
     source: Mapping[str, float],
@@ -4532,7 +4587,8 @@ def _engine_cache_request_vector(
     po2: Po2Request,
     physical_pressure_bar: float | None,
     native_activity_formula: str | None,
-    qualification: bool = False,
+    timeout_s: float | None = None,
+    isolated: bool | None = None,
 ) -> dict[str, Any] | None:
     """Describe the exact cell request and the adapter settings it consumes."""
 
@@ -4549,6 +4605,30 @@ def _engine_cache_request_vector(
     engine_id = handle.name
     options: dict[str, Any] = {}
     engine_settings: dict[str, Any] = {}
+    backend_config = getattr(handle.backend, "_config", {}) or {}
+
+    def selected_config(*names: str) -> dict[str, Any]:
+        if not isinstance(backend_config, Mapping):
+            return {}
+        return {
+            name: (
+                str(backend_config[name])
+                if isinstance(backend_config[name], os.PathLike)
+                else backend_config[name]
+            )
+            for name in names
+            if name in backend_config
+        }
+
+    def path_value(value: Any) -> str | None:
+        return None if value is None else str(value)
+
+    def library_search_path(variable: str) -> str | None:
+        value = os.environ.get(variable)
+        if value is None:
+            return None
+        return os.pathsep.join(dict.fromkeys(value.split(os.pathsep)))
+
     try:
         parameters = inspect.signature(handle.backend.equilibrate).parameters
     except (TypeError, ValueError):
@@ -4558,7 +4638,6 @@ def _engine_cache_request_vector(
     options.update(isothermal_run_kwargs(engine_id, parameters))
 
     if engine_id == "openimcc":
-        bridge = handle.backend._bridge
         composition = {"basis": "mol", "components": composition_mol}
         pressure = None
         engine_settings = {
@@ -4610,6 +4689,29 @@ def _engine_cache_request_vector(
                 "configured_vapor_transport_floor_bar": getattr(
                     backend, "_configured_vapor_transport_floor_bar", None
                 ),
+                "raw_model_name": getattr(backend, "_raw_model_name", None),
+                "pet_warm_worker": getattr(backend, "_pet_warm_enabled", None),
+                "pet_warm_timeout_s": getattr(backend, "_pet_warm_timeout_s", None),
+                "timeout_s": getattr(backend, "_timeout_s", None),
+                "engine_path": path_value(getattr(backend, "_engine_path", None)),
+                "binary_path": path_value(getattr(backend, "_binary_path", None)),
+                "ambient_calc_mode": os.environ.get("ALPHAMELTS_CALC_MODE"),
+                "config": selected_config(
+                    "mode",
+                    "python_bridge",
+                    "warm_worker",
+                    "petthermotools_warm_call_timeout_s",
+                    "fO2_buffer",
+                    "redox_buffer",
+                    "fO2_offset",
+                    "Fe3Fet_Liq",
+                    "fe3fet_ratio",
+                    "model",
+                    "timeout_s",
+                    "require_petthermotools",
+                    "vapor_transport_pO2_bar",
+                    "vapor_transport_floor_bar",
+                ),
                 "vapor_transport_pO2_admission": (
                     "observation"
                     if po2.mode == PO2_COMMANDED
@@ -4636,6 +4738,29 @@ def _engine_cache_request_vector(
                 "configured_vapor_transport_floor_bar": getattr(
                     backend, "_configured_vapor_transport_floor_bar", None
                 ),
+                "health_timeout_s": getattr(backend, "_health_timeout_s", None),
+                "equilibrate_timeout_s": getattr(
+                    getattr(backend, "_thermoengine_transport", None),
+                    "equilibrate_timeout_s",
+                    None,
+                ),
+                "thermoengine_library_search": {
+                    "DYLD_LIBRARY_PATH": library_search_path(
+                        "DYLD_LIBRARY_PATH"
+                    ),
+                    "DYLD_FALLBACK_LIBRARY_PATH": library_search_path(
+                        "DYLD_FALLBACK_LIBRARY_PATH"
+                    ),
+                    "home": str(Path.home()),
+                },
+                "config": selected_config(
+                    "mode",
+                    "model",
+                    "thermoengine_health_timeout_s",
+                    "thermoengine_equilibrate_timeout_s",
+                    "vapor_transport_pO2_bar",
+                    "vapor_transport_floor_bar",
+                ),
                 "vapor_transport_pO2_admission": (
                     "observation"
                     if po2.mode == PO2_COMMANDED
@@ -4658,6 +4783,9 @@ def _engine_cache_request_vector(
             backend = handle.backend
             engine_settings = {
                 "model": _MELT_MODEL_ID,
+                "database_path": path_value(
+                    getattr(backend, "_database_path", None)
+                ),
                 "temperature_units": getattr(backend, "_temperature_units", "C"),
                 "pressure_units": getattr(backend, "_pressure_units", "bar"),
                 "vapor_pressure_units": getattr(
@@ -4665,6 +4793,28 @@ def _engine_cache_request_vector(
                 ),
                 "reuse_system": bool(getattr(backend, "_reuse_system", False)),
                 "include_oxide_activities": False,
+                "warm_worker": getattr(backend, "_warm_worker_enabled", None),
+                "warm_pool_size": getattr(backend, "_warm_pool_size", None),
+                "warm_call_timeout_s": getattr(
+                    backend, "_warm_call_timeout_s", None
+                ),
+                "worker_startup_timeout_s": getattr(
+                    backend, "_worker_startup_timeout_s", None
+                ),
+                "session_warm_environment": os.environ.get(
+                    "REGOLITH_VAPOROCK_SESSION_WARM"
+                ),
+                "config": selected_config(
+                    "database_path",
+                    "temperature_units",
+                    "pressure_units",
+                    "vapor_pressure_units",
+                    "warm_worker",
+                    "reuse_system",
+                    "warm_pool_size",
+                    "warm_call_timeout_s",
+                    "worker_startup_timeout_s",
+                ),
             }
         elif engine_id == "magemin":
             backend = handle.backend
@@ -4675,6 +4825,19 @@ def _engine_cache_request_vector(
                 "database": getattr(backend, "_database", None),
                 "bridge": getattr(backend, "_bridge", None),
                 "fO2_buffer": getattr(backend, "_config", {}).get("fO2_buffer"),
+                "binary_path": path_value(getattr(backend, "_binary_path", None)),
+                "slots_environment": os.environ.get("REGOLITH_MAGEMIN_SLOTS", ""),
+                "config": selected_config(
+                    "database",
+                    "python_bridge",
+                    "binary_path",
+                    "warm_worker",
+                    "warm_call_timeout_s",
+                    "warm_pool_size",
+                    "worker_startup_timeout_s",
+                    "timeout_s",
+                    "fO2_buffer",
+                ),
             }
         elif engine_id not in {"alphamelts", "thermoengine", "vaporock", "magemin"}:
             return None
@@ -4712,7 +4875,10 @@ def _engine_cache_request_vector(
         "oxygen": oxygen,
         "solver_options": options,
         "engine_settings": engine_settings,
-        "qualification": bool(qualification),
+        "timeout_s": float(
+            timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(engine_id, 30.0)
+        ),
+        "isolated": None if isolated is None else bool(isolated),
     }
     if engine_id == "openimcc" and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         request["oxygen"]["cell_material"] = po2.cell_material
@@ -4775,6 +4941,15 @@ def equilibrate_cell(
     if handle.name == "magemin" and native_activity_formula is not None:
         use_isolated = False
 
+    def _finish(cell: EquilibrateCell) -> EquilibrateCell:
+        if (
+            qualification
+            and handle.name in MELTS_FAMILY_ENGINES
+            and not _defer_qualification_decoration
+        ):
+            return _decorate_qualification_outcome(cell, pot, temperature_K)
+        return cell
+
     if (
         engine_cache is not None
         and handle.available
@@ -4792,10 +4967,11 @@ def equilibrate_cell(
             po2=po2,
             physical_pressure_bar=physical_pressure_bar,
             native_activity_formula=native_activity_formula,
-            qualification=qualification,
+            timeout_s=timeout,
+            isolated=use_isolated,
         )
         if request_vector is not None:
-            from simulator.engine_cache import cached_solve, is_transient_failure
+            from simulator.engine_cache import cached_solve
 
             started_wall = time.perf_counter()
             started_cpu = time.process_time()
@@ -4811,7 +4987,7 @@ def equilibrate_cell(
                     pot,
                     temperature_K=temperature_K,
                     po2=po2,
-                    timeout_s=timeout_s,
+                    timeout_s=timeout,
                     qualification=qualification,
                     isolated=use_isolated,
                     arm=ARM_HEADLINE if qualification else arm,
@@ -4821,39 +4997,7 @@ def equilibrate_cell(
                     _defer_qualification_decoration=True,
                 ),
             )
-            if qualification and handle.name in MELTS_FAMILY_ENGINES:
-                gate = assess_qualification_gate(
-                    pot.composition_wt_pct, temperature_K
-                )
-                gate_name = cell.engine_reason or cell.refusal_reason
-                if (
-                    cell.status == "refusal"
-                    and cell.refusal_reason
-                    not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
-                    and not is_transient_failure(cell)
-                ):
-                    cell = replace(
-                        cell,
-                        refusal_reason=REFUSAL_GATE_REFUSED_IN_ADAPTER,
-                        engine_reason=gate_name,
-                        engine_annotation=None,
-                    )
-                notices = [
-                    qualification_notice(gate),
-                    *(
-                        dict(notice)
-                        for notice in cell.notices
-                        if notice.get("kind") != "melts_domain_gate"
-                    ),
-                ]
-                cell = replace(
-                    cell,
-                    notices=notices,
-                    authority=cell.authority or AUTHORITY_EXTRAPOLATED,
-                    certified_band=(
-                        cell.certified_band or dict(gate["certified_band"])
-                    ),
-                )
+            cell = _finish(cell)
             return replace(
                 cell,
                 pot_id=pot.pot_id,
@@ -4870,19 +5014,10 @@ def equilibrate_cell(
     notices: list[dict[str, Any]] = []
     authority: str | None = None
     certified_band: dict[str, Any] | None = None
-    if (
-        qualification
-        and handle.name in MELTS_FAMILY_ENGINES
-        and not _defer_qualification_decoration
-    ):
-        gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
-        notices.append(qualification_notice(gate))
-        authority = AUTHORITY_EXTRAPOLATED
-        certified_band = dict(gate["certified_band"])
 
     def _done(**kwargs: Any) -> EquilibrateCell:
         extra_notices = list(kwargs.pop("notices", None) or [])
-        return EquilibrateCell(
+        return _finish(EquilibrateCell(
             pot_id=pot.pot_id,
             engine=handle.name,
             temperature_K=float(temperature_K),
@@ -4896,7 +5031,7 @@ def equilibrate_cell(
             certified_band=kwargs.pop("certified_band", None) or certified_band,
             model_id=kwargs.pop("model_id", None) or _handle_model_id(handle),
             **kwargs,
-        )
+        ))
 
     if (
         po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
@@ -4916,7 +5051,7 @@ def equilibrate_cell(
         )
 
     if use_isolated:
-        return _run_cell_in_subprocess(
+        return _finish(_run_cell_in_subprocess(
             handle,
             pot,
             temperature_K=temperature_K,
@@ -4929,8 +5064,8 @@ def equilibrate_cell(
             certified_band=certified_band,
             simulate_crash=simulate_crash,
             physical_pressure_bar=physical_pressure_bar,
-            defer_qualification_decoration=_defer_qualification_decoration,
-        )
+            defer_qualification_decoration=True,
+        ))
 
     if not handle.available or handle.backend is None:
         return _done(
@@ -5011,21 +5146,6 @@ def equilibrate_cell(
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
         diagnostics = dict(getattr(result, "diagnostics", None) or {})
         engine_annotation = crash_floor_engine_annotation(diagnostics)
-        if (
-            qualification
-            and not _defer_qualification_decoration
-            and status == "refusal"
-            and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
-        ):
-            gate_name = (
-                diagnostics.get("backend_failure_reason_code")
-                or diagnostics.get("backend_status_reason")
-                or engine_reason
-                or refusal
-            )
-            refusal = REFUSAL_GATE_REFUSED_IN_ADAPTER
-            engine_reason = f"{gate_name}"
-            engine_annotation = None
         activities, pressures, invalid_pressure_components = (
             extract_reported_quantities(result)
         )
@@ -5084,10 +5204,12 @@ def equilibrate_cell(
             fe_redox_split=_finite_component_map(
                 getattr(result, "fe_redox_split", None)
             ),
+            backend_failure_disposition=(
+                None
+                if diagnostics.get("backend_failure_disposition") is None
+                else str(diagnostics.get("backend_failure_disposition"))
+            ),
         )
-        failure_disposition = diagnostics.get("backend_failure_disposition")
-        if failure_disposition is not None:
-            cell.backend_failure_disposition = str(failure_disposition)
         return cell
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
@@ -5110,10 +5232,12 @@ def equilibrate_cell(
             melt_activities={},
             gas_partial_pressures_Pa={},
             liquid_fraction=None,
+            backend_failure_disposition=(
+                None
+                if getattr(exc, "failure_disposition", None) is None
+                else str(getattr(exc, "failure_disposition"))
+            ),
         )
-        failure_disposition = getattr(exc, "failure_disposition", None)
-        if failure_disposition is not None:
-            cell.backend_failure_disposition = str(failure_disposition)
         return cell
 
 

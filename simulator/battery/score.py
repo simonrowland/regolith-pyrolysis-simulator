@@ -14655,6 +14655,9 @@ def _score_store_to_jsonl(
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
+                    # supervised_process_map returns input-task order. Keep
+                    # that sequence so the final index's seq tie-breaker is
+                    # the same as the serial scorer's append order.
                     for (
                         shard_path_text,
                         row_count,
@@ -19687,11 +19690,11 @@ class _ResidualJsonlStream:
             self._database.execute(
                 "CREATE TABLE residual_order ("
                 "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-                "key TEXT NOT NULL, engine TEXT NOT NULL, offset INTEGER NOT NULL, "
+                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
                 "band_value TEXT, numeric_value TEXT)"
             )
         self._pending: list[
-            tuple[str, str, str, str, int, str | None, str | None]
+            tuple[str, str, str, int, str | None, str | None]
         ] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
@@ -19712,19 +19715,11 @@ class _ResidualJsonlStream:
         decision_band = None if numeric is None else numeric.decision_band
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
-        engine = (
-            residual.candidate_request.engine.value
-            if residual.candidate_request is not None
-            else candidate.engine.name.value
-            if candidate is not None and candidate.engine is not None
-            else ""
-        )
         self._append_line(
             line,
             rail="" if residual.rail is None else residual.rail.value,
             reference=residual.reference,
             key=residual.key,
-            engine=engine,
             band_value=band_value,
             numeric_value=numeric_value,
         )
@@ -19740,20 +19735,6 @@ class _ResidualJsonlStream:
             if isinstance(band, Mapping) and band.get("value") is not None
             else None
         )
-        candidate_request = payload.get("candidate_request")
-        candidate_observation = payload.get("candidate_observation")
-        candidate_engine = (
-            candidate_observation.get("engine")
-            if isinstance(candidate_observation, Mapping)
-            else None
-        )
-        engine = (
-            str(candidate_request.get("engine") or "")
-            if isinstance(candidate_request, Mapping)
-            else str(candidate_engine.get("name") or "")
-            if isinstance(candidate_engine, Mapping)
-            else ""
-        )
         numeric_value = (
             str(numeric["value"])
             if isinstance(numeric, Mapping) and numeric.get("value") is not None
@@ -19764,7 +19745,6 @@ class _ResidualJsonlStream:
             rail=str(payload.get("rail") or ""),
             reference=str(payload.get("reference") or ""),
             key=str(payload.get("key") or ""),
-            engine=engine,
             band_value=band_value,
             numeric_value=numeric_value,
         )
@@ -19776,7 +19756,6 @@ class _ResidualJsonlStream:
         rail: str,
         reference: str,
         key: str,
-        engine: str,
         band_value: str | None,
         numeric_value: str | None,
     ) -> None:
@@ -19784,7 +19763,7 @@ class _ResidualJsonlStream:
         self.file.write(line + b"\n")
         if self.sort_on_finalize:
             self._pending.append(
-                (rail, reference, key, engine, offset, band_value, numeric_value)
+                (rail, reference, key, offset, band_value, numeric_value)
             )
             if len(self._pending) >= self._INDEX_BATCH:
                 self._flush_index()
@@ -19798,8 +19777,8 @@ class _ResidualJsonlStream:
             return
         assert self._database is not None
         self._database.executemany(
-            "INSERT INTO residual_order (rail, reference, key, engine, offset, "
-            "band_value, numeric_value) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO residual_order (rail, reference, key, offset, "
+            "band_value, numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
@@ -19832,9 +19811,6 @@ class _ResidualJsonlStream:
             typed_tier_band_values=self.tier_band_values,
         )
         temporary_path: Path | None = None
-        engine_order = "CASE engine " + " ".join(
-            f"WHEN ? THEN {index}" for index, engine in enumerate(engines)
-        ) + f" ELSE {len(engines)} END"
         try:
             with tempfile.NamedTemporaryFile(
                 mode="wb", prefix=".residuals-final-", dir=self.partial_path.parent,
@@ -19847,8 +19823,7 @@ class _ResidualJsonlStream:
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
-                        f"key COLLATE BINARY, {engine_order}, seq",
-                        tuple(engine.value for engine in engines),
+                        "key COLLATE BINARY, seq"
                     )
                     for offset, band_value, numeric_value in rows:
                         source.seek(offset)
