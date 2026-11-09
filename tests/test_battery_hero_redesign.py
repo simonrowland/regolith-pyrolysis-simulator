@@ -137,6 +137,12 @@ def _scorecard_pair_archive(path: Path, count: int = 25) -> None:
             _residual(engine, "vapour", f"pair-{index}", 1500, residual)
             for index in range(count)
         )
+    refused = _residual("magemin", "vapour", "not-scored", 1500, 0.1)
+    refused["status"] = "refused"
+    refused["numeric"] = None
+    refused["refusal"] = {"reason": "unsupported_species"}
+    refused["execution"] = {"call_evidence": True}
+    rows.append(refused)
     _write_archive(path, rows)
 
 
@@ -389,19 +395,10 @@ def test_collection_smoke_render_csv_values_html_and_legacy_history(tmp_path: Pa
 
     with files["table:scorecard"].open(newline="") as scorecard_file:
         scorecard_rows = list(csv.DictReader(scorecard_file))
-    expected_plot_values = {
-        (row["rail"], row["primary_engine"], row["comparison_engine"]): tuple(
-            Decimal(row[field]) if row[field] else None
-            for field in (
-                "high_primary_rms_dex",
-                "high_comparison_rms_dex",
-                "low_primary_rms_dex",
-                "low_comparison_rms_dex",
-            )
-        )
-        for row in scorecard_rows
-    }
-    assert hero_plot._scorecard_plot_values(scorecard_rows) == expected_plot_values
+    assert scorecard_rows
+    assert all(row["n_shared"] for row in scorecard_rows)
+    assert all(row["primary_rms_dex"] for row in scorecard_rows)
+    assert all(row["comparison_rms_dex"] for row in scorecard_rows)
     assert [
         handle.get_label() for handle in hero_plot._fingerprint_legend_handles()
     ] == [
@@ -712,28 +709,18 @@ def test_component_rows_pair_openimcc_with_each_partners_shared_rows(tmp_path: P
 def test_artists_match_csv_values_for_scorecard_and_component_pairs(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    from matplotlib.collections import PathCollection
-    from matplotlib.colors import to_hex
-
     figures = _capture_collection_figures(monkeypatch)
-    scorecard = [
-        {
-            "rail": "vapour",
-            "primary_engine": "openimcc",
-            "comparison_engine": "vaporock",
-            "n_shared": "5",
-            "high_n_shared": "5",
-            "high_primary_rms_dex": "0.2",
-            "high_comparison_rms_dex": "0.8",
-            "low_n_shared": "",
-            "low_primary_rms_dex": "",
-            "low_comparison_rms_dex": "",
-        }
-    ]
+    archive = tmp_path / "scorecard-artists.tgz"
+    _scorecard_pair_archive(archive)
+    data = hero_plot.read_scores(
+        archive, rails=("vapour",), _collection_mode=True
+    )
+    scorecard = hero_plot._scorecard_table_rows(data)
     csv_tables = _collection_csv_round_trip(
         tmp_path,
         {
             "scorecard": scorecard,
+            "coverage": _csv_rows(hero_plot._coverage_table_rows(data)),
             "components": [
                 {
                     "rail": "vapour",
@@ -772,35 +759,38 @@ def test_artists_match_csv_values_for_scorecard_and_component_pairs(
         },
     )
     scorecard_csv = csv_tables["scorecard"]
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard_csv)
-    axis = figures[-1].axes[0]
-    plotted_by_engine: dict[str, float] = {}
-    for collection in axis.collections:
-        if not isinstance(collection, PathCollection) or not len(collection.get_offsets()):
-            continue
-        colour = to_hex(collection.get_facecolors()[0])
-        engine = next(
-            name
-            for name, value in hero_plot._hero_engine_colors(ENGINE_ORDER).items()
-            if value == colour
-        )
-        plotted_by_engine[engine] = float(collection.get_offsets()[0][0])
-    assert plotted_by_engine == {
-        "openimcc": float(scorecard_csv[0]["high_primary_rms_dex"]),
-        "vaporock": float(scorecard_csv[0]["high_comparison_rms_dex"]),
-    }
-    swapped = [
-        dict(scorecard_csv[0])
-    ]
-    swapped[0]["high_primary_rms_dex"], swapped[0]["high_comparison_rms_dex"] = (
-        swapped[0]["high_comparison_rms_dex"],
-        swapped[0]["high_primary_rms_dex"],
+    hero_plot._draw_scorecard_png(
+        tmp_path / "a.png",
+        data,
+        scorecard_csv,
+        csv_tables["coverage"],
+        observables=(("vapour", "Vapour pressure"),),
     )
-    swapped_expected = {
-        "openimcc": float(swapped[0]["high_primary_rms_dex"]),
-        "vaporock": float(swapped[0]["high_comparison_rms_dex"]),
+    axis = figures[-1].axes[0]
+    pair_row = scorecard_csv[0]
+    pair_line = next(
+        line
+        for line in axis.lines
+        if line.get_gid() == "shared-row-pair:vapour:internal-analytical"
+    )
+    assert tuple(float(value) for value in pair_line.get_xdata()) == (
+        float(pair_row["primary_rms_dex"]),
+        float(pair_row["comparison_rms_dex"]),
+    )
+    all_rows = {
+        collection.get_gid(): float(collection.get_offsets()[0][0])
+        for collection in axis.collections
+        if collection.get_gid()
     }
-    assert plotted_by_engine != swapped_expected
+    for engine in ("openimcc", "internal-analytical"):
+        metric = data.hero_all_numeric_metrics[("vapour", engine)]["views"]["all"]
+        assert all_rows[f"all-rows-rms:vapour:{engine}"] == float(
+            Decimal(str(metric["rms_dex"]))
+        )
+    assert tuple(float(value) for value in pair_line.get_xdata()) != (
+        float(pair_row["comparison_rms_dex"]),
+        float(pair_row["primary_rms_dex"]),
+    )
 
     component_rows = csv_tables["components"]
     hero_plot._draw_component_png(tmp_path / "c.png", "vapour", component_rows)
@@ -1482,21 +1472,18 @@ def test_hero_chart_header_legends_and_panel_titles_do_not_overlap(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     figures = _capture_collection_figures(monkeypatch)
-    scorecard = [
-        {
-            "rail": "vapour",
-            "primary_engine": "openimcc",
-            "comparison_engine": "vaporock",
-            "n_shared": "5",
-            "high_n_shared": "5",
-            "high_primary_rms_dex": "0.2",
-            "high_comparison_rms_dex": "0.8",
-            "low_n_shared": "",
-            "low_primary_rms_dex": "",
-            "low_comparison_rms_dex": "",
-        }
-    ]
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", scorecard)
+    archive = tmp_path / "scorecard-header.tgz"
+    _scorecard_pair_archive(archive)
+    data = hero_plot.read_scores(
+        archive, rails=("vapour",), _collection_mode=True
+    )
+    hero_plot._draw_scorecard_png(
+        tmp_path / "a.png",
+        data,
+        hero_plot._scorecard_table_rows(data),
+        _csv_rows(hero_plot._coverage_table_rows(data)),
+        observables=(("vapour", "Vapour pressure"),),
+    )
     _assert_chart_header_text_does_not_overlap(figures[-1])
 
     fingerprint = [
@@ -1522,124 +1509,41 @@ def test_hero_chart_header_legends_and_panel_titles_do_not_overlap(
     _assert_chart_header_text_does_not_overlap(figures[-1])
 
 
-def test_scorecard_row_band_groups_temperature_pairs_and_counts(
+def test_scorecard_pairs_lead_the_separate_all_rows_summary(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    from matplotlib.collections import PathCollection
-    from matplotlib.transforms import Affine2D, Bbox
-
-    figures = _capture_collection_figures(monkeypatch)
-    rows = []
-    partners = (
-        "vaporock",
-        "thermoengine",
-        "alphamelts",
-        "magemin",
-        "internal-analytical",
+    archive = tmp_path / "scorecard-order.tgz"
+    _scorecard_pair_archive(archive)
+    data = hero_plot.read_scores(
+        archive, rails=("vapour",), _collection_mode=True
     )
-    for rail, _label in hero_plot.COLLECTION_OBSERVABLES:
-        for index, partner in enumerate(partners):
-            rows.append(
-                {
-                    "rail": rail,
-                    "primary_engine": "openimcc",
-                    "comparison_engine": partner,
-                    "n_shared": "10",
-                    "high_n_shared": "6",
-                    "high_primary_rms_dex": str(0.2 + index / 100),
-                    "high_comparison_rms_dex": str(0.3 + index / 100),
-                    "low_n_shared": "4",
-                    "low_primary_rms_dex": str(0.4 + index / 100),
-                    "low_comparison_rms_dex": str(0.5 + index / 100),
-                }
-            )
+    figures = _capture_collection_figures(monkeypatch)
 
-    hero_plot._draw_scorecard_png(tmp_path / "a.png", rows)
+    hero_plot._draw_scorecard_png(
+        tmp_path / "a.png",
+        data,
+        hero_plot._scorecard_table_rows(data),
+        _csv_rows(hero_plot._coverage_table_rows(data)),
+        observables=(("vapour", "Vapour pressure"),),
+    )
 
-    figure = figures[-1]
-    figure.canvas.draw()
-    renderer = figure.canvas.get_renderer()
-    axis = figure.axes[0]
-    labels = [text for text in axis.texts if " vs " in text.get_text()]
-    counts = [text for text in axis.texts if text.get_text().startswith("n=10")]
-    pair_lines = [
+    axis = figures[-1].axes[0]
+    pair_line = next(
         line
         for line in axis.lines
-        if len(line.get_ydata()) == 2
-        and line.get_ydata()[0] == line.get_ydata()[1]
-        and line.get_xdata()[0] != line.get_xdata()[1]
-        and line.get_ydata()[0] != 0
+        if line.get_gid() == "shared-row-pair:vapour:internal-analytical"
+    )
+    summary_markers = [
+        collection
+        for collection in axis.collections
+        if str(collection.get_gid()).startswith("all-rows-rms:vapour:")
     ]
-    assert len(labels) == 5
-    assert len(counts) == 5
-    assert len(pair_lines) == 10
-    assert any("internal-analytical" in text.get_text() for text in labels)
-    for row_index in range(5):
-        pair_positions = sorted(
-            float(line.get_ydata()[0])
-            for line in pair_lines
-            if round(float(line.get_ydata()[0])) == row_index
-        )
-        label = next(
-            text for text in labels
-            if text.get_text().endswith(partners[row_index])
-        )
-        count = counts[row_index]
-        assert len(pair_positions) == 2
-        assert label.get_position()[1] < pair_positions[0]
-        assert count.get_position()[1] > pair_positions[1]
-
-    row_texts_by_axis = []
-    count_texts_by_axis = []
-    for panel in figure.axes:
-        row_texts = [text for text in panel.texts if " vs " in text.get_text()]
-        count_texts = [
-            text for text in panel.texts if text.get_text().startswith("n=")
-        ]
-        marker_boxes = []
-        for collection in panel.collections:
-            if (
-                not isinstance(collection, PathCollection)
-                or not len(collection.get_offsets())
-            ):
-                continue
-            marker_box = collection.get_window_extent(renderer)
-            if all(math.isfinite(value) for value in marker_box.extents):
-                marker_boxes.append(marker_box)
-                continue
-            # Matplotlib returns an invalid extent for PathCollection. Use its
-            # renderer-resolved size transform and data-to-display offsets.
-            path_box = collection.get_paths()[0].get_extents(
-                Affine2D(collection.get_transforms()[0])
-            )
-            stroke = renderer.points_to_pixels(collection.get_linewidths()[0]) / 2
-            for center_x, center_y in collection.get_offset_transform().transform(
-                collection.get_offsets()
-            ):
-                marker_boxes.append(
-                    Bbox.from_extents(
-                        center_x + path_box.x0 - stroke,
-                        center_y + path_box.y0 - stroke,
-                        center_x + path_box.x1 + stroke,
-                        center_y + path_box.y1 + stroke,
-                    )
-                )
-        for text in row_texts + count_texts:
-            text_box = text.get_window_extent(renderer)
-            assert all(
-                not text_box.overlaps(marker_box)
-                for marker_box in marker_boxes
-            ), f"{text.get_text()} overlaps a comparison marker"
-        row_texts_by_axis.append(row_texts)
-        count_texts_by_axis.append(count_texts)
-    for index in range(len(figure.axes) - 1):
-        left_panel_counts = count_texts_by_axis[index]
-        right_panel_labels = row_texts_by_axis[index + 1]
-        for count in left_panel_counts:
-            for label in right_panel_labels:
-                assert not count.get_window_extent(renderer).overlaps(
-                    label.get_window_extent(renderer)
-                ), "neighboring panel count overlaps a long comparison label"
+    assert len(summary_markers) == 2
+    assert all(
+        float(marker.get_offsets()[0][1]) > float(pair_line.get_ydata()[0])
+        for marker in summary_markers
+    )
+    assert any(text.get_text() == "All rows" for text in axis.texts)
 
 
 def test_empty_temperature_panel_does_not_draw_zero_line_through_message(
@@ -1668,7 +1572,8 @@ def test_empty_temperature_panel_does_not_draw_zero_line_through_message(
         [],
     )
     axis = figures[-1].axes[0]
-    assert any(text.get_text() == "no scored rows" for text in axis.texts)
+    assert any("no scored rows" in text.get_text() for text in axis.texts)
+    assert not axis.axison
     assert not any(
         len(line.get_ydata())
         and all(float(value) == 0 for value in line.get_ydata())
@@ -1701,12 +1606,13 @@ def test_empty_collection_panels_explain_missing_rows(
         [],
     )
     temperature_text = [text.get_text() for text in figures[-1].axes[0].texts]
-    assert "no scored rows" in temperature_text
+    assert any("no scored rows" in text for text in temperature_text)
     assert "unavailable dex" not in figures[-1].axes[0].get_title()
 
     hero_plot._draw_fingerprint_png(tmp_path / "d.png", "vapour", [], ["magemin"])
     fingerprint_text = [text.get_text() for text in figures[-1].axes[0].texts]
     assert "no scored rows" in fingerprint_text
+    assert not figures[-1].axes[0].axison
 
 
 def test_empty_collection_chart_facets_explain_missing_data(
@@ -1717,11 +1623,36 @@ def test_empty_collection_chart_facets_explain_missing_data(
     hero_plot._draw_temperature_png(
         tmp_path / "empty-b.png", "vapour", [], [], [], []
     )
-    hero_plot._draw_component_png(tmp_path / "empty-c.png", "vapour", [])
+    hero_plot._draw_component_png(
+        tmp_path / "empty-c.png",
+        "vapour",
+        [
+            {
+                "rail": "vapour",
+                "component": "SiO",
+                "shared_with": "vaporock",
+                "engine": engine,
+                "n_shared": "5",
+                "rms_dex": "",
+            }
+            for engine in ("openimcc", "vaporock")
+        ],
+    )
     hero_plot._draw_fingerprint_png(tmp_path / "empty-d.png", "vapour", [], [])
     hero_plot._draw_coverage_png(tmp_path / "empty-e.png", [], observables)
     hero_plot._draw_progress_png(tmp_path / "empty-f.png", [], observables)
-    hero_plot._draw_exposure_png(tmp_path / "empty-g.png", [], observables)
+    hero_plot._draw_exposure_png(
+        tmp_path / "empty-g.png",
+        [
+            {
+                "rail": "vapour",
+                "engine": "openimcc",
+                "exposed_n": "0",
+                "held_out_n": "0",
+            }
+        ],
+        observables,
+    )
 
     expected = (
         "no coverage data",
@@ -1741,6 +1672,8 @@ def test_empty_collection_chart_facets_explain_missing_data(
             ]
         ).casefold()
         assert label in rendered
+        assert figure.axes
+        assert all(not axis.axison for axis in figure.axes)
 
 
 def test_scorecard_shows_internal_analytical_pair_and_separate_all_rows_summary(
@@ -1764,8 +1697,12 @@ def test_scorecard_shows_internal_analytical_pair_and_separate_all_rows_summary(
     assert "internal-analytical" in rendered
     assert "shared rows, n=25" in rendered
     assert "each engine on its own rows; not a like-for-like comparison" in rendered
+    assert "not scored: magemin (outside the engine's domain)" in rendered
     assert "no shared rows" not in rendered
     assert "interim" in files["methods"].read_text(encoding="utf-8").casefold()
+    assert "<title>Interim battery hero charts</title>" in files["html"].read_text(
+        encoding="utf-8"
+    )
 
 
 def test_scorecard_drops_empty_rail_axis_and_lists_refusal_mix(
@@ -1777,6 +1714,7 @@ def test_scorecard_drops_empty_rail_axis_and_lists_refusal_mix(
     _data, figure, _files = _render_vapour_scorecard(archive, tmp_path, monkeypatch)
 
     assert figure.axes == []
+    assert figure.legends == []
     footer = "\n".join(text.get_text() for text in figure.texts).casefold()
     assert "vapour: no engine produced a scored prediction" in footer
     assert "refusal mix:" in footer

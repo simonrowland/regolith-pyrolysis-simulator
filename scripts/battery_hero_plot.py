@@ -133,6 +133,7 @@ HERO_SCORECARD_FONT_SIZE = 3.5
 HERO_SCORECARD_LINE_HEIGHT_IN = 0.085
 HERO_SCORECARD_TABLE_HEIGHT_FRACTION = 0.88
 HERO_SCORECARD_TITLE_HEIGHT_IN = 0.16
+HERO_SCORECARD_MIN_SHARED_N = 20
 COLLECTION_OBSERVABLES = (
     (Rail.VAPOUR.value, "Vapour pressure"),
     (Rail.MELT_ACTIVITY.value, "Melt activity"),
@@ -243,6 +244,7 @@ class ScorePlotData:
     hero_refusal_totals: Mapping[tuple[str, str, str], int]
     hero_diagnostics: Mapping[tuple[str, str], Mapping[str, object]]
     hero_comparisons: Mapping[tuple[str, str], Mapping[str, object]]
+    hero_scorecard_comparisons: Mapping[tuple[str, str], Mapping[str, object]]
     hero_sweet_spot_cells: Mapping[
         tuple[str, str], tuple[Mapping[str, object], ...]
     ]
@@ -1442,6 +1444,16 @@ def read_scores(
                 ),
             )
         }
+        hero_scorecard_comparisons = {
+            (str(record["rail"]), str(record["primary_engine"])): record
+            for record in _battery_hero_pair_comparison_records_from_database(
+                database,
+                primary_engines=("openimcc",),
+                comparison_engines=("internal-analytical",),
+                rails=COLLECTION_SCORE_RAILS,
+                minimum_held_out_n=None,
+            )
+        }
         hero_openimcc_vaporock_species = tuple(
             _battery_hero_pair_comparison_records_from_database(
                 database,
@@ -1568,6 +1580,7 @@ def read_scores(
         hero_refusal_totals=dict(hero_refusal_totals),
         hero_diagnostics=_normalized_hero_diagnostics(hero_diagnostics),
         hero_comparisons=hero_comparisons,
+        hero_scorecard_comparisons=hero_scorecard_comparisons,
         hero_sweet_spot_cells={
             key: tuple(cells)
             for key, cells in sorted(hero_sweet_spot_groups.items())
@@ -4037,13 +4050,14 @@ def _write_collection_methods(
     path.write_text(
         "\n".join(
             (
-                "# Hero chart methods",
+                "# Interim hero chart methods",
                 "",
                 f"- Scorer revision: `{revision}`",
                 f"- OpenIMCC score pin: `{openimcc_commit}`",
                 f"- OpenIMCC default pack at the scored pin: `{default_pack}`",
                 "- Error: `log10(predicted / measured)`, in dex; closer to zero is better.",
                 "- Same-row comparisons include only observations scored once by both engines.",
+                f"- Chart A leads with one shared-row dumbbell per partner; pairs with n<{HERO_SCORECARD_MIN_SHARED_N} are shown as text. Hollow diamonds show each engine's all-numeric RMS across its own scored rows with n; this is a coverage summary, not a like-for-like comparison.",
                 "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
                 f"- Temperature views split at {HERO_TEMPERATURE_FLOOR_K:g} K; "
                 f"{HERO_TEMPERATURE_FLOOR_K:g} K belongs to the upper view.",
@@ -4081,148 +4095,375 @@ def _save_collection_png(figure: Any, path: Path) -> None:
     plt.close(figure)
 
 
+_SCORECARD_REFUSAL_CATEGORIES = (
+    ("input_missing_n", "input missing"),
+    ("outside_domain_n", "outside the engine's domain"),
+    ("not_output_n", "not an output of this engine"),
+    ("other_refused_n", "other refused"),
+)
+
+
+def _scorecard_coverage_notes(
+    coverage_rows: Sequence[Mapping[str, str]], rail: str
+) -> tuple[dict[str, str], str]:
+    counts_by_engine: dict[str, Counter[str]] = defaultdict(Counter)
+    refusal_mix: Counter[str] = Counter()
+    for row in coverage_rows:
+        if row.get("rail") != rail:
+            continue
+        engine = str(row.get("engine") or "unknown")
+        for field_name, label in _SCORECARD_REFUSAL_CATEGORIES:
+            count = int(row.get(field_name) or 0)
+            if count:
+                counts_by_engine[engine][label] += count
+                refusal_mix[label] += count
+    dominant = {
+        engine: max(
+            (label for _field, label in _SCORECARD_REFUSAL_CATEGORIES),
+            key=lambda label: counts[label],
+        )
+        for engine, counts in counts_by_engine.items()
+        if counts
+    }
+    mix = ", ".join(
+        f"{label}={refusal_mix[label]}"
+        for _field, label in _SCORECARD_REFUSAL_CATEGORIES
+        if refusal_mix[label]
+    )
+    return dominant, mix or "no refusals recorded"
+
+
 def _draw_scorecard_png(
     path: Path,
+    data: ScorePlotData,
     rows: Sequence[Mapping[str, str]],
+    coverage_rows: Sequence[Mapping[str, str]],
     observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
 ) -> None:
-    colors = _hero_engine_colors(
-        tuple({str(row["primary_engine"]) for row in rows} | {str(row["comparison_engine"]) for row in rows})
-    ) if rows else {}
-    max_rows = max(
-        (
-            sum(
-                row["rail"] == rail and int(row.get("n_shared") or 0) > 0
-                for row in rows
+    colors = _hero_engine_colors(data.engines)
+    all_rows_by_rail: dict[str, list[tuple[str, int, float]]] = {}
+    no_data_lines: list[str] = []
+    pair_rows_by_rail: dict[str, list[Mapping[str, str]]] = {}
+    all_plot_values: list[float] = []
+    not_scored_by_rail: dict[str, str] = {}
+
+    for rail, _label in observables:
+        summary_rows: list[tuple[str, int, float]] = []
+        not_scored: list[str] = []
+        for engine in _ordered_hero_engines(data.engines):
+            view = _view_metric(_collection_metric(data, rail, engine), "all")
+            n = int(view.get("n") or 0)
+            rms = _finite_float(view.get("rms_dex"))
+            if n and rms is not None:
+                summary_rows.append((engine, n, rms))
+                all_plot_values.append(rms)
+            else:
+                not_scored.append(engine)
+        all_rows_by_rail[rail] = summary_rows
+        if not summary_rows:
+            _dominant, refusal_mix = _scorecard_coverage_notes(
+                coverage_rows, rail
             )
-            for rail, _label in observables
-        ),
-        default=1,
-    )
-    figure, axes = plt.subplots(
-        1,
-        len(observables),
-        figsize=(max(15.0, 5.2 * len(observables)), max(4.2, 0.75 * max_rows + 1.5)),
-        squeeze=False,
-        sharex=True,
-    )
-    plot_values = _scorecard_plot_values(rows)
-    all_values = [
-        float(value)
-        for values in plot_values.values()
-        for value in values
-        if value is not None
-    ]
-    right = max(0.8, max(all_values, default=0.5) * 1.5 + 0.15)
-    for axis, (rail, label) in zip(axes.flat, observables, strict=True):
-        selected = [
+            no_data_lines.append(
+                f"{rail}: no engine produced a scored prediction "
+                f"(refusal mix: {refusal_mix})"
+            )
+            continue
+
+        dominant, _refusal_mix = _scorecard_coverage_notes(coverage_rows, rail)
+        if not_scored:
+            not_scored_by_rail[rail] = "not scored: " + ", ".join(
+                f"{engine} ({dominant.get(engine, 'no refusal recorded')})"
+                for engine in not_scored
+            )
+        pair_rows = [
             row
             for row in rows
-            if row["rail"] == rail and int(row.get("n_shared") or 0) > 0
+            if row.get("rail") == rail
+            and int(row.get("n_shared") or 0) > 0
+            and _finite_float(row.get("primary_rms_dex")) is not None
+            and _finite_float(row.get("comparison_rms_dex")) is not None
         ]
-        partners = list(dict.fromkeys(str(row["comparison_engine"]) for row in selected))
-        primaries = list(dict.fromkeys(str(row["primary_engine"]) for row in selected))
-        comparisons = [(primary, partner) for primary in primaries for partner in partners]
-        comparisons = [
-            pair for pair in comparisons
-            if any(row["primary_engine"] == pair[0] and row["comparison_engine"] == pair[1] for row in selected)
-        ]
+        pair_rows_by_rail[rail] = pair_rows
+        for row in pair_rows:
+            all_plot_values.extend(
+                value
+                for value in (
+                    _finite_float(row.get("primary_rms_dex")),
+                    _finite_float(row.get("comparison_rms_dex")),
+                )
+                if value is not None
+            )
+
+    active_observables = tuple(
+        (rail, label)
+        for rail, label in observables
+        if all_rows_by_rail[rail]
+    )
+    maximum_rows = max(
+        (
+            len(pair_rows_by_rail.get(rail, ()))
+            + len(all_rows_by_rail[rail])
+            + 2
+            for rail, _label in active_observables
+        ),
+        default=max(1, len(no_data_lines)),
+    )
+    figure_height = max(4.4, 0.36 * maximum_rows + 2.7)
+    figure = plt.figure(
+        figsize=(max(9.0, 5.2 * len(active_observables)), figure_height)
+    )
+    figure.suptitle(
+        "Interim · Which engine is closest to measurement for each observable?",
+        fontsize=11,
+        y=0.995,
+    )
+    figure.text(
+        0.5,
+        0.94,
+        "Error = log10(predicted / measured), dex · closer to 0 is better · "
+        "hollow diamonds: each engine on its own rows; not a like-for-like comparison",
+        ha="center",
+        fontsize=6.6,
+    )
+    right = max(0.8, max(all_plot_values, default=0.5) * 1.5 + 0.15)
+
+    axes = []
+    if active_observables:
+        axes_grid = figure.subplots(
+            1,
+            len(active_observables),
+            squeeze=False,
+            sharex=True,
+        )
+        axes = list(axes_grid.flat)
+    for axis, (rail, label) in zip(axes, active_observables, strict=True):
+        pair_rows = pair_rows_by_rail.get(rail, [])
+        summary_rows = all_rows_by_rail[rail]
         axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
-        axis.axvline(0, color="#263238", linewidth=1.1, zorder=1)
-        if not comparisons:
-            axis.text(
-                0.5,
-                0.5,
-                "no shared rows",
-                transform=axis.transAxes,
-                ha="center",
-                va="center",
-                fontsize=8,
-                color="#64748b",
-            )
-        for index, (primary, partner) in enumerate(comparisons):
-            row = next(
-                item for item in selected
-                if item["primary_engine"] == primary and item["comparison_engine"] == partner
-            )
-            values = plot_values[(rail, primary, partner)]
-            for primary_value, partner_value, offset, alpha in (
-                (values[0], values[1], 0.13, 1.0),
-                (values[2], values[3], -0.13, 0.38),
-            ):
-                if primary_value is None or partner_value is None:
-                    continue
-                y = index + offset
-                axis.plot(
-                    [float(primary_value), float(partner_value)], [y, y],
-                    color="#64748b", linewidth=0.65, alpha=alpha, zorder=2,
-                )
-                axis.scatter(
-                    [float(primary_value)], [y], marker="o", s=21,
-                    color=colors[primary], alpha=alpha, zorder=3,
-                )
-                axis.scatter(
-                    [float(partner_value)], [y], marker="s", s=21,
-                    color=colors[partner], alpha=alpha, zorder=3,
-                )
-            row_label = f"{primary} vs {partner}"
+        axis.axvline(0, color="#263238", linewidth=1.0, zorder=1)
+        axis.text(
+            0.02,
+            -0.58,
+            "Shared-row pairs",
+            transform=axis.get_yaxis_transform(),
+            ha="left",
+            va="center",
+            color="#334155",
+            fontsize=5.8,
+            fontweight="bold",
+        )
+        if not pair_rows:
             axis.text(
                 0.02,
-                index - 0.38,
-                row_label,
+                0,
+                "No shared-row comparisons",
+                transform=axis.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                color="#64748b",
+                fontsize=5.2,
+            )
+        for index, row in enumerate(pair_rows):
+            primary = str(row["primary_engine"])
+            partner = str(row["comparison_engine"])
+            shared_n = int(row.get("n_shared") or 0)
+            primary_rms = _finite_float(row.get("primary_rms_dex"))
+            comparison_rms = _finite_float(row.get("comparison_rms_dex"))
+            assert primary_rms is not None and comparison_rms is not None
+            if shared_n < HERO_SCORECARD_MIN_SHARED_N:
+                axis.text(
+                    0.02,
+                    index,
+                    f"{primary} vs {partner} · shared rows, n={shared_n} · "
+                    f"RMS {_format_dex(row.get('primary_rms_dex'))} / "
+                    f"{_format_dex(row.get('comparison_rms_dex'))} dex",
+                    transform=axis.get_yaxis_transform(),
+                    ha="left",
+                    va="center",
+                    color="#334155",
+                    fontsize=4.8,
+                    clip_on=True,
+                )
+                continue
+            pair_line, = axis.plot(
+                [primary_rms, comparison_rms],
+                [index, index],
+                color="#64748b",
+                linewidth=0.75,
+                zorder=2,
+            )
+            pair_line.set_gid(f"shared-row-pair:{rail}:{partner}")
+            axis.scatter(
+                [primary_rms],
+                [index],
+                marker="o",
+                s=23,
+                color=colors[primary],
+                zorder=3,
+            )
+            axis.scatter(
+                [comparison_rms],
+                [index],
+                marker="s",
+                s=22,
+                color=colors[partner],
+                zorder=3,
+            )
+            axis.text(
+                0.02,
+                index - 0.27,
+                f"{primary} vs {partner}",
                 transform=axis.get_yaxis_transform(),
                 ha="left",
                 va="center",
                 color="#334155",
-                fontsize=5.5,
+                fontsize=5.2,
                 clip_on=True,
             )
-            counts = f"n={row['n_shared']}"
-            high_n = row.get("high_n_shared")
-            low_n = row.get("low_n_shared")
-            if high_n:
-                counts += f" · ≥{HERO_TEMPERATURE_FLOOR_K:g} {high_n}"
-            if low_n:
-                counts += f" · <{HERO_TEMPERATURE_FLOOR_K:g} {low_n}"
             axis.text(
                 0.985,
-                index + 0.38,
-                counts,
+                index + 0.27,
+                f"shared rows, n={shared_n}",
                 transform=axis.get_yaxis_transform(),
                 ha="right",
                 va="center",
                 color="#64748b",
-                fontsize=5.3,
+                fontsize=4.9,
                 clip_on=True,
             )
-        axis.set_title(label, loc="left", fontsize=8)
+
+        summary_heading_y = len(pair_rows) + 0.38
+        summary_start_y = len(pair_rows) + 1.05
+        axis.axhline(
+            summary_heading_y - 0.3,
+            color="#cbd5e1",
+            linewidth=0.55,
+            zorder=1,
+        )
+        axis.text(
+            0.02,
+            summary_heading_y,
+            "All rows",
+            transform=axis.get_yaxis_transform(),
+            ha="left",
+            va="center",
+            color="#334155",
+            fontsize=5.8,
+            fontweight="bold",
+        )
+        for index, (engine, n, rms) in enumerate(summary_rows):
+            y = summary_start_y + index
+            marker = axis.scatter(
+                [rms],
+                [y],
+                marker="D",
+                s=22,
+                facecolors="none",
+                edgecolors=colors[engine],
+                linewidths=1.0,
+                zorder=4,
+            )
+            marker.set_gid(f"all-rows-rms:{rail}:{engine}")
+            axis.text(
+                0.02,
+                y - 0.25,
+                engine,
+                transform=axis.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                color="#334155",
+                fontsize=5.1,
+                clip_on=True,
+            )
+            axis.text(
+                0.985,
+                y + 0.25,
+                f"all rows, n={n}",
+                transform=axis.get_yaxis_transform(),
+                ha="right",
+                va="center",
+                color="#64748b",
+                fontsize=4.9,
+                clip_on=True,
+            )
+
+        footer_y = summary_start_y + len(summary_rows) + 0.15
+        not_scored = not_scored_by_rail.get(rail)
+        if not_scored:
+            axis.text(
+                0.02,
+                footer_y,
+                not_scored,
+                transform=axis.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                color="#64748b",
+                fontsize=4.2,
+                clip_on=False,
+            )
+        last_y = footer_y + (0.35 if not_scored else -0.25)
+        axis.set_title(label, loc="left", fontsize=7.5)
         axis.set_yticks([])
-        axis.invert_yaxis()
-        if comparisons:
-            axis.set_ylim(len(comparisons) - 0.5, -0.5)
+        axis.set_ylim(last_y + 0.5, -0.85)
         axis.set_xlim(0, right)
         axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.5)
-        axis.tick_params(axis="x", labelsize=6)
-        axis.set_xlabel("Shared-row RMS error (dex)", fontsize=6.5)
+        axis.tick_params(axis="x", labelsize=5.8)
+        axis.set_xlabel("RMS error (dex)", fontsize=6.2)
+
     engine_handles = [
-        Line2D([0], [0], marker="o", linestyle="", color=color, label=engine, markersize=4)
+        Line2D([0], [0], marker="o", linestyle="", color=color, label=engine, markersize=3.5)
         for engine, color in colors.items()
     ]
-    temp_handles = [
+    style_handles = [
+        Line2D([0], [0], marker="o", linestyle="", color="#334155", label="OpenIMCC on shared rows", markersize=3.5),
+        Line2D([0], [0], marker="s", linestyle="", color="#334155", label="partner on shared rows", markersize=3.5),
         Line2D(
-            [0], [0], marker="o", linestyle="", color="#334155", alpha=1,
-            label=f"≥{HERO_TEMPERATURE_FLOOR_K:g} K", markersize=4
-        ),
-        Line2D(
-            [0], [0], marker="o", linestyle="", color="#334155", alpha=0.38,
-            label=f"<{HERO_TEMPERATURE_FLOOR_K:g} K", markersize=4
+            [0],
+            [0],
+            marker="D",
+            linestyle="",
+            markerfacecolor="none",
+            markeredgecolor="#334155",
+            label="each engine on its own rows; not a like-for-like comparison",
+            markersize=3.5,
         ),
     ]
-    figure.suptitle("Which engine is closest to measurement for each observable?", fontsize=11, y=0.995)
-    figure.text(0.5, 0.91, "Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex", ha="center", fontsize=7)
-    if engine_handles:
-        figure.legend(handles=engine_handles + temp_handles, loc="upper center", bbox_to_anchor=(0.5, 0.86), ncol=min(8, len(engine_handles) + 2), frameon=False, fontsize=6)
-    figure.subplots_adjust(left=0.14, right=0.99, top=0.76, bottom=0.14, wspace=0.5)
+    if active_observables and (engine_handles or style_handles):
+        figure.legend(
+            handles=engine_handles + style_handles,
+            loc="upper center",
+            bbox_to_anchor=(0.5, 0.895),
+            ncol=min(6, len(engine_handles) + len(style_handles)),
+            frameon=False,
+            fontsize=5.2,
+        )
+    if active_observables:
+        figure.subplots_adjust(
+            left=0.14,
+            right=0.99,
+            top=0.76,
+            bottom=0.28 if no_data_lines else 0.16,
+            wspace=0.5,
+        )
+    if no_data_lines:
+        footer_y = 0.19 if active_observables else 0.82
+        figure.text(
+            0.015,
+            footer_y,
+            "No data:\n" + "\n".join(no_data_lines),
+            ha="left",
+            va="top",
+            fontsize=5.3,
+            linespacing=1.2,
+        )
+    figure.text(
+        0.015,
+        0.035,
+        f"Pairs with n<{HERO_SCORECARD_MIN_SHARED_N} shown as text.",
+        ha="left",
+        fontsize=5.3,
+    )
     _save_collection_png(figure, path)
 
 
@@ -4256,6 +4497,22 @@ def _draw_temperature_png(
         sharey=True,
     )
     axes_flat = list(axes.flat)
+    if not engines:
+        axis = axes_flat[0]
+        axis.set_axis_off()
+        axis.text(
+            0.5,
+            0.5,
+            f"no coverage data for {rail}",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=8,
+            color="#64748b",
+        )
+        figure.suptitle(f"How does {rail} error change with temperature?", fontsize=10)
+        _save_collection_png(figure, path)
+        return
     for axis, engine in zip(axes_flat, engines, strict=False):
         panel = panel_by_engine[engine]
         color = colors[engine]
@@ -4270,19 +4527,24 @@ def _draw_temperature_png(
         clipped_high = int(panel.get("clipped_high_n") or 0)
         count_label = f"{plotted_n} plotted of {n} scored"
         if n == 0:
+            axis.set_axis_off()
             axis.text(
                 0.5,
                 0.5,
-                "no scored rows",
+                f"{engine}: no scored rows",
                 transform=axis.transAxes,
                 ha="center",
                 va="center",
                 fontsize=8,
                 color="#64748b",
             )
+            title = f"{engine} · no scored rows"
+            if uncalibrated_kems_flagged:
+                title += f" · {uncalibrated_kems_flagged} flagged (uncalibrated KEMS)"
+            axis.set_title(title, loc="left", fontsize=7.5)
+            continue
         axis.axhspan(-0.5, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
-        if n:
-            axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
+        axis.axhline(0, color="#263238", linewidth=1.15, zorder=1)
         axis.axvline(
             float(HERO_TEMPERATURE_FLOOR_K),
             color="#64748b",
@@ -4410,16 +4672,11 @@ def _draw_temperature_png(
         flagged_kems_label = (
             f"{uncalibrated_kems_flagged} flagged (uncalibrated KEMS)"
         )
-        if n == 0:
-            title = f"{engine} · no scored rows"
-            if uncalibrated_kems_flagged:
-                title += f" · {flagged_kems_label}"
-        else:
-            title = (
-                f"{engine} · {count_label} · all-scored RMS {rms} dex · "
-                f"{flagged} extrapolated · {flagged_kems_label} · "
-                f"{clipped_low + clipped_high} beyond ±3 dex"
-            )
+        title = (
+            f"{engine} · {count_label} · all-scored RMS {rms} dex · "
+            f"{flagged} extrapolated · {flagged_kems_label} · "
+            f"{clipped_low + clipped_high} beyond ±3 dex"
+        )
         axis.set_title(title, loc="left", fontsize=7.5)
     axes_flat[-1].set_xlabel("Temperature (K)", fontsize=7)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
@@ -4449,7 +4706,14 @@ def _draw_component_png(
     for row in selected:
         by_pair[(row["component"], row["shared_with"])][row["engine"]] = row
     pairs = sorted(
-        by_pair,
+        (
+            pair
+            for pair, pair_rows in by_pair.items()
+            if _finite_float(pair_rows.get("openimcc", {}).get("rms_dex"))
+            is not None
+            and _finite_float(pair_rows.get(pair[1], {}).get("rms_dex"))
+            is not None
+        ),
         key=lambda pair: (
             -int(by_pair[pair].get("openimcc", {}).get("n_shared") or 0),
             pair[0],
@@ -4464,6 +4728,25 @@ def _draw_component_png(
         if row.get("rms_dex") not in (None, "")
     ]
     right = max(0.65, max(all_values, default=0.5) * 1.15)
+    if not pairs:
+        axis.set_axis_off()
+        axis.text(
+            0.5,
+            0.5,
+            f"No shared-row component comparisons meet n≥{HERO_MINIMUM_REPORT_N}.",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=8,
+            color="#64748b",
+        )
+        figure.suptitle(
+            f"No shared-row component comparisons for {rail}.",
+            fontsize=10,
+            y=0.99,
+        )
+        _save_collection_png(figure, path)
+        return
     axis.axvspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
     axis.axvline(0, color="#263238", linewidth=1.0, zorder=1)
     for pair_index, pair in enumerate(pairs):
@@ -4532,6 +4815,19 @@ def _draw_fingerprint_png(
         sharey=True,
     )
     figure.subplots_adjust(left=0.07, right=0.99, top=0.82, bottom=0.14, wspace=0.18)
+    if not engines:
+        axis = axes.flat[0]
+        axis.set_axis_off()
+        axis.text(
+            0.5,
+            0.5,
+            "no scored rows",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=8,
+            color="#64748b",
+        )
     rail_rows = [row for row in rows if row["rail"] == rail]
     temperatures = [
         _finite_float(row.get(key))
@@ -4555,36 +4851,43 @@ def _draw_fingerprint_png(
             for row in rail_rows
             if row["engine"] == engine
         ]
+        displayable_cells = [
+            cell
+            for cell in cells
+            if cell["n"] >= 3
+            and _finite_float(cell.get("median_abs_dex")) is not None
+            and all(
+                _finite_float(cell.get(field_name)) is not None
+                for field_name in (
+                    "temperature_lower_K",
+                    "temperature_upper_K",
+                    "sio2_lower",
+                    "sio2_upper",
+                )
+            )
+        ]
+        if not displayable_cells:
+            axis.set_axis_off()
+            axis.text(
+                0.5,
+                0.5,
+                "no scored rows" if not cells else "no fingerprint cells with n ≥ 3",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
+            axis.set_title(engine, loc="left", fontsize=6.5)
+            continue
         _draw_hero_sweet_spot(
             axis,
             engine,
-            cells,
+            displayable_cells,
             x_limits=x_limits,
             temperature_limits=limits,
             export_dpi=COLLECTION_EXPORT_DPI,
         )
-        if not cells:
-            axis.text(
-                0.5,
-                0.5,
-                "no scored rows",
-                transform=axis.transAxes,
-                ha="center",
-                va="center",
-                fontsize=8,
-                color="#64748b",
-            )
-        elif not any(cell["n"] >= 3 for cell in cells):
-            axis.text(
-                0.5,
-                0.5,
-                "no cells with n ≥ 3",
-                transform=axis.transAxes,
-                ha="center",
-                va="center",
-                fontsize=8,
-                color="#64748b",
-            )
         axis.set_title(engine, loc="left", fontsize=6.5)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
     figure.suptitle(f"Where does {observable.lower()} meet the target?", fontsize=10, y=0.99)
@@ -4637,6 +4940,23 @@ def _draw_coverage_png(
     )
     for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
+        if not selected or not any(
+            int(row.get(field_name) or 0)
+            for row in selected
+            for field_name in colors
+        ):
+            axis.set_axis_off()
+            axis.text(
+                0.5,
+                0.5,
+                f"No coverage data for {rail}.",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
+            continue
         y_positions = list(range(len(selected)))
         left = [0] * len(selected)
         for field_name in colors:
@@ -4654,9 +4974,15 @@ def _draw_coverage_png(
         axis.set_xlabel("Rows", fontsize=6)
         axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.45)
         axis.tick_params(axis="x", labelsize=5.5)
-    handles, legend_labels = axes.flat[0].get_legend_handles_labels()
+    handles: list[Any] = []
+    legend_labels: list[str] = []
+    for axis in axes.flat:
+        handles, legend_labels = axis.get_legend_handles_labels()
+        if handles:
+            break
     fig.suptitle("Can each engine predict the rows in this benchmark?", fontsize=10, y=0.995)
-    fig.legend(handles, legend_labels, loc="upper center", bbox_to_anchor=(0.5, 0.978), ncol=5, frameon=False, fontsize=5.5)
+    if handles:
+        fig.legend(handles, legend_labels, loc="upper center", bbox_to_anchor=(0.5, 0.978), ncol=5, frameon=False, fontsize=5.5)
     fig.subplots_adjust(left=0.14, right=0.99, top=0.95, bottom=0.06, hspace=0.58)
     _save_collection_png(fig, path)
 
@@ -4693,6 +5019,25 @@ def _draw_progress_png(
     candidate_legend_added = False
     for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in rows if row["rail"] == rail]
+        has_history_point = any(
+            row.get("rms_dex")
+            and _finite_float(row.get("rms_dex")) is not None
+            and _history_date({"commit_date": row.get("date")}) is not None
+            for row in selected
+        )
+        if not has_history_point:
+            axis.set_axis_off()
+            axis.text(
+                0.5,
+                0.5,
+                f"No landing history for {rail}.",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
+            continue
         axis.axhspan(0, 0.5, color=GOAL_COLOUR, alpha=0.12, zorder=0)
         axis.axhline(0, color="#263238", linewidth=0.8)
         for engine in engine_names:
@@ -4783,7 +5128,11 @@ def _draw_exposure_png(
     rows: Sequence[Mapping[str, str]],
     observables: Sequence[tuple[str, str]] = COLLECTION_OBSERVABLES,
 ) -> None:
-    exposure_rows = [row for row in rows if row.get("exposed_n") or row.get("held_out_n")]
+    exposure_rows = [
+        row
+        for row in rows
+        if int(row.get("exposed_n") or 0) or int(row.get("held_out_n") or 0)
+    ]
     figure, axes = plt.subplots(
         len(observables), 1,
         figsize=(5.0, max(1.8, 1.4 * len(observables))),
@@ -4792,6 +5141,19 @@ def _draw_exposure_png(
     )
     for axis, (rail, observable) in zip(axes.flat, observables, strict=True):
         selected = [row for row in exposure_rows if row["rail"] == rail]
+        if not selected:
+            axis.set_axis_off()
+            axis.text(
+                0.5,
+                0.5,
+                f"No exposure data for {rail}.",
+                transform=axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#64748b",
+            )
+            continue
         y = list(range(len(selected)))
         exposed = [int(row.get("exposed_n") or 0) for row in selected]
         held = [int(row.get("held_out_n") or 0) for row in selected]
@@ -4805,9 +5167,12 @@ def _draw_exposure_png(
         axis.set_title(observable, loc="left", fontsize=7.5)
         axis.grid(axis="x", color="#94a3b8", alpha=0.2, linewidth=0.45)
         axis.tick_params(axis="x", labelsize=6.5)
-    handles, labels = axes.flat[0].get_legend_handles_labels()
-    if not exposure_rows:
-        axes.flat[0].text(0.5, 0.5, "Exposure inputs were not supplied", transform=axes.flat[0].transAxes, ha="center", va="center", fontsize=8)
+    handles: list[Any] = []
+    labels: list[str] = []
+    for axis in axes.flat:
+        handles, labels = axis.get_legend_handles_labels()
+        if handles:
+            break
     figure.suptitle("Are the scored rows exposed or held out?", fontsize=10, y=0.995)
     if handles:
         figure.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.976), ncol=2, frameon=False, fontsize=6.5)
@@ -4890,7 +5255,7 @@ def _write_collection_html(
         output.write(
             "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
-            "<title>Battery hero charts</title><style>"
+            "<title>Interim battery hero charts</title><style>"
             ":root{--page:#fbfcfe;--surface:#fff;--ink:#18212b;--muted:#526171;--grid:#d8e0e8;--link:#1b5f9e}"
             ":root[data-theme=dark]{--page:#111820;--surface:#19232d;--ink:#edf3f8;--muted:#aebbc8;--grid:#344351;--link:#8fc6ff}"
             "*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}"
@@ -4901,7 +5266,7 @@ def _write_collection_html(
             ".range{display:flex;gap:5px}.toggles{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0}.toggles label{display:flex;align-items:center;gap:5px;font-size:.84rem}.toggles input{min-height:0}canvas{display:block;width:100%;height:390px;border:1px solid var(--grid);border-radius:6px;margin:10px 0 20px;touch-action:pan-y}.tooltip{position:fixed;z-index:5;display:none;max-width:min(340px,90vw);padding:9px 11px;background:var(--ink);color:var(--page);border-radius:6px;font-size:.78rem;pointer-events:none;white-space:pre-wrap}"
             "@media(max-width:700px){main{padding:10px}.chart,.interactive{padding:10px;border-radius:8px}.collection-grid{grid-template-columns:minmax(0,1fr)}#chart-a,#chart-g{grid-column:1;grid-row:auto}.chart{overflow-x:auto}#chart-a img,[id^=chart-d-] img{width:760px;max-width:none}.chart:not(#chart-a):not([id^=chart-d-]) img{width:100%;max-width:100%}.controls{align-items:stretch}.controls label{flex:1 1 130px}.controls input,.controls select{width:100%}canvas{height:320px}table{font-size:.7rem}}"
             "</style></head><body><main><header><button id=\"theme-toggle\" type=\"button\">Toggle light/dark</button>"
-            "<h1>Battery benchmark: which engine fits your application?</h1>"
+            "<h1>Interim battery benchmark: which engine fits your application?</h1>"
             "<p>Error = log10(predicted / measured), dex · closer to 0 is better · green band = within ±0.5 dex</p></header>"
         )
         output.write('<div class="collection-grid">')
@@ -5300,7 +5665,13 @@ def render_hero_collection(
             )
         chart_files: dict[str, Path] = {}
         path = output_dir / "battery-hero-A-scorecard.png"
-        _draw_scorecard_png(path, csv_rows["scorecard"], observables)
+        _draw_scorecard_png(
+            path,
+            data,
+            csv_rows["scorecard"],
+            csv_rows["coverage"],
+            observables,
+        )
         chart_files["chart:A"] = path
         files["chart:A"] = path
         for rail, _label in observables:
@@ -5403,15 +5774,21 @@ def _scorecard_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for rail, label in COLLECTION_OBSERVABLES:
         for primary in ("openimcc",):
-            comparison_record = _collection_comparison(data, rail, primary)
-            comparisons = comparison_record.get("comparisons")
-            if not isinstance(comparisons, Sequence) or isinstance(comparisons, (str, bytes)):
-                continue
-            selected_comparisons = [
-                comparison
-                for comparison in comparisons
-                if isinstance(comparison, Mapping)
-            ]
+            comparison_records = (
+                _collection_comparison(data, rail, primary),
+                data.hero_scorecard_comparisons.get((rail, primary), {}),
+            )
+            selected_comparisons = []
+            for comparison_record in comparison_records:
+                comparisons = comparison_record.get("comparisons")
+                if isinstance(comparisons, Sequence) and not isinstance(
+                    comparisons, (str, bytes)
+                ):
+                    selected_comparisons.extend(
+                        comparison
+                        for comparison in comparisons
+                        if isinstance(comparison, Mapping)
+                    )
             selected_comparisons.sort(
                 key=lambda comparison: _HERO_ENGINE_ORDER.index(
                     str(comparison.get("engine") or "")
@@ -5444,35 +5821,6 @@ def _scorecard_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
                     }
                 )
     return rows
-
-
-def _scorecard_plot_values(
-    rows: Sequence[Mapping[str, object]],
-) -> dict[
-    tuple[str, str, str],
-    tuple[Decimal | None, Decimal | None, Decimal | None, Decimal | None],
-]:
-    values: dict[
-        tuple[str, str, str],
-        tuple[Decimal | None, Decimal | None, Decimal | None, Decimal | None],
-    ] = {}
-    for row in rows:
-        key = (
-            str(row["rail"]),
-            str(row["primary_engine"]),
-            str(row["comparison_engine"]),
-        )
-        def decimal(field: str) -> Decimal | None:
-            value = row.get(field)
-            return None if value in (None, "") else Decimal(str(value))
-
-        values[key] = (
-            decimal("high_primary_rms_dex"),
-            decimal("high_comparison_rms_dex"),
-            decimal("low_primary_rms_dex"),
-            decimal("low_comparison_rms_dex"),
-        )
-    return values
 
 
 def _component_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
