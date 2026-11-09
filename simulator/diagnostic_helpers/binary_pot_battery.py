@@ -3695,6 +3695,17 @@ class _InternalAnalyticalBatteryBackend:
             oxygen_balance_pack or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
         )
 
+    def _oxygen_balance_backend_for(self, request: Po2Request | None) -> Any | None:
+        if (
+            request is not None
+            and request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+            and self._oxygen_balance_backend is None
+        ):
+            self._oxygen_balance_backend = _OpenImccBatteryBackend(
+                "openimcc", pack_name=self._oxygen_balance_pack
+            )
+        return self._oxygen_balance_backend
+
     def equilibrate(
         self,
         temperature_C: float,
@@ -3719,14 +3730,6 @@ class _InternalAnalyticalBatteryBackend:
         core._last_high_t_melt_activity_temperature_K = None
         core._high_t_melt_activity_fallback_steps = []
         core._last_vapor_pressure_diagnostic = {}
-        if (
-            po2_request is not None
-            and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-            and self._oxygen_balance_backend is None
-        ):
-            self._oxygen_balance_backend = _OpenImccBatteryBackend(
-                "openimcc", pack_name=self._oxygen_balance_pack
-            )
         return _internal_analytical_vapor_pressure_adapter(
             core=self._core,
             temperature_C=temperature_C,
@@ -3735,7 +3738,7 @@ class _InternalAnalyticalBatteryBackend:
             composition_mol=composition_mol,
             fO2_log=fO2_log,
             po2_request=po2_request,
-            oxygen_balance_backend=self._oxygen_balance_backend,
+            oxygen_balance_backend=self._oxygen_balance_backend_for(po2_request),
         )
 
 
@@ -4773,9 +4776,26 @@ def _engine_cache_request_vector(
         options["po2_request"] = po2.as_payload()
         engine_settings = {"include_diagnostic_shadows": True}
         if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+            oxygen_backend = None
+            resolve_oxygen_backend = getattr(
+                handle.backend, "_oxygen_balance_backend_for", None
+            )
+            if callable(resolve_oxygen_backend):
+                try:
+                    oxygen_backend = resolve_oxygen_backend(po2)
+                except Exception:
+                    # The real call classifies a failed optional OpenIMCC
+                    # construction as a refusal. Its attempted pack remains
+                    # the configured pack because no backend was created.
+                    oxygen_backend = None
+            oxygen_pack = getattr(oxygen_backend, "_pack_name", None)
+            if oxygen_pack is None:
+                oxygen_pack = getattr(
+                    handle.backend, "_oxygen_balance_pack", None
+                )
             engine_settings["oxygen_balance_backend"] = {
                 "engine": "openimcc",
-                "pack": handle.backend._oxygen_balance_pack,
+                "pack": oxygen_pack,
                 "allow_extrapolation": True,
                 "allow_out_of_envelope": True,
             }

@@ -165,10 +165,15 @@ ENGINE_DEPENDENCY_GUARD_SURFACES = {
             ("simulator/diagnostic_helpers/binary_pot_battery.py", "_OpenImccBatteryBackend"),
         ),
         "symbols": {
-            "OpenImccMeltBackend", "OpenImccBridgeResult", "openimcc_bridge",
-            "_OpenImccBatteryBackend", "evaluate_cleaned_melt",
-            "evaluate_gas_oxygen_balance", "cached_openimcc_evaluate",
-            "cached_openimcc_evaluate_gas", "cached_openimcc_redox",
+            "OpenImccMeltBackend", "OpenImccBridgeResult",
+            "OpenImccCleanedMeltResult", "OpenImccUnavailableError",
+            "OpenImccCompositionPolicyRefusal",
+            "OpenImccOxygenBalanceUnavailableError",
+            "openimcc_bridge", "_OpenImccBatteryBackend",
+            "evaluate_cleaned_melt", "evaluate_gas_oxygen_balance",
+            "cached_openimcc_evaluate", "cached_openimcc_evaluate_gas",
+            "cached_openimcc_redox", "OpenImccEvaluationOutcome",
+            "OpenImccGasOutcome", "OpenImccRedoxOutcome",
         },
     },
     "internal-analytical": {
@@ -190,7 +195,10 @@ ENGINE_DEPENDENCY_GUARD_SURFACES = {
         },
     },
     "magemin": {
-        "modules": (("simulator/melt_backend/magemin.py", None),),
+        "modules": (
+            ("simulator/melt_backend/magemin.py", None),
+            ("engines/magemin/provider.py", "MAGEMinShadowProvider"),
+        ),
         "symbols": {"MAGEMinBackend", "MAGEMinShadowProvider"},
     },
     "alphamelts": {
@@ -199,7 +207,7 @@ ENGINE_DEPENDENCY_GUARD_SURFACES = {
     },
     "thermoengine": {
         "modules": (("simulator/melt_backend/thermoengine.py", None),),
-        "symbols": {"ThermoEngineBackend"},
+        "symbols": {"ThermoEngineBackend", "ThermoEngineTransport"},
     },
 }
 

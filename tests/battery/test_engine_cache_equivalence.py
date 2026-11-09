@@ -283,6 +283,71 @@ def test_internal_analytical_keys_the_instantiated_oxygen_pack(
     assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == "effective-pack"
 
 
+def test_internal_analytical_oxygen_pack_matches_real_isolated_worker(
+    tmp_path: Path,
+) -> None:
+    handle = _open_available_engine(Engine.INTERNAL_ANALYTICAL)
+    openimcc_handle = _open_available_engine(Engine.OPENIMCC)
+    try:
+        backend = handle.backend
+        backend._oxygen_balance_backend = openimcc_handle.backend
+        backend._oxygen_balance_pack = "review-missing-pack"
+        effective_pack = backend._oxygen_balance_backend._pack_name
+        pot = battery.identity_battery_pot(
+            "oxygen-pack-real-worker", {"SiO2": 50.0, "FeO": 50.0}
+        )
+        po2 = Po2Request(battery.PO2_OXYGEN_BALANCE_EFFUSION, None, "W")
+        common = {
+            "temperature_K": 1700.0,
+            "po2": po2,
+            "timeout_s": 60.0,
+            "physical_pressure_bar": 1.0,
+        }
+
+        def stable(cell: EquilibrateCell) -> str:
+            return json.dumps(
+                replace(cell, wall_s=0.0, cpu_s=0.0, hostname="fixture").to_cache_payload(),
+                sort_keys=True,
+            )
+
+        off_direct = equilibrate_cell(handle, pot, isolated=False, **common)
+        off_isolated = equilibrate_cell(handle, pot, isolated=True, **common)
+        direct_cache = EngineCache(tmp_path / "real-direct.sqlite")
+        isolated_cache = EngineCache(tmp_path / "real-isolated.sqlite")
+        cold_direct = equilibrate_cell(
+            handle, pot, isolated=False, engine_cache=direct_cache, **common
+        )
+        warm_direct = equilibrate_cell(
+            handle, pot, isolated=False, engine_cache=direct_cache, **common
+        )
+        cold_isolated = equilibrate_cell(
+            handle, pot, isolated=True, engine_cache=isolated_cache, **common
+        )
+        warm_isolated = equilibrate_cell(
+            handle, pot, isolated=True, engine_cache=isolated_cache, **common
+        )
+
+        expected = stable(off_direct)
+        assert stable(off_isolated) == expected
+        assert all(
+            stable(cell) == expected
+            for cell in (cold_direct, warm_direct, cold_isolated, warm_isolated)
+        )
+        vector = battery._engine_cache_request_vector(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=po2,
+            physical_pressure_bar=1.0,
+            native_activity_formula=None,
+        )
+        assert vector is not None
+        assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == effective_pack
+    finally:
+        close_battery_engine_handle(handle)
+        close_battery_engine_handle(openimcc_handle)
+
+
 def test_bench_openimcc_reference_check_returns_typed_skip_when_unavailable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -300,6 +365,108 @@ def test_bench_openimcc_reference_check_returns_typed_skip_when_unavailable(
 
     assert not available
     assert reason.startswith("typed-skip:openimcc_not_importable:")
+
+
+def test_scored_activity_runs_other_engines_when_openimcc_is_missing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    unavailable_handle = EngineHandle(
+        name=Engine.OPENIMCC.value,
+        backend=None,
+        available=False,
+        unavailable_reason="OpenIMCC runtime package missing",
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    real_open = open_battery_engine
+
+    def open_without_openimcc(name: str) -> EngineHandle:
+        if name == Engine.OPENIMCC.value:
+            return unavailable_handle
+        return real_open(name)
+
+    monkeypatch.setattr(
+        sys.modules[__name__], "open_battery_engine", open_without_openimcc
+    )
+    engines: list[Engine] = []
+    unavailable: dict[str, str] = {}
+    for engine in CACHE_TEST_ENGINES:
+        handle = open_without_openimcc(engine.value)
+        try:
+            if handle.available:
+                engines.append(engine)
+            else:
+                unavailable[engine.value] = (
+                    f"typed-skip:engine_unavailable:{engine.value}:"
+                    f"{handle.unavailable_reason or 'engine returned unavailable'}"
+                )
+        finally:
+            close_battery_engine_handle(handle)
+    if not engines:
+        pytest.skip(f"all non-OpenIMCC scored engines unavailable: {unavailable}")
+    assert unavailable[Engine.OPENIMCC.value].startswith(
+        "typed-skip:engine_unavailable:openimcc:"
+    )
+
+    original_import = builtins.__import__
+
+    def import_without_openimcc(name: str, *args: object, **kwargs: object) -> object:
+        if name == "openimcc" or name.startswith("openimcc."):
+            raise ModuleNotFoundError("OpenIMCC missing in scored fixture")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", import_without_openimcc)
+    from simulator.battery.generators import bench
+
+    available, typed_skip = bench._imcc_reports_parent_oxide("SiO2")
+    assert not available
+    assert typed_skip.startswith("typed-skip:openimcc_not_importable:")
+
+    work = F.work()
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("FeO", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="cache-openimcc-unavailable-exp",
+        work_id=work.work_id,
+        T_K=Decimal("1703"),
+        total_P=Decimal("100000"),
+    )
+    observation = F.observation(
+        "cache-openimcc-unavailable-activity",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+            fO2_Pa=Decimal("1"),
+            total_P=Decimal("100000"),
+        ),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+    )
+    output = tmp_path / "openimcc-unavailable.jsonl"
+    _score_store_to_jsonl(
+        context,
+        output,
+        root=ROOT,
+        engines=tuple(engines),
+        rail=Rail.MELT_ACTIVITY,
+        limit=1,
+        include_diagnostics=False,
+    )
+    rows = _residual_payloads(output.with_name(output.name + ".partial"))
+    assert rows, "scoring other available engines failed without OpenIMCC"
 
 
 @pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
@@ -555,34 +722,6 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     assert parallel_counts is not None
     assert cold_counts is not None
     assert cold_parallel_counts is not None
-    cold_calls_by_engine = {
-        engine.value: sum(
-            int(value)
-            for value in cold_counts[engine.value]["calls_by_kind"].values()
-        )
-        for engine in engines
-    }
-    unprobed = [
-        engine.value
-        for engine in engines
-        if cold_calls_by_engine[engine.value] == 0
-    ]
-    assert not unprobed, f"available engines were not probed: {unprobed}"
-    parallel_cold_calls_by_engine = {
-        engine.value: sum(
-            int(value)
-            for value in cold_parallel_counts[engine.value]["calls_by_kind"].values()
-        )
-        for engine in engines
-    }
-    parallel_unprobed = [
-        engine.value
-        for engine in engines
-        if parallel_cold_calls_by_engine[engine.value] == 0
-    ]
-    assert not parallel_unprobed, (
-        f"available engines were not probed in parallel: {parallel_unprobed}"
-    )
     activity_rows = _residual_payloads(tmp_path / "cold.jsonl.partial")
     assert any(
         any(
@@ -602,18 +741,16 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         or parallel_counts[engine.value]["misses"]
     }
     assert not warm_misses, f"warm engine cache misses: {warm_misses}"
-    no_warm_hits = [
-        engine.value
+    warm_engine_calls = {
+        engine.value: {
+            "serial": warm_counts[engine.value]["calls_by_kind"],
+            "parallel": parallel_counts[engine.value]["calls_by_kind"],
+        }
         for engine in engines
-        if warm_counts[engine.value]["hits"] == 0
-        or parallel_counts[engine.value]["hits"] == 0
-    ]
-    assert not no_warm_hits, f"available engines were not warm hits: {no_warm_hits}"
-    assert all(
-        not any(warm_counts[engine.value]["calls_by_kind"].values())
-        and not any(parallel_counts[engine.value]["calls_by_kind"].values())
-        for engine in engines
-    )
+        if any(warm_counts[engine.value]["calls_by_kind"].values())
+        or any(parallel_counts[engine.value]["calls_by_kind"].values())
+    }
+    assert not warm_engine_calls, f"warm engine calls remain: {warm_engine_calls}"
     assert sum(warm_counts[engine.value]["hits"] for engine in engines) > 0
     assert warm_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
         "equilibrate_cell": 0,
@@ -759,6 +896,8 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
 
     redox_warm_counts = None
     redox_parallel_counts = None
+    redox_cold_counts = None
+    redox_cold_parallel_counts = None
     redox_rows: list[dict[str, object]] = []
     if Engine.OPENIMCC in engines:
         redox_off, _redox_off_counts = score_redox("redox-off")
@@ -813,6 +952,65 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         assert unavailable[Engine.OPENIMCC.value].startswith(
             "typed-skip:engine_unavailable:openimcc:"
         )
+
+    def engine_calls(
+        counters: Mapping[str, Mapping[str, object]], engine: Engine
+    ) -> int:
+        entry = counters.get(engine.value, {})
+        by_kind = entry.get("calls_by_kind", {})
+        if not isinstance(by_kind, Mapping):
+            return 0
+        return sum(int(value) for value in by_kind.values())
+
+    def engine_hits(
+        counters: Mapping[str, Mapping[str, object]], engine: Engine
+    ) -> int:
+        entry = counters.get(engine.value, {})
+        return int(entry.get("hits", 0))
+
+    serial_cold_counter_sets = [cold_counts, vapor_cold_counts]
+    parallel_cold_counter_sets = [cold_parallel_counts, vapor_cold_parallel_counts]
+    serial_warm_counter_sets = [warm_counts, vapor_warm_counts]
+    parallel_warm_counter_sets = [parallel_counts, vapor_parallel_counts]
+    if redox_cold_counts is not None:
+        serial_cold_counter_sets.append(redox_cold_counts)
+        parallel_cold_counter_sets.append(redox_cold_parallel_counts)
+        serial_warm_counter_sets.append(redox_warm_counts)
+        parallel_warm_counter_sets.append(redox_parallel_counts)
+    missing_scored_coverage = {
+        engine.value: {
+            "serial_cold_calls": sum(
+                engine_calls(counters, engine)
+                for counters in serial_cold_counter_sets
+                if counters is not None
+            ),
+            "parallel_cold_calls": sum(
+                engine_calls(counters, engine)
+                for counters in parallel_cold_counter_sets
+                if counters is not None
+            ),
+            "serial_warm_hits": sum(
+                engine_hits(counters, engine)
+                for counters in serial_warm_counter_sets
+                if counters is not None
+            ),
+            "parallel_warm_hits": sum(
+                engine_hits(counters, engine)
+                for counters in parallel_warm_counter_sets
+                if counters is not None
+            ),
+        }
+        for engine in engines
+    }
+    missing_scored_coverage = {
+        engine: values
+        for engine, values in missing_scored_coverage.items()
+        if not all(values.values())
+    }
+    assert not missing_scored_coverage, (
+        "available engines were not called cold and hit warm in serial and "
+        f"parallel scored paths: {missing_scored_coverage}"
+    )
 
     for counts in (
         warm_counts,
