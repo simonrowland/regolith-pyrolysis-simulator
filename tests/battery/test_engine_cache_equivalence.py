@@ -319,13 +319,18 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         )
 
     off, _off_counts = score("off")
-    cache_path = tmp_path / "engine-cache.sqlite"
-    cache_path.touch()
-    cold_cache = EngineCache(cache_path)
-    cold, _cold_counts = score("cold", cold_cache)
-    warm_cache = EngineCache(cache_path)
+    off_parallel, _off_parallel_counts = score("off-parallel", workers=3)
+    serial_cache_path = tmp_path / "engine-cache-serial.sqlite"
+    parallel_cache_path = tmp_path / "engine-cache-parallel.sqlite"
+    cold_cache = EngineCache(serial_cache_path)
+    cold, _cold_counts = score("cold", cold_cache, workers=1)
+    cold_parallel_cache = EngineCache(parallel_cache_path)
+    cold_parallel, cold_parallel_counts = score(
+        "cold-parallel", cold_parallel_cache, workers=3
+    )
+    warm_cache = EngineCache(serial_cache_path)
     warm, warm_counts = score("warm", warm_cache, workers=1)
-    parallel_warm_cache = EngineCache(cache_path)
+    parallel_warm_cache = EngineCache(parallel_cache_path)
     parallel_warm, parallel_counts = score(
         "parallel-warm", parallel_warm_cache, workers=3
     )
@@ -352,11 +357,14 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         )
 
     assert_rows_equal("cold cache vs cache off", cold, off)
+    assert_rows_equal("parallel off vs serial off", off_parallel, off)
+    assert_rows_equal("parallel cold cache vs cache off", cold_parallel, off)
     assert_rows_equal("warm cache vs cache off", warm, off)
-    assert_rows_equal("parallel warm cache vs serial warm", parallel_warm, warm)
+    assert_rows_equal("parallel warm cache vs cache off", parallel_warm, off)
     assert warm_counts is not None
     assert parallel_counts is not None
     assert _cold_counts is not None
+    assert cold_parallel_counts is not None
     activity_rows = _residual_payloads(tmp_path / "cold.jsonl.partial")
     assert any(
         any(
@@ -396,6 +404,13 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "evaluate_gas": 0,
         "residue_vapor_pressure": 0,
     }
+    assert all(
+        sum(
+            int(value)
+            for value in cold_parallel_counts[engine.value]["calls_by_kind"].values()
+        ) > 0
+        for engine in engines
+    ), "parallel cold run did not exercise every available engine"
 
     vapor_engines = tuple(
         engine
@@ -421,11 +436,37 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         score_rail=Rail.VAPOUR,
         score_limit=1,
     )
-    vapor_cache_path = tmp_path / "vapor-engine-cache.sqlite"
-    vapor_cache_path.touch()
+    vapor_off_parallel, _vapor_off_parallel_counts = score(
+        "vapor-off-parallel",
+        workers=3,
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_cache_path = tmp_path / "vapor-engine-cache-serial.sqlite"
+    vapor_parallel_cache_path = tmp_path / "vapor-engine-cache-parallel.sqlite"
     vapor_cold, vapor_cold_counts = score(
         "vapor-cold",
         EngineCache(vapor_cache_path),
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_cold_parallel, vapor_cold_parallel_counts = score(
+        "vapor-cold-parallel",
+        EngineCache(vapor_parallel_cache_path),
+        workers=3,
+        score_context=vapor_context,
+        score_engines=vapor_engines,
+        score_rail=Rail.VAPOUR,
+        score_limit=1,
+    )
+    vapor_parallel, vapor_parallel_counts = score(
+        "vapor-parallel-warm",
+        EngineCache(vapor_parallel_cache_path),
+        workers=3,
         score_context=vapor_context,
         score_engines=vapor_engines,
         score_rail=Rail.VAPOUR,
@@ -440,21 +481,13 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         score_rail=Rail.VAPOUR,
         score_limit=1,
     )
-    vapor_parallel, vapor_parallel_counts = score(
-        "vapor-parallel-warm",
-        EngineCache(vapor_cache_path),
-        workers=3,
-        score_context=vapor_context,
-        score_engines=vapor_engines,
-        score_rail=Rail.VAPOUR,
-        score_limit=1,
-    )
+    assert_rows_equal("vapor parallel off vs serial off", vapor_off_parallel, vapor_off)
     assert_rows_equal("vapor cold cache vs cache off", vapor_cold, vapor_off)
+    assert_rows_equal("vapor parallel cold cache vs cache off", vapor_cold_parallel, vapor_off)
     assert_rows_equal("vapor warm cache vs cache off", vapor_warm, vapor_off)
-    assert_rows_equal(
-        "vapor parallel warm cache vs serial warm", vapor_parallel, vapor_warm
-    )
+    assert_rows_equal("vapor parallel warm cache vs cache off", vapor_parallel, vapor_off)
     assert vapor_cold_counts is not None
+    assert vapor_cold_parallel_counts is not None
     assert vapor_warm_counts is not None
     assert vapor_parallel_counts is not None
     for engine in vapor_engines:
@@ -465,6 +498,10 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         assert not any(
             vapor_parallel_counts[engine.value]["calls_by_kind"].values()
         )
+        assert sum(
+            int(value)
+            for value in vapor_cold_parallel_counts[engine.value]["calls_by_kind"].values()
+        ) > 0
     from tests.battery.test_redox_extract_scoring import (
         _sossi_aithala_redox_context,
     )
@@ -504,27 +541,38 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         )
 
     redox_off, _redox_off_counts = score_redox("redox-off")
-    redox_cache_path = tmp_path / "redox-engine-cache.sqlite"
-    redox_cache_path.touch()
+    redox_off_parallel, _redox_off_parallel_counts = score_redox(
+        "redox-off-parallel", workers=3
+    )
+    redox_cache_path = tmp_path / "redox-engine-cache-serial.sqlite"
+    redox_parallel_cache_path = tmp_path / "redox-engine-cache-parallel.sqlite"
     redox_cold_cache = EngineCache(redox_cache_path)
-    redox_cold, redox_cold_counts = score_redox("redox-cold", redox_cold_cache)
+    redox_cold, redox_cold_counts = score_redox(
+        "redox-cold", redox_cold_cache, workers=1
+    )
+    redox_cold_parallel, redox_cold_parallel_counts = score_redox(
+        "redox-cold-parallel", EngineCache(redox_parallel_cache_path), workers=3
+    )
     redox_warm_cache = EngineCache(redox_cache_path)
     redox_warm, redox_warm_counts = score_redox(
         "redox-warm", redox_warm_cache, workers=1
     )
-    redox_parallel_cache = EngineCache(redox_cache_path)
     redox_parallel, redox_parallel_counts = score_redox(
-        "redox-parallel-warm", redox_parallel_cache, workers=3
+        "redox-parallel-warm", EngineCache(redox_parallel_cache_path), workers=3
     )
 
     assert redox_off
+    assert redox_off_parallel == redox_off
     assert redox_cold == redox_off
+    assert redox_cold_parallel == redox_off
     assert redox_warm == redox_off
     assert redox_parallel == redox_warm == redox_off
     assert redox_cold_counts is not None
     assert redox_warm_counts is not None
     assert redox_parallel_counts is not None
+    assert redox_cold_parallel_counts is not None
     assert redox_cold_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
+    assert redox_cold_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
     assert redox_warm_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
         "equilibrate_cell": 0,
         "evaluate": 0,

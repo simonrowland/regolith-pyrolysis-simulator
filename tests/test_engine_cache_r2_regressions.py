@@ -84,7 +84,9 @@ def test_isolated_magemin_environment_failure_is_transient_across_cache_boundary
             pass
 
     monkeypatch.setattr(battery, "equilibrate_cell", environment_failure)
-    monkeypatch.setattr(battery, "_isolated_cell_worker", lambda _name: InProcessWorker())
+    monkeypatch.setattr(
+        battery, "_isolated_cell_worker", lambda *_args: InProcessWorker()
+    )
     monkeypatch.setattr(engine_cache, "runtime_identity", lambda _engine: {"runtime": "test"})
 
     def solve() -> EquilibrateCell:

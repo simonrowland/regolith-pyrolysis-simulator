@@ -52,21 +52,30 @@ def assert_residue_score_cache_equivalence(
         )
 
     off, _off_counts = score("off")
-    cache_path = tmp_path / "openimcc-residue.sqlite"
-    cold, cold_counts = score("cold", EngineCache(cache_path))
-    warm, warm_counts = score("warm", EngineCache(cache_path))
+    off_parallel, _off_parallel_counts = score("off-parallel", workers=3)
+    serial_cache_path = tmp_path / "openimcc-residue-serial.sqlite"
+    parallel_cache_path = tmp_path / "openimcc-residue-parallel.sqlite"
+    cold, cold_counts = score("cold", EngineCache(serial_cache_path), workers=1)
+    cold_parallel, cold_parallel_counts = score(
+        "cold-parallel", EngineCache(parallel_cache_path), workers=3
+    )
+    warm, warm_counts = score("warm", EngineCache(serial_cache_path), workers=1)
     parallel_warm, parallel_counts = score(
-        "parallel-warm", EngineCache(cache_path), workers=3
+        "parallel-warm", EngineCache(parallel_cache_path), workers=3
     )
 
     assert off
-    assert cold == warm == parallel_warm == off
+    assert cold == cold_parallel == warm == parallel_warm == off_parallel == off
     assert cold_counts is not None
+    assert cold_parallel_counts is not None
     assert warm_counts is not None
     assert parallel_counts is not None
     cold_calls = cold_counts[Engine.OPENIMCC.value]["calls_by_kind"]
+    cold_parallel_calls = cold_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"]
     assert cold_calls["evaluate"] > 0
     assert cold_calls["evaluate_gas"] > 0
+    assert cold_parallel_calls["evaluate"] > 0
+    assert cold_parallel_calls["evaluate_gas"] > 0
     for counts in (warm_counts, parallel_counts):
         engine_counts = counts[Engine.OPENIMCC.value]
         assert engine_counts["misses"] == 0

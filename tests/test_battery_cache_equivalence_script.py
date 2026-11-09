@@ -44,11 +44,11 @@ def test_default_slice_uses_all_engines_and_all_rails(
     monkeypatch.setattr(gate, "_run_slice", run_slice)
 
     assert gate.main([str(spec_path)]) == 0
-    assert len(calls) == 4
+    assert len(calls) == 6
     assert all(tuple(call["engines"]) == SCORE_ENGINE_SET for call in calls)
     assert all(call["rail"] is None for call in calls)
     assert all(call["limit"] == 334 for call in calls)
-    assert [call["workers"] for call in calls] == [1, 1, 1, 3]
+    assert [call["workers"] for call in calls] == [1, 3, 1, 3, 1, 3]
 
 
 def test_run_slice_returns_summed_worker_cache_counters(

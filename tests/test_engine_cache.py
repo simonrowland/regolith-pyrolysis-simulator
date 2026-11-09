@@ -7,6 +7,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import ast
 from pathlib import Path
 
 import pytest
@@ -102,30 +103,101 @@ def test_key_uses_chemistry_version_and_only_accepts_request_vector(
     assert list(inspect.signature(key).parameters) == [
         "engine_id",
         "request_vector",
-        "depends_on",
     ]
     with pytest.raises(TypeError):
         key("vaporock", request, observation_id="not-an-engine-input")  # type: ignore[call-arg]
 
 
-def test_key_includes_only_declared_dependency_chemistry_versions(
+@pytest.mark.parametrize(
+    ("engine", "dependency", "call_kind"),
+    [
+        ("internal-analytical", "openimcc", "equilibrate_cell"),
+        ("internal-analytical", "openimcc", "residue_vapor_pressure"),
+        ("thermoengine", "vaporock", "evaluate_gas"),
+        ("alphamelts", "vaporock", "evaluate_gas"),
+    ],
+)
+def test_declared_dependency_epoch_changes_every_adapter_call_key(
     monkeypatch: pytest.MonkeyPatch,
+    engine: str,
+    dependency: str,
+    call_kind: str,
 ) -> None:
-    request = {"temperature_K": 1700.0, "oxygen": {"mode": "balance"}}
-    without_balance = {"temperature_K": 1700.0, "oxygen": {"mode": "default"}}
-
-    balanced_before = key(
-        "internal-analytical", request, depends_on=("openimcc",)
-    )
-    ordinary_before = key("internal-analytical", without_balance)
+    request = {"call": call_kind, "temperature_K": 1700.0}
+    before = key(engine, request)
     monkeypatch.setitem(
         ENGINE_CHEMISTRY_VERSION,
-        "openimcc",
-        ENGINE_CHEMISTRY_VERSION["openimcc"] + 1,
+        dependency,
+        ENGINE_CHEMISTRY_VERSION[dependency] + 1,
     )
 
-    assert key("internal-analytical", request, depends_on=("openimcc",)) != balanced_before
-    assert key("internal-analytical", without_balance) == ordinary_before
+    assert key(engine, request) != before
+
+
+def test_undeclared_engine_epoch_does_not_change_an_adapter_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = {"call": "evaluate_gas", "temperature_K": 1700.0}
+    before = key("alphamelts", request)
+    monkeypatch.setitem(
+        ENGINE_CHEMISTRY_VERSION,
+        "magemin",
+        ENGINE_CHEMISTRY_VERSION["magemin"] + 1,
+    )
+
+    assert key("alphamelts", request) == before
+
+
+def test_adapter_cross_engine_calls_are_declared_dependencies() -> None:
+    root = Path(engine_cache.__file__).resolve().parents[1]
+    scoped_adapters = {
+        "internal-analytical": (
+            ("simulator/diagnostic_helpers/binary_pot_battery.py", "_InternalAnalyticalBatteryBackend"),
+            ("engines/builtin/vapor_pressure.py", "_build_high_t_melt_activity_authority"),
+        ),
+        "thermoengine": (("simulator/melt_backend/thermoengine.py", None),),
+        "alphamelts": (("simulator/melt_backend/alphamelts.py", None),),
+    }
+    cross_engine_symbols = {
+        "openimcc_bridge": "openimcc",
+        "_OpenImccBatteryBackend": "openimcc",
+        "evaluate_cleaned_melt": "openimcc",
+        "openimcc_binding_selected_by_inputs": "openimcc",
+        "VapoRockBackend": "vaporock",
+    }
+
+    def names_in_adapter(path: str, scope_name: str | None) -> set[str]:
+        tree = ast.parse((root / path).read_text(encoding="utf-8"), filename=path)
+        if scope_name is not None:
+            tree = next(
+                node
+                for node in tree.body
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                and node.name == scope_name
+            )
+        names: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name):
+                names.add(node.id)
+            elif isinstance(node, ast.Attribute):
+                names.add(node.attr)
+            elif isinstance(node, ast.ImportFrom):
+                names.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.Import):
+                names.update(alias.name for alias in node.names)
+        return names
+
+    for engine, adapter_scopes in scoped_adapters.items():
+        references = set().union(
+            *(names_in_adapter(path, scope) for path, scope in adapter_scopes)
+        )
+        dependencies = engine_cache.ENGINE_CHEMISTRY_DEPENDENCIES[engine]
+        undeclared = {
+            dependency
+            for symbol, dependency in cross_engine_symbols.items()
+            if symbol in references and dependency not in dependencies
+        }
+        assert not undeclared, f"{engine} uses undeclared engine dependencies: {undeclared}"
 
 
 def test_concurrent_process_writes_preserve_same_and_different_keys(

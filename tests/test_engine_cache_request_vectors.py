@@ -34,6 +34,7 @@ class _Backend:
         self._config = {"fO2_buffer": None}
         self._binary_path = None
         self._pack_name = "default"
+        self._oxygen_balance_pack = "default"
         self._allow_extrapolation = True
         self._allow_out_of_envelope = True
         self._temperature_units = "C"
@@ -372,8 +373,92 @@ def test_internal_analytical_oxygen_balance_tracks_openimcc_epoch(
 
     assert oxygen_backend.calls == 2
     assert oxygen_cache.counters["internal-analytical"]["misses"] == 2
-    assert ordinary_backend.calls == 1
-    assert ordinary_cache.counters["internal-analytical"]["hits"] == 1
+    assert ordinary_backend.calls == 2
+    assert ordinary_cache.counters["internal-analytical"]["misses"] == 2
+    assert ordinary_cache.counters["internal-analytical"]["hits"] == 0
+
+
+def test_internal_analytical_oxygen_pack_uses_parent_setting_off_cold_and_warm(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    pack_name = "review-nonexistent-pack"
+
+    class OxygenBackend(_Backend):
+        def __init__(self, pack: str) -> None:
+            super().__init__("internal-analytical")
+            self._oxygen_balance_pack = pack
+
+        def equilibrate(self, po2_request: Po2Request | None = None, **_kwargs: Any) -> Any:
+            self.calls += 1
+            if (
+                po2_request is not None
+                and po2_request.mode == "oxygen_balance_effusion"
+                and self._oxygen_balance_pack == pack_name
+            ):
+                raise ValueError(f"unknown oxygen balance pack {self._oxygen_balance_pack}")
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"SiO2": 0.5},
+                vapor_pressures_Pa={},
+                liquid_fraction=0.9,
+                phase_assemblage_available=True,
+            )
+
+    backend = OxygenBackend(pack_name)
+    handle = _handle("internal-analytical", backend)
+    request = Po2Request("oxygen_balance_effusion", None, "W")
+    vector = _vector(handle, po2=request)
+    assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == pack_name
+
+    def open_resolved(name: str, engine_settings: dict[str, Any] | None = None) -> Any:
+        assert name == "internal-analytical"
+        settings = dict(engine_settings or {})
+        oxygen = settings.get("oxygen_balance_backend") or {}
+        return OxygenBackend(str(oxygen.get("pack") or "default"))
+
+    monkeypatch.setattr(battery, "_open_resolved_backend", open_resolved)
+
+    class InlineWorker:
+        def request(self, payload: dict[str, Any], *, timeout_s: float) -> dict[str, Any]:
+            del timeout_s
+            resource, _worker_name = battery._bootstrap_isolated_cell_engine(
+                str(payload["engine"]), dict(payload["engine_settings"])
+            )
+            try:
+                return battery.run_isolated_cell_worker(
+                    payload, handle=resource.handle
+                )
+            finally:
+                resource.close()
+
+        def retire(self) -> None:
+            pass
+
+    monkeypatch.setattr(
+        battery, "_isolated_cell_worker", lambda *_args: InlineWorker()
+    )
+    common = {
+        "temperature_K": 1703.0,
+        "po2": request,
+    }
+    off = equilibrate_cell(handle, _pot(), isolated=False, **common)
+    isolated_off = equilibrate_cell(handle, _pot(), isolated=True, **common)
+    cache = EngineCache(tmp_path / "internal-analytical-pack.sqlite")
+    cold = equilibrate_cell(
+        handle, _pot(), isolated=True, engine_cache=cache, **common
+    )
+    warm = equilibrate_cell(
+        handle, _pot(), isolated=False, engine_cache=cache, **common
+    )
+
+    assert off.status == isolated_off.status == cold.status == warm.status == "refusal"
+    assert off.refusal_reason == isolated_off.refusal_reason == cold.refusal_reason == warm.refusal_reason
+    assert cache.counters["internal-analytical"]["stores"] == 1
+    assert cache.counters["internal-analytical"]["hits"] == 1
 
 
 def test_magemin_bridge_change_does_not_reuse_subprocess_cell(
