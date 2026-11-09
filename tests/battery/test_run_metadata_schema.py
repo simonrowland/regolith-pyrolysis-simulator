@@ -7,6 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import load_migrated_store, migrate, to_plain
@@ -1449,3 +1450,254 @@ def test_run_metadata_without_unit_semantics_rejects_unit_annotations(
         and issue.path.endswith(field)
         for issue in result.validation.issues
     ), result.validation.issues
+
+
+_RUN_METADATA_NESTED_UNIT_ANNOTATION_CASES = tuple(
+    (field, home, location, unit_key)
+    for field in ("mass_kg", "final_mass_kg", "species_loss_fraction")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+    for location, unit_key in (
+        ("locator", "unit"),
+        ("locator", "unit_code"),
+        ("inference", "unit"),
+    )
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "location", "unit_key"),
+    _RUN_METADATA_NESTED_UNIT_ANNOTATION_CASES,
+    ids=[
+        f"{field}-{home}-{location}-{unit_key}"
+        for field, home, location, unit_key in _RUN_METADATA_NESTED_UNIT_ANNOTATION_CASES
+    ],
+)
+def test_nested_unit_annotations_are_typed_at_every_sample_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    location: str,
+    unit_key: str,
+) -> None:
+    point = "1" if field == "mass_kg" else "0.5"
+    raw_value = {"kind": "point", "point": point}
+    if location == "locator":
+        raw_value["locator"] = {"page": 1, unit_key: "g"}
+    else:
+        raw_value["inference"] = {
+            "method": "fixture",
+            "relation": "identity",
+            "inputs": ["source"],
+            unit_key: "g",
+        }
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, field, home, "scalar", raw_value=raw_value
+    )
+
+    errors = validate_extract_document(extract)
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in errors
+    ), errors
+
+    result = migrate(root, write=False)
+    issue_suffix = (
+        f"sample.{field}[Na]"
+        if field == "species_loss_fraction"
+        else f"sample.{field}"
+    )
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(issue_suffix)
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_UNITLESS_LOCATOR_UNIT_CASES = tuple(
+    (field, home)
+    for field in ("charge_sequence", "vaporization_statement")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home"),
+    _UNITLESS_LOCATOR_UNIT_CASES,
+    ids=[f"{field}-{home}" for field, home in _UNITLESS_LOCATOR_UNIT_CASES],
+)
+def test_locator_unit_annotations_are_typed_at_unitless_registry_homes(
+    tmp_path: Path,
+    field: str,
+    home: str,
+) -> None:
+    payload = (
+        {
+            "charge_id": "charge-a",
+            "run_index": 1,
+            "locator": {"page": 1, "unit": "g"},
+        }
+        if field == "charge_sequence"
+        else {
+            "state": {"tag": "value", "value": "congruent"},
+            "locator": {"table": "r8-vapor", "page": 1, "unit": "g"},
+        }
+    )
+    root, extract = _unitless_run_metadata_extract(tmp_path, field, home, payload)
+
+    errors = validate_extract_document(extract)
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in errors
+    ), errors
+
+    result = migrate(root, write=True)
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(field)
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert getattr(experiment, field) is None
+
+
+def test_nested_locator_unit_refusal_survives_store_write_and_load(
+    tmp_path: Path,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "scalar",
+        raw_value={
+            "kind": "point",
+            "point": "1",
+            "locator": {"table": "r8-mass", "page": 1, "unit": "g"},
+        },
+    )
+
+    assert any(
+        "experiments[0].sample.mass_kg" in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert experiment.sample.mass_kg is None
+
+
+def test_valid_inference_output_unit_is_preserved(
+    tmp_path: Path,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "scalar",
+        raw_value={
+            "kind": "point",
+            "point": "1",
+            "inference": {
+                "method": "fixture",
+                "relation": "identity",
+                "inputs": ["source"],
+                "output_unit": "kg",
+            },
+        },
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+
+    assert experiment.sample.mass_kg is not None
+    assert experiment.sample.mass_kg.inference is not None
+    assert experiment.sample.mass_kg.inference.output_unit == "kg"
+
+
+_BUSEMANN_PRECONVERTED_MASS_ROWS = (
+    ("cold_bokkeveld_csse", "9.30", "0.0093"),
+    ("grosnaja_csse", "5.68", "0.00568"),
+    ("lance_csse", "6.78", "0.00678"),
+    ("isna_csse", "9.87", "0.00987"),
+    ("chainpur_csse", "6.05", "0.00605"),
+    ("dimmitt_csse", "25.84", "0.02584"),
+)
+
+
+def test_busemann_preconverted_mass_rows_keep_their_units_and_store_bytes(
+    tmp_path: Path,
+) -> None:
+    experiments = []
+    for experiment_id, printed_grams, stored_kg in _BUSEMANN_PRECONVERTED_MASS_ROWS:
+        note = (
+            f"Derived unit conversion only: printed {printed_grams} g × 10^-3 kg/g; "
+            "no physical quantity was recomputed."
+        )
+        experiments.append(
+            {
+                "experiment_id": experiment_id,
+                "sample": {
+                    "mass_kg": {
+                        "state": {
+                            "tag": "value",
+                            "value": {"kind": "point", "point": stored_kg},
+                        },
+                        "as_published": {"value": printed_grams, "units": "g"},
+                        "locator": {
+                            "page": 3,
+                            "published_page": 951,
+                            "pdf_page_index": 2,
+                            "table": "2",
+                            "record": "sample mass column",
+                            "note": note,
+                        },
+                    }
+                },
+            }
+        )
+    root = _extract_with_experiments(
+        tmp_path,
+        experiments,
+        observation_experiment=_BUSEMANN_PRECONVERTED_MASS_ROWS[0][0],
+    )
+
+    assert validate_extract_document(
+        yaml.safe_load((root / "data/literature/extracts/fixture-source.yaml").read_text())
+    ) == []
+    migrate(root, write=True)
+    _works, loaded_experiments, _observations = load_migrated_store(root)
+
+    for experiment_id, printed_grams, stored_kg in _BUSEMANN_PRECONVERTED_MASS_ROWS:
+        mass = loaded_experiments[
+            f"10.1234/fixture::experiment::{experiment_id}"
+        ].sample.mass_kg
+        assert mass is not None and mass.state.is_value
+        assert mass.state.value == Value.point_of(stored_kg)
+        assert mass.locator is not None
+        assert mass.inference is not None
+        assert mass.inference.relation == "g_to_kg"
+        assert mass.inference.inputs == (
+            "m_kg = m_g / 1000",
+            "original_unit=g",
+        )
+        assert mass.inference.output_unit == "kg"
+        assert str(mass.inference.parameters[0][1].state.value) == printed_grams
+
+    work_yaml = root / "data/literature/works/10.1234_fixture.yaml"
+    first_bytes = work_yaml.read_bytes()
+    migrate(root, write=True)
+    assert work_yaml.read_bytes() == first_bytes
