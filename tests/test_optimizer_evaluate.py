@@ -1375,12 +1375,16 @@ def test_extraction_not_attempted_round_trips_through_result_store(tmp_path) -> 
     assert not result.feasible
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
     margins = result.feasibility_margins
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = margins[gate]
-        assert margin.status == "not-attempted"
-        assert margin.output_status == "not_attempted"
-        assert margin.status_reason == "not-attempted-no-volatilization"
-        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    purity_margin = margins["delivered_stream_purity"]
+    assert purity_margin.status == "not-attempted"
+    assert purity_margin.output_status == "not_attempted"
+    assert purity_margin.status_reason == "not-attempted-no-volatilization"
+    assert purity_margin.status_payload["diagnostic_only"] is True
+    assert purity_margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    extraction_margin = margins["extraction_completeness"]
+    assert extraction_margin.status == "unavailable"
+    assert extraction_margin.observed is None
+    assert "SiO" in extraction_margin.detail
 
     assert result.eval_spec is not None
     assert result.run_reference is not None
@@ -1403,12 +1407,16 @@ def test_extraction_not_attempted_round_trips_through_result_store(tmp_path) -> 
     loaded = store.fetch(result.cache_key)
 
     assert loaded is not None
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = loaded.feasibility_margins[gate]
-        assert margin.status == "not-attempted"
-        assert margin.output_status == "not_attempted"
-        assert margin.status_reason == "not-attempted-no-volatilization"
-        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    loaded_purity = loaded.feasibility_margins["delivered_stream_purity"]
+    assert loaded_purity.status == "not-attempted"
+    assert loaded_purity.output_status == "not_attempted"
+    assert loaded_purity.status_reason == "not-attempted-no-volatilization"
+    assert loaded_purity.status_payload["diagnostic_only"] is True
+    assert loaded_purity.status_payload["predicate"] == "melt_never_reached_solidus"
+    loaded_extraction = loaded.feasibility_margins["extraction_completeness"]
+    assert loaded_extraction.status == "unavailable"
+    assert loaded_extraction.observed is None
+    assert "SiO" in loaded_extraction.detail
 
 
 def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
@@ -1447,13 +1455,17 @@ def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
 
     assert not result.feasible
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = result.feasibility_margins[gate]
-        assert not margin.feasible
-        assert margin.status != "not-attempted"
-        assert margin.output_status != "not_attempted"
-        assert margin.status_reason != "not-attempted-no-volatilization"
-        assert "not-attempted-no-volatilization" not in margin.detail
+    purity = result.feasibility_margins["delivered_stream_purity"]
+    assert purity.feasible
+    assert purity.margin < 0.0
+    assert purity.status == "warning"
+    assert purity.output_status == "provisional"
+    assert "not-attempted-no-volatilization" not in purity.detail
+    extraction = result.feasibility_margins["extraction_completeness"]
+    assert not extraction.feasible
+    assert extraction.status == "unavailable"
+    assert extraction.observed is None
+    assert "not-attempted-no-volatilization" not in extraction.detail
 
 
 @pytest.mark.parametrize(
@@ -1658,14 +1670,15 @@ def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) 
     margin = result.feasibility_margins["extraction_completeness"]
     assert not margin.feasible
     assert margin.margin == -math.inf
-    assert margin.observed == math.inf
-    assert margin.detail == "not-applicable: zero input basis for CrO2"
+    assert margin.observed is None
+    assert margin.status == "unavailable"
+    assert "target element Cr" in margin.detail
     assert result.failing_gates == ("extraction_completeness",)
     target = result.run_reference.product_summary["extraction_completeness"][
         "targets"
     ]["CrO2"]
     assert target["status"] == "insufficient-evidence"
-    assert target["reason"] == "not-applicable: zero input basis for CrO2"
+    assert "target element Cr" in target["reason"]
 
     assert result.eval_spec is not None
     store = ResultStore(
@@ -2496,33 +2509,39 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
     assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
 
     mixed_stream_execution = _execution(trace=_trace(mixed_stream=True))
-    infeasible = evaluate(
+    enforced_purity = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
+        constraints=PhysicsConstraintSet(
+            enforce_delivered_stream_purity=True,
+        ),
     )
-    same_run_without_purity_gate = evaluate(
+    diagnostic_purity = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
-        constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
+        constraints=PhysicsConstraintSet(),
     )
 
-    assert not infeasible.feasible
-    assert infeasible.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert infeasible.objectives is not None
-    assert same_run_without_purity_gate.feasible
-    assert same_run_without_purity_gate.objectives is not None
+    assert not enforced_purity.feasible
+    assert enforced_purity.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert enforced_purity.objectives is not None
+    assert diagnostic_purity.feasible
+    assert diagnostic_purity.objectives is not None
     assert (
-        infeasible.objectives.as_mapping()
-        == same_run_without_purity_gate.objectives.as_mapping()
+        enforced_purity.objectives.as_mapping()
+        == diagnostic_purity.objectives.as_mapping()
     )
-    assert infeasible.failing_gates == ("delivered_stream_purity",)
-    assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+    assert enforced_purity.failing_gates == ("delivered_stream_purity",)
+    assert enforced_purity.feasibility_margins["delivered_stream_purity"].margin < 0.0
+    assert diagnostic_purity.feasibility_margins["delivered_stream_purity"].margin == (
+        enforced_purity.feasibility_margins["delivered_stream_purity"].margin
+    )
 
 
 def _authoritative_sio_carrier() -> dict[str, object]:

@@ -187,6 +187,18 @@ There is no literal CLI flag named `cached-real` or `real-alphamelts` in the cur
 
 Real AlphaMELTS-backed work, when configured, is slow and backend-dependent. If the backend cannot resolve, treat the run as failed or diagnostic, not as a lower-fidelity success.
 
+## Feasibility And Diagnostic Checks
+
+Extraction completeness measures target yield at the melt boundary: captured and volatile
+products, tapped metal, wall deposits, and terminal offgas count as extracted. Material not
+charged, still in the melt, or retained in the redox buffer does not. The denominator is the
+target-equivalent amount in the melt at the start of the evaluated span. Cleanup-sequestered
+material is reported separately, and wall deposits still face the coating limit.
+
+Captured-basis recovery remains reported as a provisional diagnostic. Stream purity is reported
+as a diagnostic while the condenser-train model is in development; set
+`constraints.enforce_delivered_stream_purity: true` to enforce the 95% threshold.
+
 ## Read Results
 
 ### Leaderboard
@@ -254,8 +266,9 @@ matter, because they are the opposite of the intuitive answer:
   data YAML — or shipping a new code version — does not miss cache. Do not expect a
   release bump to invalidate stored optimizer results; it will not.
 
-`physics_constraints` (feasibility thresholds and active gates) *is* first-class key
-material, because a threshold change changes verdicts and must not be served from cache.
+`physics_constraints` (feasibility thresholds, active gates, and the purity enforcement
+setting) *is* first-class key material, because changing these settings changes verdicts
+and must not be served from cache.
 Owner-ratified default `cost_parameters` serialize away, so runs at the defaults share one
 cache identity.
 

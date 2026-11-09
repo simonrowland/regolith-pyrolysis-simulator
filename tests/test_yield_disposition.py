@@ -15,6 +15,8 @@ from simulator.accounting import (
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.yield_disposition import (
+    MELT_BOUNDARY_BIN_PARTITION,
+    MELT_BOUNDARY_UNCLASSIFIED_BINS,
     MELT_RETAINED_SUBDISPOSITIONS,
     OriginUnresolvedError,
     YIELD_DISPOSITION_BINS,
@@ -35,6 +37,17 @@ def _row(payload: dict, element: str) -> dict:
         for row in payload["fraction_table"]["rows"]
         if row["element"] == element
     )
+
+
+def test_melt_boundary_partition_classifies_every_yield_disposition_bin() -> None:
+    left = set(MELT_BOUNDARY_BIN_PARTITION.left)
+    not_left = set(MELT_BOUNDARY_BIN_PARTITION.not_left)
+    cleanup = set(MELT_BOUNDARY_UNCLASSIFIED_BINS)
+
+    assert left.isdisjoint(not_left)
+    assert left.isdisjoint(cleanup)
+    assert not_left.isdisjoint(cleanup)
+    assert left | not_left | cleanup == set(YIELD_DISPOSITION_BINS)
 
 
 def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:
