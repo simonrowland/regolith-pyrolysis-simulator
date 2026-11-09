@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 import math
+from types import SimpleNamespace
 
 import pytest
 
 import simulator.fe_redox as fe_redox_module
+from simulator.core import PyrolysisSimulator
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -684,7 +686,7 @@ def test_feo_activity_anchor_basis_documents_melt_offset():
     )
 
 
-def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
+def test_iron_rich_basalt_uses_wustite_ceiling_and_closes_fe_atoms(
     vapor_pressure_data,
 ):
     anchor = _solve_metal_saturation_anchor(
@@ -702,8 +704,10 @@ def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
 
     assert diagnostic["a_FeO_calphad"]["central"] > 1.0
     assert diagnostic["a_FeO_authoritative_unclamped"] > 1.0
-    assert diagnostic["a_FeO_authoritative_clamped_to_pure_feo_ceiling"] is True
-    assert diagnostic["a_FeO_current"] == pytest.approx(1.0)
+    assert diagnostic["a_FeO_authoritative_clamped_to_pure_feo_ceiling"] is False
+    assert diagnostic["a_FeO_current"] == pytest.approx(
+        diagnostic["a_FeO_authoritative_unclamped"]
+    )
     band = diagnostic["a_FeO_calphad"]
     assert diagnostic["current_within_calphad_band"] is (
         band["low"]
@@ -718,7 +722,7 @@ def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
         fO2_log=fO2_log,
         T_K=_T_K,
         pressure_bar=1e-6,
-    ) == pytest.approx(1.0)
+    ) == pytest.approx(diagnostic["a_FeO_authoritative"])
 
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = IntentRequest(
@@ -739,4 +743,37 @@ def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
     )
 
     result = provider.dispatch(request)
-    assert result.diagnostic["activities"]["Fe"] == pytest.approx(1.0)
+    assert result.diagnostic["activities"]["Fe"] == pytest.approx(
+        diagnostic["a_FeO_authoritative"]
+    )
+
+
+def test_iron_rich_basalt_native_fe_saturates_at_its_melt_anchor():
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_IRON_RICH_BASALT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    host = SimpleNamespace(
+        _feot_equivalent_wt_pct=PyrolysisSimulator._feot_equivalent_wt_pct,
+    )
+
+    def native_fe_state(fO2_log):
+        return PyrolysisSimulator._native_fe_saturation_state(
+            host,
+            _IRON_RICH_BASALT_WT,
+            fe3_over_sigma_fe=0.1,
+            T_K=_T_K,
+            pressure_bar=1e-6,
+            fO2_log=fO2_log,
+        )
+
+    at_anchor = native_fe_state(anchor["log10_fO2_bar"])
+    assert at_anchor["native_fe_frac"] == 0.0
+    assert at_anchor["native_fe_activity"] == pytest.approx(
+        at_anchor["native_fe_saturation_activity"],
+        rel=1e-12,
+    )
+    assert native_fe_state(anchor["log10_fO2_bar"] - 0.01)[
+        "native_fe_frac"
+    ] > 0.0

@@ -522,7 +522,8 @@ def _feo_activity_to_wustite_basis(
         raise Kress91InvalidControls(
             'FeO stoichiometric-to-wustite multiplier must be finite and positive'
         )
-    return float(activity_stoich) / multiplier
+    # The pure-FeO activity ceiling belongs to this wustite reference state.
+    return min(float(activity_stoich) / multiplier, 1.0)
 
 
 def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
@@ -1371,12 +1372,7 @@ def _calphad_feo_activity_components(
     calphad_weight = _calphad_authority_weight(delta_metal_saturation_anchor)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
-    # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
-    # saturation, so greater activities are unphysical supersaturation.  The
-    # min() therefore creates a continuous kink: below 1 the authority follows
-    # the blend, while above 1 its slope is zero.  At the limiting value both
-    # branches return exactly 1 (and, e.g., an unclamped 1.2 remains authority 1).
-    authoritative = min(authoritative_unclamped, 1.0)
+    authoritative = authoritative_unclamped
     stoich_multiplier = float(holzheid['conversion_multiplier'])
     central_wustite = _feo_activity_to_wustite_basis(
         central,
@@ -1423,7 +1419,7 @@ def _calphad_feo_activity_components(
         'a_FeO_calphad': activity,
         'a_FeO_pure_feo_ceiling': 1.0,
         'a_FeO_authoritative_clamped_to_pure_feo_ceiling': (
-            authoritative_unclamped > 1.0
+            authoritative_unclamped > stoich_multiplier
         ),
         'current_within_calphad_band': low <= authoritative_unclamped <= high,
         'comparison': {
