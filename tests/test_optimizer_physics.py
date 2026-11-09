@@ -7,7 +7,9 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.diagnostics import wall_deposit_sticking_authority_status
-from simulator.accounting.yield_disposition import MELT_BOUNDARY_BIN_PARTITION
+from simulator.accounting.yield_disposition import (
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
+)
 from simulator.optimize.physics import (
     CoatingFeasibilityReportError,
     GATE_ORDER,
@@ -2033,7 +2035,7 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
         "yield_disposition.fraction_table.destination_mol_atoms"
     )
     assert target["allowed_residual"]["bins"] == (
-        MELT_BOUNDARY_BIN_PARTITION.not_left
+        YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.not_left_melt
     )
     assert target["allowed_residual"]["fraction"] == pytest.approx(0.05)
     assert target["allowed_residual"]["target_equiv_mol"] == pytest.approx(0.15)

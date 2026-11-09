@@ -22,7 +22,9 @@ from simulator.accounting.completeness import (
     target_species_yield_by_initial_cleaned_melt,
 )
 from simulator.accounting.queries import AccountingQueries
-from simulator.accounting.yield_disposition import MELT_BOUNDARY_BIN_PARTITION
+from simulator.accounting.yield_disposition import (
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
+)
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.diagnostics import (
     _carrier_is_inapplicable,
@@ -1486,7 +1488,7 @@ def _extraction_completeness_target_report(
     allowed_residual = (
         {
             "account": "yield_disposition.fraction_table.destination_mol_atoms",
-            "bins": MELT_BOUNDARY_BIN_PARTITION.not_left,
+            "bins": YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.not_left_melt,
             "fraction": 1.0 - threshold.value,
             "target_equiv_mol": (
                 (1.0 - threshold.value) * result.denominator_target_equiv_mol

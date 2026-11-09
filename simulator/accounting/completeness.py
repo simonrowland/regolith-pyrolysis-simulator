@@ -25,8 +25,7 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.accounting.yield_disposition import (
-    MELT_BOUNDARY_BIN_PARTITION,
-    MELT_BOUNDARY_UNCLASSIFIED_BINS,
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
 )
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.instrumentation import (
@@ -928,11 +927,18 @@ def _melt_boundary_fraction_table_metrics(
             f"yield-disposition {element}.{destination} mol-atoms",
         )
 
-    left = math.fsum(amount_for(name) for name in MELT_BOUNDARY_BIN_PARTITION.left)
-    not_left = math.fsum(
-        amount_for(name) for name in MELT_BOUNDARY_BIN_PARTITION.not_left
+    left = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.left_melt
     )
-    cleanup = math.fsum(amount_for(name) for name in MELT_BOUNDARY_UNCLASSIFIED_BINS)
+    not_left = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.not_left_melt
+    )
+    cleanup = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.cleanup_sequestered
+    )
     denominator = _finite_number(
         math.fsum((left, not_left)),
         f"yield-disposition {element}.left_plus_not_left mol-atoms",

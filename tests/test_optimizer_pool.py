@@ -16,11 +16,20 @@ from types import MappingProxyType
 import pytest
 
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.chemistry.kernel import ProposalRejected
+from simulator.core import PoisonedHourError, PoisonedHourState
+from simulator.engine_pool import EngineWorkerRemoteError
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
 from simulator.optimize.determinism import THREAD_ENV_VARS, deterministic_result_view, pin_worker_env
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
-from simulator.optimize.evaluate import EngineBugAbort, FailureCategory, RunReference, ScoredResult
+from simulator.optimize.evaluate import (
+    BackendUnavailableAbort,
+    EngineBugAbort,
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+)
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.pool import (
@@ -28,6 +37,7 @@ from simulator.optimize.pool import (
     evaluate_batch,
     resolve_eval_timeout_seconds,
 )
+from simulator.optimize.profiles import load_profile
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 
@@ -384,6 +394,39 @@ def _fake_evaluate(
     )
 
 
+def _poison_one_pool_candidate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    if candidate_id == "poisoned":
+        raise PoisonedHourError(
+            PoisonedHourState(
+                hour=160,
+                committed_transition_count=3,
+                aborting_exception_summary=(
+                    "ProposalRejected: partial withdrawal from mixed-origin "
+                    "process.overhead_gas.Na requires an explicitly amalgamated pool"
+                ),
+                aborting_exception_type=ProposalRejected,
+            )
+        )
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
+
 def _store_rejected_evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -575,6 +618,248 @@ def test_engine_worker_pool_timeout_evicts_only_hung_slot(tmp_path: Path) -> Non
 
     assert results[0].run_reference.backend_status_reason == 'optimizer_eval_timeout'
     assert results[1].candidate_id == 'fast'
+
+
+def test_engine_worker_pool_records_poisoned_candidate_and_runs_healthy_one(
+    tmp_path: Path,
+) -> None:
+    profile = load_profile("data/optimize_profiles/hero/lunar_mare_low_ti.yaml")
+    poisoned = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary=(
+                "ProposalRejected: partial withdrawal from mixed-origin "
+                "process.overhead_gas.Na requires an explicitly amalgamated pool"
+            ),
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+    tasks = (
+        replace(
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            profile=profile,
+            candidate_id="poisoned",
+            output_dir=str(tmp_path / "poisoned"),
+        ),
+        replace(
+            _pool_task(
+                1,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            profile=profile,
+            candidate_id="healthy",
+            output_dir=str(tmp_path / "healthy"),
+        ),
+    )
+
+    class ImmediatePool:
+        def submit(self, request: object, *, timeout_s: float) -> Future[object]:
+            task, evaluate_fn = request
+            future: Future[object] = Future()
+            if task.candidate_id == "poisoned":
+                future.set_exception(
+                    EngineWorkerRemoteError(
+                        "PoisonedHourError",
+                        str(poisoned),
+                        "remote simulator traceback",
+                    )
+                )
+            else:
+                result = evaluate_fn(
+                    task.patch,
+                    task.feedstock_id,
+                    task.fidelity,
+                    profile=task.profile,
+                    candidate_id=task.candidate_id,
+                    output_dir=task.output_dir,
+                )
+                future.set_result(
+                    {"kind": "result", "index": task.index, "result": result}
+                )
+            return future
+
+        def close(self, *, cancel_pending: bool) -> None:
+            assert cancel_pending is False
+
+    results = pool_module._evaluate_tasks_in_engine_worker_pool(
+        tasks,
+        _fake_evaluate,
+        max_workers=2,
+        per_eval_timeout_seconds=5.0,
+        warm_runtime_spec=pool_module._WarmRuntimeSpec(
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        engine_worker_pool=ImmediatePool(),
+    )
+
+    assert results[0].candidate_id == "poisoned"
+    assert results[0].failure_category is FailureCategory.PHYSICS_REFUSED
+    assert results[0].failing_gates == ("physics_refusal",)
+    refusal_detail = results[0].feasibility_margins["physics_refusal"].detail
+    assert (
+        "process.overhead_gas.Na requires an explicitly amalgamated pool"
+        in refusal_detail
+    )
+    assert results[1].candidate_id == "healthy"
+    assert results[1].feasible
+
+
+def test_engine_worker_pool_remote_poison_keeps_normal_eval_identity(
+    tmp_path: Path,
+) -> None:
+    profile = load_profile("data/optimize_profiles/hero/lunar_mare_low_ti.yaml")
+    task = replace(
+        _pool_task(
+            0,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        profile=profile,
+        candidate_id="poisoned",
+        output_dir=str(tmp_path / "poisoned"),
+    )
+    detail = (
+        "partial withdrawal from mixed-origin process.overhead_gas.Na "
+        "requires an explicitly amalgamated pool"
+    )
+
+    class RejectingExecutor:
+        def execute(self, _run_config: object) -> object:
+            raise ProposalRejected(detail)
+
+    expected = evaluate_module.evaluate(
+        task.patch,
+        task.feedstock_id,
+        task.fidelity,
+        profile=task.profile,
+        candidate_id=task.candidate_id,
+        executor=RejectingExecutor(),
+    )
+
+    class ImmediatePool:
+        def submit(self, request: object, *, timeout_s: float) -> Future[object]:
+            future: Future[object] = Future()
+            future.set_exception(
+                EngineWorkerRemoteError(
+                    "ProposalRejected", detail, "remote simulator traceback"
+                )
+            )
+            return future
+
+        def close(self, *, cancel_pending: bool) -> None:
+            assert cancel_pending is False
+
+    result = pool_module._evaluate_tasks_in_engine_worker_pool(
+        (task,),
+        _fake_evaluate,
+        max_workers=1,
+        per_eval_timeout_seconds=5.0,
+        warm_runtime_spec=pool_module._WarmRuntimeSpec(
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        engine_worker_pool=ImmediatePool(),
+    )[0]
+
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.eval_spec == expected.eval_spec
+    assert result.cache_key == expected.cache_key
+
+
+def test_engine_worker_pool_remote_backend_outage_still_aborts(
+    tmp_path: Path,
+) -> None:
+    profile = load_profile("data/optimize_profiles/hero/lunar_mare_low_ti.yaml")
+    task = replace(
+        _pool_task(
+            0,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        profile=profile,
+        candidate_id="unavailable",
+        output_dir=str(tmp_path / "unavailable"),
+    )
+
+    class ImmediatePool:
+        def submit(self, request: object, *, timeout_s: float) -> Future[object]:
+            future: Future[object] = Future()
+            future.set_exception(
+                EngineWorkerRemoteError(
+                    "BackendUnavailableError", "engine missing", "remote traceback"
+                )
+            )
+            return future
+
+        def close(self, *, cancel_pending: bool) -> None:
+            assert cancel_pending is True
+
+    with pytest.raises(BackendUnavailableAbort):
+        pool_module._evaluate_tasks_in_engine_worker_pool(
+            (task,),
+            _fake_evaluate,
+            max_workers=1,
+            per_eval_timeout_seconds=5.0,
+            warm_runtime_spec=pool_module._WarmRuntimeSpec(
+                backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            engine_worker_pool=ImmediatePool(),
+        )
+
+
+def test_engine_worker_pool_classifies_poison_before_worker_transport(
+    tmp_path: Path,
+) -> None:
+    profile = load_profile("data/optimize_profiles/hero/lunar_mare_low_ti.yaml")
+    tasks = tuple(
+        replace(
+            _pool_task(
+                index,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=False,
+            ),
+            profile=pool_module._plain_value_for_process_pool(profile),
+            candidate_id=candidate_id,
+            output_dir=str(tmp_path / candidate_id),
+        )
+        for index, candidate_id in enumerate(("poisoned", "healthy"))
+    )
+    warm_runtime_spec = pool_module._WarmRuntimeSpec(
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        feedstock_id="lunar_mare_low_ti",
+        stage0_subprocess_required=False,
+    )
+    engine_worker_pool = pool_module._create_engine_worker_pool(
+        max_workers=2,
+        timeout_seconds=30.0,
+        warm_runtime_spec=warm_runtime_spec,
+    )
+
+    results = pool_module._evaluate_tasks_in_engine_worker_pool(
+        tasks,
+        _poison_one_pool_candidate,
+        max_workers=2,
+        per_eval_timeout_seconds=30.0,
+        warm_runtime_spec=warm_runtime_spec,
+        engine_worker_pool=engine_worker_pool,
+    )
+
+    assert results[0].candidate_id == "poisoned"
+    assert results[0].failure_category is FailureCategory.PHYSICS_REFUSED
+    assert results[0].failing_gates == ("physics_refusal",)
+    assert results[1].candidate_id == "healthy"
+    assert results[1].feasible
 
 
 def _grandchild_then_hang_evaluate(

@@ -15,11 +15,10 @@ from simulator.accounting import (
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.yield_disposition import (
-    MELT_BOUNDARY_BIN_PARTITION,
-    MELT_BOUNDARY_UNCLASSIFIED_BINS,
     MELT_RETAINED_SUBDISPOSITIONS,
     OriginUnresolvedError,
     YIELD_DISPOSITION_BINS,
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
     YieldDispositionError,
     build_yield_disposition,
     capture_ledger_snapshot,
@@ -39,15 +38,16 @@ def _row(payload: dict, element: str) -> dict:
     )
 
 
-def test_melt_boundary_partition_classifies_every_yield_disposition_bin() -> None:
-    left = set(MELT_BOUNDARY_BIN_PARTITION.left)
-    not_left = set(MELT_BOUNDARY_BIN_PARTITION.not_left)
-    cleanup = set(MELT_BOUNDARY_UNCLASSIFIED_BINS)
+def test_melt_boundary_partition_covers_disposition_bins_once() -> None:
+    partition = YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION
+    assigned = (
+        *partition.left_melt,
+        *partition.not_left_melt,
+        *partition.cleanup_sequestered,
+    )
 
-    assert left.isdisjoint(not_left)
-    assert left.isdisjoint(cleanup)
-    assert not_left.isdisjoint(cleanup)
-    assert left | not_left | cleanup == set(YIELD_DISPOSITION_BINS)
+    assert len(assigned) == len(set(assigned))
+    assert set(assigned) == set(YIELD_DISPOSITION_BINS)
 
 
 def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:

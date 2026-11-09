@@ -34,13 +34,14 @@ YIELD_DISPOSITION_BINS: tuple[str, ...] = (
 )
 
 
-class MeltBoundaryBinPartition(NamedTuple):
-    left: tuple[str, ...]
-    not_left: tuple[str, ...]
+class YieldDispositionMeltBoundaryPartition(NamedTuple):
+    left_melt: tuple[str, ...]
+    not_left_melt: tuple[str, ...]
+    cleanup_sequestered: tuple[str, ...]
 
 
-MELT_BOUNDARY_BIN_PARTITION = MeltBoundaryBinPartition(
-    left=(
+YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION = YieldDispositionMeltBoundaryPartition(
+    left_melt=(
         "product_condensed",
         "product_tapped",
         "product_oxygen",
@@ -49,14 +50,14 @@ MELT_BOUNDARY_BIN_PARTITION = MeltBoundaryBinPartition(
         "offgas_vented",
         "overhead_terminal_inventory",
     ),
-    not_left=(
+    not_left_melt=(
         "melt_retained",
         "metal_phase_retained",
         "redox_buffer_retained",
         "charge_unprocessed",
     ),
+    cleanup_sequestered=("cleanup_sequestered",),
 )
-MELT_BOUNDARY_UNCLASSIFIED_BINS: tuple[str, ...] = ("cleanup_sequestered",)
 MELT_RETAINED_SUBDISPOSITIONS: tuple[str, ...] = (
     "oxide_unextracted",
     "refractory_rump",
