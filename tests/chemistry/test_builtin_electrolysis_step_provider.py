@@ -1218,6 +1218,21 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
     assert diagnostic["uncertified_yield"]["FeO"]["reference_status"] == (
         "uncertified_heuristic_reference_not_raw_thermo"
     )
+    ferric_notice = next(
+        notice
+        for notice in diagnostic.get("notices", ())
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+        and notice.get("oxide") == "Fe2O3"
+    )
+    assert ferric_notice["reason"] == (
+        "uncertified_heuristic_reference_not_raw_thermo"
+    )
+    assert ferric_notice["oxide"] == "Fe2O3"
+    assert ferric_notice["temperature_C"] == pytest.approx(1575.0)
+    assert ferric_notice["applied_voltage_V"] == pytest.approx(5.0)
+    assert math.isfinite(ferric_notice["fallback_requirement_V"])
+    assert ferric_notice["authority"] == "fallback_heuristic"
+    assert ferric_notice["heuristic_reference_V"] == pytest.approx(0.65)
     assert diagnostic["metals_produced_mol"] == {}
     assert diagnostic["O2_produced_mol"] == pytest.approx(0.5 * fe2o3_mol)
     assert result.transition.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(

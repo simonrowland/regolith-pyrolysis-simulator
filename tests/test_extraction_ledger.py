@@ -270,6 +270,61 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.campaign_mgr.c5_enabled = True
 
 
+def test_c5_fallback_voltage_commit_is_flagged_without_changing_amount():
+    def _sim_with_feo():
+        sim = _sim(
+            {
+                "feo": {
+                    "label": "FeO",
+                    "composition_wt_pct": {"FeO": 100.0},
+                }
+            }
+        )
+        sim.load_batch("feo", mass_kg=1000.0)
+        _enable_c5_mre(sim, target_species="FeO", max_voltage_V=3.0)
+        sim.melt.campaign = CampaignPhase.C5
+        sim.melt.temperature_C = 1600.0
+        sim._mre_voltage_sequence = [{
+            "voltage": 3.0,
+            "species": ["FeO"],
+            "min_hold_hours": 0,
+        }]
+        sim._mre_voltage_step_idx = 0
+        sim._mre_hold_hours = 0
+        sim._mre_effective_current_A = 100.0
+        return sim
+
+    fallback_sim = _sim_with_feo()
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        fallback_sim._step_mre()
+
+    fallback_sim.atom_ledger.assert_balanced()
+    committed_fe_mol = fallback_sim.atom_ledger.mol_by_account(
+        "process.metal_phase"
+    )["Fe"]
+    assert committed_fe_mol > 0.0
+    # Binary64 output captured from the committed fallback path at a6308d063.
+    assert committed_fe_mol.hex() == "0x1.61c6e00091064p+3"
+    notice = next(
+        notice
+        for notice in fallback_sim._mre_ellingham_ladder_diagnostic[
+            "notices"
+        ]
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+    )
+    assert notice["oxide"] == "FeO"
+    assert notice["temperature_C"] == pytest.approx(1600.0)
+    assert notice["applied_voltage_V"] == pytest.approx(3.0)
+    assert notice["fallback_requirement_V"] == pytest.approx(
+        3.0 - fallback_sim._mre_effective_voltage_margin_V_by_oxide["FeO"]
+    )
+    assert notice["reason"] == "raw_graph_voltage_missing"
+    assert notice["authority"] == "fallback_heuristic"
+
+
 def _assert_product_matches_account(sim, account, species):
     account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
     assert account_kg > 0.0
