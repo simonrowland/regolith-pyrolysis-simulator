@@ -16,7 +16,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import yaml
-from simulator.corpus_paths import regolith_corpus_root
+from simulator.corpus_paths import regolith_corpus_ctl_root, regolith_corpus_root
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -2651,11 +2651,9 @@ def _write_json(path: Path, obj: dict) -> str:
 
 
 def _pdf_paths() -> list[Path]:
-    corpus_root = regolith_corpus_root()
-    corpus_ctl_root = corpus_root.with_name("regolith-corpus-ctl")
     return [
-        corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
-        corpus_ctl_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
+        regolith_corpus_root() / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
+        regolith_corpus_ctl_root() / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
     ]
 
 

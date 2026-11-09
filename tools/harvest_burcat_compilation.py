@@ -50,13 +50,9 @@ from simulator.reference_data.burcat import (  # noqa: E402
     peer_formula_sets,
     record_document,
 )
-from simulator.corpus_paths import regolith_corpus_root  # noqa: E402
+from simulator.corpus_paths import regolith_corpus_ctl_root  # noqa: E402
 
-BURCAT_SOURCE = (
-    regolith_corpus_root().with_name("regolith-corpus-ctl")
-    / "raw"
-    / "burcat-third-millennium"
-)
+BURCAT_SOURCE = regolith_corpus_ctl_root() / "raw" / "burcat-third-millennium"
 BRIEF_THR = BURCAT_SOURCE / "BURCAT.THR.txt"
 BRIEF_XML = BURCAT_SOURCE / "BURCAT_THR.xml"
 BRIEF_SIDECAR = BURCAT_SOURCE / "sidecar.yaml"

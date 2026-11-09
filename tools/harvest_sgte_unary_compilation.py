@@ -22,13 +22,9 @@ from simulator.chemistry.sgte_unary import (  # noqa: E402
     record_to_yaml,
     sha256_file,
 )
-from simulator.corpus_paths import regolith_corpus_root  # noqa: E402
+from simulator.corpus_paths import regolith_corpus_ctl_root  # noqa: E402
 
-DEFAULT_SOURCE = (
-    regolith_corpus_root().with_name("regolith-corpus-ctl")
-    / "raw"
-    / "sgte-unary-5.0"
-)
+DEFAULT_SOURCE = regolith_corpus_ctl_root() / "raw" / "sgte-unary-5.0"
 
 
 def cli() -> argparse.Namespace:

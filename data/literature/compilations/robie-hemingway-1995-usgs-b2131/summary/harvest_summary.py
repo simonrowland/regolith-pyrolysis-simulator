@@ -9,11 +9,11 @@ import math
 from pathlib import Path
 import re
 import subprocess
-from simulator.corpus_paths import regolith_corpus_root
+from simulator.corpus_paths import regolith_corpus_ctl_root
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = (
-    regolith_corpus_root().with_name("regolith-corpus-ctl")
+    regolith_corpus_ctl_root()
     / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
 )
 TMP = Path('/private/tmp/b2131-summary-raster')

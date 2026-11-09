@@ -29,9 +29,10 @@ from pathlib import Path
 from typing import Any
 
 from tools import mineru_table_draft as draft
+from simulator.corpus_paths import regolith_corpus_root
 
 
-_DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus"
+_DEFAULT_CORPUS_ROOT = regolith_corpus_root()
 _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])(?:[+\-−–—])?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"

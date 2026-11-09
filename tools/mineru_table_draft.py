@@ -138,6 +138,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import yaml
+from simulator.corpus_paths import regolith_corpus_root
 
 
 _CHUNK_START = re.compile(r"p(\d+)-p\d+")
@@ -191,7 +192,7 @@ _CSV_FIELDS = (
     "colspan",
     "flags",
 )
-_DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus" / "raw"
+_DEFAULT_CORPUS_ROOT = regolith_corpus_root() / "raw"
 
 
 @dataclass

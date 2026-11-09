@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from simulator.corpus_paths import regolith_corpus_root
+from simulator.corpus_paths import regolith_corpus_ctl_root, regolith_corpus_root
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,10 +41,9 @@ ROLE = {
     "circularity_warning": "Do not validate an engine against a compilation it consumes.",
 }
 
-_CORPUS_ROOT = regolith_corpus_root()
 PDF_CANDIDATES = (
-    _CORPUS_ROOT / "raw" / SOURCE_ID / SOURCE_PDF_NAME,
-    _CORPUS_ROOT.with_name("regolith-corpus-ctl") / "raw" / SOURCE_ID / SOURCE_PDF_NAME,
+    regolith_corpus_root() / "raw" / SOURCE_ID / SOURCE_PDF_NAME,
+    regolith_corpus_ctl_root() / "raw" / SOURCE_ID / SOURCE_PDF_NAME,
 )
 EXPECTED_PDF_SHA256 = "11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f"
 
