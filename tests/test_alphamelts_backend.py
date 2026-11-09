@@ -10017,7 +10017,7 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     # ratio retains the full step's serialization diagnostic, including time
     # spent waiting for that shadow and host scheduling.
     #
-    # Measured premise: six xdist-off runs on Mac-Studio-256-2 produced CPU /
+    # Measured premise: six xdist-off runs on the test host produced CPU /
     # wall seconds of 18.18/34.00, 18.23/34.99, 19.13/32.27, 19.23/32.12,
     # 19.09/30.77, and 18.76/31.20 (wall/CPU 1.61-1.92x). CPU median=18.93 s;
     # min=18.18 s, max=19.23 s, spread=max-min=1.05 s. Allow five observed
