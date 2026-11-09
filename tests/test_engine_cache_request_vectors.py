@@ -398,6 +398,19 @@ def test_request_vector_tracks_thermoengine_library_environment(
     assert first != _vector(handle)
 
 
+def test_request_vector_ignores_duplicate_thermoengine_search_paths(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handle = _handle("thermoengine")
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "/engine/lib:/other/lib")
+    once = _vector(handle)
+    monkeypatch.setenv(
+        "DYLD_FALLBACK_LIBRARY_PATH", "/engine/lib:/other/lib:/other/lib"
+    )
+
+    assert once == _vector(handle)
+
+
 def test_request_vector_changes_when_magemin_native_activity_changes() -> None:
     handle = _handle("magemin")
     common = {
