@@ -110,6 +110,19 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     )
 
 
+def test_native_fe_activity_and_extent_numeric_identity_pin() -> None:
+    # Bit-level green pin, committed before moving the shared saturation rule.
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert float(split["native_fe_activity"]).hex() == "0x1.a644ba12608ffp-2"
+    assert float(split["native_fe_frac"]).hex() == "0x1.5cdc48aa30407p-1"
+
+
 def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
     sim = _make_sim("lunar_mare_low_ti")
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -5.25

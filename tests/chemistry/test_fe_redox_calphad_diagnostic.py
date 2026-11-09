@@ -85,6 +85,25 @@ def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
         assert anchor["anchor_fallback_pure_iw"] is False
 
 
+def test_metal_saturation_anchor_numeric_identity_pin(feedstocks_data: dict):
+    # Bit-level green pin, committed before moving the shared saturation rule.
+    cases = (
+        ("lunar_mare_lms1", 1.3e-12, 1.3e-12,
+         "-0x1.5fa2282a97ea1p+3", "0x1.e6e4fd38bb9dap-3"),
+        ("mars_global_mgs1", 6.1e-3, 1.0e-9,
+         "-0x1.57e6714b3ea39p+3", "0x1.418a9ff1b3ce9p-2"),
+    )
+    for feedstock_id, pressure_bar, floor_bar, root_hex, activity_hex in cases:
+        anchor = _solve_metal_saturation_anchor(
+            comp_wt=feedstocks_data[feedstock_id]["composition_wt_pct"],
+            T_K=_T_K,
+            pressure_bar=pressure_bar,
+            floor_bar=floor_bar,
+        )
+        assert float(anchor["log10_fO2_bar"]).hex() == root_hex
+        assert float(anchor["a_FeO"]).hex() == activity_hex
+
+
 def test_metal_saturation_anchor_reduces_to_pure_iw_at_unit_activity(
     monkeypatch,
 ):
