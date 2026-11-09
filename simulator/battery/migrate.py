@@ -1327,7 +1327,11 @@ def _locator_from_plain(payload: object) -> Locator | None:
         return payload
     if not isinstance(payload, Mapping):
         return Locator(note=str(payload))
-    kwargs = {k: v for k, v in payload.items() if k in _LOCATOR_FIELD_NAMES and v is not None}
+    kwargs = {
+        name: payload[name]
+        for name in _LOCATOR_FIELD_NAMES
+        if name in payload and payload[name] is not None
+    }
     if not kwargs:
         return None
     return Locator(**kwargs)
@@ -2788,281 +2792,203 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
     return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
-_RUN_METADATA_DIRECT_UNIT_ANNOTATION_KEYS = frozenset({"unit", "units"})
-_RUN_METADATA_DIRECT_UNIT_ANNOTATION_PATHS = frozenset(
-    {(), ("value",), ("state", "value"), ("value", "state", "value")}
-)
+class _RunMetadataReadRecordingMapping(Mapping):
+    def __init__(self, source: Mapping, path: tuple[str | int, ...], reads: set):
+        self._source = source
+        self._path = path
+        self._reads = reads
+
+    def __getitem__(self, key):
+        value = self._source[key]
+        self._reads.add((*self._path, str(key)))
+        return _record_run_metadata_value(
+            value, (*self._path, str(key)), self._reads
+        )
+
+    def __iter__(self):
+        return iter(self._source)
+
+    def __len__(self):
+        return len(self._source)
+
+    def __contains__(self, key):
+        present = key in self._source
+        if present:
+            self._reads.add((*self._path, str(key)))
+        return present
 
 
-def _normalize_run_metadata_unit_annotations(
+class _RunMetadataReadRecordingList(list):
+    def __init__(self, source: list, path: tuple[str | int, ...], reads: set):
+        self._source = source
+        self._path = path
+        self._reads = reads
+
+    def __len__(self):
+        return len(self._source)
+
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return [self[item] for item in range(*index.indices(len(self)))]
+        if index < 0:
+            index += len(self._source)
+        value = self._source[index]
+        return _record_run_metadata_value(
+            value, (*self._path, index), self._reads
+        )
+
+    def __iter__(self):
+        for index in range(len(self._source)):
+            yield self[index]
+
+
+class _RunMetadataReadRecordingTuple(tuple):
+    def __new__(cls, source: tuple, path: tuple[str | int, ...], reads: set):
+        instance = super().__new__(cls, source)
+        instance._source = source
+        instance._path = path
+        instance._reads = reads
+        return instance
+
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return tuple(self[item] for item in range(*index.indices(len(self))))
+        if index < 0:
+            index += len(self._source)
+        value = self._source[index]
+        return _record_run_metadata_value(
+            value, (*self._path, index), self._reads
+        )
+
+    def __iter__(self):
+        for index in range(len(self._source)):
+            yield self[index]
+
+
+def _record_run_metadata_value(
+    value: object,
+    path: tuple[str | int, ...],
+    reads: set,
+) -> object:
+    if isinstance(value, Mapping):
+        return _RunMetadataReadRecordingMapping(value, path, reads)
+    if isinstance(value, list):
+        return _RunMetadataReadRecordingList(value, path, reads)
+    if isinstance(value, tuple):
+        return _RunMetadataReadRecordingTuple(value, path, reads)
+    return value
+
+
+def _convert_run_metadata_mass_unit_value(
     payload: object,
+    units: object,
     *,
-    field: str | None,
-    shape: str,
-    parent_locator: Locator | None = None,
-) -> tuple[object | None, tuple[str | None, str] | None]:
-    """Normalize unit annotations before parsing any declared run-metadata shape."""
-
-    annotations: list[tuple[tuple[str | int, ...], str, object]] = []
-    source_errors: list[tuple[tuple[str | int, ...], str]] = []
-
-    def inference_is_consumed(path: tuple[str | int, ...]) -> bool:
-        return (
-            path == ("inference",)
-            and shape in _RUN_METADATA_LOCATED_VALUE_SHAPES
-            and not (
-                isinstance(payload, Mapping)
-                and payload.get("value") is not None
-            )
-        )
-
-    def strip_annotations(
-        value: object,
-        path: tuple[str | int, ...] = (),
-    ) -> object:
-        if isinstance(value, Mapping):
-            cleaned: dict[object, object] = {}
-            changed = False
-            for key, child in value.items():
-                key_text = str(key)
-                key_casefolded = key_text.casefold()
-                if key_text == _AS_PUBLISHED_KEY:
-                    annotation_path = (*path, key_text)
-                    is_located_value = (
-                        not path
-                        and isinstance(payload, Mapping)
-                        and "state" in payload
-                        and payload.get("value") is None
-                    ) or (
-                        path == ("value",)
-                        and isinstance(payload, Mapping)
-                        and isinstance(payload.get("value"), Mapping)
-                        and "state" in payload["value"]
-                    )
-                    if not is_located_value:
-                        source_errors.append(
-                            (annotation_path, "as_published is only valid on the Located value")
-                        )
-                    elif (
-                        field not in {"mass_kg", "final_mass_kg"}
-                        or shape not in _RUN_METADATA_LOCATED_VALUE_SHAPES
-                    ):
-                        source_errors.append(
-                            (
-                                annotation_path,
-                                f"as_published units are unsupported for {field!r} "
-                                f"with shape {shape!r}",
-                            )
-                        )
-                    elif not isinstance(child, Mapping):
-                        source_errors.append(
-                            (annotation_path, "as_published must be a mapping")
-                        )
-                    elif not any(
-                        child.get(unit_key) not in (None, "")
-                        for unit_key in _PUBLISHED_CONVERSION_UNIT_KEYS
-                    ):
-                        source_errors.append(
-                            (annotation_path, "as_published has no consumable unit annotation")
-                        )
-                    normalized_child = strip_annotations(
-                        child,
-                        annotation_path,
-                    )
-                    cleaned[key] = normalized_child
-                    changed = changed or normalized_child is not child
-                    continue
-                if key_text == "inference" and not inference_is_consumed(
-                    (*path, key_text)
-                ):
-                    source_errors.append(
-                        (
-                            (*path, key_text),
-                            f"inference metadata is not consumed by the {shape!r} reader",
-                        )
-                    )
-                if "unit" in key_casefolded:
-                    if (
-                        inference_is_consumed(path)
-                        and key_text == _DERIVATION_OUTPUT_UNIT_KEY
-                    ):
-                        cleaned[key] = child
-                        continue
-                    if (
-                        path == (_AS_PUBLISHED_KEY,)
-                        and field in {"mass_kg", "final_mass_kg"}
-                        and shape in _RUN_METADATA_LOCATED_VALUE_SHAPES
-                        and key_text in _PUBLISHED_CONVERSION_UNIT_KEYS
-                    ):
-                        cleaned[key] = child
-                        continue
-                    annotations.append((path, key_text, child))
-                    changed = True
-                    continue
-                normalized_child = strip_annotations(
-                    child,
-                    (*path, key_text),
-                )
-                cleaned[key] = normalized_child
-                changed = changed or normalized_child is not child
-            return cleaned if changed else value
-        if isinstance(value, list):
-            cleaned_items = [
-                strip_annotations(child, (*path, index))
-                for index, child in enumerate(value)
-            ]
-            return (
-                cleaned_items
-                if any(cleaned is not original for cleaned, original in zip(cleaned_items, value))
-                else value
-            )
-        if isinstance(value, tuple):
-            cleaned_items = tuple(
-                strip_annotations(child, (*path, index))
-                for index, child in enumerate(value)
-            )
-            return (
-                cleaned_items
-                if any(cleaned is not original for cleaned, original in zip(cleaned_items, value))
-                else value
-            )
-        return value
-
-    cleaned_payload = strip_annotations(payload)
-    formula = None
-    if field == "species_loss_fraction" and (annotations or source_errors):
-        raw_species, _field_locator, _wrapper = _unwrap_located_equipment_value(
-            payload, parent_locator
-        )
-        if isinstance(raw_species, Mapping):
-            paths = tuple(path for path, _key, _unit in annotations) + tuple(
-                path for path, _detail in source_errors
-            )
-            formula = next(
-                (
-                    str(species)
-                    for species in raw_species
-                    if any(
-                        str(species) == str(part)
-                        for path in paths
-                        for part in path
-                    )
-                ),
-                None,
-            )
-
-    if source_errors:
-        path, detail = source_errors[0]
-        annotation_path = ".".join(str(part) for part in path)
-        return None, (formula, f"invalid annotation at {annotation_path}: {detail}")
-    if not annotations:
-        return cleaned_payload, None
-
-    for path, key, _unit in annotations:
-        annotation_path = ".".join(str(part) for part in (*path, key))
-        path_kinds = {str(part).casefold() for part in path}
-        if "locator" in path_kinds:
-            return None, (
-                formula,
-                f"unit-like annotation at {annotation_path} is invalid "
-                "inside locator metadata",
-            )
-        if "inference" in path_kinds:
-            return None, (
-                formula,
-                f"unit-like annotation at {annotation_path} is invalid "
-                "inside inference metadata",
-            )
-        if (
-            key not in _RUN_METADATA_DIRECT_UNIT_ANNOTATION_KEYS
-            or path not in _RUN_METADATA_DIRECT_UNIT_ANNOTATION_PATHS
-        ):
-            return None, (formula, f"unsupported unit annotation key {key!r}")
-    if len(annotations) > 1:
-        return None, (formula, "specify only one unit annotation")
-    if field not in {"mass_kg", "final_mass_kg"}:
-        return None, (formula, f"units are unsupported for {field!r}")
-
-    located_payload = payload
-    if (
-        isinstance(payload, Mapping)
-        and isinstance(payload.get("value"), Mapping)
-        and "state" in payload["value"]
-    ):
-        located_payload = payload["value"]
-    if isinstance(located_payload, Mapping) and (
-        "inference" in located_payload or located_payload.get("inferred") is True
-    ):
-        return None, (
-            formula,
-            "direct unit annotations cannot be combined with explicit inference",
-        )
-
-    unit = annotations[0][2]
-    raw_value, _value_locator, _wrapper = _unwrap_located_equipment_value(
-        cleaned_payload, parent_locator
-    )
-
+    field: str,
+) -> object:
     def convert_point(value: object) -> object:
         if isinstance(value, Mapping):
-            if "state" in value:
-                state = value.get("state")
-                if not isinstance(state, Mapping) or state.get("tag") != StateTag.VALUE.value:
-                    raise ValueError(f"unit-bearing {field} must be a numeric point")
-                if "value" not in state:
-                    raise ValueError(f"unit-bearing {field} must be a numeric point")
-                converted_state = dict(state)
-                converted_state["value"] = convert_point(state["value"])
-                converted_value = dict(value)
-                converted_value["state"] = converted_state
-                return converted_value
-
-            if value.get("kind") is not None:
-                if str(value.get("kind")).casefold() != ValueKind.POINT.value:
+            kind = value.get("kind")
+            if kind is not None:
+                if str(kind).casefold() != ValueKind.POINT.value:
                     raise ValueError(f"unit-bearing {field} must be a numeric point")
                 amount = _as_dec_or_none(value.get("point"))
                 if amount is None:
                     raise ValueError(f"unit-bearing {field} must be a numeric point")
-                converted, derivation = _convert_lab_value(
-                    f"sample.{field}", amount, str(unit or "")
+                converted, detail = _convert_lab_value(
+                    f"sample.{field}", amount, str(units or "")
                 )
                 if converted is None:
-                    raise ValueError(derivation or f"unmapped units for {field}")
-                converted_value = dict(value)
-                converted_value["point"] = converted
-                return converted_value
-
-            if "value" in value and value.get("value") is not None:
-                converted_value = dict(value)
-                converted_value["value"] = convert_point(value["value"])
-                return converted_value
-
+                    raise ValueError(detail or f"unmapped units for {field}")
+                result = {"kind": kind, "point": converted}
+                approximate = value.get("approximate")
+                if approximate is not None:
+                    result["approximate"] = approximate
+                return result
             raise ValueError(f"unit-bearing {field} must be a numeric point")
 
         amount = _as_dec_or_none(value)
         if amount is None:
             raise ValueError(f"unit-bearing {field} must be a numeric point")
-        converted, derivation = _convert_lab_value(
-            f"sample.{field}", amount, str(unit or "")
+        converted, detail = _convert_lab_value(
+            f"sample.{field}", amount, str(units or "")
         )
         if converted is None:
-            raise ValueError(derivation or f"unmapped units for {field}")
+            raise ValueError(detail or f"unmapped units for {field}")
         return converted
 
-    try:
-        converted_raw_value = convert_point(raw_value)
-    except (ArithmeticError, TypeError, ValueError) as exc:
-        return None, (formula, str(exc))
+    if isinstance(payload, Mapping) and "state" in payload:
+        state = payload.get("state")
+        if (
+            not isinstance(state, Mapping)
+            or state.get("tag") != StateTag.VALUE.value
+            or "value" not in state
+        ):
+            raise ValueError(f"unit-bearing {field} must be a numeric point")
+        converted_state = {
+            "tag": state.get("tag"),
+            "value": convert_point(state.get("value")),
+        }
+        for key in ("reason", "rejection_kind"):
+            value = state.get(key)
+            if value is not None:
+                converted_state[key] = value
+        result: dict[str, object] = {"state": converted_state}
+        for key in ("locator", "inference", "inferred", _AS_PUBLISHED_KEY):
+            if key in payload:
+                result[key] = payload[key]
+        return result
 
-    if (
-        isinstance(cleaned_payload, Mapping)
-        and "state" not in cleaned_payload
-        and cleaned_payload.get("value") is not None
+    converted = convert_point(payload)
+    if isinstance(payload, Mapping) and isinstance(converted, Mapping):
+        for key in ("locator", "inference", "inferred"):
+            if key in payload:
+                converted[key] = payload[key]
+    return converted
+
+
+def _run_metadata_direct_mass_units(
+    payload: object,
+    raw_value: object,
+    *,
+    field: str | None,
+) -> tuple[object, str | None]:
+    if field not in {"mass_kg", "final_mass_kg"} or not isinstance(payload, Mapping):
+        return raw_value, None
+
+    unit_annotations: list[object] = []
+
+    def read_unit_annotation(mapping: Mapping) -> None:
+        for key in ("unit", "units"):
+            if key in mapping:
+                unit_annotations.append(mapping[key])
+
+    read_unit_annotation(payload)
+    if isinstance(raw_value, Mapping) and raw_value is not payload:
+        read_unit_annotation(raw_value)
+    if isinstance(raw_value, Mapping):
+        state = raw_value.get("state")
+        if isinstance(state, Mapping):
+            state_value = state.get("value")
+            if isinstance(state_value, Mapping):
+                read_unit_annotation(state_value)
+
+    if not unit_annotations:
+        return raw_value, None
+    if len(unit_annotations) > 1:
+        return raw_value, "specify only one unit annotation"
+    if isinstance(raw_value, Mapping) and (
+        "inference" in raw_value or raw_value.get("inferred") is True
     ):
-        converted_payload = dict(cleaned_payload)
-        converted_payload["value"] = converted_raw_value
-        return converted_payload, None
-    return converted_raw_value, None
+        return raw_value, "direct unit annotations cannot be combined with explicit inference"
+    try:
+        return (
+            _convert_run_metadata_mass_unit_value(
+                raw_value, unit_annotations[0], field=field
+            ),
+            None,
+        )
+    except (ArithmeticError, TypeError, ValueError) as exc:
+        return raw_value, str(exc)
 
 
 def _run_metadata_located_value_from_plain(
@@ -3076,21 +3002,38 @@ def _run_metadata_located_value_from_plain(
     raw_value, value_locator, _wrapper = _unwrap_located_equipment_value(
         payload, parent_locator
     )
+    raw_value, unit_error = _run_metadata_direct_mass_units(
+        payload, raw_value, field=field
+    )
+    if unit_error is not None:
+        raise ValueError(unit_error)
+
+    if isinstance(raw_value, Mapping) and "as_published" in raw_value:
+        if field not in {"mass_kg", "final_mass_kg"}:
+            raise ValueError(f"as_published units are unsupported for {field!r}")
+        published = raw_value.get("as_published")
+        if not isinstance(published, Mapping):
+            raise ValueError("as_published must be a mapping")
+        if not any(
+            key in published and published.get(key) not in (None, "")
+            for key in _PUBLISHED_CONVERSION_UNIT_KEYS
+        ):
+            raise ValueError("as_published has no consumable unit annotation")
 
     if (
         isinstance(raw_value, Mapping)
         and "state" not in raw_value
         and _is_value_kind_wrapper(raw_value)
     ):
-        normalized = dict(raw_value)
-        normalized["state"] = {
-            "tag": StateTag.VALUE.value,
-            "value": {
-                key: value
-                for key, value in raw_value.items()
-                if key not in {"locator", "inference", "inferred"}
-            },
+        normalized = {
+            "state": {
+                "tag": StateTag.VALUE.value,
+                "value": raw_value,
+            }
         }
+        for key in ("locator", "inference", "inferred"):
+            if key in raw_value:
+                normalized[key] = raw_value[key]
         raw_value = normalized
 
     located = _located_from_plain(
@@ -3118,12 +3061,7 @@ def _run_metadata_species_payload_from_plain(
     return raw_values, field_locator
 
 
-_RUN_METADATA_LOCATED_VALUE_SHAPES = frozenset(
-    {"located_value", "located_positive_value"}
-)
-
-
-def _parse_run_metadata_shape(
+def _read_run_metadata_shape(
     shape: str,
     payload: object,
     *,
@@ -3132,18 +3070,7 @@ def _parse_run_metadata_shape(
 ) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
     """Parse one declared run-metadata shape through the registry Value parser."""
 
-    source_payload = payload
-    payload, annotation_error = _normalize_run_metadata_unit_annotations(
-        source_payload,
-        field=field,
-        shape=shape,
-        parent_locator=parent_locator,
-    )
-    if annotation_error is not None:
-        formula, detail = annotation_error
-        return None, ((formula, source_payload, detail),)
-
-    if shape in _RUN_METADATA_LOCATED_VALUE_SHAPES:
+    if shape in {"located_value", "located_positive_value"}:
         if shape == "located_positive_value" and field != "mass_kg":
             return None, ((None, payload, "located_positive_value requires mass_kg"),)
         try:
@@ -3222,6 +3149,97 @@ def _parse_run_metadata_shape(
             return None, ((None, payload, str(exc)),)
 
     return None, ((None, payload, f"unsupported run-metadata shape {shape!r}"),)
+
+
+def _unconsumed_run_metadata_members(
+    payload: object,
+    reads: set[tuple[str | int, ...]],
+    *,
+    field: str | None,
+) -> tuple[tuple[str | None, tuple[str | int, ...]], ...]:
+    unread: list[tuple[str | None, tuple[str | int, ...]]] = []
+
+    def walk(value: object, path: tuple[str | int, ...] = ()) -> None:
+        if isinstance(value, Mapping):
+            for key, child in value.items():
+                key_text = str(key)
+                child_path = (*path, key_text)
+                if (
+                    key_text.casefold() == "inference"
+                    or "unit" in key_text.casefold()
+                ) and child_path not in reads:
+                    unread.append((formula_for_path(child_path), child_path))
+                walk(child, child_path)
+        elif isinstance(value, (list, tuple)):
+            for index, child in enumerate(value):
+                walk(child, (*path, index))
+
+    def formula_for_path(path: tuple[str | int, ...]) -> str | None:
+        if field != "species_loss_fraction":
+            return None
+        species_values = payload
+        if isinstance(species_values, Mapping) and species_values.get("value") is not None:
+            species_values = species_values["value"]
+        if not isinstance(species_values, Mapping):
+            return None
+        path_text = {str(part) for part in path}
+        return next(
+            (str(species) for species in species_values if str(species) in path_text),
+            None,
+        )
+
+    walk(payload)
+    return tuple(unread)
+
+
+def _parse_run_metadata_shape(
+    shape: str,
+    payload: object,
+    *,
+    field: str | None = None,
+    parent_locator: Locator | None = None,
+) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
+    reads: set[tuple[str | int, ...]] = set()
+    recorded_payload = _record_run_metadata_value(payload, (), reads)
+    parsed, errors = _read_run_metadata_shape(
+        shape,
+        recorded_payload,
+        field=field,
+        parent_locator=parent_locator,
+    )
+    if errors:
+        raw_species = payload
+        if isinstance(raw_species, Mapping) and raw_species.get("value") is not None:
+            raw_species = raw_species["value"]
+        errors = tuple(
+            (
+                formula,
+                raw_species.get(formula, raw_value)
+                if formula is not None and isinstance(raw_species, Mapping)
+                else payload,
+                detail,
+            )
+            for formula, raw_value, detail in errors
+        )
+    unread = _unconsumed_run_metadata_members(payload, reads, field=field)
+    if not unread:
+        return parsed, errors
+
+    unread_errors = []
+    for formula, path in unread:
+        path_text = ".".join(str(part) for part in path)
+        misplaced_as_published = any(
+            path[index : index + 3] == ("state", "value", "as_published")
+            for index in range(len(path) - 2)
+        )
+        detail = (
+            f"invalid annotation at {path_text}: "
+            "as_published is only valid on the Located value"
+            if misplaced_as_published
+            else f"unconsumed unit-like or inference member at {path_text}"
+        )
+        unread_errors.append((formula, payload, detail))
+    return None, (*errors, *unread_errors)
 
 
 def _run_metadata_shape_detail(
@@ -4542,8 +4560,11 @@ def locator_from_mapping(raw: object, fallback: str | None = None) -> Locator | 
         return None
     kwargs: dict[str, object] = {}
     extras: list[str] = []
-    for key, value in raw.items():
+    for key in raw:
         name = str(key)
+        if "unit" in name.casefold():
+            continue
+        value = raw[key]
         if value is None or value == "":
             continue
         if name not in LOCATOR_FIELDS:
