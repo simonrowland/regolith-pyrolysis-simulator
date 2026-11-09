@@ -31,5 +31,7 @@ registered separately from the table above, through
 `simulator/core.py::_register_vapor_pressure_pair`, because it needs the
 simulator-owned `data/vapor_pressures.yaml` payload. Its result is diagnostic
 (`transition=None`): vapour pressures are an input to `EVAPORATION_FLUX`,
-which is the intent that emits the ledger transition. VapoRock is a
-diagnostic-only shadow.
+which computes the flux; the ledger transition itself is proposed by the
+evaporation-transition provider
+(`engines/builtin/evaporation_transition.py::BuiltinEvaporationTransitionProvider`).
+VapoRock is a diagnostic-only shadow.
