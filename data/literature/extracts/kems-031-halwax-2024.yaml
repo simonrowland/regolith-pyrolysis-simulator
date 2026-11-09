@@ -56,7 +56,7 @@ benches:
   ionization:
     energy_eV:
       state: {tag: value, value: {kind: point, point: '70'}}
-      locator: {page: 826, section: 'III. Experimental'}
+      locator: {page: 6, published_page: 826, pdf_page_index: 5, section: 'III. Experimental'}
 experiments:
 - experiment_id: cao-series
   bench_id: julich-ir-kems
@@ -146,11 +146,11 @@ experiments:
 - experiment_id: nickel-calibration-series
   bench_id: julich-ir-kems
   method: knudsen_effusion
-  locator: {page: 826, section: 'A. Calibration'}
+  locator: {page: 6, published_page: 826, pdf_page_index: 5, section: 'A. Calibration'}
   sample:
     printed_composition:
       state: {tag: value, value: Pure nickel standard}
-      locator: {page: 826, section: 'A. Calibration'}
+      locator: {page: 6, published_page: 826, pdf_page_index: 5, section: 'A. Calibration'}
   apparatus:
     geometry:
       orifice_diameter_m:
@@ -1149,7 +1149,7 @@ species:
         cells:
         - {source: 'NIST-JANAF Tables[1]', delta_H_sub_kJ_mol: 8.4, quote: '418 ± 8.4'}
         - {source: 'Alcock et al.[48]', delta_H_sub_kJ_mol: 5.0, quote: '421 ± 5'}
-        locator: {page: 826, table: II}
+        locator: {page: 6, published_page: 826, pdf_page_index: 5, table: II}
         note: FactSageTM has no printed ±
 
 fidelity_samples:
