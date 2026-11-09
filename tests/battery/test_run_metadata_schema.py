@@ -2098,21 +2098,20 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                         assert inference.output_unit == "g", context
                     elif (
                         field in {"mass_kg", "final_mass_kg"}
-                        and node_path == ("as_published",)
-                        and unit_key in {"units", "low_units", "high_units"}
+                        and loaded is not None
+                        and loaded.inference is not None
                     ):
                         assert loaded is not None and loaded.state.is_value, context
                         assert loaded.inference is not None, context
                         assert loaded.inference.relation == "g_to_kg", context
+                        printed = Decimal(
+                            "0.0008" if field == "final_mass_kg" else "0.25"
+                        )
+                        assert loaded.state.value == Value.point_of(
+                            printed / Decimal(1000)
+                        ), context
                     elif (
                         field in {"mass_kg", "final_mass_kg"}
-                        and node_path
-                        in {
-                            (),
-                            ("value",),
-                            ("state", "value"),
-                            ("value", "state", "value"),
-                        }
                         and unit_key in {"unit", "units"}
                     ):
                         assert loaded is not None and loaded.state.is_value, context
