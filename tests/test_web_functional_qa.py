@@ -241,6 +241,27 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         oxygen_kg, abs=0.01
     )
     assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
+    if feedstock == "lunar_mare_low_ti":
+        oxygen_flag = runner["oxygen"].get("availability_flag")
+        assert oxygen_flag is not None
+        assert oxygen_flag["status"] == "flagged prediction"
+        assert oxygen_flag["authority"] == "extrapolated"
+        assert oxygen_flag["band"] == "d-359 B/C/E follow-ups pending"
+        assert oxygen_flag["reason"] == (
+            "Flagged structural 0.0 kg: stored, vented, and captured O2 ledger "
+            "entries are all 0.0 kg. Class B activity ladder: do not treat "
+            "a=1 as an upper bound when gamma>1; use provider activity, then "
+            "published gamma*x, then ideal-mixing a=x as an extrapolated "
+            "estimate; SiO activity 0.436 lacks its evidence link. Class C: "
+            "MnO_gas at 313 K is outside its certified 1519-2273 K band and "
+            "requires flagged extrapolation. Class E: P4O10/P4O6/PO/PO2 are "
+            "gated to Stage 0 although lunar mare contains ~0.1 wt% P2O5; "
+            "use phase-independent K or flag out-of-domain. Pending d-359 "
+            "follow-ups: B, C, E."
+        )
+        assert oxygen_flag["excluded"] == runner["oxygen"]["excluded"]
+        assert runner["metals_plus_O2"]["availability_flag"] == oxygen_flag
+        assert web_story["oxygen"]["availability_flag"] == oxygen_flag
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
         rump_kg, abs=0.01
     )

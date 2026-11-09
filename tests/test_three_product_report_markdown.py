@@ -285,6 +285,50 @@ def test_non_silica_availability_flag_renders_from_availability_field():
     assert "reason=provider pressure was below its reporting floor" in report
 
 
+def test_flagged_oxygen_zero_renders_d364_notice_in_runner_report():
+    classification = _empty_classification()
+    classification["metals_plus_O2"].update({
+        "class_total_kg": 0.0,
+        "metals_total_kg": 0.0,
+        "O2_kg": 0.0,
+        "status": "partial",
+        "availability_flag": {
+            "status": "flagged prediction",
+            "authority": "extrapolated",
+            "band": "d-359 B/C/E follow-ups pending",
+            "reason": (
+                "Flagged structural 0.0 kg: stored, vented, and captured O2 "
+                "ledger entries are all 0.0 kg. Class B activity ladder: do "
+                "not treat a=1 as an upper bound when gamma>1; use provider "
+                "activity, then published gamma*x, then ideal-mixing a=x as "
+                "an extrapolated estimate; SiO activity 0.436 lacks its "
+                "evidence link. Class C: MnO_gas at 313 K is outside its "
+                "certified 1519-2273 K band and requires flagged "
+                "extrapolation. Class E: P4O10/P4O6/PO/PO2 are gated to "
+                "Stage 0 although lunar mare contains ~0.1 wt% P2O5; use "
+                "phase-independent K or flag out-of-domain. Pending d-359 "
+                "follow-ups: B, C, E."
+            ),
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert (
+        "- Availability flag: status=flagged prediction; "
+        "authority=extrapolated; reason=Flagged structural 0.0 kg: stored, "
+        "vented, and captured O2 ledger entries are all 0.0 kg. Class B "
+        "activity ladder: do not treat a=1 as an upper bound when gamma>1; "
+        "use provider activity, then published gamma*x, then ideal-mixing "
+        "a=x as an extrapolated estimate; SiO activity 0.436 lacks its "
+        "evidence link. Class C: MnO_gas at 313 K is outside its certified "
+        "1519-2273 K band and requires flagged extrapolation. Class E: "
+        "P4O10/P4O6/PO/PO2 are gated to Stage 0 although lunar mare contains "
+        "~0.1 wt% P2O5; use phase-independent K or flag out-of-domain. "
+        "Pending d-359 follow-ups: B, C, E."
+    ) in report
+
+
 def test_refused_silica_product_quantity_is_unavailable_not_zero():
     classification = _empty_classification()
     classification['pure_silica_glass'].update({

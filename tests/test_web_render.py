@@ -495,6 +495,55 @@ def test_product_ledger_preserves_incomplete_story_status():
     assert rendered["text"]["product-ledger-state"] == "incomplete"
 
 
+def test_oxygen_out_renders_d364_flagged_zero_notice():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    reason = (
+        "Flagged structural 0.0 kg: stored, vented, and captured O2 ledger "
+        "entries are all 0.0 kg. Class B activity ladder: do not treat a=1 "
+        "as an upper bound when gamma>1; use provider activity, then "
+        "published gamma*x, then ideal-mixing a=x as an extrapolated "
+        "estimate; SiO activity 0.436 lacks its evidence link. Class C: "
+        "MnO_gas at 313 K is outside its certified 1519-2273 K band and "
+        "requires flagged extrapolation. Class E: P4O10/P4O6/PO/PO2 are "
+        "gated to Stage 0 although lunar mare contains ~0.1 wt% P2O5; use "
+        "phase-independent K or flag out-of-domain. Pending d-359 "
+        "follow-ups: B, C, E."
+    )
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "product_story": {
+                "oxygen": {
+                    "class_total_kg": 0.0,
+                    "O2_kg": 0.0,
+                    "status": "partial",
+                    "availability_flag": {
+                        "status": "flagged prediction",
+                        "authority": "extrapolated",
+                        "band": "d-359 B/C/E follow-ups pending",
+                        "reason": reason,
+                    },
+                    "excluded": [{
+                        "species": "MnO_gas",
+                        "account": "process.cleaned_melt",
+                        "reason": "outside certified temperature band",
+                        "upper_bound_kg": "unbounded",
+                    }],
+                },
+            },
+            "product_story_status": "degraded",
+        },
+    )
+    content = rendered["text"]["product-ledger-content"]
+
+    assert "Oxygen out" in content
+    assert "availability flag" in content
+    assert "status flagged prediction" in content
+    assert "authority extrapolated" in content
+    assert reason in content
+
+
 def test_ceramic_rump_panel_renders_partial_class_exclusion():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     rendered = _render_advisory_dom(
