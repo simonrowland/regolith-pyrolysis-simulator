@@ -340,6 +340,7 @@ def _run_metadata_location_errors(doc: Mapping[str, Any], label: str) -> list[st
                         )
                     else:
                         shape_error = _run_metadata_shape_error(
+                            field,
                             shape,
                             value,
                             equipment_source=any(

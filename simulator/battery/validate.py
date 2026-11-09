@@ -93,6 +93,7 @@ from simulator.battery.records import (
     SweepGasComponent,
     Value,
     Work,
+    _run_metadata_physical_range_error,
     _charge_sequence_validation_errors,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
@@ -953,6 +954,18 @@ def validate_experiment(
     context_rows: Mapping[str, Any] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+    for field in ("mass_kg", "final_mass_kg"):
+        range_error = _run_metadata_physical_range_error(
+            field, getattr(experiment.sample, field)
+        )
+        if range_error is not None:
+            issues.append(
+                _issue(
+                    f"{path}.sample.{field}",
+                    RefusalReason.INVALID_SOURCE,
+                    range_error,
+                )
+            )
     final_mass = experiment.sample.final_mass_kg
     if final_mass is not None and (
         not isinstance(final_mass, Located)
@@ -1041,6 +1054,17 @@ def validate_experiment(
                             f"{path}.sample.species_loss_fraction[{formula}]",
                             RefusalReason.INVALID_SOURCE,
                             "requires a Located Value",
+                        )
+                    )
+                range_error = _run_metadata_physical_range_error(
+                    "species_loss_fraction", located
+                )
+                if range_error is not None:
+                    issues.append(
+                        _issue(
+                            f"{path}.sample.species_loss_fraction[{formula}]",
+                            RefusalReason.INVALID_SOURCE,
+                            range_error,
                         )
                     )
                 try:

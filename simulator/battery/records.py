@@ -782,6 +782,54 @@ class Value:
         return cls(ValueKind.POINT, point=as_decimal(value))
 
 
+def _run_metadata_physical_range_error(field: str, located: object) -> str | None:
+    """Return the shared physical-range error for one located sample value."""
+
+    if field == "mass_kg":
+        minimum, minimum_inclusive, maximum = Decimal(0), False, None
+    elif field == "final_mass_kg":
+        minimum, minimum_inclusive, maximum = Decimal(0), True, None
+    elif field == "species_loss_fraction":
+        minimum, minimum_inclusive, maximum = Decimal(0), True, Decimal(1)
+    else:
+        return None
+
+    if isinstance(located, Located):
+        if not isinstance(located.state, State) or not located.state.is_value:
+            return None
+        located = located.state.value
+
+    if isinstance(located, Decimal):
+        values = (located,)
+    elif isinstance(located, Value):
+        if located.kind is ValueKind.POINT:
+            values = (located.point,)
+        elif located.kind is ValueKind.SERIES:
+            values = tuple(point for _coordinate, point in located.series or ())
+        elif located.kind is ValueKind.BOUND:
+            values = (located.bound_value,)
+        elif located.kind is ValueKind.INTERVAL:
+            values = (located.interval_low, located.interval_high)
+        elif located.kind is ValueKind.RELATIVE_SERIES:
+            values = tuple(
+                point for _coordinate, point in located.relative_series or ()
+            )
+        else:
+            return None
+    else:
+        return None
+
+    for value in values:
+        if value is None:
+            continue
+        if value < minimum or (value == minimum and not minimum_inclusive):
+            relation = "> 0" if not minimum_inclusive else ">= 0"
+            return f"{field} values must be {relation}; found {value}"
+        if maximum is not None and value > maximum:
+            return f"{field} values must be <= {maximum}; found {value}"
+    return None
+
+
 def _value_has_numeric_value(value: Value) -> bool:
     return value.kind in _NUMERIC_VALUE_KINDS
 
@@ -978,6 +1026,17 @@ class Apparatus:
 # extract location accepted by both validation and migration. ``[]`` matches a
 # list index; ``*`` matches one mapping key.
 RUN_METADATA_FIELD_HOMES: dict[str, tuple[str, tuple[str, ...]]] = {
+    "mass_kg": (
+        "located_positive_value",
+        (
+            "experiments[].sample.mass_kg",
+            "experiments.*.sample.mass_kg",
+            "experiments[].charge.mass_kg",
+            "experiments.*.charge.mass_kg",
+            "species.*.observations[].equipment.mass_kg",
+            "species.*.observations[].equipment.sample.value.mass_kg",
+        ),
+    ),
     "final_mass_kg": (
         "located_value",
         (

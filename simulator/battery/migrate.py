@@ -193,6 +193,8 @@ from simulator.battery.records import (
     ThermalSetpoint,
     Uncertainty,
     Value,
+    _located_value,
+    _run_metadata_physical_range_error,
     Work,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
@@ -2829,21 +2831,29 @@ def _parse_run_metadata_shape(
     shape: str,
     payload: object,
     *,
+    field: str | None = None,
     equipment_source: bool = False,
     parent_locator: Locator | None = None,
 ) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
     """Parse one declared run-metadata shape through the registry Value parser."""
 
-    if shape == "located_value":
+    if shape in {"located_value", "located_positive_value"}:
+        if shape == "located_positive_value" and field != "mass_kg":
+            return None, ((None, payload, "located_positive_value requires mass_kg"),)
         try:
-            return (
-                _run_metadata_located_value_from_plain(
-                    payload,
-                    parent_locator=parent_locator,
-                    equipment_source=equipment_source,
-                ),
-                (),
+            parsed = _run_metadata_located_value_from_plain(
+                payload,
+                parent_locator=parent_locator,
+                equipment_source=equipment_source,
             )
+            range_error = (
+                None
+                if field is None
+                else _run_metadata_physical_range_error(field, parsed)
+            )
+            if range_error is not None:
+                raise ValueError(range_error)
+            return parsed, ()
         except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
             return None, ((None, payload, str(exc)),)
 
@@ -2861,11 +2871,19 @@ def _parse_run_metadata_shape(
         for formula, raw_value in raw_values.items():
             formula_text = str(formula)
             try:
-                parsed[formula_text] = _run_metadata_located_value_from_plain(
+                located = _run_metadata_located_value_from_plain(
                     raw_value,
                     parent_locator=field_locator,
                     equipment_source=equipment_source,
                 )
+                range_error = (
+                    None
+                    if field is None
+                    else _run_metadata_physical_range_error(field, located)
+                )
+                if range_error is not None:
+                    raise ValueError(range_error)
+                parsed[formula_text] = located
             except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
                 errors.append((formula_text, raw_value, str(exc)))
         return parsed or None, tuple(errors)
@@ -2912,13 +2930,14 @@ def _run_metadata_shape_detail(
 
 
 def _run_metadata_shape_error(
+    field: str,
     shape: str,
     payload: object,
     *,
     equipment_source: bool = False,
 ) -> str | None:
     _parsed, errors = _parse_run_metadata_shape(
-        shape, payload, equipment_source=equipment_source
+        shape, payload, field=field, equipment_source=equipment_source
     )
     if not errors:
         return None
@@ -3224,7 +3243,7 @@ def _sample_from_plain(
         return value
 
     def parse_run_metadata(field: str, shape: str, raw: object) -> object | None:
-        parsed, errors = _parse_run_metadata_shape(shape, raw)
+        parsed, errors = _parse_run_metadata_shape(shape, raw, field=field)
         if errors and registry_issues is None:
             formula, raw_value, detail = errors[0]
             raise ValueError(
@@ -3243,6 +3262,13 @@ def _sample_from_plain(
             )
         return parsed
 
+    mass_located = (
+        None
+        if mass is None
+        else parse_run_metadata(
+            "mass_kg", RUN_METADATA_FIELD_HOMES["mass_kg"][0], mass
+        )
+    )
     printed_located = None
     if printed is not None:
         printed_located = parse_registry_located(
@@ -3297,9 +3323,7 @@ def _sample_from_plain(
     if owner_initial is not None:
         initial_located = owner_initial
     return Sample(
-        mass_kg=None
-        if mass is None
-        else _located_from_plain(mass, _value_or_point_from_plain),
+        mass_kg=mass_located,
         **sample_run_metadata,
         volume_m3=None
         if volume is None
@@ -3704,7 +3728,7 @@ def _experiment_from_plain(
         )
 
     def parse_run_metadata(field: str, shape: str, raw: object) -> object | None:
-        parsed, errors = _parse_run_metadata_shape(shape, raw)
+        parsed, errors = _parse_run_metadata_shape(shape, raw, field=field)
         if errors and registry_issues is None:
             formula, raw_value, detail = errors[0]
             raise ValueError(
@@ -16931,16 +16955,24 @@ def sample_from_equipment(
                 )
             )
 
-    for field_path, shape in _sample_run_metadata_specs():
+    equipment_sample_specs = (
+        (
+            "experiment.sample.mass_kg",
+            RUN_METADATA_FIELD_HOMES["mass_kg"][0],
+        ),
+        *_sample_run_metadata_specs(),
+    )
+    for field_path, shape in equipment_sample_specs:
         field = field_path.rsplit(".", 1)[-1]
         source_payloads = equipment_metadata_payloads(field)
-        if shape == "located_value":
+        if shape in {"located_value", "located_positive_value"}:
             located = None
             conflict = False
             for raw_payload, parent_locator, path in source_payloads:
                 parsed, errors = _parse_run_metadata_shape(
                     shape,
                     raw_payload,
+                    field=field,
                     equipment_source=True,
                     parent_locator=parent_locator,
                 )
@@ -16967,6 +16999,7 @@ def sample_from_equipment(
             parsed, errors = _parse_run_metadata_shape(
                 shape,
                 raw_payload,
+                field=field,
                 equipment_source=True,
                 parent_locator=parent_locator,
             )
@@ -16987,6 +17020,19 @@ def sample_from_equipment(
         for formula in conflicts:
             species_values.pop(formula, None)
         sample_run_metadata[field] = species_values or None
+    explicit_mass = sample_run_metadata.pop("mass_kg", None)
+    if explicit_mass is not None:
+        mass_located = _located_value(mass_located)
+        if (
+            mass_located is not None
+            and mass_located.state.is_value
+            and explicit_mass.state.is_value
+            and mass_located.state.value != explicit_mass.state.value
+        ):
+            report_metadata_conflict("experiment.sample.mass_kg")
+            mass_located = None
+        else:
+            mass_located = _prefer_located(mass_located, explicit_mass)
     form_located = _unique_text_located(_hits_for(hits, "sample.form"))
     container_located = _unique_text_located(_hits_for(hits, "sample.container"))
     hard_form, hard_container = _form_and_container(equipment)
