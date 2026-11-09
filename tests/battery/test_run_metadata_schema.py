@@ -18,13 +18,15 @@ def _extract_with_experiments(
     experiments: list[dict],
     *,
     observation_experiment: str | None = None,
+    observation_equipment: dict | None = None,
 ) -> Path:
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["experiments"] = experiments
     if observation_experiment is not None:
-        extract["species"]["Na"]["observations"][0]["experiment"] = (
-            observation_experiment
-        )
+        observation = extract["species"]["Na"]["observations"][0]
+        observation["experiment"] = observation_experiment
+        if observation_equipment is not None:
+            observation["equipment"] = observation_equipment
     return _write_min_tree(root, extract)
 
 
@@ -211,6 +213,73 @@ def test_equipment_sample_metadata_conflicts_are_typed_validation_errors(
         and issue.path.endswith("sample.species_loss_fraction[Na]")
         and "conflicting equipment values" in issue.detail
         for issue in issues
+    )
+
+
+def _registry_equipment_conflict_root(tmp_path: Path) -> Path:
+    return _extract_with_experiments(
+        tmp_path,
+        [
+            {
+                "experiment_id": "run-2",
+                "sample": {
+                    "final_mass_kg": _located_point(
+                        "0.0009", table="1", page=1
+                    ),
+                    "species_loss_fraction": {
+                        "Na": _located_point("0.5", table="1", page=1),
+                    },
+                },
+            }
+        ],
+        observation_experiment="run-2",
+        observation_equipment={
+            "final_mass_kg": {
+                "value": 0.0008,
+                "locator": {"table": "2", "page": 2},
+            },
+            "species_loss_fraction": {
+                "value": {"Na": 0.25},
+                "locator": {"table": "2", "page": 2},
+            },
+        },
+    )
+
+
+def test_registry_equipment_metadata_disagreements_are_typed_errors(
+    tmp_path: Path,
+) -> None:
+    root = _registry_equipment_conflict_root(tmp_path)
+
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    issues = result.validation.issues
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.final_mass_kg")
+        and "source_disagreement" in issue.detail
+        for issue in issues
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.species_loss_fraction[Na]")
+        and "source_disagreement" in issue.detail
+        for issue in issues
+    )
+
+
+def test_registry_equipment_species_loss_conflict_does_not_write_invalid_entry(
+    tmp_path: Path,
+) -> None:
+    root = _registry_equipment_conflict_root(tmp_path)
+
+    migrate(root, write=True)
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-2"]
+
+    assert experiment.sample.species_loss_fraction is None or (
+        "Na" not in experiment.sample.species_loss_fraction
     )
 
 

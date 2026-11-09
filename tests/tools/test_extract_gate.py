@@ -87,6 +87,178 @@ def _checks(report) -> set[str]:
     return {finding.check for finding in report.findings}
 
 
+def _set_document_path(doc: dict, path: tuple[str | int, ...], value) -> None:
+    node = doc
+    for index, segment in enumerate(path):
+        if index == len(path) - 1:
+            node[segment] = value
+            return
+        if isinstance(segment, int):
+            node = node[segment]
+            continue
+        if segment not in node:
+            node[segment] = [] if isinstance(path[index + 1], int) else {}
+        node = node[segment]
+
+
+_RUN_METADATA_LOCATOR = {"page": 1, "table": "1"}
+_RUN_METADATA_POINT = {"value": 0.0008, "locator": _RUN_METADATA_LOCATOR}
+_RUN_METADATA_SEQUENCE = {"charge_id": "charge-a", "run_index": 1}
+_RUN_METADATA_STATEMENT = {
+    "state": {"tag": "value", "value": "congruent"},
+    "locator": _RUN_METADATA_LOCATOR,
+}
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "expected_path"),
+    [
+        (
+            ("species", "Fe", "observations", 0, "equipment", "sample"),
+            {
+                "value": {"final_mass_kg": _RUN_METADATA_POINT},
+                "locator": _RUN_METADATA_LOCATOR,
+            },
+            "species.Fe.observations[0].equipment.sample.value.final_mass_kg",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "equipment", "sample"),
+            {
+                "value": [{"species_loss_fraction": {"Na": 0.25}}],
+                "locator": _RUN_METADATA_LOCATOR,
+            },
+            "species.Fe.observations[0].equipment.sample.value[0].species_loss_fraction",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "equipment", "sample"),
+            {
+                "value": {"runs": [{"final_mass_kg": _RUN_METADATA_POINT}]},
+                "locator": _RUN_METADATA_LOCATOR,
+            },
+            "species.Fe.observations[0].equipment.sample.value.runs[0].final_mass_kg",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "charge_characterization"),
+            {"value": {"charge_sequence": _RUN_METADATA_SEQUENCE}},
+            "species.Fe.observations[0].charge_characterization.value.charge_sequence",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "values", "final_mass_kg"),
+            0.0008,
+            "species.Fe.observations[0].values.final_mass_kg",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "values", "runs"),
+            [{"species_loss_fraction": {"Na": 0.25}}],
+            "species.Fe.observations[0].values.runs[0].species_loss_fraction",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "values"),
+            [{"vaporization_statement": _RUN_METADATA_STATEMENT}],
+            "species.Fe.observations[0].values[0].vaporization_statement",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "final_mass_kg"),
+            _RUN_METADATA_POINT,
+            "species.Fe.observations[0].final_mass_kg",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "charge_sequence"),
+            _RUN_METADATA_SEQUENCE,
+            "species.Fe.observations[0].charge_sequence",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "vaporization_statement"),
+            _RUN_METADATA_STATEMENT,
+            "species.Fe.observations[0].vaporization_statement",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "equipment", "charge_sequence"),
+            _RUN_METADATA_SEQUENCE,
+            "species.Fe.observations[0].equipment.charge_sequence",
+        ),
+        (
+            ("species", "Fe", "observations", 0, "equipment", "vaporization_statement"),
+            _RUN_METADATA_STATEMENT,
+            "species.Fe.observations[0].equipment.vaporization_statement",
+        ),
+        (
+            ("species", "Fe", "context", 0, "values", "charge_sequence"),
+            _RUN_METADATA_SEQUENCE,
+            "species.Fe.context[0].values.charge_sequence",
+        ),
+        (
+            ("charge_sequence",),
+            _RUN_METADATA_SEQUENCE,
+            "charge_sequence",
+        ),
+        (
+            ("species", "Fe", "charge_sequence"),
+            _RUN_METADATA_SEQUENCE,
+            "species.Fe.charge_sequence",
+        ),
+    ],
+    ids=[
+        "sample-value-mapping",
+        "sample-value-list",
+        "sample-value-runs",
+        "charge-characterization-value",
+        "observation-values-mapping",
+        "observation-values-runs",
+        "observation-values-list",
+        "observation-root-final-mass",
+        "observation-root-charge-sequence",
+        "observation-root-vaporization-statement",
+        "equipment-charge-sequence",
+        "equipment-vaporization-statement",
+        "context-row-values",
+        "document-root",
+        "species-block-root",
+    ],
+)
+def test_run_metadata_fields_outside_declared_homes_are_typed_errors(
+    path: tuple[str | int, ...], value, expected_path: str
+) -> None:
+    doc = _document()
+    _set_document_path(doc, path, value)
+    if path[:3] == ("species", "Fe", "context"):
+        doc["species"]["Fe"]["context"][0].update(
+            {
+                "observation_id": "context-1",
+                "type": "run_context",
+                "locator": _RUN_METADATA_LOCATOR,
+                "units": "text",
+            }
+        )
+
+    errors = validator.validate_extract_document(doc)
+
+    assert any(
+        expected_path in error
+        and "[run-metadata-location]" in error
+        and "allowed homes" in error
+        for error in errors
+    ), errors
+
+
+def test_run_metadata_equipment_home_in_context_is_valid() -> None:
+    doc = _document()
+    doc["species"]["Fe"]["context"] = [
+        {
+            "observation_id": "context-1",
+            "type": "run_context",
+            "locator": _RUN_METADATA_LOCATOR,
+            "units": "text",
+            "values": {"note": "experiment context"},
+            "equipment": {"final_mass_kg": _RUN_METADATA_POINT},
+        }
+    ]
+
+    errors = validator.validate_extract_document(doc)
+
+    assert not any("[run-metadata-location]" in error for error in errors), errors
+
+
 def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypatch):
     report = _run_gate(tmp_path, _document())
 
