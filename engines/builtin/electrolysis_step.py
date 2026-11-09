@@ -112,8 +112,6 @@ MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
-MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
-MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
 MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
@@ -286,6 +284,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
             _faraday_reduced_extent,
+            _mre_raw_margin_assessment,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
@@ -293,10 +292,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
             MRE_INVALID_CONTROL_REFUSAL,
+            MRE_INVALID_TARGET_REFUSAL,
+            MRE_INVALID_GAS_FUGACITY_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
-            MRE_RAW_MARGIN_GUARDED_OXIDES,
             MRE_CERTIFICATION_DENYLIST_REASON,
             MRE_CERTIFICATION_EVIDENCE_CLASS,
             MRE_CURRENT_PARTITION_CERTIFICATION,
@@ -623,40 +623,26 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             diagnostic["mre_effective_voltage_margin_V_by_oxide"][oxide] = (
                 fallback_margin_V
             )
-            raw_margin_V = None
-            if (
-                voltage_reference is not None
-                and voltage_reference.raw_graph_voltage_V is not None
-            ):
-                # The Nernst activity/pO2 shift is identical for the selected
-                # fallback and raw graph E0.  Replacing E0 therefore shifts the
-                # full requirement by exactly (E0_raw - E0_fallback).
-                raw_requirement_V = (
-                    E_nernst
-                    + voltage_reference.raw_graph_voltage_V
-                    - voltage_reference.voltage
-                )
-                raw_margin_V = voltage_V - raw_requirement_V
+            (
+                raw_requirement_V,
+                raw_margin_V,
+                raw_margin_refusal,
+            ) = _mre_raw_margin_assessment(
+                voltage_V=voltage_V,
+                fallback_requirement_V=E_nernst,
+                fallback_margin_V=fallback_margin_V,
+                reference=voltage_reference,
+            )
+            if raw_margin_V is not None:
                 diagnostic["mre_raw_graph_requirement_V_by_oxide"][oxide] = (
                     raw_requirement_V
                 )
                 diagnostic["mre_raw_voltage_margin_V_by_oxide"][oxide] = raw_margin_V
 
-            if (
-                fallback_margin_V > 0.0
-                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
-                and voltage_reference is not None
-                and not voltage_reference.authoritative
-                and raw_margin_V is not None
-                and raw_margin_V <= 0.0
-            ):
-                diagnostic["mre_raw_margin_refused_targets"][oxide] = {
-                    "fallback_requirement_V": E_nernst,
-                    "fallback_margin_V": fallback_margin_V,
-                    "raw_requirement_V": raw_requirement_V,
-                    "raw_margin_V": raw_margin_V,
-                    "voltage_status": voltage_reference.status,
-                }
+            if raw_margin_refusal is not None:
+                diagnostic["mre_raw_margin_refused_targets"][oxide] = (
+                    raw_margin_refusal
+                )
                 continue
 
             if fallback_margin_V > 0.0:
@@ -726,6 +712,21 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_raw_margin_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_RAW_MARGIN_REFUSAL
+                notices = list(diagnostic.get("notices", ()) or ())
+                for oxide, refusal in diagnostic[
+                    "mre_raw_margin_refused_targets"
+                ].items():
+                    notices.append({
+                        "kind": "mre_raw_margin_veto",
+                        "reason": MRE_RAW_MARGIN_REFUSAL,
+                        "oxide": oxide,
+                        "temperature_C": T_C,
+                        "applied_voltage_V": voltage_V,
+                        "raw_requirement_V": refusal["raw_requirement_V"],
+                        "raw_margin_V": refusal["raw_margin_V"],
+                        "reference_status": refusal["voltage_status"],
+                    })
+                diagnostic["notices"] = notices
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
