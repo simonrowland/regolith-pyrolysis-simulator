@@ -3972,11 +3972,18 @@ class ExtractionMixin:
                 0.0,
                 float(closure.partial_pressures_mbar.get('Ca', 0.0)) * 100.0,
             )
-            # The Knudsen gate judges the commanded C7 envelope
-            # (0.01–0.1 mbar), not the closure's partial-pressure sum.
-            # Substituting that sum walks a transitional operating point
-            # into the viscous band and commits Ca the envelope refuses.
-            # P_bulk still comes from the closure; total pressure does not.
+            # Closure, gas resistance, and Kn share this realized total.
+            # The command is the requested envelope. Re-evaluating the same
+            # stream at the command after the closure solved a higher
+            # partial is a second pressure state, not an envelope check.
+            overhead_pressure_pa = max(
+                overhead_pressure_pa,
+                math.fsum(
+                    max(0.0, float(value))
+                    for value in closure.partial_pressures_mbar.values()
+                )
+                * 100.0,
+            )
         if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
         ):
