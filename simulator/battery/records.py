@@ -983,10 +983,10 @@ RUN_METADATA_FIELD_HOMES: dict[str, tuple[str, tuple[str, ...]]] = {
         (
             "experiments[].sample.final_mass_kg",
             "experiments.*.sample.final_mass_kg",
+            "experiments[].charge.final_mass_kg",
+            "experiments.*.charge.final_mass_kg",
             "species.*.observations[].equipment.final_mass_kg",
             "species.*.observations[].equipment.sample.value.final_mass_kg",
-            "species.*.context[].equipment.final_mass_kg",
-            "species.*.context[].equipment.sample.value.final_mass_kg",
         ),
     ),
     "species_loss_fraction": (
@@ -994,10 +994,10 @@ RUN_METADATA_FIELD_HOMES: dict[str, tuple[str, tuple[str, ...]]] = {
         (
             "experiments[].sample.species_loss_fraction",
             "experiments.*.sample.species_loss_fraction",
+            "experiments[].charge.species_loss_fraction",
+            "experiments.*.charge.species_loss_fraction",
             "species.*.observations[].equipment.species_loss_fraction",
             "species.*.observations[].equipment.sample.value.species_loss_fraction",
-            "species.*.context[].equipment.species_loss_fraction",
-            "species.*.context[].equipment.sample.value.species_loss_fraction",
         ),
     ),
     "charge_sequence": (

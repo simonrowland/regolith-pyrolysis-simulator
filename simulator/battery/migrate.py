@@ -16511,6 +16511,67 @@ def _initial_composition_authority(initial: Located[Composition]) -> int:
     return 3
 
 
+def _merge_sample_run_metadata(
+    existing: Sample,
+    incoming: Sample,
+    *,
+    experiment_id: str,
+    validation_issues: list[ValidationIssue],
+) -> dict[str, Any]:
+    """Merge shared sample metadata and report conflicting source values."""
+
+    def report_disagreement(field: str, formula: str | None = None) -> None:
+        path = f"experiment[{experiment_id}].sample.{field}"
+        if formula is not None:
+            path += f"[{formula}]"
+        validation_issues.append(
+            ValidationIssue(
+                path=path,
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=(
+                    "source_disagreement: existing and incoming run metadata "
+                    "values differ"
+                ),
+            )
+        )
+
+    merged_fields = {}
+    for field_path, shape in _sample_run_metadata_specs():
+        field = field_path.rsplit(".", 1)[-1]
+        old_value = getattr(existing, field)
+        new_value = getattr(incoming, field)
+        if shape == "located_value":
+            merged_value = _prefer_located(old_value, new_value)
+            if (
+                merged_value is None
+                and old_value is not None
+                and new_value is not None
+                and old_value.state.is_value
+                and new_value.state.is_value
+                and old_value.state.value != new_value.state.value
+            ):
+                report_disagreement(field)
+            merged_fields[field] = merged_value
+            continue
+        merged_values = dict(old_value or {})
+        for formula, located in (new_value or {}).items():
+            old_located = merged_values.get(formula)
+            merged_located = _prefer_located(old_located, located)
+            if (
+                merged_located is None
+                and old_located is not None
+                and old_located.state.is_value
+                and located.state.is_value
+                and old_located.state.value != located.state.value
+            ):
+                report_disagreement(field, formula)
+                merged_values.pop(formula, None)
+            else:
+                merged_values[formula] = merged_located
+        merged_fields[field] = merged_values or None
+    return merged_fields
+
+
 def _merge_experiment_lab_params(
     existing: Experiment,
     sample: Sample,
@@ -16555,57 +16616,12 @@ def _merge_experiment_lab_params(
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
 
-    def report_run_metadata_disagreement(
-        field: str, formula: str | None = None
-    ) -> None:
-        path = f"experiment[{experiment_id}].sample.{field}"
-        if formula is not None:
-            path += f"[{formula}]"
-        validation_issues.append(
-            ValidationIssue(
-                path=path,
-                reason=RefusalReason.INVALID_SOURCE,
-                detail=(
-                    "source_disagreement: existing and incoming run metadata "
-                    "values differ"
-                ),
-            )
-        )
-
-    sample_run_metadata = {}
-    for field_path, shape in _sample_run_metadata_specs():
-        field = field_path.rsplit(".", 1)[-1]
-        old_value = getattr(existing.sample, field)
-        new_value = getattr(sample, field)
-        if shape == "located_value":
-            merged_value = _prefer_located(old_value, new_value)
-            if (
-                merged_value is None
-                and old_value is not None
-                and new_value is not None
-                and old_value.state.is_value
-                and new_value.state.is_value
-                and old_value.state.value != new_value.state.value
-            ):
-                report_run_metadata_disagreement(field)
-            sample_run_metadata[field] = merged_value
-            continue
-        merged_values = dict(old_value or {})
-        for formula, located in (new_value or {}).items():
-            old_located = merged_values.get(formula)
-            merged_located = _prefer_located(old_located, located)
-            if (
-                merged_located is None
-                and old_located is not None
-                and old_located.state.is_value
-                and located.state.is_value
-                and old_located.state.value != located.state.value
-            ):
-                report_run_metadata_disagreement(field, formula)
-                merged_values.pop(formula, None)
-            else:
-                merged_values[formula] = merged_located
-        sample_run_metadata[field] = merged_values or None
+    sample_run_metadata = _merge_sample_run_metadata(
+        existing.sample,
+        sample,
+        experiment_id=experiment_id,
+        validation_issues=validation_issues,
+    )
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
         **sample_run_metadata,
@@ -20000,6 +20016,34 @@ class Migrator:
             experiment = _experiment_from_plain(
                 payload, registry_issues=self.result.registry_issues
             )
+            sample_payload = raw.get("sample")
+            charge_payload = raw.get("charge")
+            if (
+                isinstance(sample_payload, Mapping)
+                and sample_payload
+                and isinstance(charge_payload, Mapping)
+            ):
+                charge_metadata = {}
+                for field_path, _shape in _sample_run_metadata_specs():
+                    field = field_path.rsplit(".", 1)[-1]
+                    if field in charge_payload:
+                        charge_metadata[field] = charge_payload[field]
+                if charge_metadata:
+                    charge_sample = _sample_from_plain(
+                        charge_metadata,
+                        experiment_id=experiment.experiment_id,
+                        registry_issues=self.result.registry_issues,
+                    )
+                    sample_run_metadata = _merge_sample_run_metadata(
+                        experiment.sample,
+                        charge_sample,
+                        experiment_id=experiment.experiment_id,
+                        validation_issues=self.result.registry_issues,
+                    )
+                    experiment = replace(
+                        experiment,
+                        sample=replace(experiment.sample, **sample_run_metadata),
+                    )
             existing_experiment = self.result.experiments.get(
                 experiment.experiment_id
             )
