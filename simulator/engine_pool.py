@@ -1076,6 +1076,11 @@ class WarmEngineWorker:
                     process.join(timeout=ENGINE_WORKER_CANCEL_POLL_S)
                 break
             process.join(timeout=ENGINE_WORKER_CANCEL_POLL_S)
+        # The worker may exit while a same-group subprocess remains. The
+        # launch owner still owns that group after the wrapper is reaped.
+        _signal_worker_process(process, signal.SIGKILL)
+        while process.is_alive():
+            process.join(timeout=ENGINE_WORKER_CANCEL_POLL_S)
 
     def _start_process_for_launch(self, launch: _EngineWorkerLaunch) -> None:
         try:
@@ -1199,6 +1204,15 @@ class WarmEngineWorker:
             return launch.finished.is_set()
         if deadline is None:
             deadline = time.monotonic() + 1.0
+        return self._wait_for_launch_cleanup(launch, deadline)
+
+    @staticmethod
+    def _wait_for_launch_cleanup(
+        launch: _EngineWorkerLaunch | None,
+        deadline: float,
+    ) -> bool:
+        if launch is None:
+            return True
         while not launch.finished.is_set():
             if launch.cleanup_started.is_set():
                 return True
@@ -1743,15 +1757,19 @@ class WarmEngineWorker:
     ) -> None:
         del cleanup_group
         with self._state_lock:
-            launch = self._launch_owner
-            if launch is not None and launch.process is process:
-                launch.diagnostic_cancel = (
-                    launch.diagnostic_cancel or diagnostic
-                )
+            current = self._launch_owner
+            launch = (
+                current
+                if current is not None and current.process is process
+                else None
+            )
+            if launch is not None:
+                launch.diagnostic_cancel = launch.diagnostic_cancel or diagnostic
+                launch.graceful_cancel = False
                 launch.cancel_requested.set()
-        self._request_launch_cancel(
-            diagnostic=diagnostic,
-            deadline=time.monotonic() + ENGINE_WORKER_STOP_PAIR_JOIN_S,
+        self._wait_for_launch_cleanup(
+            launch,
+            time.monotonic() + ENGINE_WORKER_STOP_PAIR_JOIN_S,
         )
 
     def close(self) -> None:
@@ -1777,16 +1795,7 @@ class WarmEngineWorker:
             if launch is None:
                 return True
             launch.cancel_requested.set()
-        while not launch.finished.is_set():
-            if launch.cleanup_started.is_set():
-                return True
-            remaining = deadline - time.monotonic()
-            if remaining <= 0.0:
-                return False
-            launch.cleanup_started.wait(
-                timeout=min(remaining, ENGINE_WORKER_CANCEL_POLL_S)
-            )
-        return True
+        return self._wait_for_launch_cleanup(launch, deadline)
 
     def disable(self) -> None:
         """Permanently reject new calls and kill any active request."""

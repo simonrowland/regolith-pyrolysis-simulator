@@ -178,6 +178,16 @@ def _test_worker(*, timeout_s=1.0):
     )
 
 
+def _bootstrap_worker_with_same_group_child():
+    child = subprocess.Popen(
+        [sys.executable, '-c', 'import time; time.sleep(60)'],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return None, child.pid
+
+
 def _points():
     points = []
     for index in range(22):
@@ -503,6 +513,103 @@ def test_inflight_disable_after_recv_is_call_death():
         _assert_call_death(caught)
     finally:
         pool.close(cancel_pending=True)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_stale_stop_pair_cannot_cancel_same_worker_replacement(
+    monkeypatch, inherit,
+):
+    if inherit:
+        monkeypatch.setenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, '1')
+    else:
+        monkeypatch.delenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, raising=False)
+    worker = _test_worker()
+    stop_entered = threading.Event()
+    resume_stop = threading.Event()
+    cleanup_errors = []
+    real_stop = worker._stop_pair
+
+    def paused_stop(process, connection, **kwargs):
+        stop_entered.set()
+        assert resume_stop.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        return real_stop(process, connection, **kwargs)
+
+    def discard_old_launch(old_process, old_connection):
+        try:
+            worker._discard_current(
+                diagnostic=False,
+                expected_process=old_process,
+                expected_connection=old_connection,
+            )
+        except BaseException as exc:
+            cleanup_errors.append(exc)
+
+    try:
+        worker.start()
+        old_process, old_connection = worker.process, worker.connection
+        assert old_process is not None and old_connection is not None
+        worker._stop_pair = paused_stop
+        stale_cleanup = threading.Thread(
+            target=discard_old_launch,
+            args=(old_process, old_connection),
+        )
+        stale_cleanup.start()
+        assert stop_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+
+        worker.close()
+        worker.start()
+        replacement = worker.process
+        replacement_launch = worker._launch_owner
+        assert replacement is not None and replacement is not old_process
+        assert replacement_launch is not None
+        assert replacement.is_alive()
+
+        resume_stop.set()
+        stale_cleanup.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert not stale_cleanup.is_alive()
+        assert cleanup_errors == []
+        assert worker._launch_owner is replacement_launch
+        assert not replacement_launch.cancel_requested.is_set()
+        assert replacement.is_alive()
+    finally:
+        resume_stop.set()
+        worker._stop_pair = real_stop
+        worker.close()
+
+
+def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch):
+    from tests.test_remote_stdio_engine_worker import _assert_pids_gone
+
+    monkeypatch.delenv(
+        engine_pool_module.INHERIT_PROCESS_GROUP_ENV,
+        raising=False,
+    )
+    worker = WarmEngineWorker(
+        name='graceful descendant cleanup worker',
+        bootstrap=_bootstrap_worker_with_same_group_child,
+        handler=_handle_test_request,
+        startup_timeout_s=5.0,
+        call_timeout_s=30.0,
+    )
+    child_pid = None
+    try:
+        child_pid = worker.start()
+        wrapper = worker.process
+        assert wrapper is not None
+        assert os.getpgid(child_pid) == wrapper.pid
+
+        worker.close()
+
+        wrapper.join(timeout=3.0)
+        assert not wrapper.is_alive()
+        _assert_pids_gone((child_pid,))
+    finally:
+        worker.close()
+        if child_pid is not None:
+            try:
+                os.kill(child_pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
 
 
 def test_timeout_discards_slot_and_next_call_respawns():
