@@ -164,6 +164,75 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
 
 
+def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
+    pytest.importorskip("openimcc")
+
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_cache
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    experiment_id = experiment["experiment_id"]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    original_channels = battery._openimcc_gas_channels_and_omission_notices
+    selected: list[str] = []
+
+    def ti_channels(parents, gas_pack):
+        channels, omissions = original_channels(parents, gas_pack)
+        result = [row for row in channels if str(row[1][0]) == "TiO2"]
+        assert result
+        selected.extend(str(row[0]) for row in result)
+        return result, omissions
+
+    state = SimpleNamespace(
+        parent_oxide_activities={"SiO2": 0.2, "FeO": 0.1, "TiO2": 0.01},
+        parent_oxides=("SiO2", "FeO", "TiO2"),
+        pack_model_id="fixture-model",
+        pack_version="fixture-version",
+        pack_digest="fixture-digest",
+        openimcc_version="fixture-openimcc",
+    )
+    gas_calls: list[dict[str, object]] = []
+
+    def evaluate_gas(_cache, **kwargs):
+        gas_calls.append(kwargs)
+        return {species: 1.0e-6 for species in selected}
+
+    def no_evaporation(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        )
+
+    monkeypatch.setattr(
+        battery, "_openimcc_gas_channels_and_omission_notices", ti_channels
+    )
+    monkeypatch.setattr(openimcc_cache, "cached_openimcc_evaluate", lambda *_a, **_k: state)
+    monkeypatch.setattr(openimcc_cache, "cached_openimcc_evaluate_gas", evaluate_gas)
+    monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="sossi-ti-only-cache-test",
+        engine="openimcc",
+        engine_cache=object(),
+    )[0]
+
+    assert gas_calls
+    assert prediction.provenance.get("run_refusal") is None
+    assert "Mn" in prediction.channel_missing_elements
+    assert prediction.primary_element_ppm["Ti"] > 0.0
+
+
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

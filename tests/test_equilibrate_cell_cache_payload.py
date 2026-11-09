@@ -102,12 +102,16 @@ def test_cache_payload_preserves_nested_types_and_presence() -> None:
                 "present_none": None,
             }
         ],
+        backend_failure_disposition="environment",
     )
 
     payload = cell.to_cache_payload()
     restored = EquilibrateCell.from_cache_payload(payload)
+    worker_restored = EquilibrateCell.from_payload(cell.as_payload())
 
     assert restored == cell
+    assert worker_restored.backend_failure_disposition == "environment"
+    assert worker_restored.as_payload()["backend_failure_disposition"] == "environment"
     assert restored.to_cache_payload() == payload
     notice = restored.notices[0]
     assert notice["kind"] is NoticeKind.INPUT_OMITTED
