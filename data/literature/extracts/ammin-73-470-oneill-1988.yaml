@@ -12,7 +12,7 @@ extraction:
 review_status: draft
 fidelity_samples:
 - path: species.Cu.observations[oneill_1988_cu_cu2o_measured_relation].values.relation
-  value: mu_O2 + 62 = -347705 + 246.096 T - 12.9053 T ln(T)
+  value: mu_O2 = -347705 + 246.096 T - 12.9053 T ln(T)
   locator:
     published_page: 476
     section: Cu + Cu2O; equation 9
@@ -58,12 +58,12 @@ species:
         T_range_K:
         - 750.0
         - 833.0
-        uncertainty_J_per_mol: 197.0
+        uncertainty_J_per_mol: 107.0
         uncertainty_convention: one-standard-deviation uncertainty printed in the abstract
         reference_pressure_bar: 1.0
         measured_table: Table 3, Fe + Fe3O4 cells, published page 476
       uncertainty:
-        mu_O2_J_per_mol: 197.0
+        mu_O2_J_per_mol: 107.0
         reported_status: printed abstract uncertainty; table includes flagged points above the invariant point as metastable Fe + Fe3O4
     - observation_id: oneill_1988_fe_feo_measured_relation
       type: gibbs_table
@@ -105,7 +105,7 @@ species:
         method_class: measured_direct
         quantity: chemical_potential_of_oxygen
         reaction: 6 "FeO" + O2 = 2 Fe3O4
-        relation: mu_O2 + 306 = -581927 - 65.618 T + 38.7410 T ln(T)
+        relation: mu_O2 = -581927 - 65.618 T + 38.7410 T ln(T)
         T_range_K: [833.0, 1270.0]
         uncertainty_J_per_mol: 306.0
         uncertainty_convention: source states this is the larger-than-usual standard deviation of the regression
@@ -172,7 +172,7 @@ species:
         method_class: measured_direct
         quantity: chemical_potential_of_oxygen
         reaction: 4 Cu + O2 = 2 Cu2O
-        relation: mu_O2 + 62 = -347705 + 246.096 T - 12.9053 T ln(T)
+        relation: mu_O2 = -347705 + 246.096 T - 12.9053 T ln(T)
         T_range_K: [750.0, 1330.0]
         uncertainty_J_per_mol: 62.0
         uncertainty_convention: one-standard-deviation uncertainty printed in abstract
@@ -194,7 +194,7 @@ species:
         method_class: measured_direct
         quantity: chemical_potential_of_oxygen
         reaction: 2 Cu2O + O2 = 4 CuO
-        relation: mu_O2 + 117 = -292245 + 377.012 T - 23.1976 T ln(T)
+        relation: mu_O2 = -292245 + 377.012 T - 23.1976 T ln(T)
         T_range_K: [800.0, 1300.0]
         uncertainty_J_per_mol: 117.0
         uncertainty_convention: one-standard-deviation uncertainty printed in abstract
