@@ -28,7 +28,7 @@ from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence, TextIO
 
 import yaml
 
@@ -14149,6 +14149,9 @@ def _score_store_with_decisions(
         if _engine_set is None
         else _validated_score_engines(tuple(_engine_set))
     )
+    engine_order = {
+        engine: index for index, engine in enumerate(prepared.engine_set)
+    }
     refs = prepared.refs if _refs is None else tuple(_refs)
     fusion_diagnostic_ids = prepared.fusion_diagnostic_ids
     comparison_ids = prepared.comparison_ids
@@ -14183,7 +14186,9 @@ def _score_store_with_decisions(
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
-                for point in _iter_compilation_series_cells(obs, origin):
+                for point_index, point in enumerate(
+                    _iter_compilation_series_cells(obs, origin)
+                ):
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
                         obs.observation_id not in empirical_ids
@@ -14325,7 +14330,16 @@ def _score_store_with_decisions(
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            _stream.append(residual, candidate)
+                            _stream.append(
+                                residual,
+                                candidate,
+                                sort_order=(
+                                    obs.observation_id,
+                                    point_index,
+                                    engine_order[engine],
+                                    0,
+                                ),
+                            )
                         if (
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
                             and intrinsic_redox_activity
@@ -14361,6 +14375,12 @@ def _score_store_with_decisions(
                                 _stream.append(
                                     intrinsic_residual,
                                     intrinsic_candidate,
+                                    sort_order=(
+                                        obs.observation_id,
+                                        point_index,
+                                        engine_order[engine],
+                                        1,
+                                    ),
                                 )
                             if intrinsic_candidate is not None and _stream is None:
                                 candidates[intrinsic_candidate.observation_id] = (
@@ -14655,9 +14675,6 @@ def _score_store_to_jsonl(
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
-                    # supervised_process_map returns input-task order. Keep
-                    # that sequence so the final index's seq tie-breaker is
-                    # the same as the serial scorer's append order.
                     for (
                         shard_path_text,
                         row_count,
@@ -14676,7 +14693,11 @@ def _score_store_to_jsonl(
                                     stored,
                                     current,
                                 )
-                        with Path(shard_path_text).open("rb") as shard:
+                        order_path = Path(f"{shard_path_text}.order")
+                        with (
+                            Path(shard_path_text).open("rb") as shard,
+                            order_path.open("r", encoding="utf-8") as order_file,
+                        ):
                             if shard.readline() != header:
                                 raise ValueError("score shard store stamp mismatch")
                             for line in shard:
@@ -14688,7 +14709,32 @@ def _score_store_to_jsonl(
                                     or is_store_stamp_payload(payload)
                                 ):
                                     continue
-                                stream.append_payload_line(line)
+                                order_value = json.loads(order_file.readline())
+                                if (
+                                    not isinstance(order_value, list)
+                                    or len(order_value) != 4
+                                    or not isinstance(order_value[0], str)
+                                    or any(
+                                        type(value) is not int
+                                        for value in order_value[1:]
+                                    )
+                                ):
+                                    raise ValueError(
+                                        "score shard has an invalid serial-order entry"
+                                    )
+                                stream.append_payload_line(
+                                    line,
+                                    sort_order=(
+                                        order_value[0],
+                                        order_value[1],
+                                        order_value[2],
+                                        order_value[3],
+                                    ),
+                                )
+                            if order_file.read(1):
+                                raise ValueError(
+                                    "score shard has extra serial-order entries"
+                                )
                     if stream.count != shard_count:
                         raise ValueError(
                             "score shard row count does not match merged output"
@@ -19676,6 +19722,8 @@ class _ResidualJsonlStream:
         self.file.flush()
         self._temporary: tempfile.TemporaryDirectory | None = None
         self._database: sqlite3.Connection | None = None
+        self._order_path: Path | None = None
+        self._order_file: TextIO | None = None
         if sort_on_finalize:
             self._temporary = tempfile.TemporaryDirectory(
                 prefix="battery-score-index-"
@@ -19691,10 +19739,28 @@ class _ResidualJsonlStream:
                 "CREATE TABLE residual_order ("
                 "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
                 "key TEXT NOT NULL, offset INTEGER NOT NULL, "
-                "band_value TEXT, numeric_value TEXT)"
+                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+                "order_subrow INTEGER NOT NULL)"
             )
+        else:
+            self._order_path = self.partial_path.with_name(
+                f"{self.partial_path.name}.order"
+            )
+            self._order_file = self._order_path.open("w", encoding="utf-8")
         self._pending: list[
-            tuple[str, str, str, int, str | None, str | None]
+            tuple[
+                str,
+                str,
+                str,
+                int,
+                str | None,
+                str | None,
+                str,
+                int,
+                int,
+                int,
+            ]
         ] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
@@ -19709,6 +19775,8 @@ class _ResidualJsonlStream:
         self,
         residual: Residual,
         candidate: Observation | None,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
     ) -> None:
         line = dumps_residual_line(residual, candidate).encode("utf-8")
         numeric = residual.numeric
@@ -19722,9 +19790,15 @@ class _ResidualJsonlStream:
             key=residual.key,
             band_value=band_value,
             numeric_value=numeric_value,
+            sort_order=sort_order,
         )
 
-    def append_payload_line(self, line: bytes) -> None:
+    def append_payload_line(
+        self,
+        line: bytes,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
+    ) -> None:
         payload = json.loads(line)
         if not isinstance(payload, Mapping):
             raise ValueError("score shard row is not an object")
@@ -19747,6 +19821,7 @@ class _ResidualJsonlStream:
             key=str(payload.get("key") or ""),
             band_value=band_value,
             numeric_value=numeric_value,
+            sort_order=sort_order,
         )
 
     def _append_line(
@@ -19758,15 +19833,31 @@ class _ResidualJsonlStream:
         key: str,
         band_value: str | None,
         numeric_value: str | None,
+        sort_order: tuple[str, int, int, int] | None,
     ) -> None:
         offset = self.file.tell()
         self.file.write(line + b"\n")
+        stable_order = sort_order or ("", self.count, 0, 0)
         if self.sort_on_finalize:
             self._pending.append(
-                (rail, reference, key, offset, band_value, numeric_value)
+                (
+                    rail,
+                    reference,
+                    key,
+                    offset,
+                    band_value,
+                    numeric_value,
+                    *stable_order,
+                )
             )
             if len(self._pending) >= self._INDEX_BATCH:
                 self._flush_index()
+        else:
+            assert self._order_file is not None
+            self._order_file.write(
+                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
+                + "\n"
+            )
         self.count += 1
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
@@ -19778,7 +19869,8 @@ class _ResidualJsonlStream:
         assert self._database is not None
         self._database.executemany(
             "INSERT INTO residual_order (rail, reference, key, offset, "
-            "band_value, numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
+            "band_value, numeric_value, order_ref, order_point, order_engine, "
+            "order_subrow) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
@@ -19786,6 +19878,8 @@ class _ResidualJsonlStream:
 
     def flush(self) -> None:
         self.file.flush()
+        if self._order_file is not None:
+            self._order_file.flush()
         self._last_flush = time.monotonic()
 
     def finalize(
@@ -19801,7 +19895,8 @@ class _ResidualJsonlStream:
         self._flush_index()
         self._database.execute(
             "CREATE INDEX residual_order_key ON residual_order("
-            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, seq)"
+            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, "
+            "order_ref COLLATE BINARY, order_point, order_engine, order_subrow, seq)"
         )
         report_aggregate = _ScorePayloadAccumulator(
             context,
@@ -19823,7 +19918,8 @@ class _ResidualJsonlStream:
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
-                        "key COLLATE BINARY, seq"
+                        "key COLLATE BINARY, order_ref COLLATE BINARY, order_point, "
+                        "order_engine, order_subrow, seq"
                     )
                     for offset, band_value, numeric_value in rows:
                         source.seek(offset)
@@ -19937,6 +20033,8 @@ class _ResidualJsonlStream:
     def close(self) -> None:
         if not self.file.closed:
             self.file.close()
+        if self._order_file is not None and not self._order_file.closed:
+            self._order_file.close()
         if self._database is not None:
             self._database.close()
         if self._temporary is not None:

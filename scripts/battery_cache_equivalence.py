@@ -138,14 +138,19 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("TMPDIR must name the dispatch scratch directory")
     with tempfile.TemporaryDirectory(prefix="battery-cache-equivalence-", dir=tmp_parent) as scratch:
         scratch_path = Path(scratch)
-        cache_path = scratch_path / "engine-cache.sqlite"
+        cache_paths = {
+            "serial": scratch_path / "engine-cache-serial.sqlite",
+            "parallel": scratch_path / "engine-cache-parallel.sqlite",
+        }
         outputs: dict[str, list[str]] = {}
         counters: dict[str, dict[str, dict[str, int]]] = {}
-        for name, use_cache, run_workers in (
-            ("off", False, 1),
-            ("cold", True, 1),
-            ("warm", True, 1),
-            ("parallel-warm", True, workers),
+        for name, use_cache, run_workers, cache_group in (
+            ("off", False, 1, "serial"),
+            ("off-parallel", False, workers, "parallel"),
+            ("cold", True, 1, "serial"),
+            ("cold-parallel", True, workers, "parallel"),
+            ("warm", True, 1, "serial"),
+            ("parallel-warm", True, workers, "parallel"),
         ):
             rows, counts = _run_slice(
                 context,
@@ -156,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
                 work=work,
                 limit=limit,
                 workers=run_workers,
-                cache_path=cache_path if use_cache else None,
+                cache_path=cache_paths[cache_group] if use_cache else None,
             )
             outputs[name] = rows
             counters[name] = counts
@@ -165,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
         print("slice produced no canonical residual rows", file=sys.stderr)
         return 2
     warm_names = ("warm", "parallel-warm")
+    cold_names = ("cold", "cold-parallel")
     warm_misses = sum(
         row["misses"]
         for name in warm_names
@@ -176,7 +182,10 @@ def main(argv: list[str] | None = None) -> int:
         for row in counters[name].values()
     )
     cold_calls_by_engine = {
-        engine.value: sum(counters["cold"][engine.value]["calls_by_kind"].values())
+        engine.value: sum(
+            sum(counters[name][engine.value]["calls_by_kind"].values())
+            for name in cold_names
+        )
         for engine in engines
     }
     warm_hits_by_engine = {
@@ -189,6 +198,10 @@ def main(argv: list[str] | None = None) -> int:
         engine.value
         for engine in engines
         if cold_calls_by_engine[engine.value] <= 0
+        or any(
+            sum(counters[name][engine.value]["calls_by_kind"].values()) <= 0
+            for name in cold_names
+        )
         or warm_hits_by_engine[engine.value] <= 0
         or any(
             counters[name][engine.value]["misses"]
@@ -198,10 +211,22 @@ def main(argv: list[str] | None = None) -> int:
     ]
     if any(
         outputs[name] != outputs["off"]
-        for name in ("cold", "warm", "parallel-warm")
+        for name in (
+            "off-parallel",
+            "cold",
+            "cold-parallel",
+            "warm",
+            "parallel-warm",
+        )
     ):
         expected = outputs["off"]
-        for name in ("cold", "warm", "parallel-warm"):
+        for name in (
+            "off-parallel",
+            "cold",
+            "cold-parallel",
+            "warm",
+            "parallel-warm",
+        ):
             if outputs[name] != expected:
                 print(
                     "\n".join(
@@ -225,7 +250,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         f"equivalent rows={len(outputs['off'])} engines={len(engines)} "
-        f"cold_misses={sum(row['misses'] for row in counters['cold'].values())} "
+        f"cold_misses={sum(row['misses'] for name in cold_names for row in counters[name].values())} "
         f"warm_misses={warm_misses} warm_calls={warm_calls} "
         f"warm_hits={sum(row['hits'] for row in counters['warm'].values())} "
         f"parallel_workers={workers}"

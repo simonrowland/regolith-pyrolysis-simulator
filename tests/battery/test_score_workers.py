@@ -202,10 +202,10 @@ def test_jsonl_sort_restores_serial_order_after_engine_shard_merge(
     stream = _ResidualJsonlStream(tmp_path / "sharded-ties.jsonl")
     try:
         merged_shard_rows = (
-            ("point-0", Engine.INTERNAL_ANALYTICAL.value, (0, 0, 0, 0)),
-            ("point-1", Engine.INTERNAL_ANALYTICAL.value, (0, 1, 0, 0)),
-            ("point-0", Engine.VAPOROCK.value, (0, 0, 1, 0)),
-            ("point-1", Engine.VAPOROCK.value, (0, 1, 1, 0)),
+            ("point-0", Engine.INTERNAL_ANALYTICAL.value, ("observation-1", 0, 0, 0)),
+            ("point-1", Engine.INTERNAL_ANALYTICAL.value, ("observation-1", 1, 0, 0)),
+            ("point-0", Engine.VAPOROCK.value, ("observation-1", 0, 1, 0)),
+            ("point-1", Engine.VAPOROCK.value, ("observation-1", 1, 1, 0)),
         )
         for point, engine, serial_order in merged_shard_rows:
             payload = {

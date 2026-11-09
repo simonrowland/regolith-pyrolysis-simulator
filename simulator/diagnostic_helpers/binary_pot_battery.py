@@ -3687,9 +3687,13 @@ class _InternalAnalyticalBatteryBackend:
     supports_intrinsic_fo2 = True
 
     def __init__(self, *, oxygen_balance_pack: str | None = None) -> None:
+        from simulator.melt_backend import openimcc_bridge
+
         self._core = _new_internal_analytical_core()
         self._oxygen_balance_backend: Any | None = None
-        self._oxygen_balance_pack = oxygen_balance_pack
+        self._oxygen_balance_pack = str(
+            oxygen_balance_pack or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+        )
 
     def equilibrate(
         self,
@@ -4551,6 +4555,7 @@ def _open_resolved_backend(
                 "vapor_pressure_units": settings.get(
                     "vapor_pressure_units", "bar"
                 ),
+                "warm_worker": False,
             }
         ):
             raise BackendUnavailableError(
@@ -4565,6 +4570,7 @@ def _open_resolved_backend(
                 "database": settings.get("database"),
                 "fO2_buffer": settings.get("fO2_buffer"),
                 "python_bridge": settings.get("bridge"),
+                "warm_worker": False,
             }
         )
         backend = _try_backend(MAGEMinBackend, backend_config)
@@ -4585,6 +4591,7 @@ def _open_resolved_backend(
             "fO2_buffer": settings.get("redox_buffer"),
             "fO2_offset": settings.get("fO2_offset"),
             "Fe3Fet_Liq": settings.get("Fe3Fet_ratio"),
+            "warm_worker": False,
             "vapor_transport_pO2_bar": settings.get(
                 "configured_vapor_transport_pO2_bar"
             ),
@@ -4766,11 +4773,9 @@ def _engine_cache_request_vector(
         options["po2_request"] = po2.as_payload()
         engine_settings = {"include_diagnostic_shadows": True}
         if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
-            from simulator.melt_backend import openimcc_bridge
-
             engine_settings["oxygen_balance_backend"] = {
                 "engine": "openimcc",
-                "pack": openimcc_bridge.DEFAULT_BACKEND_PACK_NAME,
+                "pack": handle.backend._oxygen_balance_pack,
                 "allow_extrapolation": True,
                 "allow_out_of_envelope": True,
             }
@@ -5040,14 +5045,6 @@ def equilibrate_cell(
                     physical_pressure_bar=physical_pressure_bar,
                     native_activity_formula=native_activity_formula,
                     _defer_qualification_decoration=True,
-                ),
-                depends_on=(
-                    ("openimcc",)
-                    if (
-                        handle.name == "internal-analytical"
-                        and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
-                    )
-                    else ()
                 ),
             )
             cell = _finish(cell)

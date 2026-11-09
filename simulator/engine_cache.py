@@ -38,6 +38,16 @@ ENGINE_CHEMISTRY_VERSION: Mapping[str, int] = {
 # magemin v1: 2026-11-08 engine lock pin 40ed109d07d4246001cab59382596d33fed79086 - initial cache population
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 with PetThermoTools pin 74a41ff5685d9c8280b90667bfa43efe97fca87c - initial cache population
 # thermoengine v1: 2026-11-08 engine lock pin df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache population
+
+ENGINE_CHEMISTRY_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
+    "openimcc": (),
+    "internal-analytical": ("openimcc",),
+    "vaporock": (),
+    "magemin": (),
+    "alphamelts": ("vaporock",),
+    "thermoengine": ("vaporock",),
+}
+
 _BUSY_TIMEOUT_MS = 60_000
 _TABLE_NAME = "engine_outputs"
 _COUNTER_NAMES = ("hits", "misses", "stores", "transient_skips")
@@ -147,8 +157,6 @@ def _canonical_json(value: Any) -> str:
 def key(
     engine_id: str,
     request_vector: Mapping[str, Any],
-    *,
-    depends_on: tuple[str, ...] = (),
 ) -> str:
     """Return the exact SHA-256 identity of one engine request vector."""
     if engine_id not in ENGINE_CHEMISTRY_VERSION:
@@ -161,11 +169,12 @@ def key(
         "request": request_vector,
     }
     dependency_versions: dict[str, int] = {}
-    for dependency in sorted(set(depends_on)):
+    for dependency in ENGINE_CHEMISTRY_DEPENDENCIES[engine_id]:
         if dependency not in ENGINE_CHEMISTRY_VERSION:
             raise ValueError(f"unknown battery engine dependency {dependency!r}")
-        if dependency != engine_id:
-            dependency_versions[dependency] = ENGINE_CHEMISTRY_VERSION[dependency]
+        if dependency == engine_id:
+            raise ValueError(f"engine {engine_id!r} cannot depend on itself")
+        dependency_versions[dependency] = ENGINE_CHEMISTRY_VERSION[dependency]
     if dependency_versions:
         identity["dependency_chemistry_versions"] = dependency_versions
     return hashlib.sha256(_canonical_json(identity).encode("utf-8")).hexdigest()
@@ -504,14 +513,12 @@ def cached_solve(
     engine_id: str,
     request_vector: Mapping[str, Any],
     solve_fn: Callable[[], Any],
-    *,
-    depends_on: tuple[str, ...] = (),
 ) -> Any:
     """Reuse an exact cached cell outcome, storing only stable results."""
     if cache is None:
         return solve_fn()
 
-    cache_key = key(engine_id, request_vector, depends_on=depends_on)
+    cache_key = key(engine_id, request_vector)
     call_kind = str(request_vector.get("call", "equilibrate_cell"))
     if call_kind not in _CALL_KINDS:
         raise ValueError(f"unknown engine call kind {call_kind!r}")
