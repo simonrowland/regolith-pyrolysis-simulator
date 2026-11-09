@@ -180,13 +180,16 @@ def test_alphamelts_diagnostic_crystalline_k_pressures_are_pinned(
         composition_wt_pct={"CaO": 40.0, "MgO": 50.0, "Na2O": 10.0},
     )
 
+    # Canonical supplied CaO/MgO activities now take precedence over the
+    # composition projection; these are their converted crystalline-K
+    # pressures. Omitting those supplied activities restores the prior pins.
     assert (
         result["species"]["CaO_gas"]["P_eq_Pa"].hex()
-        == "0x1.3507f03a468dap-25"
+        == "0x1.867c90f78150cp-16"
     )
     assert (
         result["species"]["MgO_gas"]["P_eq_Pa"].hex()
-        == "0x1.89a4929018608p-12"
+        == "0x1.c15a46ecf6999p-10"
     )
 
 
