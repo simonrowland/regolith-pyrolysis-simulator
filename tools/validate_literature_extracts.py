@@ -315,6 +315,8 @@ def _render_extract_path(path: tuple[str | int, ...]) -> str:
 
 
 def _run_metadata_location_errors(doc: Mapping[str, Any], label: str) -> list[str]:
+    from simulator.battery.migrate import _run_metadata_shape_error
+
     errors: list[str] = []
 
     def visit(node: Any, path: tuple[str | int, ...]) -> None:
@@ -324,16 +326,31 @@ def _run_metadata_location_errors(doc: Mapping[str, Any], label: str) -> list[st
                 child_path = (*path, field)
                 spec = RUN_METADATA_FIELD_HOMES.get(field)
                 if spec is not None:
-                    _shape, homes = spec
-                    if not any(
-                        _run_metadata_home_matches(child_path, home)
+                    shape, homes = spec
+                    matching_homes = tuple(
+                        home
                         for home in homes
-                    ):
+                        if _run_metadata_home_matches(child_path, home)
+                    )
+                    if not matching_homes:
                         errors.append(
                             f"{label}:{_render_extract_path(child_path)}: "
                             f"[run-metadata-location] field {field!r} is outside "
                             f"allowed homes: {', '.join(homes)}"
                         )
+                    else:
+                        shape_error = _run_metadata_shape_error(
+                            shape,
+                            value,
+                            equipment_source=any(
+                                ".equipment." in home for home in matching_homes
+                            ),
+                        )
+                        if shape_error is not None:
+                            errors.append(
+                                f"{label}:{_render_extract_path(child_path)}: "
+                                f"[run-metadata-shape] {shape_error}"
+                            )
                 visit(value, child_path)
         elif isinstance(node, (list, tuple)):
             for index, value in enumerate(node):

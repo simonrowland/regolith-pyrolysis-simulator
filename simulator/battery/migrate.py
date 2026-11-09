@@ -2771,6 +2771,161 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
     return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
+def _run_metadata_located_value_from_plain(
+    payload: object,
+    *,
+    parent_locator: Locator | None = None,
+    equipment_source: bool = False,
+) -> Located[Value]:
+    raw_value = payload
+    value_locator = parent_locator
+    if equipment_source:
+        raw_value, value_locator, _mapping = _unwrap_located_equipment_value(
+            payload, parent_locator
+        )
+
+    if (
+        isinstance(raw_value, Mapping)
+        and "state" not in raw_value
+        and _is_value_kind_wrapper(raw_value)
+    ):
+        normalized = dict(raw_value)
+        normalized["state"] = {
+            "tag": StateTag.VALUE.value,
+            "value": {
+                key: value
+                for key, value in raw_value.items()
+                if key not in {"locator", "inference", "inferred"}
+            },
+        }
+        raw_value = normalized
+
+    located = _located_from_plain(raw_value, _value_or_point_from_plain)
+    if located.locator is None and value_locator is not None:
+        return replace(located, locator=value_locator)
+    return located
+
+
+def _run_metadata_species_payload_from_plain(
+    payload: object,
+    *,
+    parent_locator: Locator | None = None,
+    equipment_source: bool = False,
+) -> tuple[Mapping[str, Any], Locator | None]:
+    raw_values = payload
+    field_locator = parent_locator
+    if equipment_source:
+        raw_values, field_locator, _mapping = _unwrap_located_equipment_value(
+            payload, parent_locator
+        )
+    if not isinstance(raw_values, Mapping):
+        raise ValueError("species_loss_fraction must be a mapping")
+    if not raw_values:
+        raise ValueError("species_loss_fraction must contain at least one species")
+    return raw_values, field_locator
+
+
+def _parse_run_metadata_shape(
+    shape: str,
+    payload: object,
+    *,
+    equipment_source: bool = False,
+    parent_locator: Locator | None = None,
+) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
+    """Parse one declared run-metadata shape through the registry Value parser."""
+
+    if shape == "located_value":
+        try:
+            return (
+                _run_metadata_located_value_from_plain(
+                    payload,
+                    parent_locator=parent_locator,
+                    equipment_source=equipment_source,
+                ),
+                (),
+            )
+        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+            return None, ((None, payload, str(exc)),)
+
+    if shape == "species_located_values":
+        try:
+            raw_values, field_locator = _run_metadata_species_payload_from_plain(
+                payload,
+                parent_locator=parent_locator,
+                equipment_source=equipment_source,
+            )
+        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+            return None, ((None, payload, str(exc)),)
+        parsed: dict[str, Located[Value]] = {}
+        errors: list[tuple[str | None, object, str]] = []
+        for formula, raw_value in raw_values.items():
+            formula_text = str(formula)
+            try:
+                parsed[formula_text] = _run_metadata_located_value_from_plain(
+                    raw_value,
+                    parent_locator=field_locator,
+                    equipment_source=equipment_source,
+                )
+            except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+                errors.append((formula_text, raw_value, str(exc)))
+        return parsed or None, tuple(errors)
+
+    if shape == "charge_sequence":
+        try:
+            if isinstance(payload, ChargeSequence):
+                return payload, ()
+            if not isinstance(payload, Mapping):
+                raise ValueError("charge_sequence must be a mapping")
+            return (
+                ChargeSequence(
+                    charge_id=payload.get("charge_id"),
+                    run_index=payload.get("run_index"),
+                    locator=_locator_from_plain(payload.get("locator")),
+                ),
+                (),
+            )
+        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+            return None, ((None, payload, str(exc)),)
+
+    if shape == "located_vaporization_mode":
+        try:
+            return (
+                _located_from_plain(
+                    payload, lambda value: VaporizationMode(str(value))
+                ),
+                (),
+            )
+        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
+            return None, ((None, payload, str(exc)),)
+
+    return None, ((None, payload, f"unsupported run-metadata shape {shape!r}"),)
+
+
+def _run_metadata_shape_detail(
+    shape: str,
+    formula: str | None,
+    raw_value: object,
+    detail: str,
+) -> str:
+    formula_suffix = f"[{formula}]" if formula is not None else ""
+    return f"invalid {shape}{formula_suffix} value {raw_value!r}: {detail}"
+
+
+def _run_metadata_shape_error(
+    shape: str,
+    payload: object,
+    *,
+    equipment_source: bool = False,
+) -> str | None:
+    _parsed, errors = _parse_run_metadata_shape(
+        shape, payload, equipment_source=equipment_source
+    )
+    if not errors:
+        return None
+    formula, raw_value, detail = errors[0]
+    return _run_metadata_shape_detail(shape, formula, raw_value, detail)
+
+
 def _uncertainty_from_plain(payload: object) -> Uncertainty:
     if not isinstance(payload, Mapping):
         return Uncertainty(kind=UncertaintyKind.NONE)
@@ -3068,10 +3223,25 @@ def _sample_from_plain(
             return replace(value, inference=inference)
         return value
 
-    def require_species_loss_mapping(raw: object) -> Mapping[str, Any]:
-        if not isinstance(raw, Mapping):
-            raise ValueError("species_loss_fraction must be a mapping")
-        return raw
+    def parse_run_metadata(field: str, shape: str, raw: object) -> object | None:
+        parsed, errors = _parse_run_metadata_shape(shape, raw)
+        if errors and registry_issues is None:
+            formula, raw_value, detail = errors[0]
+            raise ValueError(
+                _run_metadata_shape_detail(shape, formula, raw_value, detail)
+            )
+        for formula, raw_value, detail in errors:
+            issue_field = f"{field}[{formula}]" if formula is not None else field
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{issue_field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=_run_metadata_shape_detail(
+                        shape, formula, raw_value, detail
+                    ),
+                )
+            )
+        return parsed
 
     printed_located = None
     if printed is not None:
@@ -3099,28 +3269,7 @@ def _sample_from_plain(
         raw = payload.get(field)
         if raw is None:
             continue
-        if shape == "located_value":
-            sample_run_metadata[field] = parse_registry_located(
-                field,
-                raw,
-                lambda value: _located_from_plain(
-                    value, _value_or_point_from_plain
-                ),
-            )
-            continue
-        species_values = parse_registry_value(
-            field, raw, require_species_loss_mapping
-        )
-        sample_run_metadata[field] = {
-            str(formula): parse_registry_located(
-                f"{field}.{formula}",
-                value,
-                lambda item: _located_from_plain(
-                    item, _value_or_point_from_plain
-                ),
-            )
-            for formula, value in species_values.items()
-        }
+        sample_run_metadata[field] = parse_run_metadata(field, shape, raw)
     initial_located = (
         None
         if initial is None
@@ -3554,48 +3703,42 @@ def _experiment_from_plain(
             ),
         )
 
-    def parse_registry_field(field: str, raw: object, parse):
-        try:
-            return parse(raw)
-        except (ArithmeticError, KeyError, TypeError, ValueError) as exc:
-            if registry_issues is None:
-                raise
+    def parse_run_metadata(field: str, shape: str, raw: object) -> object | None:
+        parsed, errors = _parse_run_metadata_shape(shape, raw)
+        if errors and registry_issues is None:
+            formula, raw_value, detail = errors[0]
+            raise ValueError(
+                _run_metadata_shape_detail(shape, formula, raw_value, detail)
+            )
+        for formula, raw_value, detail in errors:
+            issue_field = f"{field}[{formula}]" if formula is not None else field
             registry_issues.append(
                 ValidationIssue(
-                    path=f"experiment[{experiment_id}].{field}",
+                    path=f"experiment[{experiment_id}].{issue_field}",
                     reason=RefusalReason.INVALID_SOURCE,
-                    detail=f"invalid registry value: {exc}",
+                    detail=_run_metadata_shape_detail(
+                        shape, formula, raw_value, detail
+                    ),
                 )
             )
-            return None
-
-    def parse_charge_sequence(raw: object) -> ChargeSequence:
-        if not isinstance(raw, Mapping):
-            raise ValueError("charge_sequence must be a mapping")
-        return ChargeSequence(
-            charge_id=raw.get("charge_id"),
-            run_index=raw.get("run_index"),
-            locator=_locator_from_plain(raw.get("locator")),
-        )
+        return parsed
 
     raw_charge_sequence = payload.get("charge_sequence")
     charge_sequence = (
         None
         if raw_charge_sequence is None
-        else parse_registry_field(
-            "charge_sequence", raw_charge_sequence, parse_charge_sequence
+        else parse_run_metadata(
+            "charge_sequence", "charge_sequence", raw_charge_sequence
         )
     )
     raw_vaporization_statement = payload.get("vaporization_statement")
     vaporization_statement = (
         None
         if raw_vaporization_statement is None
-        else parse_registry_field(
+        else parse_run_metadata(
             "vaporization_statement",
+            "located_vaporization_mode",
             raw_vaporization_statement,
-            lambda raw: _located_from_plain(
-                raw, lambda value: VaporizationMode(str(value))
-            ),
         )
     )
 
@@ -15624,39 +15767,6 @@ def _unwrap_located_equipment_value(
     return value, parent_locator, value if isinstance(value, Mapping) else None
 
 
-def _species_loss_values_from_equipment(
-    payload: object,
-    parent_locator: Locator | None,
-) -> dict[str, Located[Value]] | None:
-    if not isinstance(payload, Mapping):
-        return None
-    if "value" in payload and isinstance(payload.get("value"), Mapping):
-        values, field_locator, _mapping = _unwrap_located_equipment_value(
-            payload, parent_locator
-        )
-    else:
-        values = {
-            key: value for key, value in payload.items() if key != "locator"
-        }
-        field_locator = locator_from_mapping(payload.get("locator")) or parent_locator
-    if not isinstance(values, Mapping):
-        return None
-    located_values: dict[str, Located[Value]] = {}
-    for formula, raw_value in values.items():
-        if isinstance(raw_value, Mapping) and "state" in raw_value:
-            located = _located_from_plain(raw_value, _value_or_point_from_plain)
-        else:
-            value, value_locator, _mapping = _unwrap_located_equipment_value(
-                raw_value, field_locator
-            )
-            located = Located(
-                State.of(_value_or_point_from_plain(value)),
-                locator=value_locator,
-            )
-        located_values[str(formula)] = located
-    return located_values or None
-
-
 def _walk_lab_hits(
     obj: object,
     by_printed: Mapping[str, VocabEntry],
@@ -16791,46 +16901,76 @@ def sample_from_equipment(
             )
         )
 
+    def report_metadata_shape_errors(
+        field_path: str,
+        source_path: str,
+        shape: str,
+        errors: tuple[tuple[str | None, object, str], ...],
+    ) -> None:
+        if _validation_issues is None:
+            return
+        field = field_path.removeprefix("experiment.")
+        for formula, raw_value, detail in errors:
+            issue_path = (
+                f"experiment[{_experiment_id}].{field}"
+                if _experiment_id is not None
+                else f"equipment.{field}"
+            )
+            if formula is not None:
+                issue_path += f"[{formula}]"
+            _validation_issues.append(
+                ValidationIssue(
+                    path=issue_path,
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=(
+                        f"{source_path}: "
+                        + _run_metadata_shape_detail(
+                            shape, formula, raw_value, detail
+                        )
+                    ),
+                )
+            )
+
     for field_path, shape in _sample_run_metadata_specs():
         field = field_path.rsplit(".", 1)[-1]
         source_payloads = equipment_metadata_payloads(field)
         if shape == "located_value":
-            entry = next(
-                (
-                    item
-                    for item in vocab
-                    if item.printed == field
-                    and item.field == field_path
-                ),
-                None,
-            )
-            field_hits = []
-            if entry is not None:
-                field_hits = [
-                    hit
-                    for payload, parent_locator, path in source_payloads
-                    if (hit := _hit_from_value(
-                        entry, payload, parent_locator, path
-                    ))
-                    is not None
-                ]
-            located = _unique_located(field_hits)
-            numeric_hits = [
-                hit
-                for hit in field_hits
-                if hit.amount is not None or hit.interval is not None
-            ]
-            if len(numeric_hits) > 1 and located is None:
+            located = None
+            conflict = False
+            for raw_payload, parent_locator, path in source_payloads:
+                parsed, errors = _parse_run_metadata_shape(
+                    shape,
+                    raw_payload,
+                    equipment_source=True,
+                    parent_locator=parent_locator,
+                )
+                report_metadata_shape_errors(field_path, path, shape, errors)
+                if parsed is None:
+                    continue
+                if (
+                    located is not None
+                    and located.state.is_value
+                    and parsed.state.is_value
+                    and located.state.value != parsed.state.value
+                ):
+                    conflict = True
+                else:
+                    located = _prefer_located(located, parsed)
+            if conflict:
                 report_metadata_conflict(field_path)
-            sample_run_metadata[field] = located
+            sample_run_metadata[field] = None if conflict else located
             continue
 
         species_values: dict[str, Located[Value]] = {}
         conflicts: set[str] = set()
-        for raw_payload, parent_locator, _path in source_payloads:
-            parsed = _species_loss_values_from_equipment(
-                raw_payload, parent_locator
+        for raw_payload, parent_locator, path in source_payloads:
+            parsed, errors = _parse_run_metadata_shape(
+                shape,
+                raw_payload,
+                equipment_source=True,
+                parent_locator=parent_locator,
             )
+            report_metadata_shape_errors(field_path, path, shape, errors)
             for formula, located in (parsed or {}).items():
                 existing = species_values.get(formula)
                 if (
