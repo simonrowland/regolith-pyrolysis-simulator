@@ -119,6 +119,8 @@ ONEILL_IW_TEMPERATURE_RANGES_K = (
     (1184.0, 1450.0),
 )
 ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
+ONEILL_IW_FEO_MELTING_TEMPERATURE_K = 1650.0
+ONEILL_IW_FE_MELTING_TEMPERATURE_K = 1811.0
 _ONEILL_IW_R = 8.31446261815324
 _ONEILL_IW_LN10 = math.log(10.0)
 
@@ -161,6 +163,33 @@ def _require_finite_positive(value: float, label: str) -> float:
     if not math.isfinite(parsed) or parsed <= 0.0:
         raise ValueError(f"{label} must be finite and positive")
     return parsed
+
+
+def oneill_iw_extrapolation_notice(
+    temperature_K: float,
+) -> dict[str, object] | None:
+    """Return the shared IW extrapolation and phase-boundary notice, if any."""
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    low = ONEILL_IW_TEMPERATURE_RANGES_K[0][0]
+    high = ONEILL_IW_TEMPERATURE_RANGES_K[-1][1]
+    flags: list[str] = []
+    if temperature < low or temperature > high:
+        flags.append(f"predict_and_flag_outside_range_{low:g}_{high:g}_K")
+    if temperature > ONEILL_IW_FEO_MELTING_TEMPERATURE_K:
+        flags.append("phase_boundary_extrapolation_above_1650_K_FeO_melting")
+    if temperature > ONEILL_IW_FE_MELTING_TEMPERATURE_K:
+        flags.append("phase_boundary_extrapolation_above_1811_K_Fe_melting")
+    if not flags:
+        return None
+    return {
+        "reason": (
+            "O'Neill (1988) equation (11) is extrapolated outside its "
+            f"{low:g}–{high:g} K calibration range."
+        ),
+        "authority_level": "extrapolated",
+        "calibration_range_K": (low, high),
+        "flags": tuple(flags),
+    }
 
 
 # Jakobsson & Oskarsson 1994 CCO point coefficients via LEPR / ThermoEngine.

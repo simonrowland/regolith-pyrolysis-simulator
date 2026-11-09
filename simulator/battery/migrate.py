@@ -17266,6 +17266,8 @@ def _relative_oxygen_decision(
     pressure_bar: Decimal | None,
     source_id: str | None,
 ) -> PrintedOxygenDecision | None:
+    from simulator.oxygen_buffers import oneill_iw_extrapolation_notice
+
     relative = _printed_relative_oxygen(raw_item, point_conditions, buffer_text)
     if relative is None:
         return None
@@ -17319,12 +17321,15 @@ def _relative_oxygen_decision(
     lo, hi = valid_range
     outside = not lo <= float(temperature_K) <= hi
     flags: list[str] = []
-    if outside:
+    iw_notice = (
+        oneill_iw_extrapolation_notice(float(temperature_K))
+        if buffer == "IW"
+        else None
+    )
+    if iw_notice is not None:
+        flags.extend(iw_notice["flags"])
+    elif outside:
         flags.append(f"predict_and_flag_outside_range_{lo:g}_{hi:g}_K")
-    if buffer == "IW" and float(temperature_K) > 1650.0:
-        flags.append("phase_boundary_extrapolation_above_1650_K_FeO_melting")
-    if buffer == "IW" and float(temperature_K) > 1811.0:
-        flags.append("phase_boundary_extrapolation_above_1811_K_Fe_melting")
     if band is not None:
         band_text = f"±{band:.6g} dex"
         band_basis = "absolute canonical-to-Frost 1991 spread"
