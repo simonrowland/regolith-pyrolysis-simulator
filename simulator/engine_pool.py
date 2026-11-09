@@ -1718,7 +1718,14 @@ class WarmEngineWorker:
             ):
                 return
             process, connection = self.process, self.connection
+            launch = self._launch_owner
+            owned = launch is not None and launch.process is process
             self.ready_payload = None
+            if not owned:
+                # Drop an injected pair before stop. close() can raise
+                # from the pipe, and the pair must already be clear.
+                self.process = None
+                self.connection = None
         self._stop_pair(
             process,
             connection,
@@ -1756,7 +1763,6 @@ class WarmEngineWorker:
         diagnostic: bool,
         cleanup_group: bool = False,
     ) -> None:
-        del cleanup_group
         with self._state_lock:
             current = self._launch_owner
             launch = (
@@ -1768,19 +1774,114 @@ class WarmEngineWorker:
                 launch.diagnostic_cancel = launch.diagnostic_cancel or diagnostic
                 launch.graceful_cancel = False
                 launch.cancel_requested.set()
-        self._wait_for_launch_cleanup(
-            launch,
-            time.monotonic() + ENGINE_WORKER_STOP_PAIR_JOIN_S,
-        )
+        if launch is not None:
+            self._wait_for_launch_cleanup(
+                launch,
+                time.monotonic() + ENGINE_WORKER_STOP_PAIR_JOIN_S,
+            )
+            return
+        # Injected pairs have no launch owner. Match the direct stop
+        # order: diagnostic, grace, killpg+join(0.1) as one try so an
+        # OSError skips that join, then kill, join(1.0), close.
+        try:
+            pid = _process_pid(process)
+            if pid is not None:
+                if process is not None and process.is_alive() and diagnostic:
+                    try:
+                        os.kill(pid, self.diagnostic_signal)
+                    except OSError:
+                        pass
+                    time.sleep(self.watchdog_grace_s)
+                if cleanup_group or (
+                    process is not None and process.is_alive()
+                ):
+                    try:
+                        os.killpg(pid, signal.SIGKILL)
+                        process.join(timeout=0.1)
+                    except (AttributeError, OSError):
+                        pass
+                if process is not None and process.is_alive():
+                    try:
+                        process.kill()
+                    except OSError:
+                        pass
+                if process is not None:
+                    process.join(timeout=1.0)
+        finally:
+            if connection is not None:
+                self._close_connection_or_defer(connection)
 
     def close(self) -> None:
-        """Ask the launch owner to stop gracefully, then wait one second."""
+        """Stop the worker and release its pipe.
+
+        The launch owner stops gracefully. An injected pair with no owner
+        uses the direct send/join/kill sequence: close stays idempotent,
+        and a pipe-close error still joins the process.
+        """
         with self._state_lock:
+            launch = self._launch_owner
+            process, connection = self.process, self.connection
+            active_reader = (
+                connection is not None
+                and self._active_frame_readers.get(id(connection), 0) > 0
+            )
+            owned = (
+                launch is not None
+                and (process is None or launch.process is process)
+            )
+            if not owned:
+                self.process = None
+                self.connection = None
             self.ready_payload = None
-        self._request_launch_cancel(
-            graceful=True,
-            deadline=time.monotonic() + 1.0,
-        )
+        if owned:
+            self._request_launch_cancel(
+                graceful=True,
+                deadline=time.monotonic() + 1.0,
+            )
+            return
+        if active_reader:
+            self._stop_pair(
+                process,
+                connection,
+                diagnostic=False,
+                cleanup_group=True,
+            )
+            self._reap_pending(timeout_s=1.0)
+            return
+        try:
+            if connection is not None:
+                try:
+                    if (
+                        process is not None
+                        and _process_pid(process) is not None
+                        and process.is_alive()
+                    ):
+                        connection.send(None)
+                except (BrokenPipeError, EOFError, OSError):
+                    pass
+                finally:
+                    connection.close()
+        finally:
+            process_pid = _process_pid(process)
+            if process is not None and process_pid is not None:
+                process.join(timeout=1.0)
+                if process.is_alive():
+                    try:
+                        os.killpg(process_pid, signal.SIGTERM)
+                    except (AttributeError, OSError):
+                        process.terminate()
+                    process.join(timeout=1.0)
+                if process.is_alive():
+                    try:
+                        os.killpg(process_pid, signal.SIGKILL)
+                    except (AttributeError, OSError):
+                        process.kill()
+                    process.join(timeout=1.0)
+                try:
+                    os.killpg(process_pid, signal.SIGKILL)
+                except (AttributeError, OSError):
+                    pass
+        self._reap_pending(timeout_s=1.0)
 
     def request_disable(self) -> None:
         """Reject calls and ask the launch owner to stop the process."""
