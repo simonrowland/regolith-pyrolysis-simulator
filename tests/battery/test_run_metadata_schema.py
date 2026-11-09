@@ -1702,3 +1702,257 @@ def test_busemann_preconverted_mass_rows_keep_their_units_and_store_bytes(
     first_bytes = work_yaml.read_bytes()
     migrate(root, write=True)
     assert work_yaml.read_bytes() == first_bytes
+
+
+_RUN_METADATA_UNIT_KEYS = (
+    "unit",
+    "UNIT",
+    "Unit",
+    "units",
+    "UNITS",
+    "Units",
+    "unit_code",
+    "UNIT_CODE",
+    "Unit_Code",
+    "mass_unit",
+    "MASS_UNIT",
+    "Mass_Unit",
+)
+
+
+def _run_metadata_field_payload(extract: dict, field: str, home: str) -> object:
+    if home.startswith("experiments[]."):
+        experiment = extract["experiments"][0]
+    elif home.startswith("experiments.*."):
+        experiment = extract["experiments"]["run-1"]
+    elif home.startswith("species.*.observations[].equipment."):
+        equipment = extract["species"]["Na"]["observations"][0]["equipment"]
+        if ".equipment.sample.value." in home:
+            return equipment["sample"]["value"][field]
+        return equipment[field]
+    else:
+        raise AssertionError(f"unexpected run-metadata home: {home}")
+
+    if ".sample." in home:
+        return experiment["sample"][field]
+    if ".charge." in home:
+        return experiment["charge"][field]
+    return experiment[field]
+
+
+def _run_metadata_mapping_paths(
+    value: object,
+    path: tuple[str | int, ...] = (),
+) -> tuple[tuple[str | int, ...], ...]:
+    paths: list[tuple[str | int, ...]] = []
+    if isinstance(value, Mapping):
+        paths.append(path)
+        for key, child in value.items():
+            paths.extend(_run_metadata_mapping_paths(child, (*path, str(key))))
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            paths.extend(_run_metadata_mapping_paths(child, (*path, index)))
+    return tuple(paths)
+
+
+def _run_metadata_mapping_at(
+    value: object,
+    path: tuple[str | int, ...],
+) -> dict:
+    current = value
+    for part in path:
+        current = current[part]
+    assert isinstance(current, dict)
+    return current
+
+
+def _loaded_run_metadata_value(experiment, field: str):
+    if field in {"charge_sequence", "vaporization_statement"}:
+        return getattr(experiment, field)
+    return getattr(experiment.sample, field)
+
+
+def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
+    tmp_path: Path,
+) -> None:
+    mutations = 0
+    seeds = 0
+    fields = (
+        "mass_kg",
+        "final_mass_kg",
+        "species_loss_fraction",
+        "charge_sequence",
+        "vaporization_statement",
+    )
+    for field in fields:
+        for home in RUN_METADATA_FIELD_HOMES[field][1]:
+            shapes = (
+                ("scalar", "point-wrapper", "located-state")
+                if field in {"mass_kg", "final_mass_kg", "species_loss_fraction"}
+                else ("unitless",)
+            )
+            for shape in shapes:
+                seed_root = tmp_path / f"seed-{seeds}"
+                seeds += 1
+                if shape == "unitless":
+                    payload = (
+                        {"charge_id": "charge-a", "run_index": 1,
+                         "locator": {"table": "unit-matrix", "page": 1}}
+                        if field == "charge_sequence"
+                        else {
+                            "state": {"tag": "value", "value": "congruent"},
+                            "locator": {"table": "unit-matrix", "page": 1},
+                        }
+                    )
+                    _seed, base_extract = _unitless_run_metadata_extract(
+                        seed_root, field, home, payload
+                    )
+                else:
+                    _seed, base_extract = _run_metadata_shape_extract(
+                        seed_root, field, home, shape
+                    )
+
+                base_payload = _run_metadata_field_payload(
+                    base_extract, field, home
+                )
+                for node_path in _run_metadata_mapping_paths(base_payload):
+                    for unit_key in _RUN_METADATA_UNIT_KEYS:
+                        extract = deepcopy(base_extract)
+                        field_payload = _run_metadata_field_payload(
+                            extract, field, home
+                        )
+                        _run_metadata_mapping_at(field_payload, node_path)[unit_key] = "g"
+                        root = _write_min_tree(
+                            tmp_path / f"mutation-{mutations}", extract
+                        )
+                        result = migrate(root, write=True)
+                        assert result.validation is not None
+                        experiment_id = "10.1234/fixture::experiment::run-1"
+                        _works, experiments, _observations = load_migrated_store(root)
+                        loaded = _loaded_run_metadata_value(
+                            experiments[experiment_id], field
+                        )
+                        field_issues = [
+                            issue
+                            for issue in result.validation.issues
+                            if issue.reason is RefusalReason.INVALID_SOURCE
+                            and field in issue.path
+                        ]
+                        context = (
+                            f"field={field}, home={home}, shape={shape}, "
+                            f"node={node_path}, key={unit_key}"
+                        )
+                        if field_issues:
+                            assert loaded is None, context
+                        else:
+                            assert field in {"mass_kg", "final_mass_kg"}, context
+                            assert unit_key.casefold() in {"unit", "units"}, context
+                            assert not any(
+                                str(part).casefold() in {"locator", "inference"}
+                                for part in node_path
+                            ), context
+                            assert loaded is not None and loaded.state.is_value, context
+                            printed = Decimal(
+                                "0.0008" if field == "final_mass_kg" else "0.25"
+                            )
+                            assert loaded.state.value == Value.point_of(
+                                printed / Decimal(1000)
+                            ), context
+                        mutations += 1
+
+
+@pytest.mark.parametrize(
+    ("name", "raw_value"),
+    (
+        (
+            "as-published-inside-value",
+            {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "kind": "point",
+                        "point": "0.5",
+                        "as_published": {"units": "g"},
+                    },
+                }
+            },
+        ),
+        (
+            "explicit-identity-bypasses-conversion",
+            {
+                "state": {
+                    "tag": "value",
+                    "value": {"kind": "point", "point": "0.5"},
+                },
+                "as_published": {"value": "0.5", "units": "g"},
+                "inference": {
+                    "method": "fixture",
+                    "relation": "identity",
+                    "inputs": ["source"],
+                    "output_unit": "kg",
+                },
+            },
+        ),
+    ),
+)
+def test_run_metadata_as_published_conversion_bypasses_are_typed(
+    tmp_path: Path,
+    name: str,
+    raw_value: dict,
+) -> None:
+    root, _extract = _run_metadata_shape_extract(
+        tmp_path / name,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "scalar",
+        raw_value=raw_value,
+    )
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert experiment.sample.mass_kg is None
+
+
+@pytest.mark.parametrize(
+    ("name", "as_published"),
+    (
+        ("empty", {}),
+        ("unsupported-unit-key", {"unit_code": "g"}),
+    ),
+)
+def test_run_metadata_unconsumed_as_published_blocks_are_typed(
+    tmp_path: Path,
+    name: str,
+    as_published: dict,
+) -> None:
+    root, _extract = _run_metadata_shape_extract(
+        tmp_path / name,
+        "mass_kg",
+        "experiments[].sample.mass_kg",
+        "scalar",
+        raw_value={
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.5"},
+            },
+            "as_published": as_published,
+        },
+    )
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert experiment.sample.mass_kg is None
