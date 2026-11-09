@@ -39,6 +39,13 @@ ENGINE_CHEMISTRY_VERSION: Mapping[str, int] = {
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 with PetThermoTools pin 74a41ff5685d9c8280b90667bfa43efe97fca87c - initial cache population
 # thermoengine v1: 2026-11-08 engine lock pin df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache population
 
+# Bump procedure (2026-11-08 owner rule): the engineer making a chemistry
+# change bumps the owning engine here when an engine binary/package chemistry
+# changes or solve data changes (vapour-pressure YAML, JANAF tables, the
+# MAGEMin database, the MELTS model, or an OpenIMCC pack). The dependency table
+# below propagates that bump to dependent engines. Runtime identity is a
+# diagnostic tripwire only; nothing on the read path expires entries.
+
 ENGINE_CHEMISTRY_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "openimcc": (),
     "internal-analytical": ("openimcc",),
@@ -46,6 +53,34 @@ ENGINE_CHEMISTRY_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "magemin": (),
     "alphamelts": ("vaporock",),
     "thermoengine": ("vaporock",),
+}
+
+# Direct solve-time data assets by adapter. These paths document what needs an
+# explicit chemistry-version bump when changed; they are not key material and
+# are never hashed. Data owned by another adapter is inherited through
+# ENGINE_CHEMISTRY_DEPENDENCIES above.
+#   repo:<path> resolves from the repository root;
+#   package:<module>/<path> resolves from the installed package;
+#   engine:<artifact> resolves from engine_local_config's selected runtime.
+ENGINE_CHEMISTRY_DATA_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
+    "openimcc": (
+        "package:openimcc/data/packs",
+        "package:openimcc/data/gas",
+    ),
+    "internal-analytical": (
+        "repo:data/vapor_pressures.yaml",
+        "repo:data/literature/compilations/janaf/tables",
+    ),
+    "vaporock": (
+        "package:vaporock/data/JANAF-vapor-data-full.csv",
+    ),
+    "magemin": ("engine:magemin/ref_database",),
+    # The configured AlphaMELTS executable ships the MELTS model runtime.
+    "alphamelts": ("engine:alphamelts/model",),
+    "thermoengine": (
+        "package:thermoengine/data",
+        "engine:thermoengine/native-libraries",
+    ),
 }
 
 _BUSY_TIMEOUT_MS = 60_000

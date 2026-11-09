@@ -2818,6 +2818,11 @@ class _OpenImccBatteryBackend:
         )
         self._load_gas()
 
+    @property
+    def _effective_pack_name(self) -> str:
+        """Return the pack identity captured with the loaded datapack."""
+        return str(self._identity["pack"])
+
     def _load_gas(self) -> None:
         try:
             from openimcc import load_gas_datapack
@@ -2851,7 +2856,7 @@ class _OpenImccBatteryBackend:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         bridge_kwargs: dict[str, Any] = {
             "temperature_K": temperature_K,
-            "pack": self._pack_name,
+            "pack": self._effective_pack_name,
             "allow_extrapolation": True,
             "allow_out_of_envelope": True,
         }
@@ -4733,7 +4738,7 @@ def _openimcc_effective_cache_settings(
     backend: Any, _po2: Po2Request
 ) -> dict[str, Any]:
     return {
-        "pack": backend._pack_name,
+        "pack": backend._effective_pack_name,
         "allow_extrapolation": True,
         "allow_out_of_envelope": True,
     }
@@ -4755,7 +4760,7 @@ def _internal_analytical_effective_cache_settings(
             # equilibrate() classifies an unavailable optional bridge as a
             # refusal. Keep the configured pack in that same refusal key.
             oxygen_backend = None
-    pack = getattr(oxygen_backend, "_pack_name", None)
+    pack = getattr(oxygen_backend, "_effective_pack_name", None)
     if pack is None:
         pack = getattr(backend, "_oxygen_balance_pack", None)
     settings["oxygen_balance_backend"] = {
@@ -4849,12 +4854,16 @@ def _magemin_effective_cache_settings(
     backend: Any, _po2: Po2Request
 ) -> dict[str, Any]:
     bridge = getattr(backend, "_bridge", None)
-    database = getattr(backend, "_database", None)
+    database_resolver = getattr(backend, "_effective_database", None)
+    database = (
+        database_resolver()
+        if callable(database_resolver)
+        else getattr(backend, "_database", None)
+    )
     config = getattr(backend, "_config", {})
     pool = getattr(backend, "_subprocess_pool", None)
     if bridge == "subprocess" and pool is not None and pool.workers:
         args = pool.workers[0]._bootstrap_args
-        database = args[1]
         config = args[2]
     return {
         "database": database,
