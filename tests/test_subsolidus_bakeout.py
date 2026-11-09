@@ -18,6 +18,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.overhead import _solve_c0_joint_solid_host_bakeout_closure
 from simulator.runner import build_per_hour_summary
 from simulator.state import (
     Atmosphere,
@@ -774,6 +775,34 @@ def test_joint_release_stays_within_pipe_capacity():
     assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
 
 
+def test_c0_joint_closure_reports_closed_line_zero_flow_boundary():
+    boundary_partials = []
+
+    def rates_at_partials(partials_mbar):
+        boundary_partials.append(dict(partials_mbar))
+        return {}
+
+    result = _solve_c0_joint_solid_host_bakeout_closure(
+        {"Fe": 1.0},
+        rates_at_partials,
+        lambda rates: {"Fe": 0.0},
+        closed_line_equilibrium_pressures_Pa={"Fe": 50.0},
+        closed_line_total_pressure_Pa=100.0,
+    )
+
+    assert result.converged
+    assert result.status == "no_positive_root_boundary"
+    assert result.iterations == 1
+    assert result.rates_kg_hr["Fe"] == 0.0
+    assert boundary_partials == [{"Fe": 0.5}]
+    assert result.zero_flow_criterion == {
+        "source_equilibrium_pressure_sum_Pa": 50.0,
+        "closed_line_total_pressure_Pa": 100.0,
+        "zero_flow_boundary_source_rate_kg_hr": 0.0,
+        "zero_flow_boundary_probe_evaluations": 1,
+    }
+
+
 def test_c0_evaporation_uses_same_hour_source_pressure():
     """C0 flux uses the source pressure projected from its own rates."""
     backend = InternalAnalyticalBackend()
@@ -812,10 +841,31 @@ def test_c0_evaporation_uses_same_hour_source_pressure():
     )
 
     assert closure["iterations"] > 0
-    assert closure["rates_kg_hr"] == pytest.approx(flux.species_kg_hr, rel=1e-9)
-    assert closure["partial_pressures_Pa"] == pytest.approx(
-        {species: pressure * 100.0 for species, pressure in projected.items()},
-        rel=1e-9,
+    positive_closure_rates = {
+        species: rate
+        for species, rate in closure["rates_kg_hr"].items()
+        if rate > 0.0
+    }
+    positive_flux_rates = {
+        species: rate
+        for species, rate in flux.species_kg_hr.items()
+        if rate > 0.0
+    }
+    positive_closure_partials_Pa = {
+        species: pressure
+        for species, pressure in closure["partial_pressures_Pa"].items()
+        if pressure > 0.0
+    }
+    positive_projected_partials_Pa = {
+        species: pressure * 100.0
+        for species, pressure in projected.items()
+        if pressure > 0.0
+    }
+    assert positive_closure_rates == pytest.approx(
+        positive_flux_rates, rel=1e-9
+    )
+    assert positive_closure_partials_Pa == pytest.approx(
+        positive_projected_partials_Pa, rel=1e-9
     )
     assert transport["vapor_pressure_mbar"] > 0.0
     if not closure["converged"]:

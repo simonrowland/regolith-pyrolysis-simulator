@@ -16238,6 +16238,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 initial_rates,
                 rates_at_bakeout_partials,
                 partials_at_bakeout_rates,
+                closed_line_equilibrium_pressures_Pa=(
+                    equilibrium.vapor_pressures_Pa
+                    if (
+                        hour_carrier_feed_mol_s is None
+                        and pressure_held_total_Pa_this_hour is not None
+                    )
+                    else None
+                ),
+                closed_line_total_pressure_Pa=(
+                    pressure_held_total_Pa_this_hour
+                    if hour_carrier_feed_mol_s is None
+                    else None
+                ),
             )
             same_hour_partials_mbar = dict(
                 bakeout_closure.partial_pressures_mbar

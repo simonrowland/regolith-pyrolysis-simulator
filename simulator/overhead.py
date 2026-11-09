@@ -506,29 +506,6 @@ def _solve_c0_joint_solid_host_bakeout_closure(
         str(species): max(0.0, float(rate))
         for species, rate in initial_rates_kg_hr.items()
     }
-    if (
-        closed_line_equilibrium_pressures_Pa is not None
-        and closed_line_total_pressure_Pa is not None
-    ):
-        equilibrium_pressures = {
-            str(species): max(0.0, float(pressure))
-            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
-        }
-        # With no gas feed, the closed-line zero-flow boundary is a real root
-        # whenever ΣP_eq <= P_total. Detect it before evaluating a zero-rate
-        # composition: species_partial_pressures intentionally returns an
-        # empty map at zero flow, which otherwise makes that boundary look
-        # like the infinite-sweep limit and sends the solver toward its cap.
-        if math.fsum(equilibrium_pressures.values()) <= max(
-            0.0, float(closed_line_total_pressure_Pa)
-        ):
-            zero_species = set(rates) | set(equilibrium_pressures)
-            return SameHourHeadspaceClosureResult(
-                rates_kg_hr={species: 0.0 for species in zero_species},
-                partial_pressures_mbar={},
-                iterations=0,
-                converged=True,
-            )
     evaluation_cap = 2000
     species_names = set(rates)
     evaluations = 0
@@ -560,13 +537,65 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             for species in species_names
         )
 
-    def result(candidate_rates, partials, *, converged):
+    def result(
+        candidate_rates,
+        partials,
+        *,
+        converged,
+        status='converged',
+        zero_flow_criterion=None,
+    ):
         return SameHourHeadspaceClosureResult(
             rates_kg_hr=dict(candidate_rates),
             partial_pressures_mbar=dict(partials),
             iterations=evaluations,
             converged=converged,
+            status=status,
+            zero_flow_criterion=dict(zero_flow_criterion or {}),
         )
+
+    if (
+        closed_line_equilibrium_pressures_Pa is not None
+        and closed_line_total_pressure_Pa is not None
+    ):
+        equilibrium_pressures = {
+            str(species): max(0.0, float(pressure))
+            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
+        }
+        total_pressure_Pa = max(0.0, float(closed_line_total_pressure_Pa))
+        equilibrium_pressure_sum_Pa = math.fsum(equilibrium_pressures.values())
+        if equilibrium_pressure_sum_Pa <= total_pressure_Pa:
+            # Test the complete vector source at its zero-flow equilibrium map
+            # before accepting this boundary. C0 may include solid-host gas
+            # whose pressure is not in the ordinary melt equilibrium table.
+            boundary_partials_mbar = {
+                species: pressure / 100.0
+                for species, pressure in equilibrium_pressures.items()
+            }
+            boundary_rates = {
+                str(species): max(0.0, float(rate))
+                for species, rate in rates_at_partials(
+                    boundary_partials_mbar
+                ).items()
+            }
+            evaluations += 1
+            species_names.update(boundary_rates)
+            if not any(rate > 0.0 for rate in boundary_rates.values()):
+                zero_species = species_names | set(equilibrium_pressures)
+                return result(
+                    {species: 0.0 for species in zero_species},
+                    {},
+                    converged=True,
+                    status='no_positive_root_boundary',
+                    zero_flow_criterion={
+                        'source_equilibrium_pressure_sum_Pa': (
+                            equilibrium_pressure_sum_Pa
+                        ),
+                        'closed_line_total_pressure_Pa': total_pressure_Pa,
+                        'zero_flow_boundary_source_rate_kg_hr': 0.0,
+                        'zero_flow_boundary_probe_evaluations': 1,
+                    },
+                )
 
     # For a locally linear scalar map F, lambda=1/(1-F') removes the error in
     # one step. Cap the secant estimate at 0.5 so nonlinear coupled maps stay

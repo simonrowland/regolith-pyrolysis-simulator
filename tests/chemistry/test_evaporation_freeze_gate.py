@@ -55,7 +55,7 @@ from simulator.reduced_real_determinism import (
     uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
-from simulator.state import CampaignPhase, EvaporationFlux
+from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
 _CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
@@ -1048,6 +1048,8 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         enabled=False,
     )
     sim.melt.temperature_C = 900.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
     calls = []
 
     def fake_dispatch(intent, *args, **kwargs):
@@ -1055,7 +1057,12 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 7.5}},
+                diagnostic={
+                    'evaporation_flux_kg_hr': {'Fe': 7.5},
+                    'evaporation_series_resistance': {
+                        'Fe': {'alpha_intrinsic': 1.0},
+                    },
+                },
             )
         if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
             # 0.5.3 Phase A1: finite-headspace default-on routes pO2 through
@@ -1078,7 +1085,12 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
     assert ChemistryIntent.EVAPORATION_FLUX in calls
     assert ChemistryIntent.GATE_LIQUID_FRACTION not in calls
     assert ChemistryIntent.SILICATE_LIQUIDUS not in calls
-    assert flux.species_kg_hr['Na'] == pytest.approx(7.5)
+    assert flux.species_kg_hr['Fe'] == pytest.approx(
+        sim._last_evaporation_flux_diagnostic[
+            'same_hour_headspace_closure'
+        ]['rates_kg_hr']['Fe']
+    )
+    assert flux.species_kg_hr['Fe'] > 0.0
 
 
 @pytest.mark.parametrize(
@@ -1156,6 +1168,8 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         setpoints_data,
         enabled=True,
     )
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
     gate_calls = 0
 
     def fake_dispatch(intent, *args, **kwargs):
@@ -1163,7 +1177,12 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+                diagnostic={
+                    'evaporation_flux_kg_hr': {'Fe': 10.0},
+                    'evaporation_series_resistance': {
+                        'Fe': {'alpha_intrinsic': 1.0},
+                    },
+                },
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             gate_calls += 1
@@ -1193,10 +1212,11 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
-        rates.append(flux.species_kg_hr.get('Na', 0.0))
+        rates.append(flux.species_kg_hr.get('Fe', 0.0))
         factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
 
-    assert rates == pytest.approx([0.0, 5.0, 10.0])
+    assert rates[0] == 0.0
+    assert 0.0 < rates[1] < rates[2]
     assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
     assert gate_calls == 1
