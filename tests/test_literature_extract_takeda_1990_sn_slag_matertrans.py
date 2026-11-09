@@ -198,12 +198,15 @@ def _assert_table5_cell_audit(cells: list[dict[str, str]]) -> None:
     assert caption[0]["stored_value"] == '"1473"'
 
 
-def _source_pages() -> dict[int, str]:
-    text_path = (
+def _source_text_path() -> Path:
+    return (
         regolith_corpus_root()
         / "text/takeda-1990-sn-slag-matertrans/tesseract-layout.txt"
     )
-    text = text_path.read_text(encoding="utf-8")
+
+
+def _source_pages() -> dict[int, str]:
+    text = _source_text_path().read_text(encoding="utf-8")
     return {
         int(page): body
         for page, body in re.findall(
@@ -213,6 +216,9 @@ def _source_pages() -> dict[int, str]:
 
 
 def test_takeda_1990_render_cells_and_page_proofs() -> None:
+    if not _source_text_path().is_file():
+        pytest.skip("Takeda 1990 Tesseract layout text is absent")
+
     document = _document()
     _assert_table1_render_cells(document)
     _assert_figure4_marker_legend(document)
@@ -261,6 +267,14 @@ def test_takeda_1990_render_cells_and_page_proofs() -> None:
         "80 mass% Sn-20 mass% Fe",
         "53 mass% Sn-47 mass% Fe",
     ]
+
+
+def test_takeda_1990_render_cells_and_page_proofs_skips_when_corpus_is_absent(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path / "absent-corpus"))
+    with pytest.raises(pytest.skip.Exception):
+        test_takeda_1990_render_cells_and_page_proofs()
 
 
 def test_takeda_1990_render_pin_rejects_interior_mutation() -> None:
