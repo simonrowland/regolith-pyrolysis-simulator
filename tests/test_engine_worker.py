@@ -745,6 +745,9 @@ class _DeadlineRaceStartProcess:
         self.alive = False
         self.exitcode = -9
 
+    def terminate(self):
+        pass
+
 
 def _deadline_race_start_worker(
     monkeypatch,
@@ -766,9 +769,13 @@ def _deadline_race_start_worker(
         for spec in connection_specs
     ]
     processes = [_DeadlineRaceStartProcess() for _ in connections]
-    if use_real_discard:
-        for index, process in enumerate(processes):
-            process.pid = 8000 + index
+    for index, process in enumerate(processes):
+        process.pid = 8000 + index
+    monkeypatch.setattr(
+        engine_pool_module.os,
+        'killpg',
+        lambda *_args: (_ for _ in ()).throw(ProcessLookupError()),
+    )
     connection_iter = iter(connections)
     process_iter = iter(processes)
 
@@ -790,6 +797,7 @@ def _deadline_race_start_worker(
     )
     discarded = []
     readers = []
+    event_count = 0
 
     def discard_current(**kwargs):
         if (
@@ -808,7 +816,16 @@ def _deadline_race_start_worker(
         for reader in readers:
             reader.alive = False
 
-    def make_reader(*, target, name, daemon):
+    def make_reader(*, target, name, daemon, args=()):
+        if getattr(target, '__name__', '') in (
+            '_own_launch', '_start_process_for_launch',
+        ):
+            return threading.Thread(
+                target=target,
+                args=args,
+                name=name,
+                daemon=daemon,
+            )
         plan = reader_plans[len(readers)]
         run_target, caller_late = plan[:2]
         survive_join = plan[2] if len(plan) > 2 else False
@@ -822,6 +839,14 @@ def _deadline_race_start_worker(
         )
         readers.append(reader)
         return reader
+
+    def make_event():
+        nonlocal event_count
+        event_index = event_count % 6
+        event_count += 1
+        if event_index < 5:
+            return threading.Event()
+        return _DeadlineRaceEvent(clock)
 
     monkeypatch.setattr(
         engine_pool_module.multiprocessing,
@@ -840,7 +865,6 @@ def _deadline_race_start_worker(
             return real_discard_current(**kwargs)
 
         monkeypatch.setattr(worker, '_discard_current', record_real_discard)
-        monkeypatch.setattr(engine_pool_module.os, 'killpg', lambda *_args: None)
         monkeypatch.setattr(
             worker,
             '_shutdown_connection_reader',
@@ -853,7 +877,7 @@ def _deadline_race_start_worker(
         monotonic=clock.monotonic,
     ))
     monkeypatch.setattr(engine_pool_module, 'threading', SimpleNamespace(
-        Event=lambda: _DeadlineRaceEvent(clock),
+        Event=make_event,
         Lock=threading.Lock,
         Thread=make_reader,
     ))

@@ -14,7 +14,6 @@ from simulator.engine_pool import (
     EngineWorkerPool,
     EngineWorkerTimeout,
     StdioRemoteEngineWorker,
-    WarmEngineWorker,
     _remote_engine_stdio_bootstrap,
 )
 
@@ -151,8 +150,10 @@ def _set_process_group_mode(monkeypatch, inherit: bool) -> None:
 def _kill_wrapper(worker: StdioRemoteEngineWorker) -> None:
     process = worker.process
     assert process is not None
+    launch = worker._launch_owner
+    assert launch is not None
     process.kill()
-    process.join(timeout=1.0)
+    assert launch.finished.wait(timeout=5.0)
     assert not process.is_alive()
 
 
@@ -380,6 +381,8 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
         bootstrap_entered_receive.recv()
         wrapper = created[1].process
         assert wrapper is not None
+        launch = created[1]._launch_owner
+        assert launch is not None
         bootstrap_entered_sender.close()
 
         close_started = time.monotonic()
@@ -388,7 +391,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
 
         assert close_elapsed <= 3.0
         assert replacement_call.done()
-        assert created[1]._remote_pgid_reaper_started
+        assert launch.cleanup_started.is_set()
         assert wrapper.is_alive()
         release_bootstrap_sender.send(None)
         assert report_wait_receive.poll(5.0)
@@ -399,6 +402,7 @@ def test_pool_cancel_replacement_during_cold_start_respects_cleanup_deadline(
         assert report_sent_receive.poll(5.0)
         report_sent_receive.recv()
         assert reaper_finished.wait(timeout=5.0)
+        assert launch.finished.wait(timeout=5.0)
         wrapper.join(timeout=10.0)
         assert not wrapper.is_alive()
     finally:
@@ -466,29 +470,19 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
         worker = created[1]
         wrapper = worker.process
         assert wrapper is not None
-
-        cleanup_entered = threading.Event()
-        real_receive = worker._remote_pid_receive
-
-        class RecordingReceive:
-            def poll(self, timeout=0.0):
-                if (
-                    timeout > 0.0
-                    and threading.current_thread() is cleanup_thread
-                ):
-                    cleanup_entered.set()
-                return real_receive.poll(timeout)
-
-            def recv(self):
-                return real_receive.recv()
-
-        worker._remote_pid_receive = RecordingReceive()
+        launch = worker._launch_owner
+        assert launch is not None
+        worker._request_disable_with_cleanup_deadline(
+            time.monotonic() + 0.05
+        )
         cleanup_thread = threading.Thread(
             target=worker.request_disable,
             name='earlier cleanup',
         )
         cleanup_thread.start()
-        assert cleanup_entered.wait(timeout=1.0)
+        cleanup_thread.join(timeout=1.0)
+        assert not cleanup_thread.is_alive()
+        assert launch.cancel_requested.is_set()
 
         bootstrap_entered_sender.close()
         close_started = time.monotonic()
@@ -500,12 +494,13 @@ def test_overlapping_cleanup_honors_newer_pool_deadline(
 
         assert close_elapsed <= 3.2, close_error
         assert replacement_call.done()
-        assert worker._remote_pgid_reaper_started
+        assert launch.cleanup_started.is_set()
         assert wrapper.is_alive()
         release_bootstrap_sender.send(None)
         cleanup_thread.join(timeout=1.0)
         assert not cleanup_thread.is_alive()
         assert reaper_finished.wait(timeout=5.0)
+        assert launch.finished.wait(timeout=5.0)
         wrapper.join(timeout=10.0)
         assert not wrapper.is_alive()
     finally:
@@ -590,6 +585,8 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         wrapper = created[1].process
         assert wrapper is not None
+        launch = created[1]._launch_owner
+        assert launch is not None
         if expire_startup_after_close:
             # Make the startup deadline expire while the PGID report remains
             # held by the explicit pipe rendezvous below.
@@ -625,12 +622,13 @@ def test_pool_close_reaps_descendants_after_late_remote_pgid_report(
             except EOFError:
                 report_was_sent = False
         assert reaper_finished.wait(timeout=5.0)
+        assert launch.finished.wait(timeout=5.0)
         wrapper.join(timeout=3.0)
         assert not wrapper.is_alive(), (
             f'report_was_sent={report_was_sent}, '
             f'group={created[1]._remote_process_group_id}, '
             f'error={created[1]._remote_pgid_error}, '
-            f'reaper_started={created[1]._remote_pgid_reaper_started}, '
+            f'owner_finished={launch.finished.is_set()}, '
             f'reapers={[thread.name for thread in threading.enumerate() if "PGID reaper" in thread.name]}'
         )
         _assert_pids_gone(pids)
@@ -674,39 +672,9 @@ def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
         startup_timeout_s=8.0,
         call_timeout_s=30.0,
     )
-    cleanup_entered = threading.Event()
-    release_cleanup = threading.Event()
-    stale_cleanup_resumed = threading.Event()
     replies: list[dict[str, object]] = []
     pids: tuple[int, ...] = ()
-    original_remote_pgid = worker._remote_pgid
-
-    def pause_active_cleanup(
-        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
-        background_reaper=False,
-    ):
-        if (
-            cleanup
-            and wait_for_report
-            and worker._remote_startup_deadline is not None
-            and worker._remote_startup_deadline - time.monotonic() > 1.0
-            and threading.current_thread().name == 'remote active call'
-            and not cleanup_entered.is_set()
-        ):
-            cleanup_entered.set()
-            if not release_cleanup.wait(timeout=15.0):
-                raise TimeoutError('test did not release active PGID cleanup')
-        result = original_remote_pgid(
-            wait_for_report=wait_for_report,
-            cleanup=cleanup,
-            cleanup_deadline=cleanup_deadline,
-            background_reaper=background_reaper,
-        )
-        if cleanup and release_cleanup.is_set():
-            stale_cleanup_resumed.set()
-        return result
-
-    monkeypatch.setattr(worker, '_remote_pgid', pause_active_cleanup)
+    del monkeypatch
     call_thread = threading.Thread(
         target=lambda: replies.append(worker.call(_request())),
         name='remote active call',
@@ -722,20 +690,20 @@ def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
         pids = _read_pids(parent_pid_file, child_pid_file)
         wrapper = worker.process
         assert wrapper is not None
+        launch = worker._launch_owner
+        assert launch is not None
 
         wrapper.kill()
         wrapper.join(timeout=1.0)
+        cleanup_released_at = time.monotonic()
+        assert launch.finished.wait(timeout=3.0)
         assert wrapper.exitcode is not None
-        assert cleanup_entered.wait(timeout=3.0)
         assert worker.process is None
 
         worker.close()
         assert worker._remote_process_group_id is None
         assert worker._remote_startup_deadline <= time.monotonic()
 
-        cleanup_released_at = time.monotonic()
-        release_cleanup.set()
-        assert stale_cleanup_resumed.wait(timeout=2.0)
         repeated_close_started = time.monotonic()
         worker.close()
         repeated_close_wall = time.monotonic() - repeated_close_started
@@ -752,7 +720,6 @@ def test_wrapper_death_during_bootstrap_keeps_concurrent_cleanup_bounded(
         _assert_pids_gone(pids)
         _assert_caller_group_unchanged(caller_group)
     finally:
-        release_cleanup.set()
         call_thread.join(timeout=1.0)
         worker.close()
         _kill_pids(pids)
@@ -1226,16 +1193,16 @@ def test_stale_close_cannot_detach_fresh_remote_instance(
     close_errors: list[BaseException] = []
     close_thread: threading.Thread | None = None
     pids: tuple[int, ...] = ()
-    original_disable = WarmEngineWorker.request_disable
+    original_cancel = old_worker._request_launch_cancel
 
-    def pause_old_detach(worker):
-        if worker is old_worker:
+    def pause_old_cancel(**kwargs):
+        if not getattr(old_worker._remote_call_state, 'starting', False):
             disable_entered.set()
             if not release_disable.wait(timeout=15.0):
                 raise TimeoutError('test did not release stale close')
-        return original_disable(worker)
+        return original_cancel(**kwargs)
 
-    monkeypatch.setattr(WarmEngineWorker, 'request_disable', pause_old_detach)
+    monkeypatch.setattr(old_worker, '_request_launch_cancel', pause_old_cancel)
     try:
         assert old_worker.call(_request())['status'] == 'produced'
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
@@ -1283,12 +1250,17 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
 ):
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
+    descendants_started = threading.Event()
+    previous_signal_handler = signal.signal(
+        signal.SIGUSR1,
+        lambda *_args: descendants_started.set(),
+    )
     marker = tmp_path / 'startup-subtree-started.txt'
     worker_pid_file = tmp_path / 'old-worker.pid'
     grandchild_pid_file = tmp_path / 'old-grandchild.pid'
     worker = remote_worker_factory(
         'startup-subtree-first', str(marker), str(worker_pid_file),
-        str(grandchild_pid_file),
+        str(grandchild_pid_file), str(os.getpid()),
     )
     replacement = remote_worker_factory('produced')
     startup_pgid_read = threading.Event()
@@ -1297,35 +1269,25 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
     call_thread: threading.Thread | None = None
     old_process = None
     old_connection = None
+    old_launch = None
     pids: tuple[int, ...] = ()
     original_remote_pgid = worker._remote_pgid
 
-    def pause_stale_start(
-        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
-        background_reaper=False,
-    ):
-        nonlocal old_process, old_connection
+    def pause_stale_start():
+        nonlocal old_process, old_connection, old_launch
         if (
-            not cleanup
-            and wait_for_report
-            and threading.current_thread().name == 'stale cold call'
+            'remote PGID reaper' in threading.current_thread().name
             and not startup_pgid_read.is_set()
         ):
-            assert worker.ready_payload is not None
             with worker._state_lock:
                 old_process, old_connection = worker.process, worker.connection
+                old_launch = worker._launch_owner
             assert old_process is not None
             assert old_connection is not None
             startup_pgid_read.set()
             if not release_startup_pgid_read.wait(timeout=15.0):
                 raise TimeoutError('test did not release stale startup check')
-            return None
-        return original_remote_pgid(
-            wait_for_report=wait_for_report,
-            cleanup=cleanup,
-            cleanup_deadline=cleanup_deadline,
-            background_reaper=background_reaper,
-        )
+        return original_remote_pgid()
 
     monkeypatch.setattr(worker, '_remote_pgid', pause_stale_start)
     try:
@@ -1335,6 +1297,7 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
         )
         call_thread.start()
         assert startup_pgid_read.wait(timeout=5.0)
+        assert descendants_started.wait(timeout=5.0)
         assert worker_pid_file.exists() and grandchild_pid_file.exists()
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         assert replacement.call(_request())['status'] == 'produced'
@@ -1342,20 +1305,23 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
         assert replacement_process is not None
         assert replacement_process is not old_process
         assert replacement.start_count == 1
+        assert old_process is not None
+        old_process.kill()
 
         release_startup_pgid_read.set()
         call_thread.join(timeout=5.0)
 
         assert not call_thread.is_alive()
+        assert old_launch is not None
+        assert old_launch.finished.wait(timeout=5.0)
         assert len(call_results) == 1
         assert call_results[0]['status'] == 'refused'
-        assert call_results[0]['code'] == 'startup_failure'
+        assert call_results[0]['code'] in ('startup_failure', 'child_crash')
         assert replacement.process is replacement_process
         assert replacement_process.is_alive()
         assert replacement.call(_request())['status'] == 'produced'
         assert replacement.process is replacement_process
         assert replacement.start_count == 1
-        assert old_process is not None
         old_process.join(timeout=1.0)
         assert old_process.exitcode is not None
         assert not old_process.is_alive()
@@ -1368,6 +1334,7 @@ def test_failed_cold_start_cleanup_cannot_touch_replacement_instance(
         if call_thread is not None:
             call_thread.join(timeout=1.0)
         _kill_pids(pids)
+        signal.signal(signal.SIGUSR1, previous_signal_handler)
 
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
@@ -1376,11 +1343,16 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
 ):
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
+    descendants_started = threading.Event()
+    previous_signal_handler = signal.signal(
+        signal.SIGUSR1,
+        lambda *_args: descendants_started.set(),
+    )
     worker_pid_file = tmp_path / 'worker.pid'
     grandchild_pid_file = tmp_path / 'grandchild.pid'
     worker = remote_worker_factory(
         'startup-subtree', str(worker_pid_file), str(grandchild_pid_file),
-        startup_timeout_s=3.0,
+        str(os.getpid()), startup_timeout_s=15.0,
         call_timeout_s=1.0,
     )
     pgid_read_started = threading.Event()
@@ -1390,23 +1362,15 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
     pids: tuple[int, ...] = ()
     original_remote_pgid = worker._remote_pgid
 
-    def pause_start_pgid_read(
-        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
-        background_reaper=False,
-    ):
+    def pause_start_pgid_read():
         if (
-            threading.current_thread().name == 'remote cold start'
-            and not cleanup
+            'remote PGID reaper' in threading.current_thread().name
+            and not pgid_read_started.is_set()
         ):
             pgid_read_started.set()
             if not release_pgid_read.wait(timeout=5.0):
                 raise TimeoutError('test did not release startup PGID read')
-        return original_remote_pgid(
-            wait_for_report=wait_for_report,
-            cleanup=cleanup,
-            cleanup_deadline=cleanup_deadline,
-            background_reaper=background_reaper,
-        )
+        return original_remote_pgid()
 
     monkeypatch.setattr(worker, '_remote_pgid', pause_start_pgid_read)
     try:
@@ -1416,15 +1380,19 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         )
         start_thread.start()
         assert pgid_read_started.wait(timeout=5.0)
+        assert descendants_started.wait(timeout=5.0)
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         wrapper = worker.process
         assert wrapper is not None
+        launch = worker._launch_owner
+        assert launch is not None
         if inherit:
             assert os.getpgid(wrapper.pid) == caller_group
 
         worker.close()
         release_pgid_read.set()
         start_thread.join(timeout=5.0)
+        assert launch.finished.wait(timeout=5.0)
 
         assert not start_thread.is_alive()
         assert start_results == [None]
@@ -1440,7 +1408,7 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         if start_thread is not None:
             start_thread.join(timeout=1.0)
         _kill_pids(pids)
-
+        signal.signal(signal.SIGUSR1, previous_signal_handler)
 
 @pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
 @pytest.mark.parametrize(
@@ -1467,8 +1435,8 @@ def test_close_during_cold_start_owns_the_remote_pgid_once(
         'pid-before-close-pgid-after-close-expiry-before-close',
         'pid-before-close-pgid-before-close-expiry-after-close',
         'pid-before-close-pgid-before-close-expiry-before-close',
-        'pid-after-close-pgid-after-close-expiry-after-close-sweep-before-reaper-release',
-        'pid-after-close-pgid-after-close-expiry-after-close-sweep-after-reaper-release',
+        'pid-after-cancel-pgid-blocked-stale-sweep-resumes-before-owner',
+        'pid-after-cancel-pgid-released-stale-sweep-resumes-after-owner',
     ),
 )
 def test_close_orders_publication_and_reaper_before_releasing_records(
@@ -1482,7 +1450,6 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     pending_sweep_resume_after_reaper_release,
 ):
     from multiprocessing.context import SpawnProcess
-    import simulator.engine_pool as pool_module
 
     _set_process_group_mode(monkeypatch, inherit)
     caller_group = os.getpgrp()
@@ -1510,18 +1477,16 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     pgid_visible = threading.Event()
     pid_published = threading.Event()
     startup_pgid_claimed = threading.Event()
-    reaper_waiting_for_pid = threading.Event()
     reaper_finished = threading.Event()
-    pending_pid_observed = threading.Event()
+    pending_sweep_entered = threading.Event()
     release_pending_sweep = threading.Event()
     start_results: list[object] = []
     cleanup_claims: list[int | None] = []
-    cleanup_claims_lock = threading.Lock()
-    released_process_records: list[Any] = []
+    released_process_records: list[object] = []
     start_thread: threading.Thread | None = None
     pending_sweep_thread: threading.Thread | None = None
     pids: tuple[int, ...] = ()
-    wrapper_process = None
+    wrapper = None
 
     class DelayedPgidReceive:
         def __init__(self, connection):
@@ -1539,12 +1504,8 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     original_process_start = SpawnProcess.start
     original_remote_pgid = worker._remote_pgid
     original_reap = worker._reap_remote_process_group
-    original_process_pid = pool_module._process_pid
-    original_stop_remote = worker._stop_remote_process_tree
-    original_release = getattr(worker, '_release_process_records', None)
-    original_finish_capture = getattr(
-        worker, '_finish_native_output_capture', None,
-    )
+    original_release = worker._release_process_records
+    original_reap_pending = worker._reap_pending
     worker._bootstrap = _blocked_pgid_report_bootstrap
     original_bootstrap_args = worker._process_bootstrap_args
     worker._process_bootstrap_args = lambda: (
@@ -1554,43 +1515,11 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         *original_bootstrap_args(),
     )
 
-    class ObservedPublicationEvent:
-        def __init__(self, event):
-            self.event = event
-
-        def set(self):
-            self.event.set()
-
-        def is_set(self):
-            return self.event.is_set()
-
-        def wait(self, timeout=None):
-            if 'remote PGID reaper' in threading.current_thread().name:
-                reaper_waiting_for_pid.set()
-            return self.event.wait(timeout)
-
-    publication_event = getattr(
-        worker, '_remote_pid_publication_complete', None,
-    )
-    if publication_event is not None:
-        worker._remote_pid_publication_complete = ObservedPublicationEvent(
-            publication_event,
-        )
-
-    def record_remote_pgid(
-        *, wait_for_report=False, cleanup=False, cleanup_deadline=None,
-        background_reaper=False,
-    ):
-        group_id = original_remote_pgid(
-            wait_for_report=wait_for_report,
-            cleanup=cleanup,
-            cleanup_deadline=cleanup_deadline,
-            background_reaper=background_reaper,
-        )
-        if cleanup:
-            with cleanup_claims_lock:
-                cleanup_claims.append(group_id)
-        elif group_id is not None:
+    def record_remote_pgid():
+        group_id = original_remote_pgid()
+        if worker._remote_pgid_read:
+            cleanup_claims.append(group_id)
+        if group_id is not None:
             startup_pgid_claimed.set()
         return group_id
 
@@ -1604,7 +1533,7 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
 
     def tracked_process_start(process_obj):
         result = original_process_start(process_obj)
-        if process_obj is wrapper_process:
+        if process_obj is wrapper:
             pid_published.set()
         return result
 
@@ -1614,53 +1543,19 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         finally:
             reaper_finished.set()
 
-    def gated_process_pid(process):
-        pid = original_process_pid(process)
-        if (
-            threading.current_thread().name == 'remote pending sweep'
-            and process is wrapper_process
-            and pid is None
-        ):
-            pending_pid_observed.set()
-            if not release_pending_sweep.wait(timeout=30.0):
-                raise TimeoutError('test did not release pending sweep')
-        return pid
-
-    def defer_remote_stop_for_pending_sweep(
-        process,
-        connection,
-        *,
-        cleanup_deadline=None,
-    ):
+    def gate_pending_sweep(*, timeout_s):
         if threading.current_thread().name == 'remote pending sweep':
-            return True
-        return original_stop_remote(
-            process,
-            connection,
-            cleanup_deadline=cleanup_deadline,
-        )
+            pending_sweep_entered.set()
+            if not release_pending_sweep.wait(timeout=30.0):
+                raise TimeoutError('test did not resume the pending sweep')
+        return original_reap_pending(timeout_s=timeout_s)
 
     def record_release(process, *, process_start_failed=False):
-        had_pending = process in worker._pending_reap
-        capture = worker._native_output_capture
-        had_capture = capture is not None and capture[0] is process
-        if original_release is not None:
-            released = original_release(
-                process,
-                process_start_failed=process_start_failed,
-            )
-        else:
-            original_finish_capture(
-                process,
-                process_start_failed=process_start_failed,
-            )
-            released = None
-        pending_released = had_pending and process not in worker._pending_reap
-        capture = worker._native_output_capture
-        capture_released = had_capture and (
-            capture is None or capture[0] is not process
+        released = original_release(
+            process,
+            process_start_failed=process_start_failed,
         )
-        if pending_released or capture_released:
+        if released:
             released_process_records.append(process)
         return released
 
@@ -1668,19 +1563,10 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
     monkeypatch.setattr(SpawnProcess, 'start', tracked_process_start)
     monkeypatch.setattr(worker, '_remote_pgid', record_remote_pgid)
     monkeypatch.setattr(worker, '_reap_remote_process_group', record_reaper)
+    monkeypatch.setattr(worker, '_release_process_records', record_release)
     if pending_sweep_resume_after_reaper_release is not None:
-        monkeypatch.setattr(pool_module, '_process_pid', gated_process_pid)
-        monkeypatch.setattr(
-            worker,
-            '_stop_remote_process_tree',
-            defer_remote_stop_for_pending_sweep,
-        )
-    if original_release is not None:
-        monkeypatch.setattr(worker, '_release_process_records', record_release)
-    elif original_finish_capture is not None:
-        monkeypatch.setattr(
-            worker, '_finish_native_output_capture', record_release,
-        )
+        monkeypatch.setattr(worker, '_reap_pending', gate_pending_sweep)
+
     try:
         start_thread = threading.Thread(
             target=lambda: start_results.append(worker.start()),
@@ -1695,8 +1581,9 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         pids = _read_pids(worker_pid_file, grandchild_pid_file)
         wrapper = worker.process
         assert wrapper is not None
-        wrapper_process = wrapper
         assert wrapper.pid is None
+        launch = worker._launch_owner
+        assert launch is not None
         if inherit:
             assert os.getpgrp() == caller_group
 
@@ -1706,11 +1593,11 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
                 name='remote pending sweep',
             )
             pending_sweep_thread.start()
-            assert pending_pid_observed.wait(timeout=30.0)
+            assert pending_sweep_entered.wait(timeout=30.0)
+            assert launch.cancel_requested.is_set()
 
-        # Process.start has created the wrapper but remains inside the gated
-        # Popen return, so neither the PID nor the PGID ordering is inferred
-        # from elapsed time or filesystem polling.
+        # Hold PGID consumption behind a pipe event while independently
+        # publishing the wrapper PID, matching the stale-sweep schedule.
         with worker._remote_pgid_lock:
             worker._remote_pid_receive = DelayedPgidReceive(
                 worker._remote_pid_receive,
@@ -1718,6 +1605,7 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         if pid_before_close:
             release_publication.set()
             assert pid_published.wait(timeout=30.0)
+            assert launch.started.wait(timeout=30.0)
         if pgid_before_close:
             release_report_sender.send(None)
             assert report_sent_receive.poll(30.0)
@@ -1736,11 +1624,18 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
         assert close_elapsed <= 0.75
 
         if pending_sweep_resume_after_reaper_release is False:
-            assert not reaper_finished.is_set()
+            release_publication.set()
+            assert pid_published.wait(timeout=30.0)
+            assert launch.started.wait(timeout=30.0)
+            assert not worker._remote_pgid_read
+            assert wrapper.is_alive()
             release_pending_sweep.set()
             assert pending_sweep_thread is not None
-            pending_sweep_thread.join(timeout=30.0)
+            pending_sweep_thread.join(timeout=2.0)
             assert not pending_sweep_thread.is_alive()
+            # Resuming the stale sweep while the PGID is still blocked must
+            # leave the wrapper alive for its sole launch owner.
+            assert wrapper.is_alive()
 
         if not startup_expired_before_close:
             worker._remote_startup_deadline = time.monotonic() - 1.0
@@ -1750,45 +1645,28 @@ def test_close_orders_publication_and_reaper_before_releasing_records(
             report_sent_receive.recv()
             pgid_visible.set()
 
-        # A reaper handed both late reports must retain the launch until PID
-        # publication. On 6ccd6076 this wait times out because the reaper exits
-        # while Process.start still hides the PID and leaves capture behind.
-        publication_wait_observed = True
-        if not pid_before_close and not pgid_before_close:
-            publication_wait_observed = reaper_waiting_for_pid.wait(
-                timeout=5.0,
-            )
-
-        release_publication.set()
-        assert pid_published.wait(timeout=30.0)
+        if not pid_before_close:
+            release_publication.set()
+            assert pid_published.wait(timeout=30.0)
+        assert launch.started.wait(timeout=30.0)
         start_thread.join(timeout=30.0)
         assert not start_thread.is_alive()
         assert len(start_results) == 1
-        if worker._remote_pgid_reaper_started:
-            assert reaper_finished.wait(timeout=30.0)
+        assert reaper_finished.wait(timeout=30.0)
+        assert launch.finished.wait(timeout=30.0)
+
         if pending_sweep_resume_after_reaper_release is True:
-            assert reaper_finished.is_set()
-            release_pending_sweep.set()
             assert pending_sweep_thread is not None
+            release_pending_sweep.set()
             pending_sweep_thread.join(timeout=30.0)
             assert not pending_sweep_thread.is_alive()
-            assert worker._pending_reap == []
 
-        # The cleanup-claim assertion is made only after its actual owner has
-        # finished, avoiding a race with background PGID publication.
-        with cleanup_claims_lock:
-            claims = tuple(cleanup_claims)
-        assert any(group_id is not None for group_id in claims)
-        assert publication_wait_observed
-        assert wrapper.pid is not None
+        assert any(group_id is not None for group_id in cleanup_claims)
         wrapper.join(timeout=2.0)
         assert wrapper.exitcode is not None
         assert not wrapper.is_alive()
-        assert worker._pending_reap == []
+        assert worker._launch_owner is None
         assert worker._native_output_capture is None
-        record_owners = getattr(worker, '_process_record_owners', None)
-        if record_owners is not None:
-            assert record_owners[wrapper] == 'released'
         assert released_process_records == [wrapper]
         if not pid_before_close:
             refusal = worker.call(_request())

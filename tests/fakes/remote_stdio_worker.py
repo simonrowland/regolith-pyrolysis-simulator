@@ -50,12 +50,18 @@ if mode in (
     if mode == 'startup-subtree-first':
         marker = Path(sys.argv[2])
         if not marker.exists():
-            spawn_descendant(sys.argv[3], sys.argv[4])
+            notify_pid = sys.argv[5] if len(sys.argv) > 5 else None
+            spawn_descendant(sys.argv[3], sys.argv[4], notify_pid)
             marker.write_text('spawned once', encoding='utf-8')
     elif mode == 'startup-subtree-notify':
         spawn_descendant(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
-        spawn_descendant(sys.argv[2], sys.argv[3])
+        notify_pid = (
+            sys.argv[4]
+            if mode == 'startup-subtree' and len(sys.argv) > 4
+            else None
+        )
+        spawn_descendant(sys.argv[2], sys.argv[3], notify_pid)
     if mode == 'startup-subtree-bootstrap-hold':
         time.sleep(60)
 
