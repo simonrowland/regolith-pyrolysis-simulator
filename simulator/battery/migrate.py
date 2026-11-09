@@ -2798,12 +2798,23 @@ def _normalize_run_metadata_unit_annotations(
     payload: object,
     *,
     field: str | None,
+    shape: str,
     parent_locator: Locator | None = None,
 ) -> tuple[object | None, tuple[str | None, str] | None]:
     """Normalize unit annotations before parsing any declared run-metadata shape."""
 
     annotations: list[tuple[tuple[str | int, ...], str, object]] = []
     source_errors: list[tuple[tuple[str | int, ...], str]] = []
+
+    def inference_is_consumed(path: tuple[str | int, ...]) -> bool:
+        return (
+            path == ("inference",)
+            and shape in _RUN_METADATA_LOCATED_VALUE_SHAPES
+            and not (
+                isinstance(payload, Mapping)
+                and payload.get("value") is not None
+            )
+        )
 
     def strip_annotations(
         value: object,
@@ -2832,9 +2843,16 @@ def _normalize_run_metadata_unit_annotations(
                         source_errors.append(
                             (annotation_path, "as_published is only valid on the Located value")
                         )
-                    elif field not in {"mass_kg", "final_mass_kg"}:
+                    elif (
+                        field not in {"mass_kg", "final_mass_kg"}
+                        or shape not in _RUN_METADATA_LOCATED_VALUE_SHAPES
+                    ):
                         source_errors.append(
-                            (annotation_path, f"as_published units are unsupported for {field!r}")
+                            (
+                                annotation_path,
+                                f"as_published units are unsupported for {field!r} "
+                                f"with shape {shape!r}",
+                            )
                         )
                     elif not isinstance(child, Mapping):
                         source_errors.append(
@@ -2854,15 +2872,26 @@ def _normalize_run_metadata_unit_annotations(
                     cleaned[key] = normalized_child
                     changed = changed or normalized_child is not child
                     continue
+                if key_text == "inference" and not inference_is_consumed(
+                    (*path, key_text)
+                ):
+                    source_errors.append(
+                        (
+                            (*path, key_text),
+                            f"inference metadata is not consumed by the {shape!r} reader",
+                        )
+                    )
                 if "unit" in key_casefolded:
                     if (
-                        path == ("inference",)
+                        inference_is_consumed(path)
                         and key_text == _DERIVATION_OUTPUT_UNIT_KEY
                     ):
                         cleaned[key] = child
                         continue
                     if (
                         path == (_AS_PUBLISHED_KEY,)
+                        and field in {"mass_kg", "final_mass_kg"}
+                        and shape in _RUN_METADATA_LOCATED_VALUE_SHAPES
                         and key_text in _PUBLISHED_CONVERSION_UNIT_KEYS
                     ):
                         cleaned[key] = child
@@ -3089,6 +3118,11 @@ def _run_metadata_species_payload_from_plain(
     return raw_values, field_locator
 
 
+_RUN_METADATA_LOCATED_VALUE_SHAPES = frozenset(
+    {"located_value", "located_positive_value"}
+)
+
+
 def _parse_run_metadata_shape(
     shape: str,
     payload: object,
@@ -3102,13 +3136,14 @@ def _parse_run_metadata_shape(
     payload, annotation_error = _normalize_run_metadata_unit_annotations(
         source_payload,
         field=field,
+        shape=shape,
         parent_locator=parent_locator,
     )
     if annotation_error is not None:
         formula, detail = annotation_error
         return None, ((formula, source_payload, detail),)
 
-    if shape in {"located_value", "located_positive_value"}:
+    if shape in _RUN_METADATA_LOCATED_VALUE_SHAPES:
         if shape == "located_positive_value" and field != "mass_kg":
             return None, ((None, payload, "located_positive_value requires mass_kg"),)
         try:
