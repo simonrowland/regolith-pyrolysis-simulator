@@ -165,8 +165,14 @@ def _run_metadata_shape_extract(
                     "locator": locator,
                 }
             }
-        elif isinstance(raw_value, Mapping) and raw_value.get("units"):
-            observation["equipment"] = {field: field_value}
+        elif isinstance(raw_value, Mapping) and any(
+            "unit" in str(key).casefold() for key in raw_value
+        ):
+            observation["equipment"] = {
+                field: field_value
+                if "value" in raw_value
+                else {"value": field_value, "locator": locator}
+            }
         else:
             observation["equipment"] = {
                 field: {"value": field_value, "locator": locator}
@@ -987,6 +993,94 @@ def test_unsupported_equipment_final_mass_units_are_typed_errors(
         home,
         "scalar",
         raw_value={"value": "1", "units": "lb", "locator": {"page": 4}},
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.final_mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_FINAL_MASS_UNIT_ANNOTATION_CASES = tuple(
+    (home, unit_key)
+    for home in _EQUIPMENT_FINAL_MASS_HOMES
+    for unit_key in ("unit", "units")
+)
+
+
+@pytest.mark.parametrize(
+    ("home", "unit_key"),
+    _FINAL_MASS_UNIT_ANNOTATION_CASES,
+    ids=[
+        f"{home}-{unit_key}"
+        for home, unit_key in _FINAL_MASS_UNIT_ANNOTATION_CASES
+    ],
+)
+def test_equipment_final_mass_point_unit_annotations_convert_and_keep_locator(
+    tmp_path: Path,
+    home: str,
+    unit_key: str,
+) -> None:
+    unit_locator = {"table": "point-unit-source", "page": 7}
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "final_mass_kg",
+        home,
+        "scalar",
+        raw_value={
+            "kind": "point",
+            "point": "0.5",
+            unit_key: "g",
+            "locator": unit_locator,
+        },
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, observations = load_migrated_store(root)
+    experiment = experiments[next(iter(observations.values())).experiment_id]
+    located = experiment.sample.final_mass_kg
+
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of("0.0005")
+    assert located.locator == Locator(table="point-unit-source", page=7)
+
+
+_UNKNOWN_EQUIPMENT_MASS_UNIT_KEYS = tuple(
+    (home, unit_key)
+    for home in _EQUIPMENT_FINAL_MASS_HOMES
+    for unit_key in ("unit_code", "mass_unit")
+)
+
+
+@pytest.mark.parametrize(
+    ("home", "unit_key"),
+    _UNKNOWN_EQUIPMENT_MASS_UNIT_KEYS,
+    ids=[
+        f"{home}-{unit_key}"
+        for home, unit_key in _UNKNOWN_EQUIPMENT_MASS_UNIT_KEYS
+    ],
+)
+def test_unknown_equipment_mass_unit_keys_are_typed_errors(
+    tmp_path: Path,
+    home: str,
+    unit_key: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "final_mass_kg",
+        home,
+        "scalar",
+        raw_value={"kind": "point", "point": "0.5", unit_key: "g"},
     )
 
     assert any(
