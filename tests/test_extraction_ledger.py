@@ -1,3 +1,4 @@
+import json
 import shlex
 from dataclasses import replace
 from types import SimpleNamespace
@@ -684,11 +685,12 @@ def test_mre_multi_oxide_partition_predicts_with_visible_uncertainty_flag():
     from simulator.runner import build_per_hour_summary
 
     diagnostic = sim._mre_ellingham_ladder_diagnostic
+    serialized_diagnostic = json.loads(json.dumps(diagnostic))
     runner_summary = build_per_hour_summary(sim, sim._make_snapshot())
-    assert runner_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert runner_summary["mre_ellingham_ladder_diagnostic"] == serialized_diagnostic
     web_summary = _browser_socket_payload("per_hour_summary", runner_summary)
     assert web_summary == _per_hour_summary_entry(runner_summary)
-    assert web_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert web_summary["mre_ellingham_ladder_diagnostic"] == serialized_diagnostic
     tick_projection = _browser_socket_payload(
         "simulation_tick",
         {"per_hour_summary_delta": runner_summary},
@@ -697,7 +699,7 @@ def test_mre_multi_oxide_partition_predicts_with_visible_uncertainty_flag():
         tick_projection["per_hour_summary_delta"][
             "mre_ellingham_ladder_diagnostic"
         ]
-        == diagnostic
+        == serialized_diagnostic
     )
 
     assert sim._chem_no_op_dispatch_count == no_op_before
