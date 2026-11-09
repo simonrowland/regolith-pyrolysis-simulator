@@ -22744,12 +22744,9 @@ class Migrator:
                     **(point_conditions or {}),
                     **explicit_conditions,
                 }
-        # Printed oxygen beats a derived graphite C–CO pressure. Stamp it
-        # into ident_kwargs before experiment inheritance, which fills only
-        # axes still absent. The scratch fill decides whether this profile
-        # accepts the axis; a not-applicable axis is left alone.
-        # A parent fallback's log or pressure must not look row-local.
-        # Oxygen this row derived (Plante's ratio × P_K) stays on the row.
+        # Keep row oxygen separate from inherited facts. Resolve experiment
+        # pressure first, then stamp oxygen before inherited fO2 can fill it.
+        # Oxygen derived on this row (Plante's ratio × P_K) stays row-local.
         row_point_conditions = (
             _row_oxygen_point_conditions(
                 point_conditions,
@@ -22759,37 +22756,6 @@ class Migrator:
             if oxygen_from_fallback
             else point_conditions
         )
-        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
-            facts=oxygen_facts,
-            from_fallback=oxygen_from_fallback,
-            raw_item=values if isinstance(values, Mapping) else None,
-            row_point_conditions=row_point_conditions,
-            run_temperature_K=_run_temperature_K(ident_kwargs.get("temperature_K")),
-            run_pressure_bar=_pressure_bar_from_identity(
-                ident_kwargs.get("total_pressure_Pa")
-            ),
-            source_id=source_id,
-        )
-        oxygen_state = _printed_oxygen_state_for(
-            fill_identity(
-                quantity,
-                None if q_token is Quantity.LOG10_K_REACTION else species,
-                **ident_kwargs,
-            ),
-            oxygen_decision,
-            from_fallback=oxygen_decision_fallback,
-        )
-        # Residue fO2 is the printed-only promotion above. The generic
-        # decision covers every other quantity, including a derived ratio
-        # copied from the row point.
-        if (
-            q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and oxygen_state is not None
-            and not _defaulted_row_derived_plante_oxygen(
-                admission, row_point_conditions
-            )
-        ):
-            ident_kwargs["fO2_Pa"] = oxygen_state
         starting_bulk_notices: list[Notice] = []
         if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             experiment = self.result.experiments.get(experiment_id)
@@ -22893,6 +22859,58 @@ class Migrator:
             species_formula=species.formula,
             source_values=values if isinstance(values, Mapping) else None,
         )
+        pressure_for_oxygen = ident_kwargs.get("total_pressure_Pa")
+        existing_pressure = pressure_for_oxygen
+        pressure_can_fill = existing_pressure is None or (
+            isinstance(existing_pressure, State) and existing_pressure.is_unknown
+        )
+        if pressure_can_fill:
+            inherited_pressure = experiment_identity.get("total_pressure_Pa")
+            if _pressure_bar_from_identity(inherited_pressure) is not None:
+                pressure_for_oxygen = inherited_pressure
+        if q_token is Quantity.VALENCE_RATIO and pressure_can_fill and (
+            _pressure_bar_from_identity(pressure_for_oxygen) is None
+        ):
+            pressure_condition = (point_conditions or {}).get("pressure_MPa")
+            if (
+                isinstance(pressure_condition, Located)
+                and pressure_condition.state.is_value
+            ):
+                pressure, _trail = convert_pressure_to_pa(
+                    pressure_condition.state.value, "MPa"
+                )
+                if pressure is not None:
+                    pressure_for_oxygen = State.of(pressure)
+                    ident_kwargs["total_pressure_Pa"] = pressure_for_oxygen
+        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
+            facts=oxygen_facts,
+            from_fallback=oxygen_from_fallback,
+            raw_item=values if isinstance(values, Mapping) else None,
+            row_point_conditions=row_point_conditions,
+            run_temperature_K=_run_temperature_K(ident_kwargs.get("temperature_K")),
+            run_pressure_bar=_pressure_bar_from_identity(pressure_for_oxygen),
+            source_id=source_id,
+        )
+        oxygen_state = _printed_oxygen_state_for(
+            fill_identity(
+                quantity,
+                None if q_token is Quantity.LOG10_K_REACTION else species,
+                **ident_kwargs,
+            ),
+            oxygen_decision,
+            from_fallback=oxygen_decision_fallback,
+        )
+        # Residue fO2 is the printed-only promotion above. The generic
+        # decision covers every other quantity, including a derived ratio
+        # copied from the row point.
+        if (
+            q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and oxygen_state is not None
+            and not _defaulted_row_derived_plante_oxygen(
+                admission, row_point_conditions
+            )
+        ):
+            ident_kwargs["fO2_Pa"] = oxygen_state
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
@@ -25493,32 +25511,6 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
-        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
-            facts=oxygen_facts,
-            from_fallback=oxygen_from_fallback,
-            raw_item=raw_item if isinstance(raw_item, Mapping) else None,
-            row_point_conditions=row_point_conditions,
-            run_temperature_K=_run_temperature_K(
-                getattr(identity, "temperature_K", None)
-            ),
-            run_pressure_bar=_pressure_bar_from_identity(
-                getattr(identity, "total_pressure_Pa", None)
-            ),
-            source_id=source_id,
-        )
-        oxygen_state = _printed_oxygen_state_for(
-            identity,
-            oxygen_decision,
-            from_fallback=oxygen_decision_fallback,
-        )
-        if (
-            q_token_point is not Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and oxygen_state is not None
-            and not _defaulted_row_derived_plante_oxygen(
-                admission, row_point_conditions
-            )
-        ):
-            identity = replace(identity, fO2_Pa=oxygen_state)
         experiment = self.result.experiments.get(experiment_id)
         if (
             q_token_point is Quantity.VALENCE_RATIO
@@ -25701,6 +25693,32 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=State.of(pressure)
                     )
+        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
+            facts=oxygen_facts,
+            from_fallback=oxygen_from_fallback,
+            raw_item=raw_item if isinstance(raw_item, Mapping) else None,
+            row_point_conditions=row_point_conditions,
+            run_temperature_K=_run_temperature_K(
+                getattr(identity, "temperature_K", None)
+            ),
+            run_pressure_bar=_pressure_bar_from_identity(
+                getattr(identity, "total_pressure_Pa", None)
+            ),
+            source_id=source_id,
+        )
+        oxygen_state = _printed_oxygen_state_for(
+            identity,
+            oxygen_decision,
+            from_fallback=oxygen_decision_fallback,
+        )
+        if (
+            q_token_point is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and oxygen_state is not None
+            and not _defaulted_row_derived_plante_oxygen(
+                admission, row_point_conditions
+            )
+        ):
+            identity = replace(identity, fO2_Pa=oxygen_state)
         child_notices = list(notices)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(

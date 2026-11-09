@@ -17,7 +17,6 @@ from simulator.battery.records import Located
 from simulator.state_types import State
 from simulator.oxygen_buffers import (
     frost_buffer_log10_fO2_bar,
-    oneill_iw_log10_fO2_bar,
 )
 
 
@@ -45,6 +44,8 @@ def test_printed_calibration_is_used_exactly() -> None:
     assert decision.state.value == _log_fO2_to_pa(expected_log)
     assert "calibration=frost_1991_table_1" in decision.notice_reason
     assert "printed calibration used exactly" in decision.notice_reason
+    assert "pressure=1 bar" in decision.notice_reason
+    assert "pressure correction=none at or below 1 bar" in decision.notice_reason
     assert decision.notice_band == "not reported (printed calibration used exactly)"
 
 
@@ -69,8 +70,12 @@ def test_canonical_iw_conversion_carries_authority_and_calibration_band() -> Non
     decision = _decision({"delta_IW": "+1.0"})
 
     assert decision is not None and decision.state.is_value
-    expected_log = Decimal(str(oneill_iw_log10_fO2_bar(1000.0))) + Decimal("1.0")
-    assert decision.state.value == _log_fO2_to_pa(expected_log)
+    # O'Neill (1988) eq. 11 first segment gives μ°O2 = -605812 + 1366.718T
+    # - 182.7955T ln(T) + 0.10359T² J/mol. At 1000 K, μ°/(R T ln 10) is
+    # -20.799980169 log10(fO2/bar), then the printed +1.0 gives this literal.
+    # J/mol divided by (J mol-1 K-1)K is dimensionless; ln(10) changes bases.
+    expected_log = Decimal("-19.799980169")
+    assert abs(decision.state.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
     assert "buffer=IW" in decision.notice_reason
     assert "offset_as_printed=+1.0" in decision.notice_reason
     assert "calibration=oneill_1988_ammin_73_eq11" in decision.notice_reason
@@ -84,8 +89,10 @@ def test_short_diw_field_uses_the_iw_calibration() -> None:
     decision = _decision({"dIW": "-0.5"})
 
     assert decision is not None and decision.state.is_value
-    expected_log = Decimal(str(oneill_iw_log10_fO2_bar(1000.0))) - Decimal("0.5")
-    assert decision.state.value == _log_fO2_to_pa(expected_log)
+    # The same O'Neill (1988) eq. 11 1000 K value, -20.799980169 log10(bar),
+    # plus the source's printed -0.5 offset gives -21.299980169 log10(bar).
+    expected_log = Decimal("-21.299980169")
+    assert abs(decision.state.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
     assert "buffer=IW" in decision.notice_reason
     assert "offset_as_printed=-0.5" in decision.notice_reason
 
@@ -150,12 +157,17 @@ def test_mavrogenes_activity_correction_names_the_holzheid_gamma_model() -> None
     assert "delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7" in decision.notice_reason
 
 
-def test_piston_cylinder_pressure_uses_frost_delta_v_correction() -> None:
+def test_piston_cylinder_pressure_pins_frost_iw_delta_v_term() -> None:
     one_bar = _decision({"delta_IW": "+1.0"}, run_pressure_bar=Decimal("1"))
     high_pressure = _decision(
         {"delta_IW": "+1.0"}, run_pressure_bar=Decimal("10000")
     )
 
     assert one_bar is not None and high_pressure is not None
-    assert one_bar.state.value != high_pressure.state.value
+    # Frost (1991), Table 1: log10(fO2/bar)=A/T+B+C(P-1)/T. The pressure
+    # difference is exactly C(10000-1)/T = 0.055*9999/1000 = 0.549945 dex;
+    # (K/bar)*bar/K is dimensionless. Compare logs so Pa/bar cancels.
+    expected_delta = Decimal("0.055") * Decimal("9999") / Decimal("1000")
+    actual_delta = high_pressure.state.value.log10() - one_bar.state.value.log10()
+    assert abs(actual_delta - expected_delta) < Decimal("1e-25")
     assert "pressure correction=Frost 1991 molar-volume ΔV term" in high_pressure.notice_reason

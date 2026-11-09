@@ -44,9 +44,15 @@ species:
         admission_status: admitted
         calibration: Eq. 3; XANES peak-integral calibration against SB-5 (100%) and SB-41 (0%)
         points:
+        # Jugo et al. (2010), p. 5934, Eq. 6 (pdf_page_index 8), defines the
+        # reference as: "Subtracting the log fO2 value for the FMQ buffer at
+        # the appropriate P–T conditions". The Frost (1991) attribution
+        # applies to the gas-mix rows; the Table 2 footnote gives SB-41 a
+        # Churakov–Gottschalk fluid-mixture model instead.
         - label: SB-5
           value: 100.83
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ+2.7'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
@@ -54,6 +60,7 @@ species:
         - label: SB-15
           value: 94.44
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ+1.8'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
@@ -61,6 +68,7 @@ species:
         - label: SB-19
           value: 91.33
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ+1.6'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
@@ -68,6 +76,7 @@ species:
         - label: SB-35
           value: 71.87
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ+1.3'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
@@ -75,6 +84,7 @@ species:
         - label: SB-6
           value: 40.41
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ+0.9'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
@@ -82,6 +92,7 @@ species:
         - label: SB-36
           value: 0.19
           T_C: 1050
+          oxygen_buffer_as_published: "FMQ; Frost 1991"
           point_conditions:
             fO2_control: {state: {tag: value, value: 'FMQ-0.1'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
             pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
