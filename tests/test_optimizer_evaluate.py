@@ -4037,6 +4037,29 @@ def test_poisoned_backend_outage_still_aborts_as_unavailable() -> None:
         )
 
 
+def test_direct_non_withdrawal_poison_aborts_as_engine_bug() -> None:
+    message = "projected conservation failed for element Fe"
+    exc = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary=f"ProposalRejected: {message}",
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+
+    with pytest.raises(EngineBugAbort) as excinfo:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=exc),
+        )
+
+    assert message in str(excinfo.value)
+
+
 def test_backend_unavailable_green_path_accepts_available_real_backend() -> None:
     result = _backend_availability_fixture(available=True)
 

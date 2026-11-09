@@ -886,8 +886,8 @@ def evaluate(
         )
         if candidate_failure is not None:
             return candidate_failure
-        raise BackendUnavailableAbort(
-            str(exc),
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
             candidate_id=candidate_id,
             eval_spec=spec,
@@ -932,7 +932,7 @@ def evaluate(
         ) from exc
     except (ProposalRejected, OverdraftError) as exc:
         # b-285 keeps broad ProposalRejected wrappers from becoming inventory
-        # overdraws. b-1154 scores other proposal rejections as candidate failures.
+        # overdraws. b-1154 scores mixed-origin overhead-gas withdrawals as candidates.
         message = f"{type(exc).__name__}: {exc}"
         if _is_backend_unavailable(exc):
             raise BackendUnavailableAbort(
@@ -1014,14 +1014,6 @@ def evaluate(
         )
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
-        if _is_backend_unavailable(failure_exc, carrier=run_execution):
-            raise BackendUnavailableAbort(
-                error_message or "backend unavailable",
-                patch=validated_patch,
-                candidate_id=candidate_id,
-                eval_spec=spec,
-                cache_key_value=key,
-            )
         if _is_malformed_recipe_error(failure_exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -1030,6 +1022,14 @@ def evaluate(
                 str(failure_exc),
                 run_execution=run_execution,
                 profile=profile,
+            )
+        if _is_backend_unavailable(failure_exc, carrier=run_execution):
+            raise BackendUnavailableAbort(
+                error_message or "backend unavailable",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
             )
         if _is_numerical_overflow_message(error_message):
             return _numerical_overflow_result(
