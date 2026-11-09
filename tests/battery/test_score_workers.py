@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 import hashlib
+import json
 from pathlib import Path
 
 from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
 from simulator.battery.score import (
+    _ResidualJsonlStream,
     _ResidualJsonlRows,
     ScoreContext,
     _score_store_to_jsonl,
@@ -128,3 +130,46 @@ def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
     }
     assert len({owner_by_id[point.observation_id] for point in series}) == 1
     assert len({owner_by_id[point.observation_id] for point in sossi}) == 1
+
+
+def test_jsonl_merge_keeps_engine_order_for_tied_rows(
+    tmp_path: Path, monkeypatch
+) -> None:
+    class _Aggregate:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def add(self, _payload):
+            return None
+
+    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _Aggregate)
+    stream = _ResidualJsonlStream(tmp_path / "tied.jsonl")
+    try:
+        payloads = [
+            {
+                "rail": "liquid",
+                "reference": "observation-1",
+                "key": "same-key",
+                "candidate_request": {"engine": engine.value},
+            }
+            for engine in (Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK)
+        ]
+        for payload in reversed(payloads):
+            stream.append_payload_line(
+                json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+            )
+        stream.finalize(
+            context=_worker_fixture(),
+            engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
+        )
+        rows = [
+            json.loads(line)
+            for line in stream.partial_path.read_text(encoding="utf-8").splitlines()[1:]
+        ]
+    finally:
+        stream.close()
+
+    assert [row["candidate_request"]["engine"] for row in rows] == [
+        Engine.INTERNAL_ANALYTICAL.value,
+        Engine.VAPOROCK.value,
+    ]
