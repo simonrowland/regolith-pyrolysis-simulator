@@ -10354,6 +10354,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
         """
 
+        backend_diagnostics = dict(
+            getattr(self, '_last_backend_diagnostics', {}) or {}
+        )
+        backend_activity_sources = backend_diagnostics.pop(
+            'activity_source_by_species', {}
+        )
+        self._last_backend_diagnostics = backend_diagnostics
         T_C = float(self.melt.temperature_C)
         co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
         if co2_diagnostic:
@@ -10679,6 +10686,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic['vapor_pressures_source'] = dict(
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
+                if isinstance(backend_activity_sources, Mapping):
+                    retained_activity_sources = {
+                        str(species): dict(activity_source)
+                        for species, activity_source in backend_activity_sources.items()
+                        if (
+                            str(species) in backend_vp
+                            and isinstance(activity_source, Mapping)
+                        )
+                    }
+                    if retained_activity_sources:
+                        self._last_backend_diagnostics[
+                            'activity_source_by_species'
+                        ] = retained_activity_sources
         high_t_activity = diagnostic.get('high_t_melt_activity') or {}
         parent_activities = high_t_activity.get('selected_parent_activities')
         kernel_activities = parent_activities or diagnostic.get('activities') or {}
