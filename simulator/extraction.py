@@ -3961,6 +3961,11 @@ class ExtractionMixin:
                     0.0,
                     self._headspace_downstream_pressure_bar(None) * 1.0e5,
                 ),
+                pipe_conductance_positive=(
+                    self.overhead_model._has_positive_pipe_conductance(
+                        self.melt.temperature_C
+                    )
+                ),
                 **closed_line_boundary,
             )
             p_bulk_pa = max(

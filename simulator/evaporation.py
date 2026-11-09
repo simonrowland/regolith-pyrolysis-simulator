@@ -1446,6 +1446,11 @@ class EvaporationMixin:
                 # used by each scalar candidate, so no transform lands only
                 # after its first pressure projection.
                 seed_rates = admit_rates(rates_from_result(seed_result))
+                pipe_conductance_positive = (
+                    self.overhead_model._has_positive_pipe_conductance(
+                        self.melt.temperature_C
+                    )
+                )
                 seed_native_fe_capacity_allocation = (
                     native_fe_capacity_allocation
                 )
@@ -1500,6 +1505,7 @@ class EvaporationMixin:
                             self._headspace_downstream_pressure_bar(None)
                             * 1.0e5,
                         ),
+                        pipe_conductance_positive=pipe_conductance_positive,
                         carrier_feed_mol_s=getattr(
                             self.melt, 'carrier_feed_mol_s', None
                         ),
@@ -1647,6 +1653,7 @@ class EvaporationMixin:
                             self._headspace_downstream_pressure_bar(None)
                             * 1.0e5,
                         ),
+                        pipe_conductance_positive=pipe_conductance_positive,
                     )
                     final_partials_Pa = {
                         str(species): max(0.0, float(pressure)) * 100.0

@@ -167,6 +167,7 @@ def _solve_same_hour_headspace_closure(
     closed_line_total_pressure_Pa: float | None = None,
     transformed_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
     downstream_pressure_Pa: float | None = None,
+    pipe_conductance_positive: bool = False,
     carrier_feed_mol_s: float | None = None,
     n_o2_coproduct_mol_hr: float = 0.0,
 ) -> SameHourHeadspaceClosureResult:
@@ -187,15 +188,16 @@ def _solve_same_hour_headspace_closure(
 
     No monotonicity is assumed for the transformed stream. A closed-line zero
     is certified only when both raw and admitted equilibrium-pressure sums
-    are at or below total pressure; a pumped zero is certified only when the
-    positive downstream pressure is at or above every admitted effective
-    equilibrium pressure. Otherwise the logarithmic g scan reports sampled
-    sign-changing roots, selects the smallest found root, and retains all
-    found roots for the multiple-root flag. The scan cannot certify that it
-    found every root or that no root exists; a completed scan with no found
-    root returns a flagged zero with its grid and tail evidence. Evaluation-
-    budget exhaustion returns the last iterate as unresolved_budget_exhausted
-    and marks that value explicitly.
+    are at or below total pressure and feed plus coproduct are zero. A pumped
+    zero is certified only in the pumped regime (no pressure-held closure),
+    with positive pipe conductance and a positive downstream pressure at or
+    above every admitted effective equilibrium pressure. Otherwise the
+    logarithmic g scan reports sampled sign-changing roots, selects the
+    smallest found root, and retains all found roots for the multiple-root
+    flag. The scan cannot certify that it found every root or that no root
+    exists; a completed scan with no found root returns a flagged zero with
+    its grid and tail evidence. Evaluation-budget exhaustion returns the last
+    iterate as unresolved_budget_exhausted and marks that value explicitly.
 
     For Poiseuille transport, the live mean molar mass converts mdot to molar
     flow N, so at fixed T and geometry ``P²=P_down²+C*N``; changing mixture
@@ -287,7 +289,9 @@ def _solve_same_hour_headspace_closure(
             <= total_pressure_Pa
         )
     pumped_zero = (
-        downstream_Pa > 0.0
+        closed_line_total_pressure_Pa is None
+        and pipe_conductance_positive
+        and downstream_Pa > 0.0
         and admitted_equilibrium_pressures is not None
         and downstream_Pa
         >= max(admitted_equilibrium_pressures.values(), default=0.0)
@@ -690,12 +694,13 @@ def _solve_same_hour_headspace_closure(
             )
             sampling_evidence.setdefault('scan_evaluations', 1)
             sampling_evidence.setdefault('tail_fraction', 0.0)
+            scan_evaluations = int(sampling_evidence['scan_evaluations'])
             return result(
                 {species: 0.0 for species in species_names},
                 {},
                 converged=False,
                 status='no_root_found_by_sampling',
-                scan_evaluations=1,
+                scan_evaluations=scan_evaluations,
                 sampling_evidence=sampling_evidence,
             )
         scale = max(abs(zero_evaluation[2]), 1.0e-300)
@@ -2650,6 +2655,17 @@ class OverheadGasModel:
                 f'{field} must be finite, got {value!r}'
             )
         return max(0.0, pressure_bar)
+
+    def _has_positive_pipe_conductance(self, T_C: float) -> bool:
+        """Whether this pipe has positive capacity at a positive pressure drop."""
+        # A 1 Pa drop against vacuum tests the geometry and gas-law coefficient
+        # without depending on the current operating pressure difference.
+        return self._pipe_conductance(
+            1.0,
+            T_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg={'O2': 1.0},
+        ) > 0.0
 
     def _pipe_conductance(
         self,

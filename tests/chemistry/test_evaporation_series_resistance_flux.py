@@ -702,6 +702,7 @@ def test_positive_downstream_above_effective_equilibrium_returns_boundary():
         {"A": 1.0},
         transformed_equilibrium_pressures_Pa={"A": 150.0},
         downstream_pressure_Pa=200.0,
+        pipe_conductance_positive=True,
     )
 
     assert result.converged
@@ -717,6 +718,73 @@ def test_positive_downstream_above_effective_equilibrium_returns_boundary():
     assert result.scan_evaluations <= 64
 
 
+def test_positive_downstream_without_pipe_conductance_is_sampled():
+    def pressure_at_rates(rates):
+        total_flow = math.fsum(rates.values())
+        return {"A": math.sqrt(200.0**2 + total_flow) / 100.0}
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": 150.0},
+        lambda g, _pressure: {"A": 150.0 / (1.0 + g)},
+        pressure_at_rates,
+        {"A": 1.0},
+        transformed_equilibrium_pressures_Pa={"A": 150.0},
+        downstream_pressure_Pa=200.0,
+        pipe_conductance_positive=False,
+    )
+
+    assert result.status == "no_root_found_by_sampling"
+    assert result.scan_evaluations > 0
+
+
+def test_pressure_held_mixture_root_is_sampled_when_downstream_equals_total():
+    species = ("A", "B")
+
+    def rates_at_projection_g(g, _pressure_pa):
+        return {name: 60.0 / (1.0 + g) for name in species}
+
+    def partials_at_rates(rates):
+        total = math.fsum(rates.values())
+        return {name: rates[name] / total for name in species}
+
+    result = _solve_same_hour_headspace_closure(
+        {name: 60.0 for name in species},
+        rates_at_projection_g,
+        partials_at_rates,
+        {name: 1.0 for name in species},
+        closed_line_equilibrium_pressures_Pa={name: 60.0 for name in species},
+        closed_line_total_pressure_Pa=100.0,
+        transformed_equilibrium_pressures_Pa={name: 60.0 for name in species},
+        downstream_pressure_Pa=100.0,
+    )
+
+    # N=120/(1+g) and g=100/N, so the physical root is g=5 and n_i=10.
+    assert result.status == "roots_found_by_sampling"
+    assert result.roots_g[0] == pytest.approx(5.0, rel=1e-10)
+    assert result.rates_kg_hr == pytest.approx({"A": 10.0, "B": 10.0})
+
+
+def test_pressure_held_feed_root_is_sampled_when_downstream_equals_total():
+    result = _solve_same_hour_headspace_closure(
+        {"A": 40.0},
+        lambda g, _pressure_pa: {"A": 40.0 / (1.0 + g)},
+        lambda _rates: {"A": 1.0},
+        {"A": 1.0},
+        closed_line_equilibrium_pressures_Pa={"A": 40.0},
+        closed_line_total_pressure_Pa=100.0,
+        transformed_equilibrium_pressures_Pa={"A": 40.0},
+        downstream_pressure_Pa=100.0,
+        carrier_feed_mol_s=1.0e-6,
+    )
+
+    # Independent Brent solve of g=100/(0.0036+40/(1+g)).
+    assert result.status == "roots_found_by_sampling"
+    assert result.roots_g[0] == pytest.approx(16667.333266676003, rel=1e-9)
+    assert result.rates_kg_hr["A"] == pytest.approx(
+        0.002399760033593877, rel=1e-9
+    )
+
+
 def test_source_free_nested_projection_returns_sampling_zero_without_certificate():
     result = _solve_same_hour_headspace_closure(
         {},
@@ -730,10 +798,12 @@ def test_source_free_nested_projection_returns_sampling_zero_without_certificate
     assert result.status == "no_root_found_by_sampling"
     assert result.rates_kg_hr == {"A": 0.0}
     assert result.iterations <= 65
-    assert result.scan_evaluations == 1
     assert result.sampling_evidence["grid"]["axis"] == "pressure_Pa"
     assert result.sampling_evidence["grid"]["sample_ratio_between_points"] == 2.0
     assert result.sampling_evidence["tail_fraction"] == 0.0
+    assert result.scan_evaluations == result.sampling_evidence["grid"][
+        "sample_count"
+    ]
 
 
 def test_nested_admission_pressure_band_is_not_certified_as_physical_zero():
@@ -753,6 +823,9 @@ def test_nested_admission_pressure_band_is_not_certified_as_physical_zero():
     assert result.rates_kg_hr == {"A": 0.0}
     assert result.sampling_evidence["grid"]["axis"] == "pressure_Pa"
     assert result.sampling_evidence["grid"]["sample_count"] > 1
+    assert result.scan_evaluations == result.sampling_evidence["grid"][
+        "sample_count"
+    ]
 
 
 def test_scalar_scan_treats_late_species_as_zero_in_earlier_samples():
