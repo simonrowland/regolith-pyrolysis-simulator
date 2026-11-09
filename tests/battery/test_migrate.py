@@ -6083,7 +6083,12 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     assert actual_rows == expected_rows
     assert {
         row["field"] for row in rows if row["source_id"] == "fixture-source"
-    } == {"derivation", "derivation.inputs", "derivation.raw_inputs"}
+    } == {
+        "derived_from",
+        "derivation",
+        "derivation.inputs",
+        "derivation.raw_inputs",
+    }
 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
