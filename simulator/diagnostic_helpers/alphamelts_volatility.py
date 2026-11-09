@@ -349,6 +349,7 @@ def _analytical_vapor_pressures_from_activities(
         MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
         _alphamelts_vapor_activity_on_k_basis,
         _builtin_vapor_activities_from_weight_composition,
+        _select_alphamelts_vapor_activity,
     )
     builtin_vapor_activities = (
         _builtin_vapor_activities_from_weight_composition(
@@ -363,14 +364,23 @@ def _analytical_vapor_pressures_from_activities(
     has_catalog = catalog_payload.get("schema_version") == 2
 
     def selected_activity(species: str, parent_oxide: str) -> float | None:
-        explicit_activity = float(activities.get(parent_oxide, 0.0) or 0.0)
-        if (
-            parent_oxide in {"CaO", "MgO", "FeO"}
-            and explicit_activity > 0.0
-        ):
-            alpha_activity = _alphamelts_vapor_activity_on_k_basis(
+        explicit_activity = activities.get(parent_oxide)
+        builtin_activity = builtin_vapor_activities.get(parent_oxide)
+        selected_vapor_activity, explicit_activity_selected = (
+            _select_alphamelts_vapor_activity(
                 parent_oxide,
                 explicit_activity,
+                (
+                    builtin_activity.activity
+                    if builtin_activity is not None
+                    else None
+                ),
+            )
+        )
+        if explicit_activity_selected and selected_vapor_activity is not None:
+            alpha_activity = _alphamelts_vapor_activity_on_k_basis(
+                parent_oxide,
+                selected_vapor_activity,
                 T_K,
                 vapor_pressure_data=vapor_pressure_data,
             )
@@ -387,7 +397,6 @@ def _analytical_vapor_pressures_from_activities(
             )
             return float(alpha_activity.activity)
 
-        builtin_activity = builtin_vapor_activities.get(parent_oxide)
         if builtin_activity is None:
             if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
                 warnings.append(
@@ -427,7 +436,7 @@ def _analytical_vapor_pressures_from_activities(
             "alphamelts_oxide_activity_no_declared_standard->"
             "builtin_declared_standard"
         )
-        return float(builtin_activity.activity)
+        return float(selected_vapor_activity)
 
     for species in _ELLINGHAM_THERMO:
         sp_data = (vapor_pressure_data.get("metals", {}) or {}).get(species, {}) or {}

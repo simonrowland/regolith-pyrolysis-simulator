@@ -6724,6 +6724,7 @@ class _MELTSBackendSupport(MeltBackend):
             MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
             MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
             _alphamelts_vapor_activity_on_k_basis,
+            _select_alphamelts_vapor_activity,
         )
         explicit_oxide_activities, _ = _canonical_oxide_activity_map_with_notices(
             activities
@@ -6742,29 +6743,42 @@ class _MELTSBackendSupport(MeltBackend):
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
             parent_oxide = str(spec.get('parent_oxide', '') or '')
+            uses_reaction_pressure = self._antoine_uses_reaction_pressure(spec)
             builtin_vapor_activity = (
                 builtin_vapor_activities.get(parent_oxide)
-                if self._antoine_uses_reaction_pressure(spec)
+                if uses_reaction_pressure
                 else None
             )
             raw_activity = self._activity_for_vapor_species(species, activities)
             explicit_oxide_activity = explicit_oxide_activities.get(parent_oxide)
-            explicit_activity_selected = (
-                self._antoine_uses_reaction_pressure(spec)
-                and parent_oxide in {"CaO", "MgO", "FeO"}
-                and explicit_oxide_activity is not None
+            selected_activity, explicit_activity_selected = (
+                _select_alphamelts_vapor_activity(
+                    parent_oxide,
+                    explicit_oxide_activity if uses_reaction_pressure else None,
+                    (
+                        builtin_vapor_activity.activity
+                        if builtin_vapor_activity is not None
+                        else None
+                    ),
+                )
             )
             selected_vapor_activity = None
-            if explicit_activity_selected:
+            if (
+                explicit_activity_selected
+                and selected_activity is not None
+            ):
                 selected_vapor_activity = _alphamelts_vapor_activity_on_k_basis(
                     parent_oxide,
-                    float(explicit_oxide_activity),
+                    selected_activity,
                     T_K,
                     vapor_pressure_data=getattr(
                         self, "_vapor_pressure_catalog_payload", None
                     ),
                 )
-            elif builtin_vapor_activity is not None:
+            elif (
+                builtin_vapor_activity is not None
+                and selected_activity is not None
+            ):
                 selected_vapor_activity = builtin_vapor_activity
             if selected_vapor_activity is not None:
                 raw_activity = float(selected_vapor_activity.activity)

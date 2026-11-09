@@ -669,6 +669,25 @@ class _BuiltinVaporActivity:
     source_activity_diagnostic: dict[str, object] | None = None
 
 
+def _select_alphamelts_vapor_activity(
+    parent_oxide: str,
+    supplied_oxide_activity: float | None,
+    projected_vapor_activity: float | None,
+) -> tuple[float | None, bool]:
+    """Select supplied canonical activity before the composition projection.
+
+    The boolean marks a supplied liquid activity that still needs conversion
+    onto its vapor K standard state.
+    """
+    if (
+        parent_oxide in {"CaO", "MgO", "FeO"}
+        and supplied_oxide_activity is not None
+        and supplied_oxide_activity > 0.0
+    ):
+        return float(supplied_oxide_activity), True
+    return projected_vapor_activity, False
+
+
 def _alphamelts_vapor_activity_on_k_basis(
     parent_oxide: str,
     activity: float,
