@@ -364,6 +364,132 @@ def test_collection_smoke_render_csv_values_html_and_legacy_history(tmp_path: Pa
     ]
 
 
+def test_d139_rows_are_kept_flagged_in_temperature_panels(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    ordinary = _residual("openimcc", "vapour", "ordinary", 1650, 0.25)
+    uncalibrated = _residual("openimcc", "vapour", "d139-fixture", 1700, 4.5)
+    uncalibrated["status"] = "no_band"
+    uncalibrated["candidate_observation"]["identity"]["quantity"] = "p_partial"
+    uncalibrated["candidate_observation"]["notices"] = [
+        {
+            "kind": "unverified_apparatus",
+            "reason": "calibration_not_grounded: fixture without calibration",
+        }
+    ]
+    uncalibrated["numeric"]["decision_band"] = None
+    archive = tmp_path / "d139-panels.tgz"
+    _write_archive(
+        archive,
+        [
+            {"kind": "battery_store_stamp", "revision": "d139-fixture"},
+            ordinary,
+            uncalibrated,
+        ],
+    )
+    data = hero_plot.read_scores(archive, _collection_mode=True)
+    figures: list[object] = []
+    save_collection_png = hero_plot._save_collection_png
+
+    def capture_and_save(figure: object, path: Path) -> None:
+        figures.append(figure)
+        save_collection_png(figure, path)
+
+    monkeypatch.setattr(hero_plot, "_save_collection_png", capture_and_save)
+    files = hero_plot.render_hero_collection(
+        data,
+        archive,
+        tmp_path / "collection",
+        simulator_commit="simulator-pin",
+        openimcc_commit="openimcc-pin",
+        render_date="2026-11-07",
+    )
+
+    with files["table:temperature_points"].open(newline="") as point_file:
+        points = list(csv.DictReader(point_file))
+    d139_point = next(
+        row for row in points if row["reference"] == "d139-fixture"
+    )
+    assert d139_point["flagged"] == "1"
+    with files["table:panels"].open(newline="") as panel_file:
+        panels = list(csv.DictReader(panel_file))
+    panel = next(
+        row
+        for row in panels
+        if row["rail"] == "vapour" and row["engine"] == "openimcc"
+    )
+    chart_a_row = next(
+        row
+        for row in hero_plot._hero_scorecard_rows(data, "vapour")
+        if row[0] == "openimcc"
+    )
+    assert panel["n"] == "2"
+    assert f"(n={panel['n']})" in chart_a_row[1]
+    assert panel["flagged_n"] == "1"
+
+    with files["table:temperature_bins"].open(newline="") as bin_file:
+        bins = list(csv.DictReader(bin_file))
+    d139_bin = next(
+        row
+        for row in bins
+        if row["rail"] == "vapour"
+        and row["engine"] == "openimcc"
+        and row["temperature_bin"] == "17"
+    )
+    assert d139_bin["n"] == "1"
+    with files["table:temperature_density"].open(newline="") as density_file:
+        density = list(csv.DictReader(density_file))
+    flagged_density = [
+        row
+        for row in density
+        if row["rail"] == "vapour"
+        and row["engine"] == "openimcc"
+        and row["flagged"] == "1"
+    ]
+    assert sum(int(row["row_count"]) for row in flagged_density) == 1
+
+    page = files["html"].read_text(encoding="utf-8")
+    row_payload = page.split('id="row-data">', 1)[1].split("</script>", 1)[0]
+    sampled_rows = json.loads(row_payload)
+    assert next(
+        row for row in sampled_rows if row["reference"] == "d139-fixture"
+    )["flagged"] == "1"
+    assert "const flagged=Number(row.flagged)===1" in page
+    assert "ctx.fillStyle=flagged?lighten(PALETTE[row.engine],.38)" in page
+
+    vapour_figure = next(
+        figure
+        for figure in figures
+        if figure._suptitle.get_text()
+        == "How does vapour pressure error change with temperature?"
+    )
+    axis = vapour_figure.axes[0]
+    assert "1 flagged (uncalibrated KEMS)" in axis.get_title(loc="left")
+    from matplotlib.collections import PathCollection
+    from matplotlib.colors import to_rgba
+
+    outlier = next(
+        collection
+        for collection in axis.collections
+        if isinstance(collection, PathCollection)
+        and len(collection.get_offsets())
+        and any(float(point[1]) == 3.0 for point in collection.get_offsets())
+    )
+    expected_tint = to_rgba(
+        hero_plot._lighten_colour(
+            hero_plot._hero_engine_colors(data.engines)["openimcc"], 0.35
+        )
+    )
+    assert outlier.get_facecolors()[0] == pytest.approx(expected_tint)
+
+    methods = files["methods"].read_text(encoding="utf-8").casefold()
+    assert (
+        "plotted scatter, chart a, and the headline rms share one population; "
+        "uncalibrated kems p_partial rows (d-139) are drawn tinted and counted, "
+        "not excluded."
+    ) in methods
+
+
 def test_progress_uses_shared_row_metrics_when_history_has_comparisons(tmp_path: Path) -> None:
     archive = tmp_path / "fixture-battery.tgz"
     _fixture_archive(archive)
