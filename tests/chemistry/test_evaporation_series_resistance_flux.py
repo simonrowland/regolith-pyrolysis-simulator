@@ -25,6 +25,7 @@ from simulator.state import (
     Atmosphere,
     CampaignPhase,
     MAX_STIR_FACTOR,
+    MOLAR_MASS,
     EvaporationFlux,
     MeltState,
 )
@@ -741,6 +742,129 @@ def test_pressure_held_bound_selection_matches_value_and_authority(
         assert flux.species_kg_hr.get(species_id, 0.0) == pytest.approx(
             expected, rel=1e-12, abs=1e-15
         )
+
+
+def _single_species_pressure_held_closure(carrier_feed_mol_s=None):
+    species = "K"
+    p_eq_pa = 250.0
+    p_total_pa = 100.0
+    resistance_pa_hr_mol = 5.0
+    molar_mass_kg_mol = MOLAR_MASS[species] / 1000.0
+
+    def rates_at_projection_g(g, _pressure_pa):
+        molar_rate_mol_hr = p_eq_pa / (resistance_pa_hr_mol + g)
+        return {species: molar_rate_mol_hr * molar_mass_kg_mol}
+
+    def partials_at_rates(rates_kg_hr):
+        # No-feed lower bracket: evolved gas fills P_total. The feed-enabled
+        # closure replaces this projection with n_i*g in its single-species path.
+        return {species: p_total_pa / 100.0}
+
+    kwargs = {}
+    if carrier_feed_mol_s is not None:
+        kwargs["carrier_feed_mol_s"] = carrier_feed_mol_s
+    return _solve_same_hour_headspace_closure(
+        {species: p_eq_pa / resistance_pa_hr_mol * molar_mass_kg_mol},
+        rates_at_projection_g,
+        partials_at_rates,
+        {species: molar_mass_kg_mol},
+        closed_line_equilibrium_pressures_Pa={species: p_eq_pa},
+        closed_line_total_pressure_Pa=p_total_pa,
+        **kwargs,
+    )
+
+
+def test_carrier_feed_zero_is_closed_line_and_large_feed_approaches_upper():
+    lower = _single_species_pressure_held_closure()
+    zero_feed = _single_species_pressure_held_closure(0.0)
+    large_feed = _single_species_pressure_held_closure(1.0e5)
+    mass_kg_mol = MOLAR_MASS["K"] / 1000.0
+    upper_mol_hr = 250.0 / 5.0
+
+    assert zero_feed.converged
+    assert zero_feed.rates_kg_hr["K"] == pytest.approx(
+        lower.rates_kg_hr["K"], rel=1e-10, abs=1e-14
+    )
+    assert large_feed.converged
+    assert large_feed.rates_kg_hr["K"] / mass_kg_mol == pytest.approx(
+        upper_mol_hr, rel=1e-8
+    )
+
+
+def test_single_species_feed_closure_uses_total_outflow_in_beta():
+    carrier_feed_mol_s = 1.0e-3
+    p_eq_pa = 250.0
+    p_total_pa = 100.0
+    resistance_pa_hr_mol = 5.0
+    molar_mass_kg_mol = MOLAR_MASS["K"] / 1000.0
+    result = _single_species_pressure_held_closure(carrier_feed_mol_s)
+    rate_mol_hr = result.rates_kg_hr["K"] / molar_mass_kg_mol
+    # R' is Pa·hr/mol and the setpoint is mol/s, so convert F to mol/hr.
+    # The stated F+N outflow makes beta use carrier plus evolved flow:
+    # beta=(3600 F + J)R'/P_total. Consequently J=J_max*beta/(1+beta).
+    beta = (
+        (3600.0 * carrier_feed_mol_s + rate_mol_hr)
+        * resistance_pa_hr_mol
+        / p_total_pa
+    )
+    j_max_mol_hr = p_eq_pa / resistance_pa_hr_mol
+
+    assert result.converged
+    assert rate_mol_hr == pytest.approx(
+        j_max_mol_hr * beta / (1.0 + beta), rel=1e-10
+    )
+
+
+def test_unset_carrier_feed_keeps_the_pressure_held_bracket_authority(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _pressure_held_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+
+    flux = sim._calculate_evaporation(sim._get_equilibrium())
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    bounds = diagnostic["pressure_held_sweep_bounds"]
+
+    assert diagnostic["same_hour_headspace_closure"]["value_authority"] == (
+        "sweep_flow_unspecified"
+    )
+    assert all(
+        flux.species_kg_hr.get(species, 0.0)
+        == bounds["upper_rates_kg_hr"].get(species, 0.0)
+        for species in set(bounds["upper_rates_kg_hr"])
+        | set(bounds["lower_rates_kg_hr"])
+    )
+
+
+def test_carrier_feed_consumption_is_reported_per_hour_and_run(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _pressure_held_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.carrier_feed_mol_s = 2.0e-4
+    sim.melt.carrier_feed_gas = "Kr"
+    sim._update_temperature = lambda: None
+
+    snapshot = sim.step()
+    consumption = snapshot.same_hour_headspace_diagnostics[
+        "carrier_feed_consumption"
+    ]
+    expected_mol = 2.0e-4 * 3600.0
+    expected_kg = expected_mol * MOLAR_MASS["Kr"] / 1000.0
+
+    assert consumption["species"] == "Kr"
+    assert consumption["mol_per_hour"] == pytest.approx(expected_mol)
+    assert consumption["kg_per_hour"] == pytest.approx(expected_kg)
+    assert consumption["mol_per_run"] == pytest.approx(expected_mol)
+    assert consumption["kg_per_run"] == pytest.approx(expected_kg)
 
 
 def test_pumped_closure_prices_the_admitted_depleted_stream(

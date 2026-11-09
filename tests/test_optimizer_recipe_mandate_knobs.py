@@ -23,7 +23,14 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     RecipeValidationError,
 )
-from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, MeltState
+from simulator.overhead import OverheadGasModel
+from simulator.state import (
+    MOLAR_MASS,
+    BatchRecord,
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+)
 
 
 SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
@@ -234,6 +241,30 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     }
     mandate_paths = {spec.path for spec in MANDATE_LEVER_ALLOWLIST}
     assert required_examples <= mandate_paths
+
+
+def test_pressure_held_carrier_feed_knob_uses_pipe_capacity_bounds() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    schema = RecipeSchema(setpoints=setpoints)
+    path = _path("campaigns.C2A_continuous.carrier_feed_mol_s")
+    spec = schema.spec_for(path)
+    campaign = setpoints["campaigns"]["C2A_continuous"]
+    p_total_mbar = min(campaign["p_total_mbar"])
+    temperature_C = max(campaign["temp_range_C"])
+    carrier = campaign["carrier_feed_gas"]
+    capacity_kg_s = OverheadGasModel()._pipe_conductance(
+        p_total_mbar * 100.0,
+        temperature_C,
+        species_kg_for_M_avg={carrier: 1.0},
+    )
+
+    assert spec.low == 0.0
+    assert spec.high == pytest.approx(
+        capacity_kg_s / (MOLAR_MASS[carrier] / 1000.0), rel=1e-12
+    )
+    assert spec.search_enabled is True
+    assert "pipe-capacity" in spec.bounds_source
+    assert path in MANDATE_LEVER_PATHS
 
     # pO2 defaults are jointly constrained with their campaign's total-pressure
     # default (partial <= total, validate-don't-derive): tuning one above the

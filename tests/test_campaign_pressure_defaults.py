@@ -70,6 +70,23 @@ def _n2_lab_schedule() -> dict:
     }
 
 
+@pytest.mark.parametrize("value", (-1.0, math.nan))
+def test_carrier_feed_setpoint_rejects_invalid_values_as_invalid_input(value):
+    with pytest.raises(ValueError) as exc_info:
+        CampaignManager.validate_runtime_campaign_overrides(
+            {"C2A": {"carrier_feed_mol_s": value}}
+        )
+
+    assert getattr(exc_info.value, "reason", None) == "invalid_input"
+    assert exc_info.value.diagnostic["reason"] == "invalid_input"
+
+
+def test_null_carrier_feed_setpoint_means_unset():
+    CampaignManager.validate_runtime_campaign_overrides(
+        {"C2A": {"carrier_feed_mol_s": None}}
+    )
+
+
 @pytest.mark.parametrize(
     ("campaign", "pO2_mbar", "p_total_mbar", "atmosphere"),
     [
