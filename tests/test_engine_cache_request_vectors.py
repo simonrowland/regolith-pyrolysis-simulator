@@ -24,6 +24,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, EngineCache
 from tests.battery.cache_test_support import (
+    assert_real_adapter_cache_paths,
     missing_engine_reason,
     skip_if_engine_missing,
 )
@@ -55,6 +56,10 @@ class _Backend:
         self._configured_vapor_transport_floor_bar = 1.0e-12
         self._configured_vapor_transport_pO2_bar = 1.0e-9
         self._vapor_transport_pO2_admission = "environment"
+
+    @property
+    def _effective_pack_name(self) -> str:
+        return self._pack_name
 
     def equilibrate(self, **_kwargs: Any) -> Any:
         self.calls += 1
@@ -180,7 +185,7 @@ def _initialized_effective_setting(
         "oxygen_balance_backend",
         "pack",
     ):
-        return backend._oxygen_balance_backend._pack_name
+        return backend._oxygen_balance_backend._effective_pack_name
     if engine == "thermoengine" and key == "model":
         return backend._thermoengine_transport._model_name
     if engine == "alphamelts" and key == "python_api_model":
@@ -199,7 +204,7 @@ def _initialized_effective_setting(
     if engine == "magemin" and key in {"database", "fO2_buffer"}:
         return worker_settings.get(key)
     attributes = {
-        "openimcc": {"pack": "_pack_name"},
+        "openimcc": {"pack": "_effective_pack_name"},
         "internal-analytical": {},
         "alphamelts": {
             "model": "_model",
@@ -262,13 +267,15 @@ def _cell_for_marker(engine: str, po2: Po2Request, marker: float) -> Equilibrate
     ),
 )
 def test_supplementary_marker_adapter_setting_mutations_match_cache_vectors(
-    engine: str, monkeypatch: pytest.MonkeyPatch
+    engine: str,
+    monkeypatch: pytest.MonkeyPatch,
+    request,
 ) -> None:
     """Cheap vector-only coverage; real adapters are exercised separately."""
     handle = open_battery_engine(engine)
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        skip_if_engine_missing(handle, engine)
+        skip_if_engine_missing(handle, engine, nodeid=request.node.nodeid)
     po2 = (
         Po2Request("oxygen_balance_effusion", None, "W")
         if engine == "internal-analytical"
@@ -446,11 +453,14 @@ def test_engine_initialization_timeout_is_failure_not_missing_dependency() -> No
 
 def test_real_thermoengine_transport_model_matches_spawned_cache_paths(
     tmp_path: Path,
+    request,
 ) -> None:
     handle = open_battery_engine("thermoengine")
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        skip_if_engine_missing(handle, "thermoengine")
+        skip_if_engine_missing(
+            handle, "thermoengine", nodeid=request.node.nodeid
+        )
     try:
         backend = handle.backend
         transport_model = backend._thermoengine_transport._model_name
@@ -465,56 +475,17 @@ def test_real_thermoengine_transport_model_matches_spawned_cache_paths(
         )
         assert vector is not None
         assert vector["engine_settings"]["model"] == transport_model
-
-        direct_cache = EngineCache(tmp_path / "thermoengine-direct.sqlite")
-        isolated_cache = EngineCache(tmp_path / "thermoengine-isolated.sqlite")
-        common = {
-            "temperature_K": 1703.0,
-            "po2": Po2Request("engine_default", None),
-            "physical_pressure_bar": 1.0,
-        }
-        outcomes = (
-            equilibrate_cell(handle, _pot(), isolated=False, **common),
-            equilibrate_cell(
-                handle,
-                _pot(),
-                isolated=False,
-                engine_cache=direct_cache,
-                **common,
-            ),
-            equilibrate_cell(
-                handle,
-                _pot(),
-                isolated=False,
-                engine_cache=direct_cache,
-                **common,
-            ),
-            equilibrate_cell(handle, _pot(), isolated=True, **common),
-            equilibrate_cell(
-                handle,
-                _pot(),
-                isolated=True,
-                engine_cache=isolated_cache,
-                **common,
-            ),
-            equilibrate_cell(
-                handle,
-                _pot(),
-                isolated=True,
-                engine_cache=isolated_cache,
-                **common,
-            ),
+        assert_real_adapter_cache_paths(
+            handle,
+            _pot(),
+            tmp_path=tmp_path,
+            cache_stem="thermoengine",
+            common={
+                "temperature_K": 1703.0,
+                "po2": Po2Request("engine_default", None),
+                "physical_pressure_bar": 1.0,
+            },
         )
-        assert len(
-            {
-                replace(cell, wall_s=0.0, cpu_s=0.0, hostname="fixture").to_cache_payload()
-                for cell in outcomes
-            }
-        ) == 1
-        assert direct_cache.counters["thermoengine"]["stores"] == 1
-        assert direct_cache.counters["thermoengine"]["hits"] == 1
-        assert isolated_cache.counters["thermoengine"]["stores"] == 1
-        assert isolated_cache.counters["thermoengine"]["hits"] == 1
     finally:
         close_battery_engine_handle(handle)
 
@@ -745,13 +716,14 @@ def test_magemin_ctypes_failure_has_environment_disposition() -> None:
 
 def test_real_isolated_magemin_unsupported_database_is_cached_stably(
     tmp_path: Path,
+    request,
 ) -> None:
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
     handle = open_battery_engine("magemin")
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        skip_if_engine_missing(handle, "magemin")
+        skip_if_engine_missing(handle, "magemin", nodeid=request.node.nodeid)
 
     try:
         assert handle.backend.initialize(
@@ -799,11 +771,12 @@ def test_real_isolated_magemin_unsupported_database_is_cached_stably(
 
 def test_real_magemin_parent_database_matches_spawned_cache_paths(
     tmp_path: Path,
+    request,
 ) -> None:
     handle = open_battery_engine("magemin")
     if not handle.available or handle.backend is None:
         close_battery_engine_handle(handle)
-        skip_if_engine_missing(handle, "magemin")
+        skip_if_engine_missing(handle, "magemin", nodeid=request.node.nodeid)
 
     try:
         backend = handle.backend
@@ -815,86 +788,87 @@ def test_real_magemin_parent_database_matches_spawned_cache_paths(
         initialized_database = str(pool.workers[0]._bootstrap_args[1])
         assert initialized_database == "ig"
         backend._database = "review-nonexistent-db"
+        vector = battery._engine_cache_request_vector(
+            handle,
+            _pot(),
+            temperature_K=1703.0,
+            po2=Po2Request("engine_default", None),
+            physical_pressure_bar=1.0,
+            native_activity_formula=None,
+        )
+        assert vector is not None
+        assert vector["engine_settings"]["database"] == initialized_database
         common = {
             "temperature_K": 1703.0,
             "po2": Po2Request("engine_default", None),
             "physical_pressure_bar": 1.0,
             "timeout_s": 90.0,
         }
+        assert_real_adapter_cache_paths(
+            handle,
+            _pot(),
+            tmp_path=tmp_path,
+            cache_stem="magemin-parent-database",
+            common=common,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+        close_battery_engine_handle(handle)
 
-        def stable(cell: EquilibrateCell) -> dict[str, Any]:
-            return replace(
-                cell, wall_s=0.0, cpu_s=0.0, hostname="fixture"
-            ).to_cache_payload()
 
-        direct_off = equilibrate_cell(
-            handle, _pot(), isolated=False, **common
-        )
-        isolated_off = equilibrate_cell(
-            handle, _pot(), isolated=True, **common
-        )
-        direct_cache = EngineCache(tmp_path / "magemin-direct.sqlite")
-        isolated_cache = EngineCache(tmp_path / "magemin-isolated.sqlite")
-        direct_cold = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=False,
-            engine_cache=direct_cache,
-            **common,
-        )
-        direct_warm = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=False,
-            engine_cache=direct_cache,
-            **common,
-        )
-        direct_cache_isolated_hit = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=True,
-            engine_cache=direct_cache,
-            **common,
-        )
-        isolated_cold = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=True,
-            engine_cache=isolated_cache,
-            **common,
-        )
-        isolated_warm = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=True,
-            engine_cache=isolated_cache,
-            **common,
-        )
-        isolated_cache_direct_hit = equilibrate_cell(
-            handle,
-            _pot(),
-            isolated=False,
-            engine_cache=isolated_cache,
-            **common,
-        )
+def test_real_magemin_parent_mp_uses_initialized_ig_projection(
+    tmp_path: Path,
+    request,
+) -> None:
+    handle = open_battery_engine("magemin")
+    if not handle.available or handle.backend is None:
+        close_battery_engine_handle(handle)
+        skip_if_engine_missing(handle, "magemin", nodeid=request.node.nodeid)
 
-        expected = stable(direct_off)
-        assert stable(isolated_off) == expected
-        assert all(
-            stable(cell) == expected
-            for cell in (
-                direct_cold,
-                direct_warm,
-                direct_cache_isolated_hit,
-                isolated_cold,
-                isolated_warm,
-                isolated_cache_direct_hit,
-            )
+    try:
+        backend = handle.backend
+        pool = getattr(backend, "_subprocess_pool", None)
+        assert pool is not None and pool.workers, (
+            "MAGEMin warm worker failed to initialize; this is an engine "
+            "initialization failure, not an unavailable-engine skip"
         )
-        assert direct_cache.counters["magemin"]["stores"] == 1
-        assert direct_cache.counters["magemin"]["hits"] == 2
-        assert isolated_cache.counters["magemin"]["stores"] == 1
-        assert isolated_cache.counters["magemin"]["hits"] == 2
+        assert pool.workers[0]._bootstrap_args[1] == "ig"
+        backend._database = "mp"
+        pot = BinaryPot(
+            pot_id="magemin-parent-mp-ig",
+            kato_1993_table4_system=None,
+            why="MAGEMin initialized database ownership witness",
+            composition_wt_pct={
+                "SiO2": 55.0,
+                "Al2O3": 20.0,
+                "MgO": 15.0,
+                "MnO": 5.0,
+                "Cr2O3": 5.0,
+            },
+        )
+        po2 = Po2Request("engine_default", None)
+        vector = battery._engine_cache_request_vector(
+            handle,
+            pot,
+            temperature_K=1703.0,
+            po2=po2,
+            physical_pressure_bar=1.0,
+            native_activity_formula=None,
+        )
+        assert vector is not None
+        assert vector["engine_settings"]["database"] == "ig"
+        assert_real_adapter_cache_paths(
+            handle,
+            pot,
+            tmp_path=tmp_path,
+            cache_stem="magemin-parent-mp-ig",
+            common={
+                "temperature_K": 1703.0,
+                "po2": po2,
+                "physical_pressure_bar": 1.0,
+                "timeout_s": 90.0,
+            },
+        )
     finally:
         battery._close_isolated_cell_workers()
         close_battery_engine_handle(handle)

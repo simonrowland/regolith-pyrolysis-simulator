@@ -39,28 +39,14 @@ from simulator.engine_cache import EngineCache, cached_solve
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
 from tests.battery.cache_test_support import (
+    CACHE_TEST_ENGINES,
     missing_engine_reason,
+    open_available_engine as _open_available_engine,
     skip_if_engine_missing,
 )
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CACHE_TEST_ENGINES = (
-    Engine.OPENIMCC,
-    Engine.INTERNAL_ANALYTICAL,
-    Engine.VAPOROCK,
-    Engine.MAGEMIN,
-    Engine.ALPHAMELTS,
-    Engine.THERMOENGINE,
-)
-
-
-def _open_available_engine(engine: Engine) -> EngineHandle:
-    handle = open_battery_engine(engine.value)
-    if not handle.available or handle.backend is None:
-        close_battery_engine_handle(handle)
-        skip_if_engine_missing(handle, engine.value)
-    return handle
 
 
 def _canonical_residual_rows(path: Path) -> bytes:
@@ -116,17 +102,20 @@ def _residual_payloads(path: Path) -> list[dict[str, object]]:
 
 
 @pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
-def test_engine_availability_is_reported_per_engine(engine: Engine) -> None:
+def test_engine_availability_is_reported_per_engine(engine: Engine, request) -> None:
     handle = open_battery_engine(engine.value)
     try:
         if not handle.available or handle.backend is None:
-            skip_if_engine_missing(handle, engine.value)
+            skip_if_engine_missing(
+                handle, engine.value, nodeid=request.node.nodeid
+            )
     finally:
         close_battery_engine_handle(handle)
 
 
 def test_required_engine_skip_uses_the_probe_reason(
     monkeypatch: pytest.MonkeyPatch,
+    request,
 ) -> None:
     unavailable = EngineHandle(
         name=Engine.OPENIMCC.value,
@@ -137,18 +126,17 @@ def test_required_engine_skip_uses_the_probe_reason(
         supports_intrinsic_fo2=False,
     )
     closed: list[EngineHandle] = []
-    monkeypatch.setattr(
-        sys.modules[__name__], "open_battery_engine", lambda name: unavailable
-    )
-    monkeypatch.setattr(
-        sys.modules[__name__], "close_battery_engine_handle", closed.append
-    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda name: unavailable)
+    monkeypatch.setattr(battery, "close_battery_engine_handle", closed.append)
 
     with pytest.raises(
         pytest.skip.Exception,
-        match="openimcc unavailable: OpenIMCC runtime package missing",
+        match=(
+            f"{request.node.nodeid}: "
+            "openimcc unavailable: OpenIMCC runtime package missing"
+        ),
     ):
-        _open_available_engine(Engine.OPENIMCC)
+        _open_available_engine(Engine.OPENIMCC, nodeid=request.node.nodeid)
 
     assert closed == [unavailable]
 
@@ -158,6 +146,7 @@ def test_internal_analytical_keys_the_instantiated_oxygen_pack(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     isolated: bool,
+    request,
 ) -> None:
     backend = object.__new__(battery._InternalAnalyticalBatteryBackend)
     backend._core = SimpleNamespace(
@@ -167,7 +156,10 @@ def test_internal_analytical_keys_the_instantiated_oxygen_pack(
         _last_vapor_pressure_diagnostic={},
     )
     backend._oxygen_balance_pack = "configured-pack"
-    backend._oxygen_balance_backend = SimpleNamespace(_pack_name="effective-pack")
+    backend._oxygen_balance_backend = SimpleNamespace(
+        _pack_name="effective-pack",
+        _effective_pack_name="effective-pack",
+    )
     handle = EngineHandle(
         name=Engine.INTERNAL_ANALYTICAL.value,
         backend=backend,
@@ -186,7 +178,7 @@ def test_internal_analytical_keys_the_instantiated_oxygen_pack(
 
     def fake_analytical_adapter(**kwargs: object) -> EquilibriumResult:
         oxygen_backend = kwargs["oxygen_balance_backend"]
-        pack = oxygen_backend._pack_name
+        pack = oxygen_backend._effective_pack_name
         direct_packs.append(pack)
         return EquilibriumResult(
             phase_assemblage_available=False,
@@ -286,71 +278,6 @@ def test_internal_analytical_keys_the_instantiated_oxygen_pack(
     assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == "effective-pack"
 
 
-def test_internal_analytical_oxygen_pack_matches_real_isolated_worker(
-    tmp_path: Path,
-) -> None:
-    handle = _open_available_engine(Engine.INTERNAL_ANALYTICAL)
-    openimcc_handle = _open_available_engine(Engine.OPENIMCC)
-    try:
-        backend = handle.backend
-        backend._oxygen_balance_backend = openimcc_handle.backend
-        backend._oxygen_balance_pack = "review-missing-pack"
-        effective_pack = backend._oxygen_balance_backend._pack_name
-        pot = battery.identity_battery_pot(
-            "oxygen-pack-real-worker", {"SiO2": 50.0, "FeO": 50.0}
-        )
-        po2 = Po2Request(battery.PO2_OXYGEN_BALANCE_EFFUSION, None, "W")
-        common = {
-            "temperature_K": 1700.0,
-            "po2": po2,
-            "timeout_s": 60.0,
-            "physical_pressure_bar": 1.0,
-        }
-
-        def stable(cell: EquilibrateCell) -> str:
-            return json.dumps(
-                replace(cell, wall_s=0.0, cpu_s=0.0, hostname="fixture").to_cache_payload(),
-                sort_keys=True,
-            )
-
-        off_direct = equilibrate_cell(handle, pot, isolated=False, **common)
-        off_isolated = equilibrate_cell(handle, pot, isolated=True, **common)
-        direct_cache = EngineCache(tmp_path / "real-direct.sqlite")
-        isolated_cache = EngineCache(tmp_path / "real-isolated.sqlite")
-        cold_direct = equilibrate_cell(
-            handle, pot, isolated=False, engine_cache=direct_cache, **common
-        )
-        warm_direct = equilibrate_cell(
-            handle, pot, isolated=False, engine_cache=direct_cache, **common
-        )
-        cold_isolated = equilibrate_cell(
-            handle, pot, isolated=True, engine_cache=isolated_cache, **common
-        )
-        warm_isolated = equilibrate_cell(
-            handle, pot, isolated=True, engine_cache=isolated_cache, **common
-        )
-
-        expected = stable(off_direct)
-        assert stable(off_isolated) == expected
-        assert all(
-            stable(cell) == expected
-            for cell in (cold_direct, warm_direct, cold_isolated, warm_isolated)
-        )
-        vector = battery._engine_cache_request_vector(
-            handle,
-            pot,
-            temperature_K=1700.0,
-            po2=po2,
-            physical_pressure_bar=1.0,
-            native_activity_formula=None,
-        )
-        assert vector is not None
-        assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == effective_pack
-    finally:
-        close_battery_engine_handle(handle)
-        close_battery_engine_handle(openimcc_handle)
-
-
 def test_bench_openimcc_reference_check_returns_typed_skip_when_unavailable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -408,7 +335,10 @@ def test_scored_activity_runs_other_engines_when_openimcc_is_missing(
         finally:
             close_battery_engine_handle(handle)
     if not engines:
-        pytest.skip(f"all non-OpenIMCC scored engines unavailable: {unavailable}")
+        pytest.skip(
+            f"{request.node.nodeid}: all non-OpenIMCC scored engines "
+            f"unavailable: {unavailable}"
+        )
     assert unavailable[Engine.OPENIMCC.value].startswith(
         "typed-skip:engine_unavailable:openimcc:"
     )
@@ -473,58 +403,10 @@ def test_scored_activity_runs_other_engines_when_openimcc_is_missing(
     assert rows, "scoring other available engines failed without OpenIMCC"
 
 
-@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
-def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
-    tmp_path: Path, engine: Engine
+def test_scored_fixture_rows_match_cache_off_cold_and_warm(
+    tmp_path: Path,
+    request,
 ) -> None:
-    handle = _open_available_engine(engine)
-    try:
-        pots, _diagnostics = load_binary_pots()
-        pot = next(item for item in pots if item.pot_id == "mgo_sio2_40_60")
-        pressure_bar = (
-            1.0e-6 if engine in {Engine.VAPOROCK, Engine.THERMOENGINE} else 1.0
-        )
-        po2 = (
-            Po2Request("commanded", 1.0e-8)
-            if engine
-            in {
-                Engine.OPENIMCC,
-                Engine.INTERNAL_ANALYTICAL,
-                Engine.MAGEMIN,
-                Engine.ALPHAMELTS,
-            }
-            else Po2Request("engine_default", None)
-        )
-        common = {
-            "temperature_K": 1700.0,
-            "po2": po2,
-            "timeout_s": 30.0,
-            "isolated": False,
-            "physical_pressure_bar": pressure_bar,
-        }
-        uncached = equilibrate_cell(handle, pot, **common)
-        cache_path = tmp_path / f"{engine.value}.sqlite"
-        cold_cache = EngineCache(cache_path)
-        cold = equilibrate_cell(handle, pot, **common, engine_cache=cold_cache)
-        warm_cache = EngineCache(cache_path)
-        warm = equilibrate_cell(handle, pot, **common, engine_cache=warm_cache)
-
-        def stable_payload(cell: EquilibrateCell) -> str:
-            return replace(
-                cell, wall_s=0.0, cpu_s=0.0, hostname="fixture"
-            ).to_cache_payload()
-
-        assert stable_payload(cold) == stable_payload(uncached)
-        assert stable_payload(warm) == stable_payload(uncached)
-        assert cold_cache.counters[engine.value]["calls_by_kind"][
-            "equilibrate_cell"
-        ] > 0
-        assert not any(warm_cache.counters[engine.value]["calls_by_kind"].values())
-    finally:
-        close_battery_engine_handle(handle)
-
-
-def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> None:
     engines = []
     unavailable: dict[str, str] = {}
     for engine in CACHE_TEST_ENGINES:
@@ -541,7 +423,10 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         finally:
             close_battery_engine_handle(handle)
     if not engines:
-        pytest.skip(f"all scored engines unavailable: {unavailable}")
+        pytest.skip(
+            f"{request.node.nodeid}: all scored engines unavailable: "
+            f"{unavailable}"
+        )
 
     work = F.work()
     compositions = (
@@ -778,7 +663,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     )
     if not vapor_engines:
         pytest.skip(
-            "vapor fixture engines unavailable: "
+            f"{request.node.nodeid}: vapor fixture engines unavailable: "
             + json.dumps(
                 {
                     engine.value: unavailable[engine.value]
@@ -1047,8 +932,9 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
 
 def test_direct_openimcc_results_and_refusals_round_trip_through_cache(
     tmp_path: Path,
+    request,
 ) -> None:
-    handle = _open_available_engine(Engine.OPENIMCC)
+    handle = _open_available_engine(Engine.OPENIMCC, nodeid=request.node.nodeid)
     close_battery_engine_handle(handle)
     module_name = "simulator.melt_backend.openimcc_cache"
     assert importlib.util.find_spec(module_name) is not None, (

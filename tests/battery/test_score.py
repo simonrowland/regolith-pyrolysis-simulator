@@ -15716,7 +15716,16 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     backend._available = True
     backend._bridge = "subprocess"
     backend._binary_path = Path("/fake/MAGEMin")
-    backend._subprocess_pool = FailedPool()
+    pool = FailedPool()
+    pool.workers = (SimpleNamespace(
+        name="MAGEMin subprocess pool slot 0",
+        _bootstrap_args=(
+            str(backend._binary_path.resolve()),
+            backend._database,
+            dict(backend._config),
+        ),
+    ),)
+    backend._subprocess_pool = pool
     results = []
     equilibrate = backend.equilibrate
 
