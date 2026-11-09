@@ -114,7 +114,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # serialized as evaluated_below_reporting_floor with their provenance, and the
     # FeO notice rides on Fe rows; the separate ledger digest below is unchanged.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "d951cbe70e2f4c4097d740d8af3dd9b395b530f5c695cc0ff903aa2919745063"
+        "1309f3ad925d2088fcbb655ab9b303e4180880d21b74c0c4841945df0a9bd43d"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
