@@ -170,10 +170,16 @@ def test_alphamelts_subprocess_subbar_pressure_reuses_cached_result(
     same_effective_pressure = solve(1.0e-9)
     higher_pressure = solve(10.0)
 
+    def stable_payload(cell: Any) -> dict[str, Any]:
+        payload = cell.as_payload()
+        payload.pop("wall_s", None)
+        payload.pop("cpu_s", None)
+        return payload
+
     assert backend.calls == 2
-    assert subbar.to_cache_payload() == same_effective_pressure.to_cache_payload()
+    assert stable_payload(subbar) == stable_payload(same_effective_pressure)
     assert not hasattr(subbar, "physical_pressure_bar")
-    assert higher_pressure.to_cache_payload() == subbar.to_cache_payload()
+    assert stable_payload(higher_pressure) == stable_payload(subbar)
     assert cache.counters["alphamelts"]["hits"] == 1
     assert cache.counters["alphamelts"]["misses"] == 2
 
