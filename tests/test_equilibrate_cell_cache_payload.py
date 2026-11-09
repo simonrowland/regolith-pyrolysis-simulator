@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from decimal import Decimal
 
 import pytest
@@ -124,3 +125,32 @@ def test_cache_payload_preserves_nested_types_and_presence() -> None:
     assert notice["signed_zero"].hex() == "-0x0.0p+0"
     assert "present_none" in notice and notice["present_none"] is None
     assert "absent" not in notice
+
+
+def test_cache_payload_reads_cells_written_before_transient_field() -> None:
+    cell = EquilibrateCell(
+        pot_id="legacy-payload",
+        engine="internal-analytical",
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+    payload = json.loads(cell.to_cache_payload())
+    payload["value"][3] = [
+        pair
+        for pair in payload["value"][3]
+        if pair[0] != "backend_failure_disposition"
+    ]
+
+    restored = EquilibrateCell.from_cache_payload(json.dumps(payload))
+
+    assert restored.backend_failure_disposition is None

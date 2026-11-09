@@ -132,7 +132,7 @@ def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
     assert len({owner_by_id[point.observation_id] for point in sossi}) == 1
 
 
-def test_jsonl_merge_keeps_engine_order_for_tied_rows(
+def test_jsonl_sort_preserves_append_order_for_tied_rows(
     tmp_path: Path, monkeypatch
 ) -> None:
     class _Aggregate:
@@ -150,20 +150,18 @@ def test_jsonl_merge_keeps_engine_order_for_tied_rows(
                 "rail": "liquid",
                 "reference": "observation-1",
                 "key": "same-key",
-                "candidate_request": {
-                    "engine": Engine.INTERNAL_ANALYTICAL.value
+                "candidate_observation": {
+                    "engine": {"name": Engine.VAPOROCK.value}
                 },
             },
             {
                 "rail": "liquid",
                 "reference": "observation-1",
                 "key": "same-key",
-                "candidate_observation": {
-                    "engine": {"name": Engine.VAPOROCK.value}
-                },
+                "candidate_request": {"engine": Engine.INTERNAL_ANALYTICAL.value},
             },
         ]
-        for payload in reversed(payloads):
+        for payload in payloads:
             stream.append_payload_line(
                 json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
             )
@@ -185,6 +183,6 @@ def test_jsonl_merge_keeps_engine_order_for_tied_rows(
         for row in rows
     ]
     assert engine_names == [
-        Engine.INTERNAL_ANALYTICAL.value,
         Engine.VAPOROCK.value,
+        Engine.INTERNAL_ANALYTICAL.value,
     ]

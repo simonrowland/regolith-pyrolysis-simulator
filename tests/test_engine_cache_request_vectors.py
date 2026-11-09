@@ -296,6 +296,8 @@ def test_request_vector_changes_when_magemin_buffer_setting_changes() -> None:
         ("alphamelts", "warm_worker", True),
         ("alphamelts", "petthermotools_warm_call_timeout_s", 42.0),
         ("alphamelts", "timeout_s", 43.0),
+        ("thermoengine", "thermoengine_health_timeout_s", 42.0),
+        ("thermoengine", "thermoengine_equilibrate_timeout_s", 43.0),
         ("magemin", "warm_worker", False),
         ("magemin", "warm_call_timeout_s", 42.0),
         ("magemin", "warm_pool_size", 2),
@@ -349,6 +351,21 @@ def test_request_vector_tracks_vaporock_session_environment(
     monkeypatch.setenv("REGOLITH_VAPOROCK_SESSION_WARM", "1")
 
     assert ordinary != _vector(handle)
+
+
+@pytest.mark.parametrize(
+    "variable",
+    ("DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH"),
+)
+def test_request_vector_tracks_thermoengine_library_environment(
+    monkeypatch: pytest.MonkeyPatch, variable: str
+) -> None:
+    handle = _handle("thermoengine")
+    monkeypatch.setenv(variable, "/first/thermoengine")
+    first = _vector(handle)
+    monkeypatch.setenv(variable, "/second/thermoengine")
+
+    assert first != _vector(handle)
 
 
 def test_request_vector_changes_when_magemin_native_activity_changes() -> None:
