@@ -2793,12 +2793,23 @@ def _normalize_run_metadata_unit_annotations(
             for key, child in value.items():
                 key_text = str(key)
                 key_casefolded = key_text.casefold()
+                if key_casefolded == "as_published" and not any(
+                    str(part).casefold() in {"locator", "inference"}
+                    for part in path
+                ):
+                    # Printed units are provenance consumed by the existing converter.
+                    cleaned[key] = child
+                    continue
                 if "unit" in key_casefolded:
+                    if (
+                        key_casefolded == "output_unit"
+                        and path
+                        and str(path[-1]).casefold() == "inference"
+                    ):
+                        cleaned[key] = child
+                        continue
                     annotations.append((path, key_text, child))
                     changed = True
-                    continue
-                if key_casefolded in {"locator", "inference"}:
-                    cleaned[key] = child
                     continue
                 normalized_child = strip_annotations(
                     child,
@@ -2852,7 +2863,21 @@ def _normalize_run_metadata_unit_annotations(
                 None,
             )
 
-    for _path, key, _unit in annotations:
+    for path, key, _unit in annotations:
+        annotation_path = ".".join(str(part) for part in (*path, key))
+        path_kinds = {str(part).casefold() for part in path}
+        if "locator" in path_kinds:
+            return None, (
+                formula,
+                f"unit-like annotation at {annotation_path} is invalid "
+                "inside locator metadata",
+            )
+        if "inference" in path_kinds:
+            return None, (
+                formula,
+                f"unit-like annotation at {annotation_path} is invalid "
+                "inside inference metadata",
+            )
         if key.casefold() not in {"unit", "units"}:
             return None, (formula, f"unsupported unit annotation key {key!r}")
     if len(annotations) > 1:
