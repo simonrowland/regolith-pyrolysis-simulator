@@ -2214,7 +2214,12 @@ def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
     )
 
 
-def _located_from_plain(payload: object, cast) -> Located:
+def _located_from_plain(
+    payload: object,
+    cast,
+    *,
+    verify_as_published: bool = False,
+) -> Located:
     if isinstance(payload, Located):
         return payload
     if not isinstance(payload, Mapping) or "state" not in payload:
@@ -2227,7 +2232,14 @@ def _located_from_plain(payload: object, cast) -> Located:
         )
     elif payload.get("inferred") is True:
         inference = _inferred_derivation_from_plain(payload)
-    else:
+    if verify_as_published and isinstance(payload.get("as_published"), Mapping):
+        published_inference = _inference_for_printed_conversion(
+            payload,
+            explicit_inference=inference,
+        )
+        if inference is None:
+            inference = published_inference
+    elif inference is None:
         inference = _inference_for_printed_conversion(payload)
     return Located(
         _state_from_plain(payload.get("state"), cast),
@@ -2782,6 +2794,7 @@ def _normalize_run_metadata_unit_annotations(
     """Normalize unit annotations before parsing any declared run-metadata shape."""
 
     annotations: list[tuple[tuple[str | int, ...], str, object]] = []
+    source_errors: list[tuple[tuple[str | int, ...], str]] = []
 
     def strip_annotations(
         value: object,
@@ -2793,12 +2806,44 @@ def _normalize_run_metadata_unit_annotations(
             for key, child in value.items():
                 key_text = str(key)
                 key_casefolded = key_text.casefold()
-                if key_casefolded == "as_published" and not any(
-                    str(part).casefold() in {"locator", "inference"}
-                    for part in path
-                ):
-                    # Printed units are provenance consumed by the existing converter.
-                    cleaned[key] = child
+                if key_casefolded == "as_published":
+                    annotation_path = (*path, key_text)
+                    is_located_value = (
+                        not path
+                        and isinstance(payload, Mapping)
+                        and "state" in payload
+                        and payload.get("value") is None
+                    ) or (
+                        path == ("value",)
+                        and isinstance(payload, Mapping)
+                        and isinstance(payload.get("value"), Mapping)
+                        and "state" in payload["value"]
+                    )
+                    if not is_located_value:
+                        source_errors.append(
+                            (annotation_path, "as_published is only valid on the Located value")
+                        )
+                    elif field not in {"mass_kg", "final_mass_kg"}:
+                        source_errors.append(
+                            (annotation_path, f"as_published units are unsupported for {field!r}")
+                        )
+                    elif not isinstance(child, Mapping):
+                        source_errors.append(
+                            (annotation_path, "as_published must be a mapping")
+                        )
+                    elif not any(
+                        child.get(unit_key) not in (None, "")
+                        for unit_key in ("units", "low_units", "high_units")
+                    ):
+                        source_errors.append(
+                            (annotation_path, "as_published has no consumable unit annotation")
+                        )
+                    normalized_child = strip_annotations(
+                        child,
+                        annotation_path,
+                    )
+                    cleaned[key] = normalized_child
+                    changed = changed or normalized_child is not child
                     continue
                 if "unit" in key_casefolded:
                     if (
@@ -2806,6 +2851,13 @@ def _normalize_run_metadata_unit_annotations(
                         and path
                         and str(path[-1]).casefold() == "inference"
                     ):
+                        cleaned[key] = child
+                        continue
+                    if path == ("as_published",) and key_text in {
+                        "units",
+                        "low_units",
+                        "high_units",
+                    }:
                         cleaned[key] = child
                         continue
                     annotations.append((path, key_text, child))
@@ -2841,27 +2893,34 @@ def _normalize_run_metadata_unit_annotations(
         return value
 
     cleaned_payload = strip_annotations(payload)
-    if not annotations:
-        return cleaned_payload, None
-
     formula = None
-    if field == "species_loss_fraction":
+    if field == "species_loss_fraction" and (annotations or source_errors):
         raw_species, _field_locator, _wrapper = _unwrap_located_equipment_value(
             payload, parent_locator
         )
         if isinstance(raw_species, Mapping):
+            paths = tuple(path for path, _key, _unit in annotations) + tuple(
+                path for path, _detail in source_errors
+            )
             formula = next(
                 (
                     str(species)
                     for species in raw_species
                     if any(
                         str(species) == str(part)
-                        for path, _key, _unit in annotations
+                        for path in paths
                         for part in path
                     )
                 ),
                 None,
             )
+
+    if source_errors:
+        path, detail = source_errors[0]
+        annotation_path = ".".join(str(part) for part in path)
+        return None, (formula, f"invalid annotation at {annotation_path}: {detail}")
+    if not annotations:
+        return cleaned_payload, None
 
     for path, key, _unit in annotations:
         annotation_path = ".".join(str(part) for part in (*path, key))
@@ -2980,7 +3039,11 @@ def _run_metadata_located_value_from_plain(
         }
         raw_value = normalized
 
-    located = _located_from_plain(raw_value, _value_or_point_from_plain)
+    located = _located_from_plain(
+        raw_value,
+        _value_or_point_from_plain,
+        verify_as_published=True,
+    )
     if located.locator is None and value_locator is not None:
         return replace(located, locator=value_locator)
     return located
@@ -8609,7 +8672,11 @@ def _published_operands(published: Mapping[str, Any]) -> list[tuple[Decimal, str
     return None
 
 
-def _inference_for_printed_conversion(payload: Mapping[str, Any]) -> Derivation | None:
+def _inference_for_printed_conversion(
+    payload: Mapping[str, Any],
+    *,
+    explicit_inference: Derivation | None = None,
+) -> Derivation | None:
     """Derivation for a converted Located. None when the printed original is not verified.
 
     A structured ``as_published`` block that does not reproduce the stored
@@ -8634,11 +8701,39 @@ def _inference_for_printed_conversion(payload: Mapping[str, Any]) -> Derivation 
         or published.get("low")
     ):
         operands = _published_operands(published)
-        if operands is None or _operands_match_stored(operands, kind, stored) is None:
+        if operands is None:
             raise ValueError(
                 "as_published conversion does not reproduce the stored value"
             )
-        return _derivation_for_operands(operands, kind, locator)
+        if _operands_match_stored(operands, kind, stored) is None:
+            raise ValueError(
+                "as_published conversion does not reproduce the stored value"
+            )
+        derivation = _derivation_for_operands(operands, kind, locator)
+        if explicit_inference is not None:
+            if derivation is None and kind == "point" and len(operands) == 1:
+                conversion = _convert_printed_amount(*operands[0])
+                if conversion is None or not conversion[1].startswith("identity:"):
+                    raise ValueError(
+                        "as_published conversion does not match the supplied inference"
+                    )
+                expected_relation = "identity"
+                expected_output_unit = conversion[1].partition(":")[2]
+            elif derivation is not None:
+                expected_relation = derivation.relation
+                expected_output_unit = derivation.output_unit
+            else:
+                raise ValueError(
+                    "as_published conversion does not match the supplied inference"
+                )
+            if (
+                explicit_inference.relation != expected_relation
+                or explicit_inference.output_unit != expected_output_unit
+            ):
+                raise ValueError(
+                    "as_published conversion contradicts the supplied inference"
+                )
+        return derivation
     locator_raw = payload.get("locator")
     note = ""
     if isinstance(locator_raw, Mapping):
@@ -17038,20 +17133,24 @@ def sample_from_equipment(
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
     sample_run_metadata = {}
+    invalid_equipment_mass_metadata = False
 
-    def equipment_metadata_payloads(
-        field: str,
-    ) -> list[tuple[object, Locator | None, str]]:
-        """Read only the equipment homes listed in the shared record schema."""
-
+    def equipment_metadata_suffixes(field: str) -> tuple[str, ...]:
         _shape, homes = RUN_METADATA_FIELD_HOMES[field]
-        suffixes = tuple(
+        return tuple(
             dict.fromkeys(
                 home.split(".equipment.", 1)[1]
                 for home in homes
                 if ".equipment." in home
             )
         )
+
+    def equipment_metadata_payloads(
+        field: str,
+    ) -> list[tuple[object, Locator | None, str]]:
+        """Read only the equipment homes listed in the shared record schema."""
+
+        suffixes = equipment_metadata_suffixes(field)
         if not isinstance(equipment, Mapping):
             return []
 
@@ -17158,6 +17257,8 @@ def sample_from_equipment(
                     parent_locator=parent_locator,
                 )
                 report_metadata_shape_errors(field_path, path, shape, errors)
+                if field == "mass_kg" and errors:
+                    invalid_equipment_mass_metadata = True
                 if parsed is None:
                     continue
                 if (
@@ -17200,6 +17301,21 @@ def sample_from_equipment(
         for formula in conflicts:
             species_values.pop(formula, None)
         sample_run_metadata[field] = species_values or None
+    if invalid_equipment_mass_metadata:
+        mass_home_paths = tuple(
+            f"equipment.{suffix}"
+            for suffix in equipment_metadata_suffixes("mass_kg")
+        )
+        mass_located = _unique_located(
+            [
+                hit
+                for hit in _hits_for(hits, "sample.mass_kg")
+                if not any(
+                    hit.path == path or hit.path.startswith(f"{path}.")
+                    for path in mass_home_paths
+                )
+            ]
+        )
     explicit_mass = sample_run_metadata.pop("mass_kg", None)
     if explicit_mass is not None:
         mass_located = _located_value(mass_located)
