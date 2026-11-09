@@ -1360,7 +1360,15 @@ class EvaporationMixin:
                         True,
                     )
                     for species in sorted(admitted_species):
-                        molar_mass = float(molar_masses_kg_mol[species])
+                        # Absent molar mass or series row is unavailable, not
+                        # a zero. Indexing the mass map KeyErrors when the
+                        # admitted carrier was not in the sampled batch.
+                        try:
+                            molar_mass = float(molar_masses_kg_mol[species])
+                        except (KeyError, TypeError, ValueError):
+                            continue
+                        if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+                            continue
                         series = seed_series.get(species)
                         if not isinstance(series, Mapping):
                             continue
@@ -1453,15 +1461,13 @@ class EvaporationMixin:
 
                 # Seed from the same full admission/freeze/depletion/cap map
                 # used by each scalar candidate, so no transform lands only
-                # after its first pressure projection.
-                seed_rates = admit_rates(rates_from_result(seed_result))
+                # after its first pressure projection. Built only when the
+                # scalar projection can run; otherwise the provider map keeps
+                # the pre-closure freeze and native-Fe handling below.
                 pipe_conductance_positive = (
                     self.overhead_model._has_positive_pipe_conductance(
                         self.melt.temperature_C
                     )
-                )
-                seed_native_fe_capacity_allocation = (
-                    native_fe_capacity_allocation
                 )
                 atmosphere_name = str(
                     getattr(getattr(self.melt, 'atmosphere', None), 'name', '')
@@ -1473,7 +1479,35 @@ class EvaporationMixin:
                         self._headspace_downstream_pressure_bar(None),
                     )
                 )
-                if pressure_held_total_Pa is not None:
+                projection_covers_admitted = True
+                for species in sorted(admitted_species):
+                    series = seed_series.get(species)
+                    try:
+                        molar_mass = float(molar_masses_kg_mol[species])
+                    except (KeyError, TypeError, ValueError):
+                        molar_mass = None
+                    if (
+                        not isinstance(series, Mapping)
+                        or molar_mass is None
+                        or not math.isfinite(molar_mass)
+                        or molar_mass <= 0.0
+                    ):
+                        # raw_i(g) = P_eq,i / (R'_i + g) needs both a
+                        # series-resistance row and a positive molar mass.
+                        # A missing input cannot be projected; dropping the
+                        # carrier would turn that absence into a zero rate.
+                        projection_covers_admitted = False
+                        break
+                if admitted_species and not projection_covers_admitted:
+                    kernel_result = seed_result
+                elif pressure_held_total_Pa is not None:
+                    seed_rates = admit_rates(rates_from_result(seed_result))
+                    # admit_rates writes the native-Fe allocation as a side
+                    # effect. Snapshot it before the closure probes overwrite
+                    # it; the unspecified-sweep upper bound restores this seed.
+                    seed_native_fe_capacity_allocation = (
+                        native_fe_capacity_allocation
+                    )
                     # Premise: these controlled-O2 campaigns hold the vessel at
                     # P_total by throttling its outlet to the inflow, but the
                     # carrier/O2 feed rate is unspecified. In the no-feed limit
@@ -1651,6 +1685,7 @@ class EvaporationMixin:
                     else:
                         closure_rates_are_admitted = True
                 else:
+                    seed_rates = admit_rates(rates_from_result(seed_result))
                     closure = _solve_same_hour_headspace_closure(
                         seed_rates,
                         rates_at_projection_g,
