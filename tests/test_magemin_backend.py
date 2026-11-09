@@ -4207,7 +4207,16 @@ def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
 def test_oneill_qfm_coefficient_has_one_production_owner():
     repo_root = Path(__file__).resolve().parents[1]
     tracked = subprocess.run(
-        ["git", "ls-files", "--", "simulator", "engines"],
+        [
+            "git",
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            "simulator",
+            "engines",
+        ],
         cwd=repo_root,
         check=True,
         capture_output=True,
@@ -4220,8 +4229,10 @@ def test_oneill_qfm_coefficient_has_one_production_owner():
         if not relative_path.endswith(".py"):
             continue
         source_path = repo_root / relative_path
+        if not source_path.is_file():
+            continue
         for line in source_path.read_text(encoding="utf-8").splitlines():
             if coefficient.search(line):
                 occurrences.append(relative_path)
 
-    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]
+    assert occurrences == ["simulator/oxygen_buffers.py"]

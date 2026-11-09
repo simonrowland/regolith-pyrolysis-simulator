@@ -21,6 +21,7 @@ import math
 
 import pytest
 
+from simulator.oxygen_buffers import FROST_IW_COEFFICIENTS
 from simulator.chemistry.offgas_fo2 import (
     _COUPLE_RECORDS,
     _effective_domain_K,
@@ -109,7 +110,8 @@ def test_unit_ratio_h2_buffer_stays_near_iron_wustite_in_frost_range(polys):
 
     for T_K in (900.0, 1100.0, 1300.0, 1473.15):
         result = imposed_fo2({"H2": 1.0, "H2O": 1.0}, T_K, polys)
-        iw = -27489.0 / T_K + 6.702
+        a_k, b, _pressure_coefficient = FROST_IW_COEFFICIENTS
+        iw = a_k / T_K + b
         assert result.coupling == H2_COUPLE_ONLY
         assert abs(result.log10_fO2 - iw) < 1.0, (
             f"T={T_K}: imposed {result.log10_fO2:.3f} vs IW {iw:.3f} -- a gap "
