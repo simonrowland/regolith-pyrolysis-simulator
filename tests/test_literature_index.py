@@ -422,13 +422,17 @@ def test_repo_source_status_counts_match_rows() -> None:
 def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
     counts = index["counts"]
-    # Each pin is the green 91061cdad count plus the stack-owned row delta.
-    assert counts["sources"] == 775 + 18  # green 775 + stack delta 18
-    assert counts["extracts"] == 773 + 18  # green 773 + stack delta 18
-    assert counts["extracts_without_pdf"] == 773 + 18  # green 773 + stack delta 18
-    assert counts["alias_groups_needing_resolution"] == 83 + 2  # green 83 + stack delta 2
+    # Index base is landing batch f3d5d78d5 (783/781/781/84), itself green
+    # 91061cdad (775/773/773/83) plus that batch's index delta. Stack-owned
+    # index deltas are unchanged.
+    assert counts["sources"] == 783 + 18  # landing 783 + stack delta 18
+    assert counts["extracts"] == 781 + 18  # landing 781 + stack delta 18
+    assert counts["extracts_without_pdf"] == 781 + 18  # landing 781 + stack delta 18
+    assert counts["alias_groups_needing_resolution"] == 84 + 2  # landing 84 + stack delta 2
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    # SOURCE_STATUS.yaml changed only on stack 4, so this pin stays green
+    # 91061cdad plus the stack-owned status delta.
     assert status["counts"]["sources"] == 2311 + 16  # green 2311 + stack delta 16
     assert status["counts"]["by_stage"] == {
         "located": 209 + 0,  # green 209 + stack delta 0
