@@ -11,6 +11,8 @@ from simulator.condensation import (
     _authoritative_vapour_catalog_payload,
     _try_antoine_psat_pa,
 )
+from simulator.condensation_routing import designated_stage_number
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.vapour_rail.catalog import (
     CatalogCompileError,
     HotTrainInapplicable,
@@ -37,39 +39,173 @@ def _wall_pressure(
     temperature_K: float,
     pO2_bar: float | None,
     vapor_pressure_data: Mapping[str, Any] | None,
-) -> tuple[float | None, str]:
+) -> tuple[float | None, str, dict[str, Any] | None]:
     if species == "CrO":
-        return None, "CrO_has_no_independent_wall_P_sat"
+        return None, "CrO_has_no_independent_wall_P_sat", None
     if species == "SiO":
         payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
         if payload is None or pO2_bar is None or pO2_bar <= 0.0:
-            return None, "SiO_reaction_wall_pressure_inputs_unavailable"
+            return None, "SiO_reaction_wall_pressure_inputs_unavailable", None
         try:
             evaluator = compiled_catalog_for(
                 payload,
                 emit_u0_request_rules=False,
             ).evaluator_for_hot_train("SiO")
-            # Pure silica is the wall reference: the catalog owns Kp(T)/sqrt(pO2).
             result = evaluator.evaluate(
                 temperature_K,
                 source_activity=1.0,
                 pO2_bar=pO2_bar,
             )
         except (CatalogCompileError, HotTrainInapplicable, TypeError, ValueError):
-            return None, "SiO_reaction_wall_pressure_unavailable"
+            return None, "SiO_reaction_wall_pressure_unavailable", None
         pressure = _number(result.pressure_pa)
-        return (pressure, "computed") if pressure and pressure > 0.0 else (
-            None,
-            "SiO_reaction_wall_pressure_not_positive_finite",
-        )
+        notice = {
+            "valid_range_K": tuple(evaluator.valid_temperature_K),
+            "out_of_range": bool(result.out_of_range),
+            "status": result.status or "in_range",
+            "acquisition_flag": result.acquisition_flag,
+            "validation_status": getattr(
+                result.validation_status, "value", result.validation_status
+            ),
+            "pressure_observable": getattr(
+                evaluator.pressure_observable, "value", evaluator.pressure_observable
+            ),
+            "authority_level": (
+                "extrapolated" if result.out_of_range else "catalog_evaluated"
+            ),
+        }
+        if pressure is None or pressure <= 0.0:
+            return None, "SiO_reaction_wall_pressure_not_positive_finite", notice
+        return pressure, str(notice["status"]), notice
+
+    extrapolations: dict[str, dict[str, Any]] = {}
+    warnings: list[str] = []
     pressure, refused = _try_antoine_psat_pa(
         species,
         temperature_K,
         vapor_pressure_data=vapor_pressure_data,
+        antoine_extrapolations=extrapolations,
+        antoine_extrapolation_warnings=warnings,
     )
+    notice = next(iter(extrapolations.values()), None)
+    if notice is None:
+        notice = {
+            "status": "refused" if refused else "in_range",
+            "authority_level": "unavailable" if refused else "owner_evaluated",
+        }
     if refused or pressure is None or not math.isfinite(float(pressure)) or pressure <= 0.0:
-        return None, "elemental_wall_P_sat_unavailable"
-    return float(pressure), "computed"
+        return None, "elemental_wall_P_sat_unavailable", dict(notice)
+    return float(pressure), str(notice.get("status", "computed")), dict(notice)
+
+
+def _products_per_kg(owner: Any, species: str) -> dict[str, float] | None:
+    vapor_pressures = getattr(owner, "vapor_pressures", None)
+    product_resolver = getattr(owner, "_condensed_products_kg", None)
+    if not isinstance(vapor_pressures, Mapping) or not callable(product_resolver):
+        return None
+    metals = vapor_pressures.get("metals", {})
+    oxides = vapor_pressures.get("oxide_vapors", {})
+    row = (metals.get(species) if isinstance(metals, Mapping) else None) or (
+        oxides.get(species) if isinstance(oxides, Mapping) else None
+    ) or {}
+    try:
+        products = product_resolver(species, 1.0, row)
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not isinstance(products, Mapping):
+        return None
+    clean = {
+        str(product): amount
+        for product, raw_amount in products.items()
+        if (amount := _number(raw_amount)) is not None and amount > 0.0
+    }
+    return clean or None
+
+
+def _capture_by_carrier(
+    capture_by_stage_product: Mapping[tuple[int, str], float],
+    carriers: Mapping[str, float],
+    evaporation_owner: Any,
+) -> tuple[dict[str, dict[str, float]], dict[str, str], dict[str, dict[str, float]]]:
+    products_by_carrier = {
+        species: _products_per_kg(evaporation_owner, species)
+        for species in carriers
+    }
+    product_sources: dict[str, set[str]] = {}
+    for species, products in products_by_carrier.items():
+        for product in products or {species: 1.0}:
+            product_sources.setdefault(product, set()).add(species)
+
+    amounts_by_source_stage: dict[tuple[str, str], dict[str, float]] = {}
+    unattributed: dict[str, dict[str, float]] = {}
+    ambiguous: dict[str, str] = {}
+    for (stage_number, product), mass in capture_by_stage_product.items():
+        stage = str(stage_number)
+        product = str(product)
+        sources = product_sources.get(product, set())
+        if len(sources) != 1:
+            unattributed.setdefault(stage, {})[product] = mass
+            if len(sources) > 1:
+                for species in sources:
+                    ambiguous[species] = "condenser_product_has_multiple_vapor_carriers"
+            continue
+        species = next(iter(sources))
+        products = products_by_carrier[species]
+        weight = products.get(product, 1.0) if products is not None else 1.0
+        amounts_by_source_stage.setdefault((species, stage), {})[product] = mass / weight
+
+    captured_by_carrier: dict[str, dict[str, float]] = {}
+    for (species, stage), product_amounts in amounts_by_source_stage.items():
+        products = products_by_carrier[species] or {species: 1.0}
+        expected = {key: value for key, value in products.items() if value > 0.0}
+        if not set(expected).issubset(product_amounts):
+            ambiguous[species] = "condenser_product_split_incomplete"
+            continue
+        carrier_amounts = [product_amounts[key] for key in expected]
+        reference = math.fsum(carrier_amounts) / len(carrier_amounts)
+        if any(
+            not math.isclose(value, reference, rel_tol=1.0e-9, abs_tol=1.0e-12)
+            for value in carrier_amounts
+        ):
+            ambiguous[species] = "condenser_product_split_does_not_match_owner"
+            continue
+        captured_by_carrier.setdefault(species, {})[stage] = reference
+    if unattributed:
+        for species, products in products_by_carrier.items():
+            if products is None:
+                ambiguous.setdefault(
+                    species,
+                    "condenser_product_capture_cannot_be_attributed_without_owner",
+                )
+    return captured_by_carrier, ambiguous, unattributed
+
+
+def _route_refusal(
+    operating_snapshot: Mapping[str, Any],
+    route_model: Any,
+    species: str,
+    segment_name: str,
+) -> Mapping[str, Any] | None:
+    temperature_refusals = getattr(
+        route_model, "wall_temperature_input_refusals", {}
+    )
+    if isinstance(temperature_refusals, Mapping) and segment_name in temperature_refusals:
+        return {"reason": str(temperature_refusals[segment_name])}
+    notice = operating_snapshot.get("wall_sticking_alpha_provenance_notice")
+    if not isinstance(notice, Mapping):
+        notice = getattr(route_model, "last_sticking_alpha_provenance_notice", {})
+    if not isinstance(notice, Mapping):
+        return None
+    for key in (
+        "wall_saturation_pressure_refusals_by_species",
+        "wall_knudsen_regime_refusals_by_species",
+    ):
+        by_species = notice.get(key)
+        by_segment = by_species.get(species) if isinstance(by_species, Mapping) else None
+        refusal = by_segment.get(segment_name) if isinstance(by_segment, Mapping) else None
+        if isinstance(refusal, Mapping):
+            return refusal
+    return None
 
 
 def diagnose_compartment_hour(
@@ -82,13 +218,14 @@ def diagnose_compartment_hour(
     condenser_capture_by_stage_species_kg: (
         Mapping[tuple[int, str], float] | None
     ) = None,
+    condensation_model: Any | None = None,
+    evaporation_owner: Any | None = None,
 ) -> dict[str, Any]:
     """Project melt-film, headspace, duct and condenser balances for one hour.
 
-    Candidate deposits, segment partial pressures and Kn labels are read from
-    the existing condensation route. Stage captures come from the matching
-    hourly snapshot delta. Current run output has no carrier-feed ``F``; it
-    remains a typed absence and is never defaulted here.
+    Candidate wall deposits, local pressures and Kn labels are copied from the
+    existing route. Product captures are mapped back through the evaporation
+    owner's product projection. No ledger or score input is changed.
     """
     raw_evap = hour_output.get("vapor_species_kg_hr")
     if not isinstance(raw_evap, Mapping):
@@ -96,10 +233,12 @@ def diagnose_compartment_hour(
     evaporation = {str(key): float(value) for key, value in raw_evap.items()}
     if any(not math.isfinite(v) or v < 0.0 for v in evaporation.values()):
         raise ValueError("vapor_species_kg_hr values must be finite and non-negative")
-    candidates = operating_snapshot.get("wall_deposition_rate_shadow_candidate")
-    candidates = candidates if isinstance(candidates, Mapping) else {}
-    capture_by_species: dict[str, dict[str, float]] = {}
+
+    raw_candidates = operating_snapshot.get("wall_deposition_rate_shadow_candidate")
+    candidates = raw_candidates if isinstance(raw_candidates, Mapping) else {}
+    capture_by_stage_product: dict[tuple[int, str], float] | None = None
     if condenser_capture_by_stage_species_kg is not None:
+        capture_by_stage_product = {}
         for key, raw_capture in condenser_capture_by_stage_species_kg.items():
             if not isinstance(key, tuple) or len(key) != 2:
                 raise ValueError("condenser capture keys must be (stage, species)")
@@ -107,111 +246,251 @@ def diagnose_compartment_hour(
             capture = _number(raw_capture)
             if capture is None or capture < 0.0:
                 raise ValueError("condenser capture values must be finite and non-negative")
-            stage_captures = capture_by_species.setdefault(str(species), {})
-            stage_key = str(stage)
-            stage_captures[stage_key] = stage_captures.get(stage_key, 0.0) + capture
+            normalized_key = (int(stage), str(species))
+            capture_by_stage_product[normalized_key] = (
+                capture_by_stage_product.get(normalized_key, 0.0) + capture
+            )
     segments = {str(item.name): item for item in pipe_segments}
-    pO2_bar = _number(hour_output.get("pO2_bar"))
+    headspace = operating_snapshot.get("species_partial_pressures_mbar")
+    headspace = headspace if isinstance(headspace, Mapping) else {}
+    pO2_mbar = _number(headspace.get("O2"))
+    pO2_bar = pO2_mbar * 1.0e-3 if pO2_mbar is not None else None
     carrier_flow_mol_s = _number(hour_output.get("carrier_flow_mol_s"))
     if carrier_flow_mol_s is not None and carrier_flow_mol_s < 0.0:
         raise ValueError("carrier_flow_mol_s must be non-negative")
-    headspace = operating_snapshot.get("species_partial_pressures_mbar")
-    headspace = headspace if isinstance(headspace, Mapping) else {}
 
-    duct_nodes: list[dict[str, Any]] = []
+    capture_by_carrier: dict[str, dict[str, float]] = {}
+    capture_attribution_refusals: dict[str, str] = {}
+    unattributed_capture: dict[str, dict[str, float]] = {}
+    if capture_by_stage_product is not None:
+        capture_by_carrier, capture_attribution_refusals, unattributed_capture = (
+            _capture_by_carrier(
+                capture_by_stage_product,
+                evaporation,
+                evaporation_owner,
+            )
+        )
+
+    duct_nodes: dict[str, dict[str, Any]] = {}
     rows_by_species: dict[str, list[dict[str, Any]]] = {}
     deposits_by_species: dict[str, float] = {}
-    for segment_name, raw_species in candidates.items():
-        segment = segments.get(str(segment_name))
-        if segment is None or not isinstance(raw_species, Mapping):
-            continue
-        species_rows: dict[str, Any] = {}
-        try:
-            los_area_m2 = _wall_geometry_conductance_weight(segment)
-        except (AttributeError, TypeError, ValueError):
-            los_area_m2 = None
-        for species, record in raw_species.items():
-            species = str(species)
-            if species not in evaporation or not isinstance(record, Mapping):
-                continue
-            pressure = _number(record.get("species_partial_pressure_pa"))
-            surface = record.get("surface")
+    unavailable_species: set[str] = set()
+    applicable_known: set[str] = set()
+    route_partials = getattr(
+        condensation_model, "wall_species_partial_pressures_pa_by_segment", {}
+    )
+    route_partials = route_partials if isinstance(route_partials, Mapping) else {}
+    for species in evaporation:
+        candidate_segment_names = {
+            str(segment_name)
+            for segment_name, raw_species in candidates.items()
+            if isinstance(raw_species, Mapping) and species in raw_species
+        }
+        applicable_resolver = getattr(
+            condensation_model, "_mixed_temperature_wall_candidate_segments", None
+        )
+        if callable(applicable_resolver):
+            try:
+                applicable_segments = list(applicable_resolver(species))
+                applicable_known.add(species)
+            except (TypeError, ValueError):
+                applicable_segments = [segments[name] for name in candidate_segment_names if name in segments]
+        elif candidate_segment_names:
+            applicable_segments = [segments[name] for name in candidate_segment_names if name in segments]
+            applicable_known.add(species)
+        else:
+            applicable_segments = []
+
+        for segment in applicable_segments:
+            segment_name = str(getattr(segment, "name", ""))
+            candidate_species = candidates.get(segment_name, {})
+            record = candidate_species.get(species) if isinstance(candidate_species, Mapping) else None
+            record = record if isinstance(record, Mapping) else None
+            surface = record.get("surface") if record is not None else None
             surface = surface if isinstance(surface, Mapping) else {}
-            wall_K = _number(surface.get("wall_temperature_K"))
-            transport = record.get("transport")
+            transport = record.get("transport") if record is not None else None
             transport = transport if isinstance(transport, Mapping) else {}
+            raw_wall_K = surface.get("wall_temperature_K")
+            wall_K = _number(raw_wall_K)
+            wall_C = _number(getattr(segment, "wall_temperature_C", None))
+            if wall_K is None and wall_C is not None:
+                wall_K = wall_C + CELSIUS_TO_KELVIN_OFFSET
+            if wall_C is None and wall_K is not None:
+                wall_C = wall_K - CELSIUS_TO_KELVIN_OFFSET
+            try:
+                wall_area = _number(segment.surface_area_m2)
+                los_area = _wall_geometry_conductance_weight(segment)
+            except (AttributeError, TypeError, ValueError):
+                wall_area = None
+                los_area = None
+
+            route_by_segment = route_partials.get(segment_name, {})
+            route_by_segment = route_by_segment if isinstance(route_by_segment, Mapping) else {}
+            pressure = (
+                _number(record.get("species_partial_pressure_pa"))
+                if record is not None
+                else _number(route_by_segment.get(species))
+            )
             regime = str(transport.get("regime_label") or "unavailable")
-            psat, psat_status = (
-                (None, "segment_pressure_or_wall_temperature_missing")
-                if pressure is None or wall_K is None or wall_K <= 0.0
-                else _wall_pressure(species, wall_K, pO2_bar, vapor_pressure_data)
+            refusal = _route_refusal(
+                operating_snapshot, condensation_model, species, segment_name
             )
-            margin = (
-                None
-                if psat is None or pressure is None
-                else pressure / psat
-            )
-            mol_s = _number(record.get("mol_s"))
-            mass_rate = None
-            if psat is not None and mol_s is not None and mol_s >= 0.0:
-                try:
-                    formula = resolve_species_formula(species, species_formula_registry)
-                    mass_rate = (
-                        mol_s
-                        * formula.molar_mass_kg_per_mol()
-                        * SECONDS_PER_HOUR
-                    )
-                except (KeyError, TypeError, ValueError):
-                    pass
-            if mass_rate is not None and carrier_flow_mol_s == 0.0:
-                if regime != "free_molecular" or los_area_m2 is None:
-                    mass_rate = 0.0
-                elif los_area_m2 == 0.0:
-                    mass_rate = 0.0
-            if mass_rate is not None:
-                deposits_by_species[species] = deposits_by_species.get(species, 0.0) + mass_rate
-            path = (
-                "free_molecular_line_of_sight_area_proxy"
-                if regime == "free_molecular"
-                else "existing_series_resistance_route"
-            )
+            if wall_K is None or wall_K <= 0.0:
+                psat, psat_status, pressure_notice = (
+                    None,
+                    "wall_temperature_unavailable",
+                    None,
+                )
+            elif pressure is None:
+                psat, psat_status, pressure_notice = (
+                    None,
+                    "segment_partial_pressure_unavailable",
+                    None,
+                )
+            else:
+                psat, psat_status, pressure_notice = _wall_pressure(
+                    species, wall_K, pO2_bar, vapor_pressure_data
+                )
+                route_pressure_notice = (
+                    record.get("wall_saturation_pressure_notice")
+                    if record is not None
+                    else None
+                )
+                if isinstance(route_pressure_notice, Mapping):
+                    pressure_notice = {
+                        **dict(route_pressure_notice),
+                        **(pressure_notice or {}),
+                    }
+            margin = pressure / psat if pressure is not None and psat else None
+            deposit = None
+            row_status = "unavailable"
+            reason = None
+            if (
+                wall_area is None
+                or wall_area <= 0.0
+                or los_area is None
+                or wall_K is None
+            ):
+                reason = "segment_geometry_or_wall_temperature_unavailable"
+            elif refusal is not None:
+                reason = str(refusal.get("reason") or "route_owner_refused_segment")
+            elif psat is None:
+                reason = psat_status
+            elif record is None:
+                if pressure is not None and pressure <= psat:
+                    deposit = 0.0
+                    row_status = "proven_zero_below_wall_saturation"
+                else:
+                    reason = "applicable_segment_candidate_missing"
+            else:
+                mol_s = _number(record.get("mol_s"))
+                if mol_s is not None and mol_s >= 0.0:
+                    try:
+                        formula = resolve_species_formula(
+                            species, species_formula_registry
+                        )
+                        deposit = (
+                            mol_s
+                            * formula.molar_mass_kg_per_mol()
+                            * SECONDS_PER_HOUR
+                        )
+                        row_status = "computed"
+                    except (KeyError, TypeError, ValueError):
+                        reason = "species_formula_unavailable"
+                else:
+                    reason = "candidate_mass_unavailable"
+            if deposit is None:
+                unavailable_species.add(species)
+            else:
+                deposits_by_species[species] = deposits_by_species.get(species, 0.0) + deposit
+
             node_row = {
+                "status": row_status,
+                "unavailable_reason": reason,
                 "partial_pressure_pa": pressure,
+                "wall_temperature_K": wall_K,
                 "wall_saturation_pressure_pa": psat,
                 "wall_saturation_status": psat_status,
+                "wall_saturation_pressure_notice": pressure_notice,
                 "deposition_propensity_margin": margin,
+                "deposition_propensity_margin_notice": (
+                    None if margin is None else {
+                        "status": "computed",
+                        "pressure_source": "same_route_local_state",
+                        "wall_saturation_pressure_notice": pressure_notice,
+                    }
+                ),
                 "knudsen_number": _number(transport.get("Kn")),
                 "knudsen_regime": regime,
-                "transport_path": path,
-                "line_of_sight_area_proxy_m2": los_area_m2,
-                "deposit_candidate_kg_hr": mass_rate,
+                "transport_path": (
+                    "free_molecular_line_of_sight_area_proxy"
+                    if regime == "free_molecular"
+                    else "existing_series_resistance_route"
+                ),
+                "line_of_sight_area_proxy_m2": los_area,
+                "deposit_candidate_kg_hr": deposit,
             }
-            species_rows[species] = node_row
             rows_by_species.setdefault(species, []).append({
-                "segment": str(segment_name),
+                "segment": segment_name,
                 **node_row,
             })
-        if species_rows:
-            duct_nodes.append({
-                "name": str(segment_name),
-                "wall_temperature_C": float(segment.wall_temperature_C),
-                "wall_area_m2": float(segment.surface_area_m2),
-                "species": species_rows,
+            node = duct_nodes.setdefault(segment_name, {
+                "name": segment_name,
+                "wall_temperature_C": wall_C,
+                "wall_area_m2": wall_area,
+                "species": {},
             })
+            node["species"][species] = node_row
+
+    actual_capture_by_stage_species: dict[str, dict[str, float]] | None = None
+    designated_capture_by_species: dict[str, dict[str, float]] | None = None
+    if capture_by_stage_product is not None:
+        actual_capture_by_stage_species = {}
+        for (stage, product), mass in capture_by_stage_product.items():
+            actual_capture_by_stage_species.setdefault(str(stage), {})[product] = mass
+        designated_capture_by_species = {}
+        for species, by_stage in capture_by_carrier.items():
+            target_stage = designated_stage_number(species)
+            designated_capture_by_species[species] = {
+                stage: mass
+                for stage, mass in by_stage.items()
+                if target_stage is not None and int(stage) == target_stage
+            }
 
     balances: dict[str, Any] = {}
     for species, emitted in evaporation.items():
         node_rows = rows_by_species.get(species, ())
         deposited = deposits_by_species.get(species, 0.0)
-        captures = (
-            capture_by_species.get(species, {})
-            if condenser_capture_by_stage_species_kg is not None
+        capture_unknown = (
+            capture_attribution_refusals.get(species)
+            if capture_by_stage_product is not None
             else None
         )
-        captured = math.fsum(captures.values()) if captures is not None else None
+        captured_by_stage = (
+            capture_by_carrier.get(species, {})
+            if capture_by_stage_product is not None and capture_unknown is None
+            else None
+        )
+        captured = (
+            math.fsum(captured_by_stage.values())
+            if captured_by_stage is not None and capture_unknown is None
+            else None
+        )
+        designated = (
+            designated_capture_by_species.get(species, {})
+            if designated_capture_by_species is not None
+            and capture_unknown is None
+            else None
+        )
         condenser_fields = {
-            "designated_condenser_capture_by_stage_kg": captures,
-            "designated_condenser_capture_kg": captured,
+            "actual_condenser_capture_by_stage_carrier_kg": captured_by_stage,
+            "actual_condenser_capture_kg": captured,
+            "designated_condenser_capture_by_stage_kg": designated,
+            "designated_condenser_capture_kg": (
+                math.fsum(designated.values()) if designated is not None else None
+            ),
+            "actual_condenser_capture_by_stage_species_kg": actual_capture_by_stage_species,
+            "unattributed_condenser_capture_by_stage_species_kg": unattributed_capture,
         }
         if emitted == 0.0:
             balances[species] = {
@@ -222,44 +501,56 @@ def diagnose_compartment_hour(
                 "unassigned_after_condenser_kg_hr": 0.0,
                 "relative_mass_balance_error": 0.0,
             }
-        elif not node_rows or any(row["deposit_candidate_kg_hr"] is None for row in node_rows):
+            continue
+        if (
+            species in unavailable_species
+            or species not in applicable_known
+            or capture_unknown is not None
+        ):
             balances[species] = {
                 "status": "unavailable",
-                "reason": "wall_candidate_or_margin_unavailable",
+                "reason": (
+                    capture_unknown
+                    or "applicable_wall_sink_or_route_applicability_unavailable"
+                ),
                 "evaporated_kg_hr": emitted,
                 "deposited_by_segment_kg_hr": None,
                 **condenser_fields,
                 "unassigned_after_condenser_kg_hr": None,
                 "relative_mass_balance_error": None,
             }
-        elif carrier_flow_mol_s == 0.0:
-            if captured is not None and captured > 0.0:
-                balances[species] = {
-                    "status": "refused",
-                    "reason": "condenser_capture_conflicts_with_zero_carrier",
-                    "evaporated_kg_hr": emitted,
-                    "deposited_by_segment_kg_hr": None,
-                    **condenser_fields,
-                    "unassigned_after_condenser_kg_hr": None,
-                    "relative_mass_balance_error": None,
-                }
-                continue
-            remaining = max(0.0, emitted - deposited)
+            continue
+        if carrier_flow_mol_s == 0.0 and captured is None:
+            remainder = max(0.0, emitted - deposited)
+            accounted = math.fsum((deposited, remainder))
             balances[species] = {
                 "status": "ballistic_line_of_sight_only",
                 "evaporated_kg_hr": emitted,
                 "deposited_by_segment_kg_hr": {
-                    row["segment"]: row["deposit_candidate_kg_hr"] for row in node_rows
+                    row["segment"]: row["deposit_candidate_kg_hr"]
+                    for row in node_rows
                 },
-                "gas_remaining_without_advective_capture_kg_hr": remaining,
+                **condenser_fields,
+                "gas_remaining_without_advective_capture_kg_hr": remainder,
+                "unassigned_after_condenser_kg_hr": None,
+                "relative_mass_balance_error": (accounted - emitted) / emitted,
+            }
+            continue
+        if captured is None:
+            balances[species] = {
+                "status": "condenser_capture_unavailable",
+                "evaporated_kg_hr": emitted,
+                "deposited_by_segment_kg_hr": {
+                    row["segment"]: row["deposit_candidate_kg_hr"]
+                    for row in node_rows
+                },
                 **condenser_fields,
                 "unassigned_after_condenser_kg_hr": None,
-                "relative_mass_balance_error": (math.fsum((deposited, remaining)) - emitted) / emitted,
+                "relative_mass_balance_error": None,
             }
-        elif captured is not None and deposited + captured > emitted and not math.isclose(
-            deposited + captured,
-            emitted,
-            rel_tol=1.0e-12,
+            continue
+        if deposited + captured > emitted and not math.isclose(
+            deposited + captured, emitted, rel_tol=1.0e-12
         ):
             balances[species] = {
                 "status": "refused",
@@ -270,31 +561,26 @@ def diagnose_compartment_hour(
                 "unassigned_after_condenser_kg_hr": None,
                 "relative_mass_balance_error": None,
             }
-        else:
-            remainder = max(0.0, emitted - deposited - (captured or 0.0))
-            if captures is None:
-                condenser_feed = max(0.0, emitted - deposited)
-                unassigned = None
-                accounted = math.fsum((deposited, condenser_feed))
-            else:
-                condenser_feed = max(0.0, emitted - deposited)
-                unassigned = remainder
-                accounted = math.fsum((deposited, captured or 0.0, remainder))
-            balances[species] = {
-                "status": (
-                    "computed"
-                    if captures is not None
-                    else "condenser_capture_unavailable"
-                ),
-                "evaporated_kg_hr": emitted,
-                "deposited_by_segment_kg_hr": {
-                    row["segment"]: row["deposit_candidate_kg_hr"] for row in node_rows
-                },
-                **condenser_fields,
-                "condenser_feed_residual_kg_hr": condenser_feed,
-                "unassigned_after_condenser_kg_hr": unassigned,
-                "relative_mass_balance_error": (accounted - emitted) / emitted,
-            }
+            continue
+        unassigned = max(0.0, emitted - deposited - captured)
+        accounted = math.fsum((deposited, captured, unassigned))
+        balances[species] = {
+            "status": (
+                "ballistic_line_of_sight_with_condenser_capture"
+                if carrier_flow_mol_s == 0.0
+                else "computed"
+            ),
+            "evaporated_kg_hr": emitted,
+            "deposited_by_segment_kg_hr": {
+                row["segment"]: row["deposit_candidate_kg_hr"]
+                for row in node_rows
+            },
+            **condenser_fields,
+            "condenser_feed_residual_kg_hr": max(0.0, emitted - deposited),
+            "unassigned_after_condenser_kg_hr": unassigned,
+            "relative_mass_balance_error": (accounted - emitted) / emitted,
+        }
+
     return {
         "status": "diagnostic_only",
         "hour": hour_output.get("hour"),
@@ -312,9 +598,10 @@ def diagnose_compartment_hour(
                     str(key): float(value) * 100.0 for key, value in headspace.items()
                     if _number(value) is not None and float(value) >= 0.0
                 },
+                "pO2_bar": pO2_bar,
                 "source_flag": _LAG_FLAG,
             },
-            "duct_segments": duct_nodes,
+            "duct_segments": list(duct_nodes.values()),
         },
         "species_balances": balances,
         "reactive_sinks": [

@@ -117,6 +117,8 @@ def test_compartment_diagnostic_reads_one_real_c2a_hero_hour() -> None:
         condenser_capture_by_stage_species_kg=(
             trace.condensed_by_stage_species_delta[hour_index]
         ),
+        condensation_model=model,
+        evaporation_owner=sim,
     )
     ledger_after = sim.atom_ledger.mol_by_account()
     assert hour_output == hour_output_before
