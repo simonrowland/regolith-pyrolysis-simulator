@@ -6247,7 +6247,7 @@ def test_poisoned_candidate_is_recorded_and_study_evaluates_healthy_candidate(
             committed_transition_count=3,
             aborting_exception_summary=(
                 "ProposalRejected: partial withdrawal from mixed-origin "
-                "process.overhead_gas.Na"
+                "process.overhead_gas.Na requires an explicitly amalgamated pool"
             ),
             aborting_exception_type=ProposalRejected,
         )

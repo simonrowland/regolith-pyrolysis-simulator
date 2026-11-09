@@ -278,6 +278,9 @@ _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     EngineWorkerUnavailable,
     ImportError,
 )
+_TYPED_ABSENCE_EXCEPTION_NAMES = frozenset(
+    exception_type.__name__ for exception_type in _TYPED_ABSENCE_EXCEPTION_CLASSES
+)
 
 
 @dataclass(frozen=True)
@@ -753,19 +756,13 @@ def evaluate(
         return _invalid_patch_result(candidate_id, str(exc))
 
     try:
-        active_constraints = _composition_target_constraints(
-            profile,
-            constraints,
-            recipe_patch=validated_patch,
-            campaign=str(_run_options(profile, fidelity)["campaign"]),
-        )
-        spec, run_config = _build_eval_inputs(
+        active_constraints, spec, run_config = _build_eval_inputs_for_candidate(
             validated_patch,
             feedstock_id,
             fidelity,
             profile,
             active_schema,
-            constraints=active_constraints,
+            constraints=constraints,
             cost_parameters=cost_parameters,
             conditional_context=conditional_context,
         )
@@ -865,6 +862,14 @@ def evaluate(
             exc,
         )
     except PoisonedHourError as exc:
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                str(exc),
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         if _is_malformed_recipe_error(exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -960,6 +965,14 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         if _is_malformed_recipe_error(exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -1001,6 +1014,14 @@ def evaluate(
         )
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
+        if _is_backend_unavailable(failure_exc, carrier=run_execution):
+            raise BackendUnavailableAbort(
+                error_message or "backend unavailable",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            )
         if _is_malformed_recipe_error(failure_exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -1009,25 +1030,6 @@ def evaluate(
                 str(failure_exc),
                 run_execution=run_execution,
                 profile=profile,
-            )
-        candidate_failure = _candidate_simulator_failure_result(
-            candidate_id,
-            spec,
-            key,
-            failure_exc,
-            run_execution=run_execution,
-            profile=profile,
-            error_message=error_message,
-        )
-        if candidate_failure is not None:
-            return candidate_failure
-        if _is_backend_unavailable(failure_exc, carrier=run_execution):
-            raise BackendUnavailableAbort(
-                error_message or "backend unavailable",
-                patch=validated_patch,
-                candidate_id=candidate_id,
-                eval_spec=spec,
-                cache_key_value=key,
             )
         if _is_numerical_overflow_message(error_message):
             return _numerical_overflow_result(
@@ -1056,6 +1058,17 @@ def evaluate(
                 run_execution=run_execution,
                 profile=profile,
             )
+        candidate_failure = _candidate_simulator_failure_result(
+            candidate_id,
+            spec,
+            key,
+            failure_exc,
+            run_execution=run_execution,
+            profile=profile,
+            error_message=error_message,
+        )
+        if candidate_failure is not None:
+            return candidate_failure
         if isinstance(failure_exc, BaseException):
             honest = _result_from_honest_engine_exception(
                 candidate_id,
@@ -1380,9 +1393,10 @@ def _candidate_simulator_failure_result(
     detail = detail or _candidate_simulator_failure_detail(exc)
     if detail is None:
         return None
+    failure_kind = _candidate_simulator_failure_kind(exc)
     reason = (
         "poisoned_hour"
-        if isinstance(exc, PoisonedHourError)
+        if failure_kind == "poisoned_hour"
         else "proposal_rejected"
     )
     message = str(error_message or detail)
@@ -2893,6 +2907,37 @@ def _build_eval_inputs(
         conditional_context=conditional_context,
         executed_prefix_stage_ids=None,
     )
+
+
+def _build_eval_inputs_for_candidate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    profile: Mapping[str, Any],
+    schema: RecipeSchema,
+    *,
+    constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
+) -> tuple[PhysicsConstraintSet | None, EvalSpec, Any]:
+    """Build the resolved spec and run config that ``evaluate`` uses."""
+    active_constraints = _composition_target_constraints(
+        profile,
+        constraints,
+        recipe_patch=patch,
+        campaign=str(_run_options(profile, fidelity)["campaign"]),
+    )
+    spec, run_config = _build_eval_inputs(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile,
+        schema,
+        constraints=active_constraints,
+        cost_parameters=cost_parameters,
+        conditional_context=conditional_context,
+    )
+    return active_constraints, spec, run_config
 
 
 @lru_cache(maxsize=32)
@@ -6731,8 +6776,9 @@ def _is_backend_unavailable(
 
     The word "unavailable" in a message is not absence — it matches
     ``observable_unavailable``. Consumers key on
-    ``EngineWorkerUnavailable`` / ``BackendUnavailableError`` or on
-    ``reason_code`` / ``backend_status==unavailable``.
+    ``EngineWorkerUnavailable`` / ``BackendUnavailableError`` types or
+    transported type names, ``reason_code``, or
+    ``backend_status==unavailable``.
     """
     seen: set[int] = set()
     stack: list[BaseException | None] = [exc]
@@ -6742,6 +6788,8 @@ def _is_backend_unavailable(
             continue
         seen.add(id(current))
         if isinstance(current, _TYPED_ABSENCE_EXCEPTION_CLASSES):
+            return True
+        if getattr(current, "exc_name", None) in _TYPED_ABSENCE_EXCEPTION_NAMES:
             return True
         aborting_type = getattr(
             getattr(current, "state", None),
@@ -6774,11 +6822,60 @@ def _is_backend_unavailable(
 def _candidate_simulator_failure_detail(
     exc: BaseException | None,
 ) -> str | None:
-    if not isinstance(exc, (ProposalRejected, PoisonedHourError)):
+    if _candidate_simulator_failure_kind(exc) is None:
         return None
-    if _is_backend_unavailable(exc):
+    if exc is None:
         return None
+    remote_name = getattr(exc, "exc_name", None)
+    if remote_name in {"ProposalRejected", "PoisonedHourError"}:
+        return f"{remote_name}: {getattr(exc, 'detail', str(exc))}"
     return f"{type(exc).__name__}: {exc}"
+
+
+def _candidate_simulator_failure_kind(
+    exc: BaseException | None,
+) -> str | None:
+    if exc is None or _is_backend_unavailable(exc):
+        return None
+
+    if isinstance(exc, ProposalRejected):
+        return (
+            "proposal_rejected"
+            if _is_mixed_origin_overhead_withdrawal(str(exc))
+            else None
+        )
+    if isinstance(exc, PoisonedHourError):
+        state = exc.state
+        if (
+            state.aborting_exception_type is ProposalRejected
+            and _is_mixed_origin_overhead_withdrawal(
+                state.aborting_exception_summary
+            )
+        ):
+            return "poisoned_hour"
+        return None
+
+    remote_name = getattr(exc, "exc_name", None)
+    remote_detail = str(getattr(exc, "detail", str(exc)))
+    if remote_name == "ProposalRejected" and _is_mixed_origin_overhead_withdrawal(
+        remote_detail
+    ):
+        return "proposal_rejected"
+    if (
+        remote_name == "PoisonedHourError"
+        and "ProposalRejected:" in remote_detail
+        and _is_mixed_origin_overhead_withdrawal(remote_detail)
+    ):
+        return "poisoned_hour"
+    return None
+
+
+def _is_mixed_origin_overhead_withdrawal(message: str) -> bool:
+    return re.search(
+        r"partial withdrawal from mixed-origin process\.overhead_gas\."
+        r"[A-Za-z0-9_]+ requires an explicitly amalgamated pool",
+        message,
+    ) is not None
 
 
 def _is_non_finite_payload_message(message: str) -> bool:
