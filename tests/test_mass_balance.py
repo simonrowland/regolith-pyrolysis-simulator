@@ -586,8 +586,10 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     liquid_fractions = []
     original_liquid_fraction = sim._freeze_gate_liquid_fraction_factor
 
-    def record_liquid_fraction():
-        liquid_fraction = original_liquid_fraction()
+    def record_liquid_fraction(*_args, **_kwargs):
+        # Production now passes gate_authority into this factor. The spy
+        # only records the returned fraction; it must accept that keyword.
+        liquid_fraction = original_liquid_fraction(*_args, **_kwargs)
         liquid_fractions.append(liquid_fraction)
         return liquid_fraction
 
