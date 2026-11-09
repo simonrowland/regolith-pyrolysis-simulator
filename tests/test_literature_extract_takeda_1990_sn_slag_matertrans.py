@@ -44,6 +44,14 @@ FIGURE4 = (
     ("c-S", "filled upright triangle on dashed line", "0.49 - 0.62", "0.56 - 0.65"),
     ("d-S", "filled circle on dashed line", "0", "0.82 - 0.86"),
 )
+TABLE5_ROWS = (
+    ("D-S45", "-12.03**", "-12.03", "7.9", "23.2", "0.6", "39.0", "11.4", None),
+    ("46", "-11.75*", "-11.75", "12.3", "23.1", "0.7", "30.6", "16.7", "4.8"),
+    ("47", "-11.69*", "-11.69", "13.1", "23.0", "0.7", "30.6", "15.7", "3.1"),
+    ("48", "-11.75*", "-11.75", "14.3", "23.5", "0.9", "29.1", "15.6", "2.5"),
+    ("49", "-11.31*", "-11.31", "16.3", "21.3", "0.7", "27.1", "16.4", "1.7"),
+    ("50", "-11.12*", "-11.12", "18.8", "20.7", "0.8", "25.2", "17.5", "1.5"),
+)
 
 
 def _document() -> dict:
@@ -112,6 +120,84 @@ def _assert_figure4_marker_legend(document: dict) -> None:
         assert records[slag_set]["locator"]["figure"] == "4"
 
 
+def _assert_table5_render_cells(document: dict) -> None:
+    context = document["species"]["SnO"]["context"]
+    rows = {
+        row["values"]["test_no"]: row
+        for row in context
+        if row["observation_id"].startswith("takeda_1990_t5_row_")
+    }
+    assert set(rows) == {row[0] for row in TABLE5_ROWS}
+    for (test_no, _oxygen_cell, oxygen, sn, cao, mgo, fe2, fe3, metal_fe) in TABLE5_ROWS:
+        row = rows[test_no]
+        values = row["values"]
+        assert values["temperature_K"] == 1473
+        assert values["log_pO2"] == float(oxygen)
+        for field, expected in (
+            ("slag_Sn_mass_percent", sn),
+            ("slag_CaO_mass_percent", cao),
+            ("slag_MgO_mass_percent", mgo),
+            ("slag_Fe2plus_mass_percent", fe2),
+            ("slag_Fe3plus_mass_percent", fe3),
+        ):
+            assert values[field] == float(expected)
+        assert values["metal_Sn_mass_percent"] is None
+        assert values["metal_Fe_mass_percent"] == (None if metal_fe is None else float(metal_fe))
+        assert row["locator"]["page"] == 5
+        assert row["locator"]["pdf_page_index"] == 4
+        assert row["locator"]["published_page"] == 797
+        assert row["locator"]["table"] == "5"
+
+
+def _assert_table5_cell_audit(cells: list[dict[str, str]]) -> None:
+    rows = [cell for cell in cells if cell["table"] == "5"]
+    expected = []
+    columns = (
+        (2, "log_pO2", "values.log_pO2"),
+        (3, "slag_Sn_mass_percent", "values.slag_Sn_mass_percent"),
+        (4, "slag_CaO_mass_percent", "values.slag_CaO_mass_percent"),
+        (5, "slag_MgO_mass_percent", "values.slag_MgO_mass_percent"),
+        (6, "slag_Fe2plus_mass_percent", "values.slag_Fe2plus_mass_percent"),
+        (7, "slag_Fe3plus_mass_percent", "values.slag_Fe3plus_mass_percent"),
+        (9, "metal_Fe_mass_percent", "values.metal_Fe_mass_percent"),
+    )
+    for test_no, oxygen_cell, oxygen, sn, cao, mgo, fe2, fe3, metal_fe in TABLE5_ROWS:
+        values = (
+            (oxygen_cell, oxygen),
+            (sn, sn),
+            (cao, cao),
+            (mgo, mgo),
+            (fe2, fe2),
+            (fe3, fe3),
+            (metal_fe, metal_fe),
+        )
+        for (column, header, field), (cell_text, stored_value) in zip(columns, values, strict=True):
+            if stored_value is not None:
+                expected.append((test_no, str(column), header, cell_text, field, stored_value))
+    actual = [
+        (
+            cell["printed_data_row"],
+            cell["table_column"],
+            cell["column_header"],
+            cell["mineru_cell_text"],
+            cell["extract_field"],
+            cell["stored_value"],
+        )
+        for cell in rows
+    ]
+    assert actual == expected
+    assert len(rows) == 41
+
+    caption = [cell for cell in cells if cell["table"] == "Table 5 caption"]
+    assert len(caption) == 1
+    assert caption[0]["physical_pdf_page"] == "5"
+    assert caption[0]["pdf_page_index"] == "4"
+    assert caption[0]["published_page"] == "797"
+    assert caption[0]["mineru_cell_text"] == "1473 K"
+    assert caption[0]["extract_field"] == "takeda_1990_magnesia_1473_runs.conditions.temperature_K"
+    assert caption[0]["stored_value"] == '"1473"'
+
+
 def _source_pages() -> dict[int, str]:
     text_path = (
         regolith_corpus_root()
@@ -130,6 +216,7 @@ def test_takeda_1990_render_cells_and_page_proofs() -> None:
     document = _document()
     _assert_table1_render_cells(document)
     _assert_figure4_marker_legend(document)
+    _assert_table5_render_cells(document)
     context = document["species"]["SnO"]["context"]
     assert {
         table: sum(row["observation_id"].startswith(f"takeda_1990_t{table}_row_") for row in context)
@@ -157,6 +244,7 @@ def test_takeda_1990_render_cells_and_page_proofs() -> None:
     assert "A5 1573, —11.40 2.0" in pages[4]
     assert re.search(r"tivity of Sn is 0\.8 at this miscibility gap", pages[4])
     assert "47 mass% Fe metal phases coexist at 1573 K" in pages[4]
+    assert "in magnesia crucibles at 1473 K" in pages[5]
     assert "A-S51 —11.30** 2.4" in pages[5]
     assert "Fig. 4 Effect of oxygen partial pressure on tin content" in pages[6]
     assert "Fig. 6 Activity coefficient of SnO" in pages[7]
@@ -182,10 +270,28 @@ def test_takeda_1990_render_pin_rejects_interior_mutation() -> None:
         _assert_table1_render_cells(mutated)
 
 
+def test_takeda_1990_table5_audit_pin_rejects_interior_mutation() -> None:
+    with CELL_AUDIT.open(newline="", encoding="utf-8") as source:
+        cells = list(csv.DictReader(source))
+    _assert_table5_cell_audit(cells)
+    mutated = deepcopy(cells)
+    mg_cell = next(
+        cell
+        for cell in mutated
+        if cell["table"] == "5"
+        and cell["printed_data_row"] == "D-S45"
+        and cell["table_column"] == "5"
+    )
+    mg_cell["stored_value"] = "0.8"
+    with pytest.raises(AssertionError):
+        _assert_table5_cell_audit(mutated)
+
+
 def test_takeda_1990_isolated_migration_preserves_quantities_conditions_and_uncertainty() -> None:
     document = _document()
     _assert_table1_render_cells(document)
     _assert_figure4_marker_legend(document)
+    _assert_table5_render_cells(document)
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     result = migrator.result
@@ -259,7 +365,8 @@ def test_takeda_1990_isolated_migration_preserves_quantities_conditions_and_unce
 def test_takeda_1990_full_cell_audit_rows_are_pinned() -> None:
     with CELL_AUDIT.open(newline="", encoding="utf-8") as source:
         cells = list(csv.DictReader(source))
-    assert len(cells) == 1125
+    _assert_table5_cell_audit(cells)
+    assert len(cells) == 1126
     assert Counter(cell["table"] for cell in cells) == {
         "1": 79,
         "2": 14,
@@ -269,6 +376,7 @@ def test_takeda_1990_full_cell_audit_rows_are_pinned() -> None:
         "6": 653,
         "Fig. 4 legend": 18,
         "Table 4 caption": 4,
+        "Table 5 caption": 1,
         "Table 3 discussion": 10,
         "Table 5 footnote": 2,
         "Table 4 discussion": 1,

@@ -68,20 +68,22 @@ printed_tables:
       '8': Fe3+ in slag; mass%
     shared_caption_values: T=1573 K and aSn=0.8; row pO2 values are not assigned to the separate quoted miscibility-gap activity.
   - table: '5'
-    caption: Experimental data on equilibria of slags and Sn-Fe metal at 1473 K.
+    caption: Experimental data on equilibria of slags without silica and Sn-Fe metals in magnesia crucibles at 1473 K.
     physical_pdf_page: 5
     published_page: 797
     printed_data_rows: 6
     extract_rows: takeda_1990_t5_row_* (6 rows)
+    shared_caption_values: temperature=1473 K applies to all six rows; the temperature is a caption condition, not a body cell.
     columns:
       '1': test identifier
       '2': log pO2
       '3': Sn in slag; mass%
       '4': CaO in slag; mass%
-      '5': Fe2+ in slag; mass%
-      '6': Fe3+ in slag; mass%
-      '7': Sn in metal; mass%
-      '8': Fe in metal; mass%
+      '5': MgO in slag; mass%
+      '6': Fe2+ in slag; mass%
+      '7': Fe3+ in slag; mass%
+      '8': Sn in metal; mass%
+      '9': Fe in metal; mass%
     footnote: D-S45 has coexisting 81 mass% Sn-Fe and 49 mass% Sn-Fe metal phases.
   - table: '6'
     caption: Experimental data on the equilibria of slags and Sn-Fe metals in magnesia crucibles at 1573 K.

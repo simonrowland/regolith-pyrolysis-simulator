@@ -14,7 +14,7 @@ Every activity observation carries a typed standard state, temperature, composit
 
 The PDF has no usable text layer (`pdftotext-layout.txt` is 9 bytes). The secondary read was the page-marked Tesseract OCR. MinerU conversion produced eight table blocks; its `p006-t08` details block is an invented numeric reading of Figure 4 and was excluded. The first nine Table 1 data rows were classified as header rows by MinerU, leaving only five body rows in its draft. The render check reconciled all 14 printed Table 1 rows (table rows 3–16). Table 6's two MinerU blocks were joined as one printed table; its 81 runs are tests 51–131, and merged FeT cells remain one printed total-iron value rather than being split into Fe2+ and Fe3+.
 
-The audit CSV has 1,125 numeric source cells. Each listed cell was checked against a 600 dpi page render; the scan-specific QA reports that OCR numeric agreement is skipped for this source. The stored numeric cells outside printed tables are limited to the listed Figure 4 legend, table captions/footnotes, and identified prose statements.
+The audit CSV has 1,126 numeric source cells. Each listed cell was checked against a 600 dpi page render; the scan-specific QA reports that OCR numeric agreement is skipped for this source. The stored numeric cells outside printed tables are limited to the listed Figure 4 legend, table captions/footnotes, and identified prose statements.
 
 | Printed source location | Printed data rows | Audited numeric cells |
 |---|---:|---:|
@@ -26,11 +26,25 @@ The audit CSV has 1,125 numeric source cells. Each listed cell was checked again
 | Table 6 | 81 | 653 |
 | Figure 4 legend | 9 legend entries | 18 |
 | Table 4 caption | shared caption values | 4 |
+| Table 5 caption | shared temperature condition | 1 |
 | Table 3 discussion | cited prose values | 10 |
 | Table 5 footnote | 1 footnote | 2 |
 | Table 4 discussion | silica-free slag bound | 1 |
 | Nunoue and Kato quotation | prose activity value | 1 |
-| **Total** | **146 table rows** | **1,125** |
+| **Total** | **146 table rows** | **1,126** |
+
+Table 5's printed body columns are test number, log pO2, Sn, CaO, MgO, Fe2+, Fe3+, metal Sn, and metal Fe. Its caption says the runs were at 1473 K; temperature is therefore audited as one shared caption value, not as a body cell. The six body rows contain 41 numeric cells: six in D-S45 and seven in each of tests 46–50. D-S45's dagger marks the two coexisting metal phases described in the footnote; it supplies no numeric metal Sn or Fe body cell. Tests 46–50 have numeric metal Fe in column 9 and no numeric metal Sn in column 8.
+
+The first-pass Table 5 CSV had 24 shifted bindings in columns 2–5. The extract's six rows already held the source values in the correct fields; the correction below changes the audit bindings, not those extracted values. In each old-binding list, `cell → field=value` records the incorrect cell-to-field assignment; the corrected list shows the render-verified assignment. Each quoted row is the printed p. 797 body sequence from the 600 dpi render, including its source oxygen-potential mark.
+
+| Printed row | Old bindings, columns 2–5 | Corrected bindings, columns 2–5 | Rendered p. 797 row |
+|---|---|---|---|
+| D-S45 | `−12.03** → values.temperature_K=1473`; `7.9 → values.log_pO2=−12.03`; `23.2 → values.slag_Sn_mass_percent=7.9`; `0.6 → values.slag_CaO_mass_percent=23.2` | `−12.03** → values.log_pO2=−12.03`; `7.9 → values.slag_Sn_mass_percent=7.9`; `23.2 → values.slag_CaO_mass_percent=23.2`; `0.6 → values.slag_MgO_mass_percent=0.6` | “D-S45 −12.03** 7.9 23.2 0.6 39.0 11.4 †” |
+| 46 | `−11.75* → values.temperature_K=1473`; `12.3 → values.log_pO2=−11.75`; `23.1 → values.slag_Sn_mass_percent=12.3`; `0.7 → values.slag_CaO_mass_percent=23.1` | `−11.75* → values.log_pO2=−11.75`; `12.3 → values.slag_Sn_mass_percent=12.3`; `23.1 → values.slag_CaO_mass_percent=23.1`; `0.7 → values.slag_MgO_mass_percent=0.7` | “46 −11.75* 12.3 23.1 0.7 30.6 16.7 4.8” |
+| 47 | `−11.69* → values.temperature_K=1473`; `13.1 → values.log_pO2=−11.69`; `23.0 → values.slag_Sn_mass_percent=13.1`; `0.7 → values.slag_CaO_mass_percent=23.0` | `−11.69* → values.log_pO2=−11.69`; `13.1 → values.slag_Sn_mass_percent=13.1`; `23.0 → values.slag_CaO_mass_percent=23.0`; `0.7 → values.slag_MgO_mass_percent=0.7` | “47 −11.69* 13.1 23.0 0.7 30.6 15.7 3.1” |
+| 48 | `−11.75* → values.temperature_K=1473`; `14.3 → values.log_pO2=−11.75`; `23.5 → values.slag_Sn_mass_percent=14.3`; `0.9 → values.slag_CaO_mass_percent=23.5` | `−11.75* → values.log_pO2=−11.75`; `14.3 → values.slag_Sn_mass_percent=14.3`; `23.5 → values.slag_CaO_mass_percent=23.5`; `0.9 → values.slag_MgO_mass_percent=0.9` | “48 −11.75* 14.3 23.5 0.9 29.1 15.6 2.5” |
+| 49 | `−11.31* → values.temperature_K=1473`; `16.3 → values.log_pO2=−11.31`; `21.3 → values.slag_Sn_mass_percent=16.3`; `0.7 → values.slag_CaO_mass_percent=21.3` | `−11.31* → values.log_pO2=−11.31`; `16.3 → values.slag_Sn_mass_percent=16.3`; `21.3 → values.slag_CaO_mass_percent=21.3`; `0.7 → values.slag_MgO_mass_percent=0.7` | “49 −11.31* 16.3 21.3 0.7 27.1 16.4 1.7” |
+| 50 | `−11.12* → values.temperature_K=1473`; `18.8 → values.log_pO2=−11.12`; `20.7 → values.slag_Sn_mass_percent=18.8`; `0.8 → values.slag_CaO_mass_percent=20.7` | `−11.12* → values.log_pO2=−11.12`; `18.8 → values.slag_Sn_mass_percent=18.8`; `20.7 → values.slag_CaO_mass_percent=20.7`; `0.8 → values.slag_MgO_mass_percent=0.8` | “50 −11.12* 18.8 20.7 0.8 25.2 17.5 1.5” |
 
 Table 1's descending Koike range is preserved as printed (`1.4 to 0.9`); its numeric interval is stored in ascending order. Table 2's EMF ± cells and Tesseract's fused uncertainty digits were read from the render. Table 6's FeT merged cells, table layout, row order, and element headings were checked visually. The Figure 4 legend was rendered at 600 dpi; all nine marker/line-style to printed composition-range pairs are stored and pinned by the focused test. No figure-only data points were digitized. Figures 2, 3, 5, 6, 7, and 8 remain figure-read candidates.
 
@@ -49,6 +63,7 @@ Page proofs were grepped from the Tesseract text one physical page at a time; it
 | Table 3 rows and Table 4 experimental caption | 4 | 3 | 796 | `A5 1573, —11.40 2.0` |
 | Quoted Sn activity and coexisting metal phases | 4 | 3 | 796 | `tivity of Sn is 0.8 at this miscibility gap` |
 | Table 5 footnote and Table 6 rows | 5 | 4 | 797 | `A-S51 —11.30** 2.4` |
+| Table 5 caption and rows | 5 | 4 | 797 | `in magnesia crucibles at 1473 K` |
 | Figure 4 caption and marker legend | 6 | 5 | 798 | `Fig. 4 Effect of oxygen partial pressure on tin content` |
 | Figures 6–7 and unplotted gamma inputs | 7 | 6 | 799 | `Fig. 6 Activity coefficient of SnO(1) as a function` |
 | Figures 8–10 and conclusions | 8 | 7 | 800 | `Fig. 8 Magnesia content in slag` |
@@ -81,4 +96,4 @@ The row evidence choices follow the printed provenance: 13 quoted Table 1 entrie
 
 ## Expected store delta
 
-The source extract now carries 15 observations (14 SnO activity coefficients plus the quoted Sn activity), 204 context records, and 3 fidelity samples. Expected derived-store delta is **+15 observations**, with no battery-store regeneration in this change.
+The source extract carries 15 observations (14 SnO activity coefficients plus the quoted Sn activity), 204 context records, and 3 fidelity samples. Green already has 13 observations for this source; the candidate has 15, so the expected derived-store delta is **+2 observations**. The two new rows are the promoted authors' Table 1 summary and the quoted Sn activity. The existing 13 rows receive metadata repairs. No battery-store regeneration was committed.
