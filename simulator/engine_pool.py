@@ -1109,6 +1109,9 @@ class WarmEngineWorker:
                 )
                 starter.start()
                 connection_closed = False
+                # A visible pid is not Process.start() returning. start()
+                # can spawn and then block; the handshake waits until
+                # process_start_finished. Cancel still reaps that child.
                 while not launch.process_start_finished.is_set():
                     started = _process_pid(process) is not None
                     if launch.cancel_requested.is_set():
@@ -1119,8 +1122,6 @@ class WarmEngineWorker:
                                 launch.connection,
                             )
                             connection_closed = True
-                    if started:
-                        break
                     launch.process_start_finished.wait(
                         timeout=ENGINE_WORKER_CANCEL_POLL_S,
                     )
