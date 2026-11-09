@@ -1219,12 +1219,16 @@ class EvaporationMixin:
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
-                for species, value in overhead_partials_override_Pa.items()
+                for species, value in sorted(
+                    overhead_partials_override_Pa.items()
+                )
             }
             if overhead_partials_override_Pa is not None
-            else {str(species): 0.0 for species in vapor_pressures}
+            else {
+                str(species): 0.0 for species in sorted(vapor_pressures)
+            }
         )
-        for species in vapor_pressures:
+        for species in sorted(vapor_pressures):
             overhead_partials_Pa.setdefault(species, 0.0)
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
@@ -1270,7 +1274,7 @@ class EvaporationMixin:
                 )
 
             vacuum_partials_Pa = {
-                str(species): 0.0 for species in vapor_pressures
+                str(species): 0.0 for species in sorted(vapor_pressures)
             }
             seed_result = dispatch_at_partials(vacuum_partials_Pa)
             if str(seed_result.status) != 'ok':
@@ -1287,7 +1291,7 @@ class EvaporationMixin:
                 def apply_freeze_scaling(rates):
                     return {
                         str(species): max(0.0, float(rate)) * liquid_factor
-                        for species, rate in rates.items()
+                        for species, rate in sorted(rates.items())
                     }
 
                 def admit_rates(raw_rates):
@@ -1302,16 +1306,21 @@ class EvaporationMixin:
                             molar_masses_kg_mol,
                         )
                     )
-                    return admitted_rates
+                    return {
+                        species: admitted_rates[species]
+                        for species in sorted(admitted_rates)
+                    }
 
                 def rates_from_result(result):
+                    source_rates = dict(
+                        (result.diagnostic or {}).get(
+                            'evaporation_flux_kg_hr', {}
+                        )
+                        or {}
+                    )
                     rates = {
                         str(species): max(0.0, float(rate))
-                        for species, rate in dict(
-                            (result.diagnostic or {}).get(
-                                'evaporation_flux_kg_hr', {}
-                            ) or {}
-                        ).items()
+                        for species, rate in sorted(source_rates.items())
                     }
                     return rates
 
@@ -1350,7 +1359,7 @@ class EvaporationMixin:
                         'gas_resistance_enabled',
                         True,
                     )
-                    for species in admitted_species:
+                    for species in sorted(admitted_species):
                         molar_mass = float(molar_masses_kg_mol[species])
                         series = seed_series.get(species)
                         if not isinstance(series, Mapping):
@@ -1483,7 +1492,10 @@ class EvaporationMixin:
                     # The solver certifies a closed-line zero from both raw
                     # and admitted equilibrium-pressure sums; an empty sampled
                     # source alone remains a sampling result.
-                    upper_rates = dict(seed_rates)
+                    upper_rates = {
+                        species: seed_rates[species]
+                        for species in sorted(seed_rates)
+                    }
                     lower_closure = _solve_same_hour_headspace_closure(
                         upper_rates,
                         rates_at_projection_g,
@@ -1498,7 +1510,7 @@ class EvaporationMixin:
                             str(species): max(
                                 0.0, float(vapor_pressures.get(species, 0.0))
                             )
-                            for species in admitted_species
+                            for species in sorted(admitted_species)
                         },
                         downstream_pressure_Pa=max(
                             0.0,
@@ -1524,7 +1536,7 @@ class EvaporationMixin:
                         )
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
-                            for species, pressure in (
+                            for species, pressure in sorted(
                                 lower_closure.partial_pressures_mbar.items()
                             )
                         }
@@ -1544,7 +1556,8 @@ class EvaporationMixin:
                             seed_native_fe_capacity_allocation
                         )
                         selected_partials_Pa = {
-                            str(species): 0.0 for species in vapor_pressures
+                            str(species): 0.0
+                            for species in sorted(vapor_pressures)
                         }
                     elif PRESSURE_HELD_FLUX_BOUND == 'lower':
                         selected_rates = lower_rates
@@ -1553,7 +1566,7 @@ class EvaporationMixin:
                         )
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
-                            for species, pressure in (
+                            for species, pressure in sorted(
                                 lower_closure.partial_pressures_mbar.items()
                             )
                         }
@@ -1563,12 +1576,14 @@ class EvaporationMixin:
                                 upper_rates.get(species, 0.0)
                                 + lower_rates.get(species, 0.0)
                             ) / 2.0
-                            for species in set(upper_rates) | set(lower_rates)
+                            for species in sorted(
+                                set(upper_rates) | set(lower_rates)
+                            )
                         }
                         native_fe_capacity_allocation = None
                         selected_partials_Pa = {
                             str(species): max(0.0, float(pressure)) * 100.0
-                            for species, pressure in (
+                            for species, pressure in sorted(
                                 partials_at_rates(selected_rates).items()
                             )
                         }
@@ -1584,7 +1599,9 @@ class EvaporationMixin:
                         )
                         equilibrium_pressure_sum_Pa = math.fsum(
                             max(0.0, float(pressure))
-                            for pressure in vapor_pressures.values()
+                            for _species, pressure in sorted(
+                                vapor_pressures.items()
+                            )
                         )
                         sweep_notices = []
                         for species in sorted(
@@ -1613,7 +1630,7 @@ class EvaporationMixin:
                             'lower_rates_kg_hr': lower_rates,
                             'lower_bound_partial_pressures_Pa': {
                                 str(species): max(0.0, float(pressure)) * 100.0
-                                for species, pressure in (
+                                for species, pressure in sorted(
                                     lower_closure.partial_pressures_mbar.items()
                                 )
                             },
@@ -1646,7 +1663,7 @@ class EvaporationMixin:
                             str(species): max(
                                 0.0, float(vapor_pressures.get(species, 0.0))
                             )
-                            for species in admitted_species
+                            for species in sorted(admitted_species)
                         },
                         downstream_pressure_Pa=max(
                             0.0,
@@ -1657,7 +1674,7 @@ class EvaporationMixin:
                     )
                     final_partials_Pa = {
                         str(species): max(0.0, float(pressure)) * 100.0
-                        for species, pressure in (
+                        for species, pressure in sorted(
                             closure.partial_pressures_mbar.items()
                         )
                     }

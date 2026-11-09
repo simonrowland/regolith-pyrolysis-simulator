@@ -124,10 +124,14 @@ class SameHourHeadspaceClosureResult:
                 if self.status != 'converged' or self.converged
                 else 'nonconverged'
             ),
-            'rates_kg_hr': dict(self.rates_kg_hr),
+            'rates_kg_hr': {
+                species: self.rates_kg_hr[species]
+                for species in sorted(self.rates_kg_hr)
+            },
             'partial_pressures_Pa': {
-                species: max(0.0, float(value)) * 100.0
-                for species, value in self.partial_pressures_mbar.items()
+                species: max(0.0, float(self.partial_pressures_mbar[species]))
+                * 100.0
+                for species in sorted(self.partial_pressures_mbar)
             },
             'zero_flow_criterion': dict(self.zero_flow_criterion),
             'scan_evaluations': self.scan_evaluations,
@@ -240,8 +244,10 @@ def _solve_same_hour_headspace_closure(
         value_is_unresolved_last_iterate=False,
     ):
         return SameHourHeadspaceClosureResult(
-            rates_kg_hr=dict(rates),
-            partial_pressures_mbar=dict(partials),
+            rates_kg_hr={species: rates[species] for species in sorted(rates)},
+            partial_pressures_mbar={
+                species: partials[species] for species in sorted(partials)
+            },
             iterations=evaluations,
             converged=converged,
             status=status,
@@ -259,9 +265,9 @@ def _solve_same_hour_headspace_closure(
     admitted_equilibrium_pressures = (
         {
             str(species): max(0.0, float(pressure))
-            for species, pressure in (
-                transformed_equilibrium_pressures_Pa or {}
-            ).items()
+            for species, pressure in sorted(
+                (transformed_equilibrium_pressures_Pa or {}).items()
+            )
         }
         if transformed_equilibrium_pressures_Pa is not None
         else None
@@ -278,7 +284,9 @@ def _solve_same_hour_headspace_closure(
     ):
         equilibrium_pressures = {
             str(species): max(0.0, float(pressure))
-            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
+            for species, pressure in sorted(
+                closed_line_equilibrium_pressures_Pa.items()
+            )
         }
         total_pressure_Pa = max(0.0, float(closed_line_total_pressure_Pa))
         closed_line_zero = (
@@ -325,7 +333,7 @@ def _solve_same_hour_headspace_closure(
             'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
         })
         return result(
-            {species: 0.0 for species in zero_species},
+            {species: 0.0 for species in sorted(zero_species)},
             {},
             converged=True,
             status='no_positive_root_boundary',
@@ -367,14 +375,16 @@ def _solve_same_hour_headspace_closure(
         evaluations += 1
         candidate_rates = {
             str(species): max(0.0, float(rate))
-            for species, rate in rates_at_projection_g(g, pressure).items()
+            for species, rate in sorted(
+                rates_at_projection_g(g, pressure).items()
+            )
         }
         species_names.update(candidate_rates)
-        for species in species_names:
+        for species in sorted(species_names):
             candidate_rates.setdefault(species, 0.0)
         molar_flow = math.fsum(
             candidate_rates[species] / float(molar_masses_kg_mol[species])
-            for species in species_names
+            for species in sorted(species_names)
             if candidate_rates[species] > 0.0
         )
         if (
@@ -392,7 +402,7 @@ def _solve_same_hour_headspace_closure(
                     * g
                     / 100.0
                 )
-                for species in species_names
+                for species in sorted(species_names)
             }
             total_outflow_mol_hr = (
                 carrier_feed_mol_hr + molar_flow + o2_coproduct_mol_hr
@@ -406,7 +416,9 @@ def _solve_same_hour_headspace_closure(
         else:
             partials = {
                 str(species): max(0.0, float(value))
-                for species, value in partials_at_rates(candidate_rates).items()
+                for species, value in sorted(
+                    partials_at_rates(candidate_rates).items()
+                )
             }
             projected_pressure_Pa = 100.0 * math.fsum(partials.values())
             projected_g = (
@@ -434,7 +446,7 @@ def _solve_same_hour_headspace_closure(
             guessed_flow = math.fsum(
                 guessed[0][species]
                 / float(molar_masses_kg_mol[species])
-                for species in species_names
+                for species in sorted(species_names)
                 if guessed[0][species] > 0.0
             )
             if guessed_flow <= 0.0 and not root_refinement:
@@ -459,7 +471,7 @@ def _solve_same_hour_headspace_closure(
                 corrected_flow = math.fsum(
                     corrected[0][species]
                     / float(molar_masses_kg_mol[species])
-                    for species in species_names
+                    for species in sorted(species_names)
                     if corrected[0][species] > 0.0
                 )
                 if corrected_flow > 0.0:
@@ -520,7 +532,7 @@ def _solve_same_hour_headspace_closure(
                         candidate_flow = math.fsum(
                             candidate[0][species]
                             / float(molar_masses_kg_mol[species])
-                            for species in species_names
+                            for species in sorted(species_names)
                             if candidate[0][species] > 0.0
                         )
                         if candidate_flow <= 0.0:
@@ -544,7 +556,7 @@ def _solve_same_hour_headspace_closure(
         low_molar_flow = math.fsum(
             low_evaluation[0][species]
             / float(molar_masses_kg_mol[species])
-            for species in species_names
+            for species in sorted(species_names)
             if low_evaluation[0][species] > 0.0
         )
         if low_molar_flow == 0.0 and low_evaluation[3] == 0.0:
@@ -579,7 +591,7 @@ def _solve_same_hour_headspace_closure(
                 pressure_molar_flow = math.fsum(
                     pressure_rates[species]
                     / float(molar_masses_kg_mol[species])
-                    for species in species_names
+                    for species in sorted(species_names)
                     if pressure_rates[species] > 0.0
                 )
                 if pressure_molar_flow > 0.0:
@@ -603,7 +615,7 @@ def _solve_same_hour_headspace_closure(
                                 candidate_flow = math.fsum(
                                     candidate[0][species]
                                     / float(molar_masses_kg_mol[species])
-                                    for species in species_names
+                                    for species in sorted(species_names)
                                     if candidate[0][species] > 0.0
                                 )
                                 if candidate_flow <= 0.0:
@@ -682,7 +694,7 @@ def _solve_same_hour_headspace_closure(
         zero_partials = zero_evaluation[1]
         zero_flow = math.fsum(
             zero_rates[species] / float(molar_masses_kg_mol[species])
-            for species in species_names
+            for species in sorted(species_names)
             if zero_rates[species] > 0.0
         )
         if zero_flow == 0.0:
@@ -696,7 +708,7 @@ def _solve_same_hour_headspace_closure(
             sampling_evidence.setdefault('tail_fraction', 0.0)
             scan_evaluations = int(sampling_evidence['scan_evaluations'])
             return result(
-                {species: 0.0 for species in species_names},
+                {species: 0.0 for species in sorted(species_names)},
                 {},
                 converged=False,
                 status='no_root_found_by_sampling',
@@ -709,7 +721,7 @@ def _solve_same_hour_headspace_closure(
         last_evaluation = scale_evaluation
         scale_rates = scale_evaluation[0]
         effective_resistances = []
-        for species in species_names:
+        for species in sorted(species_names):
             zero_rate = zero_rates.get(species, 0.0)
             scale_rate = scale_rates.get(species, 0.0)
             if zero_rate > scale_rate > 0.0:
@@ -786,7 +798,7 @@ def _solve_same_hour_headspace_closure(
         tail_evaluation = samples[-1][1]
         reference_rates = {
             species: zero_rates.get(species, 0.0)
-            for species in species_names
+            for species in sorted(species_names)
         }
         tail_fraction = max(
             (
@@ -868,7 +880,7 @@ def _solve_same_hour_headspace_closure(
                 sampling_evidence=sampling_evidence,
             )
         return result(
-            {species: 0.0 for species in species_names},
+            {species: 0.0 for species in sorted(species_names)},
             {},
             converged=False,
             status='no_root_found_by_sampling',
@@ -920,7 +932,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
     """
     rates = {
         str(species): max(0.0, float(rate))
-        for species, rate in initial_rates_kg_hr.items()
+        for species, rate in sorted(initial_rates_kg_hr.items())
     }
     evaluation_cap = 2000
     species_names = set(rates)
@@ -933,17 +945,19 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             return None
         partials = {
             str(species): max(0.0, float(pressure))
-            for species, pressure in partials_at_rates(candidate_rates).items()
+            for species, pressure in sorted(
+                partials_at_rates(candidate_rates).items()
+            )
         }
         evaluated = {
             str(species): max(0.0, float(rate))
-            for species, rate in rates_at_partials(partials).items()
+            for species, rate in sorted(rates_at_partials(partials).items())
         }
         evaluations += 1
         species_names.update(evaluated)
         return partials, {
             species: evaluated.get(species, 0.0)
-            for species in species_names
+            for species in sorted(species_names)
         }
 
     def rates_close(left, right):
@@ -951,7 +965,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             abs(left[species] - right[species])
             <= 1.0e-9
             * max(abs(left[species]), abs(right[species]), 1.0e-300)
-            for species in species_names
+            for species in sorted(species_names)
         )
 
     def result(
@@ -966,8 +980,13 @@ def _solve_c0_joint_solid_host_bakeout_closure(
         value_is_unresolved_last_iterate=False,
     ):
         return SameHourHeadspaceClosureResult(
-            rates_kg_hr=dict(candidate_rates),
-            partial_pressures_mbar=dict(partials),
+            rates_kg_hr={
+                species: candidate_rates[species]
+                for species in sorted(candidate_rates)
+            },
+            partial_pressures_mbar={
+                species: partials[species] for species in sorted(partials)
+            },
             iterations=evaluations,
             converged=converged,
             status=status,
@@ -995,7 +1014,9 @@ def _solve_c0_joint_solid_host_bakeout_closure(
     ):
         equilibrium_pressures = {
             str(species): max(0.0, float(pressure))
-            for species, pressure in closed_line_equilibrium_pressures_Pa.items()
+            for species, pressure in sorted(
+                closed_line_equilibrium_pressures_Pa.items()
+            )
         }
         total_pressure_Pa = max(0.0, float(closed_line_total_pressure_Pa))
         equilibrium_pressure_sum_Pa = math.fsum(equilibrium_pressures.values())
@@ -1005,7 +1026,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             # whose pressure is not in the ordinary melt equilibrium table.
             boundary_partials_mbar = {
                 species: pressure / 100.0
-                for species, pressure in equilibrium_pressures.items()
+                for species, pressure in sorted(equilibrium_pressures.items())
             }
             boundary_rates = {
                 str(species): max(0.0, float(rate))
@@ -1018,7 +1039,7 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             if not any(rate > 0.0 for rate in boundary_rates.values()):
                 zero_species = species_names | set(equilibrium_pressures)
                 return result(
-                    {species: 0.0 for species in zero_species},
+                    {species: 0.0 for species in sorted(zero_species)},
                     {},
                     converged=True,
                     status='no_positive_root_boundary',
@@ -1040,13 +1061,19 @@ def _solve_c0_joint_solid_host_bakeout_closure(
     previous_rates = None
     previous_evaluated = None
     for _ in range(128):
-        rates = {species: rates.get(species, 0.0) for species in species_names}
+        rates = {
+            species: rates.get(species, 0.0)
+            for species in sorted(species_names)
+        }
         last_partials, evaluated = evaluate(rates)
-        rates = {species: rates.get(species, 0.0) for species in species_names}
+        rates = {
+            species: rates.get(species, 0.0)
+            for species in sorted(species_names)
+        }
         if rates_close(rates, evaluated):
             return result(evaluated, last_partials, converged=True)
         next_rates = {}
-        for species in species_names:
+        for species in sorted(species_names):
             relaxation = 0.5
             if previous_rates is not None and previous_evaluated is not None:
                 rate_delta = rates[species] - previous_rates.get(species, 0.0)
@@ -1150,7 +1177,9 @@ def _solve_c0_joint_solid_host_bakeout_closure(
             if zero_evaluation is None:
                 break
             _zero_partials, zero_fluxes = zero_evaluation
-            rates = {name: rates.get(name, 0.0) for name in species_names}
+            rates = {
+                name: rates.get(name, 0.0) for name in sorted(species_names)
+            }
             zero_flux = zero_fluxes.get(species, 0.0)
             if zero_flux <= 0.0:
                 rates[species] = 0.0
@@ -1215,7 +1244,10 @@ def _solve_c0_joint_solid_host_bakeout_closure(
                     break
             rates[species] = max(0.0, root)
 
-        rates = {species: rates.get(species, 0.0) for species in species_names}
+        rates = {
+            species: rates.get(species, 0.0)
+            for species in sorted(species_names)
+        }
         outer_evaluation = evaluate(rates)
         if outer_evaluation is None:
             break
