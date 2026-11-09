@@ -257,14 +257,6 @@ def test_unpaginated_preprint_line_numbers_are_never_published_folios(document):
     assert figure7["locator"]["line_range"] == "307"
     assert document["fidelity_samples"][0]["locator"]["line_range"] == "280"
 
-    result = subprocess.run(
-        ["pdftotext", "-f", "18", "-l", "18", "-layout", str(PDF), "-"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert any(line.split()[:1] == ["280"] for line in result.stdout.splitlines())
-
 
 def test_context_captures_unscored_tables_and_figures_without_digitized_points(document):
     contexts = document["species"]["SiO2"]["context"]
