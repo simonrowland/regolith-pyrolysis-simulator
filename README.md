@@ -329,7 +329,8 @@ engineering predictions.**
 [`docs/model-limitations.md`](docs/model-limitations.md) is the document to read before quoting a
 number from the simulator: it carries the per-domain error budget and the known model
 disagreements. The validation battery holds 186,644 observations. 101,709 are experimental
-measurements from the published literature, and each engine is scored against them rail by rail.
+measurements from the published literature, and each engine is scored against them rail by rail;
+[`docs/validation-battery.md`](docs/validation-battery.md) explains the scoring and how to read it.
 The other 84,935 sit in 969 compilation shards of assessed reference tables, which the engines
 read as data. An observation an engine cannot yet score carries a
 typed reason, never a silent gap. The extract-reproduction rollup is generated into
@@ -364,6 +365,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 **What the model does, and what it does not**
 
 - [Model Limitations](docs/model-limitations.md) — error budget, known disagreements, reproduction battery
+- [Validation Battery](docs/validation-battery.md) — how each engine is scored against published measurements, rail by rail
 - [Process Model](docs/process-model.md) · [Chemistry Methods](docs/chemistry-methods.md)
 - [Feedstocks](docs/feedstocks.md)
 - [Citation Policy](docs/citation-policy.md)

@@ -2,6 +2,9 @@
 
 In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. AlphaMELTS and ThermoEngine are peer diagnostic backends for `SILICATE_EQUILIBRIUM` and, when selected, the narrow `GATE_LIQUID_FRACTION` dispatch; MAGEMin remains the shadow / fallback engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `petthermotools` is required for its melt-equilibria path and is provisioned editable by `install-engines.py`; `vaporock` is required for the diagnostic overlay but is **not** pip-installable and is provisioned by `install-engines.py` (see "Python Packages" below). MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`.
 
+Every engine here is scored against the same published measurements in the
+[Validation Battery](validation-battery.md).
+
 ## Per-call result status
 
 `EquilibriumResult.status` records the per-call backend outcome: `'ok'` (engine ran and produced a usable result), `'not_converged'` (engine ran but did not produce one), `'out_of_domain'` (a DomainGate or account filter rejected the input), or `'unavailable'` (engine / library / binary absent for this call). It is descriptive only — `core.py::_get_equilibrium` continues to drive fallback decisions from `is_available()` and the raised-exception handlers, and surfaces the most recent value on `_last_backend_status` for diagnostics.
