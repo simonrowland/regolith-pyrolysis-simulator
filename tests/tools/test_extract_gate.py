@@ -119,10 +119,12 @@ _RUN_METADATA_STATEMENT = {
         (
             ("species", "Fe", "observations", 0, "equipment", "sample"),
             {
-                "value": {"final_mass_kg": _RUN_METADATA_POINT},
+                "value": {
+                    "metadata": {"final_mass_kg": _RUN_METADATA_POINT}
+                },
                 "locator": _RUN_METADATA_LOCATOR,
             },
-            "species.Fe.observations[0].equipment.sample.value.final_mass_kg",
+            "species.Fe.observations[0].equipment.sample.value.metadata.final_mass_kg",
         ),
         (
             ("species", "Fe", "observations", 0, "equipment", "sample"),
@@ -202,7 +204,7 @@ _RUN_METADATA_STATEMENT = {
         ),
     ],
     ids=[
-        "sample-value-mapping",
+            "sample-value-nested-mapping",
         "sample-value-list",
         "sample-value-runs",
         "charge-characterization-value",
@@ -253,7 +255,20 @@ def test_run_metadata_equipment_home_in_context_is_valid() -> None:
             "locator": _RUN_METADATA_LOCATOR,
             "units": "text",
             "values": {"note": "experiment context"},
-            "equipment": {"final_mass_kg": _RUN_METADATA_POINT},
+            "equipment": {
+                "final_mass_kg": _RUN_METADATA_POINT,
+                "sample": {
+                    "value": {
+                        "species_loss_fraction": {
+                            "Na": {
+                                "value": 0.25,
+                                "locator": _RUN_METADATA_LOCATOR,
+                            }
+                        }
+                    },
+                    "locator": _RUN_METADATA_LOCATOR,
+                },
+            },
         }
     ]
 

@@ -111,16 +111,19 @@ def test_equipment_sample_metadata_round_trips_with_locators(
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["species"]["Na"]["observations"][0]["equipment"] = {
         "sample": {
-            "final_mass_kg": {
-                "value": 0.0008,
-                "locator": {"table": "1", "page": 2},
-            },
-            "species_loss_fraction": {
-                "Na": {
-                    "value": 0.25,
-                    "locator": {"table": "2", "page": 3},
+            "value": {
+                "final_mass_kg": {
+                    "value": 0.0008,
+                    "locator": {"table": "1", "page": 2},
+                },
+                "species_loss_fraction": {
+                    "Na": {
+                        "value": 0.25,
+                        "locator": {"table": "2", "page": 3},
+                    },
                 },
             },
+            "locator": {"table": "1", "page": 2},
         },
     }
     root = _write_min_tree(tmp_path, extract)
@@ -185,16 +188,19 @@ def test_equipment_sample_metadata_conflicts_are_typed_validation_errors(
             "locator": {"table": "2", "page": 3},
         },
         "sample": {
-            "final_mass_kg": {
-                "value": 0.0009,
-                "locator": {"table": "3", "page": 4},
-            },
-            "species_loss_fraction": {
-                "Na": {
-                    "value": 0.5,
-                    "locator": {"table": "4", "page": 5},
+            "value": {
+                "final_mass_kg": {
+                    "value": 0.0009,
+                    "locator": {"table": "3", "page": 4},
+                },
+                "species_loss_fraction": {
+                    "Na": {
+                        "value": 0.5,
+                        "locator": {"table": "4", "page": 5},
+                    },
                 },
             },
+            "locator": {"table": "3", "page": 4},
         },
     }
 
