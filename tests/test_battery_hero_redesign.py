@@ -1500,6 +1500,122 @@ def test_interactive_fingerprint_palette_uses_one_python_definition(
     assert "const BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'}" not in html
 
 
+def test_fingerprint_drawability_flag_is_shared_by_png_csv_and_html(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "fingerprint-drawability"}
+    ]
+    rows.extend(
+        _residual("openimcc", "vapour", f"sparse-{index}", 1500, residual)
+        for index, residual in enumerate((0.1, 0.3))
+    )
+    rows.extend(
+        _residual("openimcc", "vapour", f"drawn-{index}", 1600, residual)
+        for index, residual in enumerate((0.1, 0.2, 0.3))
+    )
+    archive = tmp_path / "fingerprint-drawability.tgz"
+    _write_archive(archive, rows)
+    data = hero_plot.read_scores(
+        archive, rails=("vapour",), _collection_mode=True
+    )
+    table_rows = hero_plot._fingerprint_table_rows(data)
+    csv_files = hero_plot._write_collection_csvs(
+        tmp_path / "tables", {"fingerprints": table_rows}
+    )
+    csv_rows = hero_plot._read_collection_csv(csv_files["table:fingerprints"])
+    csv_by_n = {int(row["n"]): row for row in csv_rows}
+
+    figures = _capture_collection_figures(monkeypatch)
+    static_drawn: dict[int, bool] = {}
+    for count in (2, 3):
+        hero_plot._draw_fingerprint_png(
+            tmp_path / f"fingerprint-n{count}.png",
+            "vapour",
+            [row for row in csv_rows if int(row["n"]) == count],
+            ["openimcc"],
+        )
+        static_drawn[count] = bool(figures[-1].axes[0].patches)
+
+    chart = tmp_path / "chart.png"
+    chart.write_bytes(b"png")
+    chart_files = {
+        "chart:A": chart,
+        "chart:B:vapour": chart,
+        "chart:C:vapour": chart,
+        "chart:D:vapour": chart,
+        "chart:E": chart,
+        "chart:F": chart,
+        "chart:G": chart,
+    }
+    html_tables = {name: [] for name in hero_plot._COLLECTION_TABLE_FIELDS}
+    html_tables["fingerprints"] = csv_rows
+    page = tmp_path / "fingerprints.html"
+    hero_plot._write_collection_html(
+        page,
+        chart_files=chart_files,
+        table_rows=html_tables,
+        engine_names=("openimcc",),
+        observables=(("vapour", "Vapour pressure"),),
+    )
+    html = page.read_text(encoding="utf-8")
+    cell_payload = json.loads(
+        html.split('id="cell-data">', 1)[1].split("</script>", 1)[0]
+    )
+    cells = cell_payload["cells"]
+    script = hero_plot._COLLECTION_INTERACTIVE_SCRIPT
+
+    def function_source(name: str, next_name: str) -> str:
+        start = script.index(f"function {name}(")
+        end = script.index(f"\nfunction {next_name}(", start)
+        return script[start:end]
+
+    unavailable_start = script.index("function setPlotUnavailable(")
+    unavailable_helpers = script[
+        unavailable_start : script.index("\nfunction plotError(", unavailable_start)
+    ]
+    node_script = "\n".join(
+        (
+            "const stats={fills:[]},ctx={clearRect(){},fillRect(...args){stats.fills.push(args);},strokeRect(){},fillText(){},save(){},translate(){},rotate(){},restore(){}};",
+            f"const cellData=JSON.parse({json.dumps(json.dumps(cell_payload, separators=(',', ':')))}),cells=cellData.cells;",
+            "const mapCanvas={style:{display:''},_plot:null,getBoundingClientRect(){return {left:0,top:0}}},mapEmpty={hidden:true,textContent:''},tip={style:{display:'none'},textContent:''};",
+            "const document={documentElement:{}};",
+            "const railSelect={value:'vapour'},engineSelect={value:'openimcc'},rows=[],BANDS={good:'#1a9641',okay:'#f6c90e','needs work':'#d7191c'},TEMPERATURE_BIN_K=100,SIO2_BIN_WIDTH=.05;",
+            "function size(){return {ctx,w:800,h:400}} function windowValues(){return [1500,1700,.4,.45]} function enabled(){return true} function getComputedStyle(){return {getPropertyValue(){return '#fff'}}} let innerWidth=1000,innerHeight=1000;",
+            unavailable_helpers,
+            function_source("plotMap", "showTip"),
+            function_source("showTip", "displayCell"),
+            "plotMap();",
+            "function hover(cell){const p=mapCanvas._plot;showTip({clientX:p.x((cell[3]+.5)*SIO2_BIN_WIDTH),clientY:p.y((cell[2]+.5)*TEMPERATURE_BIN_K)},'map');return {display:tip.style.display,text:tip.textContent}}",
+            "const sparse=cells.find(cell=>cell[4]===2),drawn=cells.find(cell=>cell[4]===3);",
+            "console.log(JSON.stringify({cellFillCount:stats.fills.filter(args=>args[2]<800).length,flags:cells.map(cell=>cell[10]??null),sparse:hover(sparse),drawn:hover(drawn)}));",
+        )
+    )
+    result = subprocess.run(
+        ["node", "-e", node_script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    browser = json.loads(result.stdout)
+
+    assert {count: row.get("color_eligible") for count, row in csv_by_n.items()} == {
+        2: "False",
+        3: "True",
+    }
+    assert {count: row["band"] for count, row in csv_by_n.items()} == {
+        2: "",
+        3: "good",
+    }
+    assert static_drawn == {2: False, 3: True}
+    assert [len(cell) for cell in cells] == [11, 11]
+    assert browser["flags"] == [False, True]
+    assert browser["cellFillCount"] == 1
+    assert browser["sparse"]["display"] == "none"
+    assert browser["drawn"]["display"] == "block"
+    assert "n=3" in browser["drawn"]["text"]
+
+
 def test_html_tables_format_decimals_but_csv_keeps_full_precision(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
 ) -> None:

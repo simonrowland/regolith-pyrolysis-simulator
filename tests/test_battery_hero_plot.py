@@ -1677,7 +1677,7 @@ def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
         "temperature_lower_K": "1900",
         "temperature_upper_K": "2000",
         "n": 1,
-        "color_eligible": True,
+        "color_eligible": False,
         "median_abs_dex": "0.25",
     }
     fig, axis = plt.subplots()
@@ -1704,6 +1704,7 @@ def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
             "temperature_lower_K": "1000",
             "temperature_upper_K": "1100",
             "n": 3,
+            "color_eligible": True,
             "median_abs_dex": value,
         }
         for index, value in enumerate(("0.5", "0.8", "1.1"))
