@@ -24,41 +24,41 @@ fidelity_samples:
   locator:
     table: '5'
     published_page: 1915
-    pdf_page_index: 5
+    pdf_page_index: 4
     note: Table 5 sample 1, 1370 C, I(P2+)/I(Fe+) x 10^2 = 0.66
 - path: species.P2O5.observations[kambayashi_1985_table7_raoultian_a_p2o5].values.rows[0].a_P2O5_times_1e17_as_printed
   value: 1.2
   locator:
     table: '7'
     published_page: 1917
-    pdf_page_index: 7
+    pdf_page_index: 6
     note: Table 7 sample 1, 1370 C, a_P2O5 x 10^17 = 1.2
 - path: species.P2O5.observations[kambayashi_1985_gamma_p2o5_solid_std_henry].values.points[0].gamma
   value: 2.2e-15
   locator:
     published_page: 1911
-    pdf_page_index: 1
+    pdf_page_index: 0
     note: 'Synopsis: gamma_P2O5 = (2.2 +/- 0.8) x 10^-15 at 1370 C; standard state P2O5(s)'
 - path: species.P2O5.observations[kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c].values.rows[0].Pb_wt_percent
   value: 63.84
   locator:
     table: '3'
     published_page: 1913
-    pdf_page_index: 3
+    pdf_page_index: 2
     note: Table 3 first row Pb = 63.84 wt%
 - path: species.P2O5.observations[kambayashi_1985_table4_feto_p2o5_compositions].values.rows[0].P2O5_wt_percent
   value: 1.52
   locator:
     table: '4'
     published_page: 1914
-    pdf_page_index: 4
+    pdf_page_index: 3
     note: Table 4 sample 1 P2O5 = 1.52 wt%
 - path: species.PO.observations[kambayashi_1985_table6_partial_pressures_and_dg].values.rows[0].P_PO_x1e7_atm_as_printed
   value: 2.86
   locator:
     table: '6'
     published_page: 1917
-    pdf_page_index: 7
+    pdf_page_index: 6
     note: Table 6 sample 1, 1370 C, P_PO = 2.86 x 10^-7 atm
 - species: PO
   observable: gibbs_table
@@ -68,7 +68,7 @@ fidelity_samples:
   locator:
     table: '2'
     published_page: 1913
-    pdf_page_index: 3
+    pdf_page_index: 2
     note: Table 2 this work PO+ appearance potential = 11.7 eV
 - species: Fe
   observable: gibbs_table
@@ -77,7 +77,7 @@ fidelity_samples:
   value: 429
   locator:
     published_page: 1916
-    pdf_page_index: 6
+    pdf_page_index: 5
     figure: '8'
     note: Clausius-Clapeyron slope of Fig. 8 gives Delta-H_sub(Fe) = 429 kJ at 1370 C
 benches:
@@ -85,7 +85,7 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Hitachi RM-6E Knudsen-cell mass spectrometer}
-    locator: &apparatus_locator {published_page: 1912, pdf_page_index: 2, section: '2.1', figure: '1'}
+    locator: &apparatus_locator {published_page: 1912, pdf_page_index: 1, section: '2.1', figure: '1'}
   method:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator: *apparatus_locator
@@ -95,7 +95,7 @@ benches:
         value: Al2O3
       locator:
         published_page: 1912
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: '2.1'
         figure: '1'
     - state:
@@ -103,7 +103,7 @@ benches:
         value: Ta
       locator:
         published_page: 1912
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: '2.1'
         figure: '1'
   cell_material_and_liner:
@@ -140,7 +140,7 @@ experiments:
           P: '10.68'
       locator:
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '3'
         note: 'Table 3 row 1; elemental Pb and P wt% as printed; also printed X_P2O5=0.359 (mole fraction, not wt%); post-run chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
     characterization:
@@ -180,7 +180,7 @@ experiments:
           P: '11.28'
       locator:
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '3'
         note: 'Table 3 row 2; elemental Pb and P wt% as printed; also printed X_P2O5=0.361 (mole fraction, not wt%); post-run chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
     characterization:
@@ -220,7 +220,7 @@ experiments:
           P: '12.0'
       locator:
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '3'
         note: 'Table 3 row 3; elemental Pb and P wt% as printed; also printed X_P2O5=0.382 (mole fraction, not wt%); post-run chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
     characterization:
@@ -261,7 +261,7 @@ experiments:
           Fe2O3: '10.07'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 1; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=75.02 wt%, t in FetO=0.955, X_P2O5=0.0075 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -305,7 +305,7 @@ experiments:
           Fe2O3: '11.38'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 2; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=73.5 wt%, t in FetO=0.949, X_P2O5=0.0202 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -349,7 +349,7 @@ experiments:
           Fe2O3: '11.71'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 3; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=72.68 wt%, t in FetO=0.947, X_P2O5=0.0271 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -393,7 +393,7 @@ experiments:
           Fe2O3: '9.87'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 4; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=70.25 wt%, t in FetO=0.953, X_P2O5=0.0427 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -437,7 +437,7 @@ experiments:
           Fe2O3: '9.37'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 5; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=69.5 wt%, t in FetO=0.955, X_P2O5=0.0499 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -481,7 +481,7 @@ experiments:
           Fe2O3: '8.35'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 6; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=66.89 wt%, t in FetO=0.958, X_P2O5=0.0691 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -525,7 +525,7 @@ experiments:
           Fe2O3: '8.11'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 7; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=65.66 wt%, t in FetO=0.959, X_P2O5=0.0764 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -569,7 +569,7 @@ experiments:
           Fe2O3: '8.88'
       locator:
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: '4'
         note: 'Table 4 sample 8; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=62.96 wt%, t in FetO=0.953, X_P2O5=0.0991 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
@@ -606,7 +606,7 @@ species:
       type: gibbs_table
       locator:
         published_page: 1912
-        pdf_page_index: 2
+        pdf_page_index: 1
         figure: '1'
         section: '2.1'
         note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -666,7 +666,7 @@ species:
             of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
           locator:
             published_page: 1912
-            pdf_page_index: 2
+            pdf_page_index: 1
             figure: '1'
             section: '2.1'
             note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -675,7 +675,7 @@ species:
       locator:
         table: '1'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
       T_range_K:
       - 1573.0
@@ -711,7 +711,7 @@ species:
       locator:
         table: '3'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
       phase: gas
       condensed_form: &id003
@@ -737,7 +737,7 @@ species:
               state: {tag: value, value: &kb85_pbo_sample_1_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.641'], [P2O5, '0.359']]}}
               locator:
                 published_page: 1913
-                pdf_page_index: 3
+                pdf_page_index: 2
                 table: '3'
                 note: "Table 3 row 1 prints X_P2O5=0.359 mole fraction; binary PbO is the complement."
           P_wt_percent: 10.68
@@ -755,7 +755,7 @@ species:
               state: {tag: value, value: &kb85_pbo_sample_2_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.639'], [P2O5, '0.361']]}}
               locator:
                 published_page: 1913
-                pdf_page_index: 3
+                pdf_page_index: 2
                 table: '3'
                 note: "Table 3 row 2 prints X_P2O5=0.361 mole fraction; binary PbO is the complement."
           P_wt_percent: 11.28
@@ -773,7 +773,7 @@ species:
               state: {tag: value, value: &kb85_pbo_sample_3_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.618'], [P2O5, '0.382']]}}
               locator:
                 published_page: 1913
-                pdf_page_index: 3
+                pdf_page_index: 2
                 table: '3'
                 note: "Table 3 row 3 prints X_P2O5=0.382 mole fraction; binary PbO is the complement."
           P_wt_percent: 12.0
@@ -793,7 +793,7 @@ species:
       locator:
         table: '4'
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
       phase: l
       condensed_form: &id002
@@ -817,7 +817,7 @@ species:
               state: {tag: value, value: &kb85_sample_1_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.008376120687'], [FeO, '0.942298348183'], [Fe2O3, '0.049325531130']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 1.52
@@ -833,7 +833,7 @@ species:
               state: {tag: value, value: &kb85_sample_2_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.022459868353'], [FeO, '0.921581588885'], [Fe2O3, '0.055958542762']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 4.06
@@ -849,7 +849,7 @@ species:
               state: {tag: value, value: &kb85_sample_3_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.030152487955'], [FeO, '0.911941491152'], [Fe2O3, '0.057906020893']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 5.42
@@ -865,7 +865,7 @@ species:
               state: {tag: value, value: &kb85_sample_4_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.047032894998'], [FeO, '0.903727131891'], [Fe2O3, '0.049239973111']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 8.38
@@ -881,7 +881,7 @@ species:
               state: {tag: value, value: &kb85_sample_5_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.054853396862'], [FeO, '0.898384771315'], [Fe2O3, '0.046761831823']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 5's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 9.77
@@ -897,7 +897,7 @@ species:
               state: {tag: value, value: &kb85_sample_6_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.075561170773'], [FeO, '0.882239734492'], [Fe2O3, '0.042199094735']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 13.29
@@ -913,7 +913,7 @@ species:
               state: {tag: value, value: &kb85_sample_7_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.083407986819'], [FeO, '0.875210550207'], [Fe2O3, '0.041381462974']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 14.53
@@ -929,7 +929,7 @@ species:
               state: {tag: value, value: &kb85_sample_8_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.108572450085'], [FeO, '0.845178784247'], [Fe2O3, '0.046248765668']]}}
               locator:
                 published_page: 1914
-                pdf_page_index: 4
+                pdf_page_index: 3
                 table: '4'
                 note: "Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 18.53
@@ -945,7 +945,7 @@ species:
       locator:
         table: '5'
         published_page: 1915
-        pdf_page_index: 5
+        pdf_page_index: 4
         note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
       phase: gas
       condensed_form: *id002
@@ -1417,7 +1417,7 @@ species:
       locator:
         table: '7'
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: Table 7 Raoultian a_P2O5 x 10^17; standard state P2O5(s)
       phase: l
       condensed_form: *id002
@@ -1682,7 +1682,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 1911
-        pdf_page_index: 1
+        pdf_page_index: 0
         note: Synopsis and p. 1917/1918 conclusion; Henry region 0 < X_P2O5 < 0.08; standard state P2O5(s)
       T_range_K:
       - 1643.0
@@ -1745,7 +1745,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: Converted using Turkdogan and Pearson P2O5(s)=P2O5(l) Delta-G
       T_range_K:
       - 1643.0
@@ -1795,7 +1795,7 @@ species:
       locator:
         figure: '2'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: "Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: gas
       condensed_form: *id003
@@ -1821,7 +1821,7 @@ species:
       locator:
         figure: '6'
         published_page: 1915
-        pdf_page_index: 5
+        pdf_page_index: 4
         note: "Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3'); figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: l
       condensed_form: *id002
@@ -1848,7 +1848,7 @@ species:
       locator:
         figure: '7'
         published_page: 1916
-        pdf_page_index: 6
+        pdf_page_index: 5
         note: "Raoultian a_P2O5 and a_FetO vs X_P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: l
       condensed_form: *id002
@@ -1878,7 +1878,7 @@ species:
       locator:
         table: '3'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
       phase: gas
       condensed_form: *id003
@@ -1918,7 +1918,7 @@ species:
       locator:
         figure: '7'
         published_page: 1916
-        pdf_page_index: 6
+        pdf_page_index: 5
         equation: '8'
         note: "Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: l
@@ -1947,7 +1947,7 @@ species:
       locator:
         table: '2'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 2 appearance potentials of the ionic species
       T_range_K:
       - 1573.0
@@ -1973,7 +1973,7 @@ species:
       locator:
         table: '2'
         published_page: 1913
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 2 appearance potentials of the ionic species
       T_range_K:
       - 1573.0
@@ -2020,7 +2020,7 @@ species:
       locator:
         table: '6'
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
       phase: gas
       condensed_form: *id002
@@ -2372,7 +2372,7 @@ species:
       locator:
         table: '6'
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
       phase: gas
       condensed_form: *id002
@@ -2551,7 +2551,7 @@ species:
       locator:
         table: '6'
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
       phase: gas
       condensed_form: *id002
@@ -2739,7 +2739,7 @@ species:
       type: psat_series
       locator:
         published_page: 1917
-        pdf_page_index: 7
+        pdf_page_index: 6
         section: 4.3.3
         note: P_P4O10_sat from JANAF P4O10(s) extrapolated past 1500 K
       T_range_K:
@@ -2761,24 +2761,24 @@ species:
           point_conditions:
             temperature_K:
               state: {tag: value, value: '1643.0'}
-              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
-          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+              locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
         - T_C: 1380
           T_K: 1653.0
           pressure_atm: 709.0
           point_conditions:
             temperature_K:
               state: {tag: value, value: '1653.0'}
-              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
-          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+              locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
         - T_C: 1390
           T_K: 1663.0
           pressure_atm: 719.0
           point_conditions:
             temperature_K:
               state: {tag: value, value: '1663.0'}
-              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
-          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+              locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 6, section: 4.3.3}
       uncertainty:
         note: extrapolation of JANAF P4O10(s) beyond 1500 K; no numeric +/- printed
   Fe:
@@ -2787,7 +2787,7 @@ species:
       type: gibbs_table
       locator:
         published_page: 1916
-        pdf_page_index: 6
+        pdf_page_index: 5
         figure: '8'
         equation: '9'
         note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -2812,7 +2812,7 @@ species:
       locator:
         figure: '8'
         published_page: 1916
-        pdf_page_index: 6
+        pdf_page_index: 5
         note: "ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: gas
       standard_state: I_Fe+ T vs 1/T; not digitised
@@ -2843,7 +2843,7 @@ species:
       locator:
         figure: '3'
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         note: "Time dependence of ion current ratios at X_P2O5=0.0499; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: gas
       standard_state: I/I_Fe vs time (h)
@@ -2868,7 +2868,7 @@ species:
       locator:
         figure: '4'
         published_page: 1914
-        pdf_page_index: 4
+        pdf_page_index: 3
         note: "Temperature-cycle reproducibility at X_P2O5=0.0427; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       phase: gas
       standard_state: I/I_Fe vs time through 1370-1390-1380-1370-1360-1370 C holds
@@ -2892,7 +2892,7 @@ species:
       locator:
         figure: '5'
         published_page: 1915
-        pdf_page_index: 5
+        pdf_page_index: 4
         note: "Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       T_range_K:
       - 1643.0
@@ -2920,7 +2920,7 @@ species:
       type: rate_series
       locator:
         published_page: 1912
-        pdf_page_index: 2
+        pdf_page_index: 1
         figure: '1'
         section: '2.1'
         note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
