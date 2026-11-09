@@ -2333,6 +2333,142 @@ def test_pre_rg_missing_conversion_record_uses_documented_source_phase() -> None
     )
 
 
+@pytest.mark.parametrize(
+    ("species_id", "parent_oxide"),
+    (("CaO_gas", "CaO"), ("MgO_gas", "MgO")),
+)
+def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
+    species_id: str,
+    parent_oxide: str,
+) -> None:
+    from simulator.chemistry.melt_activity import (
+        _activity_for_crystalline_vapor_k,
+    )
+    from simulator.reference_data.janaf_fusion import (
+        d144_vapor_standard_state_pair,
+    )
+
+    source_standard_state, target_standard_state = (
+        d144_vapor_standard_state_pair(parent_oxide)
+    )
+    assert source_standard_state is not None
+    assert target_standard_state is not None
+    source_id, source_phase = source_standard_state
+    target_id, target_phase = target_standard_state
+    standard_state = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase=source_phase,
+        reference_pressure_bar=1.0,
+        component_basis="raoultian_pure_endmember",
+        identity_id=source_id,
+        component_id=parent_oxide,
+    )
+    declaration = ActivityInputDeclaration(
+        component_id=parent_oxide,
+        standard_state=standard_state,
+        activity_model="provider_reported_thermodynamic_activity",
+        require_assemblage_match=False,
+    )
+    rule = RequestRule(
+        species_id=species_id,
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({parent_oxide}),
+        required_source_atoms=frozenset(
+            {parent_oxide[:-1], "O"}
+        ),
+        solve_group_id=f"{species_id}_test",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id=species_id,
+        parent_oxide=parent_oxide,
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+        source_reaction_activity=declaration,
+        evidence=MappingProxyType(
+            {
+                "vapor_activity_source_standard_state_id": source_id,
+                "vapor_activity_source_standard_state_phase": source_phase,
+                "vapor_k_standard_state_id": target_id,
+                "vapor_k_standard_state_phase": target_phase,
+            }
+        ),
+    )
+
+    class Evaluator:
+        activity_exponent = 1.0
+        pO2_exponent = 0.0
+        pO2_reference_bar = 1.0
+        oxygen_fugacity_channel = None
+        valid_temperature_K = (298.15, 4000.0)
+
+        def evaluate(
+            self,
+            temperature_K: float,
+            *,
+            source_activity: float = 1.0,
+            pO2_bar: float | None = None,
+        ):
+            return SimpleNamespace(pressure_pa=100.0 * float(source_activity))
+
+    temperature_K = 1300.0
+    raw_activity = 0.25
+    crystalline_activity, _, _ = _activity_for_crystalline_vapor_k(
+        parent_oxide,
+        raw_activity,
+        temperature_K,
+        source_standard_state_id=source_id,
+        target_standard_state_id=target_id,
+        source_standard_state_phase=source_phase,
+        target_standard_state_phase=target_phase,
+    )
+    state = VapourResolveState(
+        temperature_K=temperature_K,
+        source_reaction_activities={species_id: raw_activity},
+        source_reaction_activity_provider="test_unprovenanced_activity",
+        source_reaction_activity_evidence_refs={species_id: "test:value"},
+    )
+    batch = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {parent_oxide: 1.0}},
+        state=state,
+        catalog_species={
+            species_id: SimpleNamespace(
+                species_id=species_id,
+                evaluator=Evaluator(),
+                vaporisation_coefficients=SimpleNamespace(
+                    evaporation_alpha={"value": 1.0}
+                ),
+            )
+        },
+        flux_activation_context=_pre_rg_activation_context(species_id),
+    )
+
+    answer = batch.channel(species_id)
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.pressure.pa == pytest.approx(100.0 * crystalline_activity)
+    notice = next(
+        notice
+        for notice in answer.extra["notices"]
+        if notice["kind"] == "oxide_channel_reference_state_predict_and_flag"
+    )
+    assert notice["reason"] == "missing_reference_state_provenance"
+    assert notice["authority_level"] == "predict_and_flag"
+    assert notice["selected_reference_phase"] == "crystalline"
+    assert notice["liquid_referenced_pressure_Pa"] == pytest.approx(
+        100.0 * raw_activity
+    )
+    assert notice["crystalline_referenced_pressure_Pa"] == pytest.approx(
+        100.0 * crystalline_activity
+    )
+    assert notice["bracket_pressure_Pa"] == pytest.approx(
+        sorted((100.0 * raw_activity, 100.0 * crystalline_activity))
+    )
+
+
 def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
     from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair
 
