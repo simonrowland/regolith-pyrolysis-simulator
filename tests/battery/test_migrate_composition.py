@@ -1408,6 +1408,8 @@ def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
         incoming,
         existing.apparatus,
         existing.pressure_environment,
+        experiment_id=existing.experiment_id,
+        validation_issues=[],
     )
 
     assert merged.sample.initial_composition == starting
@@ -5547,6 +5549,8 @@ def _merge_sample_initials(existing_initial, incoming_initial):
         replace(experiment.sample, initial_composition=incoming_initial),
         experiment.apparatus,
         experiment.pressure_environment,
+        experiment_id=experiment.experiment_id,
+        validation_issues=[],
     )
     return merged.sample.initial_composition
 
