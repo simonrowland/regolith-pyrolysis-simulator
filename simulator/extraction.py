@@ -3956,6 +3956,11 @@ class ExtractionMixin:
                 ca_partials_at_rates,
                 {'Ca': MOLAR_MASS['Ca'] / 1000.0},
                 pressure_floor_Pa=p_total_mbar * 100.0,
+                transformed_equilibrium_pressures_Pa={'Ca': p_sat_pa},
+                downstream_pressure_Pa=max(
+                    0.0,
+                    self._headspace_downstream_pressure_bar(None) * 1.0e5,
+                ),
                 **closed_line_boundary,
             )
             p_bulk_pa = max(

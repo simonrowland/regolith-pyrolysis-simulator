@@ -1475,9 +1475,9 @@ class EvaporationMixin:
                     # J_i=P_eq,i/R_total. Each resistance is Pa m² s kg⁻¹;
                     # Pa/R is kg m⁻² s⁻¹, and multiplying by surface area and
                     # 3600 s/hr gives kg/hr.
-                    # The closed-line projection below pins P_total for any
-                    # positive candidate; at zero it returns an empty mixture,
-                    # so the solver receives the explicit boiling boundary.
+                    # The solver certifies a closed-line zero from both raw
+                    # and admitted equilibrium-pressure sums; an empty sampled
+                    # source alone remains a sampling result.
                     upper_rates = dict(seed_rates)
                     lower_closure = _solve_same_hour_headspace_closure(
                         upper_rates,
@@ -1489,6 +1489,17 @@ class EvaporationMixin:
                         ),
                         closed_line_equilibrium_pressures_Pa=vapor_pressures,
                         closed_line_total_pressure_Pa=pressure_held_total_Pa,
+                        transformed_equilibrium_pressures_Pa={
+                            str(species): max(
+                                0.0, float(vapor_pressures.get(species, 0.0))
+                            )
+                            for species in admitted_species
+                        },
+                        downstream_pressure_Pa=max(
+                            0.0,
+                            self._headspace_downstream_pressure_bar(None)
+                            * 1.0e5,
+                        ),
                         carrier_feed_mol_s=getattr(
                             self.melt, 'carrier_feed_mol_s', None
                         ),
@@ -1624,6 +1635,17 @@ class EvaporationMixin:
                         molar_masses_kg_mol,
                         pressure_floor_Pa=float(
                             control_inputs.get('commanded_pressure_pa', 0.0)
+                        ),
+                        transformed_equilibrium_pressures_Pa={
+                            str(species): max(
+                                0.0, float(vapor_pressures.get(species, 0.0))
+                            )
+                            for species in admitted_species
+                        },
+                        downstream_pressure_Pa=max(
+                            0.0,
+                            self._headspace_downstream_pressure_bar(None)
+                            * 1.0e5,
                         ),
                     )
                     final_partials_Pa = {

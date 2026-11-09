@@ -644,6 +644,7 @@ def test_closed_line_subboiling_root_is_recognized_without_iteration():
         {"A": 1.0, "B": 1.0},
         closed_line_equilibrium_pressures_Pa=equilibrium_pressures,
         closed_line_total_pressure_Pa=80.0,
+        transformed_equilibrium_pressures_Pa=equilibrium_pressures,
     )
 
     assert result.converged
@@ -651,7 +652,22 @@ def test_closed_line_subboiling_root_is_recognized_without_iteration():
     assert result.rates_kg_hr == {"A": 0.0, "B": 0.0}
 
 
-def test_transformed_subboiling_source_returns_no_positive_root_boundary():
+def test_closed_line_raw_zero_is_not_certified_if_admitted_sum_exceeds_total():
+    result = _solve_same_hour_headspace_closure(
+        {"A": 75.0},
+        lambda g, _pressure: {"A": 75.0 / (1.0 + g)},
+        lambda _rates: {"A": 0.8},
+        {"A": 1.0},
+        closed_line_equilibrium_pressures_Pa={"A": 40.0},
+        closed_line_total_pressure_Pa=80.0,
+        transformed_equilibrium_pressures_Pa={"A": 100.0},
+    )
+
+    assert result.status == "no_root_found_by_sampling"
+    assert result.rates_kg_hr == {"A": 0.0}
+
+
+def test_transformed_subboiling_source_returns_sampling_zero_without_boundary():
     result = _solve_same_hour_headspace_closure(
         {"A": 75.0},
         lambda g, _pressure: {"A": 75.0 / (1.0 + g)},
@@ -661,11 +677,17 @@ def test_transformed_subboiling_source_returns_no_positive_root_boundary():
         closed_line_total_pressure_Pa=100.0,
     )
 
-    assert result.converged
-    assert result.status == "no_positive_root_boundary"
+    assert not result.converged
+    assert result.status == "no_root_found_by_sampling"
     assert result.rates_kg_hr == {"A": 0.0}
-    assert result.zero_flow_criterion["closed_line_total_pressure_Pa"] == 100.0
     assert result.scan_evaluations <= 64
+    assert result.sampling_evidence["grid"]["axis"] == "g"
+    assert result.sampling_evidence["grid"]["span_decades"] > 0.0
+    assert result.sampling_evidence["grid"]["sample_ratio_between_points"] > 1.0
+    assert result.sampling_evidence["tail_fraction"] <= 1.0e-30
+    diagnostic = result.as_diagnostic()
+    assert diagnostic["status"] == "no_root_found_by_sampling"
+    assert diagnostic["sampling_evidence"] == result.sampling_evidence
 
 
 def test_positive_downstream_above_effective_equilibrium_returns_boundary():
@@ -678,16 +700,24 @@ def test_positive_downstream_above_effective_equilibrium_returns_boundary():
         lambda g, _pressure: {"A": 150.0 / (1.0 + g)},
         pressure_at_rates,
         {"A": 1.0},
+        transformed_equilibrium_pressures_Pa={"A": 150.0},
+        downstream_pressure_Pa=200.0,
     )
 
     assert result.converged
     assert result.status == "no_positive_root_boundary"
     assert result.rates_kg_hr["A"] == 0.0
-    assert result.zero_flow_criterion["zero_flow_projected_pressure_Pa"] >= 200.0
+    assert result.zero_flow_criterion["downstream_pressure_Pa"] == 200.0
+    assert (
+        result.zero_flow_criterion[
+            "maximum_admitted_equilibrium_pressure_Pa"
+        ]
+        == 150.0
+    )
     assert result.scan_evaluations <= 64
 
 
-def test_source_free_nested_projection_returns_boundary_before_g_scan():
+def test_source_free_nested_projection_returns_sampling_zero_without_certificate():
     result = _solve_same_hour_headspace_closure(
         {},
         lambda _g, _pressure: {"A": 0.0},
@@ -696,12 +726,33 @@ def test_source_free_nested_projection_returns_boundary_before_g_scan():
         pressure_floor_Pa=1000.0,
     )
 
-    assert result.converged
-    assert result.status == "no_positive_root_boundary"
+    assert not result.converged
+    assert result.status == "no_root_found_by_sampling"
     assert result.rates_kg_hr == {"A": 0.0}
     assert result.iterations <= 65
     assert result.scan_evaluations == 1
-    assert result.zero_flow_criterion["pressure_floor_Pa"] == 1000.0
+    assert result.sampling_evidence["grid"]["axis"] == "pressure_Pa"
+    assert result.sampling_evidence["grid"]["sample_ratio_between_points"] == 2.0
+    assert result.sampling_evidence["tail_fraction"] == 0.0
+
+
+def test_nested_admission_pressure_band_is_not_certified_as_physical_zero():
+    def rates_at_projection_g(g, pressure_Pa):
+        if 2.0 < pressure_Pa < 3.0:
+            return {"A": 100.0 / (1.0 + g)}
+        return {"A": 0.0}
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": 100.0},
+        rates_at_projection_g,
+        lambda rates: {"A": 0.025} if rates.get("A", 0.0) > 0.0 else {},
+        {"A": 1.0},
+    )
+
+    assert result.status == "no_root_found_by_sampling"
+    assert result.rates_kg_hr == {"A": 0.0}
+    assert result.sampling_evidence["grid"]["axis"] == "pressure_Pa"
+    assert result.sampling_evidence["grid"]["sample_count"] > 1
 
 
 def test_scalar_scan_treats_late_species_as_zero_in_earlier_samples():
@@ -721,7 +772,7 @@ def test_scalar_scan_treats_late_species_as_zero_in_earlier_samples():
     )
 
     assert result.converged
-    assert result.status == "converged"
+    assert result.status == "roots_found_by_sampling"
     assert result.rates_kg_hr["A"] > 0.0
     assert result.rates_kg_hr["CrO3"] == 0.0
 
@@ -827,6 +878,63 @@ def test_scalar_closure_reports_all_roots_for_nonmonotone_stream():
         == pytest.approx(0.0, abs=1e-8)
         for g in result.roots_g
     )
+
+
+def test_scalar_narrow_bump_without_sampled_crossings_is_sampling_zero():
+    def total_rate_mol_hr(g):
+        return 0.01 / (1.0 + g) + 2.0 * math.exp(
+            -0.5
+            * (
+                math.log((g + 1.0e-20) / 10.0) / 0.01
+            )
+            ** 2
+        )
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": total_rate_mol_hr(0.0)},
+        lambda g, _pressure: {"A": total_rate_mol_hr(g)},
+        lambda _rates: {"A": 0.01},
+        {"A": 1.0},
+        closed_line_equilibrium_pressures_Pa={"A": 1.0},
+        closed_line_total_pressure_Pa=1.0,
+    )
+
+    assert result.status == "no_root_found_by_sampling"
+    assert result.rates_kg_hr == {"A": 0.0}
+    assert result.sampling_evidence["grid"]["axis"] == "g"
+    assert result.sampling_evidence["tail_fraction"] <= 1.0e-30
+
+
+def test_scalar_narrow_bump_reports_the_smallest_found_root_with_carrier_feed():
+    def total_rate_mol_hr(g):
+        return 0.01 / (1.0 + g) + 2.0 * math.exp(
+            -0.5
+            * (
+                math.log((g + 1.0e-20) / 10.0) / 0.01
+            )
+            ** 2
+        )
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": total_rate_mol_hr(0.0)},
+        lambda g, _pressure: {"A": total_rate_mol_hr(g)},
+        lambda _rates: {"A": 0.01},
+        {"A": 1.0},
+        closed_line_equilibrium_pressures_Pa={"A": 1.0},
+        closed_line_total_pressure_Pa=1.0,
+        carrier_feed_mol_s=1.0e-6 / 3600.0,
+    )
+
+    assert result.status == "roots_found_by_sampling"
+    assert result.roots_g
+    assert result.roots_g[0] == min(result.roots_g)
+    assert result.rates_kg_hr["A"] == pytest.approx(
+        total_rate_mol_hr(result.roots_g[0]), rel=1e-12
+    )
+    assert result.sampling_evidence["grid"]["span_decades"] > 0.0
+    diagnostic = result.as_diagnostic()
+    assert diagnostic["status"] == "roots_found_by_sampling"
+    assert diagnostic["sampling_evidence"] == result.sampling_evidence
 
 
 def _pressure_held_sim(

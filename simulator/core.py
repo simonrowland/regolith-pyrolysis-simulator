@@ -8349,6 +8349,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             native_partials_at_rates,
             {'Fe': molar_mass_kg_mol},
             pressure_floor_Pa=overhead_pressure_mbar * 100.0,
+            transformed_equilibrium_pressures_Pa=(
+                {'Fe': P_reference_Pa}
+                if native_fe_available_mol > 0.0
+                else {}
+            ),
+            downstream_pressure_Pa=max(
+                0.0,
+                self._headspace_downstream_pressure_bar(None) * 1.0e5,
+            ),
             **closed_line_boundary,
         )
         P_bulk_Pa = max(

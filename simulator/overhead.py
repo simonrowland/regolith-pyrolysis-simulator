@@ -112,6 +112,7 @@ class SameHourHeadspaceClosureResult:
     scan_evaluations: int = 0
     roots_g: tuple[float, ...] = ()
     multiple_closure_roots: bool = False
+    sampling_evidence: Mapping[str, Any] = field(default_factory=dict)
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -131,6 +132,7 @@ class SameHourHeadspaceClosureResult:
             'scan_evaluations': self.scan_evaluations,
             'roots_g': list(self.roots_g),
             'multiple_closure_roots': self.multiple_closure_roots,
+            'sampling_evidence': dict(self.sampling_evidence),
         }
 
 
@@ -159,6 +161,8 @@ def _solve_same_hour_headspace_closure(
     pressure_floor_Pa: float = 0.0,
     closed_line_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
     closed_line_total_pressure_Pa: float | None = None,
+    transformed_equilibrium_pressures_Pa: Mapping[str, float] | None = None,
+    downstream_pressure_Pa: float | None = None,
     carrier_feed_mol_s: float | None = None,
     n_o2_coproduct_mol_hr: float = 0.0,
 ) -> SameHourHeadspaceClosureResult:
@@ -177,13 +181,15 @@ def _solve_same_hour_headspace_closure(
     transformed rates, and the scalar residual is
     ``h(g) = G(N(g), mdot(g)) - g`` with N and mdot computed from n(g).
 
-    No monotonicity is assumed for the transformed stream. The solver scans a
-    logarithmic grid in g through the point where each transformed source is
-    below 1e-30 of its zero-g rate, then bisects every sampled sign change at
-    relative tolerance 1e-12. With no positive-flow sign change and h positive
-    over the scan, it returns the typed zero-flow boundary; all discovered
-    roots are retained so a multiple-root result can be flagged. This is a
-    resolution-bounded guarantee, not a uniqueness claim.
+    No monotonicity is assumed for the transformed stream. A closed-line zero
+    is certified only when both raw and admitted equilibrium-pressure sums
+    are at or below total pressure; a pumped zero is certified only when the
+    positive downstream pressure is at or above every admitted effective
+    equilibrium pressure. Otherwise the logarithmic g scan reports sampled
+    sign-changing roots, selects the smallest found root, and retains all
+    found roots for the multiple-root flag. The scan cannot certify that it
+    found every root or that no root exists; a completed scan with no found
+    root returns a flagged zero with its grid and tail evidence.
 
     For Poiseuille transport, the live mean molar mass converts mdot to molar
     flow N, so at fixed T and geometry ``P²=P_down²+C*N``; changing mixture
@@ -208,6 +214,10 @@ def _solve_same_hour_headspace_closure(
     evaluations = 0
     last_pressure_root = None
     root_refinement = False
+    sampling_evidence: dict[str, Any] = {}
+    sampled_g_points: list[float] = []
+    sampled_root_g_values: list[float] = []
+    last_bracket_g: tuple[float, float] | None = None
 
     def result(
         rates,
@@ -218,6 +228,7 @@ def _solve_same_hour_headspace_closure(
         zero_flow_criterion=None,
         scan_evaluations=0,
         roots_g=(),
+        sampling_evidence=None,
     ):
         return SameHourHeadspaceClosureResult(
             rates_kg_hr=dict(rates),
@@ -229,8 +240,26 @@ def _solve_same_hour_headspace_closure(
             scan_evaluations=scan_evaluations,
             roots_g=tuple(roots_g),
             multiple_closure_roots=len(roots_g) > 1,
+            sampling_evidence=dict(sampling_evidence or {}),
         )
 
+    equilibrium_pressures: dict[str, float] = {}
+    admitted_equilibrium_pressures = (
+        {
+            str(species): max(0.0, float(pressure))
+            for species, pressure in (
+                transformed_equilibrium_pressures_Pa or {}
+            ).items()
+        }
+        if transformed_equilibrium_pressures_Pa is not None
+        else None
+    )
+    downstream_Pa = (
+        max(0.0, float(downstream_pressure_Pa))
+        if downstream_pressure_Pa is not None
+        else 0.0
+    )
+    closed_line_zero = False
     if (
         closed_line_equilibrium_pressures_Pa is not None
         and closed_line_total_pressure_Pa is not None
@@ -239,35 +268,83 @@ def _solve_same_hour_headspace_closure(
             str(species): max(0.0, float(pressure))
             for species, pressure in closed_line_equilibrium_pressures_Pa.items()
         }
-        if (
+        total_pressure_Pa = max(0.0, float(closed_line_total_pressure_Pa))
+        closed_line_zero = (
             carrier_feed_mol_hr + o2_coproduct_mol_hr == 0.0
-            and math.fsum(equilibrium_pressures.values()) <= max(
-                0.0, float(closed_line_total_pressure_Pa)
-            )
-        ):
-            zero_species = species_names | set(equilibrium_pressures)
-            return result(
-                {species: 0.0 for species in zero_species},
-                {},
-                converged=True,
-                status='no_positive_root_boundary',
-                zero_flow_criterion={
-                    'source_equilibrium_pressure_sum_Pa': math.fsum(
-                        equilibrium_pressures.values()
-                    ),
-                    'closed_line_total_pressure_Pa': max(
-                        0.0, float(closed_line_total_pressure_Pa)
-                    ),
-                    'carrier_feed_mol_hr': carrier_feed_mol_hr,
-                    'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
-                },
-            )
+            and admitted_equilibrium_pressures is not None
+            and math.fsum(equilibrium_pressures.values()) <= total_pressure_Pa
+            and math.fsum(admitted_equilibrium_pressures.values())
+            <= total_pressure_Pa
+        )
+    pumped_zero = (
+        downstream_Pa > 0.0
+        and admitted_equilibrium_pressures is not None
+        and downstream_Pa
+        >= max(admitted_equilibrium_pressures.values(), default=0.0)
+    )
+    if closed_line_zero or pumped_zero:
+        zero_species = (
+            species_names
+            | set(equilibrium_pressures)
+            | set(admitted_equilibrium_pressures)
+        )
+        zero_criterion = (
+            {
+                'source_equilibrium_pressure_sum_Pa': math.fsum(
+                    equilibrium_pressures.values()
+                ),
+                'admitted_equilibrium_pressure_sum_Pa': math.fsum(
+                    admitted_equilibrium_pressures.values()
+                ),
+                'closed_line_total_pressure_Pa': total_pressure_Pa,
+            }
+            if closed_line_zero
+            else {
+                'downstream_pressure_Pa': downstream_Pa,
+                'maximum_admitted_equilibrium_pressure_Pa': max(
+                    admitted_equilibrium_pressures.values(), default=0.0
+                ),
+            }
+        )
+        zero_criterion.update({
+            'carrier_feed_mol_hr': carrier_feed_mol_hr,
+            'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
+        })
+        return result(
+            {species: 0.0 for species in zero_species},
+            {},
+            converged=True,
+            status='no_positive_root_boundary',
+            zero_flow_criterion=zero_criterion,
+        )
 
     class _ClosureEvaluationCapReached(Exception):
         pass
 
     class _AdmissionZeroBranch(Exception):
         pass
+
+    def sampling_grid(axis: str, points: list[float]) -> dict[str, Any]:
+        positive_points = sorted(point for point in points if point > 0.0)
+        ratios = [
+            right / left
+            for left, right in zip(positive_points, positive_points[1:])
+            if left > 0.0
+        ]
+        minimum = positive_points[0] if positive_points else None
+        maximum = positive_points[-1] if positive_points else None
+        return {
+            'axis': axis,
+            'minimum': minimum,
+            'maximum': maximum,
+            'span_decades': (
+                math.log10(maximum / minimum)
+                if minimum is not None and maximum is not None
+                else 0.0
+            ),
+            'sample_ratio_between_points': max(ratios, default=1.0),
+            'sample_count': len(points),
+        }
 
     def evaluate_at_pressure(g, pressure):
         nonlocal evaluations
@@ -460,9 +537,25 @@ def _solve_same_hour_headspace_closure(
                 pressure_low + 1.0,
             )
             previous_positive = None
+            pressure_samples: list[float] = []
+            initial_rate_total = math.fsum(
+                max(0.0, float(rate))
+                for rate in initial_rates_kg_hr.values()
+            )
             for _ in range(64):
                 pressure_evaluation = evaluate_at_pressure(g, pressure)
+                pressure_samples.append(pressure)
                 pressure_rates = pressure_evaluation[0]
+                pressure_tail_fraction = (
+                    math.fsum(pressure_rates.values()) / initial_rate_total
+                    if initial_rate_total > 0.0
+                    else (math.inf if any(pressure_rates.values()) else 0.0)
+                )
+                sampling_evidence.update({
+                    'grid': sampling_grid('pressure_Pa', pressure_samples),
+                    'scan_evaluations': len(pressure_samples),
+                    'tail_fraction': pressure_tail_fraction,
+                })
                 pressure_molar_flow = math.fsum(
                     pressure_rates[species]
                     / float(molar_masses_kg_mol[species])
@@ -573,25 +666,21 @@ def _solve_same_hour_headspace_closure(
             if zero_rates[species] > 0.0
         )
         if zero_flow == 0.0:
-            # g=0 is the maximum-driving source state. The nested pressure
-            # projection has already scanned above a suppressed pressure
-            # floor; if that entire scan still returns no admitted source,
-            # there is no positive-flow root to search for at larger g.
+            # The pressure grid can miss a narrow admitted branch. Its zero
+            # value is therefore a sampled prediction unless an analytic
+            # criterion above already certified a physical boundary.
+            sampling_evidence.setdefault(
+                'grid', sampling_grid('g', [0.0])
+            )
+            sampling_evidence.setdefault('scan_evaluations', 1)
+            sampling_evidence.setdefault('tail_fraction', 0.0)
             return result(
-                zero_rates,
-                zero_partials,
-                converged=True,
-                status='no_positive_root_boundary',
-                zero_flow_criterion={
-                    'zero_flow_source_rate_kg_hr': math.fsum(
-                        zero_rates.values()
-                    ),
-                    'zero_flow_projected_pressure_Pa': 100.0
-                    * math.fsum(zero_partials.values()),
-                    'zero_flow_residual_g': zero_evaluation[2],
-                    'pressure_floor_Pa': pressure_floor,
-                },
+                {species: 0.0 for species in species_names},
+                {},
+                converged=False,
+                status='no_root_found_by_sampling',
                 scan_evaluations=1,
+                sampling_evidence=sampling_evidence,
             )
         scale = max(abs(zero_evaluation[2]), 1.0e-300)
 
@@ -606,9 +695,9 @@ def _solve_same_hour_headspace_closure(
                 effective_resistances.append(
                     scale * scale_rate / (zero_rate - scale_rate)
                 )
-        # For the rational source law, R_eff = g*n(g)/(n(0)-n(g)); the
-        # 1e40 margin puts the final transformed rates below the requested
-        # 1e-30 scan threshold while allowing for the existing transforms.
+        # For the rational source law, R_eff = g*n(g)/(n(0)-n(g)). This
+        # estimates a useful scan scale only; transformed rates can be
+        # nonmonotone, so the sampled grid makes no completeness guarantee.
         largest_scale = max([scale, *effective_resistances])
         largest_scale = min(largest_scale, 1.0e260)
         g_max = max(largest_scale * 1.0e40, scale * 1.0e40)
@@ -646,10 +735,16 @@ def _solve_same_hour_headspace_closure(
                 last_evaluation = evaluation
             flow = molar_flow(evaluation)
             samples.append((g, evaluation, flow > 0.0))
+            sampled_g_points.append(g)
+            sampling_evidence.update({
+                'grid': sampling_grid('g', sampled_g_points),
+                'scan_evaluations': len(sampled_g_points),
+            })
 
         roots = []
         if zero_flow > 0.0 and zero_evaluation[2] == 0.0:
             roots.append((0.0, zero_evaluation))
+            sampled_root_g_values.append(0.0)
         brackets = []
         for left, right in zip(samples, samples[1:]):
             left_g, left_evaluation, left_has_flow = left
@@ -660,15 +755,47 @@ def _solve_same_hour_headspace_closure(
             right_residual = right_evaluation[2]
             if right_residual == 0.0:
                 roots.append((right_g, right_evaluation))
+                sampled_root_g_values.append(right_g)
             elif left_residual * right_residual < 0.0:
+                last_bracket_g = (left_g, right_g)
                 brackets.append(
                     (left_g, left_evaluation, right_g, right_evaluation)
                 )
 
+        tail_evaluation = samples[-1][1]
+        reference_rates = {
+            species: zero_rates.get(species, 0.0)
+            for species in species_names
+        }
+        tail_fraction = max(
+            (
+                (
+                    tail_evaluation[0].get(species, 0.0) / reference_rate
+                    if reference_rate > 0.0
+                    else (
+                        math.inf
+                        if tail_evaluation[0].get(species, 0.0) > 0.0
+                        else 0.0
+                    )
+                )
+                for species, reference_rate in reference_rates.items()
+            ),
+            default=0.0,
+        )
+        sampling_evidence.update({
+            'grid': sampling_grid('g', sampled_g_points),
+            'scan_evaluations': len(sampled_g_points),
+            'tail_fraction': tail_fraction,
+            'sampled_roots_g': list(sampled_root_g_values),
+        })
+        if last_bracket_g is not None:
+            sampling_evidence['last_bracket_g'] = list(last_bracket_g)
+
         def solve_bracketed_root(left_g, right_g):
-            nonlocal last_evaluation, root_refinement
+            nonlocal last_evaluation, root_refinement, last_bracket_g
             from scipy.optimize import brentq
 
+            last_bracket_g = (left_g, right_g)
             last_root_g = None
 
             def residual(g):
@@ -702,79 +829,31 @@ def _solve_same_hour_headspace_closure(
             root = solve_bracketed_root(bracket[0], bracket[2])
             if root is not None:
                 roots.append(root)
+                sampled_root_g_values.append(root[0])
         roots.sort(key=lambda item: item[0])
         if roots:
+            sampling_evidence['sampled_roots_g'] = [
+                root_g for root_g, _ in roots
+            ]
             selected_g, selected_evaluation = roots[0]
             return result(
                 selected_evaluation[0],
                 selected_evaluation[1],
                 converged=abs(selected_evaluation[2])
                 <= relative_tolerance * max(abs(selected_g), 1.0e-300),
+                status='roots_found_by_sampling',
                 scan_evaluations=len(ordered_g),
                 roots_g=tuple(root_g for root_g, _ in roots),
-            )
-
-        tail_evaluation = samples[-1][1]
-        reference_rates = {
-            species: zero_rates.get(species, 0.0)
-            for species in species_names
-        }
-        tail_fraction = max(
-            (
-                (
-                    tail_evaluation[0].get(species, 0.0) / reference_rate
-                    if reference_rate > 0.0
-                    else (math.inf if tail_evaluation[0].get(species, 0.0) > 0.0 else 0.0)
-                )
-                for species, reference_rate in reference_rates.items()
-            ),
-            default=0.0,
-        )
-        positive_samples = [
-            evaluation
-            for _g, evaluation, has_flow in samples
-            if has_flow
-        ]
-        if positive_samples and all(
-            evaluation[2] > 0.0 for evaluation in positive_samples
-        ):
-            return result(
-                {species: 0.0 for species in species_names},
-                {},
-                converged=tail_fraction <= 1.0e-30,
-                scan_evaluations=len(ordered_g),
-                status=(
-                    'no_positive_root_boundary'
-                    if tail_fraction <= 1.0e-30
-                    else 'nonconverged'
-                ),
-                zero_flow_criterion={
-                    'zero_flow_source_rate_kg_hr': math.fsum(
-                        zero_rates.values()
-                    ),
-                    'zero_flow_projected_pressure_Pa': 100.0
-                    * math.fsum(zero_partials.values()),
-                    'zero_flow_residual_g': zero_evaluation[2],
-                    'scan_end_rate_fraction': tail_fraction,
-                    **(
-                        {
-                            'closed_line_total_pressure_Pa': float(
-                                closed_line_total_pressure_Pa
-                            ),
-                            'carrier_feed_mol_hr': carrier_feed_mol_hr,
-                            'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
-                        }
-                        if closed_line_total_pressure_Pa is not None
-                        else {}
-                    ),
-                },
+                sampling_evidence=sampling_evidence,
             )
         return result(
-            last_evaluation[0],
-            last_evaluation[1],
+            {species: 0.0 for species in species_names},
+            {},
             converged=False,
-            status='nonconverged',
+            status='no_root_found_by_sampling',
             scan_evaluations=len(ordered_g),
+            roots_g=tuple(sampled_root_g_values),
+            sampling_evidence=sampling_evidence,
         )
     except _ClosureEvaluationCapReached:
         if last_evaluation is None:
