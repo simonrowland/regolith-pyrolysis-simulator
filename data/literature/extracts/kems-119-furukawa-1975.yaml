@@ -45,7 +45,7 @@ fidelity_samples:
   locator:
     table: '3'
     published_page: 3057
-    pdf_page_index: 8
+    pdf_page_index: 7
     note: Table 3 first row N_V=0.2 N_Fe=0.75 N_Cr=0.05, log(I_Cr+/I_Fe+)=0.238
 - species: V
   observable: activity_coefficient
@@ -54,7 +54,7 @@ fidelity_samples:
   value: -1.02
   locator:
     published_page: 3050
-    pdf_page_index: 1
+    pdf_page_index: 0
     equation: synopsis
     note: 'Synopsis: log gamma_V = -1.02 N_Fe^2 + 0.24 (0 <= N_V <= 0.20)'
 - path: species.Fe.observations[furukawa_1975_table1_starting_materials].values.rows[0].Al_wt_percent
@@ -62,13 +62,13 @@ fidelity_samples:
   locator:
     table: '1'
     published_page: 3052
-    pdf_page_index: 3
+    pdf_page_index: 2
     note: Table 1 Iron Al = 0.004 %
 - path: species.Fe.observations[furukawa_1975_kems_geometry_and_calibration].values.chamber_pressure_Torr_as_printed
   value: 3e-7 to 1.5e-6
   locator:
     published_page: 3053
-    pdf_page_index: 4
+    pdf_page_index: 3
     section: '3.2'
     note: cell-side vacuum 3 x 10^-7 to 1.5 x 10^-6 Torr during ion-intensity measurement
 benches:
@@ -118,11 +118,11 @@ benches:
   temperature_measurement:
     sensor:
       state: {tag: value, value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor}
-      locator: {page: 4, published_page: 3052, pdf_page_index: 3, section: '3.1'}
+      locator: {page: 3, published_page: 3052, pdf_page_index: 3, section: '3.1'}
   temperature_calibration:
     method:
       state: {tag: value, value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16}
-      locator: {page: 5, published_page: 3053, pdf_page_index: 4, section: '3.2'}
+      locator: {page: 4, published_page: 3053, pdf_page_index: 4, section: '3.2'}
     uncertainty:
       state: {tag: unknown, reason: not_published}
       locator: {page: 14, published_page: 3052, section: '3.1', note: 'The printed +/-0.5 C is temperature stability, not calibration uncertainty'}
@@ -166,7 +166,7 @@ experiments:
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
-      locator: &loading_locator {page: 5, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
+      locator: &loading_locator {page: 4, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
     printed_composition:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 3054, table: '2', note: 'Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal assays, not charge compositions'}
@@ -342,7 +342,7 @@ species:
           units: Torr as published
           locator:
             published_page: 3053
-            pdf_page_index: 4
+            pdf_page_index: 3
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_table1_starting_materials
@@ -350,7 +350,7 @@ species:
       locator:
         table: '1'
         published_page: 3052
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: Table 1 chemical composition of Fe, V, Cr starting metals
       T_range_K:
       - 1873.0
@@ -413,7 +413,7 @@ species:
           units: Torr as published
           locator:
             published_page: 3053
-            pdf_page_index: 4
+            pdf_page_index: 3
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_fe_binary_fit
@@ -421,7 +421,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         equation: '10'
         note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
       T_range_K:
@@ -461,7 +461,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3056
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: infinite-dilution gamma_Fe = 0.38_9 at 1600 C; conclusions round to 0.39
       T_range_K:
       - 1873.0
@@ -490,7 +490,7 @@ species:
       type: gibbs_table
       locator:
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         figure: '9'
         note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
       T_range_K:
@@ -523,7 +523,7 @@ species:
       locator:
         figure: '4'
         published_page: 3054
-        pdf_page_index: 5
+        pdf_page_index: 4
         note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
       T_range_K:
       - 1873.0
@@ -565,7 +565,7 @@ species:
       locator:
         figure: '6'
         published_page: 3055
-        pdf_page_index: 6
+        pdf_page_index: 5
         note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
       T_range_K:
       - 1873.0
@@ -689,7 +689,7 @@ species:
           units: Torr as published
           locator:
             published_page: 3053
-            pdf_page_index: 4
+            pdf_page_index: 3
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_v_fe_binary_fit
@@ -697,7 +697,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         equation: '9'
         note: eq. (9); same coefficients in the English synopsis p. 3050
       T_range_K:
@@ -731,7 +731,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3056
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: gamma0_V = 0.16_3 (solid standard) at 1600 C; conclusions round to 0.16
       T_range_K:
       - 1873.0
@@ -761,7 +761,7 @@ species:
       type: gibbs_table
       locator:
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         note: H^M_V = -8.6 kcal mol^-1 at infinite dilution
       T_range_K:
       - 1873.0
@@ -788,7 +788,7 @@ species:
       locator:
         figure: '3'
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         note: 1600 C liquidus 66 at% V, solidus 69 at% V from ion-ratio breaks
       T_range_K:
       - 1873.0
@@ -886,7 +886,7 @@ species:
       locator:
         figure: '7'
         published_page: 3056
-        pdf_page_index: 7
+        pdf_page_index: 6
         note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
       T_range_K:
       - 1873.0
@@ -914,7 +914,7 @@ species:
       locator:
         table: '3'
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
       T_range_K:
       - 1873.0
@@ -1024,7 +1024,7 @@ species:
           units: Torr as published
           locator:
             published_page: 3053
-            pdf_page_index: 4
+            pdf_page_index: 3
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_ternary_nv02_fits
@@ -1032,7 +1032,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3058
-        pdf_page_index: 9
+        pdf_page_index: 8
         equation: 14-15
         note: eqs. (14)(15) at N_V=0.2 after dropping the small N_Cr^2 term
       T_range_K:
@@ -1073,7 +1073,7 @@ species:
       type: activity_coefficient
       locator:
         published_page: 3058
-        pdf_page_index: 9
+        pdf_page_index: 8
         equation: 16-17
         note: eqs. (16)(17) at N_V=0.3
       T_range_K:
@@ -1107,7 +1107,7 @@ species:
       locator:
         figure: '10'
         published_page: 3057
-        pdf_page_index: 8
+        pdf_page_index: 7
         note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
       T_range_K:
       - 1873.0
@@ -1142,7 +1142,7 @@ species:
       locator:
         figure: '12'
         published_page: 3058
-        pdf_page_index: 9
+        pdf_page_index: 8
         note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
       T_range_K:
       - 1873.0
