@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 91205
-records out (observations): 186644
-works: 784
-experiments: 7000
-queue size: 124425
+rows in: 91208
+records out (observations): 186647
+works: 785
+experiments: 7001
+queue size: 124428
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 782
+index sources: 783
 hard issues: 1685
 
 ## Unavailable input work census
@@ -197,8 +197,8 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 781 (mismatch) |
-| doi_works | 56 | 423 (mismatch) |
+| citations | 147 | 782 (mismatch) |
+| doi_works | 56 | 424 (mismatch) |
 | no_doi_works | 91 | 361 (mismatch) |
 | admission_statuses | 374 | 31443 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
@@ -208,7 +208,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 639 (mismatch) |
 | formulas | 1625 | 22268 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 16636 (mismatch) |
+| absent_admissions | 3511 | 16639 (mismatch) |
 | absent_classes | 2174 | 2129 (mismatch) |
 | range_only_T | 3125 | 3013 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
@@ -19781,6 +19781,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 66 |
 | `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 7 | 7 | 13 |
 | `data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml` | 17 | 17 | 3 |
+| `data/literature/extracts/wood-wade-2013-trace-activities.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/wright-okamura-1977-makaopuhi-cooling.yaml` | 40 | 40 | 40 |
 | `data/literature/extracts/xiao-2002-chromium-oxide-activities.yaml` | 261 | 261 | 0 |
 | `data/literature/extracts/xiao-holappa-1993-isij-crox-slag-activities.yaml` | 0 | 0 | 1 |
@@ -19885,8 +19886,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 317586
+advisory issues: 317592
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 317586 |
+| `identity_incomplete` | 317592 |
