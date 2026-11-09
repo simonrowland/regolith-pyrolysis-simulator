@@ -305,7 +305,7 @@ real melt thermodynamics where they are installed.
 | `internal-analytical` | Built-in Ellingham/Antoine model. The default active backend. |
 | `alphamelts` | Active backend, through a subprocess or the PetThermoTools API. |
 | `thermoengine` | Active backend. Uses VapoRock for vapour–melt work when it is installed. |
-| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for the eight major melt oxides (Si, Mg, Fe, Ca, Al, Ti, Na, K) through a 45-species associate model, plus Mn in its redox pack, whichever active backend is selected. Its gas database covers 311 species from 77 elements, and melt activities for more elements are on the way. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
+| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for the eight major melt oxides (Si, Mg, Fe, Ca, Al, Ti, Na, K) through a 45-species associate model, plus Mn in its redox pack, whichever active backend is selected. Its gas database reaches well beyond the melt oxides, and melt activities for more elements are on the way. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
 | VapoRock, MAGEMin | Per-task providers and cross-checks. Not selectable as the active backend. |
 
 Choose the active backend with `--backend` on the batch runner; batch runs always name one, so every
@@ -318,7 +318,7 @@ diagnostic, and vapour-pressure authority stays with the built-in model. See
 
 `install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
 pinned source engines. Our [engine patches](patches/README.md) are applied on top with
-`patches/scripts/enginepatch.sh apply`.
+`patches/scripts/enginepatch.sh apply <engine>`.
 
 ## Model Status
 
