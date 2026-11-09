@@ -88,6 +88,35 @@ def test_openimcc_residue_gas_calls_are_cached_across_pressure_models(
     assert not any(warm_cache.counters["openimcc"]["calls_by_kind"].values())
 
 
+def test_openimcc_evaluate_timeout_is_part_of_the_cache_request(
+    tmp_path: Path,
+) -> None:
+    from simulator.melt_backend.openimcc_cache import cached_openimcc_evaluate
+
+    cache = EngineCache(tmp_path / "openimcc-timeout.sqlite")
+    calls = 0
+
+    def evaluate() -> Any:
+        nonlocal calls
+        calls += 1
+        return _openimcc_bridge_result()
+
+    common = {
+        "composition_mol": {"SiO2": 1.0},
+        "temperature_K": 1700.0,
+        "pack": None,
+        "allow_extrapolation": True,
+        "allow_out_of_envelope": True,
+        "solve_fn": evaluate,
+    }
+    first = cached_openimcc_evaluate(cache, timeout_s=30.0, **common)
+    second = cached_openimcc_evaluate(cache, timeout_s=60.0, **common)
+
+    assert first == second
+    assert calls == 2
+    assert cache.counters["openimcc"]["misses"] == 2
+
+
 def test_internal_analytical_residue_calls_are_cached_across_pressure_models(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

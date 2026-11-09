@@ -21,7 +21,9 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EquilibrateCell,
     Po2Request,
     close_battery_engine_handle,
+    equilibrate_cell,
     open_battery_engine,
+    load_binary_pots,
 )
 from simulator.engine_cache import EngineCache, cached_solve
 from tests.battery import factories as F
@@ -86,6 +88,56 @@ def test_engine_availability_is_reported_per_engine(engine: Engine) -> None:
         close_battery_engine_handle(handle)
 
 
+@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
+def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
+    tmp_path: Path, engine: Engine
+) -> None:
+    handle = open_battery_engine(engine.value)
+    if not handle.available:
+        reason = handle.unavailable_reason or "engine binary or package is absent"
+        close_battery_engine_handle(handle)
+        pytest.skip(f"{engine.value} unavailable: {reason}")
+
+    try:
+        pots, _diagnostics = load_binary_pots()
+        pot = next(item for item in pots if item.pot_id == "mgo_sio2_40_60")
+        pressure_bar = (
+            1.0e-6 if engine in {Engine.VAPOROCK, Engine.THERMOENGINE} else 1.0
+        )
+        po2 = (
+            Po2Request("commanded", 1.0e-8)
+            if engine in {Engine.OPENIMCC, Engine.MAGEMIN, Engine.ALPHAMELTS}
+            else Po2Request("engine_default", None)
+        )
+        common = {
+            "temperature_K": 1700.0,
+            "po2": po2,
+            "timeout_s": 30.0,
+            "isolated": False,
+            "physical_pressure_bar": pressure_bar,
+        }
+        uncached = equilibrate_cell(handle, pot, **common)
+        cache_path = tmp_path / f"{engine.value}.sqlite"
+        cold_cache = EngineCache(cache_path)
+        cold = equilibrate_cell(handle, pot, **common, engine_cache=cold_cache)
+        warm_cache = EngineCache(cache_path)
+        warm = equilibrate_cell(handle, pot, **common, engine_cache=warm_cache)
+
+        def stable_payload(cell: EquilibrateCell) -> str:
+            return replace(
+                cell, wall_s=0.0, cpu_s=0.0, hostname="fixture"
+            ).to_cache_payload()
+
+        assert stable_payload(cold) == stable_payload(uncached)
+        assert stable_payload(warm) == stable_payload(uncached)
+        assert cold_cache.counters[engine.value]["calls_by_kind"][
+            "equilibrate_cell"
+        ] > 0
+        assert not any(warm_cache.counters[engine.value]["calls_by_kind"].values())
+    finally:
+        close_battery_engine_handle(handle)
+
+
 def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> None:
     engines = []
     for engine in CACHE_TEST_ENGINES:
@@ -127,8 +179,12 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     temperatures = tuple(
         Decimal(str(value)) for value in (1695, 1699, 1703, 1707, 1711, 1715)
     )
-    pressure = Decimal("100000")
-    oxygen_Pa = (Decimal("0.1"),) * 6
+    pressures_Pa = tuple(
+        Decimal(str(value)) for value in (100000, 100000, 0.1, 0.09, 1, 100000)
+    )
+    oxygen_Pa = tuple(
+        Decimal(str(value)) for value in (0.1, 1, 10, 1000, 100000, 0.1)
+    )
     experiments = {}
     observations = {}
     # Use distinct Fe-bearing requests at 1 bar so the cold run populates stable
@@ -141,7 +197,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
             experiment_id=f"cache-equivalence-exp-{index:02d}",
             work_id=work.work_id,
             T_K=temperature,
-            total_P=pressure,
+            total_P=pressures_Pa[index],
         )
         observation = F.observation(
             f"cache-equivalence-activity-{index:02d}",
@@ -152,7 +208,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
                 component_basis="SiO2",
                 composition=composition,
                 fO2_Pa=oxygen_Pa[index],
-                total_P=pressure,
+                total_P=pressures_Pa[index],
             ),
             Decimal("0.4") + Decimal(variant) / Decimal("10"),
             evidence=EvidenceClass.MEASURED_DIRECT,
