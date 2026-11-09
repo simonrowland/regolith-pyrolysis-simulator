@@ -1056,7 +1056,7 @@ ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
 
 @dataclass(frozen=True)
 class VaporPressureActivityRefusal:
-    """Status-bearing refusal for an incomplete activity projection."""
+    """Status-bearing refusal when a required vapor-pressure input is missing."""
 
     missing_precursor_species: tuple[str, ...]
     context: str
@@ -6265,6 +6265,8 @@ class _MELTSBackendSupport(MeltBackend):
             account_mol=account_mol,
             use_melt_activity_ladder=use_melt_activity_ladder,
         )
+        if isinstance(pressures, VaporPressureActivityRefusal):
+            return pressures
         # Partial activity maps that omit melt-present volatiles (e.g. Na/K
         # when only FeO/SiO2 activities are present) would debit those
         # species as zero by omission. Refuse the whole projection.
@@ -6469,7 +6471,7 @@ class _MELTSBackendSupport(MeltBackend):
         pO2_bar: float | None = None,
         account_mol: Mapping[str, float] | None = None,
         use_melt_activity_ladder: bool = False,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, float] | VaporPressureActivityRefusal:
         """Project melt-source reactions when VapoRock is unavailable.
 
         Exact engine activities take precedence. AlphaMELTS can resolve a
@@ -6500,6 +6502,7 @@ class _MELTSBackendSupport(MeltBackend):
                 comp_wt
             )
         pressures: Dict[str, float] = {}
+        missing_pO2_species: list[str] = []
         self._antoine_floor_inversion_notices = {}
         self._antoine_activity_source_notices = {}
         for species, spec in table.items():
@@ -6532,11 +6535,8 @@ class _MELTSBackendSupport(MeltBackend):
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
-                raise RuntimeError(
-                    'AlphaMELTS Antoine fallback cannot evaluate '
-                    f'{species} melt-source reaction without pO2_bar; '
-                    'refusing activity-only vapor pressure'
-                )
+                missing_pO2_species.append(str(species))
+                continue
             pO2_value = validate_physical_pO2_bar(pO2_bar) if pO2_bar is not None else 1.0
             if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
@@ -6572,6 +6572,12 @@ class _MELTSBackendSupport(MeltBackend):
             warn_pseudo_vapor_pressure_fallback(
                 str(species), spec, self._pseudo_vapor_pressure_warning_seen,
                 stacklevel=3,
+            )
+        if missing_pO2_species:
+            return VaporPressureActivityRefusal(
+                missing_precursor_species=tuple(missing_pO2_species),
+                context='pO2_bar is required for melt-source pressure',
+                reason='missing_input',
             )
         return pressures
 

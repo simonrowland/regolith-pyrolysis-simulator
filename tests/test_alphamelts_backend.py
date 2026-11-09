@@ -9143,7 +9143,7 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
     ) == {}
 
 
-def test_activities_times_antoine_refuses_standard_reaction_without_po2():
+def test_activities_times_antoine_typed_refusal_for_missing_po2():
     backend = AlphaMELTSBackend()
     backend._vapor_pressure_table = {
         'K': {
@@ -9156,12 +9156,15 @@ def test_activities_times_antoine_refuses_standard_reaction_without_po2():
         },
     }
 
-    with pytest.raises(RuntimeError, match='without pO2_bar'):
-        backend._activities_times_antoine(
-            1600.0,
-            {'K2O': 0.5},
-            {'K2O': 1.0},
-        )
+    refusal = backend._activities_times_antoine(
+        1600.0,
+        {'K2O': 0.5},
+        {'K2O': 1.0},
+    )
+
+    assert isinstance(refusal, VaporPressureActivityRefusal)
+    assert refusal.missing_precursor_species == ('K',)
+    assert refusal.reason == 'missing_input'
 
 
 def test_activities_times_antoine_warns_once_for_pseudo_curvefit():
