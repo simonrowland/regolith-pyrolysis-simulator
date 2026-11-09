@@ -270,6 +270,7 @@ def test_isolated_cell_uses_parent_magemin_database_for_off_cold_and_warm(
     )
 
     direct = equilibrate_cell(handle, _pot(), isolated=False, **common)
+    isolated_off = equilibrate_cell(handle, _pot(), isolated=True, **common)
     cold = equilibrate_cell(
         handle,
         _pot(),
@@ -285,8 +286,19 @@ def test_isolated_cell_uses_parent_magemin_database_for_off_cold_and_warm(
         **common,
     )
 
-    assert direct.status == cold.status == warm.status == "refusal"
-    assert direct.engine_reason == cold.engine_reason == warm.engine_reason
+    assert (
+        direct.status
+        == isolated_off.status
+        == cold.status
+        == warm.status
+        == "refusal"
+    )
+    assert (
+        direct.engine_reason
+        == isolated_off.engine_reason
+        == cold.engine_reason
+        == warm.engine_reason
+    )
     assert opened_settings == [
         _vector(handle)["engine_settings"]
     ]
