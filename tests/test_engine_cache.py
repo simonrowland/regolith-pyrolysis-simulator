@@ -200,6 +200,67 @@ def test_cached_solve_skips_transient_failure_and_caches_typed_refusal(
     assert hit.value == refusal.value
 
 
+def test_isolated_worker_exit_cells_are_transient(
+    tmp_path: Path,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot,
+        EngineHandle,
+        Po2Request,
+        _crash_cell_from_returncode,
+    )
+
+    cell = _crash_cell_from_returncode(
+        handle=EngineHandle(
+            name="alphamelts",
+            backend=None,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=True,
+            supports_intrinsic_fo2=True,
+        ),
+        pot=BinaryPot("crashed", None, "test", {"SiO2": 100.0}),
+        temperature_K=1700.0,
+        po2=Po2Request("engine_default", None),
+        wall0=0.0,
+        cpu0=0.0,
+        hostname="test-host",
+        returncode=-9,
+        timed_out=False,
+        stderr="killed",
+        arm="headline",
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+    cache = EngineCache(tmp_path / "crash-cache.sqlite")
+    calls = 0
+
+    def crash_again():
+        nonlocal calls
+        calls += 1
+        return cell
+
+    request = {"temperature_K": 1700.0}
+    cached_solve(cache, "alphamelts", request, crash_again)
+    cached_solve(cache, "alphamelts", request, crash_again)
+
+    assert cell.engine_status == "engine_crash"
+    assert calls == 2
+    assert cache.counters["alphamelts"]["stores"] == 0
+    assert cache.counters["alphamelts"]["transient_skips"] == 2
+
+
+@pytest.mark.parametrize("disposition", ["environment", "resource", "worker_died"])
+def test_lifecycle_failure_dispositions_are_transient(disposition: str) -> None:
+    class LifecycleOutcome(_Outcome):
+        backend_failure_disposition = disposition
+
+    outcome = LifecycleOutcome({"status": "not_converged"})
+
+    assert engine_cache.is_transient_failure(outcome)
+
+
 def test_runtime_identity_tripwire_logs_once_and_keeps_the_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -288,6 +349,8 @@ def test_cached_solve_tracks_per_engine_work_unit_counters(
             "equilibrate_cell": 3,
             "evaluate": 0,
             "evaluate_redox": 0,
+            "evaluate_gas": 0,
+            "residue_vapor_pressure": 0,
         },
     }
     assert cache.counters["openimcc"] == {
@@ -299,6 +362,8 @@ def test_cached_solve_tracks_per_engine_work_unit_counters(
             "equilibrate_cell": 0,
             "evaluate": 0,
             "evaluate_redox": 0,
+            "evaluate_gas": 0,
+            "residue_vapor_pressure": 0,
         },
     }
 

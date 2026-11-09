@@ -26,6 +26,14 @@ from tests.battery import factories as F
 
 
 ROOT = Path(__file__).resolve().parents[2]
+CACHE_TEST_ENGINES = (
+    Engine.OPENIMCC,
+    Engine.INTERNAL_ANALYTICAL,
+    Engine.VAPOROCK,
+    Engine.MAGEMIN,
+    Engine.ALPHAMELTS,
+    Engine.THERMOENGINE,
+)
 
 
 def _canonical_residual_rows(path: Path) -> bytes:
@@ -48,42 +56,74 @@ def _canonical_residual_rows(path: Path) -> bytes:
     return b"\n".join(rows) + (b"\n" if rows else b"")
 
 
+@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
+def test_engine_availability_is_reported_per_engine(engine: Engine) -> None:
+    handle = open_battery_engine(engine.value)
+    try:
+        if not handle.available:
+            pytest.skip(f"{engine.value} unavailable: {handle.unavailable_reason}")
+    finally:
+        close_battery_engine_handle(handle)
+
+
 def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> None:
     engines = []
-    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+    for engine in CACHE_TEST_ENGINES:
         handle = open_battery_engine(engine.value)
         try:
             if handle.available:
                 engines.append(engine)
         finally:
             close_battery_engine_handle(handle)
-    if len(engines) < 2:
-        pytest.skip("fewer than two battery engines are available in this seat")
+    if not engines:
+        pytest.skip("no battery engines are available in this seat")
 
     work = F.work()
-    composition = Composition(
-        basis="printed_mole_fraction",
-        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
-        amount_basis=AmountBasis.MOLE_FRACTION,
+    compositions = (
+        Composition(
+            basis="printed_mole_fraction",
+            components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
+        Composition(
+            basis="printed_mole_fraction",
+            components=(("SiO2", Decimal("0.6")), ("FeO", Decimal("0.4"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
+        Composition(
+            basis="printed_mole_fraction",
+            components=(("SiO2", Decimal("0.4")), ("MgO", Decimal("0.6"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
     )
+    temperatures = (Decimal("1703"), Decimal("1711"), Decimal("1695"))
+    pressures_Pa = (Decimal("100000"), Decimal("0.1"), Decimal("0.0001"))
+    oxygen_Pa = (Decimal("1e-8"), Decimal("1e-7"), Decimal("1e-9"))
     experiments = {}
     observations = {}
     for index in range(12):
+        variant = index % len(compositions)
+        temperature = temperatures[variant]
+        pressure = pressures_Pa[variant]
+        composition = compositions[variant]
         experiment = F.tabulation_experiment(
             experiment_id=f"cache-equivalence-exp-{index:02d}",
             work_id=work.work_id,
-            T_K=Decimal("1703"),
+            T_K=temperature,
+            total_P=pressure,
         )
         observation = F.observation(
             f"cache-equivalence-activity-{index:02d}",
             experiment.experiment_id,
             F.activity_identity(
                 formula="SiO2",
-                T_K=Decimal("1703"),
+                T_K=temperature,
                 component_basis="SiO2",
                 composition=composition,
+                fO2_Pa=oxygen_Pa[variant],
+                total_P=pressure,
             ),
-            Decimal("0.5"),
+            Decimal("0.4") + Decimal(variant) / Decimal("10"),
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id=work.work_id,
         )
@@ -136,6 +176,11 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     assert parallel_warm == warm == off
     assert warm_counts is not None
     assert parallel_counts is not None
+    assert _cold_counts is not None
+    assert all(
+        sum(_cold_counts[engine.value]["calls_by_kind"].values()) > 0
+        for engine in engines
+    )
     assert all(
         warm_counts[engine.value]["misses"]
         == parallel_counts[engine.value]["misses"]
@@ -152,11 +197,15 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "equilibrate_cell": 0,
         "evaluate": 0,
         "evaluate_redox": 0,
+        "evaluate_gas": 0,
+        "residue_vapor_pressure": 0,
     }
     assert parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
         "equilibrate_cell": 0,
         "evaluate": 0,
         "evaluate_redox": 0,
+        "evaluate_gas": 0,
+        "residue_vapor_pressure": 0,
     }
 
     from tests.battery.test_redox_extract_scoring import (
@@ -223,11 +272,15 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         "equilibrate_cell": 0,
         "evaluate": 0,
         "evaluate_redox": 0,
+        "evaluate_gas": 0,
+        "residue_vapor_pressure": 0,
     }
     assert redox_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
         "equilibrate_cell": 0,
         "evaluate": 0,
         "evaluate_redox": 0,
+        "evaluate_gas": 0,
+        "residue_vapor_pressure": 0,
     }
 
 
@@ -397,4 +450,6 @@ def test_direct_openimcc_results_and_refusals_round_trip_through_cache(
         "equilibrate_cell": 0,
         "evaluate": 2,
         "evaluate_redox": 2,
+        "evaluate_gas": 0,
+        "residue_vapor_pressure": 0,
     }
