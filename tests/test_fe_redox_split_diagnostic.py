@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from simulator.accounting import resolve_species_formula
+import simulator.fe_redox as fe_redox_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
@@ -111,7 +112,7 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
 
 
 def test_native_fe_activity_and_extent_numeric_identity_pin() -> None:
-    # Bit-level green pin, committed before moving the shared saturation rule.
+    # Bit-level pin of the corrected native-Fe saturation law.
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
@@ -119,8 +120,33 @@ def test_native_fe_activity_and_extent_numeric_identity_pin() -> None:
 
     split = sim._compute_fe_redox_split_diagnostic()
 
-    assert float(split["native_fe_activity"]).hex() == "0x1.a644ba12608ffp-2"
-    assert float(split["native_fe_frac"]).hex() == "0x1.5cdc48aa30407p-1"
+    assert float(split["native_fe_activity"]).hex() == "0x1.fcc1d6ee0b790p-3"
+    assert float(split["native_fe_frac"]).hex() == "0x1.ead69fdf3438cp-2"
+
+
+def test_native_fe_saturation_is_zero_at_the_melt_anchor() -> None:
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    T_K = 1873.15
+    current = sim._compute_fe_redox_split_diagnostic()
+    liquid_domain = sim.liquid_feo_domain_at(T_K)
+    anchor = fe_redox_module._solve_calphad_metal_saturation_anchor(
+        comp_wt=sim._melt_oxide_wt_pct(),
+        T_K=T_K,
+        pressure_bar=current["pressure_bar"],
+        floor_bar=sim._vacuum_floor_bar(),
+        liquid_domain=liquid_domain,
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = anchor["log10_fO2_bar"]
+    sim.melt.fO2_log = anchor["log10_fO2_bar"]
+    sim.melt.melt_fO2_log = anchor["log10_fO2_bar"]
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["native_fe_frac"] == 0.0
+    assert split["native_fe_activity"] == pytest.approx(
+        split["native_fe_saturation_activity"],
+        rel=1e-14,
+    )
 
 
 def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:

@@ -595,13 +595,14 @@ from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
     LiquidFeODomain,
     RedoxState,
+    _feo_activity_to_wustite_basis,
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
-    _feo_activity_to_wustite_basis,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
+    holzheid_stoich_feo_gamma_band,
     intrinsic_melt_fO2,
     legacy_iw_log10_fO2_bar,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
@@ -7934,11 +7935,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             })
         a_feo_wustite = _feo_activity_to_wustite_basis(
             a_feo,
-            stoich_multiplier=1.0,
+            stoich_multiplier=float(
+                holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+            ),
         )
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
-        # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
+        # feo_iw_log10_fO2_bar(), so a_FeO,wustite,sat =
+        # 10^((log fO2 - IW)/2).
         saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
         if saturation_log10 > 300.0:
             a_feo_saturation = float('inf')
@@ -7957,12 +7961,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'native_fe_saturation': native > 0.0,
             'native_fe_threshold': 'FeO_activity_saturation',
             'native_fe_frac': native,
-            'native_fe_activity': a_feo,
+            'native_fe_activity': a_feo_wustite,
             'native_fe_saturation_activity': a_feo_saturation,
             'native_fe_pure_feo_iw_log': pure_feo_iw,
             'native_fe_activity_source': (
                 'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
-                'FeO(l)=Fe+0.5O2 saturation'
+                'FeO(wustite l)=Fe+0.5O2 saturation'
             ),
         })
 

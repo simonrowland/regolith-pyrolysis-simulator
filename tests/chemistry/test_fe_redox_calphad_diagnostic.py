@@ -65,11 +65,17 @@ def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
     feedstocks_data: dict,
 ):
     cases = (
-        ("lunar_mare_lms1", 1.3e-12, 1.3e-12, 0.237741),
-        ("mars_global_mgs1", 6.1e-3, 1.0e-9, 0.314005),
+        ("lunar_mare_lms1", 1.3e-12, 1.3e-12, 0.238735, -11.5605),
+        ("mars_global_mgs1", 6.1e-3, 1.0e-9, 0.315426, -11.3186),
     )
 
-    for feedstock_id, pressure_bar, floor_bar, expected_activity in cases:
+    for (
+        feedstock_id,
+        pressure_bar,
+        floor_bar,
+        expected_activity,
+        expected_root,
+    ) in cases:
         anchor = _solve_metal_saturation_anchor(
             comp_wt=feedstocks_data[feedstock_id]["composition_wt_pct"],
             T_K=_T_K,
@@ -79,19 +85,19 @@ def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
 
         assert anchor["a_FeO"] == pytest.approx(expected_activity, abs=2e-6)
         assert anchor["log10_fO2_bar"] == pytest.approx(
-            feo_iw_log10_fO2_bar(_T_K, a_feo=expected_activity),
-            abs=2e-6,
+            expected_root,
+            abs=5e-5,
         )
         assert anchor["anchor_fallback_pure_iw"] is False
 
 
 def test_metal_saturation_anchor_numeric_identity_pin(feedstocks_data: dict):
-    # Bit-level green pin, committed before moving the shared saturation rule.
+    # Bit-level pin of the corrected resolver; green values are in the preceding test commit.
     cases = (
         ("lunar_mare_lms1", 1.3e-12, 1.3e-12,
-         "-0x1.5fa2282a97ea1p+3", "0x1.e6e4fd38bb9dap-3"),
+         "-0x1.71efd242bb259p+3", "0x1.e8edfa176cd80p-3"),
         ("mars_global_mgs1", 6.1e-3, 1.0e-9,
-         "-0x1.57e6714b3ea39p+3", "0x1.418a9ff1b3ce9p-2"),
+         "-0x1.6a31a91d097e1p+3", "0x1.42ff1aeafb267p-2"),
     )
     for feedstock_id, pressure_bar, floor_bar, root_hex, activity_hex in cases:
         anchor = _solve_metal_saturation_anchor(
@@ -104,13 +110,18 @@ def test_metal_saturation_anchor_numeric_identity_pin(feedstocks_data: dict):
         assert float(anchor["a_FeO"]).hex() == activity_hex
 
 
-def test_metal_saturation_anchor_reduces_to_pure_iw_at_unit_activity(
+def test_metal_saturation_anchor_reduces_to_pure_iw_at_unit_wustite_activity(
     monkeypatch,
 ):
+    stoich_multiplier = holzheid_stoich_feo_gamma_band(_T_K)[
+        "conversion_multiplier"
+    ]
     monkeypatch.setattr(
         fe_redox_module,
         "_calphad_feo_activity_components",
-        lambda **kwargs: {"a_FeO_calphad": {"central": 1.0}},
+        lambda **kwargs: {
+            "a_FeO_calphad": {"central": stoich_multiplier}
+        },
     )
 
     anchor = _solve_metal_saturation_anchor(
@@ -123,7 +134,7 @@ def test_metal_saturation_anchor_reduces_to_pure_iw_at_unit_activity(
     assert anchor["log10_fO2_bar"] == pytest.approx(
         feo_iw_log10_fO2_bar(_T_K, a_feo=1.0)
     )
-    assert anchor["a_FeO"] == pytest.approx(1.0)
+    assert anchor["a_FeO"] == pytest.approx(stoich_multiplier)
     assert anchor["anchor_fallback_pure_iw"] is False
 
 
@@ -656,17 +667,24 @@ def test_feo_activity_anchor_basis_documents_melt_offset():
     assert diagnostic["authority"]["anchor_fallback_pure_iw"] is False
     assert diagnostic["a_FeO_current"] == pytest.approx(central)
     assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(iw)
-    assert offset == pytest.approx(2.0 * math.log10(central))
+    assert offset == pytest.approx(
+        tiepoint["central_melt_metal_saturation_log10_fO2_bar"] - iw
+    )
     assert offset < 0.0
     assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
-        pytest.approx(iw + offset)
+        pytest.approx(anchor["log10_fO2_bar"])
     )
 
 
 def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
     vapor_pressure_data,
 ):
-    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 0.25
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_IRON_RICH_BASALT_WT,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+    fO2_log = anchor["log10_fO2_bar"] - 0.25
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_IRON_RICH_BASALT_WT,
         fO2_log=fO2_log,

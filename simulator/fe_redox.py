@@ -1166,7 +1166,9 @@ def _solve_calphad_metal_saturation_anchor(
     liquid_domain: LiquidFeODomain | None = None,
 ) -> dict[str, float | bool | None]:
     pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-    stoich_multiplier = 1.0
+    stoich_multiplier = float(
+        holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+    )
 
     def anchor_result(
         log10_fO2_bar: float,
@@ -1207,11 +1209,14 @@ def _solve_calphad_metal_saturation_anchor(
         # 2 log10(a_FeO,wustite). Activities are dimensionless and fugacity is
         # relative to the 1-bar standard state; both logs are base-10, so the
         # coordinate is in dex. At fixed composition, T, and P,
+        # the Eq. 9 1-atm/1-bar convention is 0.0057 dex (log10(1.01325));
+        # leave it at the published value, about 19x below the 0.106-dex
+        # fO2 uncertainty implied by Holzheid's gamma=1.70 +/- 0.22.
         # KRESS91_LN_FO2_COEFFICIENT=0.196 > 0 makes the Fe3+/Fe2+ ratio
         # nondecreasing in ell. Since x_FeO=FeOt/(1+2*ratio) and central
-        # Holzheid gamma depends only on T, a_FeO is nonincreasing and this
-        # residual is strictly increasing. A sign-changing bracket confirms
-        # the unique root numerically.
+        # Holzheid gamma and the conversion multiplier depend only on T,
+        # a_FeO,wustite is nonincreasing and this residual is strictly
+        # increasing. A sign-changing bracket confirms the unique root.
         activity_wustite = _feo_activity_to_wustite_basis(
             activity,
             stoich_multiplier=stoich_multiplier,
@@ -1369,6 +1374,19 @@ def _calphad_feo_activity_components(
     # the blend, while above 1 its slope is zero.  At the limiting value both
     # branches return exactly 1 (and, e.g., an unclamped 1.2 remains authority 1).
     authoritative = min(authoritative_unclamped, 1.0)
+    stoich_multiplier = float(holzheid['conversion_multiplier'])
+    central_wustite = _feo_activity_to_wustite_basis(
+        central,
+        stoich_multiplier=stoich_multiplier,
+    )
+    authoritative_wustite = _feo_activity_to_wustite_basis(
+        authoritative,
+        stoich_multiplier=stoich_multiplier,
+    )
+    kress91_wustite = _feo_activity_to_wustite_basis(
+        kress91_activity,
+        stoich_multiplier=stoich_multiplier,
+    )
     if authoritative > 0.0:
         ratio_current = central / authoritative
         delta_log10_current = (
@@ -1463,27 +1481,37 @@ def _calphad_feo_activity_components(
         'metal_saturation_tie_point': {
             'iw_pure_feo_log10_fO2_bar': pure_feo_iw,
             'central_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
+                feo_iw_log10_fO2_bar(
+                    T_K,
+                    a_feo=max(central_wustite, 1.0e-300),
+                )
             ),
             'current_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(authoritative, 1.0e-300))
+                feo_iw_log10_fO2_bar(
+                    T_K,
+                    a_feo=max(authoritative_wustite, 1.0e-300),
+                )
             ),
             'kress91_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
+                feo_iw_log10_fO2_bar(
+                    T_K,
+                    a_feo=max(kress91_wustite, 1.0e-300),
+                )
             ),
             'central_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(central, 1.0e-300))
+                2.0 * math.log10(max(central_wustite, 1.0e-300))
             ),
             'current_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(authoritative, 1.0e-300))
+                2.0 * math.log10(max(authoritative_wustite, 1.0e-300))
             ),
             'kress91_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(kress91_activity, 1.0e-300))
+                2.0 * math.log10(max(kress91_wustite, 1.0e-300))
             ),
             'iw_basis_note': (
                 'Pure FeO(l) IW is the standard-state reference. The authority '
                 'weight uses the self-consistent Fe-saturation root, evaluating '
-                'CALPHAD a_FeO at each trial fO2; a_FeO=1 recovers pure IW.'
+                'CALPHAD a_FeO on the wustite basis at each trial fO2; '
+                'a_FeO,wustite=1 recovers pure IW.'
             ),
             'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
         },
