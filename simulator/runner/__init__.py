@@ -37,7 +37,6 @@ import subprocess
 import sys
 import threading
 import weakref
-from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -80,6 +79,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.stage0_inventory import sibling_artifact_payload
+from simulator.vapor_pressure_report import vapor_pressure_source_report_fields
 from simulator.accounting.yield_disposition import (
     build_yield_disposition,
     capture_ledger_snapshot,
@@ -2017,6 +2017,7 @@ def _empty_vapor_pressure_source_report() -> dict[str, object]:
         "species": {},
         "summary": {},
         "total_species": 0,
+        "activity_sources": {},
         "vapor_pressure_backend_status": "",
         "vapor_pressure_backend_status_summary": {},
         "vapor_pressure_backend_status_reason": "",
@@ -2026,48 +2027,23 @@ def _empty_vapor_pressure_source_report() -> dict[str, object]:
 
 
 def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
-    source_by_species = {
-        str(species): str(source)
-        for species, source in sorted(
-            (getattr(sim, "_last_vapor_pressures_source", {}) or {}).items()
-        )
-    }
-    total = len(source_by_species)
-    counts = Counter(source_by_species.values())
     diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
-    activity_source_by_species = diagnostics.get(
-        "activity_source_by_species", {}
+    source_fields = vapor_pressure_source_report_fields(
+        getattr(sim, "_last_vapor_pressures_source", {}) or {},
+        diagnostics.get("activity_source_by_species"),
     )
-    species_entries = {}
-    for species, source in source_by_species.items():
-        entry: dict[str, object] = {"source": source}
-        activity_source = (
-            activity_source_by_species.get(species)
-            if isinstance(activity_source_by_species, Mapping)
-            else None
-        )
-        if isinstance(activity_source, Mapping):
-            entry["activity_source"] = dict(activity_source)
-        species_entries[species] = entry
+    total_species = int(source_fields["total_species"])
     facet_status = str(
         diagnostics.get("vapor_pressure_backend_status") or ""
     ).strip()
     report: dict[str, object] = {
-        "species": species_entries,
-        "summary": {
-            source: {
-                "count": count,
-                "percentage": round(count / total * 100.0, 6) if total else 0.0,
-            }
-            for source, count in sorted(counts.items())
-        },
-        "total_species": total,
+        **source_fields,
         "vapor_pressure_backend_status": facet_status,
         "vapor_pressure_backend_status_summary": (
             {
                 facet_status: {
-                    "count": total,
-                    "percentage": 100.0 if total else 0.0,
+                    "count": total_species,
+                    "percentage": 100.0 if total_species else 0.0,
                 }
             }
             if facet_status

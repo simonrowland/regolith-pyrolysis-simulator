@@ -9,6 +9,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from simulator.vapor_pressure_report import vapor_pressure_source_report_fields
+
 
 APPROVED_LIVE_VAPOR_SOURCES = frozenset({"builtin_authoritative"})
 VAPOR_ACTIVE_CAMPAIGN_PREFIXES = ("C2A", "C2B", "C4")
@@ -209,18 +211,10 @@ def assert_strict_vapor_source_report(
             )
         return {"vapor_active": False, "total_species": total_species, "summary": {}}
 
-    source_by_species = {
-        species_name: (
-            entry.get("source") if isinstance(entry, Mapping) else entry
-        )
-        for species_name, entry in species.items()
-    }
-    counts = Counter(
-        _source_authority(source) for source in source_by_species.values()
-    )
+    counts = Counter(_source_authority(source) for source in species.values())
     bad_sources = {
         str(source)
-        for species_name, source in source_by_species.items()
+        for species_name, source in species.items()
         if _source_authority(source) not in approved_sources
         or _is_noncertifying_vapor_extrapolation(species_name, source)
     }
@@ -373,41 +367,18 @@ def _vapor_pressure_source_report_from_pt1_payload(
     }
     if not source_by_species:
         return None
-    counts = Counter(source_by_species.values())
-    total = len(source_by_species)
-    return {
-        "species": source_by_species,
-        "summary": {
-            source: {
-                "count": count,
-                "percentage": round(count / total * 100.0, 6) if total else 0.0,
-            }
-            for source, count in sorted(counts.items())
-        },
-        "total_species": total,
-    }
+    return vapor_pressure_source_report_fields(
+        source_by_species,
+        payload.get("activity_source_by_species"),
+    )
 
 
 def vapor_pressure_source_report_from_sim(sim: Any) -> dict[str, object]:
-    source_by_species = {
-        str(species): str(source)
-        for species, source in sorted(
-            (getattr(sim, "_last_vapor_pressures_source", {}) or {}).items()
-        )
-    }
-    total = len(source_by_species)
-    counts = Counter(source_by_species.values())
-    return {
-        "species": source_by_species,
-        "summary": {
-            source: {
-                "count": count,
-                "percentage": round(count / total * 100.0, 6) if total else 0.0,
-            }
-            for source, count in sorted(counts.items())
-        },
-        "total_species": total,
-    }
+    diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
+    return vapor_pressure_source_report_fields(
+        getattr(sim, "_last_vapor_pressures_source", {}) or {},
+        diagnostics.get("activity_source_by_species"),
+    )
 
 
 def assert_strict_vapor_result_payload(

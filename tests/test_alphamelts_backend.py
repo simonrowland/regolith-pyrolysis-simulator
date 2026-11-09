@@ -10777,14 +10777,12 @@ def test_t162_missing_mgo_activity_uses_melt_ladder_and_report_notice():
     sim._last_vapor_pressures_source = {'Mg': source['Mg']}
     sim._last_backend_diagnostics = diagnostics
     report = _vapor_pressure_source_report(sim)
-    assert report['species']['Mg'] == {
-        'source': source['Mg'],
-        'activity_source': {
-            'rung': 'published_gamma',
-            'source': expected_mgo.citation,
-            'x': expected_mgo.x_single_cation,
-            'reason': 'alphaMELTS supplied no oxide-component activity',
-        },
+    assert report['species']['Mg'] == source['Mg']
+    assert report['activity_sources']['Mg'] == {
+        'rung': 'published_gamma',
+        'source': expected_mgo.citation,
+        'x': expected_mgo.x_single_cation,
+        'reason': 'alphaMELTS supplied no oxide-component activity',
     }
 
 

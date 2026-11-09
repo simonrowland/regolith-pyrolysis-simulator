@@ -124,10 +124,8 @@ def test_l5_thermoengine_vapor_sources_survive_c2a_tick(
         if source == "builtin_authoritative"
     }
     report = _vapor_pressure_source_report(sim)
-    assert {
-        species: entry["source"]
-        for species, entry in report["species"].items()
-    } == sources
+    assert report["species"] == sources
+    assert report["activity_sources"] == {}
     if fallback_species:
         assert report["summary"]["builtin_authoritative"]["count"] == len(
             fallback_species

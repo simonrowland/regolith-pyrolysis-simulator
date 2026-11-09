@@ -74,18 +74,18 @@
     }
     const entries = Object.entries(species);
     if (!entries.length) return `<p class="sec-p10-empty">No per-species sources emitted.</p>`;
-    const rows = entries.map(([name, speciesEntry]) => {
+    const activitySources = isRecord(report.activity_sources)
+      ? report.activity_sources
+      : {};
+    const rows = entries.map(([name, source]) => {
       const color = speciesColor(name);
       const speciesLabel = esc(prettySpecies(name));
-      const source = isRecord(speciesEntry)
-        ? speciesEntry.source
-        : speciesEntry;
       const token = typeof source === "string"
         ? `<span class="sec-p10-token">${esc(source)}</span>`
         : `<span class="sec-p10-malformed">Malformed ${source === null ? "null" : Array.isArray(source) ? "array" : typeof source} source token</span>`;
       let activityDetail = "";
-      if (isRecord(speciesEntry) && hasOwn(speciesEntry, "activity_source")) {
-        const activity = speciesEntry.activity_source;
+      if (hasOwn(activitySources, name)) {
+        const activity = activitySources[name];
         activityDetail = isRecord(activity)
           ? `<small class="sec-p10-activity-source">Activity ${esc(String(activity.rung ?? ""))} · ${esc(String(activity.source ?? ""))} · x=${esc(String(activity.x ?? ""))} · ${esc(String(activity.reason ?? ""))}${activity.warning ? ` · ${esc(String(activity.warning))}` : ""}</small>`
           : `<small class="sec-p10-malformed">Malformed activity source detail</small>`;

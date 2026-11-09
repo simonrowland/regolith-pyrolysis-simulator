@@ -4,6 +4,7 @@ import hashlib
 import json
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +24,7 @@ from simulator.grind_preflight import (
     assert_strict_vapor_result_payload,
     assert_strict_vapor_result_store,
     assert_strict_vapor_source_report,
+    vapor_pressure_source_report_from_sim,
 )
 
 
@@ -453,18 +455,16 @@ def test_strict_vapor_source_report_accepts_in_band_na_standard_term() -> None:
     assert summary["vapor_active"] is True
 
 
-def test_strict_vapor_source_report_accepts_nested_activity_notice() -> None:
+def test_strict_vapor_source_report_accepts_sibling_activity_notice() -> None:
     source = "builtin_authoritative:standard_reaction_term"
     report = {
-        "species": {
+        "species": {"Mg": source},
+        "activity_sources": {
             "Mg": {
-                "source": source,
-                "activity_source": {
-                    "rung": "published_gamma",
-                    "source": "Sossi & Fegley 2018 Table 2",
-                    "x": 0.25,
-                    "reason": "alphaMELTS supplied no oxide-component activity",
-                },
+                "rung": "published_gamma",
+                "source": "Sossi & Fegley 2018 Table 2",
+                "x": 0.25,
+                "reason": "alphaMELTS supplied no oxide-component activity",
             },
         },
         "summary": {source: {"count": 1, "percentage": 100.0}},
@@ -475,6 +475,30 @@ def test_strict_vapor_source_report_accepts_nested_activity_notice() -> None:
 
     assert summary["total_species"] == 1
     assert summary["summary"]["builtin_authoritative"] == 1
+    report["species"] = {"Mg": {"source": source}}
+    with pytest.raises(GrindSourceGateError, match="must be 100%"):
+        assert_strict_vapor_source_report(report, context="wrapped-result")
+
+
+def test_vapor_pressure_source_report_from_sim_keeps_scalar_species() -> None:
+    source = "builtin_authoritative:standard_reaction_term"
+    activity_source = {
+        "rung": "published_gamma",
+        "source": "Sossi & Fegley 2018 Table 2",
+        "x": 0.25,
+        "reason": "alphaMELTS supplied no oxide-component activity",
+    }
+    sim = SimpleNamespace(
+        _last_vapor_pressures_source={"Mg": source},
+        _last_backend_diagnostics={
+            "activity_source_by_species": {"Mg": activity_source}
+        },
+    )
+
+    report = vapor_pressure_source_report_from_sim(sim)
+
+    assert report["species"] == {"Mg": source}
+    assert report["activity_sources"] == {"Mg": activity_source}
 
 
 def test_strict_vapor_source_report_rejects_extrapolated_sio_even_with_authoritative_head() -> None:

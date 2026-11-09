@@ -8,13 +8,14 @@ stream's `per_hour_summary` frames; the schema is asserted in
 
 **Schema version:** `1.10.0`
 
-Schema 1.10.0 adds an optional `activity_source` object to each per-species
-vapor-pressure source entry when AlphaMELTS has to resolve a missing oxide
-activity through the melt-activity ladder. The existing source token remains
-under that entry's `source` field. The activity notice records the rung,
-citation or `ideal`, single-cation mole fraction, and the reason the fallback
-was needed. An `activity_source.warning` is included when the shared resolver
-reports a temperature-domain warning for its published coefficient.
+Schema 1.10.0 adds the unconditional `activity_sources` sibling map to the
+vapor-pressure source report. Per-species source entries remain their original
+scalar source strings. The activity map records the rung, citation or `ideal`,
+single-cation mole fraction, and reason for each pressure that used the
+melt-activity ladder. An optional `warning` is included when the shared
+resolver reports a temperature-domain warning for its published coefficient.
+This branch keeps `RUNNER_SCHEMA_VERSION` at `1.10.0`; after this change lands,
+the concurrent b-1146 branch must rebase its schema version to `1.11.0`.
 
 Schema 1.9.0 adds the unconditional top-level
 `vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
@@ -540,17 +541,15 @@ and the aggregate liner load:
 ```jsonc
 "vapor_pressure_source_report": {
   "species": {
-    "Na": {
-      "source": "builtin_authoritative"
-    },
+    "Na": "builtin_authoritative",
+    "Mg": "builtin_authoritative:standard_reaction_term"
+  },
+  "activity_sources": {
     "Mg": {
-      "source": "builtin_authoritative:standard_reaction_term",
-      "activity_source": {
-        "rung": "published_gamma",
-        "source": "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
-        "x": 0.25,
-        "reason": "alphaMELTS supplied no oxide-component activity"
-      }
+      "rung": "published_gamma",
+      "source": "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+      "x": 0.25,
+      "reason": "alphaMELTS supplied no oxide-component activity"
     }
   },
   "summary": {
@@ -582,12 +581,13 @@ and the aggregate liner load:
   is diagnostic-only.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
-* All eight report-level keys are unconditional in schema 1.4.0. Per-species
-  entries retain the source token under `source`; an `activity_source` object
-  is present only when the AlphaMELTS activity ladder supplies that species'
-  missing oxide activity. When no backend facet status exists, the status and
-  reason/source strings are empty, the facet summary is `{}`, and
-  `authoritative_for_requested_vapor_pressure` is `null`.
+* The original eight report-level keys are unconditional from schema 1.4.0;
+  `activity_sources` is also unconditional from schema 1.10.0. Per-species
+  entries remain scalar source tokens. An `activity_sources` entry is present
+  only when the AlphaMELTS activity ladder supplied an activity for a backend
+  pressure retained after kernel refresh. When no backend facet status exists,
+  the status and reason/source strings are empty, the facet summary is `{}`,
+  and `authoritative_for_requested_vapor_pressure` is `null`.
 * When VapoRock shadow data exists, `simulator.runner` copies it from
   `_last_vapor_pressure_diagnostic["vaporock_full_speciation_Pa"]` into
   the runner diagnostics under the same key. It is not an authoritative

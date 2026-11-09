@@ -1068,6 +1068,7 @@ VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
     "species",
     "summary",
     "total_species",
+    "activity_sources",
     "vapor_pressure_backend_status",
     "vapor_pressure_backend_status_summary",
     "vapor_pressure_backend_status_reason",
@@ -1625,6 +1626,7 @@ def _assert_schema_shape(payload: dict) -> None:
     assert isinstance(source_report, dict)
     assert set(source_report) == VAPOR_PRESSURE_SOURCE_REPORT_KEYS
     assert isinstance(source_report["species"], dict)
+    assert isinstance(source_report["activity_sources"], dict)
     assert isinstance(source_report["summary"], dict)
     assert source_report["total_species"] == len(source_report["species"])
     assert isinstance(source_report["vapor_pressure_backend_status"], str)
@@ -1642,25 +1644,8 @@ def _assert_schema_shape(payload: dict) -> None:
     ] in {True, False, None}
     for species, entry in source_report["species"].items():
         assert isinstance(species, str)
-        assert set(entry) in ({"source"}, {"source", "activity_source"})
-        source = entry["source"]
-        if "activity_source" in entry:
-            activity_source = entry["activity_source"]
-            assert set(activity_source) in (
-                {"rung", "source", "x", "reason"},
-                {"rung", "source", "x", "reason", "warning"},
-            )
-            assert activity_source["rung"] in {
-                "published_gamma",
-                "ideal_mixing",
-            }
-            assert isinstance(activity_source["source"], str)
-            assert isinstance(activity_source["x"], (int, float))
-            assert activity_source["reason"] == (
-                "alphaMELTS supplied no oxide-component activity"
-            )
-            if "warning" in activity_source:
-                assert isinstance(activity_source["warning"], str)
+        assert isinstance(entry, str)
+        source = entry
         # Per-species sources carry a colon-suffixed evidence detail after the
         # SC-05 label-honesty fix (e.g. "builtin_authoritative:standard_reaction_term",
         # "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit",
@@ -1682,6 +1667,23 @@ def _assert_schema_shape(payload: dict) -> None:
             "builtin_extrapolation_limited",
             "kernel_diagnostic",
         }
+    for species, activity_source in source_report["activity_sources"].items():
+        assert species in source_report["species"]
+        assert set(activity_source) in (
+            {"rung", "source", "x", "reason"},
+            {"rung", "source", "x", "reason", "warning"},
+        )
+        assert activity_source["rung"] in {
+            "published_gamma",
+            "ideal_mixing",
+        }
+        assert isinstance(activity_source["source"], str)
+        assert isinstance(activity_source["x"], (int, float))
+        assert activity_source["reason"] == (
+            "alphaMELTS supplied no oxide-component activity"
+        )
+        if "warning" in activity_source:
+            assert isinstance(activity_source["warning"], str)
     for source, item in source_report["summary"].items():
         assert isinstance(source, str)
         assert set(item) == {"count", "percentage"}
@@ -1779,16 +1781,16 @@ def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
         },
     }
     assert report["species"] == {
+        "Na": "builtin_authoritative:legacy_pure_component_estimate",
+        "SiO": "builtin_authoritative:standard_reaction_term",
+    }
+    assert report["activity_sources"] == {
         "Na": {
-            "source": "builtin_authoritative:legacy_pure_component_estimate",
-            "activity_source": {
-                "rung": "published_gamma",
-                "source": "Sossi & Fegley 2018 Table 2",
-                "x": 0.25,
-                "reason": "alphaMELTS supplied no oxide-component activity",
-            },
+            "rung": "published_gamma",
+            "source": "Sossi & Fegley 2018 Table 2",
+            "x": 0.25,
+            "reason": "alphaMELTS supplied no oxide-component activity",
         },
-        "SiO": {"source": "builtin_authoritative:standard_reaction_term"},
     }
     assert report["vapor_pressure_backend_status"] == "fallback"
     assert report["vapor_pressure_backend_status_summary"] == {
