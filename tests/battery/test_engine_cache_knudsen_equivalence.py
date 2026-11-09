@@ -16,7 +16,6 @@ from simulator.battery.records import (
     Experiment,
     ExperimentKind,
     FlowRegime,
-    Identity,
     Located,
     Observation,
     PressureEnvironment,
@@ -28,6 +27,7 @@ from simulator.battery.records import (
     UncertaintyKind,
     Value,
 )
+from simulator.battery.identity import Identity
 from simulator.battery.score import ScoreContext, _score_store_to_jsonl
 from simulator.engine_cache import EngineCache
 from tests.battery.test_engine_cache_equivalence import _canonical_residual_rows

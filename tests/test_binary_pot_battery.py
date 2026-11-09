@@ -2287,6 +2287,7 @@ def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
         "model_id",
         "liquid_composition_wt_pct",
         "fe_redox_split",
+        "backend_failure_disposition",
     }
 
 
