@@ -151,6 +151,27 @@ def test_request_vector_omits_qualification_decoration() -> None:
     assert "qualification" not in ordinary
 
 
+def test_request_vector_ignores_isolation_policy() -> None:
+    handle = _handle("magemin")
+    common = {
+        "temperature_K": 1703.0,
+        "po2": Po2Request("engine_default", None),
+        "physical_pressure_bar": 1.0,
+        "native_activity_formula": None,
+    }
+
+    ordinary = _engine_cache_request_vector(
+        handle, _pot(), isolated=False, **common
+    )
+    isolated = _engine_cache_request_vector(
+        handle, _pot(), isolated=True, **common
+    )
+
+    assert ordinary is not None and isolated is not None
+    assert ordinary == isolated
+    assert "isolated" not in ordinary
+
+
 def test_request_vector_tracks_ambient_alphamelts_calc_mode(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
