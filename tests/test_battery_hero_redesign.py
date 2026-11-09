@@ -1923,9 +1923,9 @@ def test_temperature_panel_with_scores_but_no_temperature_shows_coverage(
     )
     axis = figures[-1].axes[0]
     assert not axis.axison
-    assert "1 scored, 0 with temperature" in " ".join(
-        text.get_text() for text in axis.texts
-    )
+    panel_message = " ".join(text.get_text() for text in axis.texts)
+    assert "1 scored, 0 with temperature" in panel_message
+    assert "all-scored RMS 0.25 dex" in panel_message
     assert not axis.lines
     assert not axis.collections
 
