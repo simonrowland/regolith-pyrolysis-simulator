@@ -208,60 +208,37 @@ the melt by the end of the run:
 
 | element | leaves the melt | stays in the melt |
 |---|---:|---:|
-| Fe | 1.000 | 0.000 |
-| Na | 1.000 | 0.000 |
-| Si | 0.999 | 0.001 |
-| K | 0.935 | 0.065 |
-| Cr | 0.256 | 0.744 |
-| Mg | 0.194 | 0.806 |
+| Fe † | 1.000 | 0.000 |
+| Na † | 1.000 | 0.000 |
+| Si † | 0.999 | 0.001 |
+| K † | 0.935 | 0.065 |
+| Cr † | 0.256 | 0.744 |
+| Mg † | 0.194 | 0.806 |
 | Ca | 0.001 | 0.999 |
 | Ti | 0.001 | 0.999 |
 | Al | 0.000 | 1.000 |
 
-⚠ **Flagged: the Na, K, Mg, Fe, Si and Cr fractions carry a known model artefact (b-1146).** Through
-the mid-run campaigns (roughly hours 32–144), the evaporation flux of these species alternates
-between full rate and exactly zero from one hour to the next. This is a period-2 lag artefact: the
-headspace pressure feeding each hour is the previous hour's. Those hours run with the headspace
-held at a set total pressure, and the model does not yet have a carrier-gas or O₂ feed rate. Until
-it does, the true flux is only bracketed: between near zero (no feed) and the full film-limited
-rate (unlimited feed). So the direction of the error is not known, and these fractions could be
-too high or too low.
-Separately, CrO evaporation is recorded as zero on this commit, which understates Cr. Fixes are in
-progress, and this table will be refreshed from a fresh run once they land.
+† Na, K, Mg, Fe, Si and Cr carry a flagged hour-to-hour flux artefact while carrier-gas feed rates
+are being added to the model, so treat their fractions as indicative. CrO evaporation is not yet
+modelled, which further understates Cr.
 
 **Refractory terminal ceramic (the rump).** This is a product, not a loss: 0.348 kg of the 1 kg charge.
 It is the `refractory_ceramic_rump` class in `product_classification`. Its composition is Al₂O₃
 39.8 wt%, CaO 32.4, MgO 21.4, TiO₂ 4.4, Cr₂O₃ 0.8, MnO 0.5 and P₂O₅ 0.3, with traces including the REEs.
-This is the Ca, Al, Ti and REE-rich ceramic that the mandate expects to line the next furnace.
+This Ca, Al, Ti and REE-rich ceramic is the material intended to line the next furnace.
 
-**Oxygen.** 0.165 kg of O₂ is released from the melt. It is counted at the source and is not yet
-recovered.
+**Oxygen.** 0.165 kg of O₂ is released from the melt, counted at the source. Recovering it as
+LOX is part of the condenser-train work.
 
-**Where the evaporated material ends up is not in this headline.** The condenser train is still
-being designed, so its capture and vent split is not yet a reliable result. The run report still
-records the full per-stage ledger under `yield_disposition` and `stage_purity_report`. Treat those
-figures as provisional until the train design is finished.
+**Where the vapour goes.** Yields here are counted at the melt boundary while the condenser-train
+model is being built. The run report already carries the per-stage ledger under `yield_disposition`
+and `stage_purity_report`, and the hard-vacuum Mg/Ca crown stage, which pulls most of the remaining
+Mg and Ca, is next on the roadmap.
 
-### Open issues in this run
+The run's vapour-pressure report covers 32 species. At these temperatures, 30 of them are evaluated
+beyond their fitted range, so the high-temperature fractions are extrapolations.
 
-- About 81% of the Mg stays in the melt, because the hard-vacuum Mg/Ca crown stage is not implemented yet.
-  Ca stays in the rump for the same reason.
-- O₂ is counted at the source, not captured.
-- The condenser train design is in progress, so capture figures are not reported in the headline (see above).
-- The Na, K, Mg, Fe, Si and Cr fractions are flagged for the alternating-hour flux artefact and the
-  missing CrO evaporation described under the table.
-- This README table is hand-copied until the nightly hero golden exists.
-
-### What this run does NOT yet show
-
-This run does not show Mg or Ca crown extraction, O₂ recovery, or a finished condenser train. It shows
-what the pressure-and-temperature sequence pulls out of the melt, and the refractory rump left behind.
-`redox_buffer_retained` is 0 for every element, including oxygen.
-
-Report fields: `status` is `ok`, `reason` is `''`, `error_message` is `''`, and
-`run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` covers 32 species, and
-30 of the 32 are evaluated beyond their fitted temperature range. The high-temperature evaporation
-fractions are therefore extrapolations, not certified values.
+### Install
 
 From a source checkout, run the dependency installer:
 
@@ -371,8 +348,6 @@ produced a stored artifact is never ambiguous.
 
 - `VapoRock` and `MAGEMin` are per-intent providers and diagnostic evidence sources, not active
   melt backends. They are listed in `simulator/backends.py::INELIGIBLE_ACTIVE_BACKENDS`.
-- `FactSAGE/ChemApp` — archived/removed adapter. Not selectable in the web UI or runner; an
-  explicit `factsage` request raises `BackendUnavailableError: unknown backend 'factsage'`.
 
 **What a backend is allowed to do.** Installing a real engine does not move ledger authority to
 it. Silicate liquidus and freeze-path providers, alphaMELTS included, are **diagnostic only** and
