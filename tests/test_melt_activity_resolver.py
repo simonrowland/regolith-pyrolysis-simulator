@@ -1141,6 +1141,7 @@ def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None
     assert result.standard_state != result.target_standard_state
     assert result.derivation["pressure_bar"] == pressure_bar
     assert result.derivation["target_conversion_status"] == "mu0_target_pending"
+    assert "notices" not in result.derivation["redox_receipt"]
 
 @pytest.mark.parametrize("complete", [True, False])
 def test_tier_c_ood_without_uncertainty_preserves_value_or_missing_input_refusal(complete):
@@ -1162,7 +1163,6 @@ def test_tier_c_ood_without_uncertainty_preserves_value_or_missing_input_refusal
     assert notice["reason"] == "descriptor_hull_exceeded"
     assert notice["authority_level"] == "extrapolated"
     assert notice["certified_band"] is None
-    assert "notices" not in result.derivation["redox_receipt"]
 
 
 def test_fe_shadow_below_liquidus_keeps_the_liquid_number_and_the_notice() -> None:
