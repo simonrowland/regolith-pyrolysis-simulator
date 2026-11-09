@@ -6653,6 +6653,24 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
     assert captured['vapor_pressures_Pa'] == {'Na': 1.0}
 
 
+def test_t162_direct_melt_component_activities_remain_valid_vapor_inputs():
+    backend = AlphaMELTSBackend()
+    activities = {'MgO': 0.23, 'SiO2': 0.41}
+
+    assert backend._activity_for_vapor_species('Mg', activities) == pytest.approx(
+        0.23
+    )
+    assert backend._activity_for_vapor_species('Si', activities) == pytest.approx(
+        0.41
+    )
+    assert backend._activity_for_vapor_species('SiO', activities) == pytest.approx(
+        0.41
+    )
+    assert backend._activity_for_vapor_species(
+        'SiO', {'SiO2_Liq': 0.41, 'Mg2SiO4': 0.5}
+    ) == pytest.approx(0.41)
+
+
 def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first():
     backend = AlphaMELTSBackend()
     results = ({

@@ -6739,19 +6739,24 @@ class _MELTSBackendSupport(MeltBackend):
         if target_oxide is None:
             return None
 
+        canonical_activities: dict[str, list[object]] = {}
+        for raw_key, raw_activity in activities.items():
+            key = canonical_melt_oxide_activity_name(raw_key) or str(raw_key)
+            canonical_activities.setdefault(key, []).append(raw_activity)
+
         # A melt endmember activity cannot be converted into a pure-oxide
         # liquid activity without a matching standard-state definition.
         for key in keys:
-            if key not in activities:
+            canonical_key = canonical_melt_oxide_activity_name(key) or key
+            if canonical_key not in {str(species), target_oxide}:
                 continue
-            try:
-                activity = float(activities[key])
-            except (TypeError, ValueError):
-                continue
-            if not math.isfinite(activity):
-                continue
-            if key == str(species) or key == target_oxide:
-                return activity
+            for raw_activity in canonical_activities.get(canonical_key, ()):
+                try:
+                    activity = float(raw_activity)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(activity):
+                    return activity
         return None
 
     def _load_vapor_pressure_table(self) -> dict:
