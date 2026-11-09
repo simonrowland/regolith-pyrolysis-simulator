@@ -651,6 +651,81 @@ def test_closed_line_subboiling_root_is_recognized_without_iteration():
     assert result.rates_kg_hr == {"A": 0.0, "B": 0.0}
 
 
+def test_transformed_subboiling_source_returns_no_positive_root_boundary():
+    result = _solve_same_hour_headspace_closure(
+        {"A": 75.0},
+        lambda g, _pressure: {"A": 75.0 / (1.0 + g)},
+        lambda _rates: {"A": 1.0},
+        {"A": 1.0},
+        closed_line_equilibrium_pressures_Pa={"A": 150.0},
+        closed_line_total_pressure_Pa=100.0,
+    )
+
+    assert result.converged
+    assert result.status == "no_positive_root_boundary"
+    assert result.rates_kg_hr == {"A": 0.0}
+    assert result.zero_flow_criterion["closed_line_total_pressure_Pa"] == 100.0
+    assert result.scan_evaluations <= 64
+
+
+def test_positive_downstream_above_effective_equilibrium_returns_boundary():
+    def pressure_at_rates(rates):
+        total_flow = math.fsum(rates.values())
+        return {"A": math.sqrt(200.0**2 + total_flow) / 100.0}
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": 150.0},
+        lambda g, _pressure: {"A": 150.0 / (1.0 + g)},
+        pressure_at_rates,
+        {"A": 1.0},
+    )
+
+    assert result.converged
+    assert result.status == "no_positive_root_boundary"
+    assert result.rates_kg_hr["A"] == 0.0
+    assert result.zero_flow_criterion["zero_flow_projected_pressure_Pa"] >= 200.0
+    assert result.scan_evaluations <= 64
+
+
+def test_source_free_nested_projection_returns_boundary_before_g_scan():
+    result = _solve_same_hour_headspace_closure(
+        {},
+        lambda _g, _pressure: {"A": 0.0},
+        lambda _rates: {},
+        {"A": 1.0},
+        pressure_floor_Pa=1000.0,
+    )
+
+    assert result.converged
+    assert result.status == "no_positive_root_boundary"
+    assert result.rates_kg_hr == {"A": 0.0}
+    assert result.iterations <= 65
+    assert result.scan_evaluations == 1
+    assert result.zero_flow_criterion["pressure_floor_Pa"] == 1000.0
+
+
+def test_scalar_scan_treats_late_species_as_zero_in_earlier_samples():
+    def rates_at_g(g, _pressure):
+        rates = {"A": 100.0 / (1.0 + g)}
+        if 0.0 < g < 1.0:
+            rates["CrO3"] = 0.01 / (1.0 + g)
+        return rates
+
+    result = _solve_same_hour_headspace_closure(
+        {"A": 100.0},
+        rates_at_g,
+        lambda _rates: {},
+        {"A": 1.0, "CrO3": 0.1},
+        carrier_feed_mol_s=1.0 / 3600.0,
+        closed_line_total_pressure_Pa=100.0,
+    )
+
+    assert result.converged
+    assert result.status == "converged"
+    assert result.rates_kg_hr["A"] > 0.0
+    assert result.rates_kg_hr["CrO3"] == 0.0
+
+
 def _pressure_held_sim(
     vapor_pressure_data,
     feedstocks_data,
@@ -989,6 +1064,10 @@ def test_native_fe_closure_uses_pressure_held_zero_boundary(
     assert diagnostic["P_reference_Antoine_Pa"] < sim.melt.p_total_mbar * 100.0
     assert closure["converged"]
     assert closure["iterations"] == 0
+    assert closure["status"] == "no_positive_root_boundary"
+    assert closure["zero_flow_criterion"]["closed_line_total_pressure_Pa"] == (
+        pytest.approx(100.0)
+    )
     assert closure["rates_kg_hr"]["Fe"] == 0.0
     assert diagnostic["native_fe_vapor_mol"] == 0.0
     assert diagnostic["native_fe_tap_mol"] == pytest.approx(1.0)
@@ -1025,7 +1104,9 @@ def test_c7_pressure_scan_finds_positive_branch_above_suppressed_floor(
     extent, diagnostic = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
     closure = diagnostic["same_hour_headspace_closure"]
 
-    assert closure["converged"] is True
+    assert closure["converged"] is True, closure
+    assert closure["iterations"] <= 200
+    assert closure["multiple_closure_roots"] is False
     assert closure["rates_kg_hr"]["Ca"] == pytest.approx(
         562.3498686097761, rel=1.0e-6
     )

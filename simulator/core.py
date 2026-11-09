@@ -8384,13 +8384,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if pressure_held_total_Pa is not None
                 else 'pumped'
             ),
-            'iterations': closure.iterations,
-            'converged': closure.converged,
-            'rates_kg_hr': dict(closure.rates_kg_hr),
-            'partial_pressures_Pa': {
-                species: max(0.0, float(value)) * 100.0
-                for species, value in closure.partial_pressures_mbar.items()
-            },
+            **closure.as_diagnostic(),
         }
         if pressure_held_total_Pa is not None:
             closure_record['value_authority'] = (
@@ -16272,9 +16266,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             closure_record = {
                 'regime': 'pumped',
-                'iterations': bakeout_closure.iterations,
-                'converged': bakeout_closure.converged,
-                'rates_kg_hr': dict(bakeout_closure.rates_kg_hr),
+                **bakeout_closure.as_diagnostic(),
                 'partial_pressures_Pa': same_hour_partials_Pa,
             }
             bakeout_diag['same_hour_headspace_closure'] = closure_record

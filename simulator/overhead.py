@@ -50,7 +50,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
@@ -107,6 +107,31 @@ class SameHourHeadspaceClosureResult:
     partial_pressures_mbar: Mapping[str, float]
     iterations: int
     converged: bool
+    status: str = 'converged'
+    zero_flow_criterion: Mapping[str, float] = field(default_factory=dict)
+    scan_evaluations: int = 0
+    roots_g: tuple[float, ...] = ()
+    multiple_closure_roots: bool = False
+
+    def as_diagnostic(self) -> dict[str, Any]:
+        return {
+            'iterations': self.iterations,
+            'converged': self.converged,
+            'status': (
+                self.status
+                if self.status != 'converged' or self.converged
+                else 'nonconverged'
+            ),
+            'rates_kg_hr': dict(self.rates_kg_hr),
+            'partial_pressures_Pa': {
+                species: max(0.0, float(value)) * 100.0
+                for species, value in self.partial_pressures_mbar.items()
+            },
+            'zero_flow_criterion': dict(self.zero_flow_criterion),
+            'scan_evaluations': self.scan_evaluations,
+            'roots_g': list(self.roots_g),
+            'multiple_closure_roots': self.multiple_closure_roots,
+        }
 
 
 def _carrier_feed_mol_hr(carrier_feed_mol_s: float) -> float:
@@ -152,37 +177,23 @@ def _solve_same_hour_headspace_closure(
     transformed rates, and the scalar residual is
     ``h(g) = G(N(g), mdot(g)) - g`` with N and mdot computed from n(g).
 
-    For a pumped line against vacuum, Poiseuille gives P proportional to
-    sqrt(mdot), so G=P/N is proportional to N**-1/2. As g grows, each raw
-    rate falls; admission, freeze scaling, group depletion and Fe capping make
-    the transformed total N(g) non-increasing. Group-scaled species retain
-    their raw-rate proportions. Thus h(0)>0 for a positive source and
-    h tends to -infinity as g grows. The scalar bracket therefore contains the
-    pumped root. For a pressure-held carrier feed, convert F from mol/s to the
-    solver's mol/hr basis: ``G(N)=P_total/(3600*F + N + n_O2)``. Here
-    ``n_o2_coproduct_mol_hr`` is the one future O2-outflow term; it is zero
-    while b-1141 routes that coproduct to the melt buffer. G remains decreasing
-    in N. As N(g) decreases, G is bounded below by zero and above by its
-    finite-flow limit, while the residual ``G(N(g))-g`` is positive at g=0
-    and negative for sufficiently large g. With F=0 and n_O2=0, the
-    sub-boiling case returns the explicit zero-flow boundary and the positive
-    root is exactly the existing lower bracket. As F tends to infinity,
-    G tends to zero and the root tends to the existing upper bracket. For one
-    species, ``J=J_max*beta/(1+beta)`` exactly with
-    ``beta=(3600*F+J)*R'/P_total``; the evolved flow J is part of the stated
-    F+N outflow. When T is the identity (no admission, depletion, or inventory
-    cap binds), the no-feed positive-flow species equations reduce to
-    ``1 = Σ P_eq,i / (R'_i*Φ + P_total)`` for total molar flow Φ. Its right
-    side strictly decreases from ΣP_eq/P_total to zero, so there is exactly
-    one positive root iff ΣP_eq>P_total; otherwise the physical root is zero.
-    With T active, the same scalar callback evaluates the complete transformed
-    vector at each bracket point.
+    No monotonicity is assumed for the transformed stream. The solver scans a
+    logarithmic grid in g through the point where each transformed source is
+    below 1e-30 of its zero-g rate, then bisects every sampled sign change at
+    relative tolerance 1e-12. With no positive-flow sign change and h positive
+    over the scan, it returns the typed zero-flow boundary; all discovered
+    roots are retained so a multiple-root result can be flagged. This is a
+    resolution-bounded guarantee, not a uniqueness claim.
 
-    R'_i and g both have units Pa·hr/mol: R'_i=R_i*M_i/(A*3600), converting
-    the existing pressure-area-time-per-mass resistance from kg/hr to mol/hr.
-    Limiting cases are g=0 for the open-vacuum source and zero rate at the
-    pressure-held sub-boiling boundary. The 200-evaluation cap includes every
-    source callback and transport projection in both brackets.
+    For Poiseuille transport, the live mean molar mass converts mdot to molar
+    flow N, so at fixed T and geometry ``P²=P_down²+C*N``; changing mixture
+    composition is already reflected in N and its live molar mass. A
+    pressure-held carrier feed uses ``G(N)=P_total/(3600*F+N+n_O2)`` after
+    converting F from mol/s to mol/hr. The coproduct term remains zero while
+    b-1141 routes that oxygen to the melt buffer. The one-species pressure-held
+    check retains ``beta=(3600*F+J)*R'/P_total``, including evolved flow J in
+    the outflow. R'_i and g both have units Pa·hr/mol; R'_i converts the
+    existing pressure-area-time-per-mass resistance to a molar-flow basis.
     """
     evaluation_cap = 200
     relative_tolerance = 1.0e-12
@@ -195,13 +206,29 @@ def _solve_same_hour_headspace_closure(
     o2_coproduct_mol_hr = max(0.0, float(n_o2_coproduct_mol_hr))
     species_names = {str(species) for species in initial_rates_kg_hr}
     evaluations = 0
+    last_pressure_root = None
+    root_refinement = False
 
-    def result(rates, partials, *, converged):
+    def result(
+        rates,
+        partials,
+        *,
+        converged,
+        status='converged',
+        zero_flow_criterion=None,
+        scan_evaluations=0,
+        roots_g=(),
+    ):
         return SameHourHeadspaceClosureResult(
             rates_kg_hr=dict(rates),
             partial_pressures_mbar=dict(partials),
             iterations=evaluations,
             converged=converged,
+            status=status,
+            zero_flow_criterion=dict(zero_flow_criterion or {}),
+            scan_evaluations=scan_evaluations,
+            roots_g=tuple(roots_g),
+            multiple_closure_roots=len(roots_g) > 1,
         )
 
     if (
@@ -223,6 +250,17 @@ def _solve_same_hour_headspace_closure(
                 {species: 0.0 for species in zero_species},
                 {},
                 converged=True,
+                status='no_positive_root_boundary',
+                zero_flow_criterion={
+                    'source_equilibrium_pressure_sum_Pa': math.fsum(
+                        equilibrium_pressures.values()
+                    ),
+                    'closed_line_total_pressure_Pa': max(
+                        0.0, float(closed_line_total_pressure_Pa)
+                    ),
+                    'carrier_feed_mol_hr': carrier_feed_mol_hr,
+                    'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
+                },
             )
 
     class _ClosureEvaluationCapReached(Exception):
@@ -287,11 +325,122 @@ def _solve_same_hour_headspace_closure(
         return candidate_rates, partials, projected_g - g, pressure_residual
 
     def evaluate(g):
+        nonlocal last_pressure_root
         if closed_line_total_pressure_Pa is not None:
             return evaluate_at_pressure(
                 g,
                 max(pressure_floor, float(closed_line_total_pressure_Pa)),
             )
+
+        if last_pressure_root is not None:
+            guessed = evaluate_at_pressure(g, last_pressure_root)
+            guessed_flow = math.fsum(
+                guessed[0][species]
+                / float(molar_masses_kg_mol[species])
+                for species in species_names
+                if guessed[0][species] > 0.0
+            )
+            if guessed_flow <= 0.0 and not root_refinement:
+                return guessed
+            if guessed_flow > 0.0:
+                if not root_refinement and guessed[2] < -10.0 * max(
+                    abs(last_pressure_root), pressure_floor, 1.0
+                ):
+                    # Far into the negative g tail, the source projection is
+                    # orders below g. The pressure correction cannot move this
+                    # sample across zero, so retain it for the g scan without
+                    # spending the remaining budget on its inner pressure root.
+                    return guessed
+                if abs(guessed[3]) <= relative_tolerance * max(
+                    abs(last_pressure_root), 1.0
+                ):
+                    return guessed
+                corrected_pressure = max(
+                    pressure_floor, last_pressure_root + guessed[3]
+                )
+                corrected = evaluate_at_pressure(g, corrected_pressure)
+                corrected_flow = math.fsum(
+                    corrected[0][species]
+                    / float(molar_masses_kg_mol[species])
+                    for species in species_names
+                    if corrected[0][species] > 0.0
+                )
+                if corrected_flow > 0.0:
+                    if abs(corrected[3]) <= relative_tolerance * max(
+                        abs(corrected_pressure), 1.0
+                    ):
+                        last_pressure_root = corrected_pressure
+                        return corrected
+                    if guessed[3] * corrected[3] < 0.0:
+                        from scipy.optimize import brentq
+
+                        lower_pressure, upper_pressure = sorted(
+                            (last_pressure_root, corrected_pressure)
+                        )
+                        def cached_pressure_residual(candidate_pressure):
+                            candidate = evaluate_at_pressure(g, candidate_pressure)
+                            if not any(candidate[0].values()):
+                                raise _AdmissionZeroBranch
+                            return candidate[3]
+
+                        try:
+                            root_pressure = brentq(
+                                cached_pressure_residual,
+                                lower_pressure,
+                                upper_pressure,
+                                xtol=1.0e-300,
+                                rtol=relative_tolerance,
+                                maxiter=max(1, evaluation_cap - evaluations),
+                            )
+                        except _AdmissionZeroBranch:
+                            last_pressure_root = None
+                        else:
+                            last_pressure_root = root_pressure
+                            return evaluate_at_pressure(g, root_pressure)
+                    previous_pressure = last_pressure_root
+                    previous_evaluation = guessed
+                    current_pressure = corrected_pressure
+                    current_evaluation = corrected
+                    for _ in range(6):
+                        residual_delta = (
+                            current_evaluation[3] - previous_evaluation[3]
+                        )
+                        if residual_delta == 0.0:
+                            break
+                        candidate_pressure = current_pressure - (
+                            current_evaluation[3]
+                            * (current_pressure - previous_pressure)
+                            / residual_delta
+                        )
+                        if (
+                            not math.isfinite(candidate_pressure)
+                            or candidate_pressure <= pressure_floor
+                            or abs(candidate_pressure - current_pressure)
+                            > 2.0 * max(current_pressure, 1.0)
+                        ):
+                            break
+                        candidate = evaluate_at_pressure(g, candidate_pressure)
+                        candidate_flow = math.fsum(
+                            candidate[0][species]
+                            / float(molar_masses_kg_mol[species])
+                            for species in species_names
+                            if candidate[0][species] > 0.0
+                        )
+                        if candidate_flow <= 0.0:
+                            break
+                        if abs(candidate[3]) <= relative_tolerance * max(
+                            abs(candidate_pressure), 1.0
+                        ):
+                            last_pressure_root = candidate_pressure
+                            return candidate
+                        previous_pressure, previous_evaluation = (
+                            current_pressure,
+                            current_evaluation,
+                        )
+                        current_pressure, current_evaluation = (
+                            candidate_pressure,
+                            candidate,
+                        )
 
         pressure_low = pressure_floor
         low_evaluation = evaluate_at_pressure(g, pressure_low)
@@ -323,6 +472,7 @@ def _solve_same_hour_headspace_closure(
                 if pressure_molar_flow > 0.0:
                     pressure_residual = pressure_evaluation[3]
                     if pressure_residual == 0.0:
+                        last_pressure_root = pressure
                         return pressure_evaluation
                     if previous_positive is not None:
                         previous_pressure, previous_evaluation = previous_positive
@@ -364,12 +514,17 @@ def _solve_same_hour_headspace_closure(
                                 previous_positive = None
                             else:
                                 if root_pressure == last_pressure:
+                                    last_pressure_root = root_pressure
                                     return last_pressure_evaluation
+                                last_pressure_root = root_pressure
                                 return evaluate_at_pressure(g, root_pressure)
                     previous_positive = (pressure, pressure_evaluation)
                 pressure *= 2.0
+            last_pressure_root = None
             return low_evaluation
         if low_evaluation[3] <= 0.0:
+            if low_molar_flow > 0.0:
+                last_pressure_root = pressure_low
             return low_evaluation
         pressure_high = max(
             pressure_low * 2.0,
@@ -401,88 +556,235 @@ def _solve_same_hour_headspace_closure(
             maxiter=max(1, evaluation_cap - evaluations),
         )
         if pressure == last_pressure:
+            last_pressure_root = pressure
             return last_pressure_evaluation
+        last_pressure_root = pressure
         return evaluate_at_pressure(g, pressure)
 
-    low = 0.0
     last_evaluation = None
-    last_g = None
     try:
-        low_evaluation = evaluate(low)
-        last_evaluation = low_evaluation
-        last_g = low
-        low_rates, low_partials, low_residual, _ = low_evaluation
-        if low_residual <= 0.0:
-            return result(low_rates, low_partials, converged=low_residual == 0.0)
-
-        low_molar_flow = math.fsum(
-            low_rates[species] / float(molar_masses_kg_mol[species])
+        zero_evaluation = evaluate(0.0)
+        last_evaluation = zero_evaluation
+        zero_rates = zero_evaluation[0]
+        zero_partials = zero_evaluation[1]
+        zero_flow = math.fsum(
+            zero_rates[species] / float(molar_masses_kg_mol[species])
             for species in species_names
-            if low_rates[species] > 0.0
+            if zero_rates[species] > 0.0
         )
-        if (
-            carrier_feed_mol_s is not None
-            and closed_line_total_pressure_Pa is not None
-        ):
-            initial_outflow_mol_hr = (
-                carrier_feed_mol_hr
-                + low_molar_flow
-                + o2_coproduct_mol_hr
-            )
-            high = max(
-                1.0e-300,
-                float(closed_line_total_pressure_Pa)
-                / initial_outflow_mol_hr
-                if initial_outflow_mol_hr > 0.0
-                else 1.0,
-            )
-        else:
-            high = max(
-                1.0e-300,
-                100.0 * math.fsum(low_partials.values()) / low_molar_flow,
-            )
-        high_evaluation = evaluate(high)
-        last_evaluation = high_evaluation
-        last_g = high
-        while high_evaluation[2] > 0.0:
-            high *= 2.0
-            high_evaluation = evaluate(high)
-            last_evaluation = high_evaluation
-            last_g = high
-        if high_evaluation[2] == 0.0:
+        if zero_flow == 0.0:
+            # g=0 is the maximum-driving source state. The nested pressure
+            # projection has already scanned above a suppressed pressure
+            # floor; if that entire scan still returns no admitted source,
+            # there is no positive-flow root to search for at larger g.
             return result(
-                high_evaluation[0], high_evaluation[1], converged=True
+                zero_rates,
+                zero_partials,
+                converged=True,
+                status='no_positive_root_boundary',
+                zero_flow_criterion={
+                    'zero_flow_source_rate_kg_hr': math.fsum(
+                        zero_rates.values()
+                    ),
+                    'zero_flow_projected_pressure_Pa': 100.0
+                    * math.fsum(zero_partials.values()),
+                    'zero_flow_residual_g': zero_evaluation[2],
+                    'pressure_floor_Pa': pressure_floor,
+                },
+                scan_evaluations=1,
+            )
+        scale = max(abs(zero_evaluation[2]), 1.0e-300)
+
+        scale_evaluation = evaluate(scale)
+        last_evaluation = scale_evaluation
+        scale_rates = scale_evaluation[0]
+        effective_resistances = []
+        for species in species_names:
+            zero_rate = zero_rates.get(species, 0.0)
+            scale_rate = scale_rates.get(species, 0.0)
+            if zero_rate > scale_rate > 0.0:
+                effective_resistances.append(
+                    scale * scale_rate / (zero_rate - scale_rate)
+                )
+        # For the rational source law, R_eff = g*n(g)/(n(0)-n(g)); the
+        # 1e40 margin puts the final transformed rates below the requested
+        # 1e-30 scan threshold while allowing for the existing transforms.
+        largest_scale = max([scale, *effective_resistances])
+        largest_scale = min(largest_scale, 1.0e260)
+        g_max = max(largest_scale * 1.0e40, scale * 1.0e40)
+        g_max = min(g_max, 1.0e300)
+        log_span = math.log10(g_max) - math.log10(scale)
+        scan_points = {0.0, scale}
+        # Nested pressure projections also count their source evaluations
+        # against the same 200-evaluation budget, so their g scan uses fewer
+        # logarithmic points than the direct pressure-held projection.
+        scan_intervals = 16 if closed_line_total_pressure_Pa is None else 61
+        for index in range(scan_intervals):
+            exponent = -12.0 + (log_span + 12.0) * index / (
+                scan_intervals - 1
+            )
+            log_g = math.log10(scale) + exponent
+            scan_points.add(min(1.0e300, 10.0**log_g))
+        ordered_g = sorted(scan_points)
+
+        def molar_flow(evaluation):
+            rates = evaluation[0]
+            return math.fsum(
+                rate / float(molar_masses_kg_mol[species])
+                for species, rate in rates.items()
+                if rate > 0.0
             )
 
-        from scipy.optimize import brentq
+        samples = []
+        for g in ordered_g:
+            if g == 0.0:
+                evaluation = zero_evaluation
+            elif g == scale:
+                evaluation = scale_evaluation
+            else:
+                evaluation = evaluate(g)
+                last_evaluation = evaluation
+            flow = molar_flow(evaluation)
+            samples.append((g, evaluation, flow > 0.0))
 
-        def outer_residual(g):
-            nonlocal last_evaluation, last_g
-            last_g = g
-            last_evaluation = evaluate(g)
-            return last_evaluation[2]
+        roots = []
+        if zero_flow > 0.0 and zero_evaluation[2] == 0.0:
+            roots.append((0.0, zero_evaluation))
+        brackets = []
+        for left, right in zip(samples, samples[1:]):
+            left_g, left_evaluation, left_has_flow = left
+            right_g, right_evaluation, right_has_flow = right
+            if not left_has_flow or not right_has_flow:
+                continue
+            left_residual = left_evaluation[2]
+            right_residual = right_evaluation[2]
+            if right_residual == 0.0:
+                roots.append((right_g, right_evaluation))
+            elif left_residual * right_residual < 0.0:
+                brackets.append(
+                    (left_g, left_evaluation, right_g, right_evaluation)
+                )
 
-        root = brentq(
-            outer_residual,
-            low,
-            high,
-            xtol=1.0e-300,
-            rtol=relative_tolerance,
-            maxiter=max(1, evaluation_cap - evaluations),
+        def solve_bracketed_root(left_g, right_g):
+            nonlocal last_evaluation, root_refinement
+            from scipy.optimize import brentq
+
+            last_root_g = None
+
+            def residual(g):
+                nonlocal last_root_g, last_evaluation
+                evaluation = evaluate(g)
+                last_root_g = g
+                last_evaluation = evaluation
+                if molar_flow(evaluation) <= 0.0:
+                    raise _AdmissionZeroBranch
+                return evaluation[2]
+
+            root_refinement = True
+            try:
+                root_g = brentq(
+                    residual,
+                    left_g,
+                    right_g,
+                    xtol=1.0e-300,
+                    rtol=relative_tolerance,
+                    maxiter=max(1, evaluation_cap - evaluations),
+                )
+            except _AdmissionZeroBranch:
+                root_refinement = False
+                return None
+            root_refinement = False
+            if root_g != last_root_g:
+                last_evaluation = evaluate(root_g)
+            return root_g, last_evaluation
+
+        for bracket in brackets:
+            root = solve_bracketed_root(bracket[0], bracket[2])
+            if root is not None:
+                roots.append(root)
+        roots.sort(key=lambda item: item[0])
+        if roots:
+            selected_g, selected_evaluation = roots[0]
+            return result(
+                selected_evaluation[0],
+                selected_evaluation[1],
+                converged=abs(selected_evaluation[2])
+                <= relative_tolerance * max(abs(selected_g), 1.0e-300),
+                scan_evaluations=len(ordered_g),
+                roots_g=tuple(root_g for root_g, _ in roots),
+            )
+
+        tail_evaluation = samples[-1][1]
+        reference_rates = {
+            species: zero_rates.get(species, 0.0)
+            for species in species_names
+        }
+        tail_fraction = max(
+            (
+                (
+                    tail_evaluation[0].get(species, 0.0) / reference_rate
+                    if reference_rate > 0.0
+                    else (math.inf if tail_evaluation[0].get(species, 0.0) > 0.0 else 0.0)
+                )
+                for species, reference_rate in reference_rates.items()
+            ),
+            default=0.0,
         )
-        if root != last_g:
-            last_g = root
-            last_evaluation = evaluate(root)
+        positive_samples = [
+            evaluation
+            for _g, evaluation, has_flow in samples
+            if has_flow
+        ]
+        if positive_samples and all(
+            evaluation[2] > 0.0 for evaluation in positive_samples
+        ):
+            return result(
+                {species: 0.0 for species in species_names},
+                {},
+                converged=tail_fraction <= 1.0e-30,
+                scan_evaluations=len(ordered_g),
+                status=(
+                    'no_positive_root_boundary'
+                    if tail_fraction <= 1.0e-30
+                    else 'nonconverged'
+                ),
+                zero_flow_criterion={
+                    'zero_flow_source_rate_kg_hr': math.fsum(
+                        zero_rates.values()
+                    ),
+                    'zero_flow_projected_pressure_Pa': 100.0
+                    * math.fsum(zero_partials.values()),
+                    'zero_flow_residual_g': zero_evaluation[2],
+                    'scan_end_rate_fraction': tail_fraction,
+                    **(
+                        {
+                            'closed_line_total_pressure_Pa': float(
+                                closed_line_total_pressure_Pa
+                            ),
+                            'carrier_feed_mol_hr': carrier_feed_mol_hr,
+                            'n_o2_coproduct_mol_hr': o2_coproduct_mol_hr,
+                        }
+                        if closed_line_total_pressure_Pa is not None
+                        else {}
+                    ),
+                },
+            )
         return result(
             last_evaluation[0],
             last_evaluation[1],
-            converged=abs(last_evaluation[2])
-            <= relative_tolerance * max(abs(root), 1.0e-300),
+            converged=False,
+            status='nonconverged',
+            scan_evaluations=len(ordered_g),
         )
     except _ClosureEvaluationCapReached:
         if last_evaluation is None:
-            return result({}, {}, converged=False)
-        return result(last_evaluation[0], last_evaluation[1], converged=False)
+            return result({}, {}, converged=False, status='nonconverged')
+        return result(
+            last_evaluation[0],
+            last_evaluation[1],
+            converged=False,
+            status='nonconverged',
+        )
 
 
 def _solve_c0_joint_solid_host_bakeout_closure(

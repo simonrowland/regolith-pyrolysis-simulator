@@ -4099,13 +4099,7 @@ class ExtractionMixin:
         }
         if closure is not None:
             closure_record = {
-                'iterations': closure.iterations,
-                'converged': closure.converged,
-                'rates_kg_hr': dict(closure.rates_kg_hr),
-                'partial_pressures_Pa': {
-                    species: max(0.0, float(value)) * 100.0
-                    for species, value in closure.partial_pressures_mbar.items()
-                },
+                **closure.as_diagnostic(),
             }
             diagnostic['same_hour_headspace_closure'] = closure_record
             iterations_by_hour = getattr(
