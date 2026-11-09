@@ -676,6 +676,13 @@ def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
     sim.melt.temperature_C = 1600.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
+    # Start just below the production-resolved saturation anchor so the
+    # reductant step tests increasing native-Fe drive on the active branch.
+    anchor = sim._compute_fe_redox_split_diagnostic()[
+        "native_fe_anchor_log10_fO2_bar"
+    ]
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = anchor - 0.01
+    sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
 
@@ -3244,10 +3251,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
-    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The corrected
+    # FeO basis also changes the native pool passed to this transport path.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.002396352847836128,
         rel=0.0,
         abs=1.0e-15,
     )
