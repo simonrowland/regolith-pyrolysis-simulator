@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import json
+import copy
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -9,6 +12,7 @@ from typing import Any
 import pytest
 
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    EquilibrateCell,
     BinaryPot,
     EngineHandle,
     Po2Request,
@@ -17,6 +21,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     equilibrate_cell,
     open_battery_engine,
 )
+import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, EngineCache
 
 
@@ -109,6 +114,350 @@ def _vector(
     )
     assert value is not None
     return value
+
+
+def _path_value(value: Any, path: tuple[str, ...]) -> Any:
+    current = value
+    for part in path:
+        current = current[part] if isinstance(current, dict) else getattr(current, part)
+    return current
+
+
+def _set_path_value(value: Any, path: tuple[str, ...], replacement: Any) -> None:
+    parent = _path_value(value, path[:-1])
+    key = path[-1]
+    if isinstance(parent, dict):
+        parent[key] = replacement
+    else:
+        setattr(parent, key, replacement)
+
+
+_INITIALIZED_SETTING_MUTATIONS: dict[str, tuple[tuple[Any, ...], ...]] = {
+    "openimcc": (("_pack_name", ("pack",), "review-cache-pack", "review-cache-pack-2"),),
+    "internal-analytical": (("_oxygen_balance_pack", ("oxygen_balance_backend", "pack"), "review-parent-pack", "review-parent-pack-2"),),
+    "alphamelts": (
+        ("_model", ("model",), "review-cache-model", "review-cache-model-2"),
+        ("_mode", ("transport",), "review-cache-transport", "review-cache-transport-2"),
+        ("_python_api_model", ("python_api_model",), ("review-model", 2), ("review-model-2", 3)),
+        ("_redox_buffer", ("redox_buffer",), "NNO", "QFM"),
+        ("_fo2_offset", ("fO2_offset",), 0.25, -0.25),
+        ("_fe3fet_ratio", ("Fe3Fet_ratio",), 0.25, 0.75),
+        ("_configured_vapor_transport_pO2_bar", ("configured_vapor_transport_pO2_bar",), 1.0e-8, 1.0e-7),
+        ("_configured_vapor_transport_floor_bar", ("configured_vapor_transport_floor_bar",), 1.0e-10, 1.0e-11),
+        ("_raw_model_name", ("raw_model_name",), "review-raw-model", "review-raw-model-2"),
+    ),
+    "thermoengine": (
+        ("_model", ("model",), "review-cache-model", "review-cache-model-2"),
+        ("_mode", ("transport",), "review-cache-transport", "review-cache-transport-2"),
+        ("_configured_vapor_transport_pO2_bar", ("configured_vapor_transport_pO2_bar",), 1.0e-8, 1.0e-7),
+        ("_configured_vapor_transport_floor_bar", ("configured_vapor_transport_floor_bar",), 1.0e-10, 1.0e-11),
+    ),
+    "vaporock": (
+        ("_temperature_units", ("temperature_units",), "K", "C"),
+        ("_pressure_units", ("pressure_units",), "Pa", "bar"),
+        ("_vapor_pressure_units", ("vapor_pressure_units",), "Pa", "bar"),
+    ),
+    "magemin": (
+        ("_database", ("database",), "mp", "ig"),
+        (("_config", "fO2_buffer"), ("fO2_buffer",), "nno", "qfm"),
+        ("_bridge", ("bridge",), "ctypes", "subprocess"),
+    ),
+}
+
+
+def _initialized_effective_setting(
+    engine: str,
+    backend: Any,
+    key_path: tuple[str, ...],
+    worker_settings: dict[str, Any],
+) -> Any:
+    key = key_path[-1]
+    if engine == "internal-analytical" and key_path == (
+        "oxygen_balance_backend",
+        "pack",
+    ):
+        return backend._oxygen_balance_backend._pack_name
+    if engine == "thermoengine" and key == "model":
+        return backend._thermoengine_transport._model_name
+    if engine == "alphamelts" and key == "raw_model_name":
+        return backend._model
+    if engine == "vaporock" and key == "vapor_pressure_units":
+        pool = getattr(backend, "_warm_pool", None)
+        if pool is not None:
+            return pool.workers[0]._bootstrap_args[1]
+    if engine == "magemin" and key in {"database", "fO2_buffer"}:
+        return worker_settings.get(key)
+    attributes = {
+        "openimcc": {"pack": "_pack_name"},
+        "internal-analytical": {},
+        "alphamelts": {
+            "model": "_model",
+            "transport": "_mode",
+            "python_api_model": "_python_api_model",
+            "redox_buffer": "_redox_buffer",
+            "fO2_offset": "_fo2_offset",
+            "Fe3Fet_ratio": "_fe3fet_ratio",
+            "configured_vapor_transport_pO2_bar": "_configured_vapor_transport_pO2_bar",
+            "configured_vapor_transport_floor_bar": "_configured_vapor_transport_floor_bar",
+        },
+        "thermoengine": {
+            "transport": "_mode",
+            "configured_vapor_transport_pO2_bar": "_configured_vapor_transport_pO2_bar",
+            "configured_vapor_transport_floor_bar": "_configured_vapor_transport_floor_bar",
+        },
+        "vaporock": {
+            "temperature_units": "_temperature_units",
+            "pressure_units": "_pressure_units",
+            "vapor_pressure_units": "_vapor_pressure_units",
+        },
+        "magemin": {"bridge": "_bridge"},
+    }
+    return getattr(backend, attributes[engine][key])
+
+
+def _setting_marker(value: Any) -> float:
+    payload = json.dumps(value, sort_keys=True, default=str).encode()
+    return 1.0 + int(hashlib.sha256(payload).hexdigest()[:8], 16) / 0xFFFFFFFF
+
+
+def _cell_for_marker(engine: str, po2: Po2Request, marker: float) -> EquilibrateCell:
+    return EquilibrateCell(
+        pot_id="cache-key-pot",
+        engine=engine,
+        temperature_K=1703.0,
+        po2=po2,
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={"SiO2": marker},
+        liquid_fraction=0.5,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="fixture",
+    )
+
+
+@pytest.mark.parametrize(
+    "engine",
+    (
+        "openimcc",
+        "internal-analytical",
+        "alphamelts",
+        "thermoengine",
+        "vaporock",
+        "magemin",
+    ),
+)
+def test_initialized_adapter_parent_setting_mutations_match_direct_and_isolated(
+    engine: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    handle = open_battery_engine(engine)
+    if not handle.available or handle.backend is None:
+        close_battery_engine_handle(handle)
+        pytest.skip(handle.unavailable_reason or f"{engine} unavailable")
+    po2 = (
+        Po2Request("oxygen_balance_effusion", None, "W")
+        if engine == "internal-analytical"
+        else Po2Request("engine_default", None)
+    )
+    backend = handle.backend
+    worker_settings: dict[str, Any] = {}
+    if engine == "magemin" and backend._subprocess_pool is not None:
+        args = backend._subprocess_pool.workers[0]._bootstrap_args
+        worker_settings = {
+            "database": str(args[1]),
+            "fO2_buffer": copy.deepcopy(args[2]).get("fO2_buffer"),
+        }
+    baseline = battery._engine_cache_request_vector(
+        handle,
+        _pot(),
+        temperature_K=1703.0,
+        po2=po2,
+        physical_pressure_bar=1.0,
+        native_activity_formula=None,
+    )
+    assert baseline is not None
+    if engine == "internal-analytical":
+        assert backend._oxygen_balance_backend is not None
+
+    active_path: list[tuple[str, ...]] = [("model",)]
+
+    def direct_equilibrate(**_kwargs: Any) -> Any:
+        value = _initialized_effective_setting(
+            engine, backend, active_path[0], worker_settings
+        )
+        return SimpleNamespace(
+            status="ok",
+            diagnostics={},
+            warnings=[],
+            activity_coefficients={},
+            vapor_pressures_Pa={"SiO2": _setting_marker(value)},
+            liquid_fraction=0.5,
+            phase_assemblage_available=True,
+        )
+
+    def isolated_cell(
+        _handle: EngineHandle,
+        pot: BinaryPot,
+        *,
+        temperature_K: float,
+        po2: Po2Request,
+        engine_settings: dict[str, Any] | None = None,
+        **_kwargs: Any,
+    ) -> EquilibrateCell:
+        vector_value = _path_value(engine_settings or {}, active_path[0])
+        return replace(
+            _cell_for_marker(engine, po2, _setting_marker(vector_value)),
+            pot_id=pot.pot_id,
+            temperature_K=temperature_K,
+        )
+
+    monkeypatch.setattr(backend, "equilibrate", direct_equilibrate)
+    monkeypatch.setattr(battery, "_run_cell_in_subprocess", isolated_cell)
+
+    try:
+        for parent_path, key_path, first_value, second_value in _INITIALIZED_SETTING_MUTATIONS[engine]:
+            if key_path not in {
+                (name,)
+                for name in baseline["engine_settings"]
+                if isinstance(baseline["engine_settings"], dict)
+            } and not (
+                key_path == ("oxygen_balance_backend", "pack")
+                and engine == "internal-analytical"
+            ):
+                continue
+            if key_path == ("raw_model_name",):
+                # raw_model_name is retained as an alias of the active model
+                # for isolated reconstruction, not as independent state.
+                assert baseline["engine_settings"].get("raw_model_name") == backend._model
+            parent_path = (
+                (parent_path,) if isinstance(parent_path, str) else parent_path
+            )
+            old_parent = _path_value(backend, parent_path)
+            replacement = first_value if old_parent != first_value else second_value
+            active_path[0] = key_path
+            before = _path_value(baseline["engine_settings"], key_path)
+            before_effective = _initialized_effective_setting(
+                engine, backend, key_path, worker_settings
+            )
+            _set_path_value(backend, parent_path, replacement)
+            current = battery._engine_cache_request_vector(
+                handle,
+                _pot(),
+                temperature_K=1703.0,
+                po2=po2,
+                physical_pressure_bar=1.0,
+                native_activity_formula=None,
+            )
+            assert current is not None
+            keyed = _path_value(current["engine_settings"], key_path)
+            effective = _initialized_effective_setting(
+                engine, backend, key_path, worker_settings
+            )
+            assert keyed == effective, f"{engine} {key_path} is not its initialized setting"
+            if effective == before_effective:
+                assert keyed == before
+            else:
+                assert keyed != before
+
+            direct = equilibrate_cell(
+                handle,
+                _pot(),
+                temperature_K=1703.0,
+                po2=po2,
+                physical_pressure_bar=1.0,
+                isolated=False,
+            )
+            isolated = equilibrate_cell(
+                handle,
+                _pot(),
+                temperature_K=1703.0,
+                po2=po2,
+                physical_pressure_bar=1.0,
+                isolated=True,
+            )
+            assert direct.status == isolated.status
+            assert direct.gas_partial_pressures_Pa == isolated.gas_partial_pressures_Pa
+            _set_path_value(backend, parent_path, old_parent)
+    finally:
+        close_battery_engine_handle(handle)
+
+
+def test_real_thermoengine_transport_model_matches_spawned_cache_paths(
+    tmp_path: Path,
+) -> None:
+    handle = open_battery_engine("thermoengine")
+    if not handle.available or handle.backend is None:
+        close_battery_engine_handle(handle)
+        pytest.skip(handle.unavailable_reason or "thermoengine unavailable")
+    try:
+        backend = handle.backend
+        transport_model = backend._thermoengine_transport._model_name
+        backend._model = "review-nonexistent-model"
+        vector = battery._engine_cache_request_vector(
+            handle,
+            _pot(),
+            temperature_K=1703.0,
+            po2=Po2Request("engine_default", None),
+            physical_pressure_bar=1.0,
+            native_activity_formula=None,
+        )
+        assert vector is not None
+        assert vector["engine_settings"]["model"] == transport_model
+
+        direct_cache = EngineCache(tmp_path / "thermoengine-direct.sqlite")
+        isolated_cache = EngineCache(tmp_path / "thermoengine-isolated.sqlite")
+        common = {
+            "temperature_K": 1703.0,
+            "po2": Po2Request("engine_default", None),
+            "physical_pressure_bar": 1.0,
+        }
+        outcomes = (
+            equilibrate_cell(handle, _pot(), isolated=False, **common),
+            equilibrate_cell(
+                handle,
+                _pot(),
+                isolated=False,
+                engine_cache=direct_cache,
+                **common,
+            ),
+            equilibrate_cell(
+                handle,
+                _pot(),
+                isolated=False,
+                engine_cache=direct_cache,
+                **common,
+            ),
+            equilibrate_cell(handle, _pot(), isolated=True, **common),
+            equilibrate_cell(
+                handle,
+                _pot(),
+                isolated=True,
+                engine_cache=isolated_cache,
+                **common,
+            ),
+            equilibrate_cell(
+                handle,
+                _pot(),
+                isolated=True,
+                engine_cache=isolated_cache,
+                **common,
+            ),
+        )
+        assert len(
+            {
+                replace(cell, wall_s=0.0, cpu_s=0.0, hostname="fixture").to_cache_payload()
+                for cell in outcomes
+            }
+        ) == 1
+        assert direct_cache.counters["thermoengine"]["stores"] == 1
+        assert direct_cache.counters["thermoengine"]["hits"] == 1
+        assert isolated_cache.counters["thermoengine"]["stores"] == 1
+        assert isolated_cache.counters["thermoengine"]["hits"] == 1
+    finally:
+        close_battery_engine_handle(handle)
 
 
 @pytest.mark.parametrize(
