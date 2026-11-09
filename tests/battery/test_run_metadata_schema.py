@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
@@ -164,6 +165,8 @@ def _run_metadata_shape_extract(
                     "locator": locator,
                 }
             }
+        elif isinstance(raw_value, Mapping) and raw_value.get("units"):
+            observation["equipment"] = {field: field_value}
         else:
             observation["equipment"] = {
                 field: {"value": field_value, "locator": locator}
@@ -877,3 +880,125 @@ def test_record_validation_rejects_out_of_range_sample_values(
             and issue.path.endswith(suffix)
             for issue in report.issues
         ), report.issues
+
+
+_EQUIPMENT_SAMPLE_MASS_HOMES = tuple(
+    home for home in RUN_METADATA_FIELD_HOMES["mass_kg"][1] if ".equipment." in home
+)
+_EQUIPMENT_FINAL_MASS_HOMES = tuple(
+    home
+    for home in RUN_METADATA_FIELD_HOMES["final_mass_kg"][1]
+    if ".equipment." in home
+)
+_MASS_UNIT_CASES = tuple(
+    (field, home, units, expected)
+    for field, homes in (
+        ("mass_kg", _EQUIPMENT_SAMPLE_MASS_HOMES),
+        ("final_mass_kg", _EQUIPMENT_FINAL_MASS_HOMES),
+    )
+    for home in homes
+    for units, expected in (("g", "0.001"), ("kg", "1"))
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "units", "expected"),
+    _MASS_UNIT_CASES,
+    ids=[
+        f"{field}-{home}-{units}"
+        for field, home, units, _expected in _MASS_UNIT_CASES
+    ],
+)
+def test_equipment_sample_mass_units_convert_before_range_checks(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    units: str,
+    expected: str,
+) -> None:
+    unit_locator = {"table": "unit-source", "page": 4}
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        field,
+        home,
+        "scalar",
+        raw_value={"value": "1", "units": units, "locator": unit_locator},
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, observations = load_migrated_store(root)
+    experiment = experiments[next(iter(observations.values())).experiment_id]
+    located = getattr(experiment.sample, field)
+
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of(expected)
+    assert located.locator == Locator(table="unit-source", page=4)
+
+
+_NONFINITE_EQUIPMENT_MASSES = tuple(
+    (home, value)
+    for home in _EQUIPMENT_SAMPLE_MASS_HOMES
+    for value in ("NaN", "Infinity", "-Infinity")
+)
+
+
+@pytest.mark.parametrize(
+    ("home", "value"),
+    _NONFINITE_EQUIPMENT_MASSES,
+    ids=[f"{home}-{value}" for home, value in _NONFINITE_EQUIPMENT_MASSES],
+)
+def test_nonfinite_equipment_initial_masses_return_typed_migration_issues(
+    tmp_path: Path,
+    home: str,
+    value: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, "mass_kg", home, "scalar", raw_value=value
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+@pytest.mark.parametrize(
+    "home",
+    _EQUIPMENT_FINAL_MASS_HOMES,
+    ids=_EQUIPMENT_FINAL_MASS_HOMES,
+)
+def test_unsupported_equipment_final_mass_units_are_typed_errors(
+    tmp_path: Path,
+    home: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path,
+        "final_mass_kg",
+        home,
+        "scalar",
+        raw_value={"value": "1", "units": "lb", "locator": {"page": 4}},
+    )
+
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in validate_extract_document(extract)
+    )
+    result = migrate(root, write=False)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith("sample.final_mass_kg")
+        for issue in result.validation.issues
+    ), result.validation.issues
