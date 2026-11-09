@@ -107,10 +107,93 @@ def _run_metadata_value_shape(shape: str, point: str) -> object:
         return {}
     if shape == "scalar":
         return point
-    if shape == "point-wrapper":
+    if shape in {"point", "point-wrapper"}:
         return {"kind": "point", "point": point}
     if shape == "located-state":
         return _located_point(point, table="shape", page=7)
+    if shape == "series":
+        return {
+            "kind": "series",
+            "series": [["1", point], ["2", str(Decimal(point) * 2)]],
+        }
+    if shape == "interval":
+        return {
+            "kind": "interval",
+            "interval_low": point,
+            "interval_high": str(Decimal(point) * 2),
+        }
+    if shape == "bound":
+        return {"kind": "bound", "bound_operator": ">", "bound_value": point}
+    if shape == "inference-with-parameters":
+        located_point = _located_point(point, table="unit-seed", page=7)
+        located_point["inference"] = {
+            "method": "fixture",
+            "relation": "identity",
+            "inputs": ["source value"],
+            "output_unit": "fraction",
+            "parameters": [
+                [
+                    "scale",
+                    {
+                        "state": {"tag": "value", "value": "1"},
+                        "locator": {"table": "unit-parameter", "page": 8},
+                    },
+                ]
+            ],
+        }
+        return located_point
+    if shape == "as-published-point":
+        stored = Decimal(point)
+        printed = stored * Decimal(1000)
+        return {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": str(stored)},
+            },
+            "as_published": {"value": str(printed), "units": "g"},
+            "locator": {"table": "as-published", "page": 9},
+        }
+    if shape == "as-published-interval":
+        low = Decimal(point)
+        high = low * 2
+        return {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "interval",
+                    "interval_low": str(low),
+                    "interval_high": str(high),
+                },
+            },
+            "as_published": {
+                "low": str(low * 1000),
+                "high": str(high * 1000),
+                "low_units": "g",
+                "high_units": "g",
+            },
+            "locator": {"table": "as-published-interval", "page": 10},
+        }
+    if shape == "nested-combination":
+        stored = Decimal(point)
+        printed = stored * Decimal(1000)
+        located_point = _located_point(str(stored), table="nested-seed", page=11)
+        located_point["as_published"] = {"value": str(printed), "units": "g"}
+        located_point["inference"] = {
+            "method": "fixture",
+            "relation": "g_to_kg",
+            "inputs": ["m_kg = m_g / 1000", "original_unit=g"],
+            "output_unit": "kg",
+            "parameters": [
+                [
+                    "printed_mass_g",
+                    {
+                        "state": {"tag": "value", "value": str(printed)},
+                        "locator": {"table": "nested-parameter", "page": 12},
+                    },
+                ]
+            ],
+        }
+        return located_point
     if shape == "malformed-point":
         return {"kind": "point"}
     if shape == "unknown-kind":
@@ -1704,19 +1787,19 @@ def test_busemann_preconverted_mass_rows_keep_their_units_and_store_bytes(
     assert work_yaml.read_bytes() == first_bytes
 
 
-_RUN_METADATA_UNIT_KEYS = (
+_RUN_METADATA_UNIT_KEY_BASES = (
     "unit",
-    "UNIT",
-    "Unit",
     "units",
-    "UNITS",
-    "Units",
     "unit_code",
-    "UNIT_CODE",
-    "Unit_Code",
     "mass_unit",
-    "MASS_UNIT",
-    "Mass_Unit",
+    "output_unit",
+    "low_units",
+    "high_units",
+)
+_RUN_METADATA_UNIT_KEYS = tuple(
+    spelling
+    for base in _RUN_METADATA_UNIT_KEY_BASES
+    for spelling in dict.fromkeys((base, base.upper(), base.title()))
 )
 
 
@@ -1839,11 +1922,31 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
     )
     for field in fields:
         for home in RUN_METADATA_FIELD_HOMES[field][1]:
-            shapes = (
-                ("scalar", "point-wrapper", "located-state")
-                if field in {"mass_kg", "final_mass_kg", "species_loss_fraction"}
-                else ("unitless",)
-            )
+            if field in {"mass_kg", "final_mass_kg"}:
+                shapes = (
+                    "scalar",
+                    "point",
+                    "located-state",
+                    "series",
+                    "interval",
+                    "bound",
+                    "inference-with-parameters",
+                    "as-published-point",
+                    "as-published-interval",
+                    "nested-combination",
+                )
+            elif field == "species_loss_fraction":
+                shapes = (
+                    "scalar",
+                    "point",
+                    "located-state",
+                    "series",
+                    "interval",
+                    "bound",
+                    "inference-with-parameters",
+                )
+            else:
+                shapes = ("unitless",)
             for shape in shapes:
                 seed_root = tmp_path / f"seed-{seeds}"
                 seeds += 1
@@ -1899,18 +2002,34 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                             assert loaded is None, context
                         else:
                             assert field in {"mass_kg", "final_mass_kg"}, context
-                            assert unit_key.casefold() in {"unit", "units"}, context
-                            assert not any(
-                                str(part).casefold() in {"locator", "inference"}
-                                for part in node_path
-                            ), context
                             assert loaded is not None and loaded.state.is_value, context
-                            printed = Decimal(
-                                "0.0008" if field == "final_mass_kg" else "0.25"
-                            )
-                            assert loaded.state.value == Value.point_of(
-                                printed / Decimal(1000)
-                            ), context
+                            if (
+                                node_path == ("inference",)
+                                and unit_key == "output_unit"
+                            ):
+                                assert loaded.inference is not None, context
+                                assert loaded.inference.output_unit == "g", context
+                            elif (
+                                node_path == ("as_published",)
+                                and unit_key in {"units", "low_units", "high_units"}
+                            ):
+                                assert loaded.inference is not None, context
+                                assert loaded.inference.relation == "g_to_kg", context
+                            elif (
+                                node_path in {(), ("value",), ("state", "value")}
+                                and unit_key in {"unit", "units"}
+                            ):
+                                printed = Decimal(
+                                    "0.0008" if field == "final_mass_kg" else "0.25"
+                                )
+                                assert loaded.state.value == Value.point_of(
+                                    printed / Decimal(1000)
+                                ), context
+                            else:
+                                pytest.fail(
+                                    "unit-like key was accepted without a consuming reader: "
+                                    f"{context}"
+                                )
                         mutations += 1
 
 
@@ -1981,6 +2100,119 @@ def test_run_metadata_as_published_conversion_bypasses_are_typed(
         "scalar",
         raw_value=raw_value,
     )
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "sample.mass_kg" in issue.path
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert experiment.sample.mass_kg is None
+
+
+_RUN_METADATA_UNIT_LOSS_WITNESSES = (
+    (
+        "as-published-high-units-alone",
+        {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.0005"},
+            },
+            "as_published": {"high_units": "g"},
+        },
+    ),
+    (
+        "as-published-point-with-unused-high-units",
+        {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.0005"},
+            },
+            "as_published": {
+                "value": "0.5",
+                "units": "g",
+                "high_units": "kg",
+            },
+        },
+    ),
+    (
+        "uppercase-output-unit-next-to-consumed-output-unit",
+        {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.0005"},
+            },
+            "inference": {
+                "method": "fixture",
+                "relation": "identity",
+                "inputs": ["source"],
+                "output_unit": "kg",
+                "OUTPUT_UNIT": "g",
+            },
+        },
+    ),
+    (
+        "fake-inference-nested-in-value",
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0005",
+                    "ignored": {"inference": {"output_unit": "g"}},
+                },
+            },
+        },
+    ),
+    (
+        "uppercase-output-unit-with-nested-unit-alias",
+        {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.0005"},
+            },
+            "inference": {
+                "method": "fixture",
+                "relation": "identity",
+                "inputs": ["source"],
+                "output_unit": "kg",
+                "OUTPUT_UNIT": {"unit": "g"},
+            },
+        },
+    ),
+)
+_RUN_METADATA_UNIT_LOSS_CASES = tuple(
+    (home, name, raw_value)
+    for home in RUN_METADATA_FIELD_HOMES["mass_kg"][1]
+    for name, raw_value in _RUN_METADATA_UNIT_LOSS_WITNESSES
+)
+
+
+@pytest.mark.parametrize(
+    ("home", "name", "raw_value"),
+    _RUN_METADATA_UNIT_LOSS_CASES,
+    ids=[
+        f"{home}-{name}"
+        for home, name, _raw_value in _RUN_METADATA_UNIT_LOSS_CASES
+    ],
+)
+def test_run_metadata_unit_reader_rejects_unconsumed_members_at_every_mass_home(
+    tmp_path: Path,
+    home: str,
+    name: str,
+    raw_value: dict,
+) -> None:
+    root, _extract = _run_metadata_shape_extract(
+        tmp_path / f"{home}-{name}",
+        "mass_kg",
+        home,
+        "scalar",
+        raw_value=raw_value,
+    )
+
     result = migrate(root, write=True)
 
     assert result.validation is not None
