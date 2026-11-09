@@ -832,8 +832,10 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # this production row total; the next row transfers it to reagent, so live
     # product returns to zero while cumulative condensate and recycled mass
     # retain the capture.
+    # Hour 8 at 1750 C is a pumped root: Na P_eq=11.744 Pa, P_bulk=0.445 Pa,
+    # g=37.24. That backpressure is the live Na+K product below.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        0.0004946302024193164, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2302,7 +2304,9 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
     assert success["status"] == "partial"
     assert set(success) == TOP_LEVEL_KEYS
     assert success["c7_product_report"]
-    assert success["c7_refusal_diagnostic"]
+    # An in-envelope commit leaves the refusal empty. extraction.py sets
+    # _last_c7_refusal_diagnostic to {} and fills it only on a refusal.
+    assert success["c7_refusal_diagnostic"] == {}
     assert set(failure) == TOP_LEVEL_KEYS
     assert failure["status"] == "failed"
     assert failure["c7_product_report"] == {}
