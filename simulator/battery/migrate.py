@@ -1353,6 +1353,9 @@ def _derivation_inputs_requirement_error(
     return None
 
 
+_DERIVATION_OUTPUT_UNIT_KEY = "output_unit"
+
+
 def _derivation_from_plain(
     payload: object,
     *,
@@ -1420,7 +1423,7 @@ def _derivation_from_plain(
         relation = "identity"
     if not isinstance(relation, str):
         raise _InvalidDerivationAnnotation("Derivation.relation must be a string")
-    output_unit = payload.get("output_unit", "as_published")
+    output_unit = payload.get(_DERIVATION_OUTPUT_UNIT_KEY, "as_published")
     if not isinstance(output_unit, str):
         raise _InvalidDerivationAnnotation("Derivation.output_unit must be a string")
     derivation = Derivation(
@@ -2785,6 +2788,12 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
     return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
+_RUN_METADATA_DIRECT_UNIT_ANNOTATION_KEYS = frozenset({"unit", "units"})
+_RUN_METADATA_DIRECT_UNIT_ANNOTATION_PATHS = frozenset(
+    {(), ("value",), ("state", "value"), ("value", "state", "value")}
+)
+
+
 def _normalize_run_metadata_unit_annotations(
     payload: object,
     *,
@@ -2806,7 +2815,7 @@ def _normalize_run_metadata_unit_annotations(
             for key, child in value.items():
                 key_text = str(key)
                 key_casefolded = key_text.casefold()
-                if key_casefolded == "as_published":
+                if key_text == _AS_PUBLISHED_KEY:
                     annotation_path = (*path, key_text)
                     is_located_value = (
                         not path
@@ -2833,7 +2842,7 @@ def _normalize_run_metadata_unit_annotations(
                         )
                     elif not any(
                         child.get(unit_key) not in (None, "")
-                        for unit_key in ("units", "low_units", "high_units")
+                        for unit_key in _PUBLISHED_CONVERSION_UNIT_KEYS
                     ):
                         source_errors.append(
                             (annotation_path, "as_published has no consumable unit annotation")
@@ -2847,17 +2856,15 @@ def _normalize_run_metadata_unit_annotations(
                     continue
                 if "unit" in key_casefolded:
                     if (
-                        key_casefolded == "output_unit"
-                        and path
-                        and str(path[-1]).casefold() == "inference"
+                        path == ("inference",)
+                        and key_text == _DERIVATION_OUTPUT_UNIT_KEY
                     ):
                         cleaned[key] = child
                         continue
-                    if path == ("as_published",) and key_text in {
-                        "units",
-                        "low_units",
-                        "high_units",
-                    }:
+                    if (
+                        path == (_AS_PUBLISHED_KEY,)
+                        and key_text in _PUBLISHED_CONVERSION_UNIT_KEYS
+                    ):
                         cleaned[key] = child
                         continue
                     annotations.append((path, key_text, child))
@@ -2937,12 +2944,30 @@ def _normalize_run_metadata_unit_annotations(
                 f"unit-like annotation at {annotation_path} is invalid "
                 "inside inference metadata",
             )
-        if key.casefold() not in {"unit", "units"}:
+        if (
+            key not in _RUN_METADATA_DIRECT_UNIT_ANNOTATION_KEYS
+            or path not in _RUN_METADATA_DIRECT_UNIT_ANNOTATION_PATHS
+        ):
             return None, (formula, f"unsupported unit annotation key {key!r}")
     if len(annotations) > 1:
         return None, (formula, "specify only one unit annotation")
     if field not in {"mass_kg", "final_mass_kg"}:
         return None, (formula, f"units are unsupported for {field!r}")
+
+    located_payload = payload
+    if (
+        isinstance(payload, Mapping)
+        and isinstance(payload.get("value"), Mapping)
+        and "state" in payload["value"]
+    ):
+        located_payload = payload["value"]
+    if isinstance(located_payload, Mapping) and (
+        "inference" in located_payload or located_payload.get("inferred") is True
+    ):
+        return None, (
+            formula,
+            "direct unit annotations cannot be combined with explicit inference",
+        )
 
     unit = annotations[0][2]
     raw_value, _value_locator, _wrapper = _unwrap_located_equipment_value(
@@ -8656,19 +8681,78 @@ def _operands_match_stored(
     return matching
 
 
+_AS_PUBLISHED_KEY = "as_published"
+_PUBLISHED_VALUE_KEY = "value"
+_PUBLISHED_UNITS_KEY = "units"
+_PUBLISHED_LOW_KEY = "low"
+_PUBLISHED_HIGH_KEY = "high"
+_PUBLISHED_LOW_UNITS_KEY = "low_units"
+_PUBLISHED_HIGH_UNITS_KEY = "high_units"
+_PUBLISHED_CONVERSION_OPERAND_KEYS = frozenset(
+    {
+        _PUBLISHED_VALUE_KEY,
+        _PUBLISHED_UNITS_KEY,
+        _PUBLISHED_LOW_KEY,
+        _PUBLISHED_HIGH_KEY,
+        _PUBLISHED_LOW_UNITS_KEY,
+        _PUBLISHED_HIGH_UNITS_KEY,
+    }
+)
+_PUBLISHED_CONVERSION_UNIT_KEYS = frozenset(
+    {
+        _PUBLISHED_UNITS_KEY,
+        _PUBLISHED_LOW_UNITS_KEY,
+        _PUBLISHED_HIGH_UNITS_KEY,
+    }
+)
+
+
 def _published_operands(published: Mapping[str, Any]) -> list[tuple[Decimal, str]] | None:
-    units = published.get("units")
-    if published.get("low") is not None and published.get("high") is not None:
-        low_unit = published.get("low_units") or units
-        high_unit = published.get("high_units") or units
-        if not low_unit or not high_unit:
+    has_low = _PUBLISHED_LOW_KEY in published
+    has_high = _PUBLISHED_HIGH_KEY in published
+    has_point = _PUBLISHED_VALUE_KEY in published
+    if has_low or has_high:
+        if not has_low or not has_high or has_point:
             return None
-        return [
-            (Decimal(str(published["low"])), str(low_unit)),
-            (Decimal(str(published["high"])), str(high_unit)),
-        ]
-    if published.get("value") is not None and units:
-        return [(Decimal(str(published["value"])), str(units))]
+        for unit_key in _PUBLISHED_CONVERSION_UNIT_KEYS:
+            if unit_key in published and (
+                not isinstance(published[unit_key], str)
+                or not published[unit_key].strip()
+            ):
+                return None
+        has_common_units = _PUBLISHED_UNITS_KEY in published
+        has_low_units = _PUBLISHED_LOW_UNITS_KEY in published
+        has_high_units = _PUBLISHED_HIGH_UNITS_KEY in published
+        if has_common_units and has_low_units and has_high_units:
+            return None
+        common_units = published.get(_PUBLISHED_UNITS_KEY)
+        low_unit = published.get(_PUBLISHED_LOW_UNITS_KEY, common_units)
+        high_unit = published.get(_PUBLISHED_HIGH_UNITS_KEY, common_units)
+        if not isinstance(low_unit, str) or not low_unit.strip():
+            return None
+        if not isinstance(high_unit, str) or not high_unit.strip():
+            return None
+        try:
+            low = Decimal(str(published[_PUBLISHED_LOW_KEY]))
+            high = Decimal(str(published[_PUBLISHED_HIGH_KEY]))
+        except (ArithmeticError, TypeError, ValueError):
+            return None
+        return [(low, low_unit), (high, high_unit)]
+
+    if has_point:
+        if (
+            _PUBLISHED_LOW_UNITS_KEY in published
+            or _PUBLISHED_HIGH_UNITS_KEY in published
+        ):
+            return None
+        units = published.get(_PUBLISHED_UNITS_KEY)
+        if not isinstance(units, str) or not units.strip():
+            return None
+        try:
+            value = Decimal(str(published[_PUBLISHED_VALUE_KEY]))
+        except (ArithmeticError, TypeError, ValueError):
+            return None
+        return [(value, units)]
     return None
 
 
@@ -8688,17 +8772,16 @@ def _inference_for_printed_conversion(
     raw_value = state.get("value") if isinstance(state, Mapping) else None
     parsed = _stored_magnitudes(raw_value)
     if parsed is None:
-        if isinstance(payload.get("as_published"), Mapping):
+        if isinstance(payload.get(_AS_PUBLISHED_KEY), Mapping):
             raise ValueError(
                 "as_published conversion does not apply to a non-numeric located value"
             )
         return None
     kind, stored, operator = parsed
     locator = _locator_from_plain(payload.get("locator"))
-    published = payload.get("as_published")
-    if isinstance(published, Mapping) and (
-        published.get("units") or published.get("low_units") or published.get("value")
-        or published.get("low")
+    published = payload.get(_AS_PUBLISHED_KEY)
+    if isinstance(published, Mapping) and _PUBLISHED_CONVERSION_OPERAND_KEYS.intersection(
+        published
     ):
         operands = _published_operands(published)
         if operands is None:
