@@ -208,15 +208,15 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
     ]
     # b-704 refusals remain for partial/non-oxide assays; b-1128 admits the
     # four 102.35 wt% kept-oxide maps after renormalization.
-    assert len(accepted_compositions) == 35
-    assert len(refused_compositions) == 106
+    assert len(accepted_compositions) == 47
+    assert len(refused_compositions) == 94
     assert all(
         "mass-percent composition is not usable:" in item.identity.composition.reason
         and (
             "kept sum=" in item.identity.composition.reason
             or "printed oxide wt% map has no positive mass"
             in item.identity.composition.reason
-            or "unsupported component(s) above 0.5 wt%" in item.identity.composition.reason
+            or "unsupported component(s) above 1.0 wt%" in item.identity.composition.reason
             or "mass-percent composition exceeds the accepted kept-sum limit" in item.identity.composition.reason
         )
         for item in refused_compositions
@@ -230,8 +230,9 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             for name, amount in printed_map.items()
         }
         # b-704 projects only the printed metallic-iron trace at or below the
-        # 0.5 wt% dropped-component threshold from an otherwise closed assay.
-        if expected.get("Fe", Decimal("0")) <= Decimal("0.5"):
+        # 1.0 wt% dropped-component threshold from an otherwise closed assay.
+        dropped_iron = expected.get("Fe", Decimal("0"))
+        if dropped_iron <= Decimal("1.0"):
             expected.pop("Fe", None)
         kept_total = sum(expected.values(), Decimal("0"))
         printed_oxides = dict(expected)
@@ -241,6 +242,15 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         if observation.identity.composition.is_value:
             assert observation.identity.composition.value.amount_basis.value == "mass_percent"
             assert observation.identity.composition.value.as_map() == expected
+            if Decimal("0") < dropped_iron <= Decimal("1.0"):
+                projection_notices = [
+                    notice
+                    for notice in observation.notices
+                    if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+                ]
+                assert len(projection_notices) == 1
+                assert projection_notices[0].dropped == ("Fe",)
+                assert f"Fe={dropped_iron} wt%" in projection_notices[0].reason
             if kept_total > Decimal("102"):
                 renormalized_rows += 1
                 expected_moles = wt_pct_to_mole_fraction(printed_oxides)
@@ -262,7 +272,7 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
                 assert "renormalized to 100 wt%" in notice.reason
                 assert "d-336 item 2" in notice.reason
         elif (
-            "unsupported component(s) above 0.5 wt%"
+            "unsupported component(s) above 1.0 wt%"
             in observation.identity.composition.reason
         ):
             iron = printed_map.get("T.Fe", printed_map.get("Fe"))

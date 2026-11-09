@@ -4520,11 +4520,11 @@ _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
 # Accept kept mass from 95 through 105 wt%; totals above 102 are renormalized
-# to 100 wt%, and no more than 0.5 wt% of dropped traces are tolerated.
+# to 100 wt%, and up to 1.0 wt% of dropped components are projected with notice.
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
 _MASS_PERCENT_RENORMALIZE_ABOVE = Decimal("102")
 _MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("105")
-_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("0.5")
+_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("1.0")
 _GREEN_READ_OXIDE_MAP = "green-read oxide map"
 _M1_ONLY_CLOSURE_CONTRIBUTOR = "m1-only closure contributor"
 _PRINTED_FORMULA_TOKEN = r"(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?|\.\d+)?)+"
@@ -5024,7 +5024,7 @@ def _mass_percent_composition_derivation(
     dropped_mass = closure_result.dropped_mass
     if (
         dropped
-        and Decimal("0") < dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+        and dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
     ):
         printed_total = closure_result.printed_analysis_total
         if printed_total is not None and printed_total > 0:
@@ -6007,20 +6007,28 @@ def _wt_percent_conversion_or_raise(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> Composition:
-    converted, refusal = _wt_percent_conversion_or_refusal(
+    result = _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
     )
-    if converted is None:
+    if result.composition is None:
         reason = (
-            refusal.reason
-            if refusal is not None
+            result.refusal.reason
+            if result.refusal is not None
             else "mass-percent composition is not usable"
         )
         detail = reason.removeprefix("mass-percent composition is not usable: ")
         raise ValueError(detail)
-    return converted
+    if result.dropped_components:
+        details = ", ".join(
+            f"{name}={amount} wt%" for name, amount in result.dropped_components
+        )
+        raise ValueError(
+            "mass-percent conversion dropped numeric component(s) without a "
+            f"notice channel: {details}"
+        )
+    return result.composition
 
 
 def _wt_percent_conversion_state(
