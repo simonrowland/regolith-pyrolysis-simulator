@@ -17323,7 +17323,7 @@ def _relative_oxygen_decision(
     flags: list[str] = []
     iw_notice = (
         oneill_iw_extrapolation_notice(float(temperature_K))
-        if buffer == "IW"
+        if calibration_id == "oneill_1988_ammin_73_eq11"
         else None
     )
     if iw_notice is not None:

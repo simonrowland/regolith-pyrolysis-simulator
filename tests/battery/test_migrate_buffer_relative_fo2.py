@@ -48,6 +48,33 @@ def test_printed_calibration_is_used_exactly() -> None:
     assert decision.notice_band == "not reported (printed calibration used exactly)"
 
 
+def test_printed_frost_iw_uses_its_own_range_flags() -> None:
+    frost_in_range = _decision(
+        {
+            "delta_IW": "+1.0",
+            "oxygen_buffer_as_published": "IW; Frost (1991)",
+        },
+        temperature_K=1460,
+    )
+
+    assert frost_in_range is not None and frost_in_range.state.is_value
+    assert "calibration=frost_1991_table_1" in frost_in_range.notice_reason
+    assert "calibration_range=838.15–1473.15 K" in frost_in_range.notice_reason
+    assert "predict_and_flag_outside_range_833_1450_K" not in frost_in_range.notice_reason
+    assert "prediction_flags=" not in frost_in_range.notice_reason
+
+    frost_out_of_range = _decision(
+        {
+            "delta_IW": "+1.0",
+            "oxygen_buffer_as_published": "IW; Frost (1991)",
+        },
+        temperature_K=1500,
+    )
+    assert frost_out_of_range is not None and frost_out_of_range.state.is_value
+    assert "predict_and_flag_outside_range_838.15_1473.15_K" in frost_out_of_range.notice_reason
+    assert "predict_and_flag_outside_range_833_1450_K" not in frost_out_of_range.notice_reason
+
+
 def test_printed_absolute_log_wins_over_buffer_relative_offset() -> None:
     facts = PrintedOxygenFacts(
         log_fO2=Located(State.of(Decimal("-9"))),
