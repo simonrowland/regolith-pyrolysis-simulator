@@ -1772,6 +1772,59 @@ def _loaded_run_metadata_value(experiment, field: str):
     return getattr(experiment.sample, field)
 
 
+_AS_PUBLISHED_MASS_BYPASS_SHAPES = (
+    (
+        "nested-inside-value",
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.5",
+                    "as_published": {"units": "g"},
+                },
+            }
+        },
+    ),
+    (
+        "explicit-identity",
+        {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": "0.5"},
+            },
+            "as_published": {"value": "0.5", "units": "g"},
+            "inference": {
+                "method": "fixture",
+                "relation": "identity",
+                "inputs": ["source"],
+                "output_unit": "kg",
+            },
+        },
+    ),
+)
+_AS_PUBLISHED_MASS_BYPASS_CASES = tuple(
+    (home, name, raw_value)
+    for home in RUN_METADATA_FIELD_HOMES["mass_kg"][1]
+    for name, raw_value in _AS_PUBLISHED_MASS_BYPASS_SHAPES
+)
+_UNCONSUMED_AS_PUBLISHED_UNIT_CASES = tuple(
+    (field, home, unit_key)
+    for field in (
+        "mass_kg",
+        "final_mass_kg",
+        "species_loss_fraction",
+        "charge_sequence",
+        "vaporization_statement",
+    )
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+    for unit_key in ("unit_code",)
+) + tuple(
+    ("mass_kg", home, "unit")
+    for home in RUN_METADATA_FIELD_HOMES["mass_kg"][1]
+)
+
+
 def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
     tmp_path: Path,
 ) -> None:
@@ -1862,48 +1915,69 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
 
 
 @pytest.mark.parametrize(
-    ("name", "raw_value"),
-    (
-        (
-            "as-published-inside-value",
-            {
-                "state": {
-                    "tag": "value",
-                    "value": {
-                        "kind": "point",
-                        "point": "0.5",
-                        "as_published": {"units": "g"},
-                    },
-                }
-            },
-        ),
-        (
-            "explicit-identity-bypasses-conversion",
-            {
-                "state": {
-                    "tag": "value",
-                    "value": {"kind": "point", "point": "0.5"},
-                },
-                "as_published": {"value": "0.5", "units": "g"},
-                "inference": {
-                    "method": "fixture",
-                    "relation": "identity",
-                    "inputs": ["source"],
-                    "output_unit": "kg",
-                },
-            },
-        ),
-    ),
+    ("field", "home", "unit_key"),
+    _UNCONSUMED_AS_PUBLISHED_UNIT_CASES,
+    ids=[
+        f"{field}-{home}-as-published-{unit_key}"
+        for field, home, unit_key in _UNCONSUMED_AS_PUBLISHED_UNIT_CASES
+    ],
+)
+def test_as_published_unit_aliases_are_refused_at_every_run_metadata_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    unit_key: str,
+) -> None:
+    if field in {"charge_sequence", "vaporization_statement"}:
+        payload = (
+            {"charge_id": "charge-a", "run_index": 1}
+            if field == "charge_sequence"
+            else {"state": {"tag": "value", "value": "congruent"}}
+        )
+        root, extract = _unitless_run_metadata_extract(
+            tmp_path / f"{field}-{home}", field, home, payload
+        )
+    else:
+        root, extract = _run_metadata_shape_extract(
+            tmp_path / f"{field}-{home}", field, home, "point-wrapper"
+        )
+    field_payload = _run_metadata_field_payload(extract, field, home)
+    assert isinstance(field_payload, dict)
+    field_payload["as_published"] = {unit_key: "g"}
+    (root / "data/literature/extracts/fixture-source.yaml").write_text(
+        yaml.safe_dump(extract, sort_keys=False), encoding="utf-8"
+    )
+
+    result = migrate(root, write=True)
+
+    assert result.validation is not None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE and field in issue.path
+        for issue in result.validation.issues
+    ), result.validation.issues
+    _works, experiments, _observations = load_migrated_store(root)
+    experiment = experiments["10.1234/fixture::experiment::run-1"]
+    assert _loaded_run_metadata_value(experiment, field) is None
+
+
+@pytest.mark.parametrize(
+    ("home", "name", "raw_value"),
+    _AS_PUBLISHED_MASS_BYPASS_CASES,
+    ids=[
+        f"{home}-{name}"
+        for home, name, _raw_value in _AS_PUBLISHED_MASS_BYPASS_CASES
+    ],
 )
 def test_run_metadata_as_published_conversion_bypasses_are_typed(
     tmp_path: Path,
+    home: str,
     name: str,
     raw_value: dict,
 ) -> None:
     root, _extract = _run_metadata_shape_extract(
-        tmp_path / name,
+        tmp_path / f"{home.replace('.', '_').replace('[', '').replace(']', '').replace('*', 'star')}-{name}",
         "mass_kg",
-        "experiments[].sample.mass_kg",
+        home,
         "scalar",
         raw_value=raw_value,
     )
@@ -1912,7 +1986,7 @@ def test_run_metadata_as_published_conversion_bypasses_are_typed(
     assert result.validation is not None
     assert any(
         issue.reason is RefusalReason.INVALID_SOURCE
-        and issue.path.endswith("sample.mass_kg")
+        and "sample.mass_kg" in issue.path
         for issue in result.validation.issues
     ), result.validation.issues
     _works, experiments, _observations = load_migrated_store(root)
@@ -1924,8 +1998,6 @@ def test_run_metadata_as_published_conversion_bypasses_are_typed(
     ("name", "as_published"),
     (
         ("empty", {}),
-        ("unsupported-unit-key", {"unit_code": "g"}),
-        ("unsupported-unit-alias", {"unit": "g"}),
     ),
 )
 def test_run_metadata_unconsumed_as_published_blocks_are_typed(
