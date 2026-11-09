@@ -1338,12 +1338,26 @@ def vapor_contract_completeness(
     )
 
 
+def _account_species_formula(species: str):
+    """Parse an inventory key. A trailing ``_gas`` suffix counts as the oxide.
+
+    The shared formula parser does not strip ``_gas``. Stripping it there makes
+    thermal-train treat ``CaO_gas`` as a known species and adds its mass to the
+    hot-vapor total.
+    """
+    text = str(species)
+    suffix = "_gas"
+    if text.endswith(suffix) and text != suffix:
+        text = text[: -len(suffix)]
+    return parse_formula(text, species=species)
+
+
 def _target_equivalent_mol(target: str, species: str, kg: Any) -> float:
     species_mol = _species_mol(species, kg)
     if species_mol <= _EPS:
         return 0.0
     target_element = _target_element(target)
-    species_formula = parse_formula(species, species=species)
+    species_formula = _account_species_formula(species)
     element_count = species_formula.elements.get(target_element, 0.0)
     if element_count <= 0.0:
         raise ValueError(f"{species} contains no {target_element} for target {target}")
@@ -1367,7 +1381,7 @@ def _species_mol(species: str, kg: Any) -> float:
     molar_mass = MOLAR_MASS.get(species)
     if molar_mass is None:
         try:
-            formula = parse_formula(species, species=species)
+            formula = _account_species_formula(species)
         except (AccountingError, ValueError) as exc:
             raise KeyError(f"missing molar mass for {species}") from exc
         molar_mass = formula.molar_mass_g_mol
@@ -1847,7 +1861,7 @@ def _target_relevant_species_kg(
         amount = _non_negative_number(kg, f"{species_name} kg")
         if amount <= _EPS:
             continue
-        formula = parse_formula(species_name, species=species_name)
+        formula = _account_species_formula(species_name)
         if formula.elements.get(element, 0.0) <= 0.0:
             continue
         values[species_name] = values.get(species_name, 0.0) + amount
@@ -2100,7 +2114,7 @@ def _element_equivalent_mol(element: str, species: str, kg: Any) -> float:
     species_mol = _species_mol(species, kg)
     if species_mol <= _EPS:
         return 0.0
-    species_formula = parse_formula(species, species=species)
+    species_formula = _account_species_formula(species)
     element_count = species_formula.elements.get(element, 0.0)
     if element_count <= 0.0:
         raise ValueError(f"{species} contains no {element}")
