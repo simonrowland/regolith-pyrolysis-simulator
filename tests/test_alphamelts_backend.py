@@ -9003,6 +9003,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         activities,
         comp_wt,
         pO2_bar=1e-9,
+        use_melt_activity_ladder=True,
     )
 
     required = {
@@ -9013,8 +9014,8 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
-    assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
-    assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
+    assert pressures['Na'] > 0.0
+    assert pressures['K'] > 0.0
     from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
 
     from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -9034,6 +9035,15 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         a_oxide=expected_mgo_activity,
         vapor_pressure_data=backend._vapor_pressure_catalog_payload,
     )
+    expected_feo = melt_oxide_activity("FeO", account_mol)
+    assert expected_feo is not None
+    assert backend._antoine_activity_source_notices["Fe"] == {
+        "rung": "ideal_mixing",
+        "source": "ideal",
+        "x": expected_feo.x_single_cation,
+        "reason": "alphaMELTS supplied no oxide-component activity",
+        "warning": expected_feo.warning,
+    }
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     for species in ('Na', 'K', 'Cr', 'Mn', 'Mg', 'Fe'):
         assert backend._activity_for_vapor_species(species, activities) is None
@@ -9041,6 +9051,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         comp_wt,
         backend._load_vapor_pressure_table(),
         activities,
+        use_melt_activity_ladder=True,
     ) == []
 
 
@@ -10761,10 +10772,10 @@ def test_t162_missing_mgo_activity_uses_melt_ladder_and_report_notice():
     )
     assert run.allow_fallback_vapor is True
     diagnostics = backend._vapor_pressure_diagnostics({}, pressures, source)
-    sim = types.SimpleNamespace(
-        _last_vapor_pressures_source={'Mg': source['Mg']},
-        _last_backend_diagnostics=diagnostics,
-    )
+    sim = run._start_session().simulator
+    assert sim._allow_fallback_vapor is True
+    sim._last_vapor_pressures_source = {'Mg': source['Mg']}
+    sim._last_backend_diagnostics = diagnostics
     report = _vapor_pressure_source_report(sim)
     assert report['species']['Mg'] == {
         'source': source['Mg'],

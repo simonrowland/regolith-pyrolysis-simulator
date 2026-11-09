@@ -6,7 +6,15 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.9.0`
+**Schema version:** `1.10.0`
+
+Schema 1.10.0 adds an optional `activity_source` object to each per-species
+vapor-pressure source entry when AlphaMELTS has to resolve a missing oxide
+activity through the melt-activity ladder. The existing source token remains
+under that entry's `source` field. The activity notice records the rung,
+citation or `ideal`, single-cation mole fraction, and the reason the fallback
+was needed. An `activity_source.warning` is included when the shared resolver
+reports a temperature-domain warning for its published coefficient.
 
 Schema 1.9.0 adds the unconditional top-level
 `vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
@@ -48,8 +56,9 @@ engine identity used for a computed C0 exit forecast (`internal-analytical`,
 `alphamelts`, `thermoengine`, or `cached-real`). Older run records without this
 nested field remain valid, and absence carries no meaning. This additive
 run-metadata field does not change the exact top-level runner envelope or the
-artifact envelope, so `RUNNER_SCHEMA_VERSION` remains `1.9.0` and
-`ARTIFACT_SCHEMA_VERSION` remains `0.2.0`.
+artifact envelope in schema 1.9.0, so at that version
+`RUNNER_SCHEMA_VERSION` remained `1.9.0` and `ARTIFACT_SCHEMA_VERSION`
+remained `0.2.0`.
 
 Run the CLI as:
 
@@ -107,7 +116,7 @@ the in-process trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -295,7 +304,7 @@ omit it.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -531,11 +540,25 @@ and the aggregate liner load:
 ```jsonc
 "vapor_pressure_source_report": {
   "species": {
-    "Na": "builtin_authoritative",
-    "K": "builtin_authoritative"
+    "Na": {
+      "source": "builtin_authoritative"
+    },
+    "Mg": {
+      "source": "builtin_authoritative:standard_reaction_term",
+      "activity_source": {
+        "rung": "published_gamma",
+        "source": "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "x": 0.25,
+        "reason": "alphaMELTS supplied no oxide-component activity"
+      }
+    }
   },
   "summary": {
-    "builtin_authoritative": {"count": 2, "percentage": 100.0}
+    "builtin_authoritative": {"count": 1, "percentage": 50.0},
+    "builtin_authoritative:standard_reaction_term": {
+      "count": 1,
+      "percentage": 50.0
+    }
   },
   "total_species": 2,
   "vapor_pressure_backend_status": "fallback",
@@ -559,9 +582,12 @@ and the aggregate liner load:
   is diagnostic-only.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
-* All eight keys are unconditional in schema 1.4.0. When no backend facet
-  status exists, the status and reason/source strings are empty, the facet
-  summary is `{}`, and `authoritative_for_requested_vapor_pressure` is `null`.
+* All eight report-level keys are unconditional in schema 1.4.0. Per-species
+  entries retain the source token under `source`; an `activity_source` object
+  is present only when the AlphaMELTS activity ladder supplies that species'
+  missing oxide activity. When no backend facet status exists, the status and
+  reason/source strings are empty, the facet summary is `{}`, and
+  `authoritative_for_requested_vapor_pressure` is `null`.
 * When VapoRock shadow data exists, `simulator.runner` copies it from
   `_last_vapor_pressure_diagnostic["vaporock_full_speciation_Pa"]` into
   the runner diagnostics under the same key. It is not an authoritative

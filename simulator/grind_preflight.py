@@ -209,10 +209,18 @@ def assert_strict_vapor_source_report(
             )
         return {"vapor_active": False, "total_species": total_species, "summary": {}}
 
-    counts = Counter(_source_authority(source) for source in species.values())
+    source_by_species = {
+        species_name: (
+            entry.get("source") if isinstance(entry, Mapping) else entry
+        )
+        for species_name, entry in species.items()
+    }
+    counts = Counter(
+        _source_authority(source) for source in source_by_species.values()
+    )
     bad_sources = {
         str(source)
-        for species_name, source in species.items()
+        for species_name, source in source_by_species.items()
         if _source_authority(source) not in approved_sources
         or _is_noncertifying_vapor_extrapolation(species_name, source)
     }

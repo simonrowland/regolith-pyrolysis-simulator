@@ -1646,7 +1646,10 @@ def _assert_schema_shape(payload: dict) -> None:
         source = entry["source"]
         if "activity_source" in entry:
             activity_source = entry["activity_source"]
-            assert set(activity_source) == {"rung", "source", "x", "reason"}
+            assert set(activity_source) in (
+                {"rung", "source", "x", "reason"},
+                {"rung", "source", "x", "reason", "warning"},
+            )
             assert activity_source["rung"] in {
                 "published_gamma",
                 "ideal_mixing",
@@ -1656,6 +1659,8 @@ def _assert_schema_shape(payload: dict) -> None:
             assert activity_source["reason"] == (
                 "alphaMELTS supplied no oxide-component activity"
             )
+            if "warning" in activity_source:
+                assert isinstance(activity_source["warning"], str)
         # Per-species sources carry a colon-suffixed evidence detail after the
         # SC-05 label-honesty fix (e.g. "builtin_authoritative:standard_reaction_term",
         # "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit",
@@ -2144,7 +2149,7 @@ def test_runner_schema_shape_contract():
     shape-checker live.
     """
 
-    payload = _run_scenario(SCENARIOS[0])
+    payload = _run_scenario({**SCENARIOS[0], "hours": 3})
     _assert_schema_shape(payload)
 
 

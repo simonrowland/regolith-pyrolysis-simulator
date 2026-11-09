@@ -133,6 +133,29 @@ def test_present_report_renders_scalar_tokens_and_full_envelope() -> None:
     ]
 
 
+def test_nested_activity_source_keeps_source_token_and_renders_notice() -> None:
+    report = _complete_report()
+    report["species"]["Mg"] = {
+        "source": "builtin_authoritative:standard_reaction_term",
+        "activity_source": {
+            "rung": "published_gamma",
+            "source": "Sossi & Fegley 2018 Table 2",
+            "x": 0.25,
+            "reason": "alphaMELTS supplied no oxide-component activity",
+            "warning": "constant_gamma_extrapolated_out_of_domain",
+        },
+    }
+    html = _render(report)
+    species_row = _table_row(_species_table(html), 'title="Mg"')
+
+    assert "builtin_authoritative:standard_reaction_term" in species_row
+    assert "Activity published_gamma" in species_row
+    assert "Sossi &amp; Fegley 2018 Table 2" in species_row
+    assert "x=0.25" in species_row
+    assert "alphaMELTS supplied no oxide-component activity" in species_row
+    assert "constant_gamma_extrapolated_out_of_domain" in species_row
+
+
 def test_all_report_states_label_final_equilibrium_not_run_history() -> None:
     for report in (..., None, _complete_report()):
         html = _render(report)

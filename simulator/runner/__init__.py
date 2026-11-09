@@ -157,7 +157,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.9.0"
+RUNNER_SCHEMA_VERSION = "1.10.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -2035,11 +2035,25 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
     total = len(source_by_species)
     counts = Counter(source_by_species.values())
     diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
+    activity_source_by_species = diagnostics.get(
+        "activity_source_by_species", {}
+    )
+    species_entries = {}
+    for species, source in source_by_species.items():
+        entry: dict[str, object] = {"source": source}
+        activity_source = (
+            activity_source_by_species.get(species)
+            if isinstance(activity_source_by_species, Mapping)
+            else None
+        )
+        if isinstance(activity_source, Mapping):
+            entry["activity_source"] = dict(activity_source)
+        species_entries[species] = entry
     facet_status = str(
         diagnostics.get("vapor_pressure_backend_status") or ""
     ).strip()
     report: dict[str, object] = {
-        "species": source_by_species,
+        "species": species_entries,
         "summary": {
             source: {
                 "count": count,

@@ -453,6 +453,30 @@ def test_strict_vapor_source_report_accepts_in_band_na_standard_term() -> None:
     assert summary["vapor_active"] is True
 
 
+def test_strict_vapor_source_report_accepts_nested_activity_notice() -> None:
+    source = "builtin_authoritative:standard_reaction_term"
+    report = {
+        "species": {
+            "Mg": {
+                "source": source,
+                "activity_source": {
+                    "rung": "published_gamma",
+                    "source": "Sossi & Fegley 2018 Table 2",
+                    "x": 0.25,
+                    "reason": "alphaMELTS supplied no oxide-component activity",
+                },
+            },
+        },
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    summary = assert_strict_vapor_source_report(report, context="stored-result")
+
+    assert summary["total_species"] == 1
+    assert summary["summary"]["builtin_authoritative"] == 1
+
+
 def test_strict_vapor_source_report_rejects_extrapolated_sio_even_with_authoritative_head() -> None:
     """Hostile construction: head approved but extrapolation suffix must fail.
 
