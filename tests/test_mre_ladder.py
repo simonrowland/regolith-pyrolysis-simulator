@@ -367,22 +367,51 @@ def test_mre_voltage_notices_reach_operator_snapshot_and_report(campaign, oxide,
 
 
 def test_mre_voltage_notices_restore_on_terminal_refusal():
-    from simulator.electrolysis import MREElectrolysisRefusal, MRE_RAW_MARGIN_REFUSAL
+    from simulator.electrolysis import (
+        MREElectrolysisInvalidInput,
+        MRE_INVALID_CONTROL_REFUSAL,
+        MRE_RAW_MARGIN_REFUSAL,
+    )
 
-    sim = _sim({"campaigns": {}})
-    sim.melt.campaign = CampaignPhase.MRE_BASELINE
-    sim.melt.temperature_C = 1500.0
-    sim._mre_voltage_sequence = [{"voltage": 2.0, "species": ["Cr2O3"], "min_hold_hours": 0}]
-    _seed_cleaned_melt_kg(sim, {"Cr2O3": 10.0})
-    sim._mre_decomposition_voltage_status_by_oxide = {"previous": "retained"}
-    sim._commanded_pO2_bar = lambda: 1.0
+    def armed():
+        sim = _sim({"campaigns": {}})
+        sim.melt.campaign = CampaignPhase.MRE_BASELINE
+        sim.melt.temperature_C = 1500.0
+        sim._mre_voltage_sequence = [
+            {"voltage": 2.0, "species": ["Cr2O3"], "min_hold_hours": 0},
+        ]
+        _seed_cleaned_melt_kg(sim, {"Cr2O3": 10.0})
+        sim._mre_decomposition_voltage_status_by_oxide = {"previous": "retained"}
+        sim._commanded_pO2_bar = lambda: 1.0
+        return sim
+
+    # d-356: a negative raw margin is a per-step veto. The attempted
+    # status stays visible and the run continues.
+    sim = armed()
     sim._dispatch_only = lambda *_args, **_kwargs: SimpleNamespace(
         status="refused", transition=None, diagnostic={
             "reason_refused": MRE_RAW_MARGIN_REFUSAL,
             "mre_decomposition_voltage_status_by_oxide": {"Cr2O3": "attempted"},
+            "notices": [{
+                "kind": "mre_raw_margin_veto",
+                "reason": MRE_RAW_MARGIN_REFUSAL,
+            }],
         },
     )
-    with pytest.raises(MREElectrolysisRefusal):
+    sim._step_mre()
+    assert sim._mre_decomposition_voltage_status_by_oxide == {"Cr2O3": "attempted"}
+
+    # Only an invalid run input is terminal, and that path restores the
+    # notices from before the attempt.
+    sim = armed()
+    sim._dispatch_only = lambda *_args, **_kwargs: SimpleNamespace(
+        status="refused", transition=None, diagnostic={
+            "reason_refused": MRE_INVALID_CONTROL_REFUSAL,
+            "invalid_controls": {"voltage_V": "missing"},
+            "mre_decomposition_voltage_status_by_oxide": {"Cr2O3": "attempted"},
+        },
+    )
+    with pytest.raises(MREElectrolysisInvalidInput):
         sim._step_mre()
     assert sim._mre_decomposition_voltage_status_by_oxide == {"previous": "retained"}
 

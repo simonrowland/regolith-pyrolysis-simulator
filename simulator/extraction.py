@@ -1994,60 +1994,8 @@ class ExtractionMixin:
             self.atom_ledger = residue_transfer_snapshot
             self._chem_kernel = self._build_chemistry_kernel()
         if proposal is None and getattr(kernel_result, 'status', '') == 'refused':
-            refusal_record = {
-                'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
-                'hour': int(self.melt.hour),
-                'campaign_hour': int(self.melt.campaign_hour),
-                'campaign': self.melt.campaign.name,
-                'temperature_C': float(self.melt.temperature_C),
-                'voltage_V': float(voltage_V),
-                'current_A': float(current_A),
-                'diagnostic': diagnostic,
-            }
-            self._last_mre_refusal_diagnostic = refusal_record
-            if not hasattr(self, '_mre_refusal_history'):
-                self._mre_refusal_history = []
-            self._mre_refusal_history.append(refusal_record)
-            self._chem_no_op_dispatch_count += 1
-            self._mre_metals_this_hr = {}
-            self._mre_voltage_V = 0.0
-            self._mre_current_A = 0.0
-            self._mre_effective_current_A = 0.0
-            self._mre_energy_this_hr = 0.0
-            self.melt.mre_voltage_V = 0.0
-            if is_plant:
-                self.melt.mre_declared_rung_V = float(
-                    mre_replay_state_before_dispatch['melt_declared_rung_V'])
-            self.melt.mre_current_A = 0.0
-            if is_plant:
-                self._mre_hold_hours = int(
-                    mre_replay_state_before_dispatch['hold_hours'])
-                self._mre_voltage_step_idx = int(
-                    mre_replay_state_before_dispatch['voltage_step_idx'])
-                self._mre_rung_ever_effective = bool(
-                    mre_replay_state_before_dispatch['rung_ever_effective'])
-                self._mre_c5_sequence_complete_key = (
-                    mre_replay_state_before_dispatch['sequence_complete_key'])
-                self.melt.mre_c5_on_final_rung = bool(
-                    mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
-                self.melt.mre_c5_ladder_complete = bool(
-                    mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
-            restore_state = (
-                mre_replay_state_before_dispatch
-                if is_plant
-                else mre_diagnostic_state_before_step
-            )
-            self._mre_decomposition_voltage_status_by_oxide = dict(
-                restore_state['voltage_status_by_oxide'])
-            self._mre_uncertified_yield = dict(
-                restore_state['uncertified_yield'])
-            self._mre_ellingham_ladder_diagnostic = dict(
-                restore_state['ellingham_ladder_diagnostic'])
-            self._mre_effective_voltage_margin_V_by_oxide = dict(
-                restore_state['effective_voltage_margin_by_oxide'])
-            self._mre_effective_voltage_margin_temperature_C = (
-                restore_state['effective_voltage_margin_temperature_C']
-            )
+            # d-356: a per-step veto keeps the attempted rung and its notices.
+            # Plant bookkeeping rolls back only for a fatal refusal, below.
             reason = str(
                 diagnostic.get('reason_refused', 'electrolysis_step_refused')
             )
@@ -2110,6 +2058,9 @@ class ExtractionMixin:
                     mre_replay_state_before_dispatch
                     if is_plant
                     else mre_diagnostic_state_before_step
+                )
+                self._mre_decomposition_voltage_status_by_oxide = dict(
+                    restore_state['voltage_status_by_oxide']
                 )
                 self._mre_uncertified_yield = dict(
                     restore_state['uncertified_yield']
