@@ -144,7 +144,12 @@ def _canonical_json(value: Any) -> str:
     return canonical_json_dumps(_json_value(value))
 
 
-def key(engine_id: str, request_vector: Mapping[str, Any]) -> str:
+def key(
+    engine_id: str,
+    request_vector: Mapping[str, Any],
+    *,
+    depends_on: tuple[str, ...] = (),
+) -> str:
     """Return the exact SHA-256 identity of one engine request vector."""
     if engine_id not in ENGINE_CHEMISTRY_VERSION:
         raise ValueError(f"unknown battery engine {engine_id!r}")
@@ -155,6 +160,14 @@ def key(engine_id: str, request_vector: Mapping[str, Any]) -> str:
         "chemistry_version": ENGINE_CHEMISTRY_VERSION[engine_id],
         "request": request_vector,
     }
+    dependency_versions: dict[str, int] = {}
+    for dependency in sorted(set(depends_on)):
+        if dependency not in ENGINE_CHEMISTRY_VERSION:
+            raise ValueError(f"unknown battery engine dependency {dependency!r}")
+        if dependency != engine_id:
+            dependency_versions[dependency] = ENGINE_CHEMISTRY_VERSION[dependency]
+    if dependency_versions:
+        identity["dependency_chemistry_versions"] = dependency_versions
     return hashlib.sha256(_canonical_json(identity).encode("utf-8")).hexdigest()
 
 
@@ -196,7 +209,32 @@ def runtime_identity(engine_id: str) -> dict[str, Any]:
     }
     if engine_id in {"alphamelts", "magemin"}:
         identity["binary"] = _binary_runtime_identity(engine_id)
+    elif engine_id == "thermoengine":
+        identity["native_library"] = _thermoengine_native_library_identity()
     return identity
+
+
+def _thermoengine_native_library_path() -> Path | None:
+    from simulator.engine_local_config import (
+        _thermoengine_phaseobjc_library_path,
+    )
+
+    return _thermoengine_phaseobjc_library_path()
+
+
+def _thermoengine_native_library_identity() -> dict[str, Any] | None:
+    try:
+        path = _thermoengine_native_library_path()
+        if path is None:
+            return None
+        resolved = Path(path).expanduser().resolve()
+        try:
+            modified_ns = resolved.stat().st_mtime_ns
+        except OSError:
+            modified_ns = None
+        return {"path": str(resolved), "mtime_ns": modified_ns}
+    except Exception:  # noqa: BLE001 - runtime metadata never gates cache use
+        return None
 
 
 @lru_cache(maxsize=2)
@@ -466,12 +504,14 @@ def cached_solve(
     engine_id: str,
     request_vector: Mapping[str, Any],
     solve_fn: Callable[[], Any],
+    *,
+    depends_on: tuple[str, ...] = (),
 ) -> Any:
     """Reuse an exact cached cell outcome, storing only stable results."""
     if cache is None:
         return solve_fn()
 
-    cache_key = key(engine_id, request_vector)
+    cache_key = key(engine_id, request_vector, depends_on=depends_on)
     call_kind = str(request_vector.get("call", "equilibrate_cell"))
     if call_kind not in _CALL_KINDS:
         raise ValueError(f"unknown engine call kind {call_kind!r}")

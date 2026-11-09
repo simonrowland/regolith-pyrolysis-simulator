@@ -14,6 +14,7 @@ import time
 from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any, Mapping
 
 import pytest
 
@@ -2647,7 +2648,11 @@ class _InternalAnalyticalBudgetBackend:
 
 
 def _internal_analytical_budget_bootstrap(
-    _engine: str, *, mode: str, cpu_budget_s: float | None
+    _engine: str,
+    engine_settings: Mapping[str, Any] | None = None,
+    *,
+    mode: str,
+    cpu_budget_s: float | None,
 ):
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
@@ -2661,7 +2666,10 @@ def _internal_analytical_budget_bootstrap(
         takes_fo2=False,
         supports_intrinsic_fo2=False,
     )
-    return battery._IsolatedCellEngine(handle), "internal-analytical-budget-test"
+    return (
+        battery._IsolatedCellEngine(handle, engine_settings),
+        "internal-analytical-budget-test",
+    )
 
 
 def _install_internal_analytical_budget_worker(

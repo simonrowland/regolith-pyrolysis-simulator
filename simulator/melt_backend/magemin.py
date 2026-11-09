@@ -2747,12 +2747,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if self._bridge == 'ctypes':
             # ctypes path is intentionally NOT auto-marshaled here —
             # the C API needs careful struct setup that depends on
-            # the exact MAGEMin build.  Raise so the simulator falls
-            # back to alphaMELTS rather than silently returning empty.
-            raise RuntimeError(
+            # the exact MAGEMin build. This is an environment/configuration
+            # failure, not a chemistry result, so callers must not cache it.
+            raise _MAGEMinEngineCallError(
+                'MAGEMinBridgeUnavailable',
                 'MAGEMin ctypes bridge marshaling is not implemented; '
                 'use the default subprocess bridge or configure '
-                'python_bridge="julia"'
+                'python_bridge="julia"',
+                failure_disposition='environment',
             )
 
         if self._bridge == 'subprocess' or capture_native_activities:
