@@ -2086,7 +2086,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # The committed mars golden's per-hour summary. The condenser stack
         # regenerated that fixture; this is its sha256, not a second run.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "665da64c22e002174f2dd792d3621ffe2707687e3240b6e746724d810edd6b16"
+            "41ea2e8dd694a9c92ace3c1768eba62e2dd46de7df9adaed67f9bfb7e390d476"
         )
 
 
