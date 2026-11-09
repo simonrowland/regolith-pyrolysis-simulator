@@ -178,6 +178,7 @@ from simulator.battery.records import (
     PressureEnvironment,
     Reaction,
     ReactionTerm,
+    RUN_METADATA_FIELD_HOMES,
     Sample,
     SourceFile,
     SourceFiles,
@@ -3000,13 +3001,12 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
-# Registry parsing and equipment migration share the vocabulary destination
-# paths and their source shapes. Equipment aliases are taken from the matching
-# vocabulary entries rather than maintained as a second field list.
-_SAMPLE_RUN_METADATA_FIELDS: dict[str, str] = {
-    "experiment.sample.final_mass_kg": "located_value",
-    "experiment.sample.species_loss_fraction": "species_located_values",
-}
+def _sample_run_metadata_specs() -> Iterator[tuple[str, str]]:
+    """Yield the shared sample metadata paths and their registry shapes."""
+
+    for field, (shape, _homes) in RUN_METADATA_FIELD_HOMES.items():
+        if shape in {"located_value", "species_located_values"}:
+            yield f"experiment.sample.{field}", shape
 
 
 def _sample_from_plain(
@@ -3094,7 +3094,7 @@ def _sample_from_plain(
             ),
         )
     sample_run_metadata = {}
-    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+    for field_path, shape in _sample_run_metadata_specs():
         field = field_path.rsplit(".", 1)[-1]
         raw = payload.get(field)
         if raw is None:
@@ -16516,6 +16516,9 @@ def _merge_experiment_lab_params(
     sample: Sample,
     apparatus: Apparatus | None,
     pressure_env: PressureEnvironment,
+    *,
+    experiment_id: str,
+    validation_issues: list[ValidationIssue],
 ) -> Experiment:
     existing_initial = existing.sample.initial_composition
     incoming_initial = sample.initial_composition
@@ -16551,19 +16554,57 @@ def _merge_experiment_lab_params(
             )
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
+
+    def report_run_metadata_disagreement(
+        field: str, formula: str | None = None
+    ) -> None:
+        path = f"experiment[{experiment_id}].sample.{field}"
+        if formula is not None:
+            path += f"[{formula}]"
+        validation_issues.append(
+            ValidationIssue(
+                path=path,
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=(
+                    "source_disagreement: existing and incoming run metadata "
+                    "values differ"
+                ),
+            )
+        )
+
     sample_run_metadata = {}
-    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+    for field_path, shape in _sample_run_metadata_specs():
         field = field_path.rsplit(".", 1)[-1]
         old_value = getattr(existing.sample, field)
         new_value = getattr(sample, field)
         if shape == "located_value":
-            sample_run_metadata[field] = _prefer_located(old_value, new_value)
+            merged_value = _prefer_located(old_value, new_value)
+            if (
+                merged_value is None
+                and old_value is not None
+                and new_value is not None
+                and old_value.state.is_value
+                and new_value.state.is_value
+                and old_value.state.value != new_value.state.value
+            ):
+                report_run_metadata_disagreement(field)
+            sample_run_metadata[field] = merged_value
             continue
         merged_values = dict(old_value or {})
         for formula, located in (new_value or {}).items():
-            merged_values[formula] = _prefer_located(
-                merged_values.get(formula), located
-            )
+            old_located = merged_values.get(formula)
+            merged_located = _prefer_located(old_located, located)
+            if (
+                merged_located is None
+                and old_located is not None
+                and old_located.state.is_value
+                and located.state.is_value
+                and old_located.state.value != located.state.value
+            ):
+                report_run_metadata_disagreement(field, formula)
+                merged_values.pop(formula, None)
+            else:
+                merged_values[formula] = merged_located
         sample_run_metadata[field] = merged_values or None
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
@@ -16665,22 +16706,52 @@ def sample_from_equipment(
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
     sample_run_metadata = {}
-    root_payloads = []
-    sample_payloads = []
-    for root_payload in (equipment, values):
-        if not isinstance(root_payload, Mapping) or any(
-            root_payload is existing for existing in root_payloads
-        ):
-            continue
-        root_payloads.append(root_payload)
-        raw_sample, sample_locator, _sample_mapping = (
-            _unwrap_located_equipment_value(root_payload.get("sample"), locator)
+
+    def equipment_metadata_payloads(
+        field: str,
+    ) -> list[tuple[object, Locator | None, str]]:
+        """Read only the equipment homes listed in the shared record schema."""
+
+        _shape, homes = RUN_METADATA_FIELD_HOMES[field]
+        suffixes = tuple(
+            dict.fromkeys(
+                home.split(".equipment.", 1)[1]
+                for home in homes
+                if ".equipment." in home
+            )
         )
-        if isinstance(raw_sample, Mapping):
+        if not isinstance(equipment, Mapping):
+            return []
+
+        sources: list[tuple[object, Locator | None, str]] = []
+        for suffix in suffixes:
+            if suffix == field and field in equipment:
+                sources.append((equipment[field], locator, f"equipment.{field}"))
+                continue
+            if suffix != f"sample.value.{field}" or "sample" not in equipment:
+                continue
+            sample_wrapper = equipment.get("sample")
+            if not isinstance(sample_wrapper, Mapping) or not {
+                "value",
+                "locator",
+            }.issubset(sample_wrapper):
+                continue
+            raw_sample, sample_locator, _sample_mapping = (
+                _unwrap_located_equipment_value(sample_wrapper, locator)
+            )
+            if not isinstance(raw_sample, Mapping) or field not in raw_sample:
+                continue
             sample_locator = (
                 locator_from_mapping(raw_sample.get("locator")) or sample_locator
             )
-            sample_payloads.append((raw_sample, sample_locator))
+            sources.append(
+                (
+                    raw_sample[field],
+                    sample_locator,
+                    f"equipment.sample.{field}",
+                )
+            )
+        return sources
 
     def report_metadata_conflict(field_path: str, formula: str | None = None) -> None:
         if _validation_issues is None:
@@ -16697,15 +16768,36 @@ def sample_from_equipment(
             ValidationIssue(
                 path=issue_path,
                 reason=RefusalReason.INVALID_SOURCE,
-                detail=f"conflicting equipment values for {field_path}"
+                detail=(
+                    f"source_disagreement: conflicting equipment values for {field_path}"
+                )
                 + (f"[{formula}]" if formula is not None else ""),
             )
         )
 
-    for field_path, shape in _SAMPLE_RUN_METADATA_FIELDS.items():
+    for field_path, shape in _sample_run_metadata_specs():
         field = field_path.rsplit(".", 1)[-1]
+        source_payloads = equipment_metadata_payloads(field)
         if shape == "located_value":
-            field_hits = _hits_for(hits, field_path)
+            entry = next(
+                (
+                    item
+                    for item in vocab
+                    if item.printed == field
+                    and item.field == field_path
+                ),
+                None,
+            )
+            field_hits = []
+            if entry is not None:
+                field_hits = [
+                    hit
+                    for payload, parent_locator, path in source_payloads
+                    if (hit := _hit_from_value(
+                        entry, payload, parent_locator, path
+                    ))
+                    is not None
+                ]
             located = _unique_located(field_hits)
             numeric_hits = [
                 hit
@@ -16717,21 +16809,9 @@ def sample_from_equipment(
             sample_run_metadata[field] = located
             continue
 
-        source_payloads = [
-            (root[entry.printed], locator)
-            for entry in vocab
-            if entry.field == field_path
-            for root in root_payloads
-            if entry.printed in root
-        ]
-        source_payloads.extend(
-            (sample[field], sample_locator)
-            for sample, sample_locator in sample_payloads
-            if field in sample
-        )
         species_values: dict[str, Located[Value]] = {}
         conflicts: set[str] = set()
-        for raw_payload, parent_locator in source_payloads:
+        for raw_payload, parent_locator, _path in source_payloads:
             parsed = _species_loss_values_from_equipment(
                 raw_payload, parent_locator
             )
@@ -19071,6 +19151,8 @@ class Migrator:
                 sample,
                 apparatus,
                 pressure_env,
+                experiment_id=experiment_id,
+                validation_issues=self.result.registry_issues,
             )
             self.result.experiments[experiment_id] = merged
             return merged

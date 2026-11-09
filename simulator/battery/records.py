@@ -974,6 +974,49 @@ class Apparatus:
     wall: Mapping[str, Located[Any]] | None = None
 
 
+# One schema for the run-metadata field names, their registry shapes, and every
+# extract location accepted by both validation and migration. ``[]`` matches a
+# list index; ``*`` matches one mapping key.
+RUN_METADATA_FIELD_HOMES: dict[str, tuple[str, tuple[str, ...]]] = {
+    "final_mass_kg": (
+        "located_value",
+        (
+            "experiments[].sample.final_mass_kg",
+            "experiments.*.sample.final_mass_kg",
+            "species.*.observations[].equipment.final_mass_kg",
+            "species.*.observations[].equipment.sample.value.final_mass_kg",
+            "species.*.context[].equipment.final_mass_kg",
+            "species.*.context[].equipment.sample.value.final_mass_kg",
+        ),
+    ),
+    "species_loss_fraction": (
+        "species_located_values",
+        (
+            "experiments[].sample.species_loss_fraction",
+            "experiments.*.sample.species_loss_fraction",
+            "species.*.observations[].equipment.species_loss_fraction",
+            "species.*.observations[].equipment.sample.value.species_loss_fraction",
+            "species.*.context[].equipment.species_loss_fraction",
+            "species.*.context[].equipment.sample.value.species_loss_fraction",
+        ),
+    ),
+    "charge_sequence": (
+        "charge_sequence",
+        (
+            "experiments[].charge_sequence",
+            "experiments.*.charge_sequence",
+        ),
+    ),
+    "vaporization_statement": (
+        "located_vaporization_mode",
+        (
+            "experiments[].vaporization_statement",
+            "experiments.*.vaporization_statement",
+        ),
+    ),
+}
+
+
 @dataclass(frozen=True)
 class Sample:
     mass_kg: Located[Value] | None = None

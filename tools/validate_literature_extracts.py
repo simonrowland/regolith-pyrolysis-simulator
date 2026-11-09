@@ -57,6 +57,7 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
+from simulator.battery.records import RUN_METADATA_FIELD_HOMES
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -279,6 +280,66 @@ def _private_path_value_errors(doc: Any, label: str) -> list[str]:
             f"{label}: {where[0]} must be repository-portable "
             f"(docs-private path refused for {key}): {value!r}{more}"
         )
+    return errors
+
+
+def _run_metadata_home_matches(
+    path: tuple[str | int, ...], home: str
+) -> bool:
+    """Match a shared run-metadata home against mapping and list path parts."""
+
+    pattern_parts: list[str] = []
+    for part in home.split("."):
+        if part.endswith("[]"):
+            pattern_parts.extend((part[:-2], "[]"))
+        else:
+            pattern_parts.append(part)
+    if len(path) != len(pattern_parts):
+        return False
+    return all(
+        (expected == "*" and isinstance(actual, str))
+        or (expected == "[]" and isinstance(actual, int))
+        or expected == actual
+        for actual, expected in zip(path, pattern_parts)
+    )
+
+
+def _render_extract_path(path: tuple[str | int, ...]) -> str:
+    rendered = ""
+    for part in path:
+        if isinstance(part, int):
+            rendered += f"[{part}]"
+        else:
+            rendered += f".{part}" if rendered else part
+    return rendered
+
+
+def _run_metadata_location_errors(doc: Mapping[str, Any], label: str) -> list[str]:
+    errors: list[str] = []
+
+    def visit(node: Any, path: tuple[str | int, ...]) -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                field = str(key)
+                child_path = (*path, field)
+                spec = RUN_METADATA_FIELD_HOMES.get(field)
+                if spec is not None:
+                    _shape, homes = spec
+                    if not any(
+                        _run_metadata_home_matches(child_path, home)
+                        for home in homes
+                    ):
+                        errors.append(
+                            f"{label}:{_render_extract_path(child_path)}: "
+                            f"[run-metadata-location] field {field!r} is outside "
+                            f"allowed homes: {', '.join(homes)}"
+                        )
+                visit(value, child_path)
+        elif isinstance(node, (list, tuple)):
+            for index, value in enumerate(node):
+                visit(value, (*path, index))
+
+    visit(doc, ())
     return errors
 
 
@@ -1692,6 +1753,7 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
+    errors.extend(_run_metadata_location_errors(doc, label))
     errors.extend(_docs_private_prose_errors(doc, label))
 
     for key_path in iter_unsupported_context_container_paths(doc):
