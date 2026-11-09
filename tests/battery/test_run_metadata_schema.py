@@ -2016,7 +2016,13 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                                 assert loaded.inference is not None, context
                                 assert loaded.inference.relation == "g_to_kg", context
                             elif (
-                                node_path in {(), ("value",), ("state", "value")}
+                                node_path
+                                in {
+                                    (),
+                                    ("value",),
+                                    ("state", "value"),
+                                    ("value", "state", "value"),
+                                }
                                 and unit_key in {"unit", "units"}
                             ):
                                 printed = Decimal(
