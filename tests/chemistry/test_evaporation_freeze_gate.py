@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
 from simulator import engine_binding_admission
@@ -20,10 +21,12 @@ from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
     ChemistryProvider,
+    IntentRequest,
     IntentResult,
     IntentResultStatusError,
     ProviderUnavailableError,
 )
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PoisonedHourError
 from simulator.evaporation import (
     EvaporationFluxRefusal,
@@ -152,15 +155,41 @@ def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
     return setpoints
 
 
-def _equilibrium() -> EquilibriumResult:
-    # t-383: Na is standard_reaction_term (L&H liquid-NaO0.5 coherent pair) and
-    # refuses pre-RG flux eligibility without NaO0.5 activity evidence. Freeze-gate
-    # tests only need a flux-eligible effective-pressure claim; Fe pure-Antoine
-    # remains eligible without oxide activity. Mocked EVAPORATION_FLUX diagnostics
-    # may still report Na rates independently of this seam claim.
+def _equilibrium(sim, vapor_pressure_data) -> EquilibriumResult:
+    temperature_C = float(sim.melt.temperature_C)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                _CLEANED_MELT_ACCOUNT: sim.atom_ledger.mol_by_account(
+                    _CLEANED_MELT_ACCOUNT
+                )
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=temperature_C,
+        pressure_bar=1.0,
+        fO2_log=0.0,
+        control_inputs={'pO2_bar': 1.0, 'intrinsic_fO2_log': 0.0},
+    )
+    provider_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        request
+    )
+    assert provider_result.status == 'ok'
+    diagnostic = dict(provider_result.diagnostic)
+    activities = diagnostic['activities']
+    fe_provenance = diagnostic['vapor_pressure_numerator_provenance']['Fe']
+    assert float(activities['Fe']) > 0.0
+    assert fe_provenance['melt_oxide_activity_reference_state']
+    assert fe_provenance['melt_oxide_activity_reference_state_phase'] in {
+        'solid',
+        'liquid',
+    }
+    sim._last_vapor_pressure_diagnostic = diagnostic
     return EquilibriumResult(
         liquid_fraction=1.0,
         vapor_pressures_Pa={'Fe': 1.0},
+        activity_coefficients=activities,
         status='ok',
     )
 
@@ -1066,7 +1095,7 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    flux = sim._calculate_evaporation(_equilibrium())
+    flux = sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
 
     assert sim._freeze_gate_enabled() is False
     # 0.5.3 Phase A1: under finite-headspace default-on, the dispatch list
@@ -1135,7 +1164,7 @@ def test_evaporation_missing_data_raises_typed_refusal(
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
     with pytest.raises(EvaporationFluxRefusal) as exc:
-        sim._calculate_evaporation(_equilibrium())
+        sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
 
     assert exc.value.reason == expected_reason
     assert str(exc.value) == expected_reason
@@ -1192,7 +1221,7 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     factors = []
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
-        flux = sim._calculate_evaporation(_equilibrium())
+        flux = sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
         rates.append(flux.species_kg_hr.get('Na', 0.0))
         factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
 
@@ -1254,7 +1283,7 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    flux = sim._calculate_evaporation(_equilibrium())
+    flux = sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
 
     assert flux.species_kg_hr['Na'] == pytest.approx(5.0)
     assert [intent for intent, _ in captured] == [
@@ -1303,7 +1332,7 @@ def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     sim.backend.find_liquidus_solidus = fake_liquidus_finder
 
     with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._calculate_evaporation(_equilibrium())
+        sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
     assert error.value.diagnostic['provider'] == 'magemin'
     assert sim._freeze_gate_liquid_fraction_cache is None
 
@@ -1341,7 +1370,7 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
     with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._calculate_evaporation(_equilibrium())
+        sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
     assert error.value.reason == 'liquid_fraction_provider_failed'
     assert 'gate_liquid_fraction provider absent' in error.value.diagnostic['detail']
 
@@ -1408,7 +1437,7 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     rates = []
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
-        flux = sim._calculate_evaporation(_equilibrium())
+        flux = sim._calculate_evaporation(_equilibrium(sim, vapor_pressure_data))
         rates.append(flux.species_kg_hr.get('Na', 0.0))
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
@@ -2036,7 +2065,11 @@ def test_lunar_composition_projected_does_not_arm_floor_fallback(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
-    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(sim, vapor_pressure_data),
+    )
     sim.melt.temperature_C = 1400.0
 
     # 1400 C is above the Kress floor, so the old fallback would return 1.
@@ -3090,7 +3123,11 @@ def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
-    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(sim, vapor_pressure_data),
+    )
 
     ticks_to_curve = 0
     while getattr(sim, '_freeze_gate_liquid_fraction_cache', None) is None:
@@ -3156,7 +3193,11 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
         return result
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
-    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(sim, vapor_pressure_data),
+    )
     monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', record_respeciation)
     monkeypatch.setattr(sim, '_apply_native_fe_saturation_split', record_native_split)
 
@@ -3312,7 +3353,11 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
-    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(sim, vapor_pressure_data),
+    )
 
     factors = []
     balance_errors = []
@@ -4294,7 +4339,11 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
         '_resolved_melt_redox_gate_authority',
         record_resolved_authority,
     )
-    monkeypatch.setattr(tick_sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        tick_sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(tick_sim, vapor_pressure_data),
+    )
     monkeypatch.setattr(tick_sim, '_update_temperature', lambda: None)
     monkeypatch.setattr(tick_sim, '_apply_oxygen_reservoir_exchange', lambda: None)
 
@@ -4401,7 +4450,11 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
         '_resolved_melt_redox_gate_authority',
         record_resolved_authority,
     )
-    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: _equilibrium(sim, vapor_pressure_data),
+    )
     monkeypatch.setattr(sim, '_update_temperature', lambda: None)
     monkeypatch.setattr(
         sim,

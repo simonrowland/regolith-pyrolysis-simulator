@@ -4,7 +4,10 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.kernel import IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.runner import build_per_hour_summary
 from simulator.vapour_rail.batch import (
@@ -160,14 +163,40 @@ def test_partial_melt_offgassing_diagnostic_stays_out_of_runner_summary(
     sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
     _install_flux_dispatch(monkeypatch, sim, {'Na': 0.01})
 
-    # t-383: Na standard_reaction_term needs NaO0.5 activity for pre-RG flux
-    # eligibility; Fe pure-Antoine keeps the batch resolvable so the partial-melt
-    # offgassing diagnostic (and runner-summary leak check) can run.
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                'process.cleaned_melt': sim.atom_ledger.mol_by_account(
+                    'process.cleaned_melt'
+                )
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1150.0,
+        pressure_bar=1.0,
+        fO2_log=0.0,
+        control_inputs={'pO2_bar': 1.0, 'intrinsic_fO2_log': 0.0},
+    )
+    provider_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        request
+    )
+    assert provider_result.status == 'ok'
+    vapor_diagnostic = dict(provider_result.diagnostic)
+    fe_provenance = vapor_diagnostic[
+        'vapor_pressure_numerator_provenance'
+    ]['Fe']
+    assert fe_provenance['activity_standard_state_conversion'][
+        'conversion_performed'
+    ] is True
+    sim._last_vapor_pressure_diagnostic = vapor_diagnostic
+
     equilibrium = EquilibriumResult(
         temperature_C=1150.0,
         pressure_bar=1e-8,
         liquid_fraction=0.2,
-        vapor_pressures_Pa={'Fe': 1.0},
+        activity_coefficients=vapor_diagnostic['activities'],
+        vapor_pressures_Pa=vapor_diagnostic['vapor_pressures_Pa'],
         diagnostics={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
     )
 

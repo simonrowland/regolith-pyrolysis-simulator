@@ -155,6 +155,10 @@ _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
     ActivityRefusalCode.REDOX_STATE_UNRESOLVED.value,
 })
 
+_D354_UNPROVENANCED_ACTIVITY_SPECIES = frozenset(
+    {"Fe", "CaO_gas", "MgO_gas"}
+)
+
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
 DEFAULT_SOLVE_GROUP_PREFIX = "u0_v:"
 
@@ -1466,8 +1470,8 @@ def refusal_closure(
         numeric_activity: float | None = None
         crystalline_vapor_activity_value: float | None = None
         activity_conversion_notice: Mapping[str, Any] | None = None
-        fe_reference_state_notice: dict[str, Any] | None = None
-        unprovenanced_fe_activity = False
+        reference_state_predict_and_flag_notice: dict[str, Any] | None = None
+        unprovenanced_reference_activity = False
         _unit_activity_note: dict[str, Any] | None = None
         if (
             compiled is not None
@@ -1817,18 +1821,22 @@ def refusal_closure(
                             "but no registered standard-state conversion",
                         )
                 elif (
-                    rule.species_id == "Fe"
+                    rule.species_id in _D354_UNPROVENANCED_ACTIVITY_SPECIES
                     and raw_activity_is_valid
                     and math.isfinite(raw_activity_value)
                     and raw_activity_value > 0.0
                     and not identity_mismatch
                 ):
-                    unprovenanced_fe_activity = True
-                elif rule.species_id == "Fe" and reported_activity is None:
+                    unprovenanced_reference_activity = True
+                elif (
+                    rule.species_id in _D354_UNPROVENANCED_ACTIVITY_SPECIES
+                    and reported_activity is None
+                ):
                     return _make_refusal(
                         rule,
                         ActivityRefusalCode.MISSING_EVIDENCE.value,
-                        "FeO activity is unavailable; no numeric value was supplied",
+                        f"{rule.parent_oxide or rule.species_id} activity is "
+                        "unavailable; no numeric value was supplied",
                     )
                 else:
                     return _make_refusal(
@@ -1844,7 +1852,7 @@ def refusal_closure(
                 and float(reported_activity) > 0.0
                 and not source_standard_state_phase
             ):
-                unprovenanced_fe_activity = True
+                unprovenanced_reference_activity = True
             if evaluator_activity_exponent != 0.0:
                 declaration = rule.source_reaction_activity
                 if declaration is None:
@@ -1875,7 +1883,7 @@ def refusal_closure(
                     provider_id = state.source_reaction_activity_provider
                     if (
                         (not isinstance(provider_id, str) or not provider_id.strip())
-                        and not unprovenanced_fe_activity
+                        and not unprovenanced_reference_activity
                     ):
                         return _make_refusal(
                             rule,
@@ -1884,7 +1892,7 @@ def refusal_closure(
                         )
                     if not isinstance(
                         reported_standard_state, StandardStateIdentity
-                    ) and not unprovenanced_fe_activity:
+                    ) and not unprovenanced_reference_activity:
                         return _make_refusal(
                             rule,
                             REFUSAL_MISSING_CHANNEL_CONTRACT,
@@ -1904,7 +1912,7 @@ def refusal_closure(
                         reported_mole_fraction = source_fractions.get(
                             coeff.parent_oxide
                         )
-                if unprovenanced_fe_activity:
+                if unprovenanced_reference_activity:
                     source_reaction_activity = SourceReactionActivity(
                         component_id=declaration.component_id,
                         value=float(reported_activity),
@@ -1923,8 +1931,9 @@ def refusal_closure(
                         authority=False,
                         report_label="predict-and-flag",
                         detail=(
-                            "numeric FeO activity exists, but the provider did "
-                            "not document its reference phase or converted K basis"
+                            f"numeric {rule.parent_oxide or rule.species_id} "
+                            "activity exists, but the provider did not document "
+                            "its reference phase or converted K basis"
                         ),
                         derivation={
                             "out_of_domain_reason": (
@@ -2055,57 +2064,133 @@ def refusal_closure(
                             "intrinsic_melt oxygen fugacity must be finite and positive",
                             source_reaction_activity=source_reaction_activity,
                         )
-                if unprovenanced_fe_activity:
-                    raw_fe_activity = float(numeric_activity)
-                    crystalline_factor = d354_feo_crystalline_activity_factor(
-                        state.temperature_K
-                    )
-                    crystalline_fe_activity = (
-                        raw_fe_activity * crystalline_factor
-                    )
-                    liquid_evaluation = compiled.evaluator.evaluate(
-                        state.temperature_K,
-                        source_activity=raw_fe_activity,
-                        pO2_bar=evaluator_fO2_bar,
-                    )
-                    crystalline_evaluation = compiled.evaluator.evaluate(
-                        state.temperature_K,
-                        source_activity=crystalline_fe_activity,
-                        pO2_bar=evaluator_fO2_bar,
-                    )
-                    liquid_pressure = float(liquid_evaluation.pressure_pa)
-                    crystalline_pressure = float(
-                        crystalline_evaluation.pressure_pa
-                    )
-                    below_fusion = (
-                        state.temperature_K < D354_FEO_FUSION_TEMPERATURE_K
-                    )
-                    source_activity = (
-                        crystalline_fe_activity if below_fusion else raw_fe_activity
-                    )
-                    selected_pressure = (
-                        crystalline_pressure if below_fusion else liquid_pressure
-                    )
+                if unprovenanced_reference_activity:
+                    raw_activity = float(numeric_activity)
                     original_reason = (
                         reported_provenance.get(
                             "melt_oxide_activity_reference_state_notice"
                         )
                         or "missing_reference_state_provenance"
                     )
-                    fe_reference_state_notice = {
-                        "kind": "fe_channel_reference_state_predict_and_flag",
+                    original_authority_level = str(
+                        reported_provenance.get("activity_authority_level")
+                        or reported_provenance.get(
+                            "melt_oxide_activity_authority_status"
+                        )
+                        or "unverified"
+                    )
+                    if rule.species_id == "Fe":
+                        crystalline_factor = d354_feo_crystalline_activity_factor(
+                            state.temperature_K
+                        )
+                        crystalline_activity = raw_activity * crystalline_factor
+                        liquid_evaluation = compiled.evaluator.evaluate(
+                            state.temperature_K,
+                            source_activity=raw_activity,
+                            pO2_bar=evaluator_fO2_bar,
+                        )
+                        crystalline_evaluation = compiled.evaluator.evaluate(
+                            state.temperature_K,
+                            source_activity=crystalline_activity,
+                            pO2_bar=evaluator_fO2_bar,
+                        )
+                        selected_reference_phase = (
+                            "crystalline"
+                            if state.temperature_K < D354_FEO_FUSION_TEMPERATURE_K
+                            else "liquid"
+                        )
+                        reference_notice_kind = (
+                            "fe_channel_reference_state_predict_and_flag"
+                        )
+                        reference_extra = {
+                            "fusion_temperature_K": (
+                                D354_FEO_FUSION_TEMPERATURE_K
+                            ),
+                            "fusion_enthalpy_J_per_mol": 24_000.0,
+                        }
+                        crystalline_reference_activity = crystalline_activity
+                    else:
+                        conversion_source_phase = (
+                            expected_source_standard_state_phase or "liquid"
+                        )
+                        conversion_target_phase = (
+                            expected_target_standard_state_phase or "crystalline"
+                        )
+                        crystalline_reference_activity, conversion_notice, _warning = (
+                            _activity_for_crystalline_vapor_k(
+                                str(rule.parent_oxide or ""),
+                                raw_activity,
+                                state.temperature_K,
+                                source_standard_state_id=(
+                                    provider_source_id
+                                    or expected_source_standard_state_id
+                                ),
+                                target_standard_state_id=(
+                                    expected_target_standard_state_id
+                                ),
+                                source_standard_state_phase=(
+                                    conversion_source_phase
+                                ),
+                                target_standard_state_phase=(
+                                    conversion_target_phase
+                                ),
+                            )
+                        )
+                        if not isinstance(conversion_notice, Mapping) or (
+                            conversion_notice.get("conversion_performed")
+                            is not True
+                        ):
+                            return _make_refusal(
+                                rule,
+                                REFUSAL_MISSING_CHANNEL_CONTRACT,
+                                "crystalline vapor K has no registered "
+                                "standard-state conversion for the best-available "
+                                "activity",
+                            )
+                        liquid_evaluation = compiled.evaluator.evaluate(
+                            state.temperature_K,
+                            source_activity=raw_activity,
+                            pO2_bar=evaluator_fO2_bar,
+                        )
+                        crystalline_evaluation = compiled.evaluator.evaluate(
+                            state.temperature_K,
+                            source_activity=crystalline_reference_activity,
+                            pO2_bar=evaluator_fO2_bar,
+                        )
+                        selected_reference_phase = "crystalline"
+                        reference_notice_kind = (
+                            "oxide_channel_reference_state_predict_and_flag"
+                        )
+                        reference_extra = {
+                            "parent_oxide": str(rule.parent_oxide or ""),
+                            "assumed_source_reference_phase": (
+                                conversion_source_phase
+                            ),
+                            "activity_standard_state_conversion_estimate": (
+                                dict(conversion_notice)
+                            ),
+                        }
+                    liquid_pressure = float(liquid_evaluation.pressure_pa)
+                    crystalline_pressure = float(
+                        crystalline_evaluation.pressure_pa
+                    )
+                    selected_pressure = (
+                        crystalline_pressure
+                        if selected_reference_phase == "crystalline"
+                        else liquid_pressure
+                    )
+                    source_activity = (
+                        crystalline_reference_activity
+                        if selected_reference_phase == "crystalline"
+                        else raw_activity
+                    )
+                    reference_state_predict_and_flag_notice = {
+                        "kind": reference_notice_kind,
                         "reason": str(original_reason),
                         "original_reason": str(original_reason),
-                        "original_authority_level": str(
-                            reported_provenance.get("activity_authority_level")
-                            or "unverified"
-                        ),
+                        "original_authority_level": original_authority_level,
                         "authority_level": "predict_and_flag",
                         "temperature_K": float(state.temperature_K),
-                        "fusion_temperature_K": (
-                            D354_FEO_FUSION_TEMPERATURE_K
-                        ),
-                        "fusion_enthalpy_J_per_mol": 24_000.0,
                         "liquid_referenced_pressure_Pa": liquid_pressure,
                         "crystalline_referenced_pressure_Pa": (
                             crystalline_pressure
@@ -2114,10 +2199,9 @@ def refusal_closure(
                             min(liquid_pressure, crystalline_pressure),
                             max(liquid_pressure, crystalline_pressure),
                         ],
-                        "selected_reference_phase": (
-                            "crystalline" if below_fusion else "liquid"
-                        ),
+                        "selected_reference_phase": selected_reference_phase,
                         "selected_pressure_Pa": selected_pressure,
+                        **reference_extra,
                     }
                 evaluation = compiled.evaluator.evaluate(
                     state.temperature_K,
@@ -2143,10 +2227,14 @@ def refusal_closure(
                 )
                 if rule.species_id == "Fe":
                     activity_notices = _liquid_model_notices(provenance)
-                    if fe_reference_state_notice is not None:
-                        activity_notices.append(fe_reference_state_notice)
-                    if activity_notices:
-                        evaluation_extra["notices"] = activity_notices
+                else:
+                    activity_notices = []
+                if reference_state_predict_and_flag_notice is not None:
+                    activity_notices.append(
+                        reference_state_predict_and_flag_notice
+                    )
+                if activity_notices:
+                    evaluation_extra["notices"] = activity_notices
                 if activity_conversion_notice is not None:
                     evaluation_extra["activity_standard_state_conversion"] = dict(
                         activity_conversion_notice

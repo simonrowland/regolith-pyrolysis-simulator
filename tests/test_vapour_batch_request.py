@@ -2429,6 +2429,14 @@ def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
         source_reaction_activities={species_id: raw_activity},
         source_reaction_activity_provider="test_unprovenanced_activity",
         source_reaction_activity_evidence_refs={species_id: "test:value"},
+        source_reaction_activity_provenance={
+            species_id: {
+                "melt_oxide_activity_reference_state_notice": (
+                    "provider_reference_phase_undocumented"
+                ),
+                "activity_authority_level": "reported_unverified",
+            }
+        },
     )
     batch = resolve_vapour_batch(
         rules=(rule,),
@@ -2455,7 +2463,9 @@ def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
         for notice in answer.extra["notices"]
         if notice["kind"] == "oxide_channel_reference_state_predict_and_flag"
     )
-    assert notice["reason"] == "missing_reference_state_provenance"
+    assert notice["reason"] == "provider_reference_phase_undocumented"
+    assert notice["original_reason"] == "provider_reference_phase_undocumented"
+    assert notice["original_authority_level"] == "reported_unverified"
     assert notice["authority_level"] == "predict_and_flag"
     assert notice["selected_reference_phase"] == "crystalline"
     assert notice["liquid_referenced_pressure_Pa"] == pytest.approx(
@@ -2500,7 +2510,10 @@ def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
     assert isinstance(unavailable_batch.channel("peer").flux, FluxEligible)
 
 
-def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
+@pytest.mark.parametrize("temperature_K", (1300.0, 1800.0))
+def test_fe_activity_without_reference_provenance_predicts_and_flags(
+    temperature_K: float,
+) -> None:
     from simulator.reference_data.janaf_fusion import d144_vapor_standard_state_pair
 
     source_standard_state, target_standard_state = d144_vapor_standard_state_pair(
@@ -2562,7 +2575,7 @@ def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
             return SimpleNamespace(pressure_pa=100.0 * float(source_activity))
 
     state = VapourResolveState(
-        temperature_K=1300.0,
+        temperature_K=temperature_K,
         source_reaction_activities={"Fe": 0.25},
         source_reaction_activity_provider="test_fe_provider",
         source_reaction_activity_evidence_refs={"Fe": "test:fe-value"},
@@ -2594,6 +2607,7 @@ def test_fe_activity_without_reference_provenance_predicts_and_flags() -> None:
     assert notice["authority_level"] == "predict_and_flag"
     assert notice["liquid_referenced_pressure_Pa"] > 0.0
     assert notice["crystalline_referenced_pressure_Pa"] > 0.0
+    assert notice["selected_pressure_Pa"] == pytest.approx(answer.pressure.pa)
 
     unavailable = resolve_vapour_batch(
         rules=(rule,),
