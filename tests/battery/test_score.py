@@ -1508,6 +1508,212 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
 
 
 @pytest.mark.parametrize(
+    ("subtype", "source_unit", "scale_unit", "quantity", "reference", "width"),
+    (
+        ("wt_percent", "wt%", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "wt.%", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "wt_percent", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "mass percent", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("mole_percent", "mol %", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol pct", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol%", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol.%", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mole percent", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+    ),
+)
+def test_composition_printed_width_resolves_on_declared_subtype_scale(
+    subtype: str,
+    source_unit: str,
+    scale_unit: str,
+    quantity: Quantity,
+    reference: str,
+    width: str,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    # The measured component basis is identity.subtype; the attached bulk
+    # composition has its own amount basis and must not supply this scale.
+    identity = Identity(
+        quantity=quantity,
+        species=Species("SiO2", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("CaO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of(subtype),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": width,
+            "units": source_unit,
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "composition-width",
+            "composition-width-experiment",
+            identity,
+            Decimal(reference),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="composition-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal(reference),
+        source_observation=observation,
+    )
+
+    operation = score_mod._residual_metric_operation(quantity, observation)
+    expected_width = score_mod._metric_uncertainty_width(
+        operation,
+        quantity,
+        Decimal(reference),
+        Decimal(width),
+        scale_unit,
+    )
+    assert expected_width is not None
+    assert resolved.refusal is None
+    assert resolved.notice is None
+    assert resolved.band is not None
+    assert resolved.band.value == expected_width * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.band.unit == (
+        "dimensionless"
+        if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
+        else scale_unit
+    )
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_band=resolved.band,
+        operation=operation,
+    ) is resolved.band
+
+
+def test_composition_printed_width_rejects_a_declared_basis_mismatch() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    quantity = Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    identity = Identity(
+        quantity=quantity,
+        species=Species("SiO2", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("CaO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of("mole_fraction"),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.4",
+            "units": "wt%",
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "composition-width-mismatch",
+            "composition-width-experiment",
+            identity,
+            Decimal("0.35"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="composition-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("0.35"),
+        source_observation=observation,
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal == {
+        "reason": "printed_uncertainty_unit_unmapped",
+        "quantity": quantity.value,
+        "source_unit": "wt%",
+        "original": score_mod._uncertainty_original(uncertainty),
+    }
+    derived = DecisionBand(Decimal("0.01"), "dimensionless", "derived_scatter: test")
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_refusal=resolved.refusal,
+        derived_band=derived,
+        operation=MetricOperation.DEX,
+    ) is None
+
+
+def test_inherited_residue_width_uses_its_oxide_weight_percent_subtype() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    quantity = Quantity.RESIDUE_COMPONENT_COMPOSITION
+    identity = Identity(
+        quantity=quantity,
+        species=Species("MgO", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("MgO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of("oxide_wt_percent"),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "sigma": "0.17",
+            "parent": "series-parent",
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "inherited-residue-width",
+            "residue-width-experiment",
+            identity,
+            Decimal("10.29"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="residue-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("10.29"),
+        source_observation=observation,
+    )
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.17") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.band.unit == "mass_percent"
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_band=resolved.band,
+        operation=MetricOperation.ABSOLUTE,
+    ) is resolved.band
+
+
+@pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
 def test_source_method_uncertainty_supplies_a_source_method_band(

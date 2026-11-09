@@ -25,3 +25,25 @@ fractions computed by stoichiometry from printed element mass percent, when
 those oxides account for the whole sample. The reason carries the printed
 oxide sum in wt%, read from the derivation inputs. Such residuals remain
 visible in the `oxide-from-element-mass-percent-composition` flagged stratum.
+
+## Composition and liquidus storage rules
+
+**Initial-charge-only compositions.** A composition with
+`proxy_flag = "initial_charge_only"` is a printed starting charge, while the
+datum it accompanies describes a later, depleted state. It is kept as sample
+context and is never treated as the composition at the measured point. When
+the source publishes no per-run composition, the point composition is stored
+as unknown (missing input), and the residual carries a source-disagreement
+notice that names the `initial_charge_only` role. Consumers may still predict
+with the starting charge, but the residual stays flagged.
+
+**Liquidus saturation rows.** A printed liquidus row (a liquid composition
+saturated with a named solid at a printed temperature) is stored as a
+`transition_temperature` quantity with subtype `liquidus`. The printed
+temperature is the point value. The row's own printed liquid composition,
+including any printed zero components, goes in `identity.composition`. The
+saturating solid is kept in the point conditions as a cross-check. When the
+source reports no starting charge, the experiment's initial composition stays
+unknown and never inherits a row's liquid composition. Liquidus-temperature
+prediction is an upcoming feature; until it ships, these rows are refused as
+`quantity_not_predicted` before any engine is opened.

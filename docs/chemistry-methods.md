@@ -98,10 +98,10 @@ Iron still carries **pseudo-Antoine** provenance metadata whose coefficients wer
 so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a fixed
 reference grid (seven lunar and Mars feedstocks, 31 temperature points from 1350 to 1950 K, at an
 iron–wüstite oxygen fugacity per Kress & Carmichael 1991). That is the
-`pseudo_psat_backsolved_from_vaporock` path. It is honestly a model-to-model fit, not a measurement:
+`pseudo_psat_backsolved_from_vaporock` path. It is a model-to-model fit, not a measurement:
 the residual metadata records about 0.418 dex for Fe, and every such row is
 UNCERTIFIED. Fe's residual pseudo Antoine is dormant. Sodium no longer uses that path for the live
-high-T rail (t-383, 2026-08-08): Na is a liquid-NaO0.5 `standard_reaction_term` assembled from
+high-T rail: Na is a liquid-NaO0.5 `standard_reaction_term` assembled from
 Lamoreaux & Hildenbrand 1984 Tables 2/4 (dual-extracted; minimax residual 1.18e-4 dex), paired with
 constant table `gamma_NaO0.5=1e-3` coherent by provenance in the L&H frame; the VapoRock-backsolved
 pseudo Antoine and the prior Chase gas-standard compensating-errors surface are inactive provenance
@@ -160,8 +160,8 @@ relative to the same temperature and activity at the reference pressure. At the 
 edges, the multiplier is `√(1×10⁻⁹ / 1×10⁻³⁰) = 3.1623×10¹⁰` and
 `√(1×10⁻⁹ / 100) = 3.1623×10⁻⁶`. Those are boundary values, not caps: outside the
 `1×10⁻³⁰–100 bar` band, the supplied transport pO₂ still enters mass action and the evaluator flags
-the result as extrapolated without projecting pO₂ to either edge, per the owner's 2026-09-05
-predict-and-flag ruling (`47436a121`). There is no SiO-specific clip at `pO₂_ref`.
+the result as extrapolated without projecting pO₂ to either edge, per the project's
+predict-and-flag policy. There is no SiO-specific clip at `pO₂_ref`.
 
 Transport pO₂ is separately gated by the request or body's vacuum floor: an explicit value below that
 floor is rejected, and an omitted value resolves to the floor. The default floor is `1×10⁻⁹ bar`,
@@ -228,9 +228,9 @@ so `a → 1` continuously as `X → 1`, eliminating the former hard branch from 
 step for the Cr₂O₃ anchor). The one-parameter pseudo-binary regular-solution mid-range model
 `ln γ = ln γ* · (T*/T) · (1−X)²` is **not** used: stored-cell enghar bisection showed that mid-range
 `(1−X)²` alone raised every Ca pressure by +0.418 dex at lunar `X_Ca ≈ 0.12` and that `T*/T` drove
-the K median regression (see `docs-private/research/2026-08-05-chemact-root/findings.md`). Multi-
-component excess G and constrained H^E remain future MC-5 work. Anchor temperatures `T*` label the
-declared gamma domain for status-bearing out-of-domain consumption (b-121); they do **not** scale the
+the K median regression. Multi-
+component excess G and constrained H^E remain future work. Anchor temperatures `T*` label the
+declared gamma domain for status-bearing out-of-domain consumption; they do **not** scale the
 numeric gamma. A species without a documented table row uses an explicit declared ideal-solution
 assertion (`γ = 1`) carrying the `ASSUMED_IDEAL_SOLUTION` tier and a warning through the activity
 seam; it is a flux-driving prediction, not a clean evidence point. Iron oxide is the exception in
@@ -357,21 +357,22 @@ the former universal scalar `1e-4·√axial_stir` conductance is **refused**
 artifacts emit `authority_class: "upper-bound"` with
 `authority_reason: "missing-species-state-dependent-melt-transfer-inputs"`.
 
-**Gas film.** Continuum `r_gas = 1/k_g` applies only for `Kn < VISCOUS_KNUDSEN_MAX` (0.01). There is no
-Fuchs–Sutugin weight and no unvalidated transitional film coefficient. At free-molecular / vacuum
+**Gas film.** Continuum `r_gas = 1/k_g` applies for `Kn < VISCOUS_KNUDSEN_MAX` (0.01); in transitional Kn the
+same continuum expression is continued and flagged `extrapolated`. There is no
+Fuchs–Sutugin weight and no fitted transitional film coefficient. At free-molecular / vacuum
 conditions the local film is off (`r_gas = 0`) and the flux approaches pure HKL on `Δp`. The diffusion
 coefficient `D_AB` is per-species Chapman–Enskog; Sherwood carries the **radial** induction-stirring
 enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0 → laminar `Sh = 3.66`).
 <!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:654 — continuum R_g branch (Fuchs weight removed; 63df9bd) -->
 <!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1460 — radial Sherwood -->
 
-**Transport-model validity domain (not a Kn safety/coating gate).** Ledger-authoritative yields refuse
-when the flux evaluation's Kn exceeds `VISCOUS_KNUDSEN_MAX` at nonzero overhead, because evolved
-`P_bulk` still comes from the viscous-only Poiseuille model. The 0.6.3 optimizer floor (~1 mbar,
-Kn≈0.004) never enters that domain; t-379 (0.7) supplies transitional/molecular conductance and lifts
-the validity refusal. Coating remains the continuous rate→lifespan model. See
+**Transport-model validity domain (not a Kn safety/coating gate).** Beyond `VISCOUS_KNUDSEN_MAX`,
+evolved `P_bulk` still comes from the viscous Poiseuille model, so the flux is computed as a finite
+continuation and flagged `extrapolated`; ledger yields are still produced. The optimizer's ~1 mbar
+floor (Kn≈0.004) stays inside the viscous domain. Coming soon: transitional and molecular
+conductance. Coating remains the continuous rate→lifespan model. See
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:800 — viscous p_bulk domain refusal (63df9bd) -->
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:800 — viscous p_bulk domain flag (63df9bd) -->
 
 ### §4.1 Directional (two-axis) induction stirring
 
@@ -660,8 +661,7 @@ practical melt window, sodium is refused above its crossover, and each refusal i
 output. For TiO2, acceptance uses the stricter raw thermodynamic margin, not only the NaO0.5
 activity-shifted diagnostic margin. A TiO2 target is refused whenever the minimum of shifted Na/Ti,
 raw Na/Ti, and Cr/Ti margins is non-positive; being in-band only makes the refusal authoritative, it
-does not make Ti reducible. This Ti rule is part of the same uncommitted re-ground epoch as the
-metallothermy fix and dual review IDs `codex-36227` and `grok-36559`. Inside the gate the reaction is
+does not make Ti reducible. Inside the gate the reaction is
 treated as temperature-independent; it does not interpolate yields across the crossover band. The
 physics and the crossover values are developed in `docs/concepts.md`.
 
@@ -708,7 +708,7 @@ liquidus itself is gated at `max(actual liquidus, ~1200 °C)` per the Kress cali
 now this is a **single bulk scalar**: it does not partition Fe between liquid and solid per species, so
 in a mid-mush window (roughly 15–30 % residual liquid) it treats the liquid as compositionally identical
 to the bulk. True fractional melting — where Fe-in-liquid need not track the bulk liquid fraction — is
-MELTS-class phase-partitioning and is deferred (backlog); the scalar is honest about being a
+MELTS-class phase-partitioning and is an upcoming feature; the scalar is explicitly a
 first-order approximation, not a partition model.
 
 Below the project's negligible-mol numerical floor (`OXYGEN_RESERVOIR_NOOP_MOL = 1e-15`) the capacity is
@@ -716,10 +716,10 @@ treated as no redox capacity at all (`no_melt_redox_capacity`), not divided into
 shuttle-exhausted melt drives `C_m` into this band (observed down to denormalized ~1e-293 mol per ln fO₂
 after the C3 alkali shuttle); dividing a residual source term by such a `C_m` yields an absurd candidate
 fO₂ (finite ~1e9…1e287, or overflow to non-finite), so *applying* it would corrupt the reservoir. A
-full-grid SSO-R scan (review codex-7466, 2026-07-08) found 846 of 15082 real source-term calls in this
+full-grid SSO-R scan found 846 of 15082 real source-term calls in this
 band and confirmed the floor refuses 37 real rows the prior branch would have applied as absurd fO₂
 jumps — a correctness fix, **not** a fail-open: floored terms are recorded as a refusal, never as
-success. The physical justification (owner-confirmed): in the default vacuum regime the O₂ tied to a
+success. The physical justification: in the default vacuum regime the O₂ tied to a
 floored term sits below lunar-atmosphere pressure (~1e-15 bar), i.e. the free-molecular ballistic-escape
 regime, so it leaves the system without re-equilibrating with the melt — applying versus refusing the
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
@@ -768,7 +768,7 @@ recorded warning.
 - **The builtin analytic model** is the authoritative provider for vapor pressure, evaporation flux,
   condensation routing, metallothermy, native-iron saturation, and electrolysis — the analytic kernels
   of §§2–8. It is deterministic and transparent, it covers the non-equilibrium kinetic steps no
-  equilibrium engine models, and it fails loudly out of range rather than extrapolating. It supplies the
+  equilibrium engine models, and it predicts and flags out-of-domain values (extrapolated authority) while refusing missing or invalid input. It supplies the
   oxide activities its own vapor-pressure path consumes — the ideal-for-non-iron, Kress-for-iron
   treatment of §3 — but it does not run a Gibbs-energy minimization or compute phase boundaries. In
   trust-architecture vocabulary this is the `internal-analytical` model (the legacy input alias
@@ -800,10 +800,6 @@ recorded warning.
   per-species provenance string may read `thermoengine`; that is a diagnostic confirmation label, not an
   authority swap.
 <!-- impl: §9 -> engines/vaporock/provider.py VapoRockProvider.capability_profile:99 — VapoRock shadow profile -->
-
-- **FactSAGE / ChemApp** is not part of this checkout: the adapter has been archived and removed, and
-  an explicit request for it raises rather than falling through. It is noted here only so that a reader
-  who finds references to it elsewhere knows it is not a selectable engine in the current code.
 
 **Internal data tables.** Distinct from the analytic model is the tabulated thermochemical data the
 analytic kernels consume — the pure-component Antoine coefficients, the JANAF-derived Ellingham and
@@ -895,7 +891,7 @@ modelled thermodynamic clearance, and several routings are known simplifications
 mixtures and their decomposition extents are approximate and not fully speciated (though the decomposed
 oxide is correctly credited to the melt and only residual carbonate goes to the salt bucket — the cation
 is not wholesale lost), refractory fluorides are carried to the rump, chlorides can volatilize and
-re-condense on cold walls, and nitrates have no explicit coverage. The per-species detail and the honest
+re-condense on cold walls, and nitrates have no explicit coverage. The per-species detail and the open
 coverage holes are in [`docs/model-limitations.md`](model-limitations.md) and the Stage 0 contract in
 [`docs/process-model.md`](process-model.md).
 <!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider.dispatch:295 — CNOPS family routing -->
@@ -975,7 +971,7 @@ The trust tiers used throughout this page are the ones defined in
 consistent basis — the only tier permitted to back a certification claim), **ASSUMED** (a stated
 engineering default with no direct measurement), and **UNCERTIFIED** (grounded but with unclosed
 scatter, and denied from certification claims until the scatter is reconciled). Where this page marks a
-value ASSUMED or UNCERTIFIED, that is the honest status of the number, not a placeholder to be quietly
+value ASSUMED or UNCERTIFIED, that is the actual status of the number, not a placeholder to be quietly
 upgraded.
 
 The reproduction error bar is treated as a deliverable, not a disclaimer: where the model is validated

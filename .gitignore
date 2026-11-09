@@ -114,8 +114,6 @@ config/*.dat
 config/*.lic
 config/*license*
 
-# Lunar Operator game — shelved stub, archived under _attic/game/.
-# Keep only the root restoration path ignored.
 /game/
 
 # Private working notes
@@ -155,3 +153,6 @@ docs/chemistry-provenance.notes.md
 # Purged from this branch's history 2026-09-22; regenerate from the score tooling
 # (write_residuals_jsonl) rather than committing it.
 data/battery/residuals.jsonl
+
+# Local archive of code removed from the live tree; never published.
+_attic/

@@ -313,6 +313,71 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
     assert all(row["values"]["numeric_points"] == [] for row in figures)
 
 
+def test_georges_printed_uncertainties_migrate_with_width_and_confidence() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    migrator = migrate_one_extract(REPO_ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    observations = [row for row in migrator.result.observations.values() if row.source_id == SID]
+
+    source_widths = Counter()
+    for container in document["species"].values():
+        for source_row in container.get("observations", []):
+            values = source_row.get("values", {})
+            uncertainty = source_row.get("uncertainty") or {}
+            if uncertainty.get("value") is not None:
+                source_widths[str(uncertainty["value"])] += 1
+            for point in values.get("points", []):
+                if point.get("sigma") is not None:
+                    source_widths[str(point["sigma"])] += 1
+
+    migrated_widths = Counter()
+    width_rows = []
+    for row in observations:
+        verbatim = row.uncertainty.verbatim
+        if not isinstance(verbatim, dict):
+            continue
+        width = verbatim.get("sigma", verbatim.get("value"))
+        if width is not None:
+            migrated_widths[str(width)] += 1
+            width_rows.append(row)
+
+    assert sum(source_widths.values()) == 940
+    assert migrated_widths == source_widths
+    assert len(width_rows) == 940
+    assert all(row.uncertainty.kind.value == "printed" for row in width_rows)
+    assert all(row.uncertainty.verbatim["confidence_level"] == "one_sigma" for row in width_rows)
+
+    scalar_source = next(
+        row
+        for row in document["species"]["SiO2"]["observations"]
+        if row.get("observation_id") == "georges_2000_annex_iii_r003_mgo"
+    )
+    scalar = next(
+        row
+        for row in observations
+        if row.observation_id == f"{SID}::georges_2000_annex_iii_r003_mgo"
+    )
+    assert scalar.value.point == Decimal("5.77")
+    assert scalar.uncertainty.kind.value == "printed"
+    assert scalar.uncertainty.verbatim["value"] == "0.09"
+    assert scalar.uncertainty.verbatim["value_as_published"] == "0.09"
+    assert scalar.uncertainty.verbatim["confidence_level"] == "one_sigma"
+    assert scalar_source["values"]["value_as_published"] == "5.77"
+
+    point = next(
+        row
+        for row in observations
+        if isinstance(row.uncertainty.verbatim, dict)
+        and row.uncertainty.verbatim.get("parent", "").endswith(
+            "::georges_2000_table_iii_3_mgo_residue_composition"
+        )
+        and row.value.point == Decimal("10.29")
+    )
+    assert point.uncertainty.kind.value == "printed"
+    assert point.uncertainty.verbatim["sigma"] == "0.17"
+    assert point.uncertainty.verbatim["confidence_level"] == "one_sigma"
+
+
 def test_annex_iii_table_grid_is_render_pinned_and_both_mutations_fail() -> None:
     pdf = regolith_corpus_root() / "raw" / SID / f"{SID}.pdf"
     if not pdf.is_file():

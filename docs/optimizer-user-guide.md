@@ -4,7 +4,7 @@ The recipe optimizer searches recipe settings for one feedstock/profile pair aga
 
 It is an operator tool for recipe search. It is not a chemistry-authority switch. Backend authority still follows the simulator backend rules, and current checked-in optimizer profiles keep every fidelity choice on the `internal-analytical` backend (the builtin analytical model; legacy name `stub`).
 
-Engineers who need runtime internals should read [Eval runtime architecture](architecture-eval-runtime-2026-06.md). This guide stays operator-facing.
+Engineers who need runtime internals should read [Eval runtime architecture](architecture-eval-runtime.md). This guide stays operator-facing.
 
 ## When To Use It
 
@@ -24,7 +24,7 @@ The page has four surfaces:
 
 - **Optimizer Results** — the **Feedstock/Profile Winners** table, which reads stored optimizer results from the configured runs directory.
 - **Launch Optimizer Job** — submits a disk-backed CLI job and polls job status.
-- **Import Study Bundle** — ingests a study bundle produced elsewhere (for example on a Studio box).
+- **Import Study Bundle** — ingests a study bundle produced on another machine.
 - **Imported Studies** — lists ingested bundles with their status and verification state.
 
 Launch fields:
@@ -80,7 +80,12 @@ Actual flags (run `--help` for the authoritative list):
 --certify
 --source-store SOURCE_STORE
 --cache-key CACHE_KEY
+--reoptimized-from STUDY_ID
+--goals-source {bundled_profile,current_local_profile}
 ```
+
+`--reoptimized-from` records the source study when a study is launched via re-optimize, and
+`--goals-source` records which goals that launch used.
 
 `--feedstock`, `--fidelity`, and `--budget` are always required; `--strategy` is required
 unless `--certify` is set. `--profile` accepts the built-in profile name, a feedstock
@@ -256,7 +261,7 @@ matter, because they are the opposite of the intuitive answer:
 
 `physics_constraints` (feasibility thresholds and active gates) *is* first-class key
 material, because a threshold change changes verdicts and must not be served from cache.
-Owner-ratified default `cost_parameters` serialize away, so runs at the defaults share one
+The default `cost_parameters` serialize away, so runs at the defaults share one
 cache identity.
 
 ### Backend Badge
@@ -314,4 +319,4 @@ If a requested real backend is unavailable, do not reinterpret that as a success
 - [Recipe Playbook](recipe-playbook.md)
 - [Output Interpretation](output-interpretation.md)
 - [Running simulations from the shell](running-from-shell.md)
-- [Eval runtime architecture](architecture-eval-runtime-2026-06.md)
+- [Eval runtime architecture](architecture-eval-runtime.md)
