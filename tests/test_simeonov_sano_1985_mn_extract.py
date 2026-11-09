@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
@@ -124,12 +125,17 @@ def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
     assert context[1]["locator"]["page"] == 5
     assert context[1]["locator"]["published_page"] == 1120
     capacity = doc["species"]["Mn"]["context"][0]
+    _assert_capacity_class(capacity)
     assert capacity["values"]["admission_status"] == "typed_refusal"
     assert capacity["values"]["defining_equation_as_printed"] == (
         "C_Mn2+ = (%Mn2+) / (a_Mn(l) · P_O2^1/2) = "
         "K / (f_Mn2+ · a_O2-) (Eq. 8)"
     )
     assert "no existing quantity token" in capacity["values"]["schema_gap"].lower()
+    mutated = deepcopy(capacity)
+    mutated["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_capacity_class(mutated)
     rows = capacity["values"]["table_rows"]
     assert len(rows) == 4
     assert [row["log_C_Mn2_plus"] for row in rows] == [
@@ -139,3 +145,9 @@ def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
         "10.53",
     ]
     assert capacity["values"]["equation_locator"]["page"] == 3
+
+
+def _assert_capacity_class(capacity: dict) -> None:
+    assert capacity["values"]["method_class"] == "measured_reduced"
+    assert capacity["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert capacity["derivation"]["raw_inputs"]["locator"]["table"] == "1"

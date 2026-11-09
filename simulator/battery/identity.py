@@ -277,6 +277,11 @@ def ideal_gas_entropy_pressure_shift_J_per_mol_K(
     return -R_J_PER_MOL_K * _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
 
 
+_STANDARD_PRESSURE_AMBIGUITY_RELATION = (
+    "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+)
+
+
 def standard_pressure_delta_g_kJ_per_mol(
     delta_n_gas: object,
     T_K: object,
@@ -1125,6 +1130,26 @@ def profile_for(identity: Identity) -> QuantityProfile:
             # flux per area may omit area from equality only after recorded
             # normalization; sample mass still required for extensive rates.
             pass
+    elif q is Quantity.WALL_DEPOSIT_AREAL_RATE:
+        req(
+            "temperature_K",
+            "per",
+            "composition",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        na(
+            "subtype",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "exposure",
+            "sample_mass_kg",
+        )
     elif q is Quantity.TRANSITION_TEMPERATURE:
         req("subtype", "total_pressure_Pa")
         # no duplicate T coordinate
@@ -1808,6 +1833,8 @@ def _values_compare(
         if left.component_basis != right.component_basis:
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
+            return _mismatch(name)
+        if left.iron_saturation_composition != right.iron_saturation_composition:
             return _mismatch(name)
         nested = _species_equal(
             left.endmember,

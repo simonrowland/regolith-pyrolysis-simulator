@@ -109,6 +109,35 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         "table": "12",
     }
 
+    table9_na2o_activity = next(
+        observation
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation["observation_id"] == "rys_2007_appendix_na2o_activity_table9"
+    )
+    table9_activity_points = table9_na2o_activity["values"]["points"]
+    assert len(table9_activity_points) == 38
+    assert {
+        (point["T_K"], point["activity"]) for point in table9_activity_points
+    } >= {("1506", "1.22E-09"), ("1487.66", "7.14E-10")}
+    table9_locator = {
+        "page": 141,
+        "published_page": 129,
+        "pdf_page_index": 140,
+        "table": "9",
+    }
+    added_cells = {("1506", "1.22E-09"), ("1487.66", "7.14E-10")}
+    for point in table9_activity_points:
+        if (point["T_K"], point["activity"]) in added_cells:
+            assert point["locator"] == table9_locator
+            assert (
+                point["point_conditions"]["total_pressure_Pa"]["locator"]
+                == table9_locator
+            )
+    assert all(
+        point["locator"]["table"] == "9" for point in table9_activity_points
+    )
+
     locators = []
 
     def collect_locators(value: object) -> None:
@@ -122,9 +151,9 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 collect_locators(item)
 
     collect_locators(document)
-    # Typing Tables 7 and 9 adds 158 locators and 73 observations; the KEMS
+    # Typing Tables 7 and 9 adds 162 locators and 75 observations; the KEMS
     # apparatus and experiment registry add three locators.
-    assert len(locators) == 2229
+    assert len(locators) == 2233
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
@@ -138,7 +167,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 continue
             for point in observation.get("values", {}).get("points", []):
                 appendix_rows[point["locator"]["table"]] += 1
-    assert sum(appendix_rows.values()) == 888
+    assert sum(appendix_rows.values()) == 890
     assert appendix_rows == Counter(
         {
             "1": 59,
@@ -149,7 +178,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
             "6": 56,
             "7": 74,
             "8": 76,
-            "9": 72,
+            "9": 74,
             "10a": 56,
             "10b": 52,
             "11a": 62,
@@ -187,7 +216,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     migrator.finalize()
     result = migrator.result
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 1001
+    assert len(result.observations) == 1003
 
     partial_pressures = [
         row
@@ -207,6 +236,16 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     )
     assert rys_experiment.method.is_value
     assert rys_experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    activity_rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activity_rows) == 382
+    assert all(
+        row.experiment_id == rys_experiment.experiment_id for row in activity_rows
+    )
     assert rys_experiment.bench_id is not None
     rys_bench = result.benches[rys_experiment.bench_id]
     assert rys_bench.cell_materials is not None

@@ -106,8 +106,18 @@ def _requirements(inputs, consumer, engine=None):
                               else GapReason.UNSUPPORTED_PRINT_FORM)
                     gaps.append(ReadinessGap(name, reason, (name,)))
         if absent:
-            reason = (waypoint.absence.reason if name == "normalized_composition" and waypoint.absence
-                      else GapReason.MISSING_EVIDENCE)
+            if name in {"charge_moles_by_species", "run_charge_moles_by_species"}:
+                reason = (
+                    charges.absence.reason
+                    if charges.absence is not None
+                    else GapReason.MISSING_EVIDENCE
+                )
+            else:
+                reason = (
+                    waypoint.absence.reason
+                    if name == "normalized_composition" and waypoint.absence
+                    else GapReason.MISSING_EVIDENCE
+                )
             gaps.append(ReadinessGap(name, reason, missing))
     return replace(constraints, status=ReadinessStatus.GAP if gaps else ReadinessStatus.READY,
                    gaps=tuple(dict.fromkeys(gaps)))

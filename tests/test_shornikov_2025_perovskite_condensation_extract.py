@@ -281,7 +281,11 @@ def test_table_cells_and_prose_pressures_are_decimal_and_migrate() -> None:
     assert melting['locator']['published_page'] == 34
     assert melting['phase'] == 'perovskite'
     assert melting['units'] == 'K'
-    assert melting['values']['method_class'] == 'quoted_attributed'
+    # The 2025 sentence names no source and gives no melting-point method.
+    # Although Shornikov (2019a) reports a similar value, the 2025 paper does
+    # not attach that citation to this statement, so do not infer attribution.
+    assert melting['values']['method_class'] == 'quoted_unattributed'
+    assert 'attribution' not in melting['values']
     assert melting['values']['property_kind'] == 'melting_point'
     assert melting['values']['temperature_K'] == 2241
     assert melting['values']['temperature_K_as_printed'] == '2241 K'

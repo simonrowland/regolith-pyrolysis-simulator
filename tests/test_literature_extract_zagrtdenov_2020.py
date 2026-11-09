@@ -6,6 +6,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from simulator.battery.enums import Authority, NoticeKind
 from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -228,7 +229,24 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
         assert row.point_conditions["fO2_control"].locator.page == 41
         assert row.point_conditions["total_pressure_Pa"].locator.page == 6
         assert "fO2_log" not in row.point_conditions
-        assert not row.notices
+        # t-1619 / d-324: the printed FMQ-relative input uses the canonical
+        # buffer curve and discloses that its calibration was not named.
+        assert len(row.notices) == 2
+        assert {
+            (notice.kind, notice.authority, notice.band)
+            for notice in row.notices
+        } == {
+            (
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+            (
+                NoticeKind.OUT_OF_CERTIFIED_BAND,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+        }
         if cell == "D.L.":
             assert row.value.kind.value == "unavailable"
             assert values["component_amount"]["tag"] == "unknown"
@@ -285,6 +303,27 @@ def test_context_preserves_starting_crystal_tables_auxiliary_columns_and_model_f
     model = find_context_row(document, "zagrtdenov_2020_model_eq19b_fit")
     assert model["values"]["coefficient_values_with_uncertainty_as_printed"]["a"] == "-7.01 ± 2.10"
     assert model["values"]["fit_comparison_as_printed"]["R_squared"] == "0.94"
+
+
+def test_intro_saturation_bundle_marks_the_uncited_example_unattributed():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = find_context_row(document, "zagrtdenov_2020_intro_literature_cr_saturation_values")
+    assert row["values"]["method_class"] == "quoted_unattributed"
+    assert "names no source for the ~1220 ppm" in row["values"]["attribution_note"]
+    assert row["values"]["values_as_printed"][2]["attribution"] == (
+        "No source is named for this example in the paper."
+    )
+    assert row["values"]["values_as_printed"][0]["attribution"] == "Forsythe & Fisk (1994)"
+    assert row["values"]["values_as_printed"][1]["attribution"] == "Roeder & Reynolds (1991)"
+    assert row["values"]["values_as_printed"][3]["attribution"] == "Gale et al. (2013)"
+
+    mutated = deepcopy(document)
+    changed = find_context_row(
+        mutated, "zagrtdenov_2020_intro_literature_cr_saturation_values"
+    )
+    changed["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        assert changed["values"]["method_class"] == "quoted_unattributed"
 
 
 def test_source_test_needs_no_external_corpus_files():

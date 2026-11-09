@@ -1412,6 +1412,16 @@ species:
           sample_mass_kg:
             state: {tag: unknown, reason: not_published}
             locator: {page: 3, published_page: 726, pdf_page_index: 2, table: '1'}
+          apparatus: evaporation from a molybdenum container
+          notes: |
+            Table 1 is a compilation; the article does not allocate the cited values to individual runs.
+            Sample holder / cell material as printed: evaporation from a molybdenum container.
+            Cell inner dimensions and orifice size: not stated.
+            Sample mass: not stated.
+            Run duration at temperature: not stated.
+            Fe-presaturation of loops and how: not stated.
+            Post-run bulk analyses (total Fe, alkalis, or Mo/W/Pt/Ir/Re pickup): not stated.
+            Cell oxygen condition: not stated; the table labels reducing conditions and reports evaporation from a molybdenum container, but gives no cell oxygen condition.
       - observation_id: shornikov_2008_table2_total_vapor_pressure
         type: experiment_series
         locator: {page: 5, published_page: 728, pdf_page_index: 4, table: '2'}
@@ -1656,6 +1666,31 @@ species:
           method_class: quoted_unattributed
           equation_number: 8
           relation: 'p(Al) = √(a(Al2O3) K_r6 / p^3(O))'
+      - observation_id: shornikov_2008_table2_melt_series_apparatus
+        type: apparatus
+        experiment: table2_melt_series
+        locator:
+          page: 5
+          published_page: 728
+          pdf_page_index: 4
+          table: '2'
+        units: as printed
+        values:
+          quantity: table2_melt_series_apparatus
+          method_class: method_only
+          apparatus: Knudsen cell mass spectrometry using a molybdenum container
+          method_as_published: >-
+            The partial pressures of vapor species over melts and oxide activities in melts (Table 2) were experimentally obtained by Knudsen cell mass spectrometry [15].
+          container_as_published: >-
+            Table 2. Experimental values of oxide activities and partial pressures of predominant vapor species over CaO–MgO–FeO–Al2O3–SiO2 melt under reducing conditions (evaporation from a molybdenum container) [15] and values calculated for chemically neutral conditions at 2000 K.
+          notes: |
+            Series scope: Table 2 samples 1 and 2; the caption states evaporation from a molybdenum container at 2000 K.
+            Cell inner dimensions and orifice size: not stated.
+            Sample mass: not stated.
+            Run duration at temperature: not stated.
+            Fe-presaturation of loops and how: not stated.
+            Post-run bulk analyses (total Fe, alkalis, or Mo/W/Pt/Ir/Re pickup): not stated.
+            Cell oxygen condition: not stated. Table 2 lists p(O) among vapor partial pressures; the article does not state a controlled cell oxygen condition.
   SiO2_alpha:
     observations:
       - observation_id: shornikov_2008_silica_evaporation_coefficient

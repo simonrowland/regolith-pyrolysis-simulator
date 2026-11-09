@@ -11,11 +11,14 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import ast
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import tokenize
 import tempfile
 import threading
 import time
@@ -2458,6 +2461,20 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
 
 
+def test_magemin_db_projection_preserves_native_feot_input():
+    backend = MAGEMinBackend()
+
+    projected = backend._build_db_bulk_projection(
+        {"SiO2": 60.0, "Al2O3": 30.0, "FeOt": 10.0},
+    )
+
+    assert projected.composition_wt_pct == {
+        "SiO2": 60.0,
+        "Al2O3": 30.0,
+        "FeOt": 10.0,
+    }
+
+
 def test_magemin_db_projection_ume_and_mtl_orders_are_not_ig_shaped():
     backend = MAGEMinBackend()
     composition = {
@@ -4204,6 +4221,44 @@ def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
         MAGEMinBackend._qfm_logfo2_oneill(-273.15)
 
 
+def _executable_source(source: str) -> str:
+    """Source with comments and docstrings removed. Strings in code stay."""
+
+    tree = ast.parse(source)
+    docstring_lines: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not node.body:
+            continue
+        first = node.body[0]
+        if (
+            isinstance(first, ast.Expr)
+            and isinstance(first.value, ast.Constant)
+            and isinstance(first.value.value, str)
+            and first.end_lineno is not None
+        ):
+            docstring_lines.update(range(first.lineno, first.end_lineno + 1))
+    kept: list[str] = []
+    reader = io.StringIO(source).readline
+    for token in tokenize.generate_tokens(reader):
+        if token.type == tokenize.COMMENT:
+            continue
+        if token.type == tokenize.STRING and token.start[0] in docstring_lines:
+            continue
+        if token.type in {
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.ENCODING,
+            tokenize.ENDMARKER,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+        }:
+            continue
+        kept.append(token.string)
+    return " ".join(kept)
+
+
 def test_oneill_qfm_coefficient_has_one_production_owner():
     repo_root = Path(__file__).resolve().parents[1]
     tracked = subprocess.run(
@@ -4219,9 +4274,8 @@ def test_oneill_qfm_coefficient_has_one_production_owner():
     for relative_path in tracked:
         if not relative_path.endswith(".py"):
             continue
-        source_path = repo_root / relative_path
-        for line in source_path.read_text(encoding="utf-8").splitlines():
-            if coefficient.search(line):
-                occurrences.append(relative_path)
+        source = (repo_root / relative_path).read_text(encoding="utf-8")
+        if coefficient.search(_executable_source(source)):
+            occurrences.append(relative_path)
 
     assert occurrences == ["simulator/chemistry/qfm_oneill.py"]

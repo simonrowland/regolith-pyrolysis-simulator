@@ -116,21 +116,34 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         )
         assert converted.identity.reference_state is not None
         assert converted.identity.reference_state.is_value
-        # d-165: the paper specifies CaO(s), but not its polymorph. The former
-        # inferred-liquid pin was 0.00002451128698546067397078399944 from
-        # 0.000228; the comparison now keeps the printed value and refuses.
-        assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
-        assert converted.value.point == observation.value.point == Decimal("0.000228")
+        # d-338: CaO(s) with no polymorph is the only JANAF solid (lime).
+        # The liquid activity is the pre-d-165 fusion pin of the printed
+        # 0.000228. The record itself stays unknown.
+        assert observation.value.point == Decimal("0.000228")
+        assert (
+            observation.identity.reference_state.value.endmember.polymorph.is_unknown
+        )
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert converted.value.point == Decimal(
+            "0.00002451128698546067397078399944"
+        )
         assert any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason.startswith(
+                'reference_polymorph_inferred_stable_phase:'
+                '{"comparison_phase": null, "comparison_table_id": null, '
+                '"phase": "lime", "sizing_dex": "not sized", "table_id": "Ca-027"}'
+            )
             for notice in converted.notices
         )
         own_row = scored[observation.observation_id]
-        assert own_row.numeric is None
+        assert own_row.numeric is not None
+        assert own_row.status is ResidualStatus.NO_BAND
         assert own_row.refusal is not None
-        assert own_row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-        assert own_row.refusal.detail["reason"] == (
-            "fusion_source_reference_phase_unprinted"
+        assert own_row.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+        assert own_row.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+        assert any(
+            notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+            for notice in own_row.notices
         )
 
 
@@ -156,12 +169,17 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
     residual = next(row for row in residuals if row.reference == observation.observation_id)
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    # d-165 keeps the missing polymorph as a secondary refusal; measurement
-    # validity remains primary when the quoted source method is unknown.
+    # The quoted source method is still unknown, so validity refuses before
+    # a number. d-338 has already inferred the polymorph; that inference is
+    # not re-attached as a secondary identity refusal.
     assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
-    assert residual.refusal.detail["secondary_reasons"] == [
-        "fusion_source_reference_phase_unprinted"
-    ]
+    assert "fusion_source_reference_phase_unprinted" not in (
+        residual.refusal.detail.get("secondary_reasons") or ()
+    )
+    assert any(
+        notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+        for notice in residual.notices
+    )
 
 
 def test_kume_own_experiments_keep_published_deoxidized_argon_control(

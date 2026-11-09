@@ -91,6 +91,22 @@ def test_zhang_thesis_residues_migrate_with_species_temperature_and_conditions()
         assert conditions["duration_min"].state.is_value
         assert conditions["duration_min"].locator is not None
 
+    vacuum_residues = [
+        observation
+        for observation in source_observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and "total_pressure_Pa" in (observation.point_conditions or {})
+        and "Printed about 10^-6 mbar"
+        in observation.point_conditions["total_pressure_Pa"].locator.note
+    ]
+    assert len(vacuum_residues) == 120
+    assert all(
+        observation.identity.total_pressure_Pa.is_value
+        and observation.identity.total_pressure_Pa.value == Decimal("0.0001")
+        for observation in vacuum_residues
+    )
+
     for formula, container in document["species"].items():
         for row in container["observations"]:
             assert row["values"].get("analyte", formula) == formula

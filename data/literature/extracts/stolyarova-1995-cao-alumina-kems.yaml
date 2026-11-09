@@ -539,10 +539,9 @@ species:
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: measured_reduced
+          evidence_class: measured_reduced
           admission_status: admitted
-          attribution: Stolyarova et al. (1995), Table 2 Eqn 1 and Eq. (5), p. 688
           method: author reduction by the printed gas equilibrium
           method_as_printed: >-
             Table 2's Eqn 1 column is calculated using Eq. (5), p. 688, for
@@ -700,10 +699,9 @@ species:
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: measured_reduced
+          evidence_class: measured_reduced
           admission_status: admitted
-          attribution: Stolyarova et al. (1995), Table 2 Eqn 2 and Eq. (6), p. 688
           method: author reduction by the printed gas equilibrium
           method_as_printed: >-
             Table 2's Eqn 2 column is calculated using Eq. (6), p. 688, for
@@ -844,10 +842,9 @@ species:
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: measured_reduced
+          evidence_class: measured_reduced
           admission_status: admitted
-          attribution: Stolyarova et al. (1995), Table 2 and Eq. (4), p. 688
           method: source-reported thermodynamic calculation
           method_as_printed: >-
             Partial pressures of O2 and O were calculated using available
@@ -984,6 +981,15 @@ species:
         regime: kems_effusion
         units: dimensionless
         standard_state: 'CaO activity relative to the pure CaO oxide reference in Eq. (7), p. 688; the paper describes vapor pressures over the "individual oxides".'
+        derived_from:
+        - stolyarova_1995_ca_partial_pressure_table2
+        - stolyarova_1995_o_partial_pressure_eqn1_table2
+        - stolyarova_1995_o_partial_pressure_eqn2_table2
+        derivation:
+          relation: >-
+            Figure 1 CaO activity is reduced from the stored Table 2 p(Ca) and p(O)
+            series using Eq. (7), p. 688. The pure-oxide reference pressures in Eq. (7)
+            are not tabulated as numeric inputs; the figure remains undigitized.
         values:
           quantity: activity
           composition_component: CaO
@@ -1018,6 +1024,15 @@ species:
         regime: kems_effusion
         units: dimensionless
         standard_state: 'Al2O3 activity relative to the pure Al2O3 oxide reference in Eq. (8), p. 688; the paper describes vapor pressures over the "individual oxides".'
+        derived_from:
+        - stolyarova_1995_al_partial_pressure_table2
+        - stolyarova_1995_o_partial_pressure_eqn1_table2
+        - stolyarova_1995_o_partial_pressure_eqn2_table2
+        derivation:
+          relation: >-
+            Figure 1 Al2O3 activity is reduced from the stored Table 2 p(Al) and p(O)
+            series using Eq. (8), p. 688. The pure-oxide reference pressures in Eq. (8)
+            are not tabulated as numeric inputs; the figure remains undigitized.
         values:
           quantity: activity
           composition_component: Al2O3

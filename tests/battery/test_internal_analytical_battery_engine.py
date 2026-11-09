@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     Quantity,
     AdmissionStatus,
     RefusalReason,
+    ResidualStatus,
 )
 from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species, State, Value
@@ -242,9 +243,9 @@ def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
-    # d-165: the paper prints SiO2(s) but leaves its polymorph unstated. The
-    # old internal-activity residual was 0.3319086250579114; do not score it
-    # by selecting a JANAF crystal from temperature alone.
+    # d-338: the paper prints SiO2(s) and leaves its polymorph unstated.
+    # The scorer takes the JANAF crystal stable at 1873 K. The internal
+    # activity residual is the pre-d-165 production value.
     root = Path(__file__).resolve().parents[2]
     context = battery_score.load_score_context(
         root, sources=("cho-suito-1994-cas-slag-activities",)
@@ -253,24 +254,32 @@ def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
         "cho-suito-1994-cas-slag-activities::"
         "cho_suito_1994_t5_acs2_sio2_cn"
     )
+    observation = context.observations[observation_id]
+    assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
     residual, _ = battery_score.compile_residual(
-        context.observations[observation_id],
+        observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
         comparison_ids={observation_id},
     )
-    assert residual.execution.state is ExecutionState.NOT_PROBED
-    assert residual.numeric is None
+    assert residual.execution.state is ExecutionState.PRODUCED
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("0.3319086250579114")
     assert residual.score_eligible is False
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["reason"] == (
-        "fusion_source_reference_phase_unprinted"
-    )
+    assert residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+    assert residual.refusal.detail["crystal_table"] == "O-035"
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason.startswith(
+            "reference_polymorph_inferred_stable_phase:"
+        )
+        and '"phase": "cristobalite_high"' in notice.reason
+        and '"table_id": "O-035"' in notice.reason
         for notice in residual.notices
     )
+    assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
