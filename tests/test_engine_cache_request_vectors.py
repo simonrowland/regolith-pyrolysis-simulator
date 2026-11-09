@@ -126,6 +126,15 @@ def test_request_vector_keeps_pressure_seen_by_adapter(
     assert first_vector != second_vector
 
 
+def test_openimcc_request_vector_ignores_unused_physical_pressure() -> None:
+    handle = _handle("openimcc")
+
+    first = _vector(handle, pressure_bar=1.0)
+    second = _vector(handle, pressure_bar=2.0)
+
+    assert first == second
+
+
 def test_request_vector_omits_qualification_decoration() -> None:
     handle = _handle("thermoengine")
 
