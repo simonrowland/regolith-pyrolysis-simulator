@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import builtins
 import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 from typing import Mapping
 
 import pytest
@@ -33,7 +34,9 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     open_battery_engine,
     load_binary_pots,
 )
+import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import EngineCache, cached_solve
+from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
 
 
@@ -147,6 +150,158 @@ def test_required_engine_skip_uses_the_probe_reason(
     assert closed == [unavailable]
 
 
+@pytest.mark.parametrize("isolated", (False, True), ids=("direct", "isolated"))
+def test_internal_analytical_keys_the_instantiated_oxygen_pack(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    isolated: bool,
+) -> None:
+    backend = object.__new__(battery._InternalAnalyticalBatteryBackend)
+    backend._core = SimpleNamespace(
+        _last_high_t_melt_activity={},
+        _last_high_t_melt_activity_temperature_K=None,
+        _high_t_melt_activity_fallback_steps=[],
+        _last_vapor_pressure_diagnostic={},
+    )
+    backend._oxygen_balance_pack = "configured-pack"
+    backend._oxygen_balance_backend = SimpleNamespace(_pack_name="effective-pack")
+    handle = EngineHandle(
+        name=Engine.INTERNAL_ANALYTICAL.value,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = battery.identity_battery_pot(
+        "oxygen-pack-key-fixture", {"SiO2": 50.0, "FeO": 50.0}
+    )
+    po2 = Po2Request(battery.PO2_OXYGEN_BALANCE_EFFUSION, None, "W")
+    pack_values = {"configured-pack": 0.25, "effective-pack": 0.5}
+    direct_packs: list[str] = []
+    isolated_packs: list[str] = []
+
+    def fake_analytical_adapter(**kwargs: object) -> EquilibriumResult:
+        oxygen_backend = kwargs["oxygen_balance_backend"]
+        pack = oxygen_backend._pack_name
+        direct_packs.append(pack)
+        return EquilibriumResult(
+            phase_assemblage_available=False,
+            activity_coefficients={"SiO2": pack_values[pack]},
+        )
+
+    def fake_isolated_cell(
+        _handle: EngineHandle,
+        _pot: object,
+        *,
+        temperature_K: float,
+        po2: Po2Request,
+        timeout_s: float,
+        qualification: bool,
+        arm: str,
+        notices: object,
+        authority: str | None,
+        certified_band: object,
+        simulate_crash: str | None = None,
+        physical_pressure_bar: float | None = None,
+        defer_qualification_decoration: bool = False,
+        engine_settings: Mapping[str, object] | None = None,
+    ) -> EquilibrateCell:
+        del timeout_s, qualification, notices, authority, certified_band
+        del simulate_crash, physical_pressure_bar, defer_qualification_decoration
+        pack = str(engine_settings["oxygen_balance_backend"]["pack"])
+        isolated_packs.append(pack)
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=handle.name,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"SiO2": pack_values[pack]},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=None,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="fixture",
+            arm=arm,
+        )
+
+    monkeypatch.setattr(
+        battery, "_internal_analytical_vapor_pressure_adapter", fake_analytical_adapter
+    )
+    monkeypatch.setattr(battery, "_run_cell_in_subprocess", fake_isolated_cell)
+
+    common = {
+        "temperature_K": 1700.0,
+        "po2": po2,
+        "timeout_s": 30.0,
+        "physical_pressure_bar": 1.0,
+    }
+    off_direct = equilibrate_cell(handle, pot, **common, isolated=False)
+    off_isolated = equilibrate_cell(handle, pot, **common, isolated=True)
+    direct_cache = EngineCache(tmp_path / "direct.sqlite")
+    isolated_cache = EngineCache(tmp_path / "isolated.sqlite")
+    cold_direct = equilibrate_cell(
+        handle, pot, **common, isolated=False, engine_cache=direct_cache
+    )
+    warm_direct = equilibrate_cell(
+        handle, pot, **common, isolated=False, engine_cache=direct_cache
+    )
+    cold_isolated = equilibrate_cell(
+        handle, pot, **common, isolated=True, engine_cache=isolated_cache
+    )
+    warm_isolated = equilibrate_cell(
+        handle, pot, **common, isolated=True, engine_cache=isolated_cache
+    )
+
+    def stable(cell: EquilibrateCell) -> str:
+        return json.dumps(
+            replace(cell, wall_s=0.0, cpu_s=0.0, hostname="fixture").to_cache_payload(),
+            sort_keys=True,
+        )
+
+    expected = stable(off_direct)
+    assert expected == stable(off_isolated)
+    assert all(
+        stable(cell) == expected
+        for cell in (cold_direct, warm_direct, cold_isolated, warm_isolated)
+    )
+    assert direct_packs == ["effective-pack", "effective-pack"]
+    assert isolated_packs == ["effective-pack", "effective-pack"]
+    vector = battery._engine_cache_request_vector(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=po2,
+        physical_pressure_bar=1.0,
+        native_activity_formula=None,
+    )
+    assert vector is not None
+    assert vector["engine_settings"]["oxygen_balance_backend"]["pack"] == "effective-pack"
+
+
+def test_bench_openimcc_reference_check_returns_typed_skip_when_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import bench
+
+    original_import = builtins.__import__
+
+    def import_without_openimcc(name: str, *args: object, **kwargs: object) -> object:
+        if name == "openimcc" or name.startswith("openimcc."):
+            raise ModuleNotFoundError("OpenIMCC missing in fixture")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", import_without_openimcc)
+    available, reason = bench._imcc_reports_parent_oxide("SiO2")
+
+    assert not available
+    assert reason.startswith("typed-skip:openimcc_not_importable:")
+
+
 @pytest.mark.parametrize("engine", CACHE_TEST_ENGINES)
 def test_each_available_engine_has_a_cold_cell_call_and_warm_hit(
     tmp_path: Path, engine: Engine
@@ -208,7 +363,8 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
                 engines.append(engine)
             else:
                 unavailable[engine.value] = (
-                    handle.unavailable_reason or "engine returned unavailable"
+                    f"typed-skip:engine_unavailable:{engine.value}:"
+                    f"{handle.unavailable_reason or 'engine returned unavailable'}"
                 )
         finally:
             close_battery_engine_handle(handle)
@@ -357,7 +513,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     serial_cache_path = tmp_path / "engine-cache-serial.sqlite"
     parallel_cache_path = tmp_path / "engine-cache-parallel.sqlite"
     cold_cache = EngineCache(serial_cache_path)
-    cold, _cold_counts = score("cold", cold_cache, workers=1)
+    cold, cold_counts = score("cold", cold_cache, workers=1)
     cold_parallel_cache = EngineCache(parallel_cache_path)
     cold_parallel, cold_parallel_counts = score(
         "cold-parallel", cold_parallel_cache, workers=3
@@ -397,8 +553,36 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     assert_rows_equal("parallel warm cache vs cache off", parallel_warm, off)
     assert warm_counts is not None
     assert parallel_counts is not None
-    assert _cold_counts is not None
+    assert cold_counts is not None
     assert cold_parallel_counts is not None
+    cold_calls_by_engine = {
+        engine.value: sum(
+            int(value)
+            for value in cold_counts[engine.value]["calls_by_kind"].values()
+        )
+        for engine in engines
+    }
+    unprobed = [
+        engine.value
+        for engine in engines
+        if cold_calls_by_engine[engine.value] == 0
+    ]
+    assert not unprobed, f"available engines were not probed: {unprobed}"
+    parallel_cold_calls_by_engine = {
+        engine.value: sum(
+            int(value)
+            for value in cold_parallel_counts[engine.value]["calls_by_kind"].values()
+        )
+        for engine in engines
+    }
+    parallel_unprobed = [
+        engine.value
+        for engine in engines
+        if parallel_cold_calls_by_engine[engine.value] == 0
+    ]
+    assert not parallel_unprobed, (
+        f"available engines were not probed in parallel: {parallel_unprobed}"
+    )
     activity_rows = _residual_payloads(tmp_path / "cold.jsonl.partial")
     assert any(
         any(
@@ -418,6 +602,13 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
         or parallel_counts[engine.value]["misses"]
     }
     assert not warm_misses, f"warm engine cache misses: {warm_misses}"
+    no_warm_hits = [
+        engine.value
+        for engine in engines
+        if warm_counts[engine.value]["hits"] == 0
+        or parallel_counts[engine.value]["hits"] == 0
+    ]
+    assert not no_warm_hits, f"available engines were not warm hits: {no_warm_hits}"
     assert all(
         not any(warm_counts[engine.value]["calls_by_kind"].values())
         and not any(parallel_counts[engine.value]["calls_by_kind"].values())
@@ -566,61 +757,69 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
             metadata.engine_cache_counters,
         )
 
-    redox_off, _redox_off_counts = score_redox("redox-off")
-    redox_off_parallel, _redox_off_parallel_counts = score_redox(
-        "redox-off-parallel", workers=3
-    )
-    redox_cache_path = tmp_path / "redox-engine-cache-serial.sqlite"
-    redox_parallel_cache_path = tmp_path / "redox-engine-cache-parallel.sqlite"
-    redox_cold_cache = EngineCache(redox_cache_path)
-    redox_cold, redox_cold_counts = score_redox(
-        "redox-cold", redox_cold_cache, workers=1
-    )
-    redox_cold_parallel, redox_cold_parallel_counts = score_redox(
-        "redox-cold-parallel", EngineCache(redox_parallel_cache_path), workers=3
-    )
-    redox_warm_cache = EngineCache(redox_cache_path)
-    redox_warm, redox_warm_counts = score_redox(
-        "redox-warm", redox_warm_cache, workers=1
-    )
-    redox_parallel, redox_parallel_counts = score_redox(
-        "redox-parallel-warm", EngineCache(redox_parallel_cache_path), workers=3
-    )
+    redox_warm_counts = None
+    redox_parallel_counts = None
+    redox_rows: list[dict[str, object]] = []
+    if Engine.OPENIMCC in engines:
+        redox_off, _redox_off_counts = score_redox("redox-off")
+        redox_off_parallel, _redox_off_parallel_counts = score_redox(
+            "redox-off-parallel", workers=3
+        )
+        redox_cache_path = tmp_path / "redox-engine-cache-serial.sqlite"
+        redox_parallel_cache_path = tmp_path / "redox-engine-cache-parallel.sqlite"
+        redox_cold_cache = EngineCache(redox_cache_path)
+        redox_cold, redox_cold_counts = score_redox(
+            "redox-cold", redox_cold_cache, workers=1
+        )
+        redox_cold_parallel, redox_cold_parallel_counts = score_redox(
+            "redox-cold-parallel", EngineCache(redox_parallel_cache_path), workers=3
+        )
+        redox_warm_cache = EngineCache(redox_cache_path)
+        redox_warm, redox_warm_counts = score_redox(
+            "redox-warm", redox_warm_cache, workers=1
+        )
+        redox_parallel, redox_parallel_counts = score_redox(
+            "redox-parallel-warm", EngineCache(redox_parallel_cache_path), workers=3
+        )
 
-    assert redox_off
-    assert redox_off_parallel == redox_off
-    assert redox_cold == redox_off
-    assert redox_cold_parallel == redox_off
-    assert redox_warm == redox_off
-    assert redox_parallel == redox_warm == redox_off
-    assert redox_cold_counts is not None
-    assert redox_warm_counts is not None
-    assert redox_parallel_counts is not None
-    assert redox_cold_parallel_counts is not None
-    assert redox_cold_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
-    assert redox_cold_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
-    assert redox_warm_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
-        "equilibrate_cell": 0,
-        "evaluate": 0,
-        "evaluate_redox": 0,
-        "evaluate_gas": 0,
-        "residue_vapor_pressure": 0,
-    }
-    assert redox_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
-        "equilibrate_cell": 0,
-        "evaluate": 0,
-        "evaluate_redox": 0,
-        "evaluate_gas": 0,
-        "residue_vapor_pressure": 0,
-    }
+        assert redox_off
+        assert redox_off_parallel == redox_off
+        assert redox_cold == redox_off
+        assert redox_cold_parallel == redox_off
+        assert redox_warm == redox_off
+        assert redox_parallel == redox_warm == redox_off
+        assert redox_cold_counts is not None
+        assert redox_warm_counts is not None
+        assert redox_parallel_counts is not None
+        assert redox_cold_parallel_counts is not None
+        assert redox_cold_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
+        assert redox_cold_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"]["evaluate_redox"] > 0
+        assert redox_warm_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
+            "equilibrate_cell": 0,
+            "evaluate": 0,
+            "evaluate_redox": 0,
+            "evaluate_gas": 0,
+            "residue_vapor_pressure": 0,
+        }
+        assert redox_parallel_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
+            "equilibrate_cell": 0,
+            "evaluate": 0,
+            "evaluate_redox": 0,
+            "evaluate_gas": 0,
+            "residue_vapor_pressure": 0,
+        }
+        redox_rows = _residual_payloads(tmp_path / "redox-cold.jsonl.partial")
+    else:
+        assert unavailable[Engine.OPENIMCC.value].startswith(
+            "typed-skip:engine_unavailable:openimcc:"
+        )
 
     for counts in (
         warm_counts,
         parallel_counts,
         vapor_warm_counts,
         vapor_parallel_counts,
-        redox_warm_counts,
-        redox_parallel_counts,
+        *(item for item in (redox_warm_counts, redox_parallel_counts) if item is not None),
     ):
         assert all(
             not any(counts[engine.value]["calls_by_kind"].values())
@@ -630,7 +829,7 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(tmp_path: Path) -> No
     scored_rows = (
         activity_rows
         + _residual_payloads(tmp_path / "vapor-cold.jsonl.partial")
-        + _residual_payloads(tmp_path / "redox-cold.jsonl.partial")
+        + redox_rows
     )
     stable_refusals = [
         row

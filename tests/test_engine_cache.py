@@ -9,6 +9,7 @@ import subprocess
 import sys
 import ast
 from pathlib import Path
+from collections.abc import Mapping
 
 import pytest
 
@@ -150,24 +151,73 @@ def test_undeclared_engine_epoch_does_not_change_an_adapter_key(
 
 def test_adapter_cross_engine_calls_are_declared_dependencies() -> None:
     root = Path(engine_cache.__file__).resolve().parents[1]
-    scoped_adapters = {
-        "internal-analytical": (
+    assert set(ENGINE_DEPENDENCY_GUARD_SURFACES) == set(ENGINE_CHEMISTRY_VERSION)
+    for engine in ENGINE_DEPENDENCY_GUARD_SURFACES:
+        undeclared = _undeclared_adapter_dependencies(engine, root)
+        assert not undeclared, f"{engine} uses undeclared engine dependencies: {undeclared}"
+
+
+ENGINE_DEPENDENCY_GUARD_SURFACES = {
+    "openimcc": {
+        "modules": (
+            ("simulator/melt_backend/openimcc_bridge.py", None),
+            ("simulator/melt_backend/openimcc_cache.py", None),
+            ("simulator/diagnostic_helpers/binary_pot_battery.py", "_OpenImccBatteryBackend"),
+        ),
+        "symbols": {
+            "OpenImccMeltBackend", "OpenImccBridgeResult", "openimcc_bridge",
+            "_OpenImccBatteryBackend", "evaluate_cleaned_melt",
+            "evaluate_gas_oxygen_balance", "cached_openimcc_evaluate",
+            "cached_openimcc_evaluate_gas", "cached_openimcc_redox",
+        },
+    },
+    "internal-analytical": {
+        "modules": (
             ("simulator/diagnostic_helpers/binary_pot_battery.py", "_InternalAnalyticalBatteryBackend"),
             ("engines/builtin/vapor_pressure.py", "_build_high_t_melt_activity_authority"),
         ),
-        "thermoengine": (("simulator/melt_backend/thermoengine.py", None),),
-        "alphamelts": (("simulator/melt_backend/alphamelts.py", None),),
-    }
-    cross_engine_symbols = {
-        "openimcc_bridge": "openimcc",
-        "_OpenImccBatteryBackend": "openimcc",
-        "evaluate_cleaned_melt": "openimcc",
-        "openimcc_binding_selected_by_inputs": "openimcc",
-        "VapoRockBackend": "vaporock",
-    }
+        "symbols": {
+            "InternalAnalyticalBackend", "_InternalAnalyticalBatteryBackend",
+            "_internal_analytical_vapor_pressure_adapter",
+            "_build_high_t_melt_activity_authority",
+        },
+    },
+    "vaporock": {
+        "modules": (("simulator/melt_backend/vaporock.py", None),),
+        "symbols": {
+            "VapoRockBackend", "open_warm_vaporock_backend",
+            "eval_gas_abundances", "_call_system_eval_gas_abundances",
+        },
+    },
+    "magemin": {
+        "modules": (("simulator/melt_backend/magemin.py", None),),
+        "symbols": {"MAGEMinBackend", "MAGEMinShadowProvider"},
+    },
+    "alphamelts": {
+        "modules": (("simulator/melt_backend/alphamelts.py", None),),
+        "symbols": {"AlphaMELTSBackend"},
+    },
+    "thermoengine": {
+        "modules": (("simulator/melt_backend/thermoengine.py", None),),
+        "symbols": {"ThermoEngineBackend"},
+    },
+}
 
-    def names_in_adapter(path: str, scope_name: str | None) -> set[str]:
-        tree = ast.parse((root / path).read_text(encoding="utf-8"), filename=path)
+
+def _undeclared_adapter_dependencies(
+    engine: str,
+    root: Path,
+    *,
+    source_overrides: Mapping[str, str] | None = None,
+) -> set[str]:
+    names: set[str] = set()
+    for path, scope_name in ENGINE_DEPENDENCY_GUARD_SURFACES[engine]["modules"]:
+        source = (
+            source_overrides[path]
+            if source_overrides is not None and path in source_overrides
+            else (root / path).read_text(encoding="utf-8")
+        )
+        tree = ast.parse(source, filename=path)
         if scope_name is not None:
             tree = next(
                 node
@@ -175,7 +225,6 @@ def test_adapter_cross_engine_calls_are_declared_dependencies() -> None:
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
                 and node.name == scope_name
             )
-        names: set[str] = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Name):
                 names.add(node.id)
@@ -185,19 +234,34 @@ def test_adapter_cross_engine_calls_are_declared_dependencies() -> None:
                 names.update(alias.name for alias in node.names)
             elif isinstance(node, ast.Import):
                 names.update(alias.name for alias in node.names)
-        return names
+    dependencies = engine_cache.ENGINE_CHEMISTRY_DEPENDENCIES[engine]
+    symbols = {
+        symbol: owner
+        for owner, surface in ENGINE_DEPENDENCY_GUARD_SURFACES.items()
+        for symbol in surface["symbols"]
+    }
+    return {
+        owner
+        for symbol, owner in symbols.items()
+        if symbol in names and owner != engine and owner not in dependencies
+    }
 
-    for engine, adapter_scopes in scoped_adapters.items():
-        references = set().union(
-            *(names_in_adapter(path, scope) for path, scope in adapter_scopes)
-        )
-        dependencies = engine_cache.ENGINE_CHEMISTRY_DEPENDENCIES[engine]
-        undeclared = {
-            dependency
-            for symbol, dependency in cross_engine_symbols.items()
-            if symbol in references and dependency not in dependencies
-        }
-        assert not undeclared, f"{engine} uses undeclared engine dependencies: {undeclared}"
+
+def test_dependency_guard_detects_injected_undeclared_engine_call() -> None:
+    root = Path(engine_cache.__file__).resolve().parents[1]
+    adapter_path = "simulator/diagnostic_helpers/binary_pot_battery.py"
+    original = (root / adapter_path).read_text(encoding="utf-8")
+    injected = original.replace(
+        "class _InternalAnalyticalBatteryBackend:",
+        "class _InternalAnalyticalBatteryBackend:\n    MAGEMinBackend()  # injected undeclared cross-engine call",
+        1,
+    )
+
+    assert "magemin" in _undeclared_adapter_dependencies(
+        "internal-analytical",
+        root,
+        source_overrides={adapter_path: injected},
+    )
 
 
 def test_concurrent_process_writes_preserve_same_and_different_keys(
