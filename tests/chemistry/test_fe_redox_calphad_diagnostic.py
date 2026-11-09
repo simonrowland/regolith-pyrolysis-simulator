@@ -8,6 +8,7 @@ import pytest
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+import simulator.fe_redox as fe_redox_module
 from simulator.fe_redox import (
     LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
@@ -43,11 +44,106 @@ _IRON_RICH_BASALT_WT = {
 _T_K = 1673.15
 
 
+def _solve_metal_saturation_anchor(**kwargs):
+    solver = getattr(
+        fe_redox_module,
+        "_solve_calphad_metal_saturation_anchor",
+        None,
+    )
+    assert callable(solver), "the CALPHAD metal-saturation anchor solver is missing"
+    return solver(**kwargs)
+
+
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
     return {
         oxide: wt / 100.0 / (MOLAR_MASS[oxide] / 1000.0)
         for oxide, wt in comp_wt.items()
     }
+
+
+def test_metal_saturation_anchor_matches_lms1_and_mgs1_audit(
+    feedstocks_data: dict,
+):
+    cases = (
+        ("lunar_mare_low_ti", 1.3e-12, 1.3e-12, 0.237741),
+        ("mars_basalt", 6.1e-3, 1.0e-9, 0.314005),
+    )
+
+    for feedstock_id, pressure_bar, floor_bar, expected_activity in cases:
+        anchor = _solve_metal_saturation_anchor(
+            comp_wt=feedstocks_data[feedstock_id]["composition_wt_pct"],
+            T_K=_T_K,
+            pressure_bar=pressure_bar,
+            floor_bar=floor_bar,
+        )
+
+        assert anchor["a_FeO"] == pytest.approx(expected_activity, abs=2e-6)
+        assert anchor["anchor_fallback_pure_iw"] is False
+
+
+def test_metal_saturation_anchor_reduces_to_pure_iw_at_unit_activity(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        fe_redox_module,
+        "_calphad_feo_activity_components",
+        lambda **kwargs: {"a_FeO_calphad": {"central": 1.0}},
+    )
+
+    anchor = _solve_metal_saturation_anchor(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        T_K=_T_K,
+        pressure_bar=1.3e-12,
+        floor_bar=1.3e-12,
+    )
+
+    assert anchor["log10_fO2_bar"] == pytest.approx(
+        feo_iw_log10_fO2_bar(_T_K, a_feo=1.0)
+    )
+    assert anchor["a_FeO"] == pytest.approx(1.0)
+    assert anchor["anchor_fallback_pure_iw"] is False
+
+
+def test_metal_saturation_anchor_no_bracket_falls_back_and_is_flagged(
+    monkeypatch,
+):
+    solver = getattr(
+        fe_redox_module,
+        "_solve_calphad_metal_saturation_anchor",
+        None,
+    )
+    assert callable(solver), "the CALPHAD metal-saturation anchor solver is missing"
+
+    with monkeypatch.context() as context:
+        context.setattr(
+            fe_redox_module,
+            "_calphad_feo_activity_components",
+            lambda **kwargs: {"a_FeO_calphad": {"central": math.nan}},
+        )
+        fallback = solver(
+            comp_wt=_BASALTIC_FE_MELT_WT,
+            T_K=_T_K,
+            pressure_bar=1.3e-12,
+            floor_bar=1.3e-12,
+        )
+
+    pure_iw = feo_iw_log10_fO2_bar(_T_K, a_feo=1.0)
+    assert fallback["log10_fO2_bar"] == pytest.approx(pure_iw)
+    assert fallback["anchor_fallback_pure_iw"] is True
+
+    monkeypatch.setattr(
+        fe_redox_module,
+        "_solve_calphad_metal_saturation_anchor",
+        lambda **kwargs: fallback,
+    )
+    diagnostic = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=pure_iw + 0.5,
+        T_K=_T_K,
+        pressure_bar=1.3e-12,
+        floor_bar=1.3e-12,
+    )
+    assert diagnostic["authority"]["anchor_fallback_pure_iw"] is True
 
 
 def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():
