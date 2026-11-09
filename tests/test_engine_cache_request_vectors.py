@@ -242,34 +242,15 @@ def test_alphamelts_calc_mode_conflict_matches_cache_off_and_warm(
         ("alphamelts", "_python_api_model", ("model-b", 2)),
         ("alphamelts", "_configured_vapor_transport_pO2_bar", 1.0e-8),
         ("alphamelts", "_configured_vapor_transport_floor_bar", 1.0e-10),
-        ("alphamelts", "_timeout_s", 42.0),
-        ("alphamelts", "_pet_warm_enabled", True),
-        ("alphamelts", "_pet_warm_timeout_s", 43.0),
-        ("alphamelts", "_binary_path", "/other/alphamelts"),
-        ("alphamelts", "_engine_path", "/other/alphamelts-engine"),
         ("thermoengine", "_model", "model-b"),
         ("thermoengine", "_mode", "alternate-transport"),
         ("thermoengine", "_configured_vapor_transport_pO2_bar", 1.0e-8),
         ("thermoengine", "_configured_vapor_transport_floor_bar", 1.0e-10),
-        ("thermoengine", "_health_timeout_s", 42.0),
-        (
-            "thermoengine",
-            "_thermoengine_transport",
-            SimpleNamespace(equilibrate_timeout_s=43.0),
-        ),
-        ("magemin", "_bridge", "julia"),
         ("magemin", "_database", "mp"),
-        ("magemin", "_binary_path", "/other/MAGEMin"),
         ("openimcc", "_pack_name", "published-core"),
-        ("vaporock", "_database_path", "/other/vaporock"),
         ("vaporock", "_temperature_units", "K"),
         ("vaporock", "_pressure_units", "Pa"),
         ("vaporock", "_vapor_pressure_units", "Pa"),
-        ("vaporock", "_reuse_system", True),
-        ("vaporock", "_warm_worker_enabled", True),
-        ("vaporock", "_warm_pool_size", 2),
-        ("vaporock", "_warm_call_timeout_s", 42.0),
-        ("vaporock", "_worker_startup_timeout_s", 43.0),
     ],
 )
 def test_request_vector_changes_when_engine_setting_changes(
@@ -283,6 +264,43 @@ def test_request_vector_changes_when_engine_setting_changes(
     second = _vector(handle)
 
     assert first != second, f"{engine}.{setting} is missing from the cache key"
+
+
+@pytest.mark.parametrize(
+    ("engine", "setting", "value"),
+    [
+        ("alphamelts", "_timeout_s", 42.0),
+        ("alphamelts", "_pet_warm_enabled", True),
+        ("alphamelts", "_pet_warm_timeout_s", 43.0),
+        ("alphamelts", "_binary_path", "/other/alphamelts"),
+        ("alphamelts", "_engine_path", "/other/alphamelts-engine"),
+        ("thermoengine", "_health_timeout_s", 42.0),
+        (
+            "thermoengine",
+            "_thermoengine_transport",
+            SimpleNamespace(equilibrate_timeout_s=43.0),
+        ),
+        ("magemin", "_bridge", "julia"),
+        ("magemin", "_binary_path", "/other/MAGEMin"),
+        ("vaporock", "_database_path", "/other/vaporock"),
+        ("vaporock", "_reuse_system", True),
+        ("vaporock", "_warm_worker_enabled", True),
+        ("vaporock", "_warm_pool_size", 2),
+        ("vaporock", "_warm_call_timeout_s", 42.0),
+        ("vaporock", "_worker_startup_timeout_s", 43.0),
+    ],
+)
+def test_request_vector_ignores_operational_engine_setting_changes(
+    engine: str, setting: str, value: Any
+) -> None:
+    backend = _Backend(engine)
+    handle = _handle(engine, backend)
+    first = _vector(handle)
+
+    setattr(backend, setting, value)
+    second = _vector(handle)
+
+    assert first == second, f"operational setting {engine}.{setting} changed the cache key"
 
 
 def test_request_vector_changes_when_magemin_buffer_setting_changes() -> None:
@@ -299,44 +317,22 @@ def test_request_vector_changes_when_magemin_buffer_setting_changes() -> None:
 @pytest.mark.parametrize(
     ("engine", "setting", "value"),
     [
-        ("alphamelts", "mode", "subprocess"),
-        ("alphamelts", "python_bridge", "subprocess"),
-        ("alphamelts", "warm_worker", True),
-        ("alphamelts", "petthermotools_warm_call_timeout_s", 42.0),
         ("alphamelts", "fO2_buffer", "NNO"),
         ("alphamelts", "redox_buffer", "NNO"),
         ("alphamelts", "fO2_offset", 0.25),
         ("alphamelts", "Fe3Fet_Liq", 0.2),
         ("alphamelts", "fe3fet_ratio", 0.2),
         ("alphamelts", "model", "model-b"),
-        ("alphamelts", "timeout_s", 43.0),
-        ("alphamelts", "require_petthermotools", False),
         ("alphamelts", "vapor_transport_pO2_bar", 1.0e-8),
         ("alphamelts", "vapor_transport_floor_bar", 1.0e-10),
-        ("thermoengine", "mode", "alternate-transport"),
         ("thermoengine", "model", "model-b"),
-        ("thermoengine", "thermoengine_health_timeout_s", 42.0),
-        ("thermoengine", "thermoengine_equilibrate_timeout_s", 43.0),
         ("thermoengine", "vapor_transport_pO2_bar", 1.0e-8),
         ("thermoengine", "vapor_transport_floor_bar", 1.0e-10),
         ("magemin", "database", "mp"),
-        ("magemin", "python_bridge", "julia"),
-        ("magemin", "binary_path", "/other/MAGEMin"),
-        ("magemin", "warm_worker", False),
-        ("magemin", "warm_call_timeout_s", 42.0),
-        ("magemin", "warm_pool_size", 2),
-        ("magemin", "worker_startup_timeout_s", 43.0),
-        ("magemin", "timeout_s", 44.0),
         ("magemin", "fO2_buffer", "nno"),
-        ("vaporock", "database_path", "/other/vaporock"),
         ("vaporock", "temperature_units", "K"),
         ("vaporock", "pressure_units", "Pa"),
         ("vaporock", "vapor_pressure_units", "Pa"),
-        ("vaporock", "reuse_system", True),
-        ("vaporock", "warm_worker", True),
-        ("vaporock", "warm_pool_size", 2),
-        ("vaporock", "warm_call_timeout_s", 42.0),
-        ("vaporock", "worker_startup_timeout_s", 43.0),
     ],
 )
 def test_request_vector_changes_when_backend_config_changes(
@@ -352,16 +348,54 @@ def test_request_vector_changes_when_backend_config_changes(
     assert first != second, f"{engine}.config[{setting!r}] is missing from the cache key"
 
 
-def test_request_vector_changes_when_caller_timeout_changes() -> None:
+@pytest.mark.parametrize(
+    ("engine", "setting", "value"),
+    [
+        ("alphamelts", "warm_worker", True),
+        ("alphamelts", "petthermotools_warm_call_timeout_s", 42.0),
+        ("alphamelts", "timeout_s", 43.0),
+        ("alphamelts", "python_bridge", "subprocess"),
+        ("alphamelts", "require_petthermotools", False),
+        ("thermoengine", "thermoengine_health_timeout_s", 42.0),
+        ("thermoengine", "thermoengine_equilibrate_timeout_s", 43.0),
+        ("magemin", "python_bridge", "julia"),
+        ("magemin", "binary_path", "/other/MAGEMin"),
+        ("magemin", "warm_worker", False),
+        ("magemin", "warm_call_timeout_s", 42.0),
+        ("magemin", "warm_pool_size", 2),
+        ("magemin", "worker_startup_timeout_s", 43.0),
+        ("magemin", "timeout_s", 44.0),
+        ("vaporock", "database_path", "/other/vaporock"),
+        ("vaporock", "reuse_system", True),
+        ("vaporock", "warm_worker", True),
+        ("vaporock", "warm_pool_size", 2),
+        ("vaporock", "warm_call_timeout_s", 42.0),
+        ("vaporock", "worker_startup_timeout_s", 43.0),
+    ],
+)
+def test_request_vector_ignores_operational_backend_config_changes(
+    engine: str, setting: str, value: Any
+) -> None:
+    backend = _Backend(engine)
+    handle = _handle(engine, backend)
+    first = _vector(handle)
+
+    backend._config[setting] = value
+    second = _vector(handle)
+
+    assert first == second, f"operational config {engine}.{setting} changed the cache key"
+
+
+def test_request_vector_ignores_caller_timeout_changes() -> None:
     handle = _handle("magemin")
 
     ordinary = _vector(handle, timeout_s=30.0)
     longer = _vector(handle, timeout_s=31.0)
 
-    assert ordinary != longer
+    assert ordinary == longer
 
 
-def test_request_vector_tracks_magemin_slot_environment(
+def test_request_vector_ignores_magemin_slot_environment(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     handle = _handle("magemin")
@@ -369,10 +403,10 @@ def test_request_vector_tracks_magemin_slot_environment(
     serialized = _vector(handle)
     monkeypatch.setenv("REGOLITH_MAGEMIN_SLOTS", "3")
 
-    assert serialized != _vector(handle)
+    assert serialized == _vector(handle)
 
 
-def test_request_vector_tracks_vaporock_session_environment(
+def test_request_vector_ignores_vaporock_session_environment(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     handle = _handle("vaporock")
@@ -380,14 +414,14 @@ def test_request_vector_tracks_vaporock_session_environment(
     ordinary = _vector(handle)
     monkeypatch.setenv("REGOLITH_VAPOROCK_SESSION_WARM", "1")
 
-    assert ordinary != _vector(handle)
+    assert ordinary == _vector(handle)
 
 
 @pytest.mark.parametrize(
     "variable",
     ("DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH"),
 )
-def test_request_vector_tracks_thermoengine_library_environment(
+def test_request_vector_ignores_thermoengine_library_environment(
     monkeypatch: pytest.MonkeyPatch, variable: str
 ) -> None:
     handle = _handle("thermoengine")
@@ -395,20 +429,7 @@ def test_request_vector_tracks_thermoengine_library_environment(
     first = _vector(handle)
     monkeypatch.setenv(variable, "/second/thermoengine")
 
-    assert first != _vector(handle)
-
-
-def test_request_vector_ignores_duplicate_thermoengine_search_paths(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    handle = _handle("thermoengine")
-    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "/engine/lib:/other/lib")
-    once = _vector(handle)
-    monkeypatch.setenv(
-        "DYLD_FALLBACK_LIBRARY_PATH", "/engine/lib:/other/lib:/other/lib"
-    )
-
-    assert once == _vector(handle)
+    assert first == _vector(handle)
 
 
 def test_request_vector_changes_when_magemin_native_activity_changes() -> None:

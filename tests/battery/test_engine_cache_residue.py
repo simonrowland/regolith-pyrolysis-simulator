@@ -88,7 +88,7 @@ def test_openimcc_residue_gas_calls_are_cached_across_pressure_models(
     assert not any(warm_cache.counters["openimcc"]["calls_by_kind"].values())
 
 
-def test_openimcc_evaluate_timeout_is_part_of_the_cache_request(
+def test_openimcc_evaluate_timeout_does_not_change_the_cache_request(
     tmp_path: Path,
 ) -> None:
     from simulator.melt_backend.openimcc_cache import cached_openimcc_evaluate
@@ -113,8 +113,9 @@ def test_openimcc_evaluate_timeout_is_part_of_the_cache_request(
     second = cached_openimcc_evaluate(cache, timeout_s=60.0, **common)
 
     assert first == second
-    assert calls == 2
-    assert cache.counters["openimcc"]["misses"] == 2
+    assert calls == 1
+    assert cache.counters["openimcc"]["misses"] == 1
+    assert cache.counters["openimcc"]["hits"] == 1
 
 
 def test_internal_analytical_residue_calls_are_cached_across_pressure_models(
