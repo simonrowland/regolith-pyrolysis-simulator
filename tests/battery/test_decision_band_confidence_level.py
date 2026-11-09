@@ -2,9 +2,37 @@
 
 from decimal import Decimal
 
+import pytest
+
 from simulator.battery.enums import Quantity, UncertaintyKind
 from simulator.battery.records import Uncertainty
-from simulator.battery.score import _printed_uncertainty_band
+from simulator.battery.score import _decision_band_kind, _printed_uncertainty_band
+
+
+@pytest.mark.parametrize(
+    ("confidence_level", "expected_kind", "expected_value"),
+    [
+        ("two_sigma", "printed_2sigma", "0.1"),
+        ("ci95", "printed_2sigma", "0.1"),
+        ("one_sigma", "printed_1sigma", "0.1959963984540054"),
+        ("range_half_width", "printed_range", "0.1"),
+    ],
+)
+def test_canonical_confidence_tokens_keep_their_existing_band_kind(
+    confidence_level: str, expected_kind: str, expected_value: str
+) -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"value": "0.1", "confidence_level": confidence_level},
+        ),
+        Decimal("1"),
+    )
+
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal(expected_value)
+    assert _decision_band_kind(resolved.band) == expected_kind
 
 
 def test_sigma_field_name_does_not_supply_confidence_level() -> None:
