@@ -1125,7 +1125,7 @@ def validate_observation(
     )
 
 
-def _model_derived_method_is_backlogged(observation: Observation) -> bool:
+def _model_derived_provenance_is_backlogged(observation: Observation) -> bool:
     evidence = observation.evidence.class_
     if not (
         evidence.is_value
@@ -1133,7 +1133,12 @@ def _model_derived_method_is_backlogged(observation: Observation) -> bool:
         and _value_has_numeric_value(observation.value)
     ):
         return False
-    return observation.derivation is None
+    derivation = observation.derivation
+    return (
+        derivation is None
+        or not derivation.has_located_method
+        or not derivation.has_named_references
+    )
 
 
 def _validate_observation(
@@ -1256,7 +1261,7 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
-    model_derived_backlogged = _model_derived_method_is_backlogged(observation)
+    model_derived_backlogged = _model_derived_provenance_is_backlogged(observation)
     method_located = derivation is not None and derivation.has_located_method
     model_references_declared = (
         derivation is not None and derivation.has_named_references
@@ -1420,6 +1425,7 @@ def _validate_observation(
         if (
             ev.value is EvidenceClass.MODEL_DERIVED
             and declares_unprinted_raw_inputs
+            and not model_derived_backlogged
         ):
             if derivation is None or derivation.method is None:
                 issues.append(
@@ -2544,10 +2550,10 @@ def validate_corpus(
         )
     source_owners = _source_owners(work_map)
     context_ids = frozenset(context_map or ())
-    method_notices_by_source: Counter[str] = Counter(
+    provenance_notices_by_source: Counter[str] = Counter(
         observation.source_id or "(no source_id)"
         for observation in obs_map.values()
-        if _model_derived_method_is_backlogged(observation)
+        if _model_derived_provenance_is_backlogged(observation)
     )
     for observation in obs_map.values():
         issues.extend(
@@ -2619,10 +2625,10 @@ def validate_corpus(
             )
     notices = tuple(
         ValidationNotice(
-            code="model_derived_method_unrecorded",
+            code="model_derived_provenance_unrecorded",
             source_id=source_id,
             count=count,
         )
-        for source_id, count in sorted(method_notices_by_source.items())
+        for source_id, count in sorted(provenance_notices_by_source.items())
     )
     return ValidationReport(tuple(issues), notices)

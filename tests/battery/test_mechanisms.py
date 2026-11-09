@@ -1348,14 +1348,24 @@ def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -
         method=Located(State.of("x"), locator=F.loc(page=164)),
         references=("Gurvich K°(T)",),
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
+    )
+    issues = report.hard_issues
     assert any(
-        issue.path.endswith(".derivation.method")
-        and "paragraph/section or equation locator" in issue.detail
+        issue.path.endswith(".derivation.raw_inputs")
         for issue in issues
     )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_unprinted_inputs_accepts_located_prose_method() -> None:
@@ -1414,14 +1424,19 @@ def test_model_derived_prose_method_without_named_references_fails() -> None:
             locator=F.loc(page=164, section="2.2"),
         ),
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
-    assert any(
-        issue.path.endswith(".derivation.references")
-        and "requires named references" in issue.detail
-        for issue in issues
     )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_unprinted_inputs_requires_named_references() -> None:
@@ -1434,14 +1449,23 @@ def test_model_derived_unprinted_inputs_requires_named_references() -> None:
             locator=F.loc(page=164, equation="7"),
         ),
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
-    assert any(
-        issue.path.endswith(".derivation.references")
-        and "requires named references" in issue.detail
-        for issue in issues
     )
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        for issue in report.hard_issues
+    )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
@@ -1450,16 +1474,23 @@ def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
         )
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
-    assert any(
-        issue.path.endswith(".derivation.method")
-        and issue.detail == (
-            "model_derived raw_inputs not_printed declaration requires a method"
-        )
-        for issue in issues
     )
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        for issue in report.hard_issues
+    )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
@@ -1496,7 +1527,7 @@ def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
-def test_model_derived_resolved_parent_requires_method_and_references() -> None:
+def test_model_derived_resolved_parent_missing_provenance_is_counted() -> None:
     experiment = F.tabulation_experiment()
     parent = F.observation(
         "raw-1",
@@ -1526,18 +1557,17 @@ def test_model_derived_resolved_parent_requires_method_and_references() -> None:
 
     report = validate_corpus([F.work()], [experiment], [parent, observation])
 
-    assert len(report.hard_issues) == 2
-    assert {
-        issue.path.rsplit(".", 1)[-1] for issue in report.hard_issues
-    } == {"method", "references"}
-    assert all(
-        issue.reason is RefusalReason.CONDITIONAL_FIELD
-        for issue in report.hard_issues
-    )
+    assert report.hard_issues == ()
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
-def test_model_derived_notice_does_not_replace_method_or_named_references() -> None:
+def test_model_derived_provenance_notice_keeps_malformed_raw_input_hard() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
@@ -1561,19 +1591,23 @@ def test_model_derived_notice_does_not_replace_method_or_named_references() -> N
             ),
         ),
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
-    assert any(
-        issue.path.endswith(".derivation.method")
-        and "requires a method" in issue.detail
-        for issue in issues
     )
     assert any(
-        issue.path.endswith(".derivation.references")
-        and "requires named references" in issue.detail
-        for issue in issues
+        issue.path.endswith(".derivation.raw_inputs")
+        for issue in report.hard_issues
     )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
@@ -1583,14 +1617,23 @@ def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
         ),
         method=Located(State.of("equation-based calculation")),
     )
-    issues = validate_corpus(
+    report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
-    ).hard_issues
-    assert any(
-        issue.path.endswith(".derivation.method")
-        and issue.detail == "model_derived raw_inputs method requires a locator"
-        for issue in issues
     )
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        for issue in report.hard_issues
+    )
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded", "janaf-4th", 1)
+    ]
 
 
 def test_model_derived_raw_inputs_not_printed_requires_raw_input_locator() -> None:

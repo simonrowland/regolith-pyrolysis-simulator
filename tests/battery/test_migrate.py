@@ -5832,8 +5832,9 @@ def test_model_derived_without_derivation_is_a_counted_notice(tmp_path: Path) ->
         for issue in report.hard_issues
     )
     assert [(notice.code, notice.source_id, notice.count) for notice in report.notices] == [
-        ("model_derived_method_unrecorded", "fixture-source", 1)
+        ("model_derived_provenance_unrecorded", "fixture-source", 1)
     ]
+    assert sum(notice.count for notice in report.notices) == 1
     assert result.validation is not None
     assert result.validation.notices == report.notices
     assert any(
@@ -5842,11 +5843,12 @@ def test_model_derived_without_derivation_is_a_counted_notice(tmp_path: Path) ->
     )
 
 
-def test_new_model_derived_derivation_without_method_fails_hard(
+def test_model_derived_derivation_missing_method_and_references_is_counted(
     tmp_path: Path,
 ) -> None:
     extract = _model_derived_density_without_derivation()
     row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("admission_status", None)
     row["values"]["derivation"] = {
         "relation": "density model output",
         "inputs": ["pdf:fixture-source"],
@@ -5856,13 +5858,16 @@ def test_new_model_derived_derivation_without_method_fails_hard(
     observation = next(iter(result.observations.values()))
     assert observation.derivation is not None
     assert result.validation is not None
-    missing = {
-        issue.path.rsplit(".", 1)[-1]
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        and issue.path.startswith(f"observation[{observation.observation_id}].")
         for issue in result.validation.hard_issues
-        if issue.path.startswith(f"observation[{observation.observation_id}].derivation.")
-    }
-    assert {"method", "references"} <= missing
-    assert result.validation.notices == ()
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in result.validation.notices
+    ] == [("model_derived_provenance_unrecorded", "fixture-source", 1)]
+    assert sum(notice.count for notice in result.validation.notices) == 1
 
 
 def test_grounded_model_derived_methods_survive_extract_migration() -> None:
@@ -6032,7 +6037,7 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     row = extract["species"]["Na"]["observations"][0]
     row["values"]["derivation"] = {
         "relation": "density model output",
-        "inputs": ["pdf:fixture-source"],
+        "inputs": ["printed model inputs"],
         "output_unit": "kg_per_m3",
     }
     root = _write_min_tree(tmp_path / "tree", extract)
@@ -6049,6 +6054,10 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
         rows = list(csv.DictReader(stream, delimiter="\t"))
 
     assert written == len(rows) == len(result.validation.hard_issues)
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in result.validation.notices
+    ] == [("model_derived_provenance_unrecorded", "fixture-source", 1)]
     expected_rows = {
         (
             "fixture-source",
@@ -6074,7 +6083,7 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     assert actual_rows == expected_rows
     assert {
         row["field"] for row in rows if row["source_id"] == "fixture-source"
-    } == {"derived_from", "derivation.method", "derivation.references"}
+    } == {"derivation", "derivation.inputs", "derivation.raw_inputs"}
 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
