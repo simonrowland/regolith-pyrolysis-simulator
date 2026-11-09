@@ -2792,93 +2792,6 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
     return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
-class _RunMetadataReadRecordingMapping(Mapping):
-    def __init__(self, source: Mapping, path: tuple[str | int, ...], reads: set):
-        self._source = source
-        self._path = path
-        self._reads = reads
-
-    def __getitem__(self, key):
-        value = self._source[key]
-        self._reads.add((*self._path, str(key)))
-        return _record_run_metadata_value(
-            value, (*self._path, str(key)), self._reads
-        )
-
-    def __iter__(self):
-        return iter(self._source)
-
-    def __len__(self):
-        return len(self._source)
-
-    def __contains__(self, key):
-        present = key in self._source
-        if present:
-            self._reads.add((*self._path, str(key)))
-        return present
-
-
-class _RunMetadataReadRecordingList(list):
-    def __init__(self, source: list, path: tuple[str | int, ...], reads: set):
-        self._source = source
-        self._path = path
-        self._reads = reads
-
-    def __len__(self):
-        return len(self._source)
-
-    def __getitem__(self, index):
-        if isinstance(index, slice):
-            return [self[item] for item in range(*index.indices(len(self)))]
-        if index < 0:
-            index += len(self._source)
-        value = self._source[index]
-        return _record_run_metadata_value(
-            value, (*self._path, index), self._reads
-        )
-
-    def __iter__(self):
-        for index in range(len(self._source)):
-            yield self[index]
-
-
-class _RunMetadataReadRecordingTuple(tuple):
-    def __new__(cls, source: tuple, path: tuple[str | int, ...], reads: set):
-        instance = super().__new__(cls, source)
-        instance._source = source
-        instance._path = path
-        instance._reads = reads
-        return instance
-
-    def __getitem__(self, index):
-        if isinstance(index, slice):
-            return tuple(self[item] for item in range(*index.indices(len(self))))
-        if index < 0:
-            index += len(self._source)
-        value = self._source[index]
-        return _record_run_metadata_value(
-            value, (*self._path, index), self._reads
-        )
-
-    def __iter__(self):
-        for index in range(len(self._source)):
-            yield self[index]
-
-
-def _record_run_metadata_value(
-    value: object,
-    path: tuple[str | int, ...],
-    reads: set,
-) -> object:
-    if isinstance(value, Mapping):
-        return _RunMetadataReadRecordingMapping(value, path, reads)
-    if isinstance(value, list):
-        return _RunMetadataReadRecordingList(value, path, reads)
-    if isinstance(value, tuple):
-        return _RunMetadataReadRecordingTuple(value, path, reads)
-    return value
-
-
 def _convert_run_metadata_mass_unit_value(
     payload: object,
     units: object,
@@ -2951,44 +2864,57 @@ def _run_metadata_direct_mass_units(
     raw_value: object,
     *,
     field: str | None,
-) -> tuple[object, str | None]:
+) -> tuple[object, str | None, frozenset[tuple[str | int, ...]]]:
     if field not in {"mass_kg", "final_mass_kg"} or not isinstance(payload, Mapping):
-        return raw_value, None
+        return raw_value, None, frozenset()
 
-    unit_annotations: list[object] = []
+    unit_annotations: list[tuple[tuple[str | int, ...], object]] = []
+    raw_path: tuple[str | int, ...] = ()
+    if payload.get("value") is raw_value and raw_value is not payload:
+        raw_path = ("value",)
 
-    def read_unit_annotation(mapping: Mapping) -> None:
+    def read_unit_annotation(
+        mapping: Mapping,
+        path: tuple[str | int, ...],
+    ) -> None:
         for key in ("unit", "units"):
             if key in mapping:
-                unit_annotations.append(mapping[key])
+                unit_annotations.append(((*path, key), mapping[key]))
 
-    read_unit_annotation(payload)
+    read_unit_annotation(payload, ())
     if isinstance(raw_value, Mapping) and raw_value is not payload:
-        read_unit_annotation(raw_value)
+        read_unit_annotation(raw_value, raw_path)
     if isinstance(raw_value, Mapping):
         state = raw_value.get("state")
         if isinstance(state, Mapping):
             state_value = state.get("value")
             if isinstance(state_value, Mapping):
-                read_unit_annotation(state_value)
+                read_unit_annotation(state_value, (*raw_path, "state", "value"))
+
+    unit_paths = frozenset(path for path, _unit in unit_annotations)
 
     if not unit_annotations:
-        return raw_value, None
+        return raw_value, None, unit_paths
     if len(unit_annotations) > 1:
-        return raw_value, "specify only one unit annotation"
+        return raw_value, "specify only one unit annotation", unit_paths
     if isinstance(raw_value, Mapping) and (
         "inference" in raw_value or raw_value.get("inferred") is True
     ):
-        return raw_value, "direct unit annotations cannot be combined with explicit inference"
+        return (
+            raw_value,
+            "direct unit annotations cannot be combined with explicit inference",
+            unit_paths,
+        )
     try:
         return (
             _convert_run_metadata_mass_unit_value(
-                raw_value, unit_annotations[0], field=field
+                raw_value, unit_annotations[0][1], field=field
             ),
             None,
+            unit_paths,
         )
     except (ArithmeticError, TypeError, ValueError) as exc:
-        return raw_value, str(exc)
+        return raw_value, str(exc), unit_paths
 
 
 def _run_metadata_located_value_from_plain(
@@ -3002,7 +2928,7 @@ def _run_metadata_located_value_from_plain(
     raw_value, value_locator, _wrapper = _unwrap_located_equipment_value(
         payload, parent_locator
     )
-    raw_value, unit_error = _run_metadata_direct_mass_units(
+    raw_value, unit_error, _unit_paths = _run_metadata_direct_mass_units(
         payload, raw_value, field=field
     )
     if unit_error is not None:
@@ -3151,45 +3077,207 @@ def _read_run_metadata_shape(
     return None, ((None, payload, f"unsupported run-metadata shape {shape!r}"),)
 
 
-def _unconsumed_run_metadata_members(
+def _run_metadata_annotation_members(
     payload: object,
-    reads: set[tuple[str | int, ...]],
-    *,
-    field: str | None,
-) -> tuple[tuple[str | None, tuple[str | int, ...]], ...]:
-    unread: list[tuple[str | None, tuple[str | int, ...]]] = []
+) -> tuple[tuple[tuple[str | int, ...], str, object], ...]:
+    annotations: list[tuple[tuple[str | int, ...], str, object]] = []
 
     def walk(value: object, path: tuple[str | int, ...] = ()) -> None:
         if isinstance(value, Mapping):
             for key, child in value.items():
                 key_text = str(key)
                 child_path = (*path, key_text)
-                if (
-                    key_text.casefold() == "inference"
-                    or "unit" in key_text.casefold()
-                ) and child_path not in reads:
-                    unread.append((formula_for_path(child_path), child_path))
+                if key_text.casefold() == "inference" or "unit" in key_text.casefold():
+                    annotations.append((child_path, key_text, child))
                 walk(child, child_path)
         elif isinstance(value, (list, tuple)):
             for index, child in enumerate(value):
                 walk(child, (*path, index))
 
-    def formula_for_path(path: tuple[str | int, ...]) -> str | None:
-        if field != "species_loss_fraction":
+    walk(payload)
+    return tuple(annotations)
+
+
+def _run_metadata_value_at_path(
+    payload: object,
+    path: tuple[str | int, ...],
+) -> object | None:
+    value = payload
+    for part in path:
+        if isinstance(value, Mapping):
+            if part not in value:
+                return None
+            value = value[part]
+        elif isinstance(value, (list, tuple)) and isinstance(part, int):
+            if part < 0 or part >= len(value):
+                return None
+            value = value[part]
+        else:
             return None
-        species_values = payload
-        if isinstance(species_values, Mapping) and species_values.get("value") is not None:
-            species_values = species_values["value"]
-        if not isinstance(species_values, Mapping):
-            return None
-        path_text = {str(part) for part in path}
-        return next(
-            (str(species) for species in species_values if str(species) in path_text),
+    return value
+
+
+def _run_metadata_formula_for_path(
+    payload: object,
+    path: tuple[str | int, ...],
+    *,
+    field: str | None,
+) -> str | None:
+    if field != "species_loss_fraction":
+        return None
+    species_values = payload
+    if isinstance(species_values, Mapping) and species_values.get("value") is not None:
+        species_values = species_values["value"]
+    if not isinstance(species_values, Mapping):
+        return None
+    for part in path:
+        formula = str(part)
+        if formula in species_values:
+            return formula
+    return None
+
+
+def _run_metadata_located_for_path(
+    parsed: object | None,
+    path: tuple[str | int, ...],
+    *,
+    field: str | None,
+) -> Located[Any] | None:
+    if isinstance(parsed, Located):
+        return parsed
+    if field == "species_loss_fraction" and isinstance(parsed, Mapping):
+        formula = next(
+            (str(part) for part in path if str(part) in parsed),
             None,
         )
+        located = parsed.get(formula) if formula is not None else None
+        return located if isinstance(located, Located) else None
+    return None
 
-    walk(payload)
-    return tuple(unread)
+
+def _run_metadata_locator_extra_reflected(
+    payload: object,
+    located: Located[Any] | None,
+    path: tuple[str | int, ...],
+) -> bool | None:
+    try:
+        locator_index = path.index("locator")
+    except ValueError:
+        return None
+    if locator_index + 1 >= len(path):
+        return False
+    locator_path = path[: locator_index + 1]
+    raw_locator = _run_metadata_value_at_path(payload, locator_path)
+    extra_key = str(path[locator_index + 1])
+    if not isinstance(raw_locator, Mapping) or extra_key in _LOCATOR_FIELD_NAMES:
+        return False
+    if located is None or located.locator is None or not located.locator.note:
+        return False
+    expected_note = f"{extra_key}={raw_locator[extra_key]}"
+    return expected_note in located.locator.note
+
+
+def _run_metadata_annotation_reflection_errors(
+    payload: object,
+    parsed: object | None,
+    *,
+    field: str | None,
+) -> tuple[tuple[str | None, object, str], ...]:
+    annotations = _run_metadata_annotation_members(payload)
+    if not annotations:
+        return ()
+
+    raw_value = payload
+    raw_path: tuple[str | int, ...] = ()
+    if isinstance(payload, Mapping) and payload.get("value") is not None:
+        raw_value = payload["value"]
+        raw_path = ("value",)
+    direct_mass_value, direct_mass_error, direct_mass_unit_paths = (
+        _run_metadata_direct_mass_units(payload, raw_value, field=field)
+    )
+    errors: list[tuple[str | None, object, str]] = []
+    for path, key, value in annotations:
+        formula = _run_metadata_formula_for_path(payload, path, field=field)
+        raw_error_value = payload
+        if formula is not None:
+            species_values = payload
+            if isinstance(species_values, Mapping) and species_values.get("value") is not None:
+                species_values = species_values["value"]
+            if isinstance(species_values, Mapping):
+                raw_error_value = species_values.get(formula, payload)
+
+        located = _run_metadata_located_for_path(parsed, path, field=field)
+        reflected = _run_metadata_locator_extra_reflected(payload, located, path)
+        if reflected is not None:
+            if reflected:
+                continue
+        elif key.casefold() == "inference":
+            try:
+                expected = _derivation_from_plain(
+                    value,
+                    allow_mapping_inputs=True,
+                )
+            except (ArithmeticError, KeyError, TypeError, ValueError):
+                expected = None
+            if located is not None and expected is not None and located.inference == expected:
+                continue
+        elif (
+            key == _DERIVATION_OUTPUT_UNIT_KEY
+            and "inference" in tuple(str(part) for part in path[:-1])
+        ):
+            if (
+                located is not None
+                and located.inference is not None
+                and located.inference.output_unit == value
+            ):
+                continue
+        elif field in {"mass_kg", "final_mass_kg"} and path in direct_mass_unit_paths:
+            if direct_mass_error is None:
+                try:
+                    expected = _run_metadata_located_value_from_plain(
+                        direct_mass_value,
+                        field=field,
+                    )
+                except (ArithmeticError, KeyError, TypeError, ValueError):
+                    expected = None
+                if located is not None and expected is not None and located.state == expected.state:
+                    continue
+        elif (
+            field in {"mass_kg", "final_mass_kg"}
+            and key in _PUBLISHED_CONVERSION_UNIT_KEYS
+            and path[:-1] == (*raw_path, _AS_PUBLISHED_KEY)
+        ):
+            try:
+                explicit_inference = None
+                if isinstance(raw_value, Mapping) and isinstance(
+                    raw_value.get("inference"), Mapping
+                ):
+                    explicit_inference = _derivation_from_plain(
+                        raw_value["inference"],
+                        allow_mapping_inputs=True,
+                    )
+                expected = _inference_for_printed_conversion(
+                    raw_value,
+                    explicit_inference=explicit_inference,
+                )
+            except (ArithmeticError, KeyError, TypeError, ValueError):
+                expected = None
+            if located is not None and expected is not None and located.inference == expected:
+                continue
+
+        path_text = ".".join(str(part) for part in path)
+        misplaced_as_published = any(
+            path[index : index + 3] == ("state", "value", "as_published")
+            for index in range(len(path) - 2)
+        )
+        detail = (
+            f"invalid annotation at {path_text}: "
+            "as_published is only valid on the Located value"
+            if misplaced_as_published
+            else f"annotation at {path_text} is not reflected in the parsed value"
+        )
+        errors.append((formula, raw_error_value, detail))
+    return tuple(errors)
 
 
 def _parse_run_metadata_shape(
@@ -3199,11 +3287,9 @@ def _parse_run_metadata_shape(
     field: str | None = None,
     parent_locator: Locator | None = None,
 ) -> tuple[object | None, tuple[tuple[str | None, object, str], ...]]:
-    reads: set[tuple[str | int, ...]] = set()
-    recorded_payload = _record_run_metadata_value(payload, (), reads)
     parsed, errors = _read_run_metadata_shape(
         shape,
-        recorded_payload,
+        payload,
         field=field,
         parent_locator=parent_locator,
     )
@@ -3221,25 +3307,14 @@ def _parse_run_metadata_shape(
             )
             for formula, raw_value, detail in errors
         )
-    unread = _unconsumed_run_metadata_members(payload, reads, field=field)
-    if not unread:
-        return parsed, errors
-
-    unread_errors = []
-    for formula, path in unread:
-        path_text = ".".join(str(part) for part in path)
-        misplaced_as_published = any(
-            path[index : index + 3] == ("state", "value", "as_published")
-            for index in range(len(path) - 2)
-        )
-        detail = (
-            f"invalid annotation at {path_text}: "
-            "as_published is only valid on the Located value"
-            if misplaced_as_published
-            else f"unconsumed unit-like or inference member at {path_text}"
-        )
-        unread_errors.append((formula, payload, detail))
-    return None, (*errors, *unread_errors)
+    reflection_errors = _run_metadata_annotation_reflection_errors(
+        payload,
+        parsed,
+        field=field,
+    )
+    if reflection_errors:
+        parsed = None
+    return parsed, (*errors, *reflection_errors)
 
 
 def _run_metadata_shape_detail(
