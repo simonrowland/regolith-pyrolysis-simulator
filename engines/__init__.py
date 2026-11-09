@@ -1,7 +1,7 @@
 """Engine source trees for the chemistry-engine refactor.
 
 Each subpackage (``engines.alphamelts``, ``engines.magemin``,
-``engines.vaporock``, ``engines.factsage``, ``engines.builtin``) holds the
+``engines.vaporock``, ``engines.builtin``) holds the
 kernel-shadow / kernel-authoritative provider source for one engine. Binary
 install artifacts under those directories (``MAGEMin``, ``run_alphamelts``,
 ``.cst`` license files, etc.) are gitignored; only the provider Python

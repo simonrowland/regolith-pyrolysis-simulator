@@ -1693,6 +1693,17 @@ def test_nonzero_extraction_completeness_margin_is_hand_pinned() -> None:
     constraints = PhysicsConstraintSet(active_gates=("extraction_completeness",))
     trace = _trace()
     trace.terminal_rump_by_species_kg = {"SiO2": 1.0}
+    trace.yield_disposition_fraction_table_rows = (
+        {
+            "element": "Si",
+            "destination_mol_atoms": {
+                "product_condensed": 2154.98,
+                "offgas_vented": 100.0,
+                "wall_deposit": 100.0,
+                "melt_retained": 16.6436,
+            },
+        },
+    )
     result = evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
@@ -1705,13 +1716,17 @@ def test_nonzero_extraction_completeness_margin_is_hand_pinned() -> None:
     assert result.feasible
     margin = result.feasibility_margins["extraction_completeness"]
     assert margin.feasible
-    assert margin.observed == pytest.approx(0.9923358418656291)
-    assert margin.margin == pytest.approx(0.04233584186562911)
-    assert margin.detail == (
-        "SiO: product_target_equiv_mol=2154.98, "
-        "residual_target_equiv_mol=16.6436, "
-        "denominator_target_equiv_mol=2171.62"
+    expected_left_melt_fraction = 2354.98 / 2371.6236
+    assert margin.observed == pytest.approx(expected_left_melt_fraction)
+    assert margin.margin == pytest.approx(expected_left_melt_fraction - 0.95)
+    target = result.run_reference.product_summary["extraction_completeness"][
+        "targets"
+    ]["SiO"]
+    assert target["captured_basis_completeness_fraction"] == pytest.approx(
+        0.9923358418656291
     )
+    assert target["terminal_offgas_target_equiv_mol"] == pytest.approx(100.0)
+    assert target["wall_deposit_target_equiv_mol"] == pytest.approx(100.0)
 
 
 def test_stub_smoke_constraint_set_skips_missing_knudsen_gate_boundary() -> None:
@@ -2516,6 +2531,7 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
         constraints=PhysicsConstraintSet(
+            active_gates=("delivered_stream_purity",),
             enforce_delivered_stream_purity=True,
         ),
     )
@@ -2525,7 +2541,9 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
-        constraints=PhysicsConstraintSet(),
+        constraints=PhysicsConstraintSet(
+            active_gates=("delivered_stream_purity",),
+        ),
     )
 
     assert not enforced_purity.feasible

@@ -23,6 +23,17 @@ from simulator.state import MOLAR_MASS
 from simulator.trace import PhysicsTrace
 
 
+_DEFAULT_YIELD_DISPOSITION_ROWS = (
+    {
+        "element": "Si",
+        "destination_mol_atoms": {
+            "product_condensed": 99.0,
+            "melt_retained": 1.0,
+        },
+    },
+)
+
+
 def _kn_snapshot(
     *,
     temperature_C: float = 1600.0,
@@ -120,7 +131,7 @@ def _trace(
     ) = None,
     yield_disposition_fraction_table_rows: tuple[
         dict[str, object], ...
-    ] | None = None,
+    ] | None = _DEFAULT_YIELD_DISPOSITION_ROWS,
     yield_disposition_fraction_table_error: str = "",
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
@@ -163,6 +174,9 @@ def _valid_trace_object(**overrides: object) -> SimpleNamespace:
         "terminal_rump_by_species_kg": {"SiO2": 1.0},
         "condensed_by_stage_species_delta": ({(3, "SiO"): 20.0},),
         "wall_deposit_by_segment_species_delta": ({},),
+        "yield_disposition_fraction_table_rows": (
+            _DEFAULT_YIELD_DISPOSITION_ROWS
+        ),
     }
     fields.update(overrides)
     return SimpleNamespace(**fields)
@@ -404,6 +418,7 @@ def test_nonfinite_carried_completeness_is_unavailable_without_yield_table() -> 
         extraction_completeness_by_target={
             "Fe": {"completeness_fraction": math.nan},
         },
+        yield_disposition_fraction_table_rows=None,
     )
     constraints = PhysicsConstraintSet(
         target_species=("Fe",),
@@ -1643,7 +1658,11 @@ def test_non_authoritative_coating_readout_uses_declared_wall_zone_buckets(
         ),
         (
             "extraction_completeness",
-            _valid_trace_object(product_ledger_kg={}, terminal_rump_by_species_kg={}),
+            _valid_trace_object(
+                product_ledger_kg={},
+                terminal_rump_by_species_kg={},
+                yield_disposition_fraction_table_rows=None,
+            ),
         ),
         (
             "knudsen_viscous",
@@ -1806,6 +1825,15 @@ def test_extraction_completeness_uses_per_species_minimum() -> None:
         condensed=({(1, "Fe"): 1.0},),
         products=products,
         rump=rump,
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "product_condensed": 0.86,
+                    "melt_retained": 0.14,
+                },
+            },
+        ),
     )
     loose = PhysicsConstraintSet(
         target_species=("Fe",),
@@ -2026,7 +2054,12 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     assert target["captured_basis_completeness_fraction"] == pytest.approx(1.0 / 3.0)
 
     missing = extraction_completeness_report(
-        _trace(condensed=({(1, "Cr"): 1.0},), products={}, rump={}),
+        _trace(
+            condensed=({(1, "Cr"): 1.0},),
+            products={},
+            rump={},
+            yield_disposition_fraction_table_rows=None,
+        ),
         constraints,
     )
     missing_target = missing["targets"]["Cr"]
@@ -2089,6 +2122,7 @@ def test_extraction_completeness_report_unknown_residual_map_never_zero_fills() 
         condensed=({(1, "Cr"): 1.0},),
         products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
         rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+        yield_disposition_fraction_table_rows=None,
     )
 
     report = extraction_completeness_report(trace, constraints)
