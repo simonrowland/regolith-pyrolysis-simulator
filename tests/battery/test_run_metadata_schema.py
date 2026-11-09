@@ -4,6 +4,7 @@ import hashlib
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -1695,7 +1696,7 @@ def test_busemann_preconverted_mass_rows_keep_their_units_and_store_bytes(
             "original_unit=g",
         )
         assert mass.inference.output_unit == "kg"
-        assert str(mass.inference.parameters[0][1].state.value) == printed_grams
+        assert mass.inference.parameters[0][1].state.value == Decimal(printed_grams)
 
     work_yaml = root / "data/literature/works/10.1234_fixture.yaml"
     first_bytes = work_yaml.read_bytes()
