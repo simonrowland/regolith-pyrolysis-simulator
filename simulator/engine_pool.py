@@ -1427,9 +1427,11 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=parent,
             )
-            # EngineWorkerTimeout stays itself. EOF and a dead pipe are
-            # the worker exiting before ready.
-            if isinstance(exc, TimeoutError):
+            # EngineWorkerTimeout stays itself. Process.start's own
+            # OSError (including BlockingIOError) stays itself so a
+            # respawn records that type. EOF and a dead pipe are the
+            # worker exiting before ready.
+            if isinstance(exc, TimeoutError) or exc is launch.start_error:
                 raise
             raise EngineWorkerDied(
                 'start',
