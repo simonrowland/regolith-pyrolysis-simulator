@@ -4524,6 +4524,24 @@ class EvaporationMixin:
                 )
         return source_mol_hr
 
+    def _deplete_evaporation_flux_unless_admitted(
+        self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
+    ) -> EvaporationFlux:
+        """Deplete provider rates once, unless closure admission already did.
+
+        ``admit_rates`` inside the same-hour projection applies freeze
+        scaling, this depletion, and the native-Fe cap before the residual
+        is formed. The ordinary step and the validation-map row both used
+        to deplete again. A second pass on the owner SiO row multiplies the
+        already parent-limited rate by ``(1-exp(-1))`` when the O2 draw
+        equals the O2 inventory (k=1): 4.370759633464901e-12 kg/hr becomes
+        2.7628470220111347e-12 kg/hr, so the map and the live tick disagree.
+        """
+        diagnostic = getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
+        if diagnostic.get('evaporation_flux_rates_are_admitted') is True:
+            return evap_flux
+        return self._apply_analytic_evaporation_depletion(evap_flux, dt_hr=dt_hr)
+
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
     ) -> EvaporationFlux:

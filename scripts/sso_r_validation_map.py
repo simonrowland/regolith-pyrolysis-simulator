@@ -505,7 +505,7 @@ def run_row(
     freeze_gate_diagnostic = dict(
         getattr(sim, "_last_freeze_gate_diagnostic", {}) or {}
     )
-    evap_flux = sim._apply_analytic_evaporation_depletion(raw_evap_flux)
+    evap_flux = sim._deplete_evaporation_flux_unless_admitted(raw_evap_flux)
     if evap_flux.total_kg_hr > 0.0:
         sim._configure_condensation_operating_conditions(evap_flux)
         sim._apply_lab_surface_temperatures(sample_time_h=SAMPLE_TIME_H)

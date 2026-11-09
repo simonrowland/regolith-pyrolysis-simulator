@@ -16171,20 +16171,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux.update_totals()
             else:
                 evap_flux = self._calculate_evaporation(equilibrium)
-                evaporation_diagnostic = getattr(
-                    self, '_last_evaporation_flux_diagnostic', {}
-                ) or {}
-                # Nonconverged and pressure-held fallbacks return the admitted
-                # fixed-point rates directly; applying depletion here again
-                # would price one stream and transport another.
-                if (
-                    evaporation_diagnostic.get(
-                        'evaporation_flux_rates_are_admitted'
-                    ) is not True
-                ):
-                    evap_flux = self._apply_analytic_evaporation_depletion(
-                        evap_flux
-                    )
+                # Admitted closure rates are already inventory-limited.
+                # ``_deplete_evaporation_flux_unless_admitted`` is the
+                # single owner of that skip; the validation-map row uses it
+                # too. Override and bakeout dispatches below still call
+                # ``_apply_analytic_evaporation_depletion`` directly because
+                # they price an explicit partial-pressure snapshot that did
+                # not pass through closure admission.
+                evap_flux = self._deplete_evaporation_flux_unless_admitted(
+                    evap_flux
+                )
         # In C0 with solid hosts, close ordinary evaporation and bakeout
         # together against one same-hour evolved stream below. The persisted
         # end-of-hour map remains for equilibrium O2 and diagnostic consumers.
