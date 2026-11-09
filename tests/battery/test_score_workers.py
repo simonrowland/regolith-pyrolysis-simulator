@@ -186,3 +186,53 @@ def test_jsonl_sort_preserves_append_order_for_tied_rows(
         Engine.VAPOROCK.value,
         Engine.INTERNAL_ANALYTICAL.value,
     ]
+
+
+def test_jsonl_sort_restores_serial_order_after_engine_shard_merge(
+    tmp_path: Path, monkeypatch
+) -> None:
+    class _Aggregate:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def add(self, _payload):
+            return None
+
+    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _Aggregate)
+    stream = _ResidualJsonlStream(tmp_path / "sharded-ties.jsonl")
+    try:
+        merged_shard_rows = (
+            ("point-0", Engine.INTERNAL_ANALYTICAL.value, (0, 0, 0, 0)),
+            ("point-1", Engine.INTERNAL_ANALYTICAL.value, (0, 1, 0, 0)),
+            ("point-0", Engine.VAPOROCK.value, (0, 0, 1, 0)),
+            ("point-1", Engine.VAPOROCK.value, (0, 1, 1, 0)),
+        )
+        for point, engine, serial_order in merged_shard_rows:
+            payload = {
+                "rail": "liquid",
+                "reference": "observation-1",
+                "key": "same-key",
+                "point": point,
+                "candidate_request": {"engine": engine},
+            }
+            stream.append_payload_line(
+                json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(),
+                sort_order=serial_order,
+            )
+        stream.finalize(
+            context=_worker_fixture(),
+            engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
+        )
+        rows = [
+            json.loads(line)
+            for line in stream.partial_path.read_text(encoding="utf-8").splitlines()[1:]
+        ]
+    finally:
+        stream.close()
+
+    assert [(row["point"], row["candidate_request"]["engine"]) for row in rows] == [
+        ("point-0", Engine.INTERNAL_ANALYTICAL.value),
+        ("point-0", Engine.VAPOROCK.value),
+        ("point-1", Engine.INTERNAL_ANALYTICAL.value),
+        ("point-1", Engine.VAPOROCK.value),
+    ]
