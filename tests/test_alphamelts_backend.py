@@ -247,7 +247,7 @@ def test_alphamelts_vaporock_fallback_keeps_below_liquidus_feo_notice():
         liquid_fraction=0.5,
         fO2_log=-9.0,
         pressure_bar=1.0e-3,
-        activities={},
+        activities={"SiO2": 0.5},
         liquid_feo_domain=liquid_domain,
     )
 
@@ -9200,7 +9200,7 @@ def test_endmember_projection_never_sums_multiple_activity_carriers():
     ) is None
 
 
-def test_thermoengine_missing_proxy_activity_uses_flagged_builtin_projection():
+def test_thermoengine_missing_na_activity_refuses_projection():
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._vaporock_available = False
@@ -9226,15 +9226,11 @@ def test_thermoengine_missing_proxy_activity_uses_flagged_builtin_projection():
     )
 
     assert result.status == 'ok'
-    assert {'Na', 'Si', 'SiO'} <= set(result.vapor_pressures_Pa)
-    notices = result.diagnostics[
-        'vapor_activity_standard_state_notices_by_species'
-    ]
-    assert {'Na', 'Si', 'SiO'} <= set(notices)
-    assert all(
-        notices[species]['reason'] == 'activity_standard_state_substitution'
-        for species in ('Na', 'Si', 'SiO')
-    )
+    assert result.vapor_pressures_Pa == {}
+    refusal = result.diagnostics['vapor_pressure_refusal']
+    assert refusal['status'] == 'refused'
+    assert refusal['reason'] == 'missing_melt_activity'
+    assert refusal['missing_precursor_species'] == ['Na']
     projection = backend._activities_times_antoine_or_fail(
         1600.0,
         {'SiO2': 0.4},
@@ -9242,7 +9238,8 @@ def test_thermoengine_missing_proxy_activity_uses_flagged_builtin_projection():
         pO2_bar=1.0e-9,
         context='test missing proxy activity',
     )
-    assert {'Na', 'Si', 'SiO'} <= set(projection)
+    assert isinstance(projection, VaporPressureActivityRefusal)
+    assert projection.missing_precursor_species == ('Na',)
 
 
 def test_activities_times_antoine_returns_empty_without_species_activity():
@@ -9412,16 +9409,9 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
             activities={},
         )
 
-    assert {'Na', 'Si', 'SiO'} <= set(pressures)
-    assert isinstance(source, dict)
-    assert {'Na', 'Si', 'SiO'} <= set(
-        backend._antoine_activity_standard_state_notices
-    )
-    assert all(
-        backend._antoine_activity_standard_state_notices[species]['reason']
-        == 'activity_standard_state_substitution'
-        for species in ('Na', 'Si', 'SiO')
-    )
+    assert pressures == {}
+    assert isinstance(source, VaporPressureActivityRefusal)
+    assert source.missing_precursor_species == ('Na', 'Si', 'SiO')
 
 
 def test_vaporock_empty_volatile_free_melt_returns_physical_zero():

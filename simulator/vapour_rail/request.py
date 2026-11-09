@@ -43,12 +43,17 @@ from simulator.vapour_rail.catalog_standard_states import (
 from simulator.chemistry.melt_activity import (
     _melt_oxide_activity_standard_state_id,
     _normalize_standard_state_phase,
+    _activity_for_crystalline_vapor_k,
     _vapor_activity_source_standard_state,
     _vapor_k_standard_state,
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
-from simulator.fe_redox import LIQUID_MODEL_BELOW_LIQUIDUS_KIND
+from simulator.fe_redox import (
+    D354_FEO_FUSION_TEMPERATURE_K,
+    LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
+    d354_feo_crystalline_activity_factor,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
@@ -1460,6 +1465,9 @@ def refusal_closure(
         source_activity = 1.0
         numeric_activity: float | None = None
         crystalline_vapor_activity_value: float | None = None
+        activity_conversion_notice: Mapping[str, Any] | None = None
+        fe_reference_state_notice: dict[str, Any] | None = None
+        unprovenanced_fe_activity = False
         _unit_activity_note: dict[str, Any] | None = None
         if (
             compiled is not None
@@ -1625,83 +1633,218 @@ def refusal_closure(
                 crystalline_activity_is_valid = is_declared_real_scalar(
                     crystalline_activity_for_k
                 )
+                raw_activity_value = (
+                    float(reported_activity) if raw_activity_is_valid else math.nan
+                )
                 try:
-                    raw_activity_value = float(reported_activity)
                     activity_for_k_value = float(activity_for_k)
                     crystalline_activity_value = float(
                         crystalline_activity_for_k
                     )
                     conversion_offset_value = float(conversion_offset)
                 except (TypeError, ValueError):
-                    raw_activity_value = math.nan
                     activity_for_k_value = math.nan
                     crystalline_activity_value = math.nan
                     conversion_offset_value = math.nan
-                if (
-                    source_standard_state_id
-                    != expected_source_standard_state_id
-                    or _normalize_standard_state_phase(
+                source_phase_from_provider = (
+                    _normalize_standard_state_phase(
                         source_standard_state_phase
                     )
-                    != expected_source_standard_state_phase
-                    or target_standard_state_id
-                    != expected_target_standard_state_id
-                    or _normalize_standard_state_phase(
-                        target_standard_state_phase
+                )
+                if (
+                    source_phase_from_provider is None
+                    and isinstance(reported_standard_state, StandardStateIdentity)
+                ):
+                    source_phase_from_provider = _normalize_standard_state_phase(
+                        reported_standard_state.phase
                     )
-                    != expected_target_standard_state_phase
-                    or not isinstance(conversion, Mapping)
-                    or conversion.get("from_standard_state_id")
-                    != expected_source_standard_state_id
-                    or _normalize_standard_state_phase(
+                provider_source_id = source_standard_state_id
+                if (
+                    provider_source_id is None
+                    and isinstance(reported_standard_state, StandardStateIdentity)
+                ):
+                    provider_source_id = reported_standard_state.identity_id
+                conversion_identity_mismatch = isinstance(
+                    conversion, Mapping
+                ) and (
+                    (
+                        conversion.get("from_standard_state_id") is not None
+                        and conversion.get("from_standard_state_id")
+                        != expected_source_standard_state_id
+                    )
+                    or (
+                        conversion.get("from_standard_state_phase") is not None
+                        and _normalize_standard_state_phase(
+                            conversion.get("from_standard_state_phase")
+                        )
+                        != expected_source_standard_state_phase
+                    )
+                    or (
+                        conversion.get("to_standard_state_id") is not None
+                        and conversion.get("to_standard_state_id")
+                        != expected_target_standard_state_id
+                    )
+                    or (
+                        conversion.get("to_standard_state_phase") is not None
+                        and _normalize_standard_state_phase(
+                            conversion.get("to_standard_state_phase")
+                        )
+                        != expected_target_standard_state_phase
+                    )
+                )
+                identity_mismatch = (
+                    conversion_identity_mismatch
+                    or (
+                        provider_source_id is not None
+                        and provider_source_id != expected_source_standard_state_id
+                    )
+                    or (
+                        source_phase_from_provider is not None
+                        and source_phase_from_provider
+                        != expected_source_standard_state_phase
+                    )
+                    or (
+                        target_standard_state_id is not None
+                        and target_standard_state_id
+                        != expected_target_standard_state_id
+                    )
+                    or (
+                        target_standard_state_phase
+                        and _normalize_standard_state_phase(
+                            target_standard_state_phase
+                        )
+                        != expected_target_standard_state_phase
+                    )
+                    or (
+                        reported_provenance.get(
+                            "vapor_activity_for_crystalline_K_standard_state_id"
+                        )
+                        is not None
+                        and reported_provenance.get(
+                            "vapor_activity_for_crystalline_K_standard_state_id"
+                        )
+                        != expected_target_standard_state_id
+                    )
+                )
+                conversion_record_valid = (
+                    not identity_mismatch
+                    and isinstance(conversion, Mapping)
+                    and conversion.get("from_standard_state_id")
+                    == expected_source_standard_state_id
+                    and _normalize_standard_state_phase(
                         conversion.get("from_standard_state_phase")
                     )
-                    != expected_source_standard_state_phase
-                    or conversion.get("to_standard_state_id")
-                    != expected_target_standard_state_id
-                    or _normalize_standard_state_phase(
+                    == expected_source_standard_state_phase
+                    and conversion.get("to_standard_state_id")
+                    == expected_target_standard_state_id
+                    and _normalize_standard_state_phase(
                         conversion.get("to_standard_state_phase")
                     )
-                    != expected_target_standard_state_phase
-                    or conversion.get("conversion_performed") is not True
-                    or reported_provenance.get(
+                    == expected_target_standard_state_phase
+                    and conversion.get("conversion_performed") is True
+                    and reported_provenance.get(
                         "vapor_activity_standard_state_id_used_for_K"
                     )
-                    != expected_target_standard_state_id
-                    or reported_provenance.get(
+                    == expected_target_standard_state_id
+                    and reported_provenance.get(
                         "vapor_activity_for_crystalline_K_standard_state_id"
                     )
-                    != expected_target_standard_state_id
-                    or not is_declared_real_scalar(conversion_offset)
-                    or not math.isfinite(conversion_offset_value)
-                    or not raw_activity_is_valid
-                    or not math.isfinite(raw_activity_value)
-                    or raw_activity_value <= 0.0
-                    or not activity_for_k_is_valid
-                    or not math.isfinite(activity_for_k_value)
-                    or activity_for_k_value <= 0.0
-                    or not crystalline_activity_is_valid
-                    or not math.isfinite(crystalline_activity_value)
-                    or crystalline_activity_value <= 0.0
-                    or activity_for_k_value != crystalline_activity_value
-                    or not math.isclose(
+                    == expected_target_standard_state_id
+                    and is_declared_real_scalar(conversion_offset)
+                    and math.isfinite(conversion_offset_value)
+                    and raw_activity_is_valid
+                    and math.isfinite(raw_activity_value)
+                    and raw_activity_value > 0.0
+                    and activity_for_k_is_valid
+                    and math.isfinite(activity_for_k_value)
+                    and activity_for_k_value > 0.0
+                    and crystalline_activity_is_valid
+                    and math.isfinite(crystalline_activity_value)
+                    and crystalline_activity_value > 0.0
+                    and activity_for_k_value == crystalline_activity_value
+                    and math.isclose(
                         activity_for_k_value / raw_activity_value,
                         10.0**conversion_offset_value,
                         rel_tol=1e-10,
                         abs_tol=0.0,
                     )
-                    or (
-                        conversion_offset_value != 0.0
-                        and activity_for_k_value == raw_activity_value
+                    and (
+                        conversion_offset_value == 0.0
+                        or activity_for_k_value != raw_activity_value
                     )
+                )
+                if conversion_record_valid:
+                    crystalline_vapor_activity_value = activity_for_k_value
+                elif (
+                    raw_activity_is_valid
+                    and math.isfinite(raw_activity_value)
+                    and raw_activity_value > 0.0
+                    and source_phase_from_provider is not None
+                    and not identity_mismatch
                 ):
+                    source_id_for_conversion = (
+                        provider_source_id
+                        or expected_source_standard_state_id
+                    )
+                    converted_activity, conversion_notice, _warning = (
+                        _activity_for_crystalline_vapor_k(
+                            str(rule.parent_oxide or ""),
+                            raw_activity_value,
+                            state.temperature_K,
+                            source_standard_state_id=source_id_for_conversion,
+                            target_standard_state_id=(
+                                expected_target_standard_state_id
+                            ),
+                            source_standard_state_phase=(
+                                source_phase_from_provider
+                            ),
+                            target_standard_state_phase=(
+                                expected_target_standard_state_phase
+                            ),
+                        )
+                    )
+                    if (
+                        conversion_notice.get("conversion_performed") is True
+                        or conversion_notice.get("authority_level") == "identity"
+                    ):
+                        crystalline_vapor_activity_value = converted_activity
+                        activity_conversion_notice = conversion_notice
+                    else:
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "crystalline vapor K has a documented source phase "
+                            "but no registered standard-state conversion",
+                        )
+                elif (
+                    rule.species_id == "Fe"
+                    and raw_activity_is_valid
+                    and math.isfinite(raw_activity_value)
+                    and raw_activity_value > 0.0
+                    and not identity_mismatch
+                ):
+                    unprovenanced_fe_activity = True
+                elif rule.species_id == "Fe" and reported_activity is None:
+                    return _make_refusal(
+                        rule,
+                        ActivityRefusalCode.MISSING_EVIDENCE.value,
+                        "FeO activity is unavailable; no numeric value was supplied",
+                    )
+                else:
                     return _make_refusal(
                         rule,
                         REFUSAL_MISSING_CHANNEL_CONTRACT,
                         "crystalline vapor K requires converted activity with "
                         "matching source and K standard-state provenance",
                     )
-                crystalline_vapor_activity_value = activity_for_k_value
+            elif (
+                rule.species_id == "Fe"
+                and is_declared_real_scalar(reported_activity)
+                and math.isfinite(float(reported_activity))
+                and float(reported_activity) > 0.0
+                and not source_standard_state_phase
+            ):
+                unprovenanced_fe_activity = True
             if evaluator_activity_exponent != 0.0:
                 declaration = rule.source_reaction_activity
                 if declaration is None:
@@ -1730,7 +1873,10 @@ def refusal_closure(
                 )
                 if reported_activity is not None:
                     provider_id = state.source_reaction_activity_provider
-                    if not isinstance(provider_id, str) or not provider_id.strip():
+                    if (
+                        (not isinstance(provider_id, str) or not provider_id.strip())
+                        and not unprovenanced_fe_activity
+                    ):
                         return _make_refusal(
                             rule,
                             REFUSAL_MISSING_CHANNEL_CONTRACT,
@@ -1738,7 +1884,7 @@ def refusal_closure(
                         )
                     if not isinstance(
                         reported_standard_state, StandardStateIdentity
-                    ):
+                    ) and not unprovenanced_fe_activity:
                         return _make_refusal(
                             rule,
                             REFUSAL_MISSING_CHANNEL_CONTRACT,
@@ -1758,24 +1904,58 @@ def refusal_closure(
                         reported_mole_fraction = source_fractions.get(
                             coeff.parent_oxide
                         )
-                source_reaction_activity = (
-                    activity_provider.resolve_source_reaction_activity(
-                        declaration,
-                        magemin=None,
-                        thermoengine=None,
-                        activity_exponent=evaluator_activity_exponent,
-                        solve_group_id=rule.solve_group_id,
+                if unprovenanced_fe_activity:
+                    source_reaction_activity = SourceReactionActivity(
+                        component_id=declaration.component_id,
+                        value=float(reported_activity),
+                        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+                        bound_direction=None,
+                        reason="missing_reference_state_provenance",
+                        standard_state=declaration.standard_state,
+                        phase_assemblage_ref=None,
+                        chemical_potential_ref=None,
                         state_fingerprint=state_identity,
-                        mole_fraction=reported_mole_fraction,
-                        reported_activity=reported_activity,
-                        reported_activity_provider=(
-                            state.source_reaction_activity_provider
+                        solve_group_id=rule.solve_group_id,
+                        provider=(
+                            str(state.source_reaction_activity_provider or "")
+                            or "unidentified_activity_provider"
                         ),
-                        reported_activity_evidence_ref=evidence_ref,
-                        reported_activity_standard_state=reported_standard_state,
-                        reported_activity_provenance=reported_provenance,
+                        authority=False,
+                        report_label="predict-and-flag",
+                        detail=(
+                            "numeric FeO activity exists, but the provider did "
+                            "not document its reference phase or converted K basis"
+                        ),
+                        derivation={
+                            "out_of_domain_reason": (
+                                "missing_reference_state_provenance"
+                            )
+                        },
+                        evidence_ref=evidence_ref,
+                        evidence_tier="uncertified_predict_and_flag",
+                        domain_status="out_of_domain",
+                        source_standard_state=None,
+                        target_standard_state=declaration.standard_state,
                     )
-                )
+                else:
+                    source_reaction_activity = (
+                        activity_provider.resolve_source_reaction_activity(
+                            declaration,
+                            magemin=None,
+                            thermoengine=None,
+                            activity_exponent=evaluator_activity_exponent,
+                            solve_group_id=rule.solve_group_id,
+                            state_fingerprint=state_identity,
+                            mole_fraction=reported_mole_fraction,
+                            reported_activity=reported_activity,
+                            reported_activity_provider=(
+                                state.source_reaction_activity_provider
+                            ),
+                            reported_activity_evidence_ref=evidence_ref,
+                            reported_activity_standard_state=reported_standard_state,
+                            reported_activity_provenance=reported_provenance,
+                        )
+                    )
                 if source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL:
                     refusal_code = (
                         source_reaction_activity.refusal_code.value
@@ -1875,6 +2055,70 @@ def refusal_closure(
                             "intrinsic_melt oxygen fugacity must be finite and positive",
                             source_reaction_activity=source_reaction_activity,
                         )
+                if unprovenanced_fe_activity:
+                    raw_fe_activity = float(numeric_activity)
+                    crystalline_factor = d354_feo_crystalline_activity_factor(
+                        state.temperature_K
+                    )
+                    crystalline_fe_activity = (
+                        raw_fe_activity * crystalline_factor
+                    )
+                    liquid_evaluation = compiled.evaluator.evaluate(
+                        state.temperature_K,
+                        source_activity=raw_fe_activity,
+                        pO2_bar=evaluator_fO2_bar,
+                    )
+                    crystalline_evaluation = compiled.evaluator.evaluate(
+                        state.temperature_K,
+                        source_activity=crystalline_fe_activity,
+                        pO2_bar=evaluator_fO2_bar,
+                    )
+                    liquid_pressure = float(liquid_evaluation.pressure_pa)
+                    crystalline_pressure = float(
+                        crystalline_evaluation.pressure_pa
+                    )
+                    below_fusion = (
+                        state.temperature_K < D354_FEO_FUSION_TEMPERATURE_K
+                    )
+                    source_activity = (
+                        crystalline_fe_activity if below_fusion else raw_fe_activity
+                    )
+                    selected_pressure = (
+                        crystalline_pressure if below_fusion else liquid_pressure
+                    )
+                    original_reason = (
+                        reported_provenance.get(
+                            "melt_oxide_activity_reference_state_notice"
+                        )
+                        or "missing_reference_state_provenance"
+                    )
+                    fe_reference_state_notice = {
+                        "kind": "fe_channel_reference_state_predict_and_flag",
+                        "reason": str(original_reason),
+                        "original_reason": str(original_reason),
+                        "original_authority_level": str(
+                            reported_provenance.get("activity_authority_level")
+                            or "unverified"
+                        ),
+                        "authority_level": "predict_and_flag",
+                        "temperature_K": float(state.temperature_K),
+                        "fusion_temperature_K": (
+                            D354_FEO_FUSION_TEMPERATURE_K
+                        ),
+                        "fusion_enthalpy_J_per_mol": 24_000.0,
+                        "liquid_referenced_pressure_Pa": liquid_pressure,
+                        "crystalline_referenced_pressure_Pa": (
+                            crystalline_pressure
+                        ),
+                        "bracket_pressure_Pa": [
+                            min(liquid_pressure, crystalline_pressure),
+                            max(liquid_pressure, crystalline_pressure),
+                        ],
+                        "selected_reference_phase": (
+                            "crystalline" if below_fusion else "liquid"
+                        ),
+                        "selected_pressure_Pa": selected_pressure,
+                    }
                 evaluation = compiled.evaluator.evaluate(
                     state.temperature_K,
                     source_activity=source_activity,
@@ -1899,8 +2143,14 @@ def refusal_closure(
                 )
                 if rule.species_id == "Fe":
                     activity_notices = _liquid_model_notices(provenance)
+                    if fe_reference_state_notice is not None:
+                        activity_notices.append(fe_reference_state_notice)
                     if activity_notices:
                         evaluation_extra["notices"] = activity_notices
+                if activity_conversion_notice is not None:
+                    evaluation_extra["activity_standard_state_conversion"] = dict(
+                        activity_conversion_notice
+                    )
                 source_notice = provenance.get("extrapolation_notice")
                 if source_notice is None:
                     # Floor inversion uses the same public extra field as

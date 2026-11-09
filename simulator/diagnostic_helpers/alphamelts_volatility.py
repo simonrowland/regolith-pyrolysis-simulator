@@ -341,7 +341,9 @@ def _analytical_vapor_pressures_from_activities(
     activity_standard_state_notices: dict[str, dict[str, Any]] = {}
     antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
-    from simulator.vapour_rail.catalog import compiled_catalog_for
+    from simulator.vapour_rail.catalog import (
+        _evaluate_catalog_activity_pressures,
+    )
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CRYSTALLINE_ACTIVITY_REFERENCE_STATE,
         MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY,
@@ -357,10 +359,7 @@ def _analytical_vapor_pressures_from_activities(
     )
 
     catalog_payload = getattr(vapor_pressure_data, "catalog_payload", vapor_pressure_data)
-    catalog = (
-        compiled_catalog_for(catalog_payload)
-        if catalog_payload.get("schema_version") == 2 else None
-    )
+    has_catalog = catalog_payload.get("schema_version") == 2
 
     def selected_activity(species: str, parent_oxide: str) -> float | None:
         builtin_activity = builtin_vapor_activities.get(parent_oxide)
@@ -474,34 +473,30 @@ def _analytical_vapor_pressures_from_activities(
             )
             continue
         if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
-            if catalog is None:
+            if not has_catalog:
                 raise RuntimeError(f"{species} requires its melt-source catalog reaction")
-            # b-189-exempt: diagnostic pressure comparison, not a hot-train read.
-            evaluator = catalog.evaluator_for(species)
             wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
             if activity <= 0.0 and wt_activity <= 0.0:
                 continue
-            reference = evaluator.evaluate(
-                T_K, source_activity=1.0, pO2_bar=evaluator.pO2_reference_bar,
+            pressure_results = _evaluate_catalog_activity_pressures(
+                catalog_payload,
+                species,
+                T_K,
+                pO2,
+                {"activity": activity, "weight_fraction": wt_activity},
             )
-            pressure = (
-                evaluator.evaluate(T_K, source_activity=activity, pO2_bar=pO2).pressure_pa
-                if activity > 0.0 else 0.0
-            )
-            wt_pressure = (
-                evaluator.evaluate(T_K, source_activity=wt_activity, pO2_bar=pO2).pressure_pa
-                if wt_activity > 0.0 else 0.0
-            )
+            pressure = pressure_results["pressures_Pa"]["activity"]
+            wt_pressure = pressure_results["pressures_Pa"]["weight_fraction"]
             if sp_data.get("liquid_oxide_standard_reaction"):
                 authority_limit = ellingham_authority_limit(
                     T_K, species=species, consumer="alphamelts-volatility-diagnostic",
                 )
                 if authority_limit is not None:
                     extrapolations[species] = authority_limit
-            if reference.out_of_range:
+            if pressure_results["reference_out_of_range"]:
                 extrapolations[species] = {
                     "temperature_K": T_K,
-                    "valid_range_K": evaluator.valid_temperature_K,
+                    "valid_range_K": pressure_results["valid_temperature_K"],
                     "authority_status": "extrapolation_limited",
                 }
             by_species[species] = _species_payload(
@@ -509,7 +504,8 @@ def _analytical_vapor_pressures_from_activities(
                 P_eq_wt_fraction_Pa=wt_pressure, melt_oxide_activity=activity,
                 wt_fraction_activity=wt_activity, activity_factor=activity,
                 wt_fraction_activity_factor=wt_activity,
-                P_reference_Antoine_Pa=reference.pressure_pa, pO2_bar=pO2,
+                    P_reference_Antoine_Pa=pressure_results["reference_pressure_Pa"],
+                    pO2_bar=pO2,
                 source_label="alphamelts_activity_diagnostic:catalog_melt_source_reaction",
             )
             continue
@@ -669,21 +665,19 @@ def _analytical_vapor_pressures_from_activities(
         if activity is None:
             continue
         if parent_oxide in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY:
-            if catalog is None:
+            if not has_catalog:
                 raise RuntimeError(
                     f"{species} requires its crystalline-K catalog reaction"
                 )
-            evaluator = catalog.evaluator_for(str(species))
-            reference = evaluator.evaluate(
+            pressure_results = _evaluate_catalog_activity_pressures(
+                catalog_payload,
+                str(species),
                 T_K,
-                source_activity=1.0,
-                pO2_bar=evaluator.pO2_reference_bar,
+                pO2,
+                {"activity": activity},
             )
-            pressure = evaluator.evaluate(
-                T_K,
-                source_activity=activity,
-                pO2_bar=pO2,
-            ).pressure_pa
+            reference_pressure = pressure_results["reference_pressure_Pa"]
+            pressure = pressure_results["pressures_Pa"]["activity"]
             wt_activity = max(
                 0.0,
                 float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0,
@@ -691,10 +685,10 @@ def _analytical_vapor_pressures_from_activities(
             # The composition proxy lacks a declared standard state, so do
             # not pass it to this crystalline-standard evaluator.
             wt_pressure = None
-            if reference.out_of_range:
+            if pressure_results["reference_out_of_range"]:
                 extrapolations[str(species)] = {
                     "temperature_K": T_K,
-                    "valid_range_K": evaluator.valid_temperature_K,
+                    "valid_range_K": pressure_results["valid_temperature_K"],
                     "authority_status": "extrapolation_limited",
                 }
             by_species[str(species)] = _species_payload(
@@ -705,7 +699,7 @@ def _analytical_vapor_pressures_from_activities(
                 wt_fraction_activity=wt_activity,
                 activity_factor=activity,
                 wt_fraction_activity_factor=None,
-                P_reference_Antoine_Pa=reference.pressure_pa,
+                P_reference_Antoine_Pa=reference_pressure,
                 pO2_bar=pO2,
                 source_label=(
                     "alphamelts_activity_diagnostic:catalog_melt_source_reaction|"

@@ -7,11 +7,38 @@ from types import MappingProxyType
 from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.feedstock_composition import (
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+
+
+D354_FEO_FUSION_TEMPERATURE_K = 1650.0
+D354_FEO_FUSION_ENTHALPY_J_PER_MOL = 24_000.0
+
+
+def d354_feo_crystalline_activity_factor(temperature_K: float) -> float:
+    """Estimate liquid-to-crystalline FeO activity for d-354's flagged bridge.
+
+    This is used only when a provider supplies a numeric FeO activity without
+    documenting its reference phase. The d-354 bridge uses the bounded
+    fusion-chord estimate ``DeltaG ~= DeltaH(1 - T/Tm)`` and never certifies
+    the converted value.
+    """
+
+    temperature = float(temperature_K)
+    if not is_declared_real_scalar(temperature) or not math.isfinite(temperature):
+        raise ValueError("FeO reference-state estimate needs finite temperature")
+    if temperature <= 0.0:
+        raise ValueError("FeO reference-state estimate needs positive temperature")
+    if temperature >= D354_FEO_FUSION_TEMPERATURE_K:
+        return 1.0
+    delta_g_j_per_mol = D354_FEO_FUSION_ENTHALPY_J_PER_MOL * (
+        1.0 - temperature / D354_FEO_FUSION_TEMPERATURE_K
+    )
+    return math.exp(delta_g_j_per_mol / (GAS_CONSTANT * temperature))
 
 
 class Kress91InvalidControls(ValueError):

@@ -1730,7 +1730,7 @@ def test_d350_alphamelts_substitution_reaches_evaporation_gateway(
         diagnostic_input.update(activity_diagnostics)
         diagnostic_input.update(
             {
-                "diagnostic_activity_source": "melt_oxide_activities",
+                "diagnostic_activity_source": "activities",
                 "activities_standard_state": {
                     "convention": "raoultian_pure_endmember",
                     "phase": "liquid",

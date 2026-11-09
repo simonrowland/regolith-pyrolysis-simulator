@@ -1245,7 +1245,7 @@ def _builtin_vapor_activities_from_weight_composition(
         catalog_payload
     )
     projected: dict[str, _BuiltinVaporActivity] = {}
-    parents = set(MELT_OXIDE_ACTIVITY_COEFFICIENTS).intersection(composition_mol)
+    parents = {"CaO", "MgO"}.intersection(composition_mol)
     if "FeO" in composition_mol:
         parents.add("FeO")
     for parent in sorted(parents):

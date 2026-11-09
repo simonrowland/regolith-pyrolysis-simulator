@@ -4715,15 +4715,25 @@ def _metric_value(
     if metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
         return _product_class_mass_value(metric, product_classes)
     if metric == "metals_plus_o2_kg":
-        return _nested_float(product_classes, ("metals_plus_O2", "class_total_kg"))
+        return _product_class_metric_value(
+            product_classes, ("metals_plus_O2", "class_total_kg")
+        )
     if metric == "metals_total_kg":
-        return _nested_float(product_classes, ("metals_plus_O2", "metals_total_kg"))
+        return _product_class_metric_value(
+            product_classes, ("metals_plus_O2", "metals_total_kg")
+        )
     if metric in {"O2_kg", "o2_kg", "oxygen_kg"}:
-        return _nested_float(product_classes, ("metals_plus_O2", "O2_kg"))
+        return _product_class_metric_value(
+            product_classes, ("metals_plus_O2", "O2_kg")
+        )
     if metric == "oxygen_stored_kg":
-        return _oxygen_partition_value(product_classes, "stored")
+        return _product_class_metric_value(
+            product_classes, ("oxygen", "partition_kg", "stored")
+        )
     if metric == "oxygen_vented_kg":
-        return _oxygen_partition_value(product_classes, "vented")
+        return _product_class_metric_value(
+            product_classes, ("oxygen", "partition_kg", "vented")
+        )
     if metric in ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES:
         return (
             _sim_float(
@@ -4790,22 +4800,9 @@ def _metric_value(
 def _product_class_mass_value(
     metric: str,
     product_classes: Mapping[str, Any],
-) -> float:
+) -> float | None:
     path = PRODUCT_CLASS_MASS_METRIC_PATHS[metric]
-    node: Any = product_classes
-    for key in path:
-        if not isinstance(node, Mapping) or key not in node:
-            raise ObjectiveComputationError(
-                f"objective source missing {'.'.join(path)}"
-            )
-        node = node[key]
-    label = ".".join(path)
-    if isinstance(node, bool):
-        raise ObjectiveComputationError(f"{label} is not numeric")
-    value = _finite_float(node, label)
-    if value < 0.0:
-        raise ObjectiveComputationError(f"{label} is negative")
-    return value
+    return _product_class_metric_value(product_classes, path)
 
 
 def _marginal_extraction_cost_summary(
@@ -5108,6 +5105,10 @@ def _furnace_lifespan_consumed_fraction(
 
 
 def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:
+    return _finite_float(_nested_value(root, path), ".".join(path))
+
+
+def _nested_value(root: Mapping[str, Any], path: tuple[str, ...]) -> Any:
     node: Any = root
     for key in path:
         if not isinstance(node, Mapping) or key not in node:
@@ -5115,11 +5116,35 @@ def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:
                 f"objective source missing {'.'.join(path)}"
             )
         node = node[key]
-    return _finite_float(node, ".".join(path))
+    return node
 
 
-def _oxygen_partition_value(product_classes: Mapping[str, Any], key: str) -> float:
-    return _nested_float(product_classes, ("oxygen", "partition_kg", key))
+def _product_class_metric_value(
+    product_classes: Mapping[str, Any],
+    path: tuple[str, ...],
+) -> float | None:
+    label = ".".join(path)
+    value = _nested_value(product_classes, path)
+    if value is None:
+        bucket = product_classes.get(path[0])
+        availability_flag = (
+            bucket.get("availability_flag") or bucket.get("flag")
+            if isinstance(bucket, Mapping)
+            else None
+        )
+        if (
+            isinstance(bucket, Mapping)
+            and bucket.get("status") == "unavailable"
+            and isinstance(availability_flag, Mapping)
+            and availability_flag.get("status") == "unavailable"
+        ):
+            return None
+    if isinstance(value, bool):
+        raise ObjectiveComputationError(f"{label} is not numeric")
+    result = _finite_float(value, label)
+    if result < 0.0:
+        raise ObjectiveComputationError(f"{label} is negative")
+    return result
 
 
 def _sim_float(sim: Any, sim_attr: str, record_attr: str) -> float:

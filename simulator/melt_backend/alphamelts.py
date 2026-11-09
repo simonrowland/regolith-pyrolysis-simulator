@@ -124,6 +124,13 @@ from simulator.physical_constants import (
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
 
+_ALPHAMELTS_LIQUID_ACTIVITY_STANDARD_STATE = {
+    "convention": "raoultian_pure_endmember",
+    "phase": "liquid",
+    "reference_pressure_bar": 1.0,
+    "reference_temperature_K": None,
+    "component_basis": "raoultian_pure_endmember",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -2385,6 +2392,15 @@ class _MELTSBackendSupport(MeltBackend):
             self._activity_diagnostic_payload(reported_activities)
         )
         result_diagnostics.update(activity_diagnostics)
+        if result_diagnostics.get('diagnostic_activity_source') in {
+            'activities',
+            'activity_coefficients_times_oxide_mole_fraction',
+            'phase_activity_fields',
+        }:
+            result_diagnostics.setdefault(
+                'activities_standard_state',
+                dict(_ALPHAMELTS_LIQUID_ACTIVITY_STANDARD_STATE),
+            )
         result_warnings = list(warnings or [])
         result_warnings.extend(
             notice for notice in activity_notices if notice not in result_warnings
@@ -6551,7 +6567,7 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species): dict(notice)
                 for species, notice in standard_state_notices.items()
             }
-        payload.update(self._antoine_activity_gateway_diagnostics())
+        payload.update(self._antoine_activity_gateway_diagnostics(payload))
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -6584,30 +6600,70 @@ class _MELTSBackendSupport(MeltBackend):
             )
         return payload
 
-    def _antoine_activity_gateway_diagnostics(self) -> dict[str, Any]:
-        """Return only the declared built-in activities substituted by AlphaMELTS."""
+    def _antoine_activity_gateway_diagnostics(
+        self,
+        diagnostics: Mapping[str, object],
+    ) -> dict[str, Any]:
+        """Return liquid source activities and the owner's K conversion proof."""
 
-        activities = dict(
+        source_activities = dict(
             getattr(self, "_antoine_activity_standard_state_activities", {}) or {}
         )
         provenance = dict(
             getattr(self, "_antoine_activity_standard_state_provenance", {}) or {}
         )
-        if not activities or not provenance:
+        built_in_activities = {
+            species: activity
+            for species, activity in source_activities.items()
+            if species in provenance
+        }
+        explicit_source_activities = {
+            species: activity
+            for species, activity in source_activities.items()
+            if species not in provenance
+        }
+        explicit_activities = diagnostics.get("diagnostic_oxide_activities")
+        standard_state = diagnostics.get("activities_standard_state")
+        has_documented_liquid_state = (
+            isinstance(standard_state, Mapping)
+            and str(standard_state.get("phase") or "").strip().lower()
+            in {"liquid", "liq"}
+        )
+        has_documented_explicit_activities = (
+            isinstance(explicit_activities, Mapping)
+            and bool(explicit_activities)
+            and has_documented_liquid_state
+        )
+        activities = dict(built_in_activities)
+        # The projection records values by vapor-channel species after mapping
+        # the explicit oxide activities. Those entries have no built-in
+        # conversion provenance and are included only when AlphaMELTS declared
+        # the liquid reference state above.
+        if has_documented_explicit_activities:
+            activities.update(explicit_source_activities)
+        if not activities:
             return {}
-        # AlphaMELTS proxy values remain untyped. The catalog sees only these
-        # routes' built-in declared-standard activities and their owner-produced
-        # K-basis conversion (or identity), matching the built-in handshake.
+        if has_documented_liquid_state:
+            activities_standard_state = dict(standard_state)
+        else:
+            activities_standard_state = dict(
+                _ALPHAMELTS_LIQUID_ACTIVITY_STANDARD_STATE
+            )
+        has_explicit_projection = any(
+            species not in provenance for species in activities
+        )
+        if built_in_activities and has_explicit_projection:
+            activities_provider = "mixed"
+        elif has_explicit_projection:
+            activities_provider = "AlphaMELTS"
+        else:
+            activities_provider = "BuiltinVaporPressureProvider"
+        # Built-in oxide projections carry owner-produced K conversion data;
+        # explicit AlphaMELTS liquid activities retain their provider state.
         return {
             "activities": activities,
-            "activities_provider": "BuiltinVaporPressureProvider",
-            "activities_standard_state": {
-                "convention": "raoultian_pure_endmember",
-                "phase": "liquid",
-                "reference_pressure_bar": 1.0,
-                "reference_temperature_K": None,
-                "component_basis": "raoultian_pure_endmember",
-            },
+            "activities_provider": activities_provider,
+            "activities_standard_state": activities_standard_state,
             "vapor_pressure_numerator_provenance": provenance,
         }
 
@@ -6687,6 +6743,7 @@ class _MELTSBackendSupport(MeltBackend):
                 if self._antoine_uses_reaction_pressure(spec)
                 else None
             )
+            raw_activity = self._activity_for_vapor_species(species, activities)
             if builtin_vapor_activity is not None:
                 raw_activity = float(builtin_vapor_activity.activity)
                 notice = dict(builtin_vapor_activity.notice)
@@ -6754,8 +6811,13 @@ class _MELTSBackendSupport(MeltBackend):
                 self._antoine_activity_standard_state_provenance[
                     str(species)
                 ] = activity_provenance
+            elif raw_activity is not None and self._is_number(raw_activity):
+                self._antoine_activity_standard_state_activities[
+                    str(species)
+                ] = float(raw_activity)
             elif (
-                self._antoine_uses_reaction_pressure(spec)
+                raw_activity is None
+                and self._antoine_uses_reaction_pressure(spec)
                 and parent_oxide
                 in MELT_OXIDES_REQUIRING_CRYSTALLINE_VAPOR_ACTIVITY
             ):
@@ -6772,10 +6834,6 @@ class _MELTSBackendSupport(MeltBackend):
                     ),
                 }
                 continue
-            else:
-                raw_activity = self._activity_for_vapor_species(
-                    species, activities
-                )
             if raw_activity is None or not self._is_number(raw_activity):
                 continue
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
@@ -6858,7 +6916,8 @@ class _MELTSBackendSupport(MeltBackend):
         for vapor_species in table:
             spec = table.get(str(vapor_species), {}) or {}
             parent_oxide = str(spec.get('parent_oxide', '') or '')
-            if (
+            raw = self._activity_for_vapor_species(str(vapor_species), dict(activities))
+            if raw is None and (
                 parent_oxide in builtin_activity_parent_oxides
                 and self._antoine_uses_reaction_pressure(spec)
             ):
@@ -6874,7 +6933,6 @@ class _MELTSBackendSupport(MeltBackend):
                     break
             if not melt_has_precursor:
                 continue
-            raw = self._activity_for_vapor_species(str(vapor_species), dict(activities))
             if raw is None or not self._is_number(raw):
                 missing.append(str(vapor_species))
         return sorted(missing)

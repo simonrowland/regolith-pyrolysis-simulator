@@ -23,8 +23,11 @@ import pytest
 import yaml
 
 from engines.builtin.foulant_disposition import chi_escape_salt
+from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.langmuir_knudsen import grounded_alpha
+from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.diagnostic_helpers.extract_reproduction import (
     evaluate_all,
     rollup_species_error_bars,
@@ -163,6 +166,7 @@ GAPS = _yaml(GAPS_PATH)
 PINS = _yaml(PINS_PATH)
 CATALOG_PAYLOAD = _yaml(DATA / "vapor_pressures.yaml")
 CATALOG = compile_vapour_rail_catalog(CATALOG_PAYLOAD)
+VAPOR_PRESSURE_PROVIDER = BuiltinVaporPressureProvider(CATALOG_PAYLOAD)
 CATALOG_RULES = {
     rule.species_id: rule
     for rule in CATALOG.request_rules
@@ -395,7 +399,7 @@ def _evaluate(species_id: str, temperature_K: float, *, activity: float = 0.37,
     )
 
 
-def _resolve_one(species_id: str, temperature_K: float):
+def _resolve_one(species_id: str, temperature_K: float, conformance_sim):
     rule = CATALOG_RULES[species_id]
     ledger = {rule.source_account: {parent: 1.0 for parent in rule.parent_species_ids}}
     state_kwargs: dict[str, Any] = {
@@ -408,15 +412,44 @@ def _resolve_one(species_id: str, temperature_K: float):
     if CATALOG.evaluator_for(species_id).activity_exponent:
         activity_declaration = CATALOG.species[species_id].source_reaction_activity
         assert activity_declaration is not None
+        account = {
+            parent: 1.0 for parent in rule.parent_species_ids
+        }
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": account},
+                species_formula_registry=conformance_sim.species_formula_registry,
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            control_inputs={"pO2_bar": 1.0e-9, "intrinsic_fO2_log": -9.0},
+        )
+        activity_result = VAPOR_PRESSURE_PROVIDER.dispatch(request)
+        assert activity_result.status == "ok"
+        activities = activity_result.diagnostic["activities"]
+        provenance = activity_result.diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ].get(species_id, {})
+        assert species_id in activities, species_id
         state_kwargs.update(
-            source_reaction_activities={species_id: 0.37},
-            source_reaction_activity_provider="rail_conformance_fixture",
+            source_reaction_activities={
+                species_id: float(activities[species_id])
+            },
+            source_reaction_activity_provider=activity_result.diagnostic[
+                "activities_provider"
+            ],
             source_reaction_activity_evidence_refs={
-                species_id: f"test_rail_conformance:{species_id}"
+                species_id: str(
+                    provenance.get("melt_oxide_gamma_citation")
+                    or f"BuiltinVaporPressureProvider:{species_id}"
+                )
             },
             source_reaction_activity_standard_states={
                 species_id: activity_declaration.standard_state
             },
+            source_reaction_activity_provenance={species_id: provenance},
         )
     batch = CATALOG.resolve_batch(
         ledger,
@@ -1454,7 +1487,7 @@ def test_c1_keys_resolve_through_real_consumers(
         split = chi_escape_salt(species_id, midpoint - 273.15, 1.0e-3)
         assert 0.0 <= split.escaped_frac <= 1.0
     else:
-        batch, answer = _resolve_one(species_id, midpoint)
+        batch, answer = _resolve_one(species_id, midpoint, conformance_sim)
         assert species_id in batch.requested_species_ids
         if answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
             assert isinstance(answer.pressure, PressureUpperBound)
@@ -1474,13 +1507,13 @@ def test_c1_keys_resolve_through_real_consumers(
     ("Ca", "Ti", "CaO_gas", "TiO", "TiO2_gas", "Ca2"),
 )
 def test_ca_ti_alpha_ceiling_uses_canonical_catalog_receipt(
-    species_id: str,
+    species_id: str, conformance_sim
 ) -> None:
     compiled = CATALOG.species[species_id]
     alpha = compiled.vaporisation_coefficients.evaporation_alpha
     midpoint = sum(compiled.valid_temperature_K) / 2.0
 
-    _, answer = _resolve_one(species_id, midpoint)
+    _, answer = _resolve_one(species_id, midpoint, conformance_sim)
     rendered = serialize_vapour_answer(answer)
 
     assert alpha["status"] == "analytical_upper_bound"
@@ -1507,7 +1540,9 @@ def test_c2_pressure_is_finite_over_required_grid(species_id: str) -> None:
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
-def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> None:
+def test_c2_out_of_domain_value_is_typed_diagnostic_flux(
+    species_id: str, conformance_sim
+) -> None:
     # Runtime contract b-142: the anti-cliff continuation is normally the best
     # available status-bearing point estimate. Rows whose source polynomials are
     # narrower than the outer continuation declare a typed refusal instead.
@@ -1519,7 +1554,9 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
     else:
         evaluator = CATALOG.evaluator_for(species_id)
         out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
-        batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
+        batch, answer = _resolve_one(
+            species_id, out_of_range_temperature_K, conformance_sim
+        )
         typed_refusal = (
             CATALOG.species[species_id].code_metadata.raw.get(
                 "out_of_domain_disposition"

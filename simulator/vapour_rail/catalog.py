@@ -1983,6 +1983,41 @@ def compiled_catalog_for(
     )
 
 
+def _evaluate_catalog_activity_pressures(
+    payload: Mapping[str, Any],
+    species_id: str,
+    temperature_K: float,
+    pO2_bar: float,
+    source_activities: Mapping[str, float],
+) -> dict[str, Any]:
+    """Resolve source activities and their K reference through the catalog owner."""
+
+    evaluator = compiled_catalog_for(payload).evaluator_for(str(species_id))
+    reference = evaluator.evaluate(
+        float(temperature_K),
+        source_activity=1.0,
+        pO2_bar=evaluator.pO2_reference_bar,
+    )
+    pressures = {
+        str(label): (
+            evaluator.evaluate(
+                float(temperature_K),
+                source_activity=float(activity),
+                pO2_bar=float(pO2_bar),
+            ).pressure_pa
+            if float(activity) > 0.0
+            else 0.0
+        )
+        for label, activity in source_activities.items()
+    }
+    return {
+        "reference_pressure_Pa": reference.pressure_pa,
+        "pressures_Pa": pressures,
+        "valid_temperature_K": evaluator.valid_temperature_K,
+        "reference_out_of_range": reference.out_of_range,
+    }
+
+
 def compile_vapour_rail_catalog(
     payload: Mapping[str, Any],
     *,
