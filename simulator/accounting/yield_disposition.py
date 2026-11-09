@@ -7,7 +7,7 @@ import math
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any, Callable, NamedTuple
 
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
@@ -32,6 +32,31 @@ YIELD_DISPOSITION_BINS: tuple[str, ...] = (
     "offgas_vented",
     "overhead_terminal_inventory",
 )
+
+
+class MeltBoundaryBinPartition(NamedTuple):
+    left: tuple[str, ...]
+    not_left: tuple[str, ...]
+
+
+MELT_BOUNDARY_BIN_PARTITION = MeltBoundaryBinPartition(
+    left=(
+        "product_condensed",
+        "product_tapped",
+        "product_oxygen",
+        "cleanup_volatile_product",
+        "wall_deposit",
+        "offgas_vented",
+        "overhead_terminal_inventory",
+    ),
+    not_left=(
+        "melt_retained",
+        "metal_phase_retained",
+        "redox_buffer_retained",
+        "charge_unprocessed",
+    ),
+)
+MELT_BOUNDARY_UNCLASSIFIED_BINS: tuple[str, ...] = ("cleanup_sequestered",)
 MELT_RETAINED_SUBDISPOSITIONS: tuple[str, ...] = (
     "oxide_unextracted",
     "refractory_rump",

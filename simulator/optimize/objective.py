@@ -3831,6 +3831,10 @@ def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsC
 
     base = PhysicsConstraintSet()
     updates: dict[str, Any] = {}
+    if "enforce_delivered_stream_purity" in raw_constraints:
+        updates["enforce_delivered_stream_purity"] = (
+            raw_constraints["enforce_delivered_stream_purity"]
+        )
     if "target_species" in raw_constraints:
         raw_targets = raw_constraints["target_species"]
         if not isinstance(raw_targets, (list, tuple)) or not raw_targets:

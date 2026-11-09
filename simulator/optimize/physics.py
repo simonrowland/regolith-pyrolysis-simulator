@@ -22,6 +22,7 @@ from simulator.accounting.completeness import (
     target_species_yield_by_initial_cleaned_melt,
 )
 from simulator.accounting.queries import AccountingQueries
+from simulator.accounting.yield_disposition import MELT_BOUNDARY_BIN_PARTITION
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.diagnostics import (
     _carrier_is_inapplicable,
@@ -57,7 +58,10 @@ SourceKind = Literal[
 # v7: d-045 bounds upstream wall deposition by feedstock charge mass and
 # bounds refused trace species by their vapour flux instead of pricing them as
 # zero.
-PHYSICS_GATE_VERSION = "physics-feasibility-v7-d045-upstream-fraction"
+# v8: purity is diagnostic-only by default; extraction completeness uses the
+# left-the-melt basis and retains the captured product-ledger ratio as a
+# provisional diagnostic.
+PHYSICS_GATE_VERSION = "physics-feasibility-v8-left-melt-purity-diagnostic"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -206,6 +210,7 @@ class PhysicsConstraintSet:
         source="engineering_envelope",
         source_ref="stage_purity_report PURE cutoff / optimizer profile default",
     ))
+    enforce_delivered_stream_purity: bool = False
     coating_min_campaigns_to_resinter: ThresholdSpec = field(
         default_factory=lambda: ThresholdSpec(
             id="coating_min_campaigns_to_resinter",
@@ -262,6 +267,9 @@ class PhysicsConstraintSet:
     def __getstate__(self) -> dict[str, Any]:
         return {
             "stream_purity_min": self.stream_purity_min,
+            "enforce_delivered_stream_purity": (
+                self.enforce_delivered_stream_purity
+            ),
             "coating_min_campaigns_to_resinter": self.coating_min_campaigns_to_resinter,
             "extraction_min_fraction": self.extraction_min_fraction,
             "extraction_min_fraction_by_species": dict(
@@ -279,9 +287,13 @@ class PhysicsConstraintSet:
     def __setstate__(self, state: Mapping[str, Any]) -> None:
         for key, value in state.items():
             object.__setattr__(self, key, value)
+        if "enforce_delivered_stream_purity" not in state:
+            object.__setattr__(self, "enforce_delivered_stream_purity", False)
         self.__post_init__()
 
     def __post_init__(self) -> None:
+        if not isinstance(self.enforce_delivered_stream_purity, bool):
+            raise ValueError("enforce_delivered_stream_purity must be a bool")
         object.__setattr__(
             self,
             "residual_species_by_target",
@@ -430,6 +442,38 @@ class PhysicsConstraintSet:
             for gate in GATE_ORDER
             if gate in self.active_gates
         }
+        if "delivered_stream_purity" in margins:
+            purity_margin = margins["delivered_stream_purity"]
+            purity_detail = (
+                f"{purity_margin.detail}; reads provisional condenser capture"
+            )
+            if self.enforce_delivered_stream_purity:
+                margins["delivered_stream_purity"] = replace(
+                    purity_margin,
+                    detail=purity_detail,
+                    status_payload={
+                        **purity_margin.status_payload,
+                        "diagnostic_only": False,
+                        "basis": "provisional condenser capture",
+                    },
+                )
+            else:
+                margins["delivered_stream_purity"] = replace(
+                    purity_margin,
+                    feasible=True,
+                    detail=purity_detail,
+                    status="warning",
+                    authoritative=False,
+                    output_status="provisional",
+                    status_reason=(
+                        "provisional condenser capture; diagnostic-only"
+                    ),
+                    status_payload={
+                        **purity_margin.status_payload,
+                        "diagnostic_only": True,
+                        "basis": "provisional condenser capture",
+                    },
+                )
         return FeasibilityResult(
             feasible=all(margin.feasible for margin in margins.values()),
             margins=margins,
@@ -1117,20 +1161,8 @@ class PhysicsConstraintSet:
                 threshold = self._extraction_threshold_for_target(str(target))
                 result = by_target[str(target)]
                 if result.completeness_fraction is None:
-                    if result.reason.startswith("unavailable: "):
-                        return _unavailable_gate(
-                            "extraction_completeness",
-                            threshold,
-                            result.reason.removeprefix("unavailable: "),
-                        )
                     detail = _extraction_completeness_fail_closed_detail(result)
-                    if detail.startswith("not-applicable:"):
-                        return _not_applicable(
-                            "extraction_completeness",
-                            threshold,
-                            detail,
-                        )
-                    return _fail_closed(
+                    return _unavailable_gate(
                         "extraction_completeness",
                         threshold,
                         detail,
@@ -1149,8 +1181,14 @@ class PhysicsConstraintSet:
                 worst_fraction,
                 worst_detail,
             )
-        except (AccountingError, KeyError, TypeError, ValueError) as exc:
-            return _fail_closed(
+        except (
+            AccountingError,
+            KeyError,
+            OverflowError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            return _unavailable_gate(
                 "extraction_completeness",
                 self.extraction_min_fraction,
                 str(exc),
@@ -1301,7 +1339,14 @@ def extraction_completeness_report(
             active_constraints,
             require_residual_species=True,
         )
-    except (AccountingError, AttributeError, KeyError, TypeError, ValueError) as exc:
+    except (
+        AccountingError,
+        AttributeError,
+        KeyError,
+        OverflowError,
+        TypeError,
+        ValueError,
+    ) as exc:
         target_payloads = {
             target: _extraction_completeness_insufficient_report(
                 target,
@@ -1350,51 +1395,9 @@ def extraction_completeness_report(
     )
 
 
-_EXTRACTION_COMPLETENESS_LEDGER_TOLERANCE = 1.0e-6
-
-
-def _ledger_mappings_from_trace(
-    trace: Any,
-) -> tuple[Mapping[Any, Any], Mapping[Any, Any]] | None:
-    products = getattr(trace, "product_ledger_kg", None)
-    rump = getattr(trace, "terminal_rump_by_species_kg", None)
-    if products is None or rump is None:
-        return None
-    if not isinstance(products, Mapping) or not isinstance(rump, Mapping):
-        return None
-    return products, rump
-
-
-def _assert_extraction_completeness_provenance_matches_ledger(
-    provenance_results: Mapping[str, TargetExtractionCompleteness],
-    ledger_results: Mapping[str, TargetExtractionCompleteness],
-    targets: tuple[str, ...],
-) -> None:
-    for target in targets:
-        carried = provenance_results[target]
-        ledger = ledger_results[target]
-        carried_fraction = carried.completeness_fraction
-        if carried_fraction is None:
-            continue
-        ledger_fraction = ledger.completeness_fraction
-        if ledger_fraction is None:
-            raise ValueError(
-                "extraction completeness provenance contradicts ledger for "
-                f"{target}: carried completeness_fraction={carried_fraction!r}, "
-                f"ledger completeness_fraction=None "
-                f"(ledger reason={ledger.reason!r})"
-            )
-        if not math.isclose(
-            carried_fraction,
-            ledger_fraction,
-            abs_tol=_EXTRACTION_COMPLETENESS_LEDGER_TOLERANCE,
-            rel_tol=0.0,
-        ):
-            raise ValueError(
-                "extraction completeness provenance contradicts ledger for "
-                f"{target}: carried completeness_fraction={carried_fraction!r}, "
-                f"ledger completeness_fraction={ledger_fraction!r}"
-            )
+def _optional_mapping(trace: Any, field_name: str) -> Mapping[Any, Any]:
+    value = getattr(trace, field_name, {})
+    return value if isinstance(value, Mapping) else {}
 
 
 def _extraction_completeness_by_target_for_trace(
@@ -1416,149 +1419,56 @@ def _extraction_completeness_by_target_for_trace(
                 None,
                 f"unavailable: {unavailable['reason']}",
             )
-    provenance_results = _provenance_extraction_results_from_trace(
-        trace,
-        constraints,
+    fraction_rows = getattr(trace, "yield_disposition_fraction_table_rows", None)
+    trace_error = str(
+        getattr(trace, "yield_disposition_fraction_table_error", "") or ""
     )
-    if provenance_results is not None:
-        ledger_mappings = _ledger_mappings_from_trace(trace)
-        if ledger_mappings is None:
-            raise ValueError(
-                "extraction completeness provenance cannot be verified without "
-                "product_ledger_kg and terminal_rump_by_species_kg ledgers"
-            )
-        products, rump = ledger_mappings
-        ledger_results = extraction_completeness_by_target(
-            tuple(str(target) for target in constraints.target_species),
-            constraints.residual_species_by_target,
-            products,
-            rump,
-            require_residual_species=require_residual_species,
-        )
-        _assert_extraction_completeness_provenance_matches_ledger(
-            provenance_results,
-            ledger_results,
-            tuple(str(target) for target in constraints.target_species),
-        )
-        return MappingProxyType({**provenance_results, **unavailable_results})
-    products = _required_mapping(trace, "product_ledger_kg")
-    rump = _required_mapping(trace, "terminal_rump_by_species_kg")
+    rows = None
+    if fraction_rows is not None and not trace_error:
+        if isinstance(fraction_rows, (tuple, list)) and all(
+            isinstance(row, Mapping) for row in fraction_rows
+        ):
+            rows = tuple(fraction_rows)
+        else:
+            trace_error = "yield-disposition fraction-table rows are malformed"
     results = extraction_completeness_by_target(
         tuple(str(target) for target in constraints.target_species),
         constraints.residual_species_by_target,
-        products,
-        rump,
+        _optional_mapping(trace, "product_ledger_kg"),
+        _optional_mapping(trace, "terminal_rump_by_species_kg"),
+        process_inventory_residual_kg=_optional_mapping(
+            trace,
+            "process_inventory_residual_kg",
+        ),
+        yield_disposition_fraction_table_rows=rows,
         require_residual_species=require_residual_species,
     )
+    if rows is None:
+        table_reason = (
+            trace_error or "yield-disposition fraction table is unavailable"
+        )
+        results = {
+            key: replace(
+                result,
+                completeness_fraction=None,
+                reason=(
+                    f"unavailable: yield-disposition fraction table unavailable for "
+                    f"{key}: {table_reason}"
+                    + (
+                        f"; captured basis: {result.reason}"
+                        if result.completeness_fraction is None and result.reason
+                        else ""
+                    )
+                ),
+                captured_basis_completeness_fraction=(
+                    result.completeness_fraction
+                    if result.completeness_fraction is not None
+                    else result.captured_basis_completeness_fraction
+                ),
+            )
+            for key, result in results.items()
+        }
     return MappingProxyType({**results, **unavailable_results})
-
-
-def _provenance_extraction_results_from_trace(
-    trace: Any,
-    constraints: PhysicsConstraintSet,
-) -> Mapping[str, TargetExtractionCompleteness] | None:
-    values = getattr(trace, "extraction_completeness_by_target", None)
-    if not isinstance(values, Mapping) or not values:
-        return None
-    results: dict[str, TargetExtractionCompleteness] = {}
-    for target in tuple(str(target) for target in constraints.target_species):
-        payload = values.get(target)
-        if not isinstance(payload, Mapping):
-            return None
-        results[target] = _target_extraction_result_from_payload(target, payload)
-    return MappingProxyType(results)
-
-
-def _target_extraction_result_from_payload(
-    target: str,
-    payload: Mapping[str, Any],
-) -> TargetExtractionCompleteness:
-    fraction_raw = payload.get("completeness_fraction")
-    fraction = None if fraction_raw is None else _finite_number(
-        fraction_raw,
-        f"{target}.completeness_fraction",
-    )
-    # Core mol fields: None is incomplete provenance, never silent 0.0 product.
-    # A claimed completeness_fraction without mol evidence is refused.
-    product_mol = _optional_finite_number(
-        payload.get("product_target_equiv_mol"),
-        f"{target}.product_target_equiv_mol",
-    )
-    residual_mol = _optional_finite_number(
-        payload.get("residual_target_equiv_mol"),
-        f"{target}.residual_target_equiv_mol",
-    )
-    denominator_mol = _optional_finite_number(
-        payload.get("denominator_target_equiv_mol"),
-        f"{target}.denominator_target_equiv_mol",
-    )
-    wall_mol = _optional_finite_number(
-        payload.get("wall_deposit_target_equiv_mol"),
-        f"{target}.wall_deposit_target_equiv_mol",
-    )
-    reagent_mol = _optional_finite_number(
-        payload.get("reagent_target_equiv_mol"),
-        f"{target}.reagent_target_equiv_mol",
-    )
-    gross_mol = _optional_finite_number(
-        payload.get("gross_product_target_equiv_mol"),
-        f"{target}.gross_product_target_equiv_mol",
-    )
-    feedstock_recovered_mol = _optional_finite_number(
-        payload.get("feedstock_recovered_reagent_target_equiv_mol"),
-        f"{target}.feedstock_recovered_reagent_target_equiv_mol",
-    )
-    credit_line_mol = _optional_finite_number(
-        payload.get("credit_line_reagent_target_equiv_mol"),
-        f"{target}.credit_line_reagent_target_equiv_mol",
-    )
-    external_additive_mol = _optional_finite_number(
-        payload.get("external_additive_reagent_target_equiv_mol"),
-        f"{target}.external_additive_reagent_target_equiv_mol",
-    )
-    missing_core = [
-        name
-        for name, value in (
-            ("product_target_equiv_mol", product_mol),
-            ("residual_target_equiv_mol", residual_mol),
-            ("denominator_target_equiv_mol", denominator_mol),
-        )
-        if value is None
-    ]
-    reason = str(payload.get("reason") or "unknown: no result")
-    if missing_core:
-        # Refuse the completeness claim; do not assert zero product for a
-        # target the fraction (if any) said was extracted.
-        fraction = None
-        reason = (
-            "incomplete extraction-completeness payload: missing mol fields "
-            f"{missing_core}; unknown mol is not zero product"
-        )
-    return TargetExtractionCompleteness(
-        target,
-        fraction,
-        # Honest fields: missing core mols stay None (not fabricated 0.0).
-        product_mol,
-        residual_mol,
-        denominator_mol,
-        reason,
-        wall_deposit_target_equiv_mol=0.0 if wall_mol is None else wall_mol,
-        reagent_target_equiv_mol=0.0 if reagent_mol is None else reagent_mol,
-        gross_product_target_equiv_mol=0.0 if gross_mol is None else gross_mol,
-        contract_id=str(payload.get("contract_id") or ""),
-        feedstock_recovered_reagent_target_equiv_mol=(
-            0.0 if feedstock_recovered_mol is None else feedstock_recovered_mol
-        ),
-        credit_line_reagent_target_equiv_mol=(
-            0.0 if credit_line_mol is None else credit_line_mol
-        ),
-        external_additive_reagent_target_equiv_mol=(
-            0.0 if external_additive_mol is None else external_additive_mol
-        ),
-        denominator_basis_source=str(
-            payload.get("denominator_basis_source") or "product_plus_residual"
-        ),
-    )
 
 
 def _extraction_completeness_target_report(
@@ -1569,22 +1479,88 @@ def _extraction_completeness_target_report(
     threshold = constraints._extraction_threshold_for_target(target)
     residual_species = _residual_species_for_target(target, constraints)
     has_denominator = result.completeness_fraction is not None
-    payload: dict[str, Any] = {
-        "status": "reported",
-        "conclusion": "reported",
-        "target_species": target,
-        "denominator_account": _extraction_denominator_account(),
-        "denominator_basis": "target_equivalent_mol",
-        "allowed_residual": _allowed_residual_payload(
+    uses_melt_boundary_basis = result.denominator_basis_source.startswith(
+        "yield_disposition_"
+    )
+    has_melt_boundary_basis = result.left_melt_target_equiv_mol is not None
+    allowed_residual = (
+        {
+            "account": "yield_disposition.fraction_table.destination_mol_atoms",
+            "bins": MELT_BOUNDARY_BIN_PARTITION.not_left,
+            "fraction": 1.0 - threshold.value,
+            "target_equiv_mol": (
+                (1.0 - threshold.value) * result.denominator_target_equiv_mol
+                if has_denominator
+                else None
+            ),
+        }
+        if uses_melt_boundary_basis
+        else _allowed_residual_payload(
             residual_species,
             threshold,
             result.denominator_target_equiv_mol if has_denominator else None,
             has_denominator,
+        )
+    )
+    payload: dict[str, Any] = {
+        "status": "reported",
+        "conclusion": "reported",
+        "target_species": target,
+        "denominator_account": (
+            "yield_disposition.fraction_table.destination_mol_atoms"
+            if uses_melt_boundary_basis
+            else _extraction_denominator_account()
         ),
+        "denominator_basis": (
+            "target-equivalent amount in the melt at the start of the evaluated "
+            "span, partitioned into left and not-left yield-disposition bins; "
+            "cleanup-sequestered amount is reported separately"
+            if uses_melt_boundary_basis
+            else "target_equivalent_mol"
+        ),
+        "completeness_basis": (
+            "material_that_left_the_melt"
+            if uses_melt_boundary_basis
+            else None
+        ),
+        "allowed_residual": allowed_residual,
         "product_bin": target,
         "product_account": "product_ledger_kg",
         "product_target_equiv_mol": (
             result.product_target_equiv_mol if has_denominator else None
+        ),
+        "terminal_offgas_target_equiv_mol": (
+            result.terminal_offgas_target_equiv_mol
+            if has_melt_boundary_basis
+            else None
+        ),
+        "wall_deposit_target_equiv_mol": (
+            result.wall_deposit_target_equiv_mol
+            if has_melt_boundary_basis
+            else None
+        ),
+        "not_left_melt_target_equiv_mol": (
+            result.not_left_melt_target_equiv_mol
+            if has_melt_boundary_basis
+            else None
+        ),
+        "cleanup_sequestered_target_equiv_mol": (
+            result.cleanup_sequestered_target_equiv_mol
+            if has_melt_boundary_basis
+            else None
+        ),
+        "left_melt_target_equiv_mol": (
+            result.left_melt_target_equiv_mol
+            if has_melt_boundary_basis
+            else None
+        ),
+        "captured_basis_completeness_fraction": (
+            result.captured_basis_completeness_fraction
+        ),
+        "captured_basis_label": (
+            "provisional product-ledger recovery; excludes terminal offgas and wall deposits"
+            if result.captured_basis_completeness_fraction is not None
+            else None
         ),
         "gross_product_target_equiv_mol": (
             result.gross_product_target_equiv_mol
@@ -1617,6 +1593,16 @@ def _extraction_completeness_target_report(
         "reason": "",
         "detail": result.detail,
     }
+    if not uses_melt_boundary_basis:
+        for key in (
+            "terminal_offgas_target_equiv_mol",
+            "wall_deposit_target_equiv_mol",
+            "not_left_melt_target_equiv_mol",
+            "cleanup_sequestered_target_equiv_mol",
+            "left_melt_target_equiv_mol",
+            "completeness_basis",
+        ):
+            payload.pop(key, None)
     if result.completeness_fraction is None:
         payload.update({
             "status": "insufficient-evidence",
@@ -1638,7 +1624,12 @@ def _extraction_completeness_insufficient_report(
         "conclusion": "inconclusive",
         "target_species": target,
         "denominator_account": _extraction_denominator_account(),
-        "denominator_basis": "target_equivalent_mol",
+        "denominator_basis": (
+            "target-equivalent amount in the melt at the start of the evaluated "
+            "span, partitioned into left and not-left yield-disposition bins; "
+            "cleanup-sequestered amount is reported separately"
+        ),
+        "completeness_basis": "material_that_left_the_melt",
         "allowed_residual": _allowed_residual_payload(
             residual_species,
             threshold,
@@ -1648,6 +1639,15 @@ def _extraction_completeness_insufficient_report(
         "product_bin": target,
         "product_account": "product_ledger_kg",
         "product_target_equiv_mol": None,
+        "terminal_offgas_target_equiv_mol": None,
+        "wall_deposit_target_equiv_mol": None,
+        "not_left_melt_target_equiv_mol": None,
+        "cleanup_sequestered_target_equiv_mol": None,
+        "left_melt_target_equiv_mol": None,
+        "captured_basis_completeness_fraction": None,
+        "captured_basis_label": (
+            "provisional product-ledger recovery; excludes terminal offgas and wall deposits"
+        ),
         "gross_product_target_equiv_mol": None,
         "residual_target_equiv_mol": None,
         "denominator_target_equiv_mol": None,
@@ -1876,7 +1876,9 @@ def _target_species_yield_report_payload(
 def _extraction_denominator_account() -> Mapping[str, str]:
     return MappingProxyType({
         "product": "product_ledger_kg",
-        "residual": "terminal_rump_by_species_kg",
+        "terminal_offgas": "terminal_offgas_kg",
+        "wall_deposit": "wall_deposit_by_segment_species_kg",
+        "residual": "terminal_rump_by_species_kg + process_inventory_residual_kg",
     })
 
 
@@ -1888,7 +1890,7 @@ def _allowed_residual_payload(
 ) -> Mapping[str, Any]:
     allowed_fraction = max(0.0, 1.0 - threshold.value)
     return MappingProxyType({
-        "account": "terminal_rump_by_species_kg",
+        "account": "melt_retained_and_redox_buffer_retained",
         "species": residual_species,
         "fraction": allowed_fraction,
         "target_equiv_mol": (
@@ -2921,6 +2923,9 @@ def physics_constraints_digest(constraints: Any | None = None) -> str:
         payload.update({
             "target_species": constraints.target_species,
             "active_gates": constraints.active_gates,
+            "enforce_delivered_stream_purity": (
+                constraints.enforce_delivered_stream_purity
+            ),
             "residual_species_by_target": dict(constraints.residual_species_by_target),
             "thresholds": tuple(
                 _threshold_payload(threshold)
@@ -2994,15 +2999,6 @@ def _required_sequence(trace: Any, field_name: str) -> tuple[Any, ...]:
     return tuple(value)
 
 
-def _required_mapping(trace: Any, field_name: str) -> Mapping[Any, Any]:
-    value = getattr(trace, field_name, None)
-    if value is None:
-        raise KeyError(f"trace missing {field_name}")
-    if not isinstance(value, Mapping):
-        raise TypeError(f"{field_name} must be a mapping")
-    return value
-
-
 def _stage_species_key(key: Any) -> tuple[int, str]:
     if not isinstance(key, tuple) or len(key) != 2:
         raise TypeError("stage/species key must be a 2-tuple")
@@ -3064,14 +3060,3 @@ def _finite_number(value: Any, name: str) -> float:
     if not math.isfinite(amount):
         raise ValueError(f"{name} must be finite")
     return amount
-
-
-def _optional_finite_number(value: Any, name: str) -> float | None:
-    """Parse a finite number, or return None when the field is absent.
-
-    Callers must not treat None as physical zero: missing mol fields on an
-    extraction-completeness payload are incomplete provenance.
-    """
-    if value is None:
-        return None
-    return _finite_number(value, name)

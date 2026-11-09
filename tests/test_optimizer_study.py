@@ -5098,7 +5098,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     assert all(key not in trace for key in primary_captures)
     bound_margin = constraints.extraction_completeness(SimpleNamespace(**trace))
     assert not bound_margin.feasible
-    assert "trace missing product_ledger_kg" in bound_margin.detail
+    assert bound_margin.status == "unavailable"
+    assert bound_margin.observed is None
+    assert "yield-disposition fraction table unavailable" in bound_margin.detail
 
     threshold = ThresholdSpec(
         id="extraction_completeness_min",
@@ -5202,7 +5204,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
             }
         )
     )
-    assert math.isfinite(bound.observed)
+    assert bound.status == "unavailable"
+    assert bound.observed is None
+    assert "yield-disposition fraction table unavailable" in bound.detail
     assert not bound.feasible
 
     stored = store.lookup(spec)
