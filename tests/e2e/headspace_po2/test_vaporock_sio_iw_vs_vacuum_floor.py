@@ -104,7 +104,15 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# At the ~1850.65 K C2A anchor, O'Neill IW is -8.144 versus -8.136 for the
+# removed line, so Δlog10(pO2) = -0.008774 dex. With p_SiO ∝ pO2^-0.5,
+# Δlog10(p_SiO,IW) = (-0.5)(-0.008774) = +0.004387 dex: the expected
+# finite/IW decade falls from 0.2090602025512069 to 0.2046732025512069.
+# Dex × dimensionless exponent remains dex; lower IW pO2 raises IW SiO and
+# narrows the ratio. The complete campaign measures 0.20449085636479408,
+# a -0.00456934618641282 dex shift; its 0.0001821 dex residual reflects the
+# full melt trajectory beyond the isolated pO2^-0.5 lever.
+EXPECTED_SIO_DECADE_DRIFT = 0.20449085636479408
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
