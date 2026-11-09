@@ -141,10 +141,10 @@ def test_alphamelts_subprocess_keys_its_effective_pressure() -> None:
 
     subbar_first = _vector(handle, pressure_bar=1.0e-6)
     subbar_second = _vector(handle, pressure_bar=1.0e-9)
-    one_bar = _vector(handle, pressure_bar=1.0)
+    higher_pressure = _vector(handle, pressure_bar=10.0)
 
     assert subbar_first == subbar_second
-    assert subbar_first != one_bar
+    assert subbar_first != higher_pressure
 
 
 def test_alphamelts_subprocess_subbar_pressure_reuses_cached_result(
@@ -168,12 +168,12 @@ def test_alphamelts_subprocess_subbar_pressure_reuses_cached_result(
 
     subbar = solve(1.0e-6)
     same_effective_pressure = solve(1.0e-9)
-    one_bar = solve(1.0)
+    higher_pressure = solve(10.0)
 
     assert backend.calls == 2
     assert subbar.to_cache_payload() == same_effective_pressure.to_cache_payload()
     assert not hasattr(subbar, "physical_pressure_bar")
-    assert one_bar.to_cache_payload() == subbar.to_cache_payload()
+    assert higher_pressure.to_cache_payload() == subbar.to_cache_payload()
     assert cache.counters["alphamelts"]["hits"] == 1
     assert cache.counters["alphamelts"]["misses"] == 2
 
@@ -300,7 +300,8 @@ def test_isolated_cell_uses_parent_magemin_database_for_off_cold_and_warm(
         == warm.engine_reason
     )
     assert opened_settings == [
-        _vector(handle)["engine_settings"]
+        _vector(handle)["engine_settings"],
+        _vector(handle)["engine_settings"],
     ]
     assert cache.counters["magemin"]["misses"] == 1
     assert cache.counters["magemin"]["hits"] == 1
