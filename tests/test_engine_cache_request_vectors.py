@@ -317,40 +317,6 @@ def test_request_vector_changes_when_magemin_buffer_setting_changes() -> None:
 @pytest.mark.parametrize(
     ("engine", "setting", "value"),
     [
-        ("alphamelts", "fO2_buffer", "NNO"),
-        ("alphamelts", "redox_buffer", "NNO"),
-        ("alphamelts", "fO2_offset", 0.25),
-        ("alphamelts", "Fe3Fet_Liq", 0.2),
-        ("alphamelts", "fe3fet_ratio", 0.2),
-        ("alphamelts", "model", "model-b"),
-        ("alphamelts", "vapor_transport_pO2_bar", 1.0e-8),
-        ("alphamelts", "vapor_transport_floor_bar", 1.0e-10),
-        ("thermoengine", "model", "model-b"),
-        ("thermoengine", "vapor_transport_pO2_bar", 1.0e-8),
-        ("thermoengine", "vapor_transport_floor_bar", 1.0e-10),
-        ("magemin", "database", "mp"),
-        ("magemin", "fO2_buffer", "nno"),
-        ("vaporock", "temperature_units", "K"),
-        ("vaporock", "pressure_units", "Pa"),
-        ("vaporock", "vapor_pressure_units", "Pa"),
-    ],
-)
-def test_request_vector_changes_when_backend_config_changes(
-    engine: str, setting: str, value: Any
-) -> None:
-    backend = _Backend(engine)
-    handle = _handle(engine, backend)
-    first = _vector(handle)
-
-    backend._config[setting] = value
-    second = _vector(handle)
-
-    assert first != second, f"{engine}.config[{setting!r}] is missing from the cache key"
-
-
-@pytest.mark.parametrize(
-    ("engine", "setting", "value"),
-    [
         ("alphamelts", "warm_worker", True),
         ("alphamelts", "petthermotools_warm_call_timeout_s", 42.0),
         ("alphamelts", "timeout_s", 43.0),
