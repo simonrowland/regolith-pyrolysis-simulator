@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {
-    "schema_version": "1.9.0",
+    "schema_version": "1.10.0",
     "feedstock_id": "mars_basalt",
     "campaign": "C2A",
     "hours_requested": 12,
@@ -20010,7 +20010,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 60,
+      "total_count": 450,
       "by_hour": [
         {
           "campaign": "C2A",
@@ -20052,37 +20052,37 @@
           "campaign": "C2A",
           "hour": 6,
           "campaign_hour": 6,
-          "count": 5
+          "count": 70
         },
         {
           "campaign": "C2A",
           "hour": 7,
           "campaign_hour": 7,
-          "count": 5
+          "count": 70
         },
         {
           "campaign": "C2A",
           "hour": 8,
           "campaign_hour": 8,
-          "count": 5
+          "count": 70
         },
         {
           "campaign": "C2A",
           "hour": 9,
           "campaign_hour": 9,
-          "count": 5
+          "count": 70
         },
         {
           "campaign": "C2A",
           "hour": 10,
           "campaign_hour": 10,
-          "count": 5
+          "count": 70
         },
         {
           "campaign": "C2A",
           "hour": 11,
           "campaign_hour": 11,
-          "count": 5
+          "count": 70
         }
       ]
     }
@@ -20362,6 +20362,27 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,
@@ -23704,6 +23725,27 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -27044,6 +27086,27 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,
@@ -30386,6 +30449,27 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -33726,6 +33810,27 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,
@@ -37068,6 +37173,27 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "not_run",
+        "closure": {},
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [],
+        "iterations_by_consumer": {},
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -40408,6 +40534,61 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,
@@ -47926,6 +48107,61 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -55442,6 +55678,61 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,
@@ -62960,6 +63251,61 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -70477,6 +70823,61 @@
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
       },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
+      },
       "stage_3_capture": {
         "Fe_kg": 0.0,
         "total_kg": 0.0,
@@ -77993,6 +78394,61 @@
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "same_hour_headspace_diagnostics": {
+        "regime": "pumped",
+        "closure": {
+          "regime": "pumped",
+          "iterations": 65,
+          "converged": false,
+          "status": "no_root_found_by_sampling",
+          "rates_kg_hr": {},
+          "partial_pressures_Pa": {},
+          "zero_flow_criterion": {},
+          "scan_evaluations": 64,
+          "roots_g": [],
+          "multiple_closure_roots": false,
+          "sampling_evidence": {
+            "grid": {
+              "axis": "pressure_Pa",
+              "minimum": 2000.0,
+              "maximum": 1.8446744073709552e+22,
+              "span_decades": 18.964889726830815,
+              "sample_ratio_between_points": 2.0,
+              "sample_count": 64
+            },
+            "scan_evaluations": 64,
+            "tail_fraction": 0.0
+          },
+          "value_is_unresolved_last_iterate": false
+        },
+        "pressure_held_sweep_bounds": {},
+        "species_physical_zeros": {},
+        "notices": [
+          {
+            "type": "typed_notice",
+            "kind": "same_hour_headspace_closure_nonconvergence",
+            "source": "ordinary_evaporation",
+            "iterations": 65,
+            "authority": "extrapolated"
+          }
+        ],
+        "iterations_by_consumer": {
+          "ordinary_evaporation": 65
+        },
+        "carrier_feed_consumption": {
+          "status": "inactive",
+          "species": null,
+          "feed_rate_mol_s": null,
+          "mol_per_hour": 0.0,
+          "kg_per_hour": 0.0,
+          "mol_per_run": 0.0,
+          "kg_per_run": 0.0,
+          "known_mol_per_run": 0.0,
+          "known_kg_per_run": 0.0,
+          "run_totals_status": "complete",
+          "by_species_per_run": {}
+        }
       },
       "stage_3_capture": {
         "Fe_kg": 0.0,

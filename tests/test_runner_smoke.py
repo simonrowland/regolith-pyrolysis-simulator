@@ -115,15 +115,15 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        "flux_maps_sha256": "0f68382f83fa9853f28e45ce26d6e16f03334c1a83fb3188974377a988f91c14",
+        "ledger_sha256": "9c3149afcde0845e497b8aaba9cb0a2f6a3a3bf9e61d42c8707c17b188aac39a",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
         # 9666fc129 plus the de32c69ca runner regen). flux_maps_sha256 did
         # not move. Mars full runs diverge between the laptop and studio-3,
         # so this digest is not a laptop re-run.
-        "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
+        "flux_maps_sha256": "b45d479caffb8e8672037a0c592d8f3d4bee0c688fd9ae41dfae0fed99742190",
         "ledger_sha256": "12d2bd219387ab9e6df5d1016845f1f926319f7913693f9202385db65e771337",
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
