@@ -78,6 +78,82 @@ def oneill_qfm_log10_fO2_bar(temperature_K: float) -> float:
     return 8.58 - 25050 / temperature_K
 
 
+# O'Neill (1987), Am. Mineral. 72, 67-75, reaction (2), QFM; primary EMF fit.
+# Premise: μ°_O2 for 3 Fe2SiO4 + O2 = 2 Fe3O4 + 3 SiO2 is printed as
+# μ_O2 (±200 J/mol) = -587474 + 1584.427 T - 203.3164 T ln(T) + 0.092710 T²
+# (900 < T < 1420 K; the quoted ±200 J/mol is the uncertainty, not an offset;
+# 1 bar). At equilibrium μ°_O2=RT ln(fO2/bar), so
+# log10(fO2/bar)=μ°_O2/(R T ln(10)). The units cancel to a dimensionless
+# base-10 logarithm. At 1200 K this gives -12.296398239 (rounded).
+ONEILL_QFM_TEMPERATURE_RANGE_K = (900.0, 1420.0)
+ONEILL_QFM_UNCERTAINTY_J_MOL = 200.0
+
+
+def oneill_1987_qfm_log10_fO2_bar(temperature_K: float) -> float:
+    """Return O'Neill (1987) primary EMF QFM relation at 1 bar."""
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    mu_o2 = (
+        -587474.0
+        + 1584.427 * temperature
+        - 203.3164 * temperature * math.log(temperature)
+        + 0.092710 * temperature**2
+    )
+    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+
+
+# O'Neill (1988), Am. Mineral. 73, 470-486, equation (11), Fe + "FeO".
+# The source gives μ_O2 (±100 J mol^-1) in three temperature segments;
+# ±100 J mol^-1 is the uncertainty, not an additive offset. μ°_O2 is ΔG° for
+# 2 Fe + O2 = 2 "FeO" at the 1-bar reference. Thus
+# Source equations (O'Neill, p. 477, eq. 11):
+# μ_O2 (±100) = -605812 + 1366.718T - 182.7955T ln(T) + 0.10359T²
+# (833<T<1042); -519357 + 59.427T + 8.9276T ln(T) (1042<T<1184);
+# -551159 + 269.404T - 16.9484T ln(T) (1184<T<1450), all J mol^-1.
+# log10(fO2/bar) = μ°_O2 / (R T ln(10)); J mol^-1 /(J mol^-1 K^-1 K)
+# is dimensionless, and the 1-bar standard makes the numerical logarithm
+# directly log10(fO2/bar). At 1000 K the printed first segment gives
+# log10(fO2/bar) = -20.799980169 (rounded), a reducing IW value.
+ONEILL_IW_TEMPERATURE_RANGES_K = (
+    (833.0, 1042.0),
+    (1042.0, 1184.0),
+    (1184.0, 1450.0),
+)
+ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
+_ONEILL_IW_R = 8.31446261815324
+_ONEILL_IW_LN10 = math.log(10.0)
+
+
+def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
+    """Return O'Neill (1988) equation (11) log10(fO2/bar) for IW.
+
+    Outside the printed range the nearest end segment is extrapolated; callers
+    retain that range and flag the prediction rather than clamping its value.
+    The three source equations are transcribed below. The printed ±100 J/mol
+    uncertainty is metadata and does not shift μ°.
+    """
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    if temperature < 1042.0:
+        mu_o2 = (
+            -605812.0
+            + 1366.718 * temperature
+            - 182.7955 * temperature * math.log(temperature)
+            + 0.10359 * temperature**2
+        )
+    elif temperature < 1184.0:
+        mu_o2 = (
+            -519357.0
+            + 59.427 * temperature
+            + 8.9276 * temperature * math.log(temperature)
+        )
+    else:
+        mu_o2 = (
+            -551159.0
+            + 269.404 * temperature
+            - 16.9484 * temperature * math.log(temperature)
+        )
+    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+
+
 def _require_finite_positive(value: float, label: str) -> float:
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         raise TypeError(f"{label} must be numeric")
@@ -261,7 +337,12 @@ def legacy_iw_log10_fO2_bar(
     *,
     vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Return the legacy IW line, flooring T unless it is strictly positive."""
+    """Return the legacy IW line used by runtime Fe-redox.
+
+    This line is uncited and slated for removal per d-324; changing its
+    runtime calibration is a separate owner card. Battery migration must use
+    the cited O'Neill calibration below instead.
+    """
     temperature = float(temperature_K)
     if not (temperature > 0.0):
         return math.log10(vacuum_floor_bar)
@@ -290,6 +371,7 @@ def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
 
 
 def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
+    """Return the Holzheid activity-bearing IW relation for a_FeO input."""
     activity = max(float(a_feo), 1.0e-300)
     R = 8.31446261815324
     ln_fO2 = 2.0 * (
@@ -306,8 +388,20 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
 FE_FEO_BUFFER_STANDARD = 'wustite_FeO_l_holzheid1997_eq9'
 
 
+# Frost (1991), Rev. Mineral. 25, Table 1; log10(fO2/bar) = A/T + B +
+# C(P_bar-1)/T. These are cited calibration data owned here so the battery and
+# reproduction benchmark cannot carry independent coefficient copies.
+FROST_IW_COEFFICIENTS = (-27489.0, 6.702, 0.055)
+FROST_NNO_COEFFICIENTS = (-24930.0, 9.36, 0.046)
+FROST_WM_COEFFICIENTS = (-32807.0, 13.012, 0.083)
 FROST_QFM_ALPHA_COEFFICIENTS = (-26455.3, 10.344, 0.092)
 FROST_QFM_BETA_COEFFICIENTS = (-25096.3, 8.735, 0.110)
+FROST_BUFFER_TEMPERATURE_RANGES_K = {
+    "IW": (838.15, 1473.15),
+    "NNO": (873.15, 1473.15),
+    "QFM": (846.15, 1473.15),
+    "WM": (838.15, 1473.15),
+}
 
 
 def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
@@ -349,3 +443,20 @@ def frost_condensed_buffer_log10_fO2_bar(
         + B
         + pressure_coefficient_K_per_bar * (P_bar - 1) / T_K
     )
+
+
+def frost_buffer_log10_fO2_bar(
+    buffer: str, T_K: float, P_bar: float = 1.0
+) -> float:
+    """Return the Frost (1991) log10(fO2/bar) for a named buffer."""
+    name = buffer.upper()
+    if name == "QFM":
+        return _qfm_logfo2_frost(T_K, P_bar)
+    coefficients = {
+        "IW": FROST_IW_COEFFICIENTS,
+        "NNO": FROST_NNO_COEFFICIENTS,
+        "WM": FROST_WM_COEFFICIENTS,
+    }.get(name)
+    if coefficients is None:
+        raise ValueError(f"unsupported Frost buffer {buffer!r}")
+    return float(frost_condensed_buffer_log10_fO2_bar(*coefficients, T_K, P_bar))
