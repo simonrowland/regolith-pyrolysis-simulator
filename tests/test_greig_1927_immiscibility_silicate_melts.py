@@ -8,6 +8,13 @@ from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml"
+MAPPING = ROOT / "data/literature/extracts/audits/greig-1927-ajs-immiscibility-silicate-melts-part1.mapping.yaml"
+
+
+def test_greig_1927_audit_mapping_is_valid_yaml():
+    mapping = yaml.safe_load(MAPPING.read_text(encoding="utf-8"))
+
+    assert isinstance(mapping, dict)
 
 
 def _context_by_id(document):
