@@ -78,13 +78,11 @@ def test_harvest_and_mineru_defaults_honor_configured_roots(
 
     from tools import (
         harvest_burcat_compilation as burcat,
-        harvest_sgte_unary_compilation as sgte,
         mineru_table_draft as draft,
         mineru_table_qa as qa,
     )
 
     assert burcat.default_source() == configured_root / "raw/burcat-third-millennium"
-    assert sgte.default_source() == configured_root / "raw/sgte-unary-5.0"
     assert draft.default_corpus_root() == configured_root / "raw"
     assert qa.default_corpus_root() == configured_root
 
@@ -151,7 +149,6 @@ def test_consumer_defaults_preserve_legacy_owner_paths(monkeypatch, tmp_path):
     from simulator.corpus_paths import regolith_corpus_ctl_root
     from tools import (
         harvest_burcat_compilation as burcat,
-        harvest_sgte_unary_compilation as sgte,
         ingest_pankratz_1987_usbm_b689 as pankratz,
         mineru_table_draft as draft,
         mineru_table_qa as qa,
@@ -167,7 +164,6 @@ def test_consumer_defaults_preserve_legacy_owner_paths(monkeypatch, tmp_path):
     ctl_root = regolith_corpus_ctl_root()
 
     assert burcat.default_source() == ctl_root / "raw/burcat-third-millennium"
-    assert sgte.default_source() == ctl_root / "raw/sgte-unary-5.0"
     assert draft.default_corpus_root() == corpus_root / "raw"
     assert qa.default_corpus_root() == corpus_root
     assert b1544.pdf_candidates() == (
