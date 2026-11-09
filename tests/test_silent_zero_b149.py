@@ -310,6 +310,18 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
         _build_partial_melt_offgassing_diagnostic=lambda *a, **kw: {},
         _freeze_gate_enabled=lambda: False,
+        # Same-hour closure reads these before it can see that this double
+        # has no series-resistance row. Projection then keeps the kernel
+        # flux; the answers only let that check run.
+        overhead_model=SimpleNamespace(
+            _has_positive_pipe_conductance=lambda _temperature_C: False,
+        ),
+        _headspace_downstream_pressure_bar=lambda _override=None: 0.0,
+    )
+    sim.melt.p_total_mbar = 0.0
+    sim._evaporation_overhead_total_pressure_Pa = MethodType(
+        EvaporationMixin._evaporation_overhead_total_pressure_Pa,
+        sim,
     )
     sim._resolve_evaporation_batch_flux_state = MethodType(
         EvaporationMixin._resolve_evaporation_batch_flux_state,
@@ -480,6 +492,7 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         melt=SimpleNamespace(
             campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
             campaign_hour=0,
+            temperature_C=float(source_row["default_hold_T_C"]),
             melt_surface_area_m2=0.2,
             p_total_mbar=0.05,
             stir_state=SimpleNamespace(axial=1.0),
@@ -490,8 +503,20 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         campaign_mgr=CampaignManager(setpoints),
         _resolve_condensation_carrier_gas=lambda: "N2",
         overhead=SimpleNamespace(headspace_temperature_K=1000.0),
-        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        # Closure asks pipe conductance and builds partials from the
+        # overhead model. This double has no pipe; empty partials and a
+        # non-positive conductance keep the Ca extent on the P_bulk=0 flux.
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.12,
+            estimate_transport_state=lambda *args, **kwargs: {
+                "vapor_pressure_mbar": 0.0,
+            },
+            species_partial_pressures=lambda *args, **kwargs: {},
+            _has_positive_pipe_conductance=lambda _temperature_C: False,
+        ),
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
+        _headspace_downstream_pressure_bar=lambda _override=None: 0.0,
+        species_formula_registry={},
         _silent_zero_notes=[],
     )
     # Static/instance helpers resolved on the mixin class, not the host.
