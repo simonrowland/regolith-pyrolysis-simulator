@@ -261,7 +261,7 @@ def test_unitless_log_iw_band_edges_follow_the_row_temperature(tmp_path: Path) -
     The centre is ``feo_iw_log10_fO2_bar`` at the row temperature, then
     ``Decimal(str(centre))``, the same conversion the migrator applies.
     """
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
     temperature = Decimal("1677")
     centre = Decimal(str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0)))

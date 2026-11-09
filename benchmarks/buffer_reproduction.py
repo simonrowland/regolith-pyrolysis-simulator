@@ -75,6 +75,11 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Callable, Sequence
 
+from simulator.oxygen_buffers import (
+    FROST_QFM_BETA_COEFFICIENTS,
+    frost_condensed_buffer_log10_fO2_bar,
+)
+
 GAS_CONSTANT_J_MOL_K = 8.314462618
 LN10 = math.log(10.0)
 
@@ -134,7 +139,13 @@ class PublishedBuffer:
     notes: str = ""
 
     def log10_fo2(self, T_K: float) -> float:
-        return self.A_K / float(T_K) + self.B
+        return frost_condensed_buffer_log10_fO2_bar(
+            self.A_K,
+            self.B,
+            self.pressure_coefficient_K_per_bar,
+            float(T_K),
+            1.0,
+        )
 
 
 #: Coefficients AND windows read from Frost (1991) Table 1 and checked against
@@ -184,11 +195,11 @@ PUBLISHED_BUFFERS: dict[str, PublishedBuffer] = {
     ),
     "QFM": PublishedBuffer(
         name="QFM",
-        A_K=-25096.3,
-        B=8.735,
+        A_K=FROST_QFM_BETA_COEFFICIENTS[0],
+        B=FROST_QFM_BETA_COEFFICIENTS[1],
         T_min_K=846.15,   # ~573 C, the beta-quartz branch
         T_max_K=1473.15,  # 1200 C
-        pressure_coefficient_K_per_bar=0.110,
+        pressure_coefficient_K_per_bar=FROST_QFM_BETA_COEFFICIENTS[2],
         citation=(
             "Frost (1991) Rev. Mineral. 25, 1-10, Table 1 (quartz-fayalite-"
             "magnetite, beta-quartz branch); the same coefficients are carried "

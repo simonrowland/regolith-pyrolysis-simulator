@@ -28,7 +28,7 @@ from engines.builtin.melt_effect_adjustment import (
     strip_non_oxide_residuals,
     warn_tier_analytical_diagnostic,
 )
-from engines.builtin.cco_redox_buffer import cco_log10_fO2_bar
+from simulator.oxygen_buffers import cco_log10_fO2_bar
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 from simulator.melt_backend.base import (

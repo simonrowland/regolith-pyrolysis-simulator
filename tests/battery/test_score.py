@@ -8013,7 +8013,7 @@ def _hero_deck_score_row(
 
 
 def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
     composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
@@ -8106,7 +8106,7 @@ def test_battery_hero_nbo_t_refuses_free_oxygen_beyond_four() -> None:
 
 def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
     from simulator.battery.score import compute_metric
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
     composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
@@ -8269,7 +8269,7 @@ def test_solved_effusion_po2_bar_keeps_its_binary_value() -> None:
 
 
 def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
     composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,

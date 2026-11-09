@@ -192,7 +192,7 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
-from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 

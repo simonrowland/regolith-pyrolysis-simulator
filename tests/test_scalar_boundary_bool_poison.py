@@ -18,7 +18,7 @@ from engines.builtin._common import (
     control_float as builtin_control_float,
     resolve_request_vacuum_floor_bar,
 )
-from engines.builtin.cco_redox_buffer import _require_finite_positive
+from simulator.oxygen_buffers import _require_finite_positive
 from engines.builtin.evaporation_flux import (
     EvaporationFluxConfigurationError,
     _coerce_alpha_by_species,

@@ -16815,7 +16815,7 @@ def _bare_log_convention(
         or temperature_K <= 0
     ):
         return State.unknown(_BARE_LOG_SCALE_UNKNOWN), None
-    from simulator.fe_redox import Kress91InvalidControls, feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import Kress91InvalidControls, feo_iw_log10_fO2_bar
 
     try:
         centre = feo_iw_log10_fO2_bar(float(temperature_K), a_feo=1.0)

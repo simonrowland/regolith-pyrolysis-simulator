@@ -75,6 +75,7 @@ from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
+from simulator.oxygen_buffers import _qfm_logfo2_frost
 from simulator.feedstock_composition import (
     feot_equivalent_wt_pct,
     iron_oxide_values,
@@ -170,23 +171,6 @@ class SulfurSaturationResult:
     S_in_sulfate_ppm: float = 0.0
     warnings: List[str] = field(default_factory=list)
     calibration_status: str = 'unavailable'
-
-
-def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
-    """Return absolute log10(fO2) of the Frost (1991) QFM buffer."""
-    T_K = float(T_K)
-    P_bar = float(P_bar)
-    # Jugo et al. (2010) defines deltaQFM against Frost (1991), not O'Neill.
-    # Frost's log10(fO2) = A + B/T + C(P-1)/T, as reproduced by PySulfSat
-    # 1.0.12 (s6_corrections.py:643-653): beta quartz uses A=8.735,
-    # B=-25096.3 K, C=0.110 K/bar; alpha quartz uses A=10.344,
-    # B=-26455.3 K, C=0.092 K/bar. Thus every term is dimensionless
-    # (log10 units). At 1200 K and 1 bar the beta branch gives -12.1786,
-    # the published Frost QFM value and PySulfSat's result at that point.
-    quartz_transition_K = 573.0 + 273.15 + 0.025 * P_bar
-    if T_K < quartz_transition_K:
-        return 10.344 - 26455.3 / T_K + 0.092 * (P_bar - 1.0) / T_K
-    return 8.735 - 25096.3 / T_K + 0.110 * (P_bar - 1.0) / T_K
 
 
 class SulfSatGate:

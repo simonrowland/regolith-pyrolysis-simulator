@@ -29,7 +29,7 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
-from simulator.chemistry.graphite_c_co import (
+from simulator.oxygen_buffers import (
     _CCO_EQUATION,
     cco_log10_fO2_bar,
 )
