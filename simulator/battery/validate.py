@@ -1475,8 +1475,11 @@ def _validate_observation(
             ev.value is EvidenceClass.MODEL_DERIVED
             and observation.value.kind is ValueKind.UNAVAILABLE
         )
+        model_derived_without_derivation = (
+            model_derived_backlogged and derivation is None
+        )
         if not figure_only_without_value and not (
-            model_derived_backlogged or model_derived_unavailable
+            model_derived_without_derivation or model_derived_unavailable
         ):
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for

@@ -1431,6 +1431,10 @@ def test_model_derived_prose_method_without_named_references_fails() -> None:
         issue.path.endswith((".derivation.method", ".derivation.references"))
         for issue in report.hard_issues
     )
+    assert any(
+        issue.path == f"observation[{observation.observation_id}].derived_from"
+        for issue in report.hard_issues
+    )
     assert [
         (notice.code, notice.source_id, notice.count)
         for notice in report.notices
