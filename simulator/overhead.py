@@ -228,6 +228,9 @@ def _solve_same_hour_headspace_closure(
     class _ClosureEvaluationCapReached(Exception):
         pass
 
+    class _AdmissionZeroBranch(Exception):
+        pass
+
     def evaluate_at_pressure(g, pressure):
         nonlocal evaluations
         if evaluations >= evaluation_cap:
@@ -292,6 +295,80 @@ def _solve_same_hour_headspace_closure(
 
         pressure_low = pressure_floor
         low_evaluation = evaluate_at_pressure(g, pressure_low)
+        low_molar_flow = math.fsum(
+            low_evaluation[0][species]
+            / float(molar_masses_kg_mol[species])
+            for species in species_names
+            if low_evaluation[0][species] > 0.0
+        )
+        if low_molar_flow == 0.0 and low_evaluation[3] == 0.0:
+            # A zero at the pressure floor can be only an admission transform
+            # (for example, C7's viscous-domain guard). Scan increasing
+            # pressure geometrically and bracket only sign changes between
+            # positive-flow samples; the floor zero is not a physical root.
+            pressure = max(
+                pressure_low * 2.0,
+                pressure_low + 1.0,
+            )
+            previous_positive = None
+            for _ in range(64):
+                pressure_evaluation = evaluate_at_pressure(g, pressure)
+                pressure_rates = pressure_evaluation[0]
+                pressure_molar_flow = math.fsum(
+                    pressure_rates[species]
+                    / float(molar_masses_kg_mol[species])
+                    for species in species_names
+                    if pressure_rates[species] > 0.0
+                )
+                if pressure_molar_flow > 0.0:
+                    pressure_residual = pressure_evaluation[3]
+                    if pressure_residual == 0.0:
+                        return pressure_evaluation
+                    if previous_positive is not None:
+                        previous_pressure, previous_evaluation = previous_positive
+                        if previous_evaluation[3] * pressure_residual < 0.0:
+                            from scipy.optimize import brentq
+
+                            last_pressure = None
+                            last_pressure_evaluation = None
+
+                            def positive_pressure_residual(candidate_pressure):
+                                nonlocal last_pressure, last_pressure_evaluation
+                                candidate = evaluate_at_pressure(
+                                    g, candidate_pressure
+                                )
+                                candidate_flow = math.fsum(
+                                    candidate[0][species]
+                                    / float(molar_masses_kg_mol[species])
+                                    for species in species_names
+                                    if candidate[0][species] > 0.0
+                                )
+                                if candidate_flow <= 0.0:
+                                    raise _AdmissionZeroBranch(
+                                        'pressure root crossed an admission-zero branch'
+                                    )
+                                last_pressure = candidate_pressure
+                                last_pressure_evaluation = candidate
+                                return candidate[3]
+
+                            try:
+                                root_pressure = brentq(
+                                    positive_pressure_residual,
+                                    previous_pressure,
+                                    pressure,
+                                    xtol=1.0e-300,
+                                    rtol=relative_tolerance,
+                                    maxiter=max(1, evaluation_cap - evaluations),
+                                )
+                            except _AdmissionZeroBranch:
+                                previous_positive = None
+                            else:
+                                if root_pressure == last_pressure:
+                                    return last_pressure_evaluation
+                                return evaluate_at_pressure(g, root_pressure)
+                    previous_positive = (pressure, pressure_evaluation)
+                pressure *= 2.0
+            return low_evaluation
         if low_evaluation[3] <= 0.0:
             return low_evaluation
         pressure_high = max(

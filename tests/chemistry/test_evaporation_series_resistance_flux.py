@@ -997,6 +997,41 @@ def test_native_fe_closure_uses_pressure_held_zero_boundary(
     ]["native_fe"] == 0
 
 
+def test_c7_pressure_scan_finds_positive_branch_above_suppressed_floor(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1750.0
+    sim.melt.p_total_mbar = 0.03632
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead.headspace_temperature_K = 2023.15
+    cfg = dict(sim._c7_campaign_config())
+    cfg.update(
+        active_ca_condensation_route=True,
+        dedicated_ca_condenser=True,
+        hold_temp_C=1750.0,
+        p_total_mbar=0.03632,
+        ca_route_surface_area_m2=0.2,
+        hold_time_h=1.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+    )
+
+    extent, diagnostic = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
+    closure = diagnostic["same_hour_headspace_closure"]
+
+    assert closure["converged"] is True
+    assert closure["rates_kg_hr"]["Ca"] == pytest.approx(
+        562.3498686097761, rel=1.0e-6
+    )
+    assert extent > 0.0
+
+
 @pytest.mark.parametrize("pressure_held", (False, True))
 def test_step_persists_the_selected_same_hour_source_map(
     vapor_pressure_data,
