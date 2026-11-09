@@ -1,19 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import RefusalReason
-from simulator.battery.migrate import load_migrated_store, migrate
+from simulator.battery.migrate import _parse_run_metadata_shape
 from simulator.battery.records import RUN_METADATA_FIELD_HOMES, Value
-from tests.battery.test_migrate import _write_min_tree
 from tests.battery.test_run_metadata_schema import (
     _RUN_METADATA_UNIT_KEYS,
-    _loaded_run_metadata_inference,
-    _loaded_run_metadata_value,
     _run_metadata_field_payload,
     _run_metadata_mapping_at,
     _run_metadata_mapping_paths,
@@ -25,7 +22,6 @@ from tests.battery.test_run_metadata_schema import (
 def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
     tmp_path: Path,
 ) -> None:
-    mutations = 0
     fields = (
         "mass_kg",
         "final_mass_kg",
@@ -121,64 +117,57 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                 extract = deepcopy(base_extract)
                 field_payload = _run_metadata_field_payload(extract, field, home)
                 _run_metadata_mapping_at(field_payload, node_path)[unit_key] = "g"
-                root = _write_min_tree(
-                    tmp_path / f"mutation-{mutations}", extract
+                parsed, errors = _parse_run_metadata_shape(
+                    RUN_METADATA_FIELD_HOMES[field][0],
+                    field_payload,
+                    field=field,
                 )
-                result = migrate(root, write=True)
-                assert result.validation is not None
-                experiment_id = "10.1234/fixture::experiment::run-1"
-                _works, experiments, _observations = load_migrated_store(root)
-                loaded = _loaded_run_metadata_value(
-                    experiments[experiment_id], field
-                )
-                field_issues = [
-                    issue
-                    for issue in result.validation.issues
-                    if issue.reason is RefusalReason.INVALID_SOURCE
-                    and field in issue.path
-                ]
                 context = (
                     f"field={field}, home={home}, shape={shape}, "
                     f"node={node_path}, key={unit_key}"
                 )
-                if field_issues:
-                    if field == "species_loss_fraction" and node_path == ():
+                if errors:
+                    if field == "species_loss_fraction" and parsed is not None:
+                        assert unit_key not in parsed, context
                         assert any(
-                            issue.path.endswith(f"[{unit_key}]")
-                            for issue in field_issues
+                            formula == unit_key
+                            for formula, _raw_value, _detail in errors
                         ), context
-                        assert loaded is None or unit_key not in loaded, context
                     else:
-                        assert loaded is None, context
+                        assert parsed is None, context
                     if shape == "misplaced-as-published":
                         assert any(
                             "as_published is only valid on the Located value"
-                            in issue.detail
-                            for issue in field_issues
+                            in detail
+                            for _formula, _raw_value, detail in errors
                         ), context
-                elif unit_key.casefold() == "output_unit":
-                    inference = _loaded_run_metadata_inference(
-                        experiments[experiment_id], field
-                    )
+                    continue
+
+                located = parsed
+                if field == "species_loss_fraction":
+                    assert isinstance(parsed, Mapping), context
+                    located = parsed.get("Na")
+                assert located is not None, context
+                if unit_key.casefold() == "output_unit":
+                    inference = located.inference
                     assert inference is not None, context
                     assert inference.output_unit == "g", context
                 elif (
                     field in {"mass_kg", "final_mass_kg"}
-                    and loaded is not None
-                    and loaded.inference is not None
+                    and located.inference is not None
                 ):
-                    assert loaded.state.is_value, context
-                    assert loaded.inference.relation == "g_to_kg", context
-                    assert loaded.inference.output_unit == "kg", context
+                    assert located.state.is_value, context
+                    assert located.inference.relation == "g_to_kg", context
+                    assert located.inference.output_unit == "kg", context
                 elif (
                     field in {"mass_kg", "final_mass_kg"}
                     and unit_key in {"unit", "units"}
                 ):
-                    assert loaded is not None and loaded.state.is_value, context
+                    assert located.state.is_value, context
                     printed = Decimal(
                         "0.0008" if field == "final_mass_kg" else "0.25"
                     )
-                    assert loaded.state.value == Value.point_of(
+                    assert located.state.value == Value.point_of(
                         printed / Decimal(1000)
                     ), context
                 else:
@@ -186,4 +175,3 @@ def test_run_metadata_unit_keys_are_consumed_or_typed_at_every_home(
                         "unit-like key was accepted without a consuming reader: "
                         f"{context}"
                     )
-                mutations += 1
