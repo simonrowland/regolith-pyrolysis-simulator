@@ -1,0 +1,1289 @@
+schema_version: literature_extract.v1
+source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+source:
+  citation: >-
+    Koehler, M. F., Barany, R., and Kelley, K. K. (1961). Heats and free
+    energies of formation of ferrites and aluminates of calcium, magnesium,
+    sodium, and lithium. U.S. Bureau of Mines Report of Investigations 5711.
+  year: 1961
+  corpus_asset: raw/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.pdf
+extraction:
+  method: >-
+    Transcribed from the MinerU content-list tables and markdown, then
+    reconciled with pdftotext-layout.txt. Numeric and layout mismatches in the
+    target tables were checked against 300-dpi page renders. Absolute PDF page
+    numbers are used in locators; printed report pages are recorded separately.
+  date: '2026-11-05'
+  worker: w1105fe-ri5711
+  provenance_path: text/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/pdftotext-layout.txt
+  source_note: >-
+    Scope is NaFeO2, CaFe2O4, and Ca2Fe2O5. Table 7 reports the authors'
+    298.15 K heats of formation from oxides and elements in cal/mol; Table 8
+    quotes entropies from Kelley and King (1961) in cal/(deg mol). Tables 9,
+    10, and 12 report oxide-reference ΔH and ΔF° values in kcal/mol; Tables
+    20, 21, and 23 report element-reference values in kcal/mol. Values and
+    units are retained as printed. The authors state that high-temperature
+    heat-content data were taken from Kelley (1960), and that space did not
+    permit retabulation; no Cp equation or H(T)-H(298) rows for the target
+    ferrites are printed in this report. No fusion enthalpy or incongruent
+    melting statement for the target ferrites was found. Table captions label
+    products c or c,l; table rows at transition and melting temperatures are
+    retained with their printed row labels and footnote markers. Experiment
+    pressure is not stated for these thermochemical values.
+review_status: draft
+fidelity_samples:
+  - path: species.Ca2Fe2O5.observations[ri5711_table7_ca2fe2o5_oxide].values.delta_fH
+    value: -10560
+    locator: {page: 16, published_page: 9, table: '7', row: Ca2Fe2O5(c), column: From oxides}
+  - path: species.CaFe2O4.observations[ri5711_table7_cafe2o4_elements].values.delta_fH
+    value: -363470
+    locator: {page: 16, published_page: 9, table: '7', row: CaFe2O4(c), column: From elements}
+  - path: species.CaFe2O4.observations[ri5711_table7_cafe2o4_oxide].values.uncertainty_as_printed
+    value: ±180 cal/mol
+    locator: {page: 16, published_page: 9, table: '7', row: CaFe2O4(c), column: From oxides uncertainty}
+  - path: species.NaFeO2.observations[ri5711_table12_nafeo2_oxide_enthalpy].values.points[0].delta_fH
+    value: -18.45
+    locator: {page: 18, published_page: 11, table: '12', row: 'T=298.15 K, ΔH'}
+  - path: species.NaFeO2.observations[ri5711_table23_nafeo2_element_free_energy].values.points[15].delta_fG
+    value: -111.95
+    locator: {page: 19, published_page: 12, table: '23', row: 'T=1178 K, ΔF°'}
+  - path: species.Ca2Fe2O5.observations[ri5711_table20_ca2fe2o5_element_free_energy].values.points[17].delta_fG
+    value: -392.3
+    locator: {page: 19, published_page: 12, table: '20', row: 'T=1200 K, ΔF°'}
+species:
+  Ca2Fe2O5:
+    observations:
+      - observation_id: ri5711_ca2fe2o5_calorimetric_inputs
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 11, published_page: 4, table: '1', row: 'Reaction 6'}
+        T_range_K: [303.15, 303.15]
+        phase: cr
+        units: cal/mol
+        values:
+          quantity: calorimetric_reaction_enthalpy_as_printed
+          method_class: measured_direct
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Candidate quantity token is reaction enthalpy. No exact quantity is
+            present in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES; the observation
+            type is admitted by tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            but neither it nor the quantity sets a reaction-enthalpy value form.
+          reaction_number_as_printed: '6'
+          calorimetric_reaction_enthalpy_as_printed: -45600
+          corrected_at_298_15_K_cal_mol: -44710
+          uncertainty_as_printed: ±130 cal/mol
+          calorimetry_method_as_printed: hydrochloric acid solution calorimetry
+      - observation_id: ri5711_table7_ca2fe2o5_oxide
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: Ca2Fe2O5(c), column: From oxides}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: Ca2Fe2O5(c)
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derived_from: [ri5711_ca2fe2o5_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the calorimetric reaction scheme with reference thermochemical data to obtain the standard formation enthalpy.
+            inputs: [ri5711_ca2fe2o5_calorimetric_inputs]
+          delta_fH: -10560
+          uncertainty_as_printed: ±720 cal/mol
+          reference_state_as_printed: 2 CaO(c) + Fe2O3(α)
+          reaction_as_printed: 2 CaO(c) + Fe2O3(α) = Ca2Fe2O5(c)
+          property_as_printed: Heat of formation from calcium oxide and hematite at 298.15 K
+        uncertainty: {reported_status: printed, value: 720, confidence: not_stated}
+      - observation_id: ri5711_table7_ca2fe2o5_elements
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: Ca2Fe2O5(c), column: From elements}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: Ca2Fe2O5(c)
+          quantity: delta_fH
+          method_class: measured_reduced
+          derived_from: [ri5711_table7_ca2fe2o5_oxide, ri5711_ca2fe2o5_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the oxide-referenced formation result with standard formation data for the constituent oxides.
+            inputs: [ri5711_table7_ca2fe2o5_oxide, ri5711_ca2fe2o5_calorimetric_inputs]
+          delta_fH: -511240
+          uncertainty_as_printed: ±670 cal/mol
+          reference_state_as_printed: Ca(c) + Fe(α) + O2(g), stoichiometric coefficients as in reaction
+          reaction_as_printed: 2 Ca(c) + 2 Fe(α) + 5/2 O2(g) = Ca2Fe2O5(c)
+          property_as_printed: Heat of formation from the elements at 298.15 K
+        uncertainty: {reported_status: printed, value: 670, confidence: not_stated}
+      - observation_id: ri5711_table8_ca2fe2o5_entropy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '8', row: Ca2Fe2O5(c)}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol/K
+        values:
+          phase_as_printed: Ca2Fe2O5(c)
+          quantity: S
+          method_class: quoted_attributed
+          entropy: 45.1
+          uncertainty_as_printed: ±0.3 cal/(deg mol)
+          units_as_printed: cal./deg. mole
+          attribution: Kelley and King (1961), Bureau of Mines Bulletin 592, as cited by the authors
+          property_as_printed: Entropy at 298.15 K
+        uncertainty: {reported_status: printed, value: 0.3, confidence: not_stated}
+      - observation_id: ri5711_table9_ca2fe2o5_oxide_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '9', row: '2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 2 CaO(c) + Fe2O3(c)
+          reaction_as_printed: 2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -10.55}
+            - {T_K: 400, delta_fH: -10.65}
+            - {T_K: 500, delta_fH: -10.6}
+            - {T_K: 600, delta_fH: -10.55}
+            - {T_K: 700, delta_fH: -10.75}
+            - {T_K: 800, delta_fH: -11.1}
+            - {T_K: 900, delta_fH: -11.6}
+            - {T_K: 950, delta_fH: -11.95, row_marker_as_printed: '1'}
+            - {T_K: 950, delta_fH: -12.1}
+            - {T_K: 1000, delta_fH: -12.25}
+            - {T_K: 1050, delta_fH: -12.35, row_marker_as_printed: '2'}
+            - {T_K: 1050, delta_fH: -12.35}
+            - {T_K: 1100, delta_fH: -12.35}
+            - {T_K: 1200, delta_fH: -12.45}
+            - {T_K: 1300, delta_fH: -12.6}
+            - {T_K: 1400, delta_fH: -12.8}
+            - {T_K: 1500, delta_fH: -13.0}
+            - {T_K: 1600, delta_fH: -13.3}
+            - {T_K: 1700, delta_fH: -13.7}
+            - {T_K: 1750, delta_fH: -14.0, row_marker_as_printed: '3'}
+
+      - observation_id: ri5711_table9_ca2fe2o5_oxide_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '9', row: '2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 2 CaO(c) + Fe2O3(c)
+          reaction_as_printed: 2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 1750, delta_fH: 22.1}
+            - {T_K: 1800, delta_fH: 22.6}
+      - observation_id: ri5711_table9_ca2fe2o5_oxide_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '9', row: '2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 2 CaO(c) + Fe2O3(c)
+          reaction_as_printed: 2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -12.1}
+            - {T_K: 400, delta_fG: -12.6}
+            - {T_K: 500, delta_fG: -13.15}
+            - {T_K: 600, delta_fG: -13.65}
+            - {T_K: 700, delta_fG: -14.15}
+            - {T_K: 800, delta_fG: -14.6}
+            - {T_K: 900, delta_fG: -15.05}
+            - {T_K: 950, delta_fG: -15.15, row_marker_as_printed: '1'}
+            - {T_K: 950, delta_fG: -15.15}
+            - {T_K: 1000, delta_fG: -15.35}
+            - {T_K: 1050, delta_fG: -15.5, row_marker_as_printed: '2'}
+            - {T_K: 1050, delta_fG: -15.5}
+            - {T_K: 1100, delta_fG: -15.7}
+            - {T_K: 1200, delta_fG: -15.95}
+            - {T_K: 1300, delta_fG: -16.25}
+            - {T_K: 1400, delta_fG: -16.55}
+            - {T_K: 1500, delta_fG: -16.8}
+            - {T_K: 1600, delta_fG: -17.05}
+            - {T_K: 1700, delta_fG: -17.25}
+            - {T_K: 1750, delta_fG: -17.4, row_marker_as_printed: '3'}
+
+      - observation_id: ri5711_table9_ca2fe2o5_oxide_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '9', row: '2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 2 CaO(c) + Fe2O3(c)
+          reaction_as_printed: 2 CaO(c) + Fe2O3(c) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 1750, delta_fG: -17.4}
+            - {T_K: 1800, delta_fG: -18.5}
+      - observation_id: ri5711_table20_ca2fe2o5_element_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '20', row: '2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: 2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -511.25}
+            - {T_K: 400, delta_fH: -510.8}
+            - {T_K: 500, delta_fH: -510.0}
+            - {T_K: 600, delta_fH: -509.15}
+            - {T_K: 700, delta_fH: -508.5}
+            - {T_K: 713, delta_fH: -508.4, row_marker_as_printed: '1'}
+            - {T_K: 713, delta_fH: -508.95}
+            - {T_K: 800, delta_fH: -508.55}
+            - {T_K: 900, delta_fH: -508.45}
+            - {T_K: 1000, delta_fH: -508.95}
+            - {T_K: 1033, delta_fH: -509.35, row_marker_as_printed: '2'}
+            - {T_K: 1033, delta_fH: -509.35}
+            - {T_K: 1100, delta_fH: -509.8}
+            - {T_K: 1123, delta_fH: -509.9, row_marker_as_printed: '3'}
+            - {T_K: 1123, delta_fH: -514.05}
+            - {T_K: 1183, delta_fH: -513.9, row_marker_as_printed: '4'}
+            - {T_K: 1183, delta_fH: -514.35}
+            - {T_K: 1200, delta_fH: -514.25}
+            - {T_K: 1300, delta_fH: -513.65}
+            - {T_K: 1400, delta_fH: -513.15}
+            - {T_K: 1500, delta_fH: -512.7}
+            - {T_K: 1600, delta_fH: -512.3}
+            - {T_K: 1673, delta_fH: -512.05, row_marker_as_printed: '5'}
+            - {T_K: 1673, delta_fH: -512.35}
+            - {T_K: 1700, delta_fH: -512.3}
+            - {T_K: 1750, delta_fH: -512.15, row_marker_as_printed: '6'}
+
+      - observation_id: ri5711_table20_ca2fe2o5_element_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '20', row: '2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: 2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 1750, delta_fH: -476.05}
+            - {T_K: 1800, delta_fH: -475.15}
+      - observation_id: ri5711_table20_ca2fe2o5_element_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '20', row: '2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: 2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -478.35}
+            - {T_K: 400, delta_fG: -467.2}
+            - {T_K: 500, delta_fG: -456.35}
+            - {T_K: 600, delta_fG: -445.7}
+            - {T_K: 700, delta_fG: -435.2}
+            - {T_K: 713, delta_fG: -433.85, row_marker_as_printed: '1'}
+            - {T_K: 713, delta_fG: -433.85}
+            - {T_K: 800, delta_fG: -424.7}
+            - {T_K: 900, delta_fG: -414.25}
+            - {T_K: 1000, delta_fG: -403.75}
+            - {T_K: 1033, delta_fG: -400.25, row_marker_as_printed: '2'}
+            - {T_K: 1033, delta_fG: -400.25}
+            - {T_K: 1100, delta_fG: -393.2}
+            - {T_K: 1123, delta_fG: -390.75, row_marker_as_printed: '3'}
+            - {T_K: 1123, delta_fG: -390.75}
+            - {T_K: 1183, delta_fG: -384.15, row_marker_as_printed: '4'}
+            - {T_K: 1183, delta_fG: -384.15}
+            - {T_K: 1200, delta_fG: -392.3}
+            - {T_K: 1300, delta_fG: -371.35}
+            - {T_K: 1400, delta_fG: -360.4}
+            - {T_K: 1500, delta_fG: -349.5}
+            - {T_K: 1600, delta_fG: -338.7}
+            - {T_K: 1673, delta_fG: -330.7, row_marker_as_printed: '5'}
+            - {T_K: 1673, delta_fG: -330.7}
+            - {T_K: 1700, delta_fG: -327.8}
+            - {T_K: 1750, delta_fG: -322.45, row_marker_as_printed: '6'}
+
+      - observation_id: ri5711_table20_ca2fe2o5_element_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '20', row: '2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: 2 Ca(c,l) + 2 Fe(c) + 5/2 O2(g) = Ca2Fe2O5(c,l)
+          phase_as_printed: Ca2Fe2O5(c,l)
+          points:
+            - {T_K: 1750, delta_fG: -322.45}
+            - {T_K: 1800, delta_fG: -318.05}
+    context:
+      - observation_id: ri5711_ca2fe2o5_transition_locator_key
+        type: thermochemical_values
+        locator: {page: 17, published_page: 10, table: '9'}
+        units: K
+        values:
+          quantity: transition and fusion temperature markers
+          table9_marker_mapping:
+            - {marker: '1', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
+            - {marker: '2', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '3', label_as_printed: Melting point of Ca2Fe2O5, T_K: 1750}
+          table20_marker_mapping: [{marker: '6', label_as_printed: Melting point of Ca2Fe2O5, T_K: 1750}]
+          enthalpy_note: >-
+            No separate heat of fusion or transition enthalpy is printed. The
+            reaction enthalpy values on both rows at 1750 K are retained in
+            the corresponding reaction tables.
+      - observation_id: ri5711_ca2fe2o5_heat_content_citation
+        type: thermochemical_values
+        locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+        units: as_published
+        values:
+          method_class: quoted_attributed
+          quantity: high-temperature heat-content data availability
+          statement_as_printed: >-
+            All high-temperature heat-content data used subsequently in this
+            report were taken from the compilation of Kelley. Space does not
+            permit retabulation of these values here.
+          attribution: Kelley (1960), Bureau of Mines Bulletin 584
+      - observation_id: ri5711_ca2fe2o5_no_incongruent_melting_statement
+        type: thermochemical_values
+        locator: {page: 19, published_page: 12, table: '20'}
+        units: as_published
+        values:
+          quantity: incongruent_melting_statement
+          statement_as_printed: no incongruent-melting statement for Ca2Fe2O5 found in the source
+  CaFe2O4:
+    observations:
+      - observation_id: ri5711_cafe2o4_calorimetric_inputs
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 12, published_page: 5, table: '2', row: 'Reaction 14'}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          quantity: calorimetric_reaction_enthalpy_as_printed
+          method_class: measured_direct
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Candidate quantity token is reaction enthalpy. No exact quantity is
+            present in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES; the observation
+            type is admitted by tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            but neither it nor the quantity sets a reaction-enthalpy value form.
+          reaction_number_as_printed: '14'
+          calorimetric_reaction_enthalpy_as_printed: -71950
+          uncertainty_as_printed: ±90 cal/mol
+          calorimetry_method_as_printed: hydrofluoric acid solution calorimetry
+      - observation_id: ri5711_table7_cafe2o4_oxide
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: CaFe2O4(c), column: From oxides}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: CaFe2O4(c)
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derived_from: [ri5711_cafe2o4_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the calorimetric reaction scheme with reference thermochemical data to obtain the standard formation enthalpy.
+            inputs: [ri5711_cafe2o4_calorimetric_inputs]
+          delta_fH: -14580
+          uncertainty_as_printed: ±180 cal/mol
+          reference_state_as_printed: CaO(c) + Fe2O3(α)
+          reaction_as_printed: CaO(c) + Fe2O3(α) = CaFe2O4(c)
+          property_as_printed: Heat of formation from calcium oxide and hematite at 298.15 K
+        uncertainty: {reported_status: printed, value: 180, confidence: not_stated}
+      - observation_id: ri5711_table7_cafe2o4_elements
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: CaFe2O4(c), column: From elements}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: CaFe2O4(c)
+          quantity: delta_fH
+          method_class: measured_reduced
+          derived_from: [ri5711_table7_cafe2o4_oxide, ri5711_cafe2o4_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the oxide-referenced formation result with standard formation data for the constituent oxides.
+            inputs: [ri5711_table7_cafe2o4_oxide, ri5711_cafe2o4_calorimetric_inputs]
+          delta_fH: -363470
+          uncertainty_as_printed: ±560 cal/mol
+          reference_state_as_printed: Ca(c) + Fe(α) + O2(g), stoichiometric coefficients as in reaction
+          reaction_as_printed: Ca(c) + 2 Fe(α) + 2 O2(g) = CaFe2O4(c)
+          property_as_printed: Heat of formation from the elements at 298.15 K
+        uncertainty: {reported_status: printed, value: 560, confidence: not_stated}
+      - observation_id: ri5711_table8_cafe2o4_entropy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '8', row: CaFe2O4(c)}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol/K
+        values:
+          phase_as_printed: CaFe2O4(c)
+          quantity: S
+          method_class: quoted_attributed
+          entropy: 34.7
+          uncertainty_as_printed: ±0.2 cal/(deg mol)
+          units_as_printed: cal./deg. mole
+          attribution: Kelley and King (1961), Bureau of Mines Bulletin 592, as cited by the authors
+          property_as_printed: Entropy at 298.15 K
+        uncertainty: {reported_status: printed, value: 0.2, confidence: not_stated}
+      - observation_id: ri5711_table10_cafe2o4_oxide_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '10', row: 'CaO(c) + Fe2O3(c) = CaFe2O4(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: CaO(c) + Fe2O3(c)
+          reaction_as_printed: CaO(c) + Fe2O3(c) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -14.6}
+            - {T_K: 400, delta_fH: -14.5}
+            - {T_K: 500, delta_fH: -14.7}
+            - {T_K: 600, delta_fH: -15.05}
+            - {T_K: 700, delta_fH: -15.55}
+            - {T_K: 800, delta_fH: -16.2}
+            - {T_K: 900, delta_fH: -17.05}
+            - {T_K: 950, delta_fH: -17.5, row_marker_as_printed: '1'}
+            - {T_K: 950, delta_fH: -17.7}
+            - {T_K: 1000, delta_fH: -17.9}
+            - {T_K: 1050, delta_fH: -18.15, row_marker_as_printed: '2'}
+            - {T_K: 1050, delta_fH: -18.15}
+            - {T_K: 1100, delta_fH: -18.25}
+            - {T_K: 1200, delta_fH: -18.45}
+            - {T_K: 1300, delta_fH: -18.6}
+            - {T_K: 1400, delta_fH: -18.75}
+            - {T_K: 1500, delta_fH: -18.85}
+            - {T_K: 1510, delta_fH: -18.9, row_marker_as_printed: '3'}
+
+      - observation_id: ri5711_table10_cafe2o4_oxide_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '10', row: 'CaO(c) + Fe2O3(c) = CaFe2O4(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: CaO(c) + Fe2O3(c)
+          reaction_as_printed: CaO(c) + Fe2O3(c) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 1510, delta_fH: 7.0}
+            - {T_K: 1600, delta_fH: 7.6}
+            - {T_K: 1700, delta_fH: 8.2}
+            - {T_K: 1800, delta_fH: 8.55}
+      - observation_id: ri5711_table10_cafe2o4_oxide_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '10', row: 'CaO(c) + Fe2O3(c) = CaFe2O4(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: CaO(c) + Fe2O3(c)
+          reaction_as_printed: CaO(c) + Fe2O3(c) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -15.85}
+            - {T_K: 400, delta_fG: -16.3}
+            - {T_K: 500, delta_fG: -16.75}
+            - {T_K: 600, delta_fG: -17.15}
+            - {T_K: 700, delta_fG: -17.45}
+            - {T_K: 800, delta_fG: -17.7}
+            - {T_K: 900, delta_fG: -17.8}
+            - {T_K: 950, delta_fG: -17.8, row_marker_as_printed: '1'}
+            - {T_K: 950, delta_fG: -17.8}
+            - {T_K: 1000, delta_fG: -17.85}
+            - {T_K: 1050, delta_fG: -17.9, row_marker_as_printed: '2'}
+            - {T_K: 1050, delta_fG: -17.9}
+            - {T_K: 1100, delta_fG: -17.85}
+            - {T_K: 1200, delta_fG: -17.8}
+            - {T_K: 1300, delta_fG: -17.75}
+            - {T_K: 1400, delta_fG: -17.65}
+            - {T_K: 1500, delta_fG: -17.55}
+            - {T_K: 1510, delta_fG: -17.55, row_marker_as_printed: '3'}
+
+      - observation_id: ri5711_table10_cafe2o4_oxide_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '10', row: 'CaO(c) + Fe2O3(c) = CaFe2O4(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: CaO(c) + Fe2O3(c)
+          reaction_as_printed: CaO(c) + Fe2O3(c) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 1510, delta_fG: -17.55}
+            - {T_K: 1600, delta_fG: -19.05}
+            - {T_K: 1700, delta_fG: -20.7}
+            - {T_K: 1800, delta_fG: -22.45}
+      - observation_id: ri5711_table21_cafe2o4_element_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '21', row: 'Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -363.45}
+            - {T_K: 400, delta_fH: -362.9}
+            - {T_K: 500, delta_fH: -362.45}
+            - {T_K: 600, delta_fH: -362.1}
+            - {T_K: 700, delta_fH: -361.8}
+            - {T_K: 713, delta_fH: -361.8, row_marker_as_printed: '1'}
+            - {T_K: 713, delta_fH: -362.05}
+            - {T_K: 800, delta_fH: -362.0}
+            - {T_K: 900, delta_fH: -362.15}
+            - {T_K: 1000, delta_fH: -362.8}
+            - {T_K: 1033, delta_fH: -363.2, row_marker_as_printed: '2'}
+            - {T_K: 1033, delta_fH: -363.2}
+            - {T_K: 1100, delta_fH: -363.7}
+            - {T_K: 1123, delta_fH: -363.75, row_marker_as_printed: '3'}
+            - {T_K: 1123, delta_fH: -365.8}
+            - {T_K: 1183, delta_fH: -365.85, row_marker_as_printed: '4'}
+            - {T_K: 1183, delta_fH: -366.3}
+            - {T_K: 1200, delta_fH: -366.2}
+            - {T_K: 1300, delta_fH: -365.8}
+            - {T_K: 1400, delta_fH: -365.4}
+            - {T_K: 1500, delta_fH: -365.0}
+            - {T_K: 1510, delta_fH: -364.95, row_marker_as_printed: '5'}
+
+      - observation_id: ri5711_table21_cafe2o4_element_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '21', row: 'Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 1510, delta_fH: -339.1}
+            - {T_K: 1600, delta_fH: -338.0}
+            - {T_K: 1673, delta_fH: -337.1, row_marker_as_printed: '6'}
+            - {T_K: 1673, delta_fH: -337.45}
+            - {T_K: 1700, delta_fH: -337.15}
+            - {T_K: 1800, delta_fH: -336.1}
+      - observation_id: ri5711_table21_cafe2o4_element_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '21', row: 'Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -337.75}
+            - {T_K: 400, delta_fG: -329.05}
+            - {T_K: 500, delta_fG: -320.65}
+            - {T_K: 600, delta_fG: -312.3}
+            - {T_K: 700, delta_fG: -304.05}
+            - {T_K: 713, delta_fG: -302.95, row_marker_as_printed: '1'}
+            - {T_K: 713, delta_fG: -302.95}
+            - {T_K: 800, delta_fG: -295.8}
+            - {T_K: 900, delta_fG: -287.5}
+            - {T_K: 1000, delta_fG: -279.15}
+            - {T_K: 1033, delta_fG: -276.4, row_marker_as_printed: '2'}
+            - {T_K: 1033, delta_fG: -276.4}
+            - {T_K: 1100, delta_fG: -270.75}
+            - {T_K: 1123, delta_fG: -268.8, row_marker_as_printed: '3'}
+            - {T_K: 1123, delta_fG: -268.8}
+            - {T_K: 1183, delta_fG: -263.6, row_marker_as_printed: '4'}
+            - {T_K: 1183, delta_fG: -263.6}
+            - {T_K: 1200, delta_fG: -262.15}
+            - {T_K: 1300, delta_fG: -253.5}
+            - {T_K: 1400, delta_fG: -244.85}
+            - {T_K: 1500, delta_fG: -236.3}
+            - {T_K: 1510, delta_fG: -235.45, row_marker_as_printed: '5'}
+
+      - observation_id: ri5711_table21_cafe2o4_element_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '21', row: 'Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Ca(c,l) + 2 Fe(c) + 2 O2(g) = CaFe2O4(c,l)
+          phase_as_printed: CaFe2O4(c,l)
+          points:
+            - {T_K: 1510, delta_fG: -235.45}
+            - {T_K: 1600, delta_fG: -229.3}
+            - {T_K: 1673, delta_fG: -224.3, row_marker_as_printed: '6'}
+            - {T_K: 1673, delta_fG: -224.3}
+            - {T_K: 1700, delta_fG: -222.5}
+            - {T_K: 1800, delta_fG: -215.85}
+    context:
+      - observation_id: ri5711_cafe2o4_transition_locator_key
+        type: thermochemical_values
+        locator: {page: 17, published_page: 10, table: '10'}
+        units: K
+        values:
+          quantity: transition and fusion temperature markers
+          table10_marker_mapping:
+            - {marker: '1', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
+            - {marker: '2', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '3', label_as_printed: Melting point of CaFe2O4, T_K: 1510}
+          table21_marker_mapping: [{marker: '5', label_as_printed: Melting point of CaFe2O4, T_K: 1510}]
+          enthalpy_note: >-
+            No separate heat of fusion or transition enthalpy is printed. The
+            reaction enthalpy values on both rows at 1510 K are retained in
+            the corresponding reaction tables.
+      - observation_id: ri5711_cafe2o4_reaction17_uncertainty_comparison
+        type: thermochemical_values
+        locator: {page: 13, published_page: 6, table: '2', row: 'Reaction 17'}
+        units: cal/mol
+        values:
+          quantity: heat of formation from oxides at 298.15 K
+          reaction_as_printed: CaO(c,25°) + Fe2O3(c,25°) = CaFe2O4(c,25°)
+          value_as_printed: -14580
+          uncertainty_as_printed: ±130 cal/mol
+          reference_state_as_printed: CaO(c) + Fe2O3(α)
+          comparison_with_this_work: >-
+            The prose repeats the Table 7 oxide-basis value but gives ±130 cal/mol;
+            Table 7 prints ±180 cal/mol for the same heat of formation.
+      - observation_id: ri5711_cafe2o4_nbs_comparison
+        type: thermochemical_values
+        locator: {page: 20, published_page: 13, section: Discussion and conclusions}
+        units: kcal/mol
+        values:
+          method_class: quoted_attributed
+          quantity: heat of formation from oxides at 298.15 K
+          attribution: National Bureau of Standards tables, as cited by Koehler et al.
+          value_as_printed: -49.5
+          reference_state_as_printed: oxides
+          comparison_with_this_work: >-
+            The source converts the cited NBS element values to the oxide basis;
+            the element values are cited but not printed. The printed prior oxide-basis value is -49.5 kcal/mol;
+            Table 7 reports -14580 cal/mol from oxides.
+      - observation_id: ri5711_cafe2o4_heat_content_citation
+        type: thermochemical_values
+        locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+        units: as_published
+        values:
+          method_class: quoted_attributed
+          quantity: high-temperature heat-content data availability
+          statement_as_printed: >-
+            All high-temperature heat-content data used subsequently in this
+            report were taken from the compilation of Kelley. Space does not
+            permit retabulation of these values here.
+          attribution: Kelley (1960), Bureau of Mines Bulletin 584
+      - observation_id: ri5711_cafe2o4_no_incongruent_melting_statement
+        type: thermochemical_values
+        locator: {page: 19, published_page: 12, table: '21'}
+        units: as_published
+        values:
+          quantity: incongruent_melting_statement
+          statement_as_printed: no incongruent-melting statement for CaFe2O4 found in the source
+  NaFeO2:
+    observations:
+      - observation_id: ri5711_nafeo2_calorimetric_inputs
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 13, published_page: 6, table: '4', row: 'Reaction 25'}
+        T_range_K: [303.15, 303.15]
+        phase: cr
+        units: cal/mol
+        values:
+          quantity: calorimetric_reaction_enthalpy_as_printed
+          method_class: measured_direct
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Candidate quantity token is reaction enthalpy. No exact quantity is
+            present in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES; the observation
+            type is admitted by tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            but neither it nor the quantity sets a reaction-enthalpy value form.
+          reaction_number_as_printed: '25'
+          calorimetric_reaction_enthalpy_as_printed: -34350
+          uncertainty_as_printed: ±20 cal/mol
+          calorimetry_method_as_printed: hydrochloric acid solution calorimetry
+      - observation_id: ri5711_nafeo2_calorimetric_reaction30
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 13, published_page: 6, table: '4', row: 'Reaction 30'}
+        T_range_K: [303.15, 303.15]
+        phase: cr
+        units: cal/mol
+        values:
+          quantity: calorimetric_reaction_enthalpy_as_printed
+          method_class: measured_direct
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Candidate quantity token is reaction enthalpy. No exact quantity is
+            present in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES; the observation
+            type is admitted by tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            but neither it nor the quantity sets a reaction-enthalpy value form.
+          reaction_number_as_printed: '30'
+          calorimetric_reaction_enthalpy_as_printed: 7640
+          uncertainty_as_printed: ±40 cal/mol
+          calorimetry_method_as_printed: hydrochloric acid solution calorimetry
+      - observation_id: ri5711_nafeo2_calorimetric_reaction30_298_15
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 13, published_page: 6, table: '4', row: 'Reaction 30, at 298.15 K'}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          quantity: calorimetric_reaction_enthalpy_as_printed
+          method_class: measured_direct
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Candidate quantity token is reaction enthalpy. No exact quantity is
+            present in simulator/battery/enums.py::Quantity or
+            simulator/battery/migrate.py::QUANTITY_ALIASES; the observation
+            type is admitted by tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            but neither it nor the quantity sets a reaction-enthalpy value form.
+          reaction_number_as_printed: '30'
+          calorimetric_reaction_enthalpy_as_printed: 8240
+          uncertainty_as_printed: ±40 cal/mol
+          calorimetry_method_as_printed: hydrochloric acid solution calorimetry
+      - observation_id: ri5711_table7_nafeo2_oxide
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: NaFeO2(c), column: From oxides}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: NaFeO2(c)
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derived_from: [ri5711_nafeo2_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the calorimetric reaction scheme with reference thermochemical data to obtain the standard formation enthalpy.
+            inputs: [ri5711_nafeo2_calorimetric_inputs]
+          delta_fH: -18470
+          uncertainty_as_printed: ±640 cal/mol
+          reference_state_as_printed: 1/2 Na2O(c) + 1/2 Fe2O3(α)
+          reaction_as_printed: 1/2 Na2O(c) + 1/2 Fe2O3(α) = NaFeO2(c)
+          property_as_printed: Heat of formation from the oxides at 298.15 K
+        uncertainty: {reported_status: printed, value: 640, confidence: not_stated}
+      - observation_id: ri5711_table7_nafeo2_elements
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 16, published_page: 9, table: '7', row: NaFeO2(c), column: From elements}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol
+        values:
+          phase_as_printed: NaFeO2(c)
+          quantity: delta_fH
+          method_class: measured_reduced
+          derived_from: [ri5711_table7_nafeo2_oxide, ri5711_nafeo2_calorimetric_inputs]
+          derivation:
+            relation: Authors combine the oxide-referenced formation result with standard formation data for the constituent oxides.
+            inputs: [ri5711_table7_nafeo2_oxide, ri5711_nafeo2_calorimetric_inputs]
+          delta_fH: -166720
+          uncertainty_as_printed: ±310 cal/mol
+          reference_state_as_printed: Na(c) + Fe(α) + O2(g), stoichiometric coefficients as in reaction
+          reaction_as_printed: Na(c) + Fe(α) + O2(g) = NaFeO2(c)
+          property_as_printed: Heat of formation from the elements at 298.15 K
+        uncertainty: {reported_status: printed, value: 310, confidence: not_stated}
+      - observation_id: ri5711_table8_nafeo2_entropy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 17, published_page: 10, table: '8', row: NaFeO2(c)}
+        T_range_K: [298.15, 298.15]
+        phase: cr
+        units: cal/mol/K
+        values:
+          phase_as_printed: NaFeO2(c)
+          quantity: S
+          method_class: quoted_attributed
+          entropy: 21.1
+          uncertainty_as_printed: ±0.2 cal/(deg mol)
+          units_as_printed: cal./deg. mole
+          attribution: Kelley and King (1961), Bureau of Mines Bulletin 592, as cited by the authors
+          property_as_printed: Entropy at 298.15 K
+        uncertainty: {reported_status: printed, value: 0.2, confidence: not_stated}
+      - observation_id: ri5711_table12_nafeo2_oxide_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 18, published_page: 11, table: '12', row: '1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c)
+          reaction_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -18.45}
+            - {T_K: 400, delta_fH: -18.55}
+            - {T_K: 500, delta_fH: -18.65}
+            - {T_K: 600, delta_fH: -18.7}
+            - {T_K: 700, delta_fH: -18.7}
+            - {T_K: 800, delta_fH: -18.8}
+            - {T_K: 870, delta_fH: -18.7, row_marker_as_printed: '1'}
+            - {T_K: 870, delta_fH: -18.7}
+            - {T_K: 900, delta_fH: -18.8}
+            - {T_K: 950, delta_fH: -18.95, row_marker_as_printed: '2'}
+            - {T_K: 950, delta_fH: -19.05}
+            - {T_K: 1000, delta_fH: -19.1}
+            - {T_K: 1050, delta_fH: -19.15, row_marker_as_printed: '3'}
+            - {T_K: 1050, delta_fH: -19.15}
+            - {T_K: 1100, delta_fH: -19.15}
+            - {T_K: 1190, delta_fH: -19.15, row_marker_as_printed: '4'}
+            - {T_K: 1190, delta_fH: -22.75}
+            - {T_K: 1200, delta_fH: -22.75}
+            - {T_K: 1270, delta_fH: -22.75, row_marker_as_printed: '5'}
+            - {T_K: 1270, delta_fH: -22.2}
+            - {T_K: 1300, delta_fH: -22.25}
+            - {T_K: 1400, delta_fH: -22.25}
+            - {T_K: 1500, delta_fH: -22.3}
+            - {T_K: 1600, delta_fH: -22.35}
+            - {T_K: 1620, delta_fH: -22.35, row_marker_as_printed: '6'}
+
+      - observation_id: ri5711_table12_nafeo2_oxide_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 18, published_page: 11, table: '12', row: '1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FH is standard enthalpy of formation from the elements; there is no typed reaction-enthalpy-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fH.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c)
+          reaction_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 1620, delta_fH: -10.6}
+            - {T_K: 1700, delta_fH: -10.0}
+            - {T_K: 1800, delta_fH: -9.35}
+      - observation_id: ri5711_table12_nafeo2_oxide_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 18, published_page: 11, table: '12', row: '1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c)
+          reaction_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -18.95}
+            - {T_K: 400, delta_fG: -19.1}
+            - {T_K: 500, delta_fG: -19.2}
+            - {T_K: 600, delta_fG: -19.3}
+            - {T_K: 700, delta_fG: -19.4}
+            - {T_K: 800, delta_fG: -19.5}
+            - {T_K: 870, delta_fG: -19.6, row_marker_as_printed: '1'}
+            - {T_K: 870, delta_fG: -19.6}
+            - {T_K: 900, delta_fG: -19.6}
+            - {T_K: 950, delta_fG: -19.65, row_marker_as_printed: '2'}
+            - {T_K: 950, delta_fG: -19.65}
+            - {T_K: 1000, delta_fG: -19.7}
+            - {T_K: 1050, delta_fG: -19.7, row_marker_as_printed: '3'}
+            - {T_K: 1050, delta_fG: -19.7}
+            - {T_K: 1100, delta_fG: -19.75}
+            - {T_K: 1190, delta_fG: -19.75, row_marker_as_printed: '4'}
+            - {T_K: 1190, delta_fG: -19.75}
+            - {T_K: 1200, delta_fG: -19.75}
+            - {T_K: 1270, delta_fG: -19.6, row_marker_as_printed: '5'}
+            - {T_K: 1270, delta_fG: -19.6}
+            - {T_K: 1300, delta_fG: -19.55}
+            - {T_K: 1400, delta_fG: -19.3}
+            - {T_K: 1500, delta_fG: -19.1}
+            - {T_K: 1600, delta_fG: -18.9}
+            - {T_K: 1620, delta_fG: -18.85, row_marker_as_printed: '6'}
+
+      - observation_id: ri5711_table12_nafeo2_oxide_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 18, published_page: 11, table: '12', row: '1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: reaction_gibbs_from_component_oxides
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The printed reaction forms the ferrite from component oxides, not from the elements. Quantity.DELTA_FG is standard Gibbs energy of formation from the elements; there is no typed reaction-Gibbs-from-component-oxides quantity, so this value is unavailable rather than scored as delta_fG.
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c)
+          reaction_as_printed: 1/2 Na2O(c,l) + 1/2 Fe2O3(c) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 1620, delta_fG: -18.85}
+            - {T_K: 1700, delta_fG: -19.25}
+            - {T_K: 1800, delta_fG: -19.8}
+      - observation_id: ri5711_table23_nafeo2_element_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '23', row: 'Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 298.15, delta_fH: -166.7}
+            - {T_K: 371, delta_fH: -166.65, row_marker_as_printed: '1'}
+            - {T_K: 371, delta_fH: -167.25}
+            - {T_K: 400, delta_fH: -167.25}
+            - {T_K: 500, delta_fH: -167.05}
+            - {T_K: 600, delta_fH: -166.75}
+            - {T_K: 700, delta_fH: -166.4}
+            - {T_K: 800, delta_fH: -166.0}
+            - {T_K: 870, delta_fH: -165.6, row_marker_as_printed: '2'}
+            - {T_K: 870, delta_fH: -165.6}
+            - {T_K: 900, delta_fH: -165.55}
+            - {T_K: 1000, delta_fH: -165.5}
+            - {T_K: 1033, delta_fH: -165.6, row_marker_as_printed: '3'}
+            - {T_K: 1033, delta_fH: -165.6}
+            - {T_K: 1100, delta_fH: -165.6}
+            - {T_K: 1178, delta_fH: -165.4, row_marker_as_printed: '4'}
+            - {T_K: 1178, delta_fH: -188.75}
+            - {T_K: 1183, delta_fH: -188.75, row_marker_as_printed: '5'}
+            - {T_K: 1183, delta_fH: -188.95}
+            - {T_K: 1200, delta_fH: -188.85}
+            - {T_K: 1270, delta_fH: -188.35, row_marker_as_printed: '6'}
+            - {T_K: 1270, delta_fH: -187.8}
+            - {T_K: 1300, delta_fH: -187.6}
+            - {T_K: 1400, delta_fH: -186.95}
+            - {T_K: 1500, delta_fH: -186.3}
+            - {T_K: 1600, delta_fH: -185.7}
+            - {T_K: 1620, delta_fH: -185.55, row_marker_as_printed: '7'}
+
+      - observation_id: ri5711_table23_nafeo2_element_enthalpy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '23', row: 'Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)', column: ΔH}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 1620, delta_fH: -173.8}
+            - {T_K: 1673, delta_fH: -173.05, row_marker_as_printed: '8'}
+            - {T_K: 1673, delta_fH: -173.2}
+            - {T_K: 1700, delta_fH: -172.85}
+            - {T_K: 1800, delta_fH: -171.45}
+      - observation_id: ri5711_table23_nafeo2_element_free_energy
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '23', row: 'Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 298.15, delta_fG: -152.8}
+            - {T_K: 371, delta_fG: -149.4, row_marker_as_printed: '1'}
+            - {T_K: 371, delta_fG: -149.4}
+            - {T_K: 400, delta_fG: -148.05}
+            - {T_K: 500, delta_fG: -143.25}
+            - {T_K: 600, delta_fG: -138.5}
+            - {T_K: 700, delta_fG: -133.8}
+            - {T_K: 800, delta_fG: -129.2}
+            - {T_K: 870, delta_fG: -126.05, row_marker_as_printed: '2'}
+            - {T_K: 870, delta_fG: -126.05}
+            - {T_K: 900, delta_fG: -124.65}
+            - {T_K: 1000, delta_fG: -120.1}
+            - {T_K: 1033, delta_fG: -118.6, row_marker_as_printed: '3'}
+            - {T_K: 1033, delta_fG: -118.6}
+            - {T_K: 1100, delta_fG: -115.55}
+            - {T_K: 1178, delta_fG: -111.95, row_marker_as_printed: '4'}
+            - {T_K: 1178, delta_fG: -111.95}
+            - {T_K: 1183, delta_fG: -111.65, row_marker_as_printed: '5'}
+            - {T_K: 1183, delta_fG: -111.65}
+            - {T_K: 1200, delta_fG: -110.55}
+            - {T_K: 1270, delta_fG: -106.0, row_marker_as_printed: '6'}
+            - {T_K: 1270, delta_fG: -106.0}
+            - {T_K: 1300, delta_fG: -104.1}
+            - {T_K: 1400, delta_fG: -97.65}
+            - {T_K: 1500, delta_fG: -91.3}
+            - {T_K: 1600, delta_fG: -85.0}
+            - {T_K: 1620, delta_fG: -83.75, row_marker_as_printed: '7'}
+
+      - observation_id: ri5711_table23_nafeo2_element_free_energy_liquid
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 19, published_page: 12, table: '23', row: 'Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)', column: ΔF°}
+        temperature_range_as_printed: 298.15–1800 K
+        phase: l
+        units: kcal/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          derivation:
+            relation: Authors derive the temperature series from previously listed or cited thermochemical data, including high-temperature heat contents.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+          reference_state_as_printed: elements
+          reaction_as_printed: Na(c,l,g) + Fe(c) + O2(g) = NaFeO2(c,l)
+          phase_as_printed: NaFeO2(c,l)
+          points:
+            - {T_K: 1620, delta_fG: -83.75}
+            - {T_K: 1673, delta_fG: -80.8, row_marker_as_printed: '8'}
+            - {T_K: 1673, delta_fG: -80.8}
+            - {T_K: 1700, delta_fG: -79.3}
+            - {T_K: 1800, delta_fG: -73.9}
+    context:
+      - observation_id: ri5711_nafeo2_transition_locator_key
+        type: thermochemical_values
+        locator: {page: 18, published_page: 11, table: '12'}
+        units: K
+        values:
+          quantity: transition and fusion temperature markers
+          table12_marker_mapping:
+            - {marker: '1', label_as_printed: Transition point of NaFeO2(α→β), T_K: 870}
+            - {marker: '2', label_as_printed: Transition point of Fe2O3(α→β), T_K: 950}
+            - {marker: '3', label_as_printed: Transition point of Fe2O3(β→γ), T_K: 1050}
+            - {marker: '4', label_as_printed: Melting point of Na2O, T_K: 1190}
+            - {marker: '5', label_as_printed: Transition point of NaFeO2(β→γ), T_K: 1270}
+            - {marker: '6', label_as_printed: Melting point of NaFeO2, T_K: 1620}
+          table23_marker_mapping:
+            - {marker: '2', label_as_printed: Transition point of NaFeO2(α→β), T_K: 870}
+            - {marker: '6', label_as_printed: Transition point of NaFeO2(β→γ), T_K: 1270}
+            - {marker: '7', label_as_printed: Melting point of NaFeO2, T_K: 1620}
+          enthalpy_note: >-
+            No separate heat of fusion or transition enthalpy is printed. The
+            reaction enthalpy values on both rows at each marked temperature
+            are retained in the corresponding reaction tables.
+      - observation_id: ri5711_nafeo2_nbs_comparison
+        type: thermochemical_values
+        locator: {page: 20, published_page: 13, section: Discussion and conclusions}
+        units: kcal/mol
+        values:
+          method_class: quoted_attributed
+          quantity: heat of formation from oxides at 298.15 K
+          attribution: National Bureau of Standards tables, as cited by Koehler et al.
+          value_as_printed: 22.5
+          reference_state_as_printed: oxides
+          comparison_with_this_work: >-
+            The source converts the cited NBS element values to the oxide basis;
+            the element values are cited but not printed. The printed prior oxide-basis value is +22.5 kcal/mol;
+            Table 7 reports -18470 cal/mol from oxides, so the signs disagree.
+      - observation_id: ri5711_nafeo2_heat_content_citation
+        type: thermochemical_values
+        locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+        units: as_published
+        values:
+          method_class: quoted_attributed
+          quantity: high-temperature heat-content data availability
+          statement_as_printed: >-
+            All high-temperature heat-content data used subsequently in this
+            report were taken from the compilation of Kelley. Space does not
+            permit retabulation of these values here.
+          attribution: Kelley (1960), Bureau of Mines Bulletin 584
+      - observation_id: ri5711_nafeo2_no_incongruent_melting_statement
+        type: thermochemical_values
+        locator: {page: 18, published_page: 11, table: '12'}
+        units: as_published
+        values:
+          quantity: incongruent_melting_statement
+          statement_as_printed: no incongruent-melting statement for NaFeO2 found in the source

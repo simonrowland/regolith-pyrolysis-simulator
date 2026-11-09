@@ -49,6 +49,7 @@ species:
         regime: cooling_to_298_K_in_drop_calorimeter
         units: 'K; kJ mol−1'
         values:
+          reference_temperature_K: 298
           quantity: negative_enthalpy_change_on_cooling
           method_class: measured_direct
           table_csv: tables/zigo-1987-gehlenite-fusion/t1.csv
@@ -69,6 +70,7 @@ species:
         regime: least_squares_fit_to_drop_calorimetry
         units: 'T in K; −ΔHcool in kJ mol−1'
         values:
+          reference_temperature_K: 298
           quantity: negative_enthalpy_change_on_cooling
           method_class: model_derived
           derived_from: [zigo_1987_t1_crystal_cooling_measured]

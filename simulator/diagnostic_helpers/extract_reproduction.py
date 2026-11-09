@@ -72,7 +72,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
-MODEL_LIMITATIONS_PATH = REPO_ROOT / "docs" / "model-limitations.md"
+# The generated rollup lives on its own page, linked from docs/model-limitations.md.
+MODEL_LIMITATIONS_PATH = REPO_ROOT / "docs" / "validation-battery-rollup.md"
 MOTZFELDT_TOOL_PATH = REPO_ROOT / "tools" / "motzfeldt.py"
 TOOLS_DIR = REPO_ROOT / "tools"
 
@@ -163,8 +164,8 @@ PARENT_OXIDE_BY_ENGINE_SPECIES: dict[str, str] = {
     "Mn": "MnO",
 }
 
-ROLLUP_BEGIN = "<!-- BEGIN t-512 extract-store reproduction rollup -->"
-ROLLUP_END = "<!-- END t-512 extract-store reproduction rollup -->"
+ROLLUP_BEGIN = "<!-- BEGIN extract-store reproduction rollup -->"
+ROLLUP_END = "<!-- END extract-store reproduction rollup -->"
 
 _TYPED_SKIP_PREFIX = "typed-refusal:"
 
@@ -5242,7 +5243,7 @@ def format_rollup_markdown(
     *,
     evaluations: Sequence[ObservationEvaluation] | None = None,
 ) -> str:
-    """Markdown section for docs/model-limitations.md."""
+    """Markdown section for docs/validation-battery-rollup.md."""
 
     n_findings = sum(1 for r in rows if r.get("classification") == "FINDING-mismatch")
     n_extrapolated_findings = 0
@@ -5269,7 +5270,7 @@ def format_rollup_markdown(
         # committed-vs-generated parity guard fails on a line-count mismatch.
         '<a id="extract-store-reproduction-battery"></a>',
         "",
-        "### Extract-store single-species reproduction battery (t-512)",
+        "### Extract-store single-species reproduction battery",
         "",
         "Generated from production priority-winner observations plus every KEMS",
         "extract observation of type `psat_series` / `rate_series` /",
@@ -5436,7 +5437,7 @@ def format_rollup_markdown(
 
 
 def extract_rollup_section(text: str) -> str | None:
-    """Return the marker-delimited t-512 rollup section (inclusive), or None."""
+    """Return the marker-delimited rollup section (inclusive), or None."""
 
     if ROLLUP_BEGIN not in text or ROLLUP_END not in text:
         return None
@@ -5452,7 +5453,7 @@ def append_rollup_to_model_limitations(
     evaluations: Sequence[ObservationEvaluation] | None = None,
     path: Path | None = None,
 ) -> Path:
-    """Insert or replace the t-512 rollup section in docs/model-limitations.md.
+    """Insert or replace the rollup section in docs/validation-battery-rollup.md.
 
     Prefer writing to a temp path from tests and *diffing* against the committed
     file. The regen escape hatch is the env var ``RPS_T512_REGEN_ROLLUP=1``

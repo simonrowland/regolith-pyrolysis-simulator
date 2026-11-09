@@ -1,23 +1,18 @@
-"""write=False residue migrations match green 0418c0fd9.
-
-The temp-root setup copies tests/battery/test_migrate.py::_migrate_real_extract
-(original extract text, one INDEX row, migrate(root, write=False)). Importing
-that module would load the whole migration suite into the green subprocess.
-"""
+"""write=False residue migrations match the frozen green 0418c0fd9 baseline."""
 
 from __future__ import annotations
 
 import json
-import os
-import subprocess
-import sys
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-GREEN = "0418c0fd9"
+GREEN_FIXTURE = (
+    REPO
+    / "tests/fixtures/battery/residue_oxide_green_parity_0418c0fd9.json"
+)
 SOURCES = (
     "ivanova-2018-spinel-rich-cai-evaporation",
     "kems-026-markova-1984",
@@ -167,40 +162,6 @@ def migrate_sources(root_base: Path) -> dict[str, list[dict[str, object]]]:
     return out
 
 
-def _install_green_migrate(path: str) -> None:
-    from importlib.machinery import SourceFileLoader
-    from importlib.util import spec_from_loader
-
-    class Finder:
-        def find_spec(self, fullname, search_path, target=None):
-            if fullname != "simulator.battery.migrate":
-                return None
-            loader = SourceFileLoader(fullname, path)
-            return spec_from_loader(fullname, loader)
-
-    # The finder object must be an instance. Inserting the class makes
-    # find_spec bind the module name to self, return None, and both sides
-    # of the diff run the worktree migrator.
-    sys.meta_path.insert(0, Finder())
-
-
-def _rebind_green_paths() -> None:
-    import simulator.battery.migrate as migrate
-
-    migrate.REPO_ROOT = REPO
-    migrate.LITERATURE = REPO / "data" / "literature"
-    migrate.EXTRACTS_DIR = migrate.LITERATURE / "extracts"
-    migrate.COMPILATIONS_DIR = migrate.LITERATURE / "compilations"
-    migrate.INDEX_PATH = migrate.LITERATURE / "INDEX.yaml"
-    migrate.WORKS_DIR = migrate.LITERATURE / "works"
-    migrate.EXTRACTS_V2_DIR = migrate.LITERATURE / "extracts-v2"
-    migrate.OBSERVATIONS_V2_DIR = migrate.LITERATURE / "observations-v2"
-    migrate.BATTERY_DIR = REPO / "data" / "battery"
-    migrate.LAB_PARAMETER_VOCAB_PATH = (
-        migrate.LITERATURE / "lab_parameter_vocabulary.yaml"
-    )
-
-
 def _without_text(row: dict[str, object]) -> dict[str, object]:
     return {
         key: value
@@ -292,31 +253,9 @@ def diff_payloads(
 
 
 def test_printed_residue_migrations_match_green_0418c0fd9(tmp_path: Path) -> None:
-    green_src = tmp_path / "green-migrate.py"
-    with green_src.open("w") as handle:
-        subprocess.run(
-            ["git", "show", f"{GREEN}:simulator/battery/migrate.py"],
-            cwd=REPO,
-            check=True,
-            stdout=handle,
-        )
     tip = migrate_sources(tmp_path / "tip")
-    green_out = tmp_path / "green.json"
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(REPO)
-    env["PARITY_GREEN_SRC"] = str(green_src)
-    env["PARITY_OUT"] = str(green_out)
-    env["PARITY_ROOT"] = str(tmp_path / "green")
-    subprocess.run(
-        [sys.executable, str(Path(__file__).resolve())],
-        cwd=REPO,
-        env=env,
-        check=True,
-    )
-    green_payload = json.loads(green_out.read_text(encoding="utf-8"))
-    loaded = Path(str(green_payload["loaded_migrate"])).resolve()
-    assert loaded == green_src.resolve(), loaded
-    report = diff_payloads(tip, green_payload["sources"])
+    green_fixture = json.loads(GREEN_FIXTURE.read_text(encoding="utf-8"))
+    report = diff_payloads(tip, green_fixture["sources"])
     assert report["real_total"] == 0, report.get("first") or report
     composition_changes = {
         source_id: source_report["identity_composition_changes"]
@@ -332,33 +271,10 @@ def test_printed_residue_migrations_match_green_0418c0fd9(tmp_path: Path) -> Non
     tip_rows = {str(row["id"]): row for row in tip["kems-015-hashimoto-1983"]}
     green_rows = {
         str(row["id"]): row
-        for row in green_payload["sources"]["kems-015-hashimoto-1983"]
+        for row in green_fixture["sources"]["kems-015-hashimoto-1983"]
     }
     # Green leaves Hashimoto's starting_Ave_ row out of identity composition;
     # an accepted printed mass map does not add a composition identity axis.
     assert tip_rows[row_id]["identity_composition"] is None
     assert green_rows[row_id]["identity_composition"] is None
     assert report["decimal_text_only_total"] == 0, report
-
-
-if __name__ == "__main__":
-    import sys
-
-    green_src = Path(os.environ["PARITY_GREEN_SRC"]).resolve()
-    import simulator.battery as battery_pkg
-
-    sys.modules.pop("simulator.battery.migrate", None)
-    if hasattr(battery_pkg, "migrate"):
-        delattr(battery_pkg, "migrate")
-    _install_green_migrate(str(green_src))
-    _rebind_green_paths()
-    import simulator.battery.migrate as migrate
-
-    loaded = Path(migrate.__file__).resolve()
-    if loaded != green_src:
-        raise SystemExit(f"green migrate was not loaded: {loaded}")
-    payload = {
-        "loaded_migrate": str(loaded),
-        "sources": migrate_sources(Path(os.environ["PARITY_ROOT"])),
-    }
-    Path(os.environ["PARITY_OUT"]).write_text(json.dumps(payload), encoding="utf-8")

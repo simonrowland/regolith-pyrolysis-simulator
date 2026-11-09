@@ -499,6 +499,7 @@ def test_write_artifacts_emits_study_summary_schema(
         "verdict_counts",
         "objectives_spec",
         "winner",
+        "winner_provenance",
         "dual_winner_non_seeded",
         "honesty",
         "badges",
@@ -531,7 +532,50 @@ def test_write_artifacts_emits_study_summary_schema(
     assert manifest["strategy"]["config"]["seed"] == 7
     assert manifest["strategy"]["config"]["budget"] == 4
     assert manifest["strategy"]["config"]["sampler_name"] == "random"
+    assert summary["winner_provenance"] == "in_archive"
+    assert manifest["winner_provenance"] == "in_archive"
     assert manifest["replayable"] is True
+
+
+@pytest.mark.parametrize(
+    ("archive_contains_winner", "expected_provenance"),
+    ((True, "in_archive"), (False, "pruned_record")),
+)
+def test_study_manifest_reports_staged_winner_provenance(
+    tmp_path: Path,
+    archive_contains_winner: bool,
+    expected_provenance: str,
+) -> None:
+    out = tmp_path / expected_provenance
+    out.mkdir()
+    record = _save_format_record()
+    candidate = SimpleNamespace(id=record.candidate_id)
+    strategy = SimpleNamespace(
+        name="staged",
+        _archive=(SimpleNamespace(candidate=candidate),) if archive_contains_winner else (),
+        results=((candidate, None),),
+    )
+    artifacts = study._write_artifacts(
+        out,
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        definitions=study.objective_definitions(PROFILE),
+        pareto=(record,),
+        leaderboard=(record,),
+        winner=record,
+        schema=RecipeSchema(),
+        failure_counts={},
+        strategy=strategy,
+        staged_strategies=(strategy,),
+        strategy_name="staged",
+        sampler_name="scipy-sobol",
+    )
+
+    summary = json.loads(artifacts["summary"].read_text(encoding="utf-8"))
+    manifest = json.loads(artifacts["manifest"].read_text(encoding="utf-8"))
+    assert summary["winner_provenance"] == expected_provenance
+    assert manifest["winner_provenance"] == expected_provenance
 
 
 def test_study_summary_distinguishes_unavailable_and_empty_stage_three_glass() -> None:

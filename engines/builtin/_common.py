@@ -3,7 +3,7 @@
 These helpers live OUTSIDE ``simulator/chemistry/kernel/`` on purpose:
 they encode builtin-provider conventions (oxide-weight projection of
 ``process.cleaned_melt``, control-input idioms) that other engines
-(AlphaMELTS, FactSAGE) must not be silently coerced into.
+(AlphaMELTS, MAGEMin) must not be silently coerced into.
 
 ``simulator.accounting.formulas`` and ``simulator.state`` are imported
 lazily inside the function bodies that need them. The package-init

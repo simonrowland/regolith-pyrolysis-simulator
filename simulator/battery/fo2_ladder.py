@@ -1,6 +1,6 @@
 """One fO2 per row, shared by every engine (d-180).
 
-The ladder is the seeding order from d-160/d-163:
+The general ladder is the seeding order from d-160/d-163:
 
 1. printed fO2;
 2. printed Fe3+/ΣFe through the Kress91 inverse;
@@ -8,8 +8,13 @@ The ladder is the seeding order from d-160/d-163:
    effusion oxygen-mass-balance closure and metal/slag saturation;
 4. the melt's intrinsic fO2, flagged borrowed.
 
-Tiers 1, 2 and 4 share one numeric fO2. For tier 3 effusion the shared
-input is the closure condition, not a number.
+Knudsen vapour rows keep printed fO2 and explicit atmosphere/buffer routes
+first, then use a measured same-cell oxygen condition, then congruent effusion
+before composition-only redox estimates. If its melt composition or
+temperature is missing, the row does not resolve.
+
+Tiers 1, 2 and 4 share one numeric fO2. Tier 3 can be a numeric measured
+same-cell pressure, or an effusion closure whose shared input is not a number.
 
 Tiers 1 and the atmosphere part of tier 3 reuse ``oxygen_condition`` routes.
 The Kress inverse lives in ``simulator.fe_redox``. The effusion closure is
@@ -89,10 +94,26 @@ class ResolvedFo2:
     # ``cell_material`` is the modelled reservoir (W or Mo), or None.
     closure: bool = False
     cell_material: str | None = None
+    # Physics-95 rung is separate from the existing generic ``tier`` taxonomy.
+    physics_rung: int | None = None
+
+
+_PHYSICS_RUNG_LABELS = {
+    1: "printed_fO2_or_buffer",
+    2: "measured_same_cell_oxygen",
+    3: "congruent_effusion_balance",
+    4: "refusal",
+}
 
 
 def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
-    reason = f"fo2_tier={resolved.tier}; route={resolved.route}"
+    reason = f"fo2_tier={resolved.tier}"
+    if resolved.physics_rung is not None:
+        reason += (
+            f"; physics_rung={resolved.physics_rung}:"
+            f"{_PHYSICS_RUNG_LABELS[resolved.physics_rung]}"
+        )
+    reason += f"; route={resolved.route}"
     if resolved.borrowed:
         reason += "; borrowed"
     return Notice(
@@ -107,6 +128,15 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
+    )
+
+
+def fo2_refusal_notice(quantity: Quantity) -> Notice:
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=f"physics_rung=4:{_PHYSICS_RUNG_LABELS[4]}",
+        origin="fo2_ladder",
     )
 
 
@@ -169,6 +199,7 @@ def resolve_row_fo2(
     composition_wt: Mapping[str, float] | None = None,
     temperature_K: float | None | object = _TEMPERATURE_UNSET,
     oxygen: WaypointResult | None = None,
+    source_oxygen_bar: float | None = None,
     quantity: Quantity | None = None,
 ) -> ResolvedFo2 | None:
     """Resolve one fO2 for this row. None when every tier fails.
@@ -189,31 +220,72 @@ def resolve_row_fo2(
     else:
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
+    knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
     for route in routes:
         if _is_tier1(route, observation):
             log = _log_point(route.value)
             if log is not None:
-                return ResolvedFo2(log, 1, route.route, False)
+                return ResolvedFo2(
+                    log, 1, route.route, False,
+                    physics_rung=1 if knudsen_vapour else None,
+                )
     printed = _printed_identity_bar(observation, identity)
     if printed is not None:
         bar, log = printed
-        return ResolvedFo2(log, 1, "identity_fO2_Pa", False, po2_bar=bar)
+        return ResolvedFo2(
+            log, 1, "identity_fO2_Pa", False, po2_bar=bar,
+            physics_rung=1 if knudsen_vapour else None,
+        )
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
-    tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
-    if tier2 is not None:
-        return tier2
+    # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
+    # does not replace the cell's explicit oxygen control or effusion balance.
+    if not knudsen_vapour:
+        tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
+        if tier2 is not None:
+            return tier2
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)
             if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
+                return ResolvedFo2(
+                    log, 3, route.route, False,
+                    physics_rung=1 if knudsen_vapour else None,
+                )
     atmosphere = _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
+        if knudsen_vapour:
+            return ResolvedFo2(
+                atmosphere.log10_fO2_bar,
+                atmosphere.tier,
+                atmosphere.route,
+                atmosphere.borrowed,
+                po2_bar=atmosphere.po2_bar,
+                closure=atmosphere.closure,
+                cell_material=atmosphere.cell_material,
+                physics_rung=1,
+            )
         return atmosphere
+    if knudsen_vapour and source_oxygen_bar is not None:
+        try:
+            bar = float(source_oxygen_bar)
+        except (TypeError, ValueError, ArithmeticError):
+            bar = math.nan
+        if math.isfinite(bar) and bar > 0.0:
+            return ResolvedFo2(
+                math.log10(bar),
+                3,
+                "source_linked_oxygen_condition",
+                False,
+                po2_bar=bar,
+                physics_rung=2,
+            )
+    if knudsen_vapour and (temperature is None or not weights):
+        return None
     closure = _effusion_closure(
         experiment,
         bench,
         observation,
+        temperature_K=temperature,
         quantity=quantity,
         weights=weights,
     )
@@ -713,18 +785,6 @@ def _has_carrier_gas(experiment: Experiment | None) -> bool:
     return False
 
 
-def _closable_cell(bench: object | None) -> tuple[bool, str | None]:
-    """(True, metal or None) when the cell is inert or a uniform W/Mo reservoir."""
-
-    materials = None if bench is None else getattr(bench, "cell_materials", None)
-    material_class, modelled = _cell_oxygen_class(materials)
-    if material_class == "inert":
-        return True, None
-    if modelled is not None:
-        return True, modelled
-    return False, None
-
-
 def _formula_has_oxygen(formula: str) -> bool:
     elements = []
     token = ""
@@ -754,15 +814,18 @@ def _effusion_closure(
     bench: object | None,
     observation: Observation | None,
     *,
+    temperature_K: float | None,
     quantity: Quantity | None,
     weights: dict[str, float] | None,
 ) -> ResolvedFo2 | None:
     """Tier-3 oxygen mass balance, after atmosphere routes and before vacuum.
 
-    A Knudsen cell that is inert or a uniform W/Mo reservoir closes, including
-    a p_sat row. Any other congruent vaporisation of a pure oxide or an oxide
-    melt, with no carrier gas, closes for a partial or reference pressure.
-    p_sat outside a closable Knudsen cell stays not an oxygen input.
+    Knudsen vapor rows close when melt composition and temperature are known.
+    A uniform W/Mo reservoir adds modelled wall-oxide channels; an unmodelled
+    wall uses melt-only closure and is flagged by the scorer. Any other
+    congruent vaporisation of a pure oxide or an oxide melt, with no carrier
+    gas, closes for a partial or reference pressure. p_sat outside Knudsen
+    effusion stays not an oxygen input.
     """
 
     if not _vapour_quantity(quantity) or experiment is None or observation is None:
@@ -773,9 +836,10 @@ def _effusion_closure(
     if _has_carrier_gas(experiment):
         return None
     if _is_knudsen(experiment):
-        closes, material = _closable_cell(bench)
-        if not closes:
+        if temperature_K is None or not weights:
             return None
+        materials = None if bench is None else getattr(bench, "cell_materials", None)
+        _material_class, material = _cell_oxygen_class(materials)
         return ResolvedFo2(
             float("nan"),
             3,
@@ -783,6 +847,7 @@ def _effusion_closure(
             False,
             closure=True,
             cell_material=material,
+            physics_rung=3,
         )
     if quantity is Quantity.P_SAT or not _oxide_or_melt(weights):
         return None
@@ -793,6 +858,7 @@ def _effusion_closure(
         False,
         closure=True,
         cell_material=None,
+        physics_rung=3,
     )
 
 

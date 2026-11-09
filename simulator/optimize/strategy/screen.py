@@ -46,7 +46,7 @@ class MorrisGroup:
 @dataclass(frozen=True)
 class ObjectiveImportance:
     mu_star: float
-    sigma: float
+    sigma: float | None
     effects: tuple[float, ...]
 
 
@@ -57,7 +57,7 @@ class GroupImportance:
     never_prune: bool
     objectives: Mapping[str, ObjectiveImportance]
     aggregate_mu_star: float
-    aggregate_sigma: float
+    aggregate_sigma: float | None
     recommendation: str
 
     def __post_init__(self) -> None:
@@ -459,7 +459,13 @@ def _morris_delta(num_levels: int) -> float:
 def _rank_scores(
     objective_by_group: Mapping[str, Mapping[str, ObjectiveImportance]],
     attribute: str,
-) -> dict[str, float]:
+) -> dict[str, float | None]:
+    if attribute == "sigma" and all(
+        row.sigma is None
+        for objective_rows in objective_by_group.values()
+        for row in objective_rows.values()
+    ):
+        return {group_name: None for group_name in objective_by_group}
     metric_names = sorted(
         {metric for objective_rows in objective_by_group.values() for metric in objective_rows}
     )
@@ -517,8 +523,11 @@ def _mean(values: Any) -> float:
     return sum(float(value) for value in collected) / len(collected)
 
 
-def _sigma(values: tuple[float, ...]) -> float:
-    if not values:
-        return 0.0
+def _sigma(values: tuple[float, ...]) -> float | None:
+    if len(values) < 2:
+        return None
     mean = _mean(values)
-    return math.sqrt(sum((value - mean) ** 2 for value in values) / len(values))
+    # Elementary effects are a sample of trajectories, so unbiased variance divides by n-1.
+    # At n=4 the old population formula understated sigma by 13.4% (factor 1.155);
+    # with n=1 there is no spread information to estimate.
+    return math.sqrt(sum((value - mean) ** 2 for value in values) / (len(values) - 1))

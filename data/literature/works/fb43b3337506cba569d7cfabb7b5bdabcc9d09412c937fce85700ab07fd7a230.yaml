@@ -1,0 +1,320 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  citation: Koehler, M. F., Barany, R., and Kelley, K. K. (1961). Heats and free energies of formation of ferrites and aluminates
+    of calcium, magnesium, sodium, and lithium. U.S. Bureau of Mines Report of Investigations 5711.
+  source_ids:
+  - koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      role: pdf
+      path: raw/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.pdf
+      sha256:
+        tag: value
+        value: 6c3519828b11ff90533918c3de0c51ea9112f9d0cffd076e8b26575b8daf7e6a
+    - asset_id: pdftotext:koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      role: pdftotext
+      path: text/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230::koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  locator:
+    page: 11
+    published_page: 4
+    table: '1'
+    note: row=Reaction 6
+context:
+- observation_id: ri5711_ca2fe2o5_heat_content_citation
+  type: thermochemical_values
+  locator:
+    page: 17
+    published_page: 10
+    section: Entropies and high-temperature heat contents
+  units: as_published
+  values:
+    method_class: quoted_attributed
+    quantity: high-temperature heat-content data availability
+    statement_as_printed: All high-temperature heat-content data used subsequently in this report were taken from the compilation
+      of Kelley. Space does not permit retabulation of these values here.
+    attribution: Kelley (1960), Bureau of Mines Bulletin 584
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_ca2fe2o5_heat_content_citation
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: Ca2Fe2O5
+- observation_id: ri5711_ca2fe2o5_no_incongruent_melting_statement
+  type: thermochemical_values
+  locator:
+    page: 19
+    published_page: 12
+    table: '20'
+  units: as_published
+  values:
+    quantity: incongruent_melting_statement
+    statement_as_printed: no incongruent-melting statement for Ca2Fe2O5 found in the source
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_ca2fe2o5_no_incongruent_melting_statement
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: Ca2Fe2O5
+- observation_id: ri5711_ca2fe2o5_transition_locator_key
+  type: thermochemical_values
+  locator:
+    page: 17
+    published_page: 10
+    table: '9'
+  units: K
+  values:
+    quantity: transition and fusion temperature markers
+    table9_marker_mapping:
+    - marker: '1'
+      label_as_printed: Transition point of Fe2O3(α→β)
+      T_K: 950
+    - marker: '2'
+      label_as_printed: Transition point of Fe2O3(β→γ)
+      T_K: 1050
+    - marker: '3'
+      label_as_printed: Melting point of Ca2Fe2O5
+      T_K: 1750
+    table20_marker_mapping:
+    - marker: '6'
+      label_as_printed: Melting point of Ca2Fe2O5
+      T_K: 1750
+    enthalpy_note: No separate heat of fusion or transition enthalpy is printed. The reaction enthalpy values on both rows
+      at 1750 K are retained in the corresponding reaction tables.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_ca2fe2o5_transition_locator_key
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: Ca2Fe2O5
+- observation_id: ri5711_cafe2o4_heat_content_citation
+  type: thermochemical_values
+  locator:
+    page: 17
+    published_page: 10
+    section: Entropies and high-temperature heat contents
+  units: as_published
+  values:
+    method_class: quoted_attributed
+    quantity: high-temperature heat-content data availability
+    statement_as_printed: All high-temperature heat-content data used subsequently in this report were taken from the compilation
+      of Kelley. Space does not permit retabulation of these values here.
+    attribution: Kelley (1960), Bureau of Mines Bulletin 584
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_cafe2o4_heat_content_citation
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: CaFe2O4
+- observation_id: ri5711_cafe2o4_nbs_comparison
+  type: thermochemical_values
+  locator:
+    page: 20
+    published_page: 13
+    section: Discussion and conclusions
+  units: kcal/mol
+  values:
+    method_class: quoted_attributed
+    quantity: heat of formation from oxides at 298.15 K
+    attribution: National Bureau of Standards tables, as cited by Koehler et al.
+    value_as_printed: '-49.5'
+    reference_state_as_printed: oxides
+    comparison_with_this_work: The source converts the cited NBS element values to the oxide basis; the element values are
+      cited but not printed. The printed prior oxide-basis value is -49.5 kcal/mol; Table 7 reports -14580 cal/mol from oxides.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_cafe2o4_nbs_comparison
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: CaFe2O4
+- observation_id: ri5711_cafe2o4_no_incongruent_melting_statement
+  type: thermochemical_values
+  locator:
+    page: 19
+    published_page: 12
+    table: '21'
+  units: as_published
+  values:
+    quantity: incongruent_melting_statement
+    statement_as_printed: no incongruent-melting statement for CaFe2O4 found in the source
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_cafe2o4_no_incongruent_melting_statement
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: CaFe2O4
+- observation_id: ri5711_cafe2o4_reaction17_uncertainty_comparison
+  type: thermochemical_values
+  locator:
+    page: 13
+    published_page: 6
+    table: '2'
+    row: Reaction 17
+  units: cal/mol
+  values:
+    quantity: heat of formation from oxides at 298.15 K
+    reaction_as_printed: CaO(c,25°) + Fe2O3(c,25°) = CaFe2O4(c,25°)
+    value_as_printed: -14580
+    uncertainty_as_printed: ±130 cal/mol
+    reference_state_as_printed: CaO(c) + Fe2O3(α)
+    comparison_with_this_work: The prose repeats the Table 7 oxide-basis value but gives ±130 cal/mol; Table 7 prints ±180
+      cal/mol for the same heat of formation.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_cafe2o4_reaction17_uncertainty_comparison
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: CaFe2O4
+- observation_id: ri5711_cafe2o4_transition_locator_key
+  type: thermochemical_values
+  locator:
+    page: 17
+    published_page: 10
+    table: '10'
+  units: K
+  values:
+    quantity: transition and fusion temperature markers
+    table10_marker_mapping:
+    - marker: '1'
+      label_as_printed: Transition point of Fe2O3(α→β)
+      T_K: 950
+    - marker: '2'
+      label_as_printed: Transition point of Fe2O3(β→γ)
+      T_K: 1050
+    - marker: '3'
+      label_as_printed: Melting point of CaFe2O4
+      T_K: 1510
+    table21_marker_mapping:
+    - marker: '5'
+      label_as_printed: Melting point of CaFe2O4
+      T_K: 1510
+    enthalpy_note: No separate heat of fusion or transition enthalpy is printed. The reaction enthalpy values on both rows
+      at 1510 K are retained in the corresponding reaction tables.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_cafe2o4_transition_locator_key
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: CaFe2O4
+- observation_id: ri5711_nafeo2_heat_content_citation
+  type: thermochemical_values
+  locator:
+    page: 17
+    published_page: 10
+    section: Entropies and high-temperature heat contents
+  units: as_published
+  values:
+    method_class: quoted_attributed
+    quantity: high-temperature heat-content data availability
+    statement_as_printed: All high-temperature heat-content data used subsequently in this report were taken from the compilation
+      of Kelley. Space does not permit retabulation of these values here.
+    attribution: Kelley (1960), Bureau of Mines Bulletin 584
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_nafeo2_heat_content_citation
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: NaFeO2
+- observation_id: ri5711_nafeo2_nbs_comparison
+  type: thermochemical_values
+  locator:
+    page: 20
+    published_page: 13
+    section: Discussion and conclusions
+  units: kcal/mol
+  values:
+    method_class: quoted_attributed
+    quantity: heat of formation from oxides at 298.15 K
+    attribution: National Bureau of Standards tables, as cited by Koehler et al.
+    value_as_printed: '22.5'
+    reference_state_as_printed: oxides
+    comparison_with_this_work: The source converts the cited NBS element values to the oxide basis; the element values are
+      cited but not printed. The printed prior oxide-basis value is +22.5 kcal/mol; Table 7 reports -18470 cal/mol from oxides,
+      so the signs disagree.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_nafeo2_nbs_comparison
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: NaFeO2
+- observation_id: ri5711_nafeo2_no_incongruent_melting_statement
+  type: thermochemical_values
+  locator:
+    page: 18
+    published_page: 11
+    table: '12'
+  units: as_published
+  values:
+    quantity: incongruent_melting_statement
+    statement_as_printed: no incongruent-melting statement for NaFeO2 found in the source
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_nafeo2_no_incongruent_melting_statement
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: NaFeO2
+- observation_id: ri5711_nafeo2_transition_locator_key
+  type: thermochemical_values
+  locator:
+    page: 18
+    published_page: 11
+    table: '12'
+  units: K
+  values:
+    quantity: transition and fusion temperature markers
+    table12_marker_mapping:
+    - marker: '1'
+      label_as_printed: Transition point of NaFeO2(α→β)
+      T_K: 870
+    - marker: '2'
+      label_as_printed: Transition point of Fe2O3(α→β)
+      T_K: 950
+    - marker: '3'
+      label_as_printed: Transition point of Fe2O3(β→γ)
+      T_K: 1050
+    - marker: '4'
+      label_as_printed: Melting point of Na2O
+      T_K: 1190
+    - marker: '5'
+      label_as_printed: Transition point of NaFeO2(β→γ)
+      T_K: 1270
+    - marker: '6'
+      label_as_printed: Melting point of NaFeO2
+      T_K: 1620
+    table23_marker_mapping:
+    - marker: '2'
+      label_as_printed: Transition point of NaFeO2(α→β)
+      T_K: 870
+    - marker: '6'
+      label_as_printed: Transition point of NaFeO2(β→γ)
+      T_K: 1270
+    - marker: '7'
+      label_as_printed: Melting point of NaFeO2
+      T_K: 1620
+    enthalpy_note: No separate heat of fusion or transition enthalpy is printed. The reaction enthalpy values on both rows
+      at each marked temperature are retained in the corresponding reaction tables.
+  context_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation::context::ri5711_nafeo2_transition_locator_key
+  work_id: fb43b3337506cba569d7cfabb7b5bdabcc9d09412c937fce85700ab07fd7a230
+  source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+  species: NaFeO2

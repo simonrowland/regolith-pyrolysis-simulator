@@ -1,0 +1,749 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mcgill-na-fe-o-critical-assessment.yaml
+observations:
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_alpha_beta_transition_enthalpy
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'polymorph_transition_enthalpy_as_printed'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'polymorph_transition_enthalpy_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=Phase transformations; column=ΔH_tr α → β
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '870'
+          approximate: false
+      locator:
+        page: 5
+        table: II
+  derivation:
+    relation: Authors' thermodynamic assessment based on Christensen et al. [27] transition data.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        note: Numerical experimental transition inputs are not separately printed.
+    method:
+      state:
+        tag: value
+        value: Authors' thermodynamic assessment from Christensen et al. [27] transition data.
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        equation: Table II phase-transformation summary
+        note: The authors state the transition enthalpies were determined based on Christensen et al. [27].
+    references:
+    - Christensen et al. [27]
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-697.35'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=α-NaFeO2 this work; column=ΔH°298 K
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 5
+        published_page: 580
+        pdf_page_index: 4
+        table: II
+        note: row=α-NaFeO2 this work; column=ΔH°298 K
+  derivation:
+    relation: The authors fixed NaFeO2 thermodynamic properties from experimental data before optimizing other solid Gibbs
+      energies and liquid-model parameters.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        note: The numerical experimental and emf inputs used in the assessment are not tabulated as a complete input set.
+    method:
+      state:
+        tag: value
+        value: The standard enthalpy was determined from Koehler et al. [28] calorimetry and Gibbs-energy data measured using
+          emf.
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        equation: NaFeO2 standard-enthalpy assessment described in prose
+        note: The authors say the emf results are inconsistent and explain the enthalpy assessment against Koehler calorimetry.
+    references:
+    - Koehler et al. [28]
+    - Yamaguchi et al. [2]
+    - emf studies [2, 4, 33, 34]
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '88.341'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=α-NaFeO2 this work; column=S°298 K
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 5
+        published_page: 580
+        pdf_page_index: 4
+        table: II
+        note: row=α-NaFeO2 this work; column=S°298 K
+  derivation:
+    relation: The authors fixed the standard entropy of α-NaFeO2 at 298 K according to King [32] as part of the NaFeO2 thermodynamic
+      assessment.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        note: The assessment's numerical inputs are not tabulated as a complete input set.
+    method:
+      state:
+        tag: value
+        value: The standard entropy of formation was fixed according to King [32].
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        equation: NaFeO2 standard-entropy assessment described in prose
+        note: The authors identify King [32] as the basis for the fixed value.
+    references:
+    - King [32]
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_beta_gamma_transition_enthalpy
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'polymorph_transition_enthalpy_as_printed'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'polymorph_transition_enthalpy_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=Phase transformations; column=ΔH_tr β → γ
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1270'
+          approximate: false
+      locator:
+        page: 5
+        table: II
+  derivation:
+    relation: Authors' thermodynamic assessment based on Christensen et al. [27] transition data.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        note: Numerical experimental transition inputs are not separately printed.
+    method:
+      state:
+        tag: value
+        value: Authors' thermodynamic assessment from Christensen et al. [27] transition data.
+      locator:
+        page: 8
+        published_page: 583
+        pdf_page_index: 7
+        section: NaFeO2 thermodynamic properties
+        equation: Table II phase-transformation summary
+        note: The authors state the transition enthalpies were determined based on Christensen et al. [27].
+    references:
+    - Christensen et al. [27]
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_fusion_temperature_exp
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: gamma
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1620'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Christensen et al. [27] and Koehler et al. [28], Table IV references [27, 28]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_fusion_temperature_exp
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 7
+    published_page: 582
+    pdf_page_index: 6
+    table: IV
+    note: row=L = NaFeO2(c); column=T exp
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1620'
+          approximate: false
+      locator:
+        page: 7
+        table: IV
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_delta_fH
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-698.02'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.30'
+      verbatim: ± 1.30 kJ/mol
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Koehler et al. [28], solution calorimetry (SC)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_delta_fH
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=NaFeO2; column=ΔH°298 K
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 5
+        published_page: 580
+        pdf_page_index: 4
+        table: II
+        note: row=NaFeO2; column=ΔH°298 K
+- observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_entropy
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '88.34'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.84'
+      verbatim: ± 0.84 J/mol-K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: King [32], adiabatic calorimetry (AC)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_entropy
+  source_id: mcgill-na-fe-o-critical-assessment
+  locator:
+    page: 5
+    published_page: 580
+    pdf_page_index: 4
+    table: II
+    note: row=NaFeO2; column=S°298 K
+  read_from: pdf:mcgill-na-fe-o-critical-assessment
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 5
+        published_page: 580
+        pdf_page_index: 4
+        table: II
+        note: row=NaFeO2; column=S°298 K

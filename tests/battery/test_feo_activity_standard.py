@@ -48,7 +48,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
     ),
 }
 _DISTIN_GREEN_RESIDUAL_SHA256 = (
-    "3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0"
+    "39e7f3aed9b19d1ea1b6e8c1559cb7736d6acfccb8cf65e3f34f6f68b9cf4bc0"
 )
 
 
@@ -292,7 +292,31 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert candidate is not None
+    assert (
+        residual.numeric.operation.value,
+        residual.numeric.unit,
+        residual.numeric.value.as_tuple(),
+        residual.numeric.decision_band,
+        residual.numeric.metric_uncertainty,
+        residual.numeric.verdict,
+    ) == (
+        "dex",
+        "dimensionless",
+        Decimal("-0.013180332034779389").as_tuple(),
+        None,
+        None,
+        None,
+    )
+    assert candidate.provenance == {
+        "selected_oxygen_condition": {
+            "fo2_tier": 3,
+            "physics_rung": None,
+            "route": "openimcc_closed_fe_metal_saturation",
+            "value_Pa": "0.01295993251002745564044143855",
+        }
+    }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
+    # The digest moved only for the added candidate observation provenance field.
     assert sha256(serialized).hexdigest() == _DISTIN_GREEN_RESIDUAL_SHA256
 
 

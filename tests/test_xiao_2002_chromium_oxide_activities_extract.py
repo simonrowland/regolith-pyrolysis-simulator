@@ -170,7 +170,7 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
     work = next(work for work in result.works.values() if SID in work.source_ids)
     asset = next(source for source in work.source_files.files if source.asset_id == ASSET_ID)
     assert asset.role is AssetRole.TABLE_CSV
-    assert asset.path == "tables/xiao-2002-chromium-oxide-activities/t1.csv"
+    assert asset.path == "data/literature/tables/xiao-2002-chromium-oxide-activities/t1.csv"
     derived_rows = [
         observation
         for observation in result.observations.values()

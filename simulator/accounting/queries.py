@@ -1343,8 +1343,8 @@ def _robinot_o2_error_budget(
                 ROBINOT_REPRODUCIBILITY_FLOOR_FRACTION
             ),
             "source": (
-                "docs/lab-validation-whitepaper.md section 4.1 and "
-                "section 5 E3"
+                "Robinot et al. 2026 (kems-044-robinot-2026), "
+                "experiments 1 and 2"
             ),
         },
         "model_runtime": {
@@ -1376,8 +1376,8 @@ def _robinot_o2_error_budget(
                 "factor_vs_exp1": raw_factor,
                 "bucket": "source-side O2 potential before sink allocation",
                 "source": (
-                    "docs/lab-validation-whitepaper.md section 5 "
-                    "Raw faithful model row"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "raw faithful model row"
                 ),
             },
             "literature_alpha_top_area_source_side_potential": {
@@ -1393,8 +1393,8 @@ def _robinot_o2_error_budget(
                     "and top-area forward prediction"
                 ),
                 "source": (
-                    "docs/lab-validation-whitepaper.md section 4.1 and "
-                    "section 5 Literature-alpha/top-area row"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "literature-alpha/top-area row"
                 ),
             },
             "normalization_note": ROBINOT_O2_NORMALIZATION_NOTE,
@@ -1402,8 +1402,8 @@ def _robinot_o2_error_budget(
         "budget_terms": {
             "plume_oxidation": {
                 "source": (
-                    "docs/lab-validation-whitepaper.md M3 / four-channel "
-                    "allocation"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "four-channel allocation"
                 ),
                 "direction": (
                     "LOWER_SIM_O2: consumes free O2/O into plume products "
@@ -1419,8 +1419,8 @@ def _robinot_o2_error_budget(
             },
             "deposit_gettering": {
                 "source": (
-                    "docs/lab-validation-whitepaper.md M3 / per-surface "
-                    "deposition rows"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "per-surface deposition rows"
                 ),
                 "direction": (
                     "LOWER_SIM_O2: binds oxygen into deposits instead of "
@@ -1464,8 +1464,8 @@ def _robinot_o2_error_budget(
             },
             "post_run_air_oxidation": {
                 "source": (
-                    "docs/lab-validation-whitepaper.md M3 / E5 oxidation "
-                    "state caveat"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "deposit oxidation-state caveat"
                 ),
                 "direction": (
                     "NO_IN_RUN_CLOSURE: can raise recovered-deposit oxygen "
@@ -1480,8 +1480,8 @@ def _robinot_o2_error_budget(
             },
             "analyzer_flow_baseline": {
                 "source": (
-                    "docs/lab-validation-whitepaper.md E3 O2 ppm x flow "
-                    "integration"
+                    "Robinot et al. 2026 (kems-044-robinot-2026); "
+                    "O2 ppm x flow integration"
                 ),
                 "direction": (
                     "RAISE_PAPER_O2 if the trace missed peaks, baseline, "

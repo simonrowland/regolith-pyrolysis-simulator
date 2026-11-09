@@ -69,7 +69,8 @@ class OptunaTPEStrategy:
         seed: int,
         objective_profile: Mapping[str, Any] | None = None,
         profile: Mapping[str, Any] | None = None,
-        n_startup_trials: int = 10,
+        budget: int = 24,
+        n_startup_trials: int | None = None,
         n_ei_candidates: int = 24,
         parallel: int = 1,
         warm_start_seeds: Sequence[WarmStartSeed] | None = None,
@@ -81,12 +82,13 @@ class OptunaTPEStrategy:
         active_profile = objective_profile if objective_profile is not None else profile
         if active_profile is None:
             raise ValueError("objective_profile is required")
-        _validate_non_negative_int("n_startup_trials", n_startup_trials)
+        startup_trials = _resolve_n_startup_trials(budget, n_startup_trials)
         _validate_positive_int("n_ei_candidates", n_ei_candidates)
         _validate_positive_int("parallel", parallel)
 
         self.schema = schema or RecipeSchema()
         self._seed = seed
+        self._n_startup_trials = startup_trials
         self.objective_profile = MappingProxyType(dict(active_profile))
         self._objective_definitions = objective_definitions(self.objective_profile)
         self._directions = tuple(
@@ -100,7 +102,7 @@ class OptunaTPEStrategy:
         sampler = optuna.samplers.TPESampler(
             seed=self.seed,
             multivariate=True,
-            n_startup_trials=n_startup_trials,
+            n_startup_trials=self._n_startup_trials,
             n_ei_candidates=n_ei_candidates,
             constraints_func=_constraints_for_trial,
             # Penalize pending trials only when concurrent suggestions can be in flight.
@@ -676,6 +678,16 @@ def _failed_trial_state() -> Any:
 def _validate_non_negative_int(name: str, value: int) -> None:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise ValueError(f"{name} must be a non-negative int")
+
+
+def _resolve_n_startup_trials(budget: int, override: int | None) -> int:
+    _validate_positive_int("budget", budget)
+    if override is not None:
+        _validate_non_negative_int("n_startup_trials", override)
+        return override
+    # A quarter-budget warm-up leaves most trials for modeled suggestions, with a
+    # two-trial floor for tiny studies and a ten-trial cap for larger budgets.
+    return min(10, max(2, budget // 4))
 
 
 def _validate_positive_int(name: str, value: int) -> None:

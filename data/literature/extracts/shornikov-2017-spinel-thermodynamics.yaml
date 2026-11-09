@@ -254,6 +254,29 @@ experiments:
         Knudsen effusion mass spectrometry at 1850–2300 K. Experimental
         details of the apparatuses are described in reference [52]. This
         paper does not restate the cell metal.
+schema_gaps:
+  - observation_id: shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+  - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
+    reason: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
 species:
   MgAl2O4:
     observations:
@@ -309,7 +332,10 @@ species:
                 as a numeric table. Figure 2 series 16 is a partial marker
                 read, not that input list.
         values:
-          quantity: delta_fH
+          quantity_as_printed: "Table 1. Entropy and enthalpy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
           method_class: measured_reduced
           value: '-12.02'
           value_as_printed: '–12.02 ± 1.14'
@@ -665,7 +691,10 @@ species:
                 is the reduction to the formation constants on published
                 page 292.
         values:
-          quantity: delta_fH
+          quantity_as_printed: "Table 1. Entropy and enthalpy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
           method_class: measured_reduced
           value: '43.79'
           value_as_printed: '43.79 ± 4.84'
@@ -799,7 +828,10 @@ species:
           whether those simple oxides are solid or liquid.
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-22.41'
           T_K: '2050'
@@ -845,7 +877,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-22.70'
           T_K: '2102'
@@ -892,7 +927,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-22.92'
           T_K: '2160'
@@ -939,7 +977,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-23.61'
           T_K: '2302'
@@ -988,7 +1029,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-22.32'
           T_K: '2004'
@@ -1040,7 +1084,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-23.47'
           T_K: '2210'
@@ -1090,7 +1137,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-23.39'
           T_K: '2252'
@@ -1139,7 +1189,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-21.15'
           T_K: '1863'
@@ -1187,7 +1240,10 @@ species:
         standard_state: *fig2_standard_state
         experiment: shornikov_2017_spinel_thermodynamics_kems
         values:
-          quantity: delta_fG
+          quantity_as_printed: "Fig. 2. Gibbs energy of spinel formation from simple oxides"
+          reference_state_as_printed: "formation from simple oxides"
+          schema_gap: "No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements."
+
           method_class: figure_only
           value: '-22.07'
           T_K: '1950'

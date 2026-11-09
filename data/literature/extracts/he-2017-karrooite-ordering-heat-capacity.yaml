@@ -83,6 +83,9 @@ scope_assessment:
     Figure 10 contains measured Cp points, but figure digitization is deferred
     by the family rule. Figures 11–12 are calculated or reduced curves and
     remain unscored context.
+schema_gaps:
+  - observation_id: he2017_figure11_configurational_entropy
+    reason: "No quantity token represents the printed configurational entropy; S denotes absolute entropy."
 species:
   MgTi2O5:
     observations:
@@ -672,7 +675,11 @@ species:
         panel: whole_figure
         units: J mol−1 K−1 per mole of formula unit
         values:
-          quantity: S
+          quantity_as_printed: "S_config (J K−1)"
+          reference_state_as_printed: "configurational entropy"
+          schema_gap: "No quantity token represents the printed configurational entropy; S denotes absolute entropy."
+          value_as_printed: "5.9(6)"
+
           method_class: model_derived
           species: MgTi2O5
           phase: crystalline MgTi2O5 ordering states

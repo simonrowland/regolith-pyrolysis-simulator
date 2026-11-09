@@ -46,6 +46,7 @@ from simulator.optimize.recipe import (
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
+    _resolve_n_startup_trials,
     _CONSTRAINT_NAMES_ATTR,
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
@@ -294,6 +295,12 @@ def _infeasible_result(
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
         feasibility_margins={"gate": margin},
     )
+
+
+def test_tpe_startup_trials_scale_with_budget_and_allow_override() -> None:
+    assert _resolve_n_startup_trials(24, None) == 6
+    assert _resolve_n_startup_trials(256, None) == 10
+    assert _resolve_n_startup_trials(24, 3) == 3
 
 
 def test_tpe_strategy_implements_protocol_and_round_trips() -> None:

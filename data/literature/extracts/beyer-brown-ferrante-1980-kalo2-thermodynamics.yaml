@@ -1,0 +1,4816 @@
+schema_version: literature_extract.v1
+source_id: beyer-brown-ferrante-1980-kalo2-thermodynamics
+source:
+  citation: Beyer, R. P.; Ferrante, M. J.; Brown, R. R. (1980). Thermodynamic properties of KAlO2. Journal of Chemical
+    Thermodynamics 12(10), 985–991. DOI 10.1016/0021-9614(80)90139-1.
+  doi: 10.1016/0021-9614(80)90139-1
+  year: 1980
+extraction:
+  method: MinerU table draft transcription cross-checked with born-digital pdftotext-layout and rendered PDF pages
+    for cell and row/column verification.
+  date: '2026-11-06'
+  worker: w1106a-beyer80
+  provenance_path: text/beyer-brown-ferrante-1980-kalo2-thermodynamics/pdftotext-layout.txt
+  source_note: The source prints 54 direct Cp pairs (Table 1), 16 direct enthalpy increments (Table 2), and 59 smoothed
+    rows over Table 3 pp. 988–989. Authors state both experimental Cp and enthalpy were smoothed with Justice FITAB.
+    They rejected their HCl-calorimeter formation enthalpies because the final solution was cloudy. Table 3 is referenced
+    to 0 K, extends to 1400 K although measurements stopped at 1197.8 K, and its G column is a thermal function,
+    not ΔfG.
+review_status: draft
+fidelity_samples:
+- path: species.KAlO2.observations[beyer80_table1_experimental_cp].values.points[0].value
+  value: '16.209'
+  locator:
+    page: 4
+    published_page: 988
+    table: '1'
+    row: 3
+    column: 2
+- path: species.KAlO2.observations[beyer80_table2_enthalpy_increments].values.points[0].value
+  value: '8850'
+  locator:
+    page: 4
+    published_page: 988
+    table: '2'
+    row: 3
+    column: 2
+- path: species.KAlO2.observations[beyer80_table3_smoothed_cp].values.points[35].value
+  value: '76.12'
+  locator:
+    page: 5
+    published_page: 989
+    table: '3'
+    row: 30
+    column: Cp
+- path: species.KAlO2.observations[beyer80_table3_negative_gibbs_function_over_T].values.points[35].value
+  value: '40.76'
+  locator:
+    page: 5
+    published_page: 989
+    table: '3'
+    row: 30
+    column: -{G°(T)-H°(0)}/T
+scope_assessment:
+  measured_direct_observations: 2
+  measured_reduced_observations: 5
+  schema_gap_observations: 4
+  rejected_source_claims:
+  - HCl-calorimeter formation-enthalpy measurements; explicitly rejected by authors
+  note: The transition temperature is observed directly; the 1295 J/mol first-order transition enthalpy is calculated.
+    No accepted formation enthalpy or formation Gibbs energy is printed.
+species:
+  KAlO2:
+    observations:
+    - observation_id: beyer80_table1_experimental_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '1'
+        row: all printed body rows
+      phase: cr
+      units: J/mol/K
+      per: mol_species
+      method_as_published: Experimental heat-capacity measurements by adiabatic calorimetry.
+      values:
+        quantity: cp
+        method_class: measured_direct
+        points:
+        - T_K: '51.58'
+          value: '16.209'
+          locator: &id001
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 3
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '51.58'
+              locator: *id001
+          series_as_printed: Series I
+        - T_K: '58.64'
+          value: '19.606'
+          locator: &id002
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 4
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '58.64'
+              locator: *id002
+          series_as_printed: Series I
+        - T_K: '67.35'
+          value: '23.527'
+          locator: &id003
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 5
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '67.35'
+              locator: *id003
+          series_as_printed: Series I
+        - T_K: '72.36'
+          value: '25.669'
+          locator: &id004
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 6
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '72.36'
+              locator: *id004
+          series_as_printed: Series I
+        - T_K: '80.16'
+          value: '28.840'
+          locator: &id005
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 7
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '80.16'
+              locator: *id005
+          series_as_printed: Series I
+        - T_K: '89.75'
+          value: '32.505'
+          locator: &id006
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 8
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '89.75'
+              locator: *id006
+          series_as_printed: Series I
+        - T_K: '101.19'
+          value: '36.547'
+          locator: &id007
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 9
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '101.19'
+              locator: *id007
+          series_as_printed: Series I
+        - T_K: '111.76'
+          value: '39.961'
+          locator: &id008
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 10
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '111.76'
+              locator: *id008
+          series_as_printed: Series I
+        - T_K: '122.99'
+          value: '43.313'
+          locator: &id009
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 11
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '122.99'
+              locator: *id009
+          series_as_printed: Series I
+        - T_K: '133.57'
+          value: '46.246'
+          locator: &id010
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 12
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '133.57'
+              locator: *id010
+          series_as_printed: Series I
+        - T_K: '129.92'
+          value: '45.208'
+          locator: &id011
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 15
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '129.92'
+              locator: *id011
+          series_as_printed: Series II
+        - T_K: '139.44'
+          value: '47.765'
+          locator: &id012
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 16
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '139.44'
+              locator: *id012
+          series_as_printed: Series II
+        - T_K: '149.53'
+          value: '50.29'
+          locator: &id013
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 2
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '149.53'
+              locator: *id013
+          series_as_printed: Series II
+        - T_K: '159.70'
+          value: '52.72'
+          locator: &id014
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 3
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '159.70'
+              locator: *id014
+          series_as_printed: Series II
+        - T_K: '179.60'
+          value: '57.11'
+          locator: &id015
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 4
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '179.60'
+              locator: *id015
+          series_as_printed: Series II
+        - T_K: '188.91'
+          value: '59.04'
+          locator: &id016
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 5
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '188.91'
+              locator: *id016
+          series_as_printed: Series II
+        - T_K: '198.49'
+          value: '60.92'
+          locator: &id017
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 6
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '198.49'
+              locator: *id017
+          series_as_printed: Series II
+        - T_K: '208.69'
+          value: '62.84'
+          locator: &id018
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 7
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '208.69'
+              locator: *id018
+          series_as_printed: Series II
+        - T_K: '218.40'
+          value: '64.60'
+          locator: &id019
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 8
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '218.40'
+              locator: *id019
+          series_as_printed: Series II
+        - T_K: '228.14'
+          value: '66.23'
+          locator: &id020
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 9
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '228.14'
+              locator: *id020
+          series_as_printed: Series II
+        - T_K: '238.10'
+          value: '67.82'
+          locator: &id021
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 10
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '238.10'
+              locator: *id021
+          series_as_printed: Series II
+        - T_K: '248.31'
+          value: '69.37'
+          locator: &id022
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 11
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '248.31'
+              locator: *id022
+          series_as_printed: Series II
+        - T_K: '4.87'
+          value: '0.008'
+          locator: &id023
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 14
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '4.87'
+              locator: *id023
+          series_as_printed: Series III
+        - T_K: '5.53'
+          value: '0.017'
+          locator: &id024
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 15
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '5.53'
+              locator: *id024
+          series_as_printed: Series III
+        - T_K: '6.14'
+          value: '0.025'
+          locator: &id025
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 16
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '6.14'
+              locator: *id025
+          series_as_printed: Series III
+        - T_K: '6.78'
+          value: '0.038'
+          locator: &id026
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 2
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '6.78'
+              locator: *id026
+          series_as_printed: Series III
+        - T_K: '7.76'
+          value: '0.067'
+          locator: &id027
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 3
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '7.76'
+              locator: *id027
+          series_as_printed: Series III
+        - T_K: '8.53'
+          value: '0.096'
+          locator: &id028
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 4
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '8.53'
+              locator: *id028
+          series_as_printed: Series III
+        - T_K: '9.41'
+          value: '0.146'
+          locator: &id029
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 5
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '9.41'
+              locator: *id029
+          series_as_printed: Series III
+        - T_K: '10.40'
+          value: '0.222'
+          locator: &id030
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 6
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '10.40'
+              locator: *id030
+          series_as_printed: Series III
+        - T_K: '11.22'
+          value: '0.289'
+          locator: &id031
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 7
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '11.22'
+              locator: *id031
+          series_as_printed: Series III
+        - T_K: '12.21'
+          value: '0.385'
+          locator: &id032
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 8
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '12.21'
+              locator: *id032
+          series_as_printed: Series III
+        - T_K: '13.42'
+          value: '0.519'
+          locator: &id033
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 9
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '13.42'
+              locator: *id033
+          series_as_printed: Series III
+        - T_K: '14.58'
+          value: '0.674'
+          locator: &id034
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 10
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '14.58'
+              locator: *id034
+          series_as_printed: Series III
+        - T_K: '15.91'
+          value: '0.895'
+          locator: &id035
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 11
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '15.91'
+              locator: *id035
+          series_as_printed: Series III
+        - T_K: '17.87'
+          value: '1.293'
+          locator: &id036
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 12
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '17.87'
+              locator: *id036
+          series_as_printed: Series III
+        - T_K: '19.19'
+          value: '1.611'
+          locator: &id037
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 13
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '19.19'
+              locator: *id037
+          series_as_printed: Series III
+        - T_K: '21.02'
+          value: '2.117'
+          locator: &id038
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 14
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '21.02'
+              locator: *id038
+          series_as_printed: Series III
+        - T_K: '23.96'
+          value: '3.100'
+          locator: &id039
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 15
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '23.96'
+              locator: *id039
+          series_as_printed: Series III
+        - T_K: '27.07'
+          value: '4.284'
+          locator: &id040
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 16
+            column: 6
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '27.07'
+              locator: *id040
+          series_as_printed: Series III
+        - T_K: '30.23'
+          value: '5.653'
+          locator: &id041
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 2
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '30.23'
+              locator: *id041
+          series_as_printed: Series III
+        - T_K: '33.94'
+          value: '7.385'
+          locator: &id042
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 3
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '33.94'
+              locator: *id042
+          series_as_printed: Series III
+        - T_K: '38.07'
+          value: '9.410'
+          locator: &id043
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 4
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '38.07'
+              locator: *id043
+          series_as_printed: Series III
+        - T_K: '42.81'
+          value: '11.799'
+          locator: &id044
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 5
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '42.81'
+              locator: *id044
+          series_as_printed: Series III
+        - T_K: '43.08'
+          value: '14.460'
+          locator: &id045
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 6
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '43.08'
+              locator: *id045
+          series_as_printed: Series III
+        - T_K: '53.11'
+          value: '16.958'
+          locator: &id046
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 7
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '53.11'
+              locator: *id046
+          series_as_printed: Series III
+        - T_K: '54.18'
+          value: '17.485'
+          locator: &id047
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 8
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '54.18'
+              locator: *id047
+          series_as_printed: Series III
+        - T_K: '59.35'
+          value: '19.933'
+          locator: &id048
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 9
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '59.35'
+              locator: *id048
+          series_as_printed: Series III
+        - T_K: '172.23'
+          value: '55.52'
+          locator: &id049
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 10
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '172.23'
+              locator: *id049
+          series_as_printed: Series III
+        - T_K: '257.71'
+          value: '70.75'
+          locator: &id050
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 11
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '257.71'
+              locator: *id050
+          series_as_printed: Series III
+        - T_K: '269.61'
+          value: '72.47'
+          locator: &id051
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 12
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '269.61'
+              locator: *id051
+          series_as_printed: Series III
+        - T_K: '281.19'
+          value: '73.97'
+          locator: &id052
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 13
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '281.19'
+              locator: *id052
+          series_as_printed: Series III
+        - T_K: '292.19'
+          value: '75.40'
+          locator: &id053
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 14
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '292.19'
+              locator: *id053
+          series_as_printed: Series III
+        - T_K: '303.07'
+          value: '76.73'
+          locator: &id054
+            page: 4
+            published_page: 988
+            table: '1'
+            row: 15
+            column: 8
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '303.07'
+              locator: *id054
+          series_as_printed: Series III
+      note: 54 experimental Cp pairs; four interleaved column pairs retain their printed chronological series labels.
+        Low-temperature adiabatic calorimetry, 5–303 K.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '6700'
+          locator:
+            page: 2
+            published_page: 986
+            section: Calorimetric technique
+            note: helium pressure as printed for this calorimeter series
+    - observation_id: beyer80_table2_enthalpy_increments
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '2'
+        row: all printed body rows
+      phase: cr
+      units: J/mol
+      per: mol_species
+      method_as_published: Experimental enthalpy-increment measurements by copper-block drop calorimetry.
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        points:
+        - T_K: '406.1'
+          value: '8850'
+          locator: &id055
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 3
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '406.1'
+              locator: *id055
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+13'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 3
+            column: 3
+        - T_K: '780.5'
+          value: '45470'
+          locator: &id056
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 3
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '780.5'
+              locator: *id056
+          deviation_from_smoothed_curve_J_per_mol_as_printed: $+184^b$
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 3
+            column: 6
+          transition_region_not_used_in_curve_fit: true
+        - T_K: '501.9'
+          value: '17485'
+          locator: &id057
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 4
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '501.9'
+              locator: *id057
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+21'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 4
+            column: 3
+        - T_K: '818.4'
+          value: '50405'
+          locator: &id058
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 4
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '818.4'
+              locator: *id058
+          deviation_from_smoothed_curve_J_per_mol_as_printed: $-155^b$
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 4
+            column: 6
+          transition_region_not_used_in_curve_fit: true
+        - T_K: '601.4'
+          value: '26970'
+          locator: &id059
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 5
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '601.4'
+              locator: *id059
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-29'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 5
+            column: 3
+        - T_K: '741.8'
+          value: '41240'
+          locator: &id060
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 5
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '741.8'
+              locator: *id060
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+13'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 5
+            column: 6
+        - T_K: '704.0'
+          value: '37330'
+          locator: &id061
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 6
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '704.0'
+              locator: *id061
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+8'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 6
+            column: 3
+        - T_K: '837.5'
+          value: '52440'
+          locator: &id062
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 6
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '837.5'
+              locator: *id062
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-67'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 6
+            column: 6
+        - T_K: '802.9'
+          value: '48180'
+          locator: &id063
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 7
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '802.9'
+              locator: *id063
+          deviation_from_smoothed_curve_J_per_mol_as_printed: $+527^b$
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 7
+            column: 3
+          transition_region_not_used_in_curve_fit: true
+        - T_K: '1051.1'
+          value: '74540'
+          locator: &id064
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 7
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1051.1'
+              locator: *id064
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-29'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 7
+            column: 6
+        - T_K: '902.0'
+          value: '59255'
+          locator: &id065
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 8
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '902.0'
+              locator: *id065
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+142'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 8
+            column: 3
+        - T_K: '1098.7'
+          value: '79535'
+          locator: &id066
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 8
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1098.7'
+              locator: *id066
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-29'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 8
+            column: 6
+        - T_K: '952.4'
+          value: '64450'
+          locator: &id067
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 9
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '952.4'
+              locator: *id067
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+142'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 9
+            column: 3
+        - T_K: '1149.4'
+          value: '84840'
+          locator: &id068
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 9
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1149.4'
+              locator: *id068
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-67'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 9
+            column: 6
+        - T_K: '1001.9'
+          value: '69555'
+          locator: &id069
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 10
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1001.9'
+              locator: *id069
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '+113'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 10
+            column: 3
+        - T_K: '1197.8'
+          value: '90100'
+          locator: &id070
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 10
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1197.8'
+              locator: *id070
+          deviation_from_smoothed_curve_J_per_mol_as_printed: '-54'
+          deviation_locator:
+            page: 4
+            published_page: 988
+            table: '2'
+            row: 10
+            column: 6
+        reference_temperature_K: '298.15'
+      note: 16 experimental H°(T)-H°(298.15 K) increments from drop calorimetry; δH values are deviations from the
+        smoothed curve. Three transition-region values are footnoted as not used in the curve fit.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101000'
+          locator:
+            page: 3
+            published_page: 987
+            section: Calorimetric technique
+            note: helium pressure as printed for this calorimeter series
+    - observation_id: beyer80_table3_smoothed_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '3'
+        additional_page: 5
+        additional_published_page: 989
+        row: all 59 printed rows
+      phase: cr
+      units: J/mol/K
+      per: mol_species
+      method_as_published: Smoothed by Justice’s FITAB curve-fitting routine from this study’s measured heat capacities
+        and enthalpy increments.
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        points:
+        - T_K: '5'
+          value: '0.013'
+          locator: &id071
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 2
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '5'
+              locator: *id071
+        - T_K: '10'
+          value: '0.188'
+          locator: &id072
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 3
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '10'
+              locator: *id072
+        - T_K: '15'
+          value: '0.736'
+          locator: &id073
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 4
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '15'
+              locator: *id073
+        - T_K: '20'
+          value: '1.828'
+          locator: &id074
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 5
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '20'
+              locator: *id074
+        - T_K: '25'
+          value: '3.473'
+          locator: &id075
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 6
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '25'
+              locator: *id075
+        - T_K: '30'
+          value: '5.548'
+          locator: &id076
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 7
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '30'
+              locator: *id076
+        - T_K: '35'
+          value: '7.895'
+          locator: &id077
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 8
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '35'
+              locator: *id077
+        - T_K: '40'
+          value: '10.381'
+          locator: &id078
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 2
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '40'
+              locator: *id078
+        - T_K: '45'
+          value: '12.908'
+          locator: &id079
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 3
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '45'
+              locator: *id079
+        - T_K: '55'
+          value: '17.88'
+          locator: &id080
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 4
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '55'
+              locator: *id080
+        - T_K: '60'
+          value: '20.24'
+          locator: &id081
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 5
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '60'
+              locator: *id081
+        - T_K: '70'
+          value: '24.69'
+          locator: &id082
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 6
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '70'
+              locator: *id082
+        - T_K: '80'
+          value: '28.80'
+          locator: &id083
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 7
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '80'
+              locator: *id083
+        - T_K: '90'
+          value: '32.59'
+          locator: &id084
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 8
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '90'
+              locator: *id084
+        - T_K: '100'
+          value: '36.11'
+          locator: &id085
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 9
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '100'
+              locator: *id085
+        - T_K: '110'
+          value: '39.38'
+          locator: &id086
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 10
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '110'
+              locator: *id086
+        - T_K: '120'
+          value: '42.42'
+          locator: &id087
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 11
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '120'
+              locator: *id087
+        - T_K: '130'
+          value: '45.26'
+          locator: &id088
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 12
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '130'
+              locator: *id088
+        - T_K: '140'
+          value: '47.93'
+          locator: &id089
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 13
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '140'
+              locator: *id089
+        - T_K: '150'
+          value: '50.44'
+          locator: &id090
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 14
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '150'
+              locator: *id090
+        - T_K: '160'
+          value: '52.82'
+          locator: &id091
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 15
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '160'
+              locator: *id091
+        - T_K: '170'
+          value: '55.07'
+          locator: &id092
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 16
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '170'
+              locator: *id092
+        - T_K: '180'
+          value: '57.21'
+          locator: &id093
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 17
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '180'
+              locator: *id093
+        - T_K: '190'
+          value: '59.25'
+          locator: &id094
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 18
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '190'
+              locator: *id094
+        - T_K: '200'
+          value: '61.20'
+          locator: &id095
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 19
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '200'
+              locator: *id095
+        - T_K: '210'
+          value: '63.05'
+          locator: &id096
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 20
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '210'
+              locator: *id096
+        - T_K: '220'
+          value: '64.83'
+          locator: &id097
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 21
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '220'
+              locator: *id097
+        - T_K: '230'
+          value: '66.52'
+          locator: &id098
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 22
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '230'
+              locator: *id098
+        - T_K: '240'
+          value: '68.13'
+          locator: &id099
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 23
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '240'
+              locator: *id099
+        - T_K: '250'
+          value: '69.66'
+          locator: &id100
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 24
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '250'
+              locator: *id100
+        - T_K: '260'
+          value: '71.12'
+          locator: &id101
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 25
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '260'
+              locator: *id101
+        - T_K: '270'
+          value: '72.51'
+          locator: &id102
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 26
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '270'
+              locator: *id102
+        - T_K: '273.15'
+          value: '72.93'
+          locator: &id103
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 27
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '273.15'
+              locator: *id103
+        - T_K: '280'
+          value: '73.84'
+          locator: &id104
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 28
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '280'
+              locator: *id104
+        - T_K: '290'
+          value: '75.11'
+          locator: &id105
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 29
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '290'
+              locator: *id105
+        - T_K: '298.15'
+          value: '76.12'
+          locator: &id106
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 30
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '298.15'
+              locator: *id106
+        - T_K: '300'
+          value: '76.34'
+          locator: &id107
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 31
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '300'
+              locator: *id107
+        - T_K: '350'
+          value: '81.89'
+          locator: &id108
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 32
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '350'
+              locator: *id108
+        - T_K: '400'
+          value: '86.21'
+          locator: &id109
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 33
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '400'
+              locator: *id109
+        - T_K: '450'
+          value: '89.84'
+          locator: &id110
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 34
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '450'
+              locator: *id110
+        - T_K: '500'
+          value: '92.99'
+          locator: &id111
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 35
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '500'
+              locator: *id111
+        - T_K: '550'
+          value: '95.78'
+          locator: &id112
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 36
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '550'
+              locator: *id112
+        - T_K: '600'
+          value: '98.27'
+          locator: &id113
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 37
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '600'
+              locator: *id113
+        - T_K: '650'
+          value: '100.53'
+          locator: &id114
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 38
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '650'
+              locator: *id114
+        - T_K: '700'
+          value: '102.55'
+          locator: &id115
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 39
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '700'
+              locator: *id115
+        - T_K: '750'
+          value: '104.39'
+          locator: &id116
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 40
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '750'
+              locator: *id116
+        - T_K: '800'
+          value: '106.03'
+          locator: &id117
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 41
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '800'
+              locator: *id117
+        - T_K: '810'
+          value: '106.34'
+          locator: &id118
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 42
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id118
+          transition_state_as_printed: 1
+        - T_K: '810'
+          value: '101.69'
+          locator: &id119
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 43
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id119
+          transition_state_as_printed: 2
+        - T_K: '900'
+          value: '102.77'
+          locator: &id120
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 44
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '900'
+              locator: *id120
+        - T_K: '1000'
+          value: '103.97'
+          locator: &id121
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 45
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id121
+        - T_K: '1050'
+          value: '104.57'
+          locator: &id122
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 46
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1050'
+              locator: *id122
+        - T_K: '1100'
+          value: '105.17'
+          locator: &id123
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 47
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1100'
+              locator: *id123
+        - T_K: '1150'
+          value: '105.77'
+          locator: &id124
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 48
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1150'
+              locator: *id124
+        - T_K: '1200'
+          value: '106.37'
+          locator: &id125
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 49
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id125
+        - T_K: '1250'
+          value: '106.97'
+          locator: &id126
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 50
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1250'
+              locator: *id126
+        - T_K: '1300'
+          value: '107.57'
+          locator: &id127
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 51
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1300'
+              locator: *id127
+        - T_K: '1350'
+          value: '108.17'
+          locator: &id128
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 52
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id128
+        - T_K: '1400'
+          value: '108.77'
+          locator: &id129
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 53
+            column: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1400'
+              locator: *id129
+        derivation:
+          relation: The authors smoothed their experimental heat capacities and enthalpy increments with Justice’s
+            FITAB curve-fitting routine; thermodynamic functions were generated from the fit. Below 5 K they extrapolated
+            Cp/T against T² and integrated entropy and enthalpy by Simpson’s rule.
+          inputs: &id130
+          - beyer80_table1_experimental_cp
+          - beyer80_table2_enthalpy_increments
+      derived_from: *id130
+    - observation_id: beyer80_table3_entropy_increment_from_zero
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '3'
+        additional_page: 5
+        additional_published_page: 989
+        row: all 59 printed rows
+      phase: cr
+      units: J/mol/K
+      per: mol_species
+      method_as_published: Smoothed by Justice’s FITAB curve-fitting routine from this study’s measured heat capacities
+        and enthalpy increments.
+      values:
+        quantity: entropy_increment_from_S0
+        method_class: measured_reduced
+        points:
+        - T_K: '5'
+          value: '0.004'
+          locator: &id131
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 2
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '5'
+              locator: *id131
+        - T_K: '10'
+          value: '0.046'
+          locator: &id132
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 3
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '10'
+              locator: *id132
+        - T_K: '15'
+          value: '0.213'
+          locator: &id133
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 4
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '15'
+              locator: *id133
+        - T_K: '20'
+          value: '0.561'
+          locator: &id134
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 5
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '20'
+              locator: *id134
+        - T_K: '25'
+          value: '1.134'
+          locator: &id135
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 6
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '25'
+              locator: *id135
+        - T_K: '30'
+          value: '1.946'
+          locator: &id136
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 7
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '30'
+              locator: *id136
+        - T_K: '35'
+          value: '2.975'
+          locator: &id137
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 8
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '35'
+              locator: *id137
+        - T_K: '40'
+          value: '4.192'
+          locator: &id138
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 2
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '40'
+              locator: *id138
+        - T_K: '45'
+          value: '5.561'
+          locator: &id139
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 3
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '45'
+              locator: *id139
+        - T_K: '55'
+          value: '8.636'
+          locator: &id140
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 4
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '55'
+              locator: *id140
+        - T_K: '60'
+          value: '10.293'
+          locator: &id141
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 5
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '60'
+              locator: *id141
+        - T_K: '70'
+          value: '13.753'
+          locator: &id142
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 6
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '70'
+              locator: *id142
+        - T_K: '80'
+          value: '17.32'
+          locator: &id143
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 7
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '80'
+              locator: *id143
+        - T_K: '90'
+          value: '20.94'
+          locator: &id144
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 8
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '90'
+              locator: *id144
+        - T_K: '100'
+          value: '24.56'
+          locator: &id145
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 9
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '100'
+              locator: *id145
+        - T_K: '110'
+          value: '28.15'
+          locator: &id146
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 10
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '110'
+              locator: *id146
+        - T_K: '120'
+          value: '31.71'
+          locator: &id147
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 11
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '120'
+              locator: *id147
+        - T_K: '130'
+          value: '35.22'
+          locator: &id148
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 12
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '130'
+              locator: *id148
+        - T_K: '140'
+          value: '38.67'
+          locator: &id149
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 13
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '140'
+              locator: *id149
+        - T_K: '150'
+          value: '42.06'
+          locator: &id150
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 14
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '150'
+              locator: *id150
+        - T_K: '160'
+          value: '45.40'
+          locator: &id151
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 15
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '160'
+              locator: *id151
+        - T_K: '170'
+          value: '48.66'
+          locator: &id152
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 16
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '170'
+              locator: *id152
+        - T_K: '180'
+          value: '51.87'
+          locator: &id153
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 17
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '180'
+              locator: *id153
+        - T_K: '190'
+          value: '55.02'
+          locator: &id154
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 18
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '190'
+              locator: *id154
+        - T_K: '200'
+          value: '58.11'
+          locator: &id155
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 19
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '200'
+              locator: *id155
+        - T_K: '210'
+          value: '61.14'
+          locator: &id156
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 20
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '210'
+              locator: *id156
+        - T_K: '220'
+          value: '64.12'
+          locator: &id157
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 21
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '220'
+              locator: *id157
+        - T_K: '230'
+          value: '67.04'
+          locator: &id158
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 22
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '230'
+              locator: *id158
+        - T_K: '240'
+          value: '69.90'
+          locator: &id159
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 23
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '240'
+              locator: *id159
+        - T_K: '250'
+          value: '72.71'
+          locator: &id160
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 24
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '250'
+              locator: *id160
+        - T_K: '260'
+          value: '75.48'
+          locator: &id161
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 25
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '260'
+              locator: *id161
+        - T_K: '270'
+          value: '78.19'
+          locator: &id162
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 26
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '270'
+              locator: *id162
+        - T_K: '273.15'
+          value: '79.03'
+          locator: &id163
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 27
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '273.15'
+              locator: *id163
+        - T_K: '280'
+          value: '80.85'
+          locator: &id164
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 28
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '280'
+              locator: *id164
+        - T_K: '290'
+          value: '83.46'
+          locator: &id165
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 29
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '290'
+              locator: *id165
+        - T_K: '298.15'
+          value: '85.55'
+          locator: &id166
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 30
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '298.15'
+              locator: *id166
+        - T_K: '300'
+          value: '86.03'
+          locator: &id167
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 31
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '300'
+              locator: *id167
+        - T_K: '350'
+          value: '98.25'
+          locator: &id168
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 32
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '350'
+              locator: *id168
+        - T_K: '400'
+          value: '109.47'
+          locator: &id169
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 33
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '400'
+              locator: *id169
+        - T_K: '450'
+          value: '119.84'
+          locator: &id170
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 34
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '450'
+              locator: *id170
+        - T_K: '500'
+          value: '129.47'
+          locator: &id171
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 35
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '500'
+              locator: *id171
+        - T_K: '550'
+          value: '138.47'
+          locator: &id172
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 36
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '550'
+              locator: *id172
+        - T_K: '600'
+          value: '146.91'
+          locator: &id173
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 37
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '600'
+              locator: *id173
+        - T_K: '650'
+          value: '154.87'
+          locator: &id174
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 38
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '650'
+              locator: *id174
+        - T_K: '700'
+          value: '162.39'
+          locator: &id175
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 39
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '700'
+              locator: *id175
+        - T_K: '750'
+          value: '169.53'
+          locator: &id176
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 40
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '750'
+              locator: *id176
+        - T_K: '800'
+          value: '176.32'
+          locator: &id177
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 41
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '800'
+              locator: *id177
+        - T_K: '810'
+          value: '177.64'
+          locator: &id178
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 42
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id178
+          transition_state_as_printed: 1
+        - T_K: '810'
+          value: '179.24'
+          locator: &id179
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 43
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id179
+          transition_state_as_printed: 2
+        - T_K: '900'
+          value: '190.01'
+          locator: &id180
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 44
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '900'
+              locator: *id180
+        - T_K: '1000'
+          value: '200.90'
+          locator: &id181
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 45
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id181
+        - T_K: '1050'
+          value: '205.99'
+          locator: &id182
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 46
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1050'
+              locator: *id182
+        - T_K: '1100'
+          value: '210.87'
+          locator: &id183
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 47
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1100'
+              locator: *id183
+        - T_K: '1150'
+          value: '215.56'
+          locator: &id184
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 48
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1150'
+              locator: *id184
+        - T_K: '1200'
+          value: '220.07'
+          locator: &id185
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 49
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id185
+        - T_K: '1250'
+          value: '224.43'
+          locator: &id186
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 50
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1250'
+              locator: *id186
+        - T_K: '1300'
+          value: '228.63'
+          locator: &id187
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 51
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1300'
+              locator: *id187
+        - T_K: '1350'
+          value: '232.70'
+          locator: &id188
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 52
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id188
+        - T_K: '1400'
+          value: '236.65'
+          locator: &id189
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 53
+            column: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1400'
+              locator: *id189
+        derivation:
+          relation: The authors smoothed their experimental heat capacities and enthalpy increments with Justice’s
+            FITAB curve-fitting routine; thermodynamic functions were generated from the fit. Below 5 K they extrapolated
+            Cp/T against T² and integrated entropy and enthalpy by Simpson’s rule.
+          inputs: &id190
+          - beyer80_table1_experimental_cp
+          - beyer80_table2_enthalpy_increments
+      derived_from: *id190
+      schema_gap: 'No exact token: Quantity.S is absolute standard entropy, while the printed column is S°(T)-S°(0);
+        see simulator/battery/enums.py::Quantity.S and simulator/battery/migrate.py::QUANTITY_ALIASES.'
+    - observation_id: beyer80_table3_negative_gibbs_function_over_T
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '3'
+        additional_page: 5
+        additional_published_page: 989
+        row: all 59 printed rows
+      phase: cr
+      units: J/mol/K
+      per: mol_species
+      method_as_published: Smoothed by Justice’s FITAB curve-fitting routine from this study’s measured heat capacities
+        and enthalpy increments.
+      values:
+        quantity: negative_gibbs_function_over_T_from_H0
+        method_class: measured_reduced
+        points:
+        - T_K: '5'
+          value: '0.001'
+          locator: &id191
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 2
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '5'
+              locator: *id191
+        - T_K: '10'
+          value: '0.009'
+          locator: &id192
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 3
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '10'
+              locator: *id192
+        - T_K: '15'
+          value: '0.045'
+          locator: &id193
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 4
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '15'
+              locator: *id193
+        - T_K: '20'
+          value: '0.127'
+          locator: &id194
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 5
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '20'
+              locator: *id194
+        - T_K: '25'
+          value: '0.265'
+          locator: &id195
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 6
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '25'
+              locator: *id195
+        - T_K: '30'
+          value: '0.475'
+          locator: &id196
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 7
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '30'
+              locator: *id196
+        - T_K: '35'
+          value: '0.756'
+          locator: &id197
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 8
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '35'
+              locator: *id197
+        - T_K: '40'
+          value: '1.109'
+          locator: &id198
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 2
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '40'
+              locator: *id198
+        - T_K: '45'
+          value: '1.526'
+          locator: &id199
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 3
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '45'
+              locator: *id199
+        - T_K: '55'
+          value: '2.532'
+          locator: &id200
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 4
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '55'
+              locator: *id200
+        - T_K: '60'
+          value: '3.109'
+          locator: &id201
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 5
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '60'
+              locator: *id201
+        - T_K: '70'
+          value: '4.382'
+          locator: &id202
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 6
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '70'
+              locator: *id202
+        - T_K: '80'
+          value: '5.774'
+          locator: &id203
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 7
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '80'
+              locator: *id203
+        - T_K: '90'
+          value: '7.263'
+          locator: &id204
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 8
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '90'
+              locator: *id204
+        - T_K: '100'
+          value: '8.813'
+          locator: &id205
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 9
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '100'
+              locator: *id205
+        - T_K: '110'
+          value: '10.402'
+          locator: &id206
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 10
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '110'
+              locator: *id206
+        - T_K: '120'
+          value: '12.032'
+          locator: &id207
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 11
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '120'
+              locator: *id207
+        - T_K: '130'
+          value: '13.682'
+          locator: &id208
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 12
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '130'
+              locator: *id208
+        - T_K: '140'
+          value: '15.34'
+          locator: &id209
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 13
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '140'
+              locator: *id209
+        - T_K: '150'
+          value: '17.01'
+          locator: &id210
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 14
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '150'
+              locator: *id210
+        - T_K: '160'
+          value: '18.69'
+          locator: &id211
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 15
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '160'
+              locator: *id211
+        - T_K: '170'
+          value: '20.34'
+          locator: &id212
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 16
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '170'
+              locator: *id212
+        - T_K: '180'
+          value: '22.01'
+          locator: &id213
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 17
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '180'
+              locator: *id213
+        - T_K: '190'
+          value: '23.66'
+          locator: &id214
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 18
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '190'
+              locator: *id214
+        - T_K: '200'
+          value: '25.31'
+          locator: &id215
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 19
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '200'
+              locator: *id215
+        - T_K: '210'
+          value: '26.94'
+          locator: &id216
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 20
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '210'
+              locator: *id216
+        - T_K: '220'
+          value: '28.57'
+          locator: &id217
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 21
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '220'
+              locator: *id217
+        - T_K: '230'
+          value: '30.18'
+          locator: &id218
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 22
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '230'
+              locator: *id218
+        - T_K: '240'
+          value: '31.77'
+          locator: &id219
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 23
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '240'
+              locator: *id219
+        - T_K: '250'
+          value: '33.35'
+          locator: &id220
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 24
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '250'
+              locator: *id220
+        - T_K: '260'
+          value: '34.93'
+          locator: &id221
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 25
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '260'
+              locator: *id221
+        - T_K: '270'
+          value: '36.48'
+          locator: &id222
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 26
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '270'
+              locator: *id222
+        - T_K: '273.15'
+          value: '36.94'
+          locator: &id223
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 27
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '273.15'
+              locator: *id223
+        - T_K: '280'
+          value: '38.01'
+          locator: &id224
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 28
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '280'
+              locator: *id224
+        - T_K: '290'
+          value: '39.54'
+          locator: &id225
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 29
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '290'
+              locator: *id225
+        - T_K: '298.15'
+          value: '40.76'
+          locator: &id226
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 30
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '298.15'
+              locator: *id226
+        - T_K: '300'
+          value: '41.04'
+          locator: &id227
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 31
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '300'
+              locator: *id227
+        - T_K: '350'
+          value: '48.36'
+          locator: &id228
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 32
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '350'
+              locator: *id228
+        - T_K: '400'
+          value: '55.30'
+          locator: &id229
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 33
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '400'
+              locator: *id229
+        - T_K: '450'
+          value: '61.90'
+          locator: &id230
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 34
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '450'
+              locator: *id230
+        - T_K: '500'
+          value: '68.18'
+          locator: &id231
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 35
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '500'
+              locator: *id231
+        - T_K: '550'
+          value: '74.17'
+          locator: &id232
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 36
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '550'
+              locator: *id232
+        - T_K: '600'
+          value: '79.88'
+          locator: &id233
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 37
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '600'
+              locator: *id233
+        - T_K: '650'
+          value: '85.35'
+          locator: &id234
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 38
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '650'
+              locator: *id234
+        - T_K: '700'
+          value: '90.58'
+          locator: &id235
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 39
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '700'
+              locator: *id235
+        - T_K: '750'
+          value: '95.61'
+          locator: &id236
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 40
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '750'
+              locator: *id236
+        - T_K: '800'
+          value: '100.45'
+          locator: &id237
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 41
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '800'
+              locator: *id237
+        - T_K: '810'
+          value: '101.39'
+          locator: &id238
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 42
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id238
+          transition_state_as_printed: 1
+        - T_K: '810'
+          value: '101.39'
+          locator: &id239
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 43
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id239
+          transition_state_as_printed: 2
+        - T_K: '900'
+          value: '109.72'
+          locator: &id240
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 44
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '900'
+              locator: *id240
+        - T_K: '1000'
+          value: '118.30'
+          locator: &id241
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 45
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id241
+        - T_K: '1050'
+          value: '122.36'
+          locator: &id242
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 46
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1050'
+              locator: *id242
+        - T_K: '1100'
+          value: '126.27'
+          locator: &id243
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 47
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1100'
+              locator: *id243
+        - T_K: '1150'
+          value: '130.06'
+          locator: &id244
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 48
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1150'
+              locator: *id244
+        - T_K: '1200'
+          value: '133.71'
+          locator: &id245
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 49
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id245
+        - T_K: '1250'
+          value: '137.25'
+          locator: &id246
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 50
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1250'
+              locator: *id246
+        - T_K: '1300'
+          value: '140.68'
+          locator: &id247
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 51
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1300'
+              locator: *id247
+        - T_K: '1350'
+          value: '144.02'
+          locator: &id248
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 52
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id248
+        - T_K: '1400'
+          value: '147.26'
+          locator: &id249
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 53
+            column: 4
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1400'
+              locator: *id249
+        derivation:
+          relation: The authors smoothed their experimental heat capacities and enthalpy increments with Justice’s
+            FITAB curve-fitting routine; thermodynamic functions were generated from the fit. Below 5 K they extrapolated
+            Cp/T against T² and integrated entropy and enthalpy by Simpson’s rule.
+          inputs: &id250
+          - beyer80_table1_experimental_cp
+          - beyer80_table2_enthalpy_increments
+      derived_from: *id250
+      schema_gap: No exact token represents -{G°(T)-H°(0)}/T; delta_fG is a formation quantity, not this thermal
+        function; see simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/migrate.py::QUANTITY_ALIASES.
+    - observation_id: beyer80_table3_enthalpy_increment_from_zero
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 988
+        table: '3'
+        additional_page: 5
+        additional_published_page: 989
+        row: all 59 printed rows
+      phase: cr
+      units: J/mol
+      per: mol_species
+      method_as_published: Smoothed by Justice’s FITAB curve-fitting routine from this study’s measured heat capacities
+        and enthalpy increments.
+      values:
+        quantity: enthalpy_increment_from_H0
+        method_class: measured_reduced
+        points:
+        - T_K: '5'
+          value: '0.013'
+          locator: &id251
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 2
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '5'
+              locator: *id251
+        - T_K: '10'
+          value: '0.368'
+          locator: &id252
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 3
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '10'
+              locator: *id252
+        - T_K: '15'
+          value: '2.519'
+          locator: &id253
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 4
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '15'
+              locator: *id253
+        - T_K: '20'
+          value: '8.686'
+          locator: &id254
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 5
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '20'
+              locator: *id254
+        - T_K: '25'
+          value: '21.732'
+          locator: &id255
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 6
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '25'
+              locator: *id255
+        - T_K: '30'
+          value: '44.145'
+          locator: &id256
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 7
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '30'
+              locator: *id256
+        - T_K: '35'
+          value: '77.67'
+          locator: &id257
+            page: 4
+            published_page: 988
+            table: '3'
+            row: 8
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '35'
+              locator: *id257
+        - T_K: '40'
+          value: '123.33'
+          locator: &id258
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 2
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '40'
+              locator: *id258
+        - T_K: '45'
+          value: '181.56'
+          locator: &id259
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 3
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '45'
+              locator: *id259
+        - T_K: '55'
+          value: '335.70'
+          locator: &id260
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 4
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '55'
+              locator: *id260
+        - T_K: '60'
+          value: '431.02'
+          locator: &id261
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 5
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '60'
+              locator: *id261
+        - T_K: '70'
+          value: '656.0'
+          locator: &id262
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 6
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '70'
+              locator: *id262
+        - T_K: '80'
+          value: '923.7'
+          locator: &id263
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 7
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '80'
+              locator: *id263
+        - T_K: '90'
+          value: '1230.9'
+          locator: &id264
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 8
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '90'
+              locator: *id264
+        - T_K: '100'
+          value: '1574.7'
+          locator: &id265
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 9
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '100'
+              locator: *id265
+        - T_K: '110'
+          value: '1952.3'
+          locator: &id266
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 10
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '110'
+              locator: *id266
+        - T_K: '120'
+          value: '2361.4'
+          locator: &id267
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 11
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '120'
+              locator: *id267
+        - T_K: '130'
+          value: '2799.9'
+          locator: &id268
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 12
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '130'
+              locator: *id268
+        - T_K: '140'
+          value: '3266.0'
+          locator: &id269
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 13
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '140'
+              locator: *id269
+        - T_K: '150'
+          value: '3758.0'
+          locator: &id270
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 14
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '150'
+              locator: *id270
+        - T_K: '160'
+          value: '4274.3'
+          locator: &id271
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 15
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '160'
+              locator: *id271
+        - T_K: '170'
+          value: '4813.9'
+          locator: &id272
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 16
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '170'
+              locator: *id272
+        - T_K: '180'
+          value: '5375'
+          locator: &id273
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 17
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '180'
+              locator: *id273
+        - T_K: '190'
+          value: '5958'
+          locator: &id274
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 18
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '190'
+              locator: *id274
+        - T_K: '200'
+          value: '6560'
+          locator: &id275
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 19
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '200'
+              locator: *id275
+        - T_K: '210'
+          value: '7181'
+          locator: &id276
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 20
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '210'
+              locator: *id276
+        - T_K: '220'
+          value: '7821'
+          locator: &id277
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 21
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '220'
+              locator: *id277
+        - T_K: '230'
+          value: '8478'
+          locator: &id278
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 22
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '230'
+              locator: *id278
+        - T_K: '240'
+          value: '9151'
+          locator: &id279
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 23
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '240'
+              locator: *id279
+        - T_K: '250'
+          value: '9840'
+          locator: &id280
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 24
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '250'
+              locator: *id280
+        - T_K: '260'
+          value: '10544'
+          locator: &id281
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 25
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '260'
+              locator: *id281
+        - T_K: '270'
+          value: '11262'
+          locator: &id282
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 26
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '270'
+              locator: *id282
+        - T_K: '273.15'
+          value: '11491'
+          locator: &id283
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 27
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '273.15'
+              locator: *id283
+        - T_K: '280'
+          value: '11994'
+          locator: &id284
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 28
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '280'
+              locator: *id284
+        - T_K: '290'
+          value: '12738'
+          locator: &id285
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 29
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '290'
+              locator: *id285
+        - T_K: '298.15'
+          value: '13355'
+          locator: &id286
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 30
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '298.15'
+              locator: *id286
+        - T_K: '300'
+          value: '13496'
+          locator: &id287
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 31
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '300'
+              locator: *id287
+        - T_K: '350'
+          value: '17462'
+          locator: &id288
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 32
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '350'
+              locator: *id288
+        - T_K: '400'
+          value: '21668'
+          locator: &id289
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 33
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '400'
+              locator: *id289
+        - T_K: '450'
+          value: '26071'
+          locator: &id290
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 34
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '450'
+              locator: *id290
+        - T_K: '500'
+          value: '30644'
+          locator: &id291
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 35
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '500'
+              locator: *id291
+        - T_K: '550'
+          value: '35364'
+          locator: &id292
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 36
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '550'
+              locator: *id292
+        - T_K: '600'
+          value: '40216'
+          locator: &id293
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 37
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '600'
+              locator: *id293
+        - T_K: '650'
+          value: '45187'
+          locator: &id294
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 38
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '650'
+              locator: *id294
+        - T_K: '700'
+          value: '50270'
+          locator: &id295
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 39
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '700'
+              locator: *id295
+        - T_K: '750'
+          value: '55440'
+          locator: &id296
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 40
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '750'
+              locator: *id296
+        - T_K: '800'
+          value: '60700'
+          locator: &id297
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 41
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '800'
+              locator: *id297
+        - T_K: '810'
+          value: '61760'
+          locator: &id298
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 42
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id298
+          transition_state_as_printed: 1
+        - T_K: '810'
+          value: '63060'
+          locator: &id299
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 43
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '810'
+              locator: *id299
+          transition_state_as_printed: 2
+        - T_K: '900'
+          value: '72260'
+          locator: &id300
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 44
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '900'
+              locator: *id300
+        - T_K: '1000'
+          value: '82600'
+          locator: &id301
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 45
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id301
+        - T_K: '1050'
+          value: '87810'
+          locator: &id302
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 46
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1050'
+              locator: *id302
+        - T_K: '1100'
+          value: '93060'
+          locator: &id303
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 47
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1100'
+              locator: *id303
+        - T_K: '1150'
+          value: '98330'
+          locator: &id304
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 48
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1150'
+              locator: *id304
+        - T_K: '1200'
+          value: '103633'
+          locator: &id305
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 49
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id305
+        - T_K: '1250'
+          value: '108967'
+          locator: &id306
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 50
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1250'
+              locator: *id306
+        - T_K: '1300'
+          value: '114330'
+          locator: &id307
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 51
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1300'
+              locator: *id307
+        - T_K: '1350'
+          value: '119724'
+          locator: &id308
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 52
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id308
+        - T_K: '1400'
+          value: '125147'
+          locator: &id309
+            page: 5
+            published_page: 989
+            table: '3'
+            row: 53
+            column: 5
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1400'
+              locator: *id309
+        derivation:
+          relation: The authors smoothed their experimental heat capacities and enthalpy increments with Justice’s
+            FITAB curve-fitting routine; thermodynamic functions were generated from the fit. Below 5 K they extrapolated
+            Cp/T against T² and integrated entropy and enthalpy by Simpson’s rule.
+          inputs: &id310
+          - beyer80_table1_experimental_cp
+          - beyer80_table2_enthalpy_increments
+      derived_from: *id310
+      schema_gap: No exact token represents H°(T)-H°(0); Quantity.H_MINUS_H298 is explicitly referenced to 298.15
+        K; see simulator/battery/enums.py::Quantity.H_MINUS_H298 and simulator/battery/migrate.py::QUANTITY_ALIASES.
+    - observation_id: beyer80_reversible_transition_temperature
+      type: transition_point
+      locator:
+        page: 6
+        published_page: 990
+        section: Discussion
+        row: paragraph describing the reversible transition
+      T_K: '810'
+      phase: cr
+      units: K
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '810'
+          locator:
+            page: 6
+            published_page: 990
+            section: Discussion
+            row: transition statement
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        T_K: '810'
+        property_kind: first_order_reversible_solid_solid_transition
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '810'
+            locator:
+              page: 6
+              published_page: 990
+              section: Discussion
+              row: transition statement
+    - observation_id: beyer80_transition_enthalpy_schema_gap
+      type: phase_transition
+      locator:
+        page: 7
+        published_page: 991
+        section: Discussion
+        row: paragraph giving calculated transition enthalpy
+      phase: cr
+      units: J/mol
+      per: mol_species
+      values:
+        quantity: transition_enthalpy_as_printed
+        method_class: measured_reduced
+        value: '1295'
+        basis_as_printed: per mole KAlO2
+        transition_temperature_K: '810'
+        T_K: '810'
+        derivation:
+          relation: Calculated assuming the observed reversible transition is first order.
+          inputs:
+          - beyer80_table2_enthalpy_increments
+      derived_from:
+      - beyer80_table2_enthalpy_increments
+      schema_gap: No exact generic transition-enthalpy quantity token exists; heat_of_fusion is not the printed
+        solid-solid transition quantity. See simulator/battery/enums.py::Quantity and simulator/battery/migrate.py::QUANTITY_ALIASES.
+    context:
+    - observation_id: beyer80_sample_characterization
+      type: context_record
+      locator:
+        page: 2
+        published_page: 986
+        section: Sample preparation
+        row: sample characterization
+      units: as printed
+      candidate_quantities:
+      - cp
+      reason: Sample identity and chemical characterization contextualize the KAlO2 measurements; they are not additional
+        thermodynamic measurements.
+      values:
+        method_class: measured_direct
+        formula_as_printed: KAlO2
+        synthesis: Stoichiometric K2CO3 and Al(OH)3 heated in platinum dishes; handled in an inert-atmosphere dry
+          box and cooled under vacuum because the product was very moisture sensitive.
+        initial_phase: Single-phase KAlO2 by X-ray powder diffraction.
+        unit_cell_parameter_a_nm: 0.7700 ± 0.0002
+        impurity: Na, 0.05 mol% by atomic absorption.
+        chemical_analysis_mass_percent:
+          Al2O3: '52.09'
+          K2O: 47.87 (Na impurity included)
+        theoretical_mass_percent:
+          Al2O3: '51.98'
+          K2O: '48.02'
+    - observation_id: beyer80_measurement_conditions
+      type: context_record
+      locator:
+        page: 2
+        published_page: 986
+        section: Calorimetric technique
+        row: paragraphs for 5–303 K and 406–1198 K
+      units: apparatus conditions as printed
+      candidate_quantities:
+      - cp
+      - H_minus_H298
+      reason: The apparatus details are experimental context; only printed conditions are recorded.
+      values:
+        method_class: measured_direct
+        low_temperature_sample_mass_g: '89.17894'
+        low_temperature_calorimeter: Adiabatic; gold-plated oxygen-free copper; internal volume approximately 90
+          cm3; evacuated then backfilled with helium to 6.7 kPa at 300 K before sealing.
+        high_temperature_sample_mass_g: '6.7523'
+        high_temperature_calorimeter: Copper-block drop calorimeter; platinum + 10 mass% rhodium capsule, approximately
+          6 cm3 and 10 g; capsule evacuated and backfilled with helium to 101 kPa before sealing.
+        low_temperature_cp_uncertainty: ±1% below 25 K; ±0.5% from 25 to 50 K; ±0.2% from 50 to 310 K.
+        enthalpy_uncertainty: Absolute uncertainty ±0.3%; standard error of measurement ±0.2%.
+        enthalpy_increment_deviation_note: Table 2 δH is deviation from the smoothed curve, not uncertainty.
+    - observation_id: beyer80_formation_enthalpy_rejected
+      type: context_record
+      locator:
+        page: 7
+        published_page: 991
+        section: Discussion
+        row: final paragraph
+      units: as printed
+      candidate_quantities:
+      - delta_fH
+      reason: The authors explicitly rejected hydrochloric-acid-calorimeter formation-enthalpy values because the
+        final solution state was uncertain; no accepted ΔfH or ΔfG value is reported.
+      values:
+        method_class: measured_direct
+        result: rejected
+        reason_as_published: Uncertainty in the final state of the solution, evidenced by slight cloudiness.

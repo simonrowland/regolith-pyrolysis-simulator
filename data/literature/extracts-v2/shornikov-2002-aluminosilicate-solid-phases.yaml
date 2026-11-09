@@ -563,8 +563,8 @@ observations:
   experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: Al6Si2O13
       phase:
@@ -577,54 +577,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1676.0, 2180.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '12.9'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -640,14 +602,9 @@ observations:
     original_method_class: measured_reduced
     attribution: this work, least squares of the Gibbs energies from equations (4) and (5)
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_mullite_delta_fH
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikov-2002-aluminosilicate-solid-phases
   locator:
     page: 3

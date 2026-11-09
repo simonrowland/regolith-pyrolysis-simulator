@@ -1,0 +1,136 @@
+source_id: koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation
+source:
+  citation: Koehler, Barany, and Kelley (1961), USBM RI 5711
+input_order:
+  primary_machine_text:
+    - text/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/mineru/p002-p025
+    - text/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation/pdftotext-layout.txt
+  render_policy: >-
+    Every numeric stored cell was checked against 300-dpi rendered PDF pages 11–13, 16–20; renders also resolve disagreements and verify row/column assignments.
+  table_tool:
+    convert: tools/mineru_table_draft.py convert
+    qa: tools/mineru_table_qa.py
+    compare: tools/mineru_table_draft.py compare
+    emit: unavailable in this tool version; target rows were transcribed from drafts and reconciled manually
+    qa_result: >-
+      QA reports 31 tables and 18 flagged overall. Target drafts flag Table 9
+      numeric/LaTeX cells, Table 12 comma-decimal/LaTeX cells, Table 20 numeric/
+      LaTeX cells, Table 21 LaTeX cells, and Table 23 numeric cells. All target
+      tables 7, 8, 9, 10, 12, 20, 21, and 23 were checked on full page renders
+      16–19; the cell audit records render verification for every target numeric cell.
+printed_tables:
+  - printed_table: '7'
+    pdf_page: 16
+    published_page: 9
+    draft_file: p016-t08.csv
+    draft_table_index: 8
+    stored: Table 7 heats of formation from oxides and elements for Ca2Fe2O5, CaFe2O4, and NaFeO2
+    render_verification: Rendered page confirms captions, row/column assignment, signs, digits, units, uncertainty and phases.
+  - printed_table: '8'
+    pdf_page: 17
+    published_page: 10
+    draft_file: p017-t09.csv
+    draft_table_index: 9
+    stored: 298.15 K entropies for the three target ferrites
+    render_verification: Rendered page confirms row assignment, digits, uncertainty and unit notation.
+  - printed_table: '9'
+    pdf_page: 17
+    published_page: 10
+    draft_file: p017-t10.csv
+    draft_table_index: 10
+    stored: Ca2Fe2O5 oxide-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, transition marker, melting marker, value and column.
+  - printed_table: '10'
+    pdf_page: 17
+    published_page: 10
+    draft_file: p017-t11.csv
+    draft_table_index: 11
+    stored: CaFe2O4 oxide-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, melting marker, value and column.
+  - printed_table: '12'
+    pdf_page: 18
+    published_page: 11
+    draft_file: p018-t13.csv
+    draft_table_index: 13
+    stored: NaFeO2 oxide-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, phase-transition markers, melting marker, values and columns.
+  - printed_table: '20'
+    pdf_page: 19
+    published_page: 12
+    draft_file: p019-t21.csv
+    draft_table_index: 21
+    stored: Ca2Fe2O5 element-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, transition marker, melting marker, value and column.
+  - printed_table: '21'
+    pdf_page: 19
+    published_page: 12
+    draft_file: p019-t22.csv
+    draft_table_index: 22
+    stored: CaFe2O4 element-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, melting marker, values and columns.
+  - printed_table: '23'
+    pdf_page: 19
+    published_page: 12
+    draft_file: p019-t24.csv
+    draft_table_index: 24
+    stored: NaFeO2 element-reference ΔH and ΔF° temperature rows
+    render_verification: Rendered page confirms every target row, transition markers, melting marker, values and columns.
+non_table_mappings:
+  - locator: {page: 13, published_page: 6, table: '2', row: 'Reaction 17'}
+    stored: Prose uncertainty ±130 cal/mol for CaFe2O4 formation from oxides; differs from Table 7's ±180 cal/mol.
+  - locator: {page: 16, published_page: 9, section: Table 7}
+    stored: Target 298.15 K formation values, printed reactions and reference states.
+  - locator: {page: 17, published_page: 10, section: Entropies and high-temperature heat contents}
+    stored: Attribution for Table 8 entropy and source statement that Kelley (1960) high-temperature heat contents are not retabulated.
+  - locator: {page: 20, published_page: 13, section: Discussion and conclusions}
+    stored: NBS element values are cited but not printed; the authors convert them to the reported CaFe2O4 and NaFeO2 oxide-basis comparison values.
+schema_gaps:
+  - >-
+    The calorimetric reaction-enthalpy quantity has no exact token in
+    simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES;
+    the rows remain typed-refused with their printed reaction result.
+evidence_class_decisions:
+  - Table 7 authors' calorimetric formation reductions: measured_reduced, linked to the printed calorimetric reaction result.
+  - Table 8 entropy: quoted_attributed to Kelley and King (1961), as cited by the authors.
+  - Tables 9, 10, 12, 20, 21, and 23: measured_reduced; authors derive the series from thermochemical data and Kelley (1960) heat contents, which are not retabulated.
+render_checks:
+  - {pdf_page: 11, printed_page: 4, reason: 'Table 1 Ca2Fe2O5 reaction 6 measured and corrected results.'}
+  - {pdf_page: 13, printed_page: 6, reason: 'Table 2 CaFe2O4 reaction 17 prose uncertainty and Table 4 NaFeO2 reaction 25 and 30 values with separate uncertainties.'}
+  - {pdf_page: 16, printed_page: 9, reason: 'Target rows and all numeric cells in Tables 7 and 8; layout, signs, uncertainty marks, phase labels and units.'}
+  - {pdf_page: 17, printed_page: 10, reason: 'Target rows and all numeric cells in Tables 9 and 10; layout, duplicated transition/fusion temperatures, markers, signs and columns.'}
+  - {pdf_page: 18, printed_page: 11, reason: 'Target rows and all numeric cells in Table 12; layout, duplicate rows, phase-transition and fusion markers, signs and columns.'}
+  - {pdf_page: 19, printed_page: 12, reason: 'Target rows and all numeric cells in Tables 20, 21, and 23; layout, markers, phase transitions, melting rows, signs and columns.'}
+  - {pdf_page: 20, printed_page: 13, reason: 'NBS oxide-basis comparison values for CaFe2O4 and NaFeO2; cited NBS element values are not printed.'}
+stored_conditions:
+  temperature: Values use printed T_K coordinates; Table 7/8 values are at 298.15 K.
+  total_pressure: Not printed; omitted, with no standard-pressure value inferred.
+  fO2: Not applicable to the standard thermochemical tables and not printed.
+  reaction: Printed reaction strings retained per formation quantity.
+source_comparison:
+  - >-
+    CaFe2O4: Table 7 is -14580 cal/mol from oxides; NBS oxide-basis prior is -49.5 kcal/mol. The cited element value is not printed; Table 7 and reaction (17) prose uncertainties differ (±180 vs ±130 cal/mol).
+  - >-
+    NaFeO2: Table 7 is -18470 cal/mol from oxides; NBS oxide-basis prior is +22.5 kcal/mol. The cited element value is not printed; the signs disagree and units remain as printed.
+  - 'Ca2Fe2O5: No other same-compound formation value is cited in the discussion.'
+transitions_and_fusion:
+  Ca2Fe2O5: Table 9 and Table 20 mark melting at 1750 K; no separate fusion enthalpy is printed.
+  CaFe2O4: Table 10 and Table 21 mark melting at 1510 K; no separate fusion enthalpy is printed.
+  NaFeO2: Tables 12 and 23 mark α→β at 870 K, β→γ at 1270 K, and melting at 1620 K; no separate transition or fusion enthalpy is printed.
+incongruent_melting: No target-compound incongruent-melting statement appears in the report.
+table_mappings:
+  - {printed_table: '7', page: 16, table_index: 8, draft_file: p016-t08.csv}
+  - {printed_table: '8', page: 17, table_index: 9, draft_file: p017-t09.csv}
+  - {printed_table: '9', page: 17, table_index: 10, draft_file: p017-t10.csv}
+  - {printed_table: '10', page: 17, table_index: 11, draft_file: p017-t11.csv}
+  - {printed_table: '12', page: 18, table_index: 13, draft_file: p018-t13.csv}
+  - {printed_table: '20', page: 19, table_index: 21, draft_file: p019-t21.csv}
+  - {printed_table: '21', page: 19, table_index: 22, draft_file: p019-t22.csv}
+  - {printed_table: '23', page: 19, table_index: 24, draft_file: p019-t24.csv}
+
+fix_pass_rendered_pages: [11, 12, 13, 16, 17, 18, 19, 20]
+fix_pass_findings:
+  - Table 7 CaFe2O4 from oxides is -14580 ±180 cal/mol; reaction (17) prose separately prints ±130 cal/mol.
+  - Table 20 Ca2Fe2O5 ΔF° at 1200 K is -392.3 kcal/mol.
+  - Table 12 has 28 rows, both 1050 K rows retained; first 950 K and 1050 K rows carry Fe2O3 markers 2 and 3; NaFeO2 melting marker is 6.
+  - NBS comparison values -49.5 and +22.5 are from oxides, at PDF page 20 / published page 13; the element values cited are not printed.
+  - For every printed (c,l) table, the marked melting row is crystalline and its following unmarked duplicate-temperature row plus later rows are liquid.

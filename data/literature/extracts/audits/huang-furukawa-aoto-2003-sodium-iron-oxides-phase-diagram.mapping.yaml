@@ -1,0 +1,34 @@
+source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+source:
+  citation: Huang, Furukawa and Aoto (2003), Thermochimica Acta 405, 67–72.
+  doi: 10.1016/S0040-6031(03)00137-0
+extraction:
+  machine_inputs:
+    - MinerU Table 1 HTML and markdown
+    - pdftotext-layout Table 1
+  render_check: >-
+    Table 1 row and column layout was checked on PDF page 2 (printed page 68).
+    The table's 55 standalone numeric cells agree between MinerU and pdftotext;
+    formula rows with merged cells are recorded in the table audit note.
+  printed_row_count: 13 body rows, including two merged formula rows
+  standalone_numeric_cell_count: 55
+  mineru_qa_numeric_cells: 70
+  mineru_qa_numeric_agreement: '0.902'
+tables:
+  - page: 2
+    table: '1'
+    table_index_for_machine_tool_only: 1
+    published_page: 68
+    printed_body_rows: 13
+    numeric_data_rows: 11
+    columns:
+      - {column: 1, role: printed row label}
+      - {column: 2, species: NaFeO2}
+      - {column: 3, species: Na4FeO3}
+      - {column: 4, species: Na3FeO3}
+      - {column: 5, species: Na5FeO4}
+      - {column: 6, species: Na8Fe2O7}
+    row_groups:
+      - {printed_rows: 1-3, quantities: [delta_fG at 298, delta_fH at 298, S at 298], observation_fields: delta_fG_298_kJ_mol / delta_fH_298_kJ_mol / value}
+      - {printed_rows: 4-6, quantity: Cp(T) coefficients a, b, c, observation_status: context schema gap}
+      - {printed_rows: 7-11, quantity: G(T) coefficients g1-g5, observation_status: context schema gap}

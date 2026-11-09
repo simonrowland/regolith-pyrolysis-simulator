@@ -9,10 +9,11 @@ This package explores that control problem. It compares hard vacuum, Mars backpr
 It is a process-modeling workbench. It computes molten-regolith pyrolysis workflows from a
 built-in Ellingham/Antoine model, and can route silicate melt equilibria to external
 thermochemistry engines — alphaMELTS (directly or via PetThermoTools), ThermoEngine/VapoRock,
-and MAGEMin — when those are installed. See [Melt Chemistry Backends](#melt-chemistry-backends)
+MAGEMin, and our sister project [OpenIMCC](https://github.com/simonrowland/openimcc) for
+high-temperature melt activities — when those are installed. See [Melt Chemistry Backends](#melt-chemistry-backends)
 for which engine holds which role.
 
-Author: Simon Rowland, simon@simonrowland.com.
+Author: Simon Rowland, simon@directleap.com.
 
 ## Why This Exists
 
@@ -130,7 +131,7 @@ chain has to be walked by hand, one run at a time.
 
 **"How much does overhead pO2 suppress SiO boiloff?"**
 `python -m simulator.runner.sio_tsweep` and `sio_yield` drive the temperature/ramp grids directly;
-two worked sweeps are checked in under `docs/sio_tsweep_*.md`.
+two historical sweeps from an earlier release are checked in under `docs/sio_tsweep_*.md`.
 
 **"How does Mars CO2 backpressure change the first stage?"**
 Mars feedstocks carrying `surface_pressure_mbar` run Stage 0 against a CO2 pressure floor instead
@@ -197,55 +198,47 @@ python3 -m simulator.runner \
   --output hero-run.json
 ```
 
-The 2026-09-26 figures previously shown here came from a run with a redox-runaway defect (fixed by b-894).
+This uses a default recipe.
 
-Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in analytical backend:
+The furnace reached 2200 °C at hour 213 and held there through hour 225. The largest per-element
+mass-closure residual is 1.5e-15, against a limit of 5e-14.
 
-Per-element destination atom fractions:
+**What leaves the melt.** This is the fraction of each element's feedstock atoms that evaporates out of
+the melt by the end of the run:
 
-| element | condensed | retained in melt | vented | other (O₂, wall, overhead) |
-|---|---:|---:|---:|---:|
-| Al | 0.000 | 1.000 | 0.000 | 0.000 |
-| Ca | 0.001 | 0.999 | 0.000 | 0.000 |
-| Ti | 0.001 | 0.999 | 0.000 | 0.000 |
-| Si | 0.956 | 0.001 | 0.043 | 0.000 |
-| Fe | 0.078 | 0.000 | 0.921 | 0.001 |
-| Mg | 0.088 | 0.806 | 0.105 | 0.000 |
-| Na | 0.633 | 0.000 | 0.367 | 0.000 |
-| K | 0.499 | 0.115 | 0.386 | 0.000 |
-| Cr | 0.265 | 0.735 | 0.000 | 0.000 |
-| O | 0.280 | 0.319 | 0.014 | 0.387 |
+| element | leaves the melt | stays in the melt |
+|---|---:|---:|
+| Fe † | 1.000 | 0.000 |
+| Na † | 1.000 | 0.000 |
+| Si † | 0.999 | 0.001 |
+| K † | 0.935 | 0.065 |
+| Cr † | 0.256 | 0.744 |
+| Mg † | 0.194 | 0.806 |
+| Ca | 0.001 | 0.999 |
+| Ti | 0.001 | 0.999 |
+| Al | 0.000 | 1.000 |
 
-| result | value |
-|---|---:|
-| Melt rump | 0.3485 kg |
-| Condensed | 0.3416 kg |
-| O₂, source-side and not recovered | 0.1645 kg |
-| Vented | 0.1442 kg |
-| Wall | 0.0002 kg |
-| Cleanup-sequestered | 0.0007 kg |
-| Tapped | 0.0002 kg |
-| Furnace endpoint | 2200 °C at hour 213; held through hour 225 |
-| Mass-closure residual | below 1e-14 (max element residual ~1e-15; limit 5e-14) |
+† Na, K, Mg, Fe, Si and Cr carry a flagged hour-to-hour flux artefact while carrier-gas feed rates
+are being added to the model, so treat their fractions as indicative. CrO evaporation is not yet
+modelled, which further understates Cr.
 
-### Open issues in this run
+**Refractory terminal ceramic (the rump).** This is a product, not a loss: 0.348 kg of the 1 kg charge.
+It is the `refractory_ceramic_rump` class in `product_classification`. Its composition is Al₂O₃
+39.8 wt%, CaO 32.4, MgO 21.4, TiO₂ 4.4, Cr₂O₃ 0.8, MnO 0.5 and P₂O₅ 0.3, with traces including the REEs.
+This Ca, Al, Ti and REE-rich ceramic is the material intended to line the next furnace.
 
-- 92% of Fe is vented past Stage 1 (b-591; capture-law fix pending an owner decision on collector areas).
-- About 80% of Mg stays in the melt; the hard-vacuum crown stage is not built.
-- 37% of alkalis are vented.
-- O₂ is counted at the source side, not captured.
-- This README table is hand-copied until the nightly hero golden exists.
+**Oxygen.** 0.165 kg of O₂ is released from the melt, counted at the source. Recovering it as
+LOX is part of the condenser-train work.
 
-### What this run does NOT yet show
+**Where the vapour goes.** Yields here are counted at the melt boundary while the condenser-train
+model is being built. The run report already carries the per-stage ledger under `yield_disposition`
+and `stage_purity_report`, and the hard-vacuum Mg/Ca crown stage, which pulls most of the remaining
+Mg and Ca, is next on the roadmap.
 
-This run does not show Fe capture, Mg-crown extraction, full alkali capture (about 37% is vented), or
-O₂ recovery; see the open issues above. The refractory rump remains. `redox_buffer_retained` is 0 for
-every element, including oxygen.
+The run's vapour-pressure report covers 32 species. At these temperatures, 30 of them are evaluated
+beyond their fitted range, so the high-temperature fractions are extrapolations.
 
-Report fields: `status` is `ok`, `reason` is `''`, `error_message` is `''`, and
-`run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` has 32 species
-summaries; 30 of 32 are extrapolated beyond their fitted temperature range. No VapoRock shadow is
-recorded. The high-temperature yields are extrapolations, not certified values.
+### Install
 
 From a source checkout, run the dependency installer:
 
@@ -291,86 +284,41 @@ integration rather than exposing the development server.
 
 ## Installed Dependencies
 
-`pip install -r requirements.txt` installs:
+`install-dependencies.py` installs the Python stack from `requirements.txt`: Flask and
+Flask-SocketIO (web UI), PyYAML, Plotly, NumPy (pinned `<2`, because VapoRock needs `np.bool8`),
+SciPy, pandas, psutil, threadpoolctl, optuna (recipe optimizer), OpenIMCC (high-temperature melt
+activities), and the pytest plugins the test configuration requires. It also installs the locked alphaMELTS app.
 
-- `flask` — web server and templates.
-- `flask-socketio` — live simulation updates.
-- `pyyaml` — feedstock, setpoint, and vapor-pressure data files.
-- `plotly` — browser-side charts.
-- `numpy` — numerical helpers. Pinned `<2`: VapoRock imports `np.bool8`, removed in NumPy 2.0.
-- `scipy` — scientific calculations.
-- `pandas` — IMCC gas-model tables.
-- `psutil` — optimizer child-process identity checks.
-- `pytest`, `pytest-xdist`, `pytest-timeout` — required by the `addopts` in `pyproject.toml`;
-  without them `pytest` aborts during argument parsing before any test runs.
+`install-engines.py` builds the pinned chemistry engines: MAGEMin, PySulfSat, ThermoEngine,
+VapoRock, PetThermoTools and Thermobar. Run it after the base install. A later exact `uv sync`
+removes them, so provision the engines again after any sync.
 
-Optional extras declared in `pyproject.toml` (`pip install -e ".[<name>]"`):
-
-| extra | contents |
-|---|---|
-| `dev` | `pytest`, `pytest-xdist`, `pytest-timeout` |
-| `optimize` | `optuna` (pinned) — the recipe-optimizer strategies |
-| `sulfur` | marker only; PySulfSat comes from `install-engines.py` |
-| `magemin` | marker only; the MAGEMin binary itself comes from `install-engines.py` |
-
-There is no `melts` extra. PetThermoTools is required for its melt-equilibria
-path and comes from `install-engines.py`; the alphaMELTS binary is installed
-by `install-dependencies.py`. The base lock excludes installer-owned engines.
-An exact `uv sync` removes those installations: sync first, then provision
-engines again. After provisioning, use `.venv/bin/python` or `uv run --no-sync`.
-A fresh uv venv needs `.venv/bin/python -m ensurepip --upgrade` before the
-pip-based engine installer. The engine lock records the validated source pins;
-check engine imports explicitly because installer exit status alone does not
-prove success.
+The one optional extra is `e2e` (browser tests): `pip install -e ".[e2e]"`.
 
 ## Melt Chemistry Backends
 
-The simulator runs without any external melt chemistry package. In that mode it uses the
-built-in Ellingham/Antoine model for comparative vapor-pressure estimates.
+The simulator runs out of the box on its built-in Ellingham/Antoine model. External engines add
+real melt thermodynamics where they are installed.
 
-**Selectable as the active melt backend** by the batch runner's `--backend`:
-
-| name | notes |
+| engine | role |
 |---|---|
-| `internal-analytical` | the built-in Ellingham/Antoine model. The default. |
-| `alphamelts` | alphaMELTS, via subprocess or the PetThermoTools Python API. |
-| `thermoengine` | ThermoEngine; delegates vapor-melt work to VapoRock when VapoRock is importable, and warns and falls back to activity × Antoine rows when it is not. |
+| `internal-analytical` | Built-in Ellingham/Antoine model. The default active backend. |
+| `alphamelts` | Active backend, through a subprocess or the PetThermoTools API. |
+| `thermoengine` | Active backend. Uses VapoRock for vapour–melt work when it is installed. |
+| [OpenIMCC](https://github.com/simonrowland/openimcc) | Sister project. Supplies melt activities above 1700 K for the eight major melt oxides (Si, Mg, Fe, Ca, Al, Ti, Na, K) through a 45-species associate model, plus Mn in its redox pack, whichever active backend is selected. Its gas database reaches well beyond the melt oxides, and melt activities for more elements are on the way. Installed by default. If it refuses a composition, the run uses the built-in activity table for that step and records a notice. |
+| VapoRock, MAGEMin | Per-task providers and cross-checks. Not selectable as the active backend. |
 
-`stub` and `diagnostic_stub` are accepted input aliases for `internal-analytical`. They are
-folded at every name-keyed boundary, so a run started with either spelling records
-`internal-analytical` in its metadata and shares that cache identity. `internal-analytical` is
-the only spelling that is ever serialized; the `--help` text advertises only that spelling.
+Choose the active backend with `--backend` on the batch runner; batch runs always name one, so every
+stored result says which engine produced it. The web UI offers Auto (alphaMELTS preferred),
+alphaMELTS and Built-in analytical.
 
-`cached-real` — replaying cached real-engine results — is a fourth backend, but it is **not**
-reachable from the runner CLI (`--backend cached-real` is an argparse error). It is reached
-through the optimizer's `fast` fidelity tier. By contract it serves cached *real*-engine results
-only, and never analytical output dressed as real-engine evidence.
+Installing an engine does not hand it the ledger. Liquidus and freeze-path providers are
+diagnostic, and vapour-pressure authority stays with the built-in model. See
+[`docs/melt-backends.md`](docs/melt-backends.md) for the per-task authority table.
 
-The web UI's engine picker is deliberately narrower: `Auto (AlphaMELTS preferred)`,
-`AlphaMELTS (strict)`, and `Built-in analytical`. `auto` is accepted by that web autodetect path
-but **rejected** under runner-strict — a batch run must name the engine it wants, so that what
-produced a stored artifact is never ambiguous.
-
-**Not selectable as the active backend**, by design:
-
-- `VapoRock` and `MAGEMin` are per-intent providers and diagnostic evidence sources, not active
-  melt backends. They are listed in `simulator/backends.py::INELIGIBLE_ACTIVE_BACKENDS`.
-- `FactSAGE/ChemApp` — archived/removed adapter. Not selectable in the web UI or runner; an
-  explicit `factsage` request raises `BackendUnavailableError: unknown backend 'factsage'`.
-
-**What a backend is allowed to do.** Installing a real engine does not move ledger authority to
-it. Silicate liquidus and freeze-path providers, alphaMELTS included, are **diagnostic only** and
-may not mutate the ledger; vapor-pressure runtime authority stays with the built-in model until an
-explicit source-selection change. The per-intent authority table is in `AGENTS.md`
-§"Chemistry-engine policy", with the operator-facing version in
-[`docs/melt-backends.md`](docs/melt-backends.md).
-
-The supported alphaMELTS path is `alphamelts_binary_path` in the generated,
-machine-local `engines/engines.local.toml`; it points to the locked app under
-`~/repos/engine-bin/alphaMELTS/<archive-sha>/`. `install-dependencies.py`
-downloads and verifies the release archive, then writes the base local config
-from the lock. `install-engines.py` refreshes it after the pinned source engines
-are built and publishes ThermoEngine's dylibs as symlinks in `~/lib`.
+`install-dependencies.py` downloads the locked alphaMELTS app, and `install-engines.py` builds the
+pinned source engines. Our [engine patches](patches/README.md) are applied on top with
+`patches/scripts/enginepatch.sh apply <engine>`.
 
 ## Model Status
 
@@ -378,15 +326,16 @@ The simulator includes a built-in Ellingham/Antoine thermodynamic model and can 
 external melt backends. **Results should be read as comparative process estimates, not validated
 engineering predictions.**
 
-[`docs/model-limitations.md`](docs/model-limitations.md) is the honest accounting, and it is the
-document to read before quoting any number out of this simulator. It carries the per-domain error
-budget, the known model disagreements, and the reproduction battery: the engine is scored against
-published experimental measurements, and **most of the corpus does not score**. The current
-measurement is 570 in-scope observations, of which 67 are comparable, producing 105 comparable
-residual points and 532 explicit gap records. The gaps are not hidden — every skipped observation
-carries a typed refusal reason (missing melt-activity coefficient, not-comparable condensed form,
-no numeric rate in the source, and so on), and those reasons are tabulated in that document.
-Regenerate the numbers rather than trusting this paragraph:
+[`docs/model-limitations.md`](docs/model-limitations.md) is the document to read before quoting a
+number from the simulator: it carries the per-domain error budget and the known model
+disagreements. The validation battery holds 186,644 observations. 101,709 are experimental
+measurements from the published literature, and each engine is scored against them rail by rail;
+[`docs/validation-battery.md`](docs/validation-battery.md) explains the scoring and how to read it.
+The other 84,935 sit in 969 compilation shards of assessed reference tables, which the engines
+read as data. An observation an engine cannot yet score carries a
+typed reason, never a silent gap. The extract-reproduction rollup is generated into
+[`docs/validation-battery-rollup.md`](docs/validation-battery-rollup.md); regenerate it rather than
+quoting fixed numbers:
 
 ```python
 from simulator.diagnostic_helpers.extract_reproduction import evaluate_all, coverage_summary
@@ -404,17 +353,7 @@ Two literature stores back that, and the split is load-bearing:
 
 ## Development
 
-```bash
-pip install -e ".[dev]"
-python3 -m pytest tests/ -v
-```
-
-`pyproject.toml` sets `addopts = -n auto --dist loadgroup --no-loadscope-reorder --timeout=300`.
-Those defaults are load-bearing, not cosmetic. The staged-freeze mass-balance case spawns the real
-MAGEMin binary for a bracket-and-bisect liquidus search that takes minutes; lowering `--timeout`
-below ~200 s clips a legitimate run and pytest-timeout fires SIGALRM inside a subprocess poll,
-which the xdist gateway cannot recover from. It looks like a hang or a silent die, not a timeout.
-Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not freeze'`).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Public Docs
 
@@ -426,10 +365,11 @@ Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not
 **What the model does, and what it does not**
 
 - [Model Limitations](docs/model-limitations.md) — error budget, known disagreements, reproduction battery
+- [Validation Battery](docs/validation-battery.md) — how each engine is scored against published measurements, rail by rail
 - [Process Model](docs/process-model.md) · [Chemistry Methods](docs/chemistry-methods.md)
 - [Feedstocks](docs/feedstocks.md)
-- [Citation Policy](docs/citation-policy.md) · [Lab Validation Whitepaper](docs/lab-validation-whitepaper.md)
-- [IMCC SF-04 (retired)](docs/imcc-sf04-spec.md) · [MD Target List](docs/md-target-list.md)
+- [Citation Policy](docs/citation-policy.md)
+- IMCC melt-activity model: [openimcc](https://github.com/simonrowland/openimcc) · [Validation Battery Rollup](docs/validation-battery-rollup.md)
 
 **Running it**
 
@@ -440,14 +380,14 @@ Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not
 **Internals and engines**
 
 - [Architecture](docs/architecture.md) — interactive Flask + Socket.IO plane
-- [Eval-Runtime Architecture](docs/architecture-eval-runtime-2026-06.md) — batch eval, warm workers, caches
+- [Eval-Runtime Architecture](docs/architecture-eval-runtime.md) — batch eval, warm workers, caches
 - [Developer Map](docs/developer-map.md) · [Melt Backends](docs/melt-backends.md)
-- [ThermoEngine Patches](docs/thermoengine-patches.md) · [CI/Local Divergence](docs/ci-local-divergence.md) · [Performance Ratchet](docs/performance-ratchet.md)
+- [Engine Patches](patches/README.md) — our fixes to the third-party engines, pending upstream adoption
+- [ThermoEngine Patches](docs/thermoengine-patches.md) · [Performance Ratchet](docs/performance-ratchet.md)
 
 **Reference registry and campaign analyses**
 
-- [`docs/references/`](docs/references/) — the `REF-NNN` registry, source PDFs, and generated pages
-- SiO temperature sweeps: [lunar mare, low-Ti](docs/sio_tsweep_lunar_mare_low_ti_2026-05-19.md) · [Mars basalt](docs/sio_tsweep_mars_basalt_2026-05-19.md)
+- [`docs/references/`](docs/references/) — the `REF-NNN` reference registry and generated bibliography pages
 
 ## Source Layout
 

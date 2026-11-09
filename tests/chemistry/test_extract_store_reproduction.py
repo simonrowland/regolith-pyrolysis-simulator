@@ -79,7 +79,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
 from simulator.diagnostic_helpers.reproduction_compare import compare_values
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-MODEL_LIMITATIONS = REPO_ROOT / "docs" / "model-limitations.md"
+MODEL_LIMITATIONS = REPO_ROOT / "docs" / "validation-battery-rollup.md"
 BASELINES_PATH = (
     Path(__file__).resolve().parent / "extract_store_reproduction_residual_baselines.yaml"
 )
@@ -1790,7 +1790,7 @@ def test_battery_rollup_matches_committed_model_limitations(
     )
     assert generated_section.startswith(ROLLUP_BEGIN)
     assert generated_section.endswith(ROLLUP_END)
-    assert "Extract-store single-species reproduction battery (t-512)" in generated_section
+    assert "Extract-store single-species reproduction battery" in generated_section
     assert "Observations:" in generated_section
     assert "Coverage by observation type" in generated_section
     assert "Coverage by species" in generated_section
@@ -1866,7 +1866,7 @@ def test_battery_rollup_matches_committed_model_limitations(
                 f"  length committed={len(c_lines)} generated={len(g_lines)}"
             )
         pytest.fail(
-            "docs/model-limitations.md t-512 rollup drifted from the live battery.\n"
+            "docs/validation-battery-rollup.md rollup drifted from the live battery.\n"
             "The test does NOT rewrite the committed file (no self-heal).\n"
             f"Regenerate with:\n"
             f"  {REGEN_ENV}=1 pytest tests/chemistry/test_extract_store_reproduction.py "

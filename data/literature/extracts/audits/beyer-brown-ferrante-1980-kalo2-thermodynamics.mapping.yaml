@@ -1,0 +1,93 @@
+source_id: beyer-brown-ferrante-1980-kalo2-thermodynamics
+source_locator_basis: absolute PDF page plus printed table number; row and numeric column retained per point
+machine_inputs:
+  mineru: text/beyer-brown-ferrante-1980-kalo2-thermodynamics/mineru/p004-p005/out/beyer-brown-ferrante-1980-kalo2-thermodynamics-p004-p005/vlm/beyer-brown-ferrante-1980-kalo2-thermodynamics-p004-p005_content_list.json
+  pdftotext: text/beyer-brown-ferrante-1980-kalo2-thermodynamics/pdftotext-layout.txt
+  rendered_pages: [4, 5]
+tables:
+  - page: 4
+    published_page: 988
+    table: '1'
+    mineru_table_key: p004-t01
+    observation: beyer80_table1_experimental_cp
+    type: heat_capacity_and_heat_content_series
+    phase: cr
+    quantity: cp
+    evidence_class: measured_direct
+    unit: J/(mol K)
+    printed_pairs: 54
+    series:
+      - name: Series I
+        rows: '3-12'
+        temperature_column: 1
+        value_column: 2
+        point_count: 10
+      - name: Series II
+        rows: '15-16'
+        temperature_column: 1
+        value_column: 2
+        point_count: 2
+      - name: Series II
+        rows: '2-11'
+        temperature_column: 3
+        value_column: 4
+        point_count: 10
+      - name: Series III
+        rows: '14-16'
+        temperature_column: 3
+        value_column: 4
+        point_count: 3
+      - name: Series III
+        rows: '2-16'
+        temperature_column: 5
+        value_column: 6
+        point_count: 15
+      - name: Series III
+        rows: '2-15'
+        temperature_column: 7
+        value_column: 8
+        point_count: 14
+    conditions:
+      helium_pressure_Pa: 6700
+      condition_locator: {page: 2, published_page: 986, section: 'Calorimetric technique'}
+  - page: 4
+    published_page: 988
+    table: '2'
+    mineru_table_key: p004-t02
+    observation: beyer80_table2_enthalpy_increments
+    type: heat_capacity_and_heat_content_series
+    phase: cr
+    quantity: H_minus_H298
+    evidence_class: measured_direct
+    unit: J/mol
+    reference_temperature_K: 298.15
+    point_count: 16
+    columns:
+      left: {temperature: 1, enthalpy_increment: 2, deviation_from_fit: 3}
+      right: {temperature: 4, enthalpy_increment: 5, deviation_from_fit: 6}
+    condition_locator: {page: 3, published_page: 987, section: 'Calorimetric technique'}
+    helium_pressure_Pa: 101000
+    deviation_footnotes:
+      a: 'Deviation from smoothed curve; not measurement uncertainty.'
+      b: 'Transition region not used in curve fit.'
+  - page: 4
+    published_page: 988
+    continuation_page: 5
+    continuation_published_page: 989
+    table: '3'
+    mineru_table_keys: [p004-t03, p005-t04]
+    type: heat_capacity_and_heat_content_series
+    phase: cr
+    evidence_class: measured_reduced
+    method: 'Justice FITAB curve fit to the authors’ measured Cp and enthalpy increments.'
+    derived_from:
+      - beyer80_table1_experimental_cp
+      - beyer80_table2_enthalpy_increments
+    point_count: 59
+    columns:
+      1: {label: T, unit: K}
+      2: {label: Cp, quantity: cp, unit: J/(mol K), observation: beyer80_table3_smoothed_cp}
+      3: {label: 'S°(T)-S°(0)', unit: J/(mol K), observation: beyer80_table3_entropy_increment_from_zero, schema_gap: 'Quantity.S is absolute entropy.'}
+      4: {label: '-{G°(T)-H°(0)}/T', unit: J/(mol K), observation: beyer80_table3_negative_gibbs_function_over_T, schema_gap: 'No exact thermal Gibbs-function quantity token; this is not delta_fG.'}
+      5: {label: 'H°(T)-H°(0)', unit: J/mol, observation: beyer80_table3_enthalpy_increment_from_zero, schema_gap: 'H_minus_H298 has a different reference temperature.'}
+    row_counts: {page_4: 7, page_5: 52}

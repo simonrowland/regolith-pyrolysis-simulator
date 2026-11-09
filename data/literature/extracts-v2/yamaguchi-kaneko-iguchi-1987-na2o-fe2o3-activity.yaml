@@ -1,0 +1,976 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml
+observations:
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, printed_form, status, equation_as_printed,
+      fit_coefficients_as_printed, T_range_as_printed, phase_assemblage_as_printed, standard_state_as_printed, schema_gap'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '3'
+    note: row=N3F5 + F, <1405 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1405'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '3'
+  derivation:
+    relation: log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T
+    inputs: []
+    parameters: []
+    output_unit: log10 activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 989
+        figure: '2'
+        note: Cell No. 0 EMF values used for activity reduction are plotted, not numerically tabulated.
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_gt1278
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, printed_form, status, equation_as_printed,
+      fit_coefficients_as_printed, T_range_as_printed, phase_assemblage_as_printed, standard_state_as_printed, schema_gap'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '3'
+    note: row=N3F5 + NF, >1278 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '1278'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '3'
+  derivation:
+    relation: log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T
+    inputs: []
+    parameters: []
+    output_unit: log10 activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 990
+        figure: '3'
+        note: EMF values used for activity reduction are plotted, not numerically tabulated.
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_lt1053
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, printed_form, status, equation_as_printed,
+      fit_coefficients_as_printed, T_range_as_printed, phase_assemblage_as_printed, standard_state_as_printed, schema_gap'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '3'
+    note: row=N3F5 + NF, <1053 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1053'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '3'
+  derivation:
+    relation: log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T
+    inputs: []
+    parameters: []
+    output_unit: log10 activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 990
+        figure: '3'
+        note: EMF values used for activity reduction are plotted, not numerically tabulated.
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_mid
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, printed_form, status, equation_as_printed,
+      fit_coefficients_as_printed, T_range_as_printed, phase_assemblage_as_printed, standard_state_as_printed, schema_gap'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '3'
+    note: row=N3F5 + NF, 1053<T<1278 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1053'
+          interval_high: '1278'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '3'
+  derivation:
+    relation: log aNa2O = (A ± dA) + (B ± dB) × 10^4 K/T
+    inputs: []
+    parameters: []
+    output_unit: log10 activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 990
+        figure: '3'
+        note: EMF values used for activity reduction are plotted, not numerically tabulated.
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_abstract_na2fe2o4_1047_1278
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 1
+    published_page: 986
+    paragraph: abstract
+    note: row=Na2Fe2O4, 1047<T<1278 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1047'
+          interval_high: '1278'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 986
+        paragraph: abstract
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_mid
+  derivation:
+    relation: Abstracted author fit based on the Table 3 activity segments overlapping 1047–1278 K and equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_mid
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_abstract_na2fe2o4_gt1278
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 1
+    published_page: 986
+    paragraph: abstract
+    note: row=Na2Fe2O4, 1278<T<1405 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1278'
+          interval_high: '1405'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 986
+        paragraph: abstract
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_gt1278
+  derivation:
+    relation: Abstracted author fit based on Table 3 log activity functions and equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_gt1278
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_abstract_na2fe2o4_lt1047
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 1
+    published_page: 986
+    paragraph: abstract
+    note: row=Na2Fe2O4, <1047 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1047'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 986
+        paragraph: abstract
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_lt1053
+  derivation:
+    relation: Abstracted author fit based on Table 3 log activity functions and equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_lt1053
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_abstract_na3fe5o9
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_B'
+    species:
+      formula: Na3Fe5O9
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_B';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 1
+    published_page: 986
+    paragraph: abstract
+    note: row=Na3Fe5O9, <1405 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1405'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 986
+        paragraph: abstract
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  derivation:
+    relation: ΔG°(B) = 2ΔG°(Na3Fe5O9) = 3RT ln aNa2O(F/N3F5)
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_table4_na2fe2o4_lt1047
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '4'
+    note: row=Eq. (D), <1047 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1047'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '4'
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_lt1053
+  derivation:
+    relation: Table 4 coefficients derived from the Table 3 activity fits using equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_lt1053
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_table4_na2fe2o4_mid
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '4'
+    note: row=Eq. (D), 1047<T<1278 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1047'
+          interval_high: '1278'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '4'
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_mid
+  derivation:
+    relation: Table 4 coefficients derived from the Table 3 activity segments overlapping 1047–1278 K using equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_mid
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_table4_na2fe2o4_nf_lt1405
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D'
+    species:
+      formula: NaFeO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_D';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '4'
+    note: row=−NF <1405 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1405'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '4'
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_gt1278
+  derivation:
+    relation: Table 4 coefficients derived from the Table 3 activity fits using equations (4)–(6).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_n3f5_nf_gt1278
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_gibbs_table4_na3fe5o9
+  experiment_id: 10.2320/matertrans1960.28.986::yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_B'
+    species:
+      formula: Na3Fe5O9
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_standard_gibbs_energy_for_reaction_B';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  locator:
+    page: 6
+    published_page: 991
+    table: '4'
+    note: row=Eq. (A), <1405 K
+  read_from: pdf:yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1405'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 991
+        table: '4'
+  derived_from:
+  - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+  derivation:
+    relation: Table 4 coefficients calculated from the Table 3 log activity fit by equation (4).
+    inputs:
+    - yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity::yki1987_activity_f_n3f5
+    parameters: []
+    output_unit: kJ/mol reaction as printed
+    references: []

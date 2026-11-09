@@ -36,9 +36,15 @@ def _assert_table3_grid(document: dict, grid: list[dict[str, str]]) -> None:
         observation_id = (
             f"{SID}_{expected['sample'].lower()}_glass_{expected['component'].lower()}"
         )
-        values = observations[observation_id]["values"]
+        observation = observations[observation_id]
+        values = observation["values"]
         assert values["component_amount"] == expected["value"]
-        assert values["sigma"] == expected["sigma"]
+        assert values["value_as_published"] == (
+            f"{expected['value']} ({expected['sigma']})"
+        )
+        assert observation["uncertainty"]["sigma"] == expected["sigma"]
+        assert observation["uncertainty"]["units"] == "wt.%"
+        assert observation["uncertainty"]["confidence_level"] == "one_sigma"
 
 
 def _assert_fO2_control_glosses(document: dict) -> None:
@@ -216,6 +222,9 @@ def test_table3_glass_rows_migrate_with_sample_conditions(tmp_path: Path) -> Non
         assert row.point_conditions["fO2_log"].state.value == Decimal(expected["logfO2_bar"])
         assert row.point_conditions["total_pressure_Pa"].state.value == Decimal(expected["P_bar"]) * Decimal("100000")
         assert row.value.point == Decimal(expected["value"])
+        assert row.uncertainty.kind.value == "printed"
+        assert row.uncertainty.verbatim["sigma"] == expected["sigma"]
+        assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
 
 
 def test_table3_source_test_skips_when_corpus_is_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

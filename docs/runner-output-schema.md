@@ -7,14 +7,13 @@ stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
 **Schema version:** `1.9.0`
-**Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Schema 1.9.0 adds the unconditional top-level
 `vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
 plus required per-hour `vapour_batch_summary` and
 `vapour_batch_flux_overlay` fields. These surfaces expose typed vapour-channel
-selection, refusals, the named pre-RG effective-pressure value seam, and
-legacy-shadow comparison. Eligible channels consume the pre-RG seam whenever a
+selection, refusals, the named effective-pressure value seam, and
+legacy-shadow comparison. Eligible channels consume that seam whenever a
 value is present, regardless of domain status. Only a genuinely missing seam
 value uses the catalog fallback; the overlay reports that source per species
 while retaining out-of-domain status for degraded-path accounting.
@@ -34,14 +33,11 @@ markdown projection from the same completed simulation state.
 Schema 1.5.0 added the unconditional `run_metadata.campaigns_elapsed` field and
 the `campaigns_to_resinter_by_segment` and
 `aggregate_campaigns_to_resinter` fields in the SiO wall-fouling report.
-Golden runner and SiO-yield fixtures therefore require controller regeneration
-on main; this worktree intentionally does not regenerate them.
 
 Schema 1.4.0 makes the vapor-pressure source report's backend-facet keys
 unconditional, admits the staged-C2A `c2a_staged_gas` per-hour key, and
 keeps handled failure envelopes on the same fidelity/engine metadata surface as
-successful runs. Existing golden runner fixtures need controller regeneration on
-main; this worktree intentionally does not regenerate them.
+successful runs.
 The conditional `run_metadata.refusal_diagnostic` is an additive metadata field:
 campaign-pressure refusals populate that generic field only, while Knudsen
 refusals populate it and the transport-specific
@@ -105,7 +101,7 @@ propagate before the document is written.
 
 The `--sio-*` flags are deterministic C2A/SiO pre-run controls. They
 apply after session construction and before hour advancement, matching
-the in-process P6a trace harness used by the CLI-boundary parity test.
+the in-process trace harness used by the CLI-boundary parity test.
 
 ## Top-level structure
 
@@ -131,7 +127,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
   "c7_refusal_diagnostic": {...}, // see "C7 product report and refusal diagnostic"
   "degraded_path_engagement": {...}, // see "Degraded-path engagement"
   "melt_redox_gate_floor_fallback_engagement": {...}, // see "Melt-redox gate floor fallback engagement"
-  "pO2_enforcement_by_hour": [...], // see "pO2 enforcement"
+  "pO2_enforcement_by_hour": [...], // see "Per-hour summary"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed" | "refused",
@@ -317,7 +313,7 @@ omit it.
       "stage0_pretreatment": "builtin-stage0-pretreatment",
       ...
     },
-    "requested": {                            // operator overrides (Goal #19 forward-compat)
+    "requested": {                            // operator overrides (forward-compatible)
       "vapor_pressure": "builtin-vapor-pressure"
     },
     "registry": {                             // ChemistryKernel.registry.capability_summary()
@@ -345,7 +341,7 @@ omit it.
     "allowed_pN2_mbar": [5.0, 15.0]
   },
   "knudsen_regime_diagnostic": {              // present after condensation routing
-    "status": "ok" | "warning" | "refused",
+    "status": "ok" | "warning" | "refused",   // transitional/free-molecular warn; refused = invalid inputs
     "reason": "",
     "regime": "viscous" | "transitional" | "free_molecular",
     "segments": [...]
@@ -393,7 +389,7 @@ omit it.
   `GATE_LIQUID_FRACTION` provider is dispatch-authoritative but lacks
   ledger-transition authority. It is diagnostic provenance only: it does not
   change the gate or any simulated number. The same notice is copied into
-  `product_classification` for operator markdown/P11 rendering and forwarded
+  `product_classification` for operator markdown rendering and forwarded
   into optimizer traces and product summaries.
 * Handled failure envelopes emit the same base fidelity fields as successful
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
@@ -595,19 +591,18 @@ and the aggregate liner load:
 ```
 
 * Empty list when no shuttle step was refused. Every entry is one C3
-  K-shuttle (`C3_K`) or Na-shuttle (`C3_NA`) dispatch that the S1b
-  shuttle T-acceptance gate rejected (thermodynamic margin ≤ 0 at the
-  current melt T per the post-V1c JANAF Ellingham crossovers).
+  K-shuttle (`C3_K`) or Na-shuttle (`C3_NA`) dispatch that the
+  shuttle temperature-acceptance gate rejected (thermodynamic margin ≤ 0 at the
+  current melt T per the JANAF-4th Ellingham crossovers).
 * Sourced from `simulator/extraction.py::_shuttle_inject_K` /
   `_shuttle_inject_Na`; accumulated on
   `PyrolysisSimulator._shuttle_refusal_history` and surfaced verbatim
   here so an operator can see WHICH recipe step the engine refused and
-  WHY (autoreview r3 P2, 2026-05-27 — previously refusal vs benign
-  no-op were indistinguishable to downstream consumers).
+  WHY (a refusal is distinguishable from a benign no-op).
 * Status remains `ok` / `partial` when only individual shuttle steps
   are refused (the recipe can still complete; the C3 cleanup target is
   what suffers). `status='refused'` is reserved for whole-run refusals
-  that cannot continue, e.g. `KnudsenRegimeRefusal`.
+  that cannot continue, e.g. a typed campaign-pressure refusal.
 
 ## C7 product report and refusal diagnostic
 
@@ -736,7 +731,7 @@ mole, energy, pressure, or partition arithmetic.
     "mre_voltage_V": 0.75,
     "mre_current_A": 1000.0,
     "O2_yield_kg_cumulative": 0.0,           // legacy key; source-side O2 potential, kg
-    "O2_source_side_potential_kg_cumulative": 0.0, // honest alias for the same value
+    "O2_source_side_potential_kg_cumulative": 0.0, // explicit alias for the same value
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {                     // compatibility: metal product projection at this hour
       "Fe": 5.0
@@ -833,8 +828,8 @@ incident, stuck, re-evaporated, and net continuous flux and has
 * `O2_yield_kg_cumulative` is retained for serialized compatibility but
   must be read as source-side emitted O2 potential, not recovered,
   captured, or analyzer-visible O2. `O2_source_side_potential_kg_cumulative`
-  is the preferred alias with the same numeric value. The downstream
-  sink/recovery model is Phase B; recovered-O2 claims do not belong in
+  is the preferred alias with the same numeric value. Recovered-O2
+  accounting is an upcoming feature; recovered-O2 claims do not belong in
   this runner output yet.
 * `metal_yields_kg` is sourced from `PyrolysisSimulator.product_ledger`
   filtered to a curated list of metal species (see
@@ -1013,7 +1008,7 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `_last_reduced_real_cache_state` is not `None`) and serialized into
     `per_hour_summary` via `simulator/runner/__init__.py`; the reduced-real backend
     cache-state label (string).
-* P6a wall-deposit fields are direct projections of
+* Wall-deposit fields are direct projections of
   `HourSnapshot.wall_deposit_by_segment_species_delta` and the running
   sum of those deltas. The report layer does not recompute deposits.
 * `vapor_species_kg_hr` is copied from `HourSnapshot.evap_flux`.
@@ -1050,7 +1045,7 @@ Two event types appear today:
 * **`operator_decision`** -- emitted whenever the runner auto-applies a
   decision the simulator paused for.  `choice` equals `recommendation`
   when one is set; otherwise the first option in `options`.  This is
-  Goal #18's contract for unattended runs: every routing decision the
+  the runner's contract for unattended runs: every routing decision the
   runner made on the operator's behalf shows up in the trace.
 * **`parity_warning`** / **`parity_error`** -- forwarded verbatim from
   the kernel's `Planner.shadow_trace` so a downstream consumer can
@@ -1070,7 +1065,7 @@ diagnostics but noise for the operator-facing JSON.
   but a different bytes-on-disk result.
 * No RNG seeds are pinned today because the simulator does not call
   `random` / `numpy.random` directly in its mainline step path.  If
-  Goal #19 or #21 introduce stochastic providers, this section will
+  stochastic providers are added, this section will
   list the seeded surfaces.
 
 ## Web stream parity

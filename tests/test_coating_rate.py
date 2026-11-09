@@ -646,7 +646,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     # constack merge: repin on gate box
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "48374e101d1a174ce69ae0481448fbc5c76538d1896a26e82483878966a2d0d2"
+        "8b01fd5fa0f7eafd7f44c36d5421ac636ddcfe76ef400f5b5190f3da91e8cf65"
     )
 
 

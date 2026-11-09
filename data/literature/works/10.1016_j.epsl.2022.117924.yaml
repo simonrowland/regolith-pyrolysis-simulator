@@ -1,0 +1,1723 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.epsl.2022.117924
+  citation: Su, X., Zhang, Y., Liu, Y. & Holder, R. M. (2023). Outgassing and In-gassing of Na, K and Cu in Lunar 74220 Orange
+    Glass Beads. Earth and Planetary Science Letters.
+  source_ids:
+  - su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 75e3b98190a442a2afc77502a9d21cae21701992
+    files:
+    - asset_id: unknown:su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+    - asset_id: tables:su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+      role: table_csv
+      path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+      sha256:
+        tag: value
+        value: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+  doi: 10.1016/j.epsl.2022.117924
+experiments:
+- experiment_id: 10.1016/j.epsl.2022.117924::su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.epsl.2022.117924
+  locator:
+    table: Table S2
+    note: Supplementary XLSX Table S2!A7, L7, C4; row GB-G1, worksheet row 7. radial distance A7 displayed 1.2 (number format
+      0.0); analytical total L7 displayed 98.3 (number format 0.0; stored value 98.339600000000004); bead diameter C4 displayed
+      232 (number format 0). Printed oxide sum; not an individual oxide component.
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    record: GB-G1, worksheet row 7
+context:
+- observation_id: su_zhang_2023_table_s1_empa_standards
+  type: printed_data_context
+  units: Mixed analytical setup fields as printed in Table S1.
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S1
+    note: EMPA standards and instrument conditions; rows 11–20.
+  values:
+    reason: Table S1 records EMPA analytical standards and setup; it is context for the Table S2 direct measurements.
+    rows:
+    - workbook_row: 11
+      values:
+        element: Na
+        standard_name: ALBA
+        spectrometer: Sp1
+        crystal: LTAP
+        peak_position: '46381'
+        background1: '-1400'
+        background2: '820'
+        counting_time: 360 s
+      source_cells:
+        element:
+          cell: A11
+          number_format: General
+          stored: Na
+        standard_name:
+          cell: B11
+          number_format: General
+          stored: ALBA
+        spectrometer:
+          cell: C11
+          number_format: General
+          stored: Sp1
+        crystal:
+          cell: D11
+          number_format: General
+          stored: LTAP
+        peak_position:
+          cell: E11
+          number_format: General
+          stored: '46381'
+        background1:
+          cell: F11
+          number_format: General
+          stored: '-1400'
+        background2:
+          cell: G11
+          number_format: General
+          stored: '820'
+        counting_time:
+          cell: H11
+          number_format: General
+          stored: 360 s
+    - workbook_row: 12
+      values:
+        element: Si
+        standard_name: FOBO
+        spectrometer: Sp2
+        crystal: TAP
+        peak_position: '27747'
+        background1: '-760'
+        background2: '800'
+        counting_time: 40 s
+      source_cells:
+        element:
+          cell: A12
+          number_format: General
+          stored: Si
+        standard_name:
+          cell: B12
+          number_format: General
+          stored: FOBO
+        spectrometer:
+          cell: C12
+          number_format: General
+          stored: Sp2
+        crystal:
+          cell: D12
+          number_format: General
+          stored: TAP
+        peak_position:
+          cell: E12
+          number_format: General
+          stored: '27747'
+        background1:
+          cell: F12
+          number_format: General
+          stored: '-760'
+        background2:
+          cell: G12
+          number_format: General
+          stored: '800'
+        counting_time:
+          cell: H12
+          number_format: General
+          stored: 40 s
+    - workbook_row: 13
+      values:
+        element: Mg
+        standard_name: FOBO
+        spectrometer: Sp2
+        crystal: TAP
+        peak_position: '38505'
+        background1: '-1600'
+        background2: '1000'
+        counting_time: 280 s
+      source_cells:
+        element:
+          cell: A13
+          number_format: General
+          stored: Mg
+        standard_name:
+          cell: B13
+          number_format: General
+          stored: FOBO
+        spectrometer:
+          cell: C13
+          number_format: General
+          stored: Sp2
+        crystal:
+          cell: D13
+          number_format: General
+          stored: TAP
+        peak_position:
+          cell: E13
+          number_format: General
+          stored: '38505'
+        background1:
+          cell: F13
+          number_format: General
+          stored: '-1600'
+        background2:
+          cell: G13
+          number_format: General
+          stored: '1000'
+        counting_time:
+          cell: H13
+          number_format: General
+          stored: 280 s
+    - workbook_row: 14
+      values:
+        element: Al
+        standard_name: SILL
+        spectrometer: Sp2
+        crystal: TAP
+        peak_position: '32449'
+        background1: '-850'
+        background2: '850'
+        counting_time: 40 s
+      source_cells:
+        element:
+          cell: A14
+          number_format: General
+          stored: Al
+        standard_name:
+          cell: B14
+          number_format: General
+          stored: SILL
+        spectrometer:
+          cell: C14
+          number_format: General
+          stored: Sp2
+        crystal:
+          cell: D14
+          number_format: General
+          stored: TAP
+        peak_position:
+          cell: E14
+          number_format: General
+          stored: '32449'
+        background1:
+          cell: F14
+          number_format: General
+          stored: '-850'
+        background2:
+          cell: G14
+          number_format: General
+          stored: '850'
+        counting_time:
+          cell: H14
+          number_format: General
+          stored: 40 s
+    - workbook_row: 15
+      values:
+        element: Fe
+        standard_name: FESI
+        spectrometer: Sp3
+        crystal: LLIF
+        peak_position: '48084'
+        background1: '-1200'
+        background2: '1250'
+        counting_time: 100 s
+      source_cells:
+        element:
+          cell: A15
+          number_format: General
+          stored: Fe
+        standard_name:
+          cell: B15
+          number_format: General
+          stored: FESI
+        spectrometer:
+          cell: C15
+          number_format: General
+          stored: Sp3
+        crystal:
+          cell: D15
+          number_format: General
+          stored: LLIF
+        peak_position:
+          cell: E15
+          number_format: General
+          stored: '48084'
+        background1:
+          cell: F15
+          number_format: General
+          stored: '-1200'
+        background2:
+          cell: G15
+          number_format: General
+          stored: '1250'
+        counting_time:
+          cell: H15
+          number_format: General
+          stored: 100 s
+    - workbook_row: 16
+      values:
+        element: Mn
+        standard_name: BHRH
+        spectrometer: Sp3
+        crystal: LLIF
+        peak_position: '52203'
+        background1: '-1200'
+        background2: '1600'
+        counting_time: 260 s
+      source_cells:
+        element:
+          cell: A16
+          number_format: General
+          stored: Mn
+        standard_name:
+          cell: B16
+          number_format: General
+          stored: BHRH
+        spectrometer:
+          cell: C16
+          number_format: General
+          stored: Sp3
+        crystal:
+          cell: D16
+          number_format: General
+          stored: LLIF
+        peak_position:
+          cell: E16
+          number_format: General
+          stored: '52203'
+        background1:
+          cell: F16
+          number_format: General
+          stored: '-1200'
+        background2:
+          cell: G16
+          number_format: General
+          stored: '1600'
+        counting_time:
+          cell: H16
+          number_format: General
+          stored: 260 s
+    - workbook_row: 17
+      values:
+        element: K
+        standard_name: GKFS
+        spectrometer: Sp4
+        crystal: LPET
+        peak_position: '42752'
+        background1: '-530'
+        background2: '1100'
+        counting_time: 200 s
+      source_cells:
+        element:
+          cell: A17
+          number_format: General
+          stored: K
+        standard_name:
+          cell: B17
+          number_format: General
+          stored: GKFS
+        spectrometer:
+          cell: C17
+          number_format: General
+          stored: Sp4
+        crystal:
+          cell: D17
+          number_format: General
+          stored: LPET
+        peak_position:
+          cell: E17
+          number_format: General
+          stored: '42752'
+        background1:
+          cell: F17
+          number_format: General
+          stored: '-530'
+        background2:
+          cell: G17
+          number_format: General
+          stored: '1100'
+        counting_time:
+          cell: H17
+          number_format: General
+          stored: 200 s
+    - workbook_row: 18
+      values:
+        element: Ca
+        standard_name: WOLL
+        spectrometer: Sp4
+        crystal: LPET
+        peak_position: '38381'
+        background1: '-700'
+        background2: '1300'
+        counting_time: 160 s
+      source_cells:
+        element:
+          cell: A18
+          number_format: General
+          stored: Ca
+        standard_name:
+          cell: B18
+          number_format: General
+          stored: WOLL
+        spectrometer:
+          cell: C18
+          number_format: General
+          stored: Sp4
+        crystal:
+          cell: D18
+          number_format: General
+          stored: LPET
+        peak_position:
+          cell: E18
+          number_format: General
+          stored: '38381'
+        background1:
+          cell: F18
+          number_format: General
+          stored: '-700'
+        background2:
+          cell: G18
+          number_format: General
+          stored: '1300'
+        counting_time:
+          cell: H18
+          number_format: General
+          stored: 160 s
+    - workbook_row: 19
+      values:
+        element: Ti
+        standard_name: GEIK
+        spectrometer: Sp5
+        crystal: LIF
+        peak_position: '68236'
+        background1: '-600'
+        background2: '1150'
+        counting_time: 150 s
+      source_cells:
+        element:
+          cell: A19
+          number_format: General
+          stored: Ti
+        standard_name:
+          cell: B19
+          number_format: General
+          stored: GEIK
+        spectrometer:
+          cell: C19
+          number_format: General
+          stored: Sp5
+        crystal:
+          cell: D19
+          number_format: General
+          stored: LIF
+        peak_position:
+          cell: E19
+          number_format: General
+          stored: '68236'
+        background1:
+          cell: F19
+          number_format: General
+          stored: '-600'
+        background2:
+          cell: G19
+          number_format: General
+          stored: '1150'
+        counting_time:
+          cell: H19
+          number_format: General
+          stored: 150 s
+    - workbook_row: 20
+      values:
+        element: Cr
+        standard_name: Cr2O3
+        spectrometer: Sp5
+        crystal: LIF
+        peak_position: '56854'
+        background1: '-600'
+        background2: '600'
+        counting_time: 210 s
+      source_cells:
+        element:
+          cell: A20
+          number_format: General
+          stored: Cr
+        standard_name:
+          cell: B20
+          number_format: General
+          stored: Cr2O3
+        spectrometer:
+          cell: C20
+          number_format: General
+          stored: Sp5
+        crystal:
+          cell: D20
+          number_format: General
+          stored: LIF
+        peak_position:
+          cell: E20
+          number_format: General
+          stored: '56854'
+        background1:
+          cell: F20
+          number_format: General
+          stored: '-600'
+        background2:
+          cell: G20
+          number_format: General
+          stored: '600'
+        counting_time:
+          cell: H20
+          number_format: General
+          stored: 210 s
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s1_empa_standards
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_a_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-A Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A144:AV188, 45 rows x 48 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-A
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A144:AV188
+    shape:
+      rows: 45
+      columns: 48
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_a_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_a_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-A Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A98:AV142, 45 rows x 48 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-A
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A98:AV142
+    shape:
+      rows: 45
+      columns: 48
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_a_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_a_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-A K39_cps
+    note: Raw LA-ICP-MS signal-map range A52:AV96, 45 rows x 48 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-A
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A52:AV96
+    shape:
+      rows: 45
+      columns: 48
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_a_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_a_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-A Na23_cps
+    note: Raw LA-ICP-MS signal-map range A6:AV50, 45 rows x 48 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-A
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A6:AV50
+    shape:
+      rows: 45
+      columns: 48
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_a_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_b_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-B Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A306:AI342, 37 rows x 35 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-B
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A306:AI342
+    shape:
+      rows: 37
+      columns: 35
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_b_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_b_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-B Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A268:AI304, 37 rows x 35 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-B
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A268:AI304
+    shape:
+      rows: 37
+      columns: 35
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_b_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_b_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-B K39_cps
+    note: Raw LA-ICP-MS signal-map range A230:AI266, 37 rows x 35 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-B
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A230:AI266
+    shape:
+      rows: 37
+      columns: 35
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_b_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_b_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-B Na23_cps
+    note: Raw LA-ICP-MS signal-map range A192:AI228, 37 rows x 35 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-B
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A192:AI228
+    shape:
+      rows: 37
+      columns: 35
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_b_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_c_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-C Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A475:AW516, 42 rows x 49 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-C
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A475:AW516
+    shape:
+      rows: 42
+      columns: 49
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_c_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_c_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-C Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A432:AW473, 42 rows x 49 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-C
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A432:AW473
+    shape:
+      rows: 42
+      columns: 49
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_c_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_c_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-C K39_cps
+    note: Raw LA-ICP-MS signal-map range A389:AW430, 42 rows x 49 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-C
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A389:AW430
+    shape:
+      rows: 42
+      columns: 49
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_c_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_c_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-C Na23_cps
+    note: Raw LA-ICP-MS signal-map range A346:AW387, 42 rows x 49 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-C
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A346:AW387
+    shape:
+      rows: 42
+      columns: 49
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_c_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g1_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G1 Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A640:AP678, 39 rows x 42 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G1
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A640:AP678
+    shape:
+      rows: 39
+      columns: 42
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g1_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g1_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G1 Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A600:AP638, 39 rows x 42 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G1
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A600:AP638
+    shape:
+      rows: 39
+      columns: 42
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g1_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g1_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G1 K39_cps
+    note: Raw LA-ICP-MS signal-map range A560:AP598, 39 rows x 42 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G1
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A560:AP598
+    shape:
+      rows: 39
+      columns: 42
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g1_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g1_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G1 Na23_cps
+    note: Raw LA-ICP-MS signal-map range A520:AP558, 39 rows x 42 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G1
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A520:AP558
+    shape:
+      rows: 39
+      columns: 42
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g1_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g2_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G2 Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A826:AU872, 47 rows x 47 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G2
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A826:AU872
+    shape:
+      rows: 47
+      columns: 47
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g2_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g2_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G2 Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A778:AU824, 47 rows x 47 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G2
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A778:AU824
+    shape:
+      rows: 47
+      columns: 47
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g2_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g2_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G2 K39_cps
+    note: Raw LA-ICP-MS signal-map range A730:AU776, 47 rows x 47 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G2
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A730:AU776
+    shape:
+      rows: 47
+      columns: 47
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g2_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g2_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G2 Na23_cps
+    note: Raw LA-ICP-MS signal-map range A682:AU728, 47 rows x 47 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G2
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A682:AU728
+    shape:
+      rows: 47
+      columns: 47
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g2_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g5_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G5 Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A1011:AT1054, 44 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G5
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1011:AT1054
+    shape:
+      rows: 44
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g5_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g5_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G5 Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A966:AT1009, 44 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G5
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A966:AT1009
+    shape:
+      rows: 44
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g5_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g5_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G5 K39_cps
+    note: Raw LA-ICP-MS signal-map range A921:AT964, 44 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G5
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A921:AT964
+    shape:
+      rows: 44
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g5_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g5_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G5 Na23_cps
+    note: Raw LA-ICP-MS signal-map range A876:AT919, 44 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G5
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A876:AT919
+    shape:
+      rows: 44
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g5_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g6_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G6 Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A1208:AY1256, 49 rows x 51 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G6
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1208:AY1256
+    shape:
+      rows: 49
+      columns: 51
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g6_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g6_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G6 Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A1158:AY1206, 49 rows x 51 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G6
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1158:AY1206
+    shape:
+      rows: 49
+      columns: 51
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g6_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g6_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G6 K39_cps
+    note: Raw LA-ICP-MS signal-map range A1108:AY1156, 49 rows x 51 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G6
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1108:AY1156
+    shape:
+      rows: 49
+      columns: 51
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g6_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g6_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G6 Na23_cps
+    note: Raw LA-ICP-MS signal-map range A1058:AY1106, 49 rows x 51 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G6
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1058:AY1106
+    shape:
+      rows: 49
+      columns: 51
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g6_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g7_cu63_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G7 Cu63_cps
+    note: Raw LA-ICP-MS signal-map range A1401:AT1446, 46 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G7
+    isotope_as_printed: Cu63_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1401:AT1446
+    shape:
+      rows: 46
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g7_cu63_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g7_fe57_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G7 Fe57_cps
+    note: Raw LA-ICP-MS signal-map range A1354:AT1399, 46 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G7
+    isotope_as_printed: Fe57_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1354:AT1399
+    shape:
+      rows: 46
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g7_fe57_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g7_k39_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G7 K39_cps
+    note: Raw LA-ICP-MS signal-map range A1307:AT1352, 46 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G7
+    isotope_as_printed: K39_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1307:AT1352
+    shape:
+      rows: 46
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g7_k39_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown
+- observation_id: su_zhang_2023_table_s5_gb_g7_na23_map
+  type: printed_data_context
+  units: counts per second
+  locator:
+    source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.xlsx
+    table: Table S5
+    record: GB-G7 Na23_cps
+    note: Raw LA-ICP-MS signal-map range A1260:AT1305, 46 rows x 46 columns. Caption at Table S5!A1; reduction method in supplementary
+      DOCX S3 paragraphs 69–88.
+  values:
+    typed_refused_schema_gap: true
+    sample: GB-G7
+    isotope_as_printed: Na23_cps
+    source_sha256: e257ffbf82975050e76320dfa0127b15699d712bce10095d2c6eedfcd3d0a2b3
+    sheet_name: Table S5
+    cell_range: A1260:AT1305
+    shape:
+      rows: 46
+      columns: 46
+    units: counts per second
+    caption_as_printed: Table S5. Raw LA-ICP-MS mapping data of 23Na, 39K, 57Fe and 63Cu of eight 74220 orange glass beads.
+    caption_locator: Table S5!A1
+    method_as_printed: Raw LA-ICP-MS isotope signals in counts per second; the authors convert these maps to radial concentration
+      profiles with Map2Profile.py and apply calibrations as described in supplementary DOCX S3.
+    method_locator:
+      corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
+      section: S3
+      paragraphs: P69-P88
+    schema_gap: No 2-D spatial map type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES. simulator/battery/migrate.py::TYPE_QUANTITY
+      has no map-family default, and relevant simulator/battery/migrate.py::QUANTITY_ALIASES entries map scalar intensity
+      labels to simulator/battery/enums.py::Quantity.ION_INTENSITY, not a matrix. simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe composition bases and physical phase roles, not spatial signal maps.
+      data/literature/extracts/drowart-1960-al2o3-kems.yaml stores scalar ion-intensity observations, not maps. Retained as
+      range and shape context without a near-miss quantity token or per-cell values.
+  context_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing::context::su_zhang_2023_table_s5_gb_g7_na23_map
+  work_id: 10.1016/j.epsl.2022.117924
+  source_id: su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+  species: unknown

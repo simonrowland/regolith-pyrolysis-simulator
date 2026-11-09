@@ -643,6 +643,32 @@ def melts_endmember_to_parent_oxide_activity(
     return None, f'engine returned no positive activity for {parent}'
 
 
+def _endmember_activity_repair_notices(
+    values: Mapping[str, object] | None,
+) -> tuple[str, ...]:
+    notices: list[str] = []
+    for label, raw in dict(values or {}).items():
+        parent = canonical_melt_oxide_activity_name(label)
+        if parent is None:
+            parent = _liquid_oxide_endmember_label(label)
+        if parent not in MELTS_LIQUID_OXIDE_ENDMEMBERS:
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if value > 0.0 and math.isfinite(value):
+            continue
+        reason = 'nonfinite' if not math.isfinite(value) else 'nonpositive'
+        notices.append(
+            'SR04:alphamelts_endmember_activity_repaired '
+            f'producer=AlphaMELTS field=endmember_activity '
+            f'endmember={str(label)!r} parent_oxide={parent} '
+            f'action=omitted reason={reason}'
+        )
+    return tuple(notices)
+
+
 def _liquid_oxide_endmember_label(name: object) -> str | None:
     """Oxide endmember label, including H2O outside the 14-oxide basis."""
 

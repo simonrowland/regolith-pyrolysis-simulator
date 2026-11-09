@@ -151,7 +151,9 @@ context:
     figure: '2'
   units: ΔfG_T(M), kJ/mol; T, K
   values:
-    quantity: delta_fG
+    quantity_as_printed: Fig. 2. Gibbs energy of mullite formation from oxides
+    reference_state_as_printed: formation from simple oxides
+    schema_gap: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
     method_class: figure_only
     admission_status: figure_only
     species: mullite

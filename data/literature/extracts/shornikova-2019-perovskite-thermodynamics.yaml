@@ -72,6 +72,53 @@ skipped_empty_or_dash:
   - page: 4
     table_index: 2
     count: 1
+schema_gaps:
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r03_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r04_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r05_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r06_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r07_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r08_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r09_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r10_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r11_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r12_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r13_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r14_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r15_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r16_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r17_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r18_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r19_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r21_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r22_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r23_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r24_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+  - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+    reason: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
 species:
   CaTiO3:
     observations:
@@ -90,7 +137,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-40.48'
         attribution: Table 1 Ref. [5, 18]. The cited paper is not stored in this extract.
@@ -141,7 +191,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-41.84'
         attribution: Table 1 Ref. [17]. The cited paper is not stored in this extract.
@@ -192,7 +245,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-40.48'
         attribution: Table 1 Ref. [11]. The cited paper is not stored in this extract.
@@ -243,7 +299,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-47.11'
         attribution: Table 1 Ref. [13]. The cited paper is not stored in this extract.
@@ -294,7 +353,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-42.98'
         attribution: Table 1 Ref. [27]. The cited paper is not stored in this extract.
@@ -345,7 +407,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-37.05'
         attribution: Table 1 Ref. [34]. The cited paper is not stored in this extract.
@@ -394,7 +459,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-40.07'
         attribution: Table 1 Ref. [36]. The cited paper is not stored in this extract.
@@ -443,7 +511,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-38.73'
         attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
@@ -494,7 +565,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-42.25'
         attribution: Table 1 Ref. [24, 25]. The cited paper is not stored in this extract.
@@ -545,7 +619,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-41.88'
         attribution: Table 1 Ref. [26]. The cited paper is not stored in this extract.
@@ -596,7 +673,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-42.86'
         attribution: Table 1 Ref. [23]. The cited paper is not stored in this extract.
@@ -647,7 +727,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-42.38'
         attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
@@ -698,7 +781,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-40.45'
         attribution: Table 1 Ref. [19]. The cited paper is not stored in this extract.
@@ -750,7 +836,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-40.43'
         attribution: Table 1 Ref. [20]. The cited paper is not stored in this extract.
@@ -801,7 +890,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-43.78'
         attribution: Table 1 Ref. [21]. The cited paper is not stored in this extract.
@@ -852,7 +944,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-42.83'
         attribution: Table 1 Ref. [30]. The cited paper is not stored in this extract.
@@ -903,7 +998,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-26.88'
         attribution: Table 1 Ref. [33]. The cited paper is not stored in this extract.
@@ -952,7 +1050,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-37.19'
         attribution: Table 1 Ref. [7]. The cited paper is not stored in this extract.
@@ -1001,7 +1102,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-38.23'
         attribution: Table 1 Ref. [8]. The cited paper is not stored in this extract.
@@ -1050,7 +1154,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-37.47'
         attribution: Table 1 Ref. [9]. The cited paper is not stored in this extract.
@@ -1099,7 +1206,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: quoted_attributed
         value: '-37.55'
         attribution: Table 1 Ref. [37]. The cited paper is not stored in this extract.
@@ -1151,7 +1261,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: derived_least_squares
         value: '-39.98'
         value_as_printed: -39.98 ± 0.54
@@ -1205,7 +1318,10 @@ species:
       units: kJ/mol
       mineru_flags: []
       values:
-        quantity: delta_fH
+        quantity_as_printed: "Table 1. Entropy (ΔST) and enthalpy (ΔHT) of perovskite formation from simple oxides"
+        reference_state_as_printed: "formation from simple oxides"
+        schema_gap: "No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements."
+
         method_class: derived_least_squares
         value: '7.73'
         value_as_printed: 7.73 ± 1.76

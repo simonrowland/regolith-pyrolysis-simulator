@@ -633,12 +633,11 @@ def test_pin_reactive_re_cell_predicts_with_notice_not_refusal(monkeypatch) -> N
 
 
 def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> None:
-    """Re cell: prediction+flag, or typed refusal naming the missing input — not old reservoir."""
+    """Re cell: use the melt-only balance and preserve the wall-model notice."""
     from tests.battery import test_silent_fills as sf
 
-    sf._capture_cell(monkeypatch)
-    # Default _kems_partial has no printed fO2. An unmodelled Re cell cannot
-    # close, so the row stays a typed missing-fO2 refusal.
+    seen = sf._capture_cell(monkeypatch)
+    # The fake engine stops after the scorer sends the flagged melt balance.
     observation, experiment = sf._kems_partial(cell_material=None)
     bench = sf._cell_material_bench((CellMaterial.RE,))
     experiment = replace(experiment, bench_id=bench.id)
@@ -658,16 +657,9 @@ def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> No
     assert residual.refusal is None or residual.refusal.detail.get("reason") != (
         "reactive_cell_oxygen_reservoir"
     )
-    if residual.status is ResidualStatus.REFUSED:
-        detail = dict(residual.refusal.detail) if residual.refusal is not None else {}
-        reason = str(detail.get("reason") or detail.get("missing_input") or "")
-        assert reason not in {
-            "oxygen_balance_effusion_unsupported_engine",
-            "reactive_cell_oxygen_reservoir",
-        }, detail
-        assert "fO2" in reason or reason == "missing_fO2", detail
-    else:
-        assert residual.numeric is not None
+    assert seen["mode"] == sf.PO2_OXYGEN_BALANCE_EFFUSION
+    assert residual.refusal is not None
+    assert residual.refusal.detail.get("refusal_reason") == "census_stop"
     assert any(
         "reactive cell: oxygen balance of the cell not modelled" in notice.reason
         for notice in residual.notices
@@ -697,7 +689,7 @@ def test_pin_predict_with_engine_re_cell_does_not_refuse_reservoir(
         "reactive cell: oxygen balance of the cell not modelled" in notice.reason
         for notice in prediction.notices
     )
-    assert seen.get("mode") in {sf.PO2_NOT_AN_INPUT, sf.PO2_COMMANDED, None} or seen
+    assert seen["mode"] == sf.PO2_OXYGEN_BALANCE_EFFUSION
 
 
 def test_pin_reactive_cell_with_printed_o2_uses_commanded_po2(monkeypatch) -> None:
