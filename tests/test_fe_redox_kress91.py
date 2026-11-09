@@ -57,68 +57,139 @@ def _no_iron_redox_diagnostic_sim() -> SimpleNamespace:
     )
 
 
-def test_legacy_iw_current_outputs_are_bit_identical_at_pinned_temperatures() -> None:
-    """Pin both legacy IW call paths before consolidating their shared line.
-
-    Mutation caught: changing the legacy IW coefficients in either resolver
-    or diagnostic moves at least one pinned hexadecimal float result.
-    """
+def test_oneill_iw_runtime_outputs_are_pinned_at_representative_temperatures() -> None:
+    """Pin the canonical O'Neill resolver through both runtime call paths."""
     expected_hex = {
-        -1.0: "-0x1.2000000000000p+3",
-        0.0: "-0x1.2000000000000p+3",
-        1873.15: "-0x1.fd6049b57f6fep+2",
-        2500.0: "-0x1.14395810624dcp+2",
-        4000.0: "-0x1.deb851eb851e0p-3",
+        1400.0: (
+            "-0x1.9cf408dc43a98p+3",
+            "-0x1.2000000000000p+3",
+        ),
+        1600.0: (
+            "-0x1.4e7b4f4e61afdp+3",
+            "-0x1.2000000000000p+3",
+        ),
+        1800.0: (
+            "-0x1.11d7bc199f247p+3",
+            "-0x1.11d7bc199f247p+3",
+        ),
+        1873.15: (
+            "-0x1.fdf7efa70b43cp+2",
+            "-0x1.fdf7efa70b43cp+2",
+        ),
+        2500.0: (
+            "-0x1.17afda0f112dfp+2",
+            "-0x1.17afda0f112dfp+2",
+        ),
+        4000.0: (
+            "-0x1.df1097cde0238p-2",
+            "-0x1.df1097cde0238p-2",
+        ),
     }
-    for temperature_K, expected in expected_hex.items():
-        assert intrinsic_melt_fO2({"FeO": 1.0}, temperature_K).hex() == expected
+    for temperature_K, (iw_expected, intrinsic_expected) in expected_hex.items():
+        assert intrinsic_melt_fO2(
+            {"FeO": 1.0}, temperature_K
+        ).hex() == intrinsic_expected
         diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
             _no_iron_redox_diagnostic_sim(),
             temperature_K,
         )
-        assert diagnostic["iw_log"].hex() == expected
+        assert diagnostic["iw_log"].hex() == iw_expected
 
 
-def test_legacy_iw_nonfinite_outputs_match_green_pins() -> None:
-    """Pin the distinct nonfinite results from origin/work-v064-green."""
-    expected = (
-        (math.nan, "0x0.0p+0", "-0x1.2000000000000p+3"),
-        (math.inf, "0x0.0p+0", "0x1.a47ae147ae148p+2"),
-        (-math.inf, "-0x1.2000000000000p+3", "-0x1.2000000000000p+3"),
+def test_runtime_iw_deltas_match_main_legacy_measurements() -> None:
+    # These are committed legacy runtime outputs; keeping the points avoids
+    # retaining a second copy of the removed formula in the test.
+    old_runtime_iw = {
+        1400.0: -12.869285714285713,
+        1600.0: -10.439374999999998,
+        1800.0: -8.549444444444443,
+    }
+    measured_deltas = {
+        1400.0: -0.0355,
+        1600.0: -0.0132,
+        1800.0: -0.0081,
+    }
+    for temperature_K, old_log_iw in old_runtime_iw.items():
+        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+            _no_iron_redox_diagnostic_sim(),
+            temperature_K,
+        )
+        assert diagnostic["iw_log"] - old_log_iw == pytest.approx(
+            measured_deltas[temperature_K], abs=5.0e-5
+        )
+
+
+@pytest.mark.parametrize(
+    "temperature_K",
+    [math.nan, math.inf, -math.inf, -1.0, 0.0],
+)
+def test_runtime_iw_rejects_nonfinite_and_nonpositive_temperatures(
+    temperature_K: float,
+) -> None:
+    with pytest.raises(ValueError, match="temperature_K must be finite and positive"):
+        intrinsic_melt_fO2({"FeO": 1.0}, temperature_K)
+    with pytest.raises(ValueError, match="temperature_K must be finite and positive"):
+        PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+            _no_iron_redox_diagnostic_sim(),
+            temperature_K,
+        )
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_flags"),
+    (
+        (1600.0, ("predict_and_flag_outside_range_833_1450_K",)),
+        (
+            1700.0,
+            (
+                "predict_and_flag_outside_range_833_1450_K",
+                "phase_boundary_extrapolation_above_1650_K_FeO_melting",
+            ),
+        ),
+        (
+            1812.0,
+            (
+                "predict_and_flag_outside_range_833_1450_K",
+                "phase_boundary_extrapolation_above_1650_K_FeO_melting",
+                "phase_boundary_extrapolation_above_1811_K_Fe_melting",
+            ),
+        ),
+    ),
+)
+def test_runtime_iw_carries_calibration_and_phase_extrapolation_flags(
+    temperature_K: float,
+    expected_flags: tuple[str, ...],
+) -> None:
+    diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+        _no_iron_redox_diagnostic_sim(),
+        temperature_K,
     )
-    for temperature_K, intrinsic_hex, diagnostic_hex in expected:
-        intrinsic = intrinsic_melt_fO2({"FeO": 1.0}, temperature_K)
-        assert intrinsic.hex() == intrinsic_hex
-        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
-            _no_iron_redox_diagnostic_sim(),
-            temperature_K,
-        )
-        assert diagnostic["iw_log"].hex() == diagnostic_hex
-        assert diagnostic["native_fe_saturation"] is True
+
+    notice = diagnostic["iw_extrapolation_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["calibration_range_K"] == (833.0, 1450.0)
+    assert tuple(notice["flags"]) == expected_flags
+    assert "O'Neill (1988) equation (11)" in notice["reason"]
 
 
-def test_legacy_iw_callers_use_the_shared_owner(
+def test_oneill_iw_callers_use_the_shared_owner(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Catch restoring either caller's inline legacy IW expression."""
-    calls: list[tuple[float, float]] = []
+    """Keep both runtime paths routed through the shared O'Neill resolver."""
+    calls: list[float] = []
 
-    def owner_sentinel(
-        temperature_K: float,
-        *,
-        vacuum_floor_bar: float,
-    ) -> float:
-        calls.append((temperature_K, vacuum_floor_bar))
+    def owner_sentinel(temperature_K: float) -> float:
+        calls.append(temperature_K)
         return -4.25
 
     monkeypatch.setattr(
         fe_redox_module,
-        "legacy_iw_log10_fO2_bar",
+        "oneill_iw_log10_fO2_bar",
         owner_sentinel,
     )
     monkeypatch.setattr(
         core_module,
-        "legacy_iw_log10_fO2_bar",
+        "oneill_iw_log10_fO2_bar",
         owner_sentinel,
     )
 
@@ -129,7 +200,7 @@ def test_legacy_iw_callers_use_the_shared_owner(
     )
 
     assert intrinsic == diagnostic["iw_log"] == -4.25
-    assert calls == [(2000.0, 1.0e-9), (2000.0, 1.0e-9)]
+    assert calls == [2000.0, 2000.0]
 
 
 @pytest.mark.parametrize('pressure_bar', [0.0, -1.0])

@@ -55,7 +55,6 @@ import math
 from dataclasses import dataclass
 from decimal import Decimal
 
-from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -359,23 +358,6 @@ def stagno_frost_emog_emod_log10_fO2_interval(
         formulation="StagnoFrost2010_EMOG_EMOD_interval_only",
         source="Stagno & Frost 2010 EPSL 300:72-84",
     )
-
-
-def legacy_iw_log10_fO2_bar(
-    temperature_K: float,
-    *,
-    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
-) -> float:
-    """Return the legacy IW line used by runtime Fe-redox.
-
-    This line is uncited and slated for removal per d-324; changing its
-    runtime calibration is a separate owner card. Battery migration must use
-    the cited O'Neill calibration below instead.
-    """
-    temperature = float(temperature_K)
-    if not (temperature > 0.0):
-        return math.log10(vacuum_floor_bar)
-    return -27215.0 / temperature + 6.57
 
 
 # Holzheid et al. 1997, DOI 10.1016/S0009-2541(97)00030-2:

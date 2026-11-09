@@ -3607,6 +3607,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
             "fO2_log": -8.0,
             "ferric_frac": 0.2,
             "valid": True,
+            "iw_extrapolation_notice": {
+                "reason": "O'Neill (1988) equation (11) is extrapolated.",
+                "authority_level": "extrapolated",
+                "calibration_range_K": (833.0, 1450.0),
+                "flags": ("predict_and_flag_outside_range_833_1450_K",),
+            },
             "native_fe_saturation_event": {
                 "native_fe_event": "deferred_not_liquid_for_redox",
                 "native_fe_event_status": "deferred",
@@ -3621,6 +3627,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     assert fe_split_export["native_fe_saturation_event"] == {
         "native_fe_event": "deferred_not_liquid_for_redox",
         "native_fe_event_status": "deferred",
+    }
+    assert fe_split_export["iw_extrapolation_notice"] == {
+        "reason": "O'Neill (1988) equation (11) is extrapolated.",
+        "authority_level": "extrapolated",
+        "calibration_range_K": [833.0, 1450.0],
+        "flags": ["predict_and_flag_outside_range_833_1450_K"],
     }
 
     emitted: set[str] = set()

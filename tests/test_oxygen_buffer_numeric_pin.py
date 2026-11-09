@@ -27,8 +27,8 @@ def _snapshot() -> tuple[tuple[object, ...], ...]:
     oneill = _buffer_function(
         "oneill_qfm_log10_fO2_bar", "simulator.chemistry.qfm_oneill"
     )
-    legacy_iw = _buffer_function(
-        "legacy_iw_log10_fO2_bar", "simulator.fe_redox"
+    oneill_iw = _buffer_function(
+        "oneill_iw_log10_fO2_bar", "simulator.oxygen_buffers"
     )
     feo_iw = _buffer_function("feo_iw_log10_fO2_bar", "simulator.fe_redox")
     cco = _buffer_function("cco_log10_fO2_bar", "simulator.chemistry.graphite_c_co")
@@ -50,7 +50,7 @@ def _snapshot() -> tuple[tuple[object, ...], ...]:
         rows.extend(
             (
                 ("oneill_qfm", temperature_K, repr(oneill(temperature_K))),
-                ("legacy_iw", temperature_K, repr(legacy_iw(temperature_K))),
+                ("oneill_iw", temperature_K, repr(oneill_iw(temperature_K))),
                 ("holzheid_iw", temperature_K, repr(feo_iw(temperature_K))),
                 (
                     "holzheid_iw_a_feo_0_25",
@@ -85,7 +85,7 @@ def _snapshot() -> tuple[tuple[object, ...], ...]:
 
 EXPECTED = (
     ("oneill_qfm", 1000.0, "-16.47"),
-    ("legacy_iw", 1000.0, "-20.645"),
+    ("oneill_iw", 1000.0, "-20.79998016889021"),
     ("holzheid_iw", 1000.0, "-19.545331557951705"),
     ("holzheid_iw_a_feo_0_25", 1000.0, "-20.74945154060763"),
     ("cco_qfm_reference", 1000.0, "-16.47"),
@@ -110,7 +110,7 @@ EXPECTED = (
     ("cco_buffered_fO2", 1000.0, 10.0, "-17.476461", "3.3384048296861456e-18", "-16.47", "-1.0064610000000016"),
     ("frost_piecewise_qfm", 1000.0, 10.0, "-16.36031"),
     ("oneill_qfm", 1200.0, "-12.295"),
-    ("legacy_iw", 1200.0, "-16.109166666666667"),
+    ("oneill_iw", 1200.0, "-16.195588895900833"),
     ("holzheid_iw", 1200.0, "-15.456343740646174"),
     ("holzheid_iw_a_feo_0_25", 1200.0, "-16.6604637233021"),
     ("cco_qfm_reference", 1200.0, "-12.295"),
@@ -135,7 +135,7 @@ EXPECTED = (
     ("cco_buffered_fO2", 1200.0, 10.0, "-13.842884166666666", "1.4358723525694863e-14", "-12.295", "-1.547884166666666"),
     ("frost_piecewise_qfm", 1200.0, 10.0, "-12.177758333333331"),
     ("oneill_qfm", 1400.0, "-9.312857142857142"),
-    ("legacy_iw", 1400.0, "-12.869285714285713"),
+    ("oneill_iw", 1400.0, "-12.904789381221505"),
     ("holzheid_iw", 1400.0, "-12.556814347947418"),
     ("holzheid_iw_a_feo_0_25", 1400.0, "-13.760934330603343"),
     ("cco_qfm_reference", 1400.0, "-9.312857142857142"),
@@ -160,7 +160,7 @@ EXPECTED = (
     ("cco_buffered_fO2", 1400.0, 10.0, "-11.247472142857141", "5.656240369981254e-12", "-9.312857142857142", "-1.934614999999999"),
     ("frost_piecewise_qfm", 1400.0, 10.0, "-9.190221428571428"),
     ("oneill_qfm", 1600.0, "-7.07625"),
-    ("legacy_iw", 1600.0, "-10.439374999999998"),
+    ("oneill_iw", 1600.0, "-10.452552464570084"),
     ("holzheid_iw", 1600.0, "-10.398029648404632"),
     ("holzheid_iw_a_feo_0_25", 1600.0, "-11.602149631060557"),
     ("cco_qfm_reference", 1600.0, "-7.07625"),
@@ -185,7 +185,7 @@ EXPECTED = (
     ("cco_buffered_fO2", 1600.0, 10.0, "-9.300913125", "5.001345704302987e-10", "-7.07625", "-2.2246631249999993"),
     ("frost_piecewise_qfm", 1600.0, 10.0, "-6.94956875"),
     ("oneill_qfm", 1800.0, "-5.336666666666666"),
-    ("legacy_iw", 1800.0, "-8.549444444444443"),
+    ("oneill_iw", 1800.0, "-8.557584810297284"),
     ("holzheid_iw", 1800.0, "-8.73130231649131"),
     ("holzheid_iw_a_feo_0_25", 1800.0, "-9.935422299147234"),
     ("cco_qfm_reference", 1800.0, "-5.336666666666666"),
@@ -210,7 +210,7 @@ EXPECTED = (
     ("cco_buffered_fO2", 1800.0, 10.0, "-7.786922777777778", "1.6333423478833046e-08", "-5.336666666666666", "-2.450256111111112"),
     ("frost_piecewise_qfm", 1800.0, 10.0, "-5.20683888888889"),
     ("oneill_qfm", 2000.0, "-3.9450000000000003"),
-    ("legacy_iw", 2000.0, "-7.0375"),
+    ("oneill_iw", 2000.0, "-7.051467430197829"),
     ("holzheid_iw", 2000.0, "-7.407776961649966"),
     ("holzheid_iw_a_feo_0_25", 2000.0, "-8.611896944305892"),
     ("cco_qfm_reference", 2000.0, "-3.9450000000000003"),

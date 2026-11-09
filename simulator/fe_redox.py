@@ -15,7 +15,7 @@ from simulator.oxygen_buffers import (
     FE_FEO_BUFFER_STANDARD,
     Kress91InvalidControls,
     feo_iw_log10_fO2_bar,
-    legacy_iw_log10_fO2_bar,
+    oneill_iw_log10_fO2_bar,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -26,25 +26,13 @@ def intrinsic_melt_fO2(
     *,
     vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
+    """Return intrinsic fO2 for an oxide composition using O'Neill (1988) IW."""
     temperature = float(temperature_K)
-    if temperature <= 0.0:
-        return legacy_iw_log10_fO2_bar(
-            temperature,
-            vacuum_floor_bar=vacuum_floor_bar,
-        )
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
-    log_iw = (
-        temperature
-        if math.isnan(temperature)
-        else legacy_iw_log10_fO2_bar(
-            temperature,
-            vacuum_floor_bar=vacuum_floor_bar,
-        )
-    )
+    log_iw = oneill_iw_log10_fO2_bar(temperature)
     redox_offset = 0.0
     if feo > 0.0 and fe2o3 > 0.0:
         redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))

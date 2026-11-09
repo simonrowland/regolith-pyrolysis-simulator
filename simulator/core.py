@@ -609,7 +609,8 @@ from simulator.fe_redox import (
 )
 from simulator.oxygen_buffers import (
     feo_iw_log10_fO2_bar,
-    legacy_iw_log10_fO2_bar,
+    oneill_iw_extrapolation_notice,
+    oneill_iw_log10_fO2_bar,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -7610,67 +7611,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError('temperature_K must be finite and greater than zero')
         comp = self._melt_oxide_wt_pct()
-        # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
-        # matching the Phase 1 contract's Kress91 basalt reference.
-        # ★ THE FERRIC BRANCH BELOW IS INERT WHERE THIS IS ACTUALLY CALLED.
-        # Measured 2026-08-18 (t-655); an earlier version of this comment said
-        # the branch was live and that "intrinsic fO2 sets melt.fO2_log every
-        # tick (core.py:5398)". Both claims were FALSE, and the false one cost
-        # a full investigation, so the evidence is written out here.
-        #
-        #   * The only caller is load_batch, immediately after it sets
-        #     self.melt.temperature_C = 25.0. So T = 298.15 K, not process T.
-        #     (core.py:5398 is an OXYGEN_BUBBLER dispatch and never touched
-        #     this.) After load_batch, fO2 is a STATE VARIABLE and Kress91 is
-        #     used FORWARD by FE_REDOX_RESPECIATION -- nothing re-derives fO2
-        #     from this heuristic per tick.
-        #   * Magnitude check at the seed temperature:
-        #         log_iw = -27215/298.15 + 6.57 = -84.710
-        #     and the return floors at log10(vacuum_floor) ~ -9, so the offset
-        #     must exceed -9 - (-84.710) = +75.71 dex to change anything. Its
-        #     ceiling is 0.25*log10(100) = +0.50 dex at an absurd Fe2O3/FeO of
-        #     100. It cannot move the seed. The floor wins for every feedstock.
-        #   * Exposure is zero independently: 0 of 25 loadable feedstocks put
-        #     non-zero Fe2O3 into cleaned_melt, mars_basalt and
-        #     mars_sulfate_rich included once their required carbon is
-        #     supplied. Shipped Mars sulfate is bulk SO3 with FeSO4 deferred,
-        #     so the Stage-0 FeSO4->Fe2O3 route (foulant_thermo.yaml:199-215;
-        #     test_stage0_cation_routing.py:433-434) never fires today.
-        #
-        # The coefficient IS wrong on its own terms, and that is worth knowing
-        # before anyone revives the branch: Kress91's a = 0.196 (fe_redox.py)
-        # inverts to d(log10 fO2)/d(log10 ratio) = 1/0.196 = 5.102, so 0.25 is
-        # ~20x too weak, and it is handed a WEIGHT ratio where Kress91 takes a
-        # MOLAR one (factor 71.844/159.688 = 0.4499). Do NOT "fix" it by
-        # swapping the constant: on a ledger Fe2O3 that never equilibrated,
-        # inverting Kress91 is a category error, not a correction.
-        #
-        # Numerical proximity to Frost 1991 does not validate this IW fit over
-        # the claimed 1273-2273 K interval. Subtracting Frost's Table 1 form
-        # from this expression gives
-        #
-        #   (-27215/T + 6.57) - (-27489/T + 6.702)
-        #       = 274 K/T - 0.132 dex.
-        #
-        # T is in kelvin, so K/T is dimensionless and the difference is in
-        # log10-fugacity units. It is +0.083 dex at 1273 K and -0.011 dex at
-        # 2273 K, which explains the numerical closeness but not physical
-        # validity. Frost Table 1 limits IW to 565-1200 degC
-        # (838.15-1473.15 K), while NIST-JANAF FeO(cr,l) records the
-        # crystal-liquid transition at 1650 K. Thus the old comparison extended
-        # 800 degC beyond Frost's upper limit and crossed a phase boundary.
-        # The correct replacement outside the published window is unestablished;
-        # do not alter the coefficient without the gated SSO-R replacement.
-        # Sources: Frost 1991, doi:10.2138/rmg.1991.25.1, Table 1;
-        # NIST-JANAF FeO(cr,l), https://janaf.nist.gov/tables/Fe-020.html.
-        # Evidence: docs-private/research/2026-08-18-t655-fo2-gap/.
-        #
-        # SSO-R task #41 is the intended grounded replacement (explicit
-        # Fe3+/Fe2+ policy, Kress & Carmichael 1991, fO2 as state variable ->
-        # split) in docs-private/research/2026-06-18-staged-selectivity-
-        # optimizer/sso-r-fe-redox-design.md. That replacement is
-        # golden-affecting for sulfate feedstocks, so it is gated and
-        # re-baselined there rather than swapped in here.
+        # The load-time intrinsic fO2 diagnostic uses the shared O'Neill
+        # (1988) IW line; process-step diagnostics retain its range notice.
         return intrinsic_melt_fO2(
             comp,
             T_K,
@@ -7706,10 +7648,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
-        log_iw = legacy_iw_log10_fO2_bar(
-            T_K,
-            vacuum_floor_bar=self._oxygen_numerical_floor_bar(),
-        )
+        iw_notice = oneill_iw_extrapolation_notice(T_K)
+        log_iw = oneill_iw_log10_fO2_bar(T_K)
         base = {
             'fO2_log': float(fO2_log),
             'temperature_K': float(T_K),
@@ -7719,6 +7659,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'native_fe_threshold': 'IW',
             'reference': KRESS_CARMICHAEL_1991_REFERENCE,
             'diagnostic_only': True,
+            **({'iw_extrapolation_notice': iw_notice} if iw_notice else {}),
         }
         feot_wt = self._feot_equivalent_wt_pct(comp)
         if T_K <= 0.0 or feot_wt <= 0.0:
