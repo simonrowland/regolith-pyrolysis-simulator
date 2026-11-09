@@ -29,6 +29,15 @@ _RUN_METADATA_VALUE_HOMES = tuple(
 _RUN_METADATA_SPECIES_LOSS_HOMES = tuple(
     home for field, home in _RUN_METADATA_VALUE_HOMES if field == "species_loss_fraction"
 )
+_SAMPLE_MASS_HOMES = (
+    "experiments[].sample.mass_kg",
+    "experiments.*.sample.mass_kg",
+    "experiments[].charge.mass_kg",
+    "experiments.*.charge.mass_kg",
+    "species.*.observations[].equipment.mass_kg",
+    "species.*.observations[].equipment.sample.value.mass_kg",
+)
+_RAW_VALUE_UNSET = object()
 
 _RUN_METADATA_VALUE_SHAPES = (
     ("scalar", True),
@@ -106,10 +115,16 @@ def _run_metadata_shape_extract(
     field: str,
     home: str,
     value_shape: str,
+    *,
+    raw_value: object = _RAW_VALUE_UNSET,
 ) -> tuple[Path, dict]:
     extract = deepcopy(FIXTURE_EXTRACT)
     point = "0.0008" if field == "final_mass_kg" else "0.25"
-    leaf = _run_metadata_value_shape(value_shape, point)
+    leaf = (
+        _run_metadata_value_shape(value_shape, point)
+        if raw_value is _RAW_VALUE_UNSET
+        else raw_value
+    )
     field_value = (
         {}
         if field == "species_loss_fraction" and value_shape == "empty-species-map"
@@ -693,3 +708,163 @@ def test_empty_species_loss_mapping_is_rejected_at_every_home(
         and "{}" in issue.detail
         for issue in result.validation.issues
     ), result.validation.issues
+
+
+_RANGE_INVALID_VALUES = {
+    "mass_kg": (
+        ("zero-point", "0"),
+        ("negative-point", "-0.1"),
+        ("zero-series-value", {"kind": "series", "series": [[1, "0"]]}),
+        (
+            "zero-interval-endpoint",
+            {"kind": "interval", "interval_low": "0", "interval_high": "1"},
+        ),
+    ),
+    "final_mass_kg": (
+        ("negative-point", "-0.1"),
+        ("negative-series-value", {"kind": "series", "series": [[1, "-0.1"]]}),
+        (
+            "negative-interval-endpoint",
+            {"kind": "interval", "interval_low": "-0.1", "interval_high": "0.5"},
+        ),
+    ),
+    "species_loss_fraction": (
+        ("negative-point", "-0.1"),
+        ("above-one-point", "1.1"),
+        ("negative-series-value", {"kind": "series", "series": [[1, "-0.1"]]}),
+        ("above-one-series-value", {"kind": "series", "series": [[1, "1.1"]]}),
+        (
+            "negative-interval-endpoint",
+            {"kind": "interval", "interval_low": "-0.1", "interval_high": "0.5"},
+        ),
+        (
+            "above-one-interval-endpoint",
+            {"kind": "interval", "interval_low": "0.5", "interval_high": "1.1"},
+        ),
+    ),
+}
+
+_RANGE_HOMES = tuple(("mass_kg", home) for home in _SAMPLE_MASS_HOMES) + tuple(
+    (field, home)
+    for field in ("final_mass_kg", "species_loss_fraction")
+    for home in RUN_METADATA_FIELD_HOMES[field][1]
+)
+_OUT_OF_RANGE_CASES = tuple(
+    (field, home, label, raw_value)
+    for field, home in _RANGE_HOMES
+    for label, raw_value in _RANGE_INVALID_VALUES[field]
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "case", "raw_value"),
+    _OUT_OF_RANGE_CASES,
+    ids=[f"{field}-{home}-{case}" for field, home, case, _ in _OUT_OF_RANGE_CASES],
+)
+def test_out_of_range_sample_values_are_typed_at_every_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    case: str,
+    raw_value: object,
+) -> None:
+    del case
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, field, home, "scalar", raw_value=raw_value
+    )
+
+    errors = validate_extract_document(extract)
+    assert any(
+        _run_metadata_shape_home_path(home) in error
+        and "[run-metadata-shape]" in error
+        for error in errors
+    ), errors
+
+    result = migrate(root, write=False)
+    assert result.validation is not None
+    issue_suffix = (
+        f"sample.{field}[Na]"
+        if field == "species_loss_fraction"
+        else f"sample.{field}"
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(issue_suffix)
+        for issue in result.validation.issues
+    ), result.validation.issues
+
+
+_RANGE_BOUNDARIES = tuple(
+    ("mass_kg", home, "1") for home in _SAMPLE_MASS_HOMES
+) + tuple(
+    ("final_mass_kg", home, "0")
+    for home in RUN_METADATA_FIELD_HOMES["final_mass_kg"][1]
+) + tuple(
+    ("species_loss_fraction", home, value)
+    for home in _RUN_METADATA_SPECIES_LOSS_HOMES
+    for value in ("0", "1")
+)
+
+
+@pytest.mark.parametrize(
+    ("field", "home", "value"),
+    _RANGE_BOUNDARIES,
+    ids=[f"{field}-{home}-{value}" for field, home, value in _RANGE_BOUNDARIES],
+)
+def test_physical_range_boundaries_are_accepted_at_every_home(
+    tmp_path: Path,
+    field: str,
+    home: str,
+    value: str,
+) -> None:
+    root, extract = _run_metadata_shape_extract(
+        tmp_path, field, home, "scalar", raw_value=value
+    )
+
+    assert validate_extract_document(extract) == []
+    migrate(root, write=True)
+    _works, experiments, _observations = load_migrated_store(root)
+    sample = experiments["10.1234/fixture::experiment::run-1"].sample
+    if field == "species_loss_fraction":
+        assert sample.species_loss_fraction is not None
+        located = sample.species_loss_fraction["Na"]
+    else:
+        located = getattr(sample, field)
+    assert located is not None and located.state.is_value
+    assert located.state.value == Value.point_of(value)
+
+
+def test_record_validation_rejects_out_of_range_sample_values(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.validate import validate_corpus
+
+    root = _extract_with_experiments(
+        tmp_path,
+        [{"experiment_id": "run-1", "sample": {}}],
+    )
+    result = migrate(root, write=False)
+    experiment_id = "10.1234/fixture::experiment::run-1"
+    experiment = result.experiments[experiment_id]
+    invalid_sample = replace(
+        experiment.sample,
+        mass_kg=_located_point("0", table="1", page=2),
+        final_mass_kg=_located_point("-0.1", table="1", page=2),
+        species_loss_fraction={"Na": _located_point("1.1", table="2", page=3)},
+    )
+    invalid_experiment = replace(experiment, sample=invalid_sample)
+    experiments = dict(result.experiments)
+    experiments[experiment_id] = invalid_experiment
+
+    report = validate_corpus(result.works, experiments, result.observations)
+
+    for suffix in (
+        "sample.mass_kg",
+        "sample.final_mass_kg",
+        "sample.species_loss_fraction[Na]",
+    ):
+        assert any(
+            issue.reason is RefusalReason.INVALID_SOURCE
+            and issue.path.endswith(suffix)
+            for issue in report.issues
+        ), report.issues
