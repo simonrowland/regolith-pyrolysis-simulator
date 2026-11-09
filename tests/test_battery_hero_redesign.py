@@ -1386,6 +1386,7 @@ def test_interactive_empty_error_and_fingerprint_plots_skip_axes() -> None:
     cases = json.loads(result.stdout)
     assert len(cases) == 2
     for case in cases:
+        assert case["sizeCalls"] == 0
         assert case["strokes"] == 0
         assert case["frames"] == 0
         assert case["labels"] == []
