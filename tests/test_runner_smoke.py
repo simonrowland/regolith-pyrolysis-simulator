@@ -1520,7 +1520,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.9.0"
+    assert RUNNER_SCHEMA_VERSION == "1.10.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
@@ -1640,8 +1640,22 @@ def _assert_schema_shape(payload: dict) -> None:
     assert source_report[
         "authoritative_for_requested_vapor_pressure"
     ] in {True, False, None}
-    for species, source in source_report["species"].items():
+    for species, entry in source_report["species"].items():
         assert isinstance(species, str)
+        assert set(entry) in ({"source"}, {"source", "activity_source"})
+        source = entry["source"]
+        if "activity_source" in entry:
+            activity_source = entry["activity_source"]
+            assert set(activity_source) == {"rung", "source", "x", "reason"}
+            assert activity_source["rung"] in {
+                "published_gamma",
+                "ideal_mixing",
+            }
+            assert isinstance(activity_source["source"], str)
+            assert isinstance(activity_source["x"], (int, float))
+            assert activity_source["reason"] == (
+                "alphaMELTS supplied no oxide-component activity"
+            )
         # Per-species sources carry a colon-suffixed evidence detail after the
         # SC-05 label-honesty fix (e.g. "builtin_authoritative:standard_reaction_term",
         # "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit",
@@ -1728,6 +1742,14 @@ def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
             "SiO": "builtin_authoritative:standard_reaction_term",
         },
         _last_backend_diagnostics={
+            "activity_source_by_species": {
+                "Na": {
+                    "rung": "published_gamma",
+                    "source": "Sossi & Fegley 2018 Table 2",
+                    "x": 0.25,
+                    "reason": "alphaMELTS supplied no oxide-component activity",
+                },
+            },
             "vapor_pressure_backend_status": "fallback",
             "vapor_pressure_backend_status_reason": (
                 "vaporock_to_antoine_fallback"
@@ -1750,6 +1772,18 @@ def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
             "count": 1,
             "percentage": 50.0,
         },
+    }
+    assert report["species"] == {
+        "Na": {
+            "source": "builtin_authoritative:legacy_pure_component_estimate",
+            "activity_source": {
+                "rung": "published_gamma",
+                "source": "Sossi & Fegley 2018 Table 2",
+                "x": 0.25,
+                "reason": "alphaMELTS supplied no oxide-component activity",
+            },
+        },
+        "SiO": {"source": "builtin_authoritative:standard_reaction_term"},
     }
     assert report["vapor_pressure_backend_status"] == "fallback"
     assert report["vapor_pressure_backend_status_summary"] == {
