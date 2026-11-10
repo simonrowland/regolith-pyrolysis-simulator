@@ -10928,7 +10928,9 @@ families:
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
-              allow_henrian_upper_bound: true
+              # d-359 E: use the interim activity ladder so hot-train P
+              # carriers resolve as numeric, flagged, debiting estimates.
+              allow_henrian_upper_bound: false
               henrian_gamma_upper_envelope: 1.0e-06
               gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10
                 in CMFS melts at 1823-1923 K
@@ -11141,7 +11143,9 @@ families:
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
-              allow_henrian_upper_bound: true
+              # d-359 E: use the interim activity ladder so hot-train P
+              # carriers resolve as numeric, flagged, debiting estimates.
+              allow_henrian_upper_bound: false
               henrian_gamma_upper_envelope: 1.0e-06
               gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10
                 in CMFS melts at 1823-1923 K
@@ -11346,7 +11350,9 @@ families:
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
-              allow_henrian_upper_bound: true
+              # d-359 E: use the interim activity ladder so hot-train P
+              # carriers resolve as numeric, flagged, debiting estimates.
+              allow_henrian_upper_bound: false
               henrian_gamma_upper_envelope: 1.0e-06
               gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10
                 in CMFS melts at 1823-1923 K
@@ -11535,7 +11541,9 @@ families:
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
-              allow_henrian_upper_bound: true
+              # d-359 E: use the interim activity ladder so hot-train P
+              # carriers resolve as numeric, flagged, debiting estimates.
+              allow_henrian_upper_bound: false
               henrian_gamma_upper_envelope: 1.0e-06
               gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10
                 in CMFS melts at 1823-1923 K

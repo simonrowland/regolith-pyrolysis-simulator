@@ -1834,11 +1834,10 @@ def refusal_closure(
                     rule.species_id in _D354_UNPROVENANCED_ACTIVITY_SPECIES
                     and reported_activity is None
                 ):
-                    return _make_refusal(
-                        rule,
-                        ActivityRefusalCode.MISSING_EVIDENCE.value,
-                        f"{rule.parent_oxide or rule.species_id} activity is "
-                        "unavailable; no numeric value was supplied",
+                    activity_d359_original_reason = (
+                        f"missing_evidence: {rule.parent_oxide or rule.species_id} "
+                        "activity is unavailable; no numeric value was supplied; "
+                        "using the d-359 activity ladder"
                     )
                 else:
                     return _make_refusal(
@@ -2003,6 +2002,49 @@ def refusal_closure(
                         "source-reaction activity verdict carried no numeric value",
                         source_reaction_activity=source_reaction_activity,
                     )
+                if (
+                    requires_vapor_standard_conversion
+                    and crystalline_vapor_activity_value is None
+                    and source_reaction_activity.provider
+                    in {"published_gamma", "ideal_mixing"}
+                ):
+                    # The d-359 ladder answers in the declared source standard
+                    # state. Convert that estimate through the same existing
+                    # crystalline-K authority used for provider activities.
+                    (
+                        converted_activity,
+                        conversion_notice,
+                        _warning,
+                    ) = _activity_for_crystalline_vapor_k(
+                        str(rule.parent_oxide or ""),
+                        numeric_activity,
+                        state.temperature_K,
+                        source_standard_state_id=(
+                            expected_source_standard_state_id
+                        ),
+                        target_standard_state_id=(
+                            expected_target_standard_state_id
+                        ),
+                        source_standard_state_phase=(
+                            expected_source_standard_state_phase
+                        ),
+                        target_standard_state_phase=(
+                            expected_target_standard_state_phase
+                        ),
+                    )
+                    if (
+                        conversion_notice.get("conversion_performed") is True
+                        or conversion_notice.get("authority_level") == "identity"
+                    ):
+                        crystalline_vapor_activity_value = converted_activity
+                        activity_conversion_notice = conversion_notice
+                    else:
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_CHANNEL_CONTRACT,
+                            "crystalline vapor K has a documented source phase "
+                            "but no registered standard-state conversion",
+                        )
                 source_activity = numeric_activity
                 if crystalline_vapor_activity_value is not None:
                     # Preserve the liquid value in the activity handshake;
@@ -2568,11 +2610,17 @@ def refusal_closure(
                         "provider-reported activity is retained with its "
                         "missing or limited evidence"
                     )
-                if rule.species_id == "SiO":
+                if rule.species_id == "SiO" and rung == "provider activity":
                     original_reason = (
                         "missing_evidence: provider SiO activity is present "
                         "but its evidence link is missing "
                         f"(value={source_reaction_activity.value:.3g})"
+                    )
+                elif rule.species_id == "SiO":
+                    original_reason = (
+                        activity_d359_original_reason
+                        or source_reaction_activity.reason
+                        or "missing_evidence: SiO activity evidence is missing"
                     )
                 else:
                     original_reason = activity_d359_original_reason or (
