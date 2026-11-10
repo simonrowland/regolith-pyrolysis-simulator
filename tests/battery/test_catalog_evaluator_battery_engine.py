@@ -20,12 +20,73 @@ from simulator.battery.migrate import REPO_ROOT, load_yaml
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
     ScoreContext,
+    _catalog_score_rows,
+    _catalog_source_terms,
     compile_residual,
     headline_rows,
     predict_with_engine,
 )
 from simulator.vapour_rail.catalog import compiled_catalog_for
 from tests.battery import factories as F
+
+
+_CATALOG_REACTION_TERM_GOLDEN = (
+    ("Na", "Na=1, NaO0.5=-1, O2=1/4"),
+    ("K", "K=1, KO0.5=-1, O2=1/4"),
+    ("Mg", "Mg=1, MgO=-1, O2=1/2"),
+    ("Ca", "Ca=1, CaO=-1, O2=1/2"),
+    ("Al", "Al=1, AlO1.5=-1, O2=3/4"),
+    ("Si", "O2=1, Si=1, SiO2=-1"),
+    ("Ti", "O2=1, Ti=1, TiO2=-1"),
+    ("Cr", "Cr=1, CrO1.5=-1, O2=3/4"),
+    ("Mn", "Mn=1, MnO=-1, O2=1/2"),
+    ("TiO", "O2=1/2, TiO=1, TiO2=-1"),
+    ("AlO", "AlO=1, AlO1.5=-1, O2=1/4"),
+    ("Al2O", "Al2O=1, AlO1.5=-2, O2=1"),
+    ("Al2", "Al2=1, AlO1.5=-2, O2=3/2"),
+    ("Al2O2", "Al2O2=1, AlO1.5=-2, O2=1/2"),
+    ("Al2O3_gas", "Al2O3=1, AlO1.5=-2"),
+    ("AlO2", "AlO1.5=-1, AlO2=1, O2=-1/4"),
+    ("Ca2", "Ca2=1, CaO=-2, O2=1"),
+    ("CrO", "CrO=1, CrO1.5=-1, O2=1/4"),
+    ("SiO", "O2=1/2, SiO=1, SiO2=-1"),
+    ("CrO2", "CrO1.5=-1, CrO2=1, O2=-1/4"),
+    ("CrO3", "CrO1.5=-1, CrO3=1, O2=-3/4"),
+    ("PO", "O2=3/2, P2O5=-1, PO=2"),
+    ("PO2", "O2=1/2, P2O5=-1, PO2=2"),
+    ("P4O6", "O2=2, P2O5=-2, P4O6=1"),
+    ("P4O10", "P2O5=-2, P4O10=1"),
+    ("P2", "O2=5/2, P2=1, P2O5=-1"),
+    ("P4", "O2=5, P2O5=-2, P4=1"),
+    ("K2", "K2=1, K2O=-1, O2=1/2"),
+    ("Mg2", "Mg2=1, MgO=-2, O2=1"),
+    ("Na2", "Na2=1, Na2O=-1, O2=1/2"),
+    ("Si2", "O2=2, Si2=1, SiO2=-2"),
+    ("Si3", "O2=3, Si3=1, SiO2=-3"),
+)
+
+
+def test_catalog_reaction_terms_match_reviewed_row_goldens() -> None:
+    rows, error = _catalog_score_rows()
+    assert error is None
+    actual = []
+    for row in rows:
+        reaction = row.source_reaction
+        if (
+            reaction is None
+            or reaction.get("activity_input") is None
+            or row.species.evaluator is None
+        ):
+            continue
+        terms = _catalog_source_terms(reaction)
+        if terms is None:
+            continue
+        encoded = ", ".join(
+            f"{formula}={coefficient}"
+            for formula, coefficient in sorted(terms.items())
+        )
+        actual.append((row.species_id, encoded))
+    assert tuple(actual) == _CATALOG_REACTION_TERM_GOLDEN
 
 
 def _catalog_pressure(formula: str, temperature_K: Decimal):
