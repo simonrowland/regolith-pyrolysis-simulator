@@ -332,5 +332,6 @@ def test_default_classification_values_preserve_controlled_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # Re-pinned after d-364 kept the O₂ ledger total and attached its notice.
-    assert digest == "5f14d5d1e78a20bffb23494ad099aa53d8b7bc42a10ca7a5f70706d892c5116c"
+    # Re-pinned after d-367 routed the interim B/C/E estimates through the
+    # vapour rail while preserving numeric class totals.
+    assert digest == "c58ff8ebb8dcfbb9da4d662c2487f0284610553dd9b8fc3613091e47efd3222f"
