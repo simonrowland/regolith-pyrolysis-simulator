@@ -128,6 +128,14 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         assert "WITHOUT ROWID" in schema.upper()
 
 
+def test_engine_cache_key_preserves_exact_float_values() -> None:
+    assert engine_cache_key(
+        "openimcc", 1, {"temperature_K": 1700.0}
+    ) != engine_cache_key(
+        "openimcc", 1, {"temperature_K": 1700.0000000000002}
+    )
+
+
 def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
