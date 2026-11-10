@@ -91,6 +91,7 @@ C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
+C4_MAX_HOLD_NO_SIGNAL_REFUSAL_REASON = 'c4_max_hold_no_signal'
 
 
 class C0ForecastAdjustmentNotice(TypedDict):
@@ -2594,7 +2595,8 @@ class CampaignManager:
           hold, else max_hold
         - C3_K / C3_NA: path-dependent duration
         - C4: in-window armed species kg/hr below configured threshold
-          after min window hours, else max_hold or a typed window refusal
+          after min window hours; max_hold after signal arming, else a typed
+          refusal when depletion evidence is absent or the window is lost
         - C5: ladder complete, or armed current below configured
           threshold_A for consecutive_hours on the final rung, else
           max_hold
@@ -3126,7 +3128,7 @@ class CampaignManager:
                     }
                     return True
             if current_in_window and completed_window_hr >= max_hold_hr:
-                self.last_c4_termination = {
+                termination = {
                     'outcome': (
                         'max_hold_signal_not_depleted'
                         if signal_armed
@@ -3138,6 +3140,16 @@ class CampaignManager:
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,
                 }
+                self.last_c4_termination = termination
+                if not signal_armed:
+                    # A max-hold timeout without an authorized high sample is
+                    # not evidence that the target species was depleted.
+                    raise CampaignC4EndpointRefusal({
+                        'reason_refused': (
+                            C4_MAX_HOLD_NO_SIGNAL_REFUSAL_REASON
+                        ),
+                        **termination,
+                    })
                 return True
 
             if process_elapsed_hr >= process_limit_hr:

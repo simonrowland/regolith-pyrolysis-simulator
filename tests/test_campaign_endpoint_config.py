@@ -548,19 +548,23 @@ def test_c4_acquired_high_rate_arms_without_ending() -> None:
     ) is False
 
 
-def test_c4_max_hold_without_signal_has_distinct_outcome() -> None:
+def test_c4_max_hold_without_signal_is_a_typed_refusal() -> None:
     manager = CampaignManager(_setpoints())
     record = BatchRecord(snapshots=[
         _c4_snapshot(temperature_C=1580.0, mg_rate=0.0)
         for _ in range(19)
     ])
 
-    assert manager.check_endpoint(
-        _melt(CampaignPhase.C4, 19, temperature_C=1580.0),
-        _flux(Mg=0.0),
-        CondensationTrain(),
-        record,
-    ) is True
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 19, temperature_C=1580.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            record,
+        )
+
+    assert refusal.value.reason == "c4_max_hold_no_signal"
+    assert refusal.value.diagnostic["outcome"] == "max_hold_no_signal"
     assert manager.last_c4_termination == {
         "outcome": "max_hold_no_signal",
         "species": "Mg",
