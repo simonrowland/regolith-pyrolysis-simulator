@@ -74,9 +74,10 @@ def test_counter_table_is_printed_on_success_and_failure(
         if line.startswith("engine_cache_counters run=")
     ]
     assert len(success_lines) == 6
+    engine_id = SCORE_ENGINE_SET[0].value
     assert any(
         "engine_cache_counters run=parallel-warm" in line
-        and "openimcc:hits=1,misses=0,stores=0,calls_by_kind={}" in line
+        and f"{engine_id}:hits=1,misses=0,stores=0,calls_by_kind={{}}" in line
         for line in success_lines
     )
 
