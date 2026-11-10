@@ -3221,10 +3221,14 @@ class CondensationModel:
                 'stage_alpha_records_by_stage': {},
             }
 
+        # Dimers with no collection-product contract cannot use a flowing
+        # partial they were not given. That missing input belongs to the
+        # carrier: refusing it later must not abort every other species.
         missing_partial_species = sorted(
             species for species, rate in evap_flux.species_kg_hr.items()
             if rate > 0.0 and species in stage_route_by_species
             and species not in self.wall_species_partial_pressures_pa
+            and species not in MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES
         )
         if missing_partial_species:
             raise ValueError(

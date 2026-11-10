@@ -93,3 +93,42 @@ def test_positive_dimer_mass_refuses_collection_and_keeps_vapor():
             "uncollected_vapor_missing_collection_product_contract"
         )
         assert route.retained_in_source_by_species.get(species, 0.0) == 0.0
+
+
+def test_missing_dimer_partial_pressure_refuses_that_quantity_only():
+    """A positive dimer with no supplied partial pressure must not abort the train.
+
+    The unavailable pressure is that carrier's input. Na, which has a
+    partial pressure and a collection stage, still routes.
+    """
+
+    species_kg = {species: 1.0 for species in DIMER_CARRIERS}
+    species_kg["Na"] = 1.0
+    route = _model(partials={"Na": 0.1}).route(
+        EvaporationFlux(
+            species_kg_hr=species_kg,
+            total_kg_hr=float(len(species_kg)),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+    na_only = _model(partials={"Na": 0.1}).route(
+        EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    assert _deposited_kg(route, "Na") == pytest.approx(_deposited_kg(na_only, "Na"))
+    assert _deposited_kg(route, "Na") > 0.0
+
+    for species in DIMER_CARRIERS:
+        assert _deposited_kg(route, species) == 0.0
+        assert route.remaining_by_species[species] == pytest.approx(1.0)
+        refusal = route.condensation_refusals_by_species[species]
+        assert refusal["reason"] == CONTRACT_REASON
+        assert refusal["status"] == "refused"
+        assert refusal["collection_product_kg_hr"] is None
+        assert any(
+            item.get("parameter") == "flowing_pressure_pa"
+            and item.get("status") == "refused"
+            for item in refusal.get("stage_outcomes", ())
+        )
+        assert route.retained_in_source_by_species.get(species, 0.0) == 0.0
