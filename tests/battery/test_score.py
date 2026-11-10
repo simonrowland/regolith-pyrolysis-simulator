@@ -205,6 +205,40 @@ def _context(work=None, experiment=None, *observations, review=None) -> ScoreCon
     )
 
 
+def _assert_score_store_matches_compile_jsonl(
+    context: ScoreContext,
+    reference: Observation,
+    *,
+    engines: tuple[Engine, ...],
+    predict=None,
+) -> dict[Engine, tuple[Residual, Observation | None]]:
+    compiled_rows = {}
+    for engine in engines:
+        scored, candidates = score_store(
+            context,
+            engines=(engine,),
+            include_diagnostics=False,
+            predict=predict,
+        )
+        assert len(scored) == 1
+        scored_residual = scored[0]
+        scored_candidate = candidates.get(scored_residual.candidate or "")
+        compiled_residual, compiled_candidate = compile_residual(
+            reference,
+            engine,
+            context=context,
+            comparison_ids={reference.observation_id},
+            predict=predict,
+        )
+        assert dumps_residual_line(
+            scored_residual, scored_candidate
+        ).encode("utf-8") == dumps_residual_line(
+            compiled_residual, compiled_candidate
+        ).encode("utf-8"), engine.value
+        compiled_rows[engine] = (compiled_residual, compiled_candidate)
+    return compiled_rows
+
+
 def _with_activity_reference_polymorph(
     identity: Identity, polymorph: str | None
 ) -> Identity:
@@ -2609,7 +2643,9 @@ def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
 
 
 
-def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
+def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     exp = F.kems_experiment()
     identity = replace(
         F.activity_identity(formula="NaO0.5"),
@@ -2663,12 +2699,13 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
             coefficient_basis=SINGLE_CATION_COEFFICIENT_BASIS,
         )
 
-    residual, candidate = compile_residual(
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
+        ctx,
         reference,
-        Engine.INTERNAL_ANALYTICAL,
-        context=ctx,
+        engines=SCORE_ENGINE_SET,
         predict=predict,
     )
+    residual, candidate = compiled_rows[Engine.INTERNAL_ANALYTICAL]
     assert candidate is not None
     assert residual.numeric is not None
     assert residual.numeric.verdict == "consistent"
@@ -2702,6 +2739,60 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
     assert outside_band_residual.numeric.verdict == "outside_literature_band"
     assert outside_band_residual.numeric.value == Decimal("-2")
     assert outside_band_residual.status is ResidualStatus.NO_BAND
+
+    memo_reference_quantities = []
+    prediction_request_quantities = []
+    lineage_checks = []
+    relation_checks = []
+
+    def cached_lineage(_resolver, cached_reference, _engine):
+        memo_reference_quantities.append(quantity_token(cached_reference.identity))
+        return True, SourceRelation.SAME_INPUT
+
+    def unsupported_rewritten_request(engine, observation, **_kwargs):
+        prediction_request_quantities.append(quantity_token(observation.identity))
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=("rewritten-request-source",),
+            lineage_complete=False,
+            identity=observation.identity,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.ACTIVITY_COEFFICIENT.value,
+            },
+        )
+
+    def lineage_complete(sources, **_kwargs):
+        lineage_checks.append(tuple(sources))
+        return False
+
+    def resolve_relation(_reference, sources, _complete, **_kwargs):
+        relation_checks.append(tuple(sources))
+        return SourceRelation.UNKNOWN
+
+    monkeypatch.setattr(
+        score_mod._ScoringLineageResolver, "for_reference", cached_lineage
+    )
+    monkeypatch.setattr(
+        score_mod, "_score_predict_with_engine", unsupported_rewritten_request
+    )
+    monkeypatch.setattr(score_mod, "lineage_complete_for", lineage_complete)
+    monkeypatch.setattr(score_mod, "resolve_source_relation", resolve_relation)
+    rewritten_residuals, _ = score_store(
+        ctx,
+        engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
+    )
+
+    assert memo_reference_quantities == [Quantity.EVAPORATION_COEFFICIENT_ALPHA]
+    assert prediction_request_quantities == [Quantity.ACTIVITY_COEFFICIENT]
+    assert ("rewritten-request-source",) in lineage_checks
+    assert relation_checks == [("rewritten-request-source",)]
+    assert len(rewritten_residuals) == 1
+    assert rewritten_residuals[0].source_relation is SourceRelation.UNKNOWN
 
 
 @pytest.mark.parametrize("reported_basis", ["parent_oxide", None])
@@ -12875,7 +12966,7 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     assert summary["static_refusals"] == expected_static
 
 
-def test_static_quantity_refusal_skips_compile_with_identical_residual(
+def test_static_thermo_refusal_matches_compile_on_all_score_engines(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     experiment = F.tabulation_experiment()
@@ -12888,12 +12979,6 @@ def test_static_quantity_refusal_skips_compile_with_identical_residual(
         evidence=EvidenceClass.MODEL_DERIVED,
     )
     context = _context(F.work(), experiment, reference)
-    expected, _ = compile_residual(
-        reference,
-        Engine.ALPHAMELTS,
-        context=context,
-        comparison_ids={reference.observation_id},
-    )
     monkeypatch.setattr(
         score_mod,
         "comparison_candidates",
@@ -12904,21 +12989,15 @@ def test_static_quantity_refusal_skips_compile_with_identical_residual(
         score_mod, "_refusal_diagnostic_references", lambda _context: ()
     )
 
-    def unexpected_compile(*_args, **_kwargs):
-        raise AssertionError("static quantity refusal reached compile_residual")
-
-    monkeypatch.setattr(
-        score_mod, "_compile_residual_with_lineage", unexpected_compile
-    )
-    residuals, candidates = score_store(
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
         context,
-        engines=(Engine.ALPHAMELTS,),
-        include_diagnostics=False,
+        reference,
+        engines=SCORE_ENGINE_SET,
     )
-
-    assert candidates == {}
-    assert len(residuals) == 1
-    assert dumps_residual_line(residuals[0]) == dumps_residual_line(expected)
+    assert all(
+        residual.status is ResidualStatus.REFUSED
+        for residual, _candidate in compiled_rows.values()
+    )
 
 
 def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
