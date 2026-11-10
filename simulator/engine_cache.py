@@ -78,6 +78,18 @@ def engine_cache_counters(*, reset: bool = False) -> dict[str, dict[str, int]]:
         return snapshot
 
 
+def _record_engine_cache_counters(
+    counters: Mapping[str, Mapping[str, int]],
+) -> None:
+    with _LOCK:
+        for engine, values in counters.items():
+            target = _COUNTERS.setdefault(
+                engine, {"hits": 0, "misses": 0, "stores": 0}
+            )
+            for name in target:
+                target[name] += int(values.get(name, 0))
+
+
 def cached_engine_call(
     engine_id: str,
     request: Any,
