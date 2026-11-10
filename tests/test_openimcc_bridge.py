@@ -1359,3 +1359,38 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
 
     assert result.pack_model_id == expected_pack.model_id
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
+
+
+def test_redox_result_keeps_its_type_across_cache_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from simulator import engine_cache
+    from simulator.melt_backend.openimcc_bridge import evaluate_redox
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "redox-cache.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    original = openimcc.evaluate_redox
+    expected = original({"Fe": 1.0, "O": 1.0}, 1700.0, "closed")
+    calls = 0
+
+    def counted(inventory, temperature_K, mode, *, lambda_imposed=None):
+        nonlocal calls
+        calls += 1
+        return expected
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", counted)
+    request = {"Fe": 1.0, "O": 1.0}
+    cold = evaluate_redox(request, 1700.0, "closed")
+    warm = evaluate_redox(request, 1700.0, "closed")
+
+    assert type(cold) is type(expected)
+    assert type(warm) is type(expected)
+    assert warm == expected
+    assert calls == 1
+    assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+    }
