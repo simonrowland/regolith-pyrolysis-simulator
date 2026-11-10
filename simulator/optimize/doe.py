@@ -27,6 +27,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     c5_sampler_context,
     _default_setpoint_value,
+    knob_search_high,
     knob_search_low,
 )
 from simulator.optimize.canonical import canonical_json_dumps
@@ -679,7 +680,7 @@ def _conditional_mapper(
     def mapper(spec: Any, unit_value: float) -> Any:
         if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
             return _map_numeric_unit_value(
-                spec, unit_value, positive_floor, float(spec.high)
+                spec, unit_value, positive_floor, float(knob_search_high(spec))
             )
         return base_mapper(spec, unit_value)
 
@@ -1234,10 +1235,11 @@ def _anchored_numeric_interval(
 
 def _numeric_bounds(spec: Any) -> tuple[float, float]:
     low_bound = knob_search_low(spec)
-    if low_bound is None or spec.high is None:
+    high_bound = knob_search_high(spec)
+    if low_bound is None or high_bound is None:
         raise ValueError(f"{'.'.join(spec.path)} numeric knob lacks bounds")
     low = float(low_bound)
-    high = float(spec.high)
+    high = float(high_bound)
     if not math.isfinite(low) or not math.isfinite(high) or low >= high:
         raise ValueError(f"{'.'.join(spec.path)} has invalid numeric bounds")
     return low, high

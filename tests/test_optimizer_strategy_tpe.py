@@ -42,6 +42,8 @@ from simulator.optimize.recipe import (
     RecipeValidationError,
     _default_setpoint_value,
     _validate_numeric_bounds,
+    knob_search_high,
+    knob_search_low,
 )
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
@@ -357,10 +359,12 @@ def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
         assert all(not schema.is_forbidden(path) for path in candidate.patch.values)
         for spec in schema.search_allowlist:
             value = candidate.patch.values[spec.path]
-            if spec.low is not None:
-                assert float(value) >= float(spec.low)
-            if spec.high is not None:
-                assert float(value) <= float(spec.high)
+            low = knob_search_low(spec)
+            high = knob_search_high(spec)
+            if low is not None:
+                assert float(value) >= float(low)
+            if high is not None:
+                assert float(value) <= float(high)
 
 
 def test_tpe_ask_batch_after_startup_does_not_duplicate_parameters() -> None:

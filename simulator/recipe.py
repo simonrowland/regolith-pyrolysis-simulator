@@ -411,9 +411,10 @@ class KnobSpec:
     kind: Literal["float", "int", "categorical"]
     low: float | None = None
     high: float | None = None
-    # Optimizer sampling interval when it is wider or narrower than admission.
-    # None means the search interval is ``low``.
+    # Optimizer sampling interval when it differs from admission.
+    # None means that search edge is the admission edge.
     search_low: float | None = None
+    search_high: float | None = None
     choices: tuple[str, ...] | None = None
     units: str = ""
     bounds_source: str = ""
@@ -429,6 +430,13 @@ def knob_search_low(spec: KnobSpec) -> float | None:
     if spec.search_low is not None:
         return spec.search_low
     return spec.low
+
+
+def knob_search_high(spec: KnobSpec) -> float | None:
+    """Upper edge the optimizer samples. Admission uses ``spec.high``."""
+    if spec.search_high is not None:
+        return spec.search_high
+    return spec.high
 
 
 def _knob(
@@ -2085,17 +2093,23 @@ def _setpoint_sourced_allowlist(
             low = spec._bound_types[0](low)
             high = spec._bound_types[1](high)
         search_low = spec.search_low
+        search_high = spec.search_high
         if spec.bounds_source in _C2A_TOTAL_PRESSURE_SETPOINT_SOURCES:
-            # Keep the setpoints band as the search envelope. Admission is
-            # physical: finite and >= 0, including a hard-vacuum crown total.
+            # The setpoints [5, 15] mbar band is the optimizer search
+            # envelope (engineering margin). Admission is physical: finite
+            # and >= 0, with no engineering ceiling. A staged po2_hold total
+            # of 20 mbar is admissible; sampling stays inside the YAML band.
             search_low = low
+            search_high = high
             low = 0.0
+            high = None
         resolved.append(
             replace(
                 spec,
                 low=low,
                 high=high,
                 search_low=search_low,
+                search_high=search_high,
                 bounds_source=bounds_source,
             )
         )
@@ -2149,6 +2163,8 @@ def _bounds_identity_entry(spec: KnobSpec) -> dict[str, Any]:
         entry["high"] = _bounds_identity_float(spec.high)
     if spec.search_low is not None:
         entry["search_low"] = _bounds_identity_float(spec.search_low)
+    if spec.search_high is not None:
+        entry["search_high"] = _bounds_identity_float(spec.search_high)
     if spec.choices is not None:
         entry["choices"] = [str(choice) for choice in spec.choices]
     step = getattr(spec, "step", None)

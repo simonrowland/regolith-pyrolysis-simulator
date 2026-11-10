@@ -42,7 +42,7 @@ from simulator.evaporation import (
     viscous_p_bulk_out_of_domain_diagnostic,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import MOLAR_MASS, CampaignPhase
+from simulator.state import CampaignPhase
 from simulator.transport_regime import (
     _ELECTROLYSIS_CAMPAIGNS,
     _IDLE_CAMPAIGNS,
@@ -74,6 +74,17 @@ _MELT_RAW_KG_HR = 1.0e6
 # Independent of _series: C2A Na continuation at the transitional point above.
 _NA_CONTINUATION_KG_S_M2 = 0.007424038156428245
 _CERTIFIED_BAND_MBAR = (5.0, 15.0)
+# Frozen native-Fe pool-first split at the transitional fixture above
+# (pool 1e-6 mol, area 0.2 m^2, Fe alpha 0.02). Not recomputed from the
+# series-resistance calculator or from the diagnostic's own operands.
+# Green refused this point, so capacity, vapor, residual and the residual-
+# limited melt rate were 0 and the tap kept the whole pool.
+_FE_CONTINUATION_CAPACITY_KG_HR = 0.15496798052986593
+_FE_CONTINUATION_CAPACITY_MOL_HR = 2.774966076280167
+_FE_CONTINUATION_VAPOR_MOL = 1.0e-6
+_FE_CONTINUATION_TAP_MOL = 0.0
+_FE_CONTINUATION_RESIDUAL_MOL_HR = 2.774965076280167
+_FE_CONTINUATION_MELT_KG_HR = 0.15496792468486592
 
 
 def _molar_mass_kg_mol(species: str) -> float:
@@ -218,7 +229,8 @@ def _fe_molar_mass_kg_mol(sim: PyrolysisSimulator) -> float:
     return float(sim.vapor_pressures["metals"]["Fe"]["molar_mass_g_mol"]) / 1000.0
 
 
-def _independent_native_series(sim: PyrolysisSimulator, part: dict, *, extrapolate: bool):
+def _in_band_native_series(sim: PyrolysisSimulator, part: dict):
+    """In-band cross-check only. Transitional magnitudes are frozen literals."""
     series = part["series_resistance"]
     return _series_resistance_evaporation_flux_kg_m2_s(
         species="Fe",
@@ -236,7 +248,7 @@ def _independent_native_series(sim: PyrolysisSimulator, part: dict, *, extrapola
         if "gas_temperature_K" in series
         else _T_GAS_K,
         gas_resistance_enabled=True,
-        extrapolate_continuum=extrapolate,
+        extrapolate_continuum=False,
     )
 
 
@@ -286,37 +298,34 @@ def test_native_and_melt_fe_follow_the_invariant(
     assert part["P_eq_Pa"] > part["P_bulk_Pa"]
 
     if phase.name in _STAGE0_BAKEOUT_CAMPAIGNS:
-        ordinary = _independent_native_series(sim, part, extrapolate=False)
         assert part["status"] == "out_of_domain"
         assert part["ledger_yields_authorized"] is True
-        assert ordinary.r_gas == pytest.approx(0.0)
-        assert capacity_kg_hr == pytest.approx(ordinary.flux_kg_s_m2 * area * 3600.0)
+        assert part["series_resistance"]["r_gas"] == pytest.approx(0.0)
         assert capacity_kg_hr > 0.0
         assert residual_mol > 0.0
         assert melt_kg_hr > 0.0
+        # Stage 0 keeps ordinary HKL. It must not publish the continuation.
+        assert capacity_kg_hr != pytest.approx(_FE_CONTINUATION_CAPACITY_KG_HR)
         return
 
-    continued = _independent_native_series(sim, part, extrapolate=True)
     assert part["status"] == "extrapolated"
     assert part["ledger_yields_authorized"] is True
     assert part["evaporation_flux_status"] == "extrapolated"
     assert part["regime"] == "transitional"
     assert part["authority_level"] == "extrapolated"
     assert part["certified_band_mbar"] == pytest.approx(_CERTIFIED_BAND_MBAR)
-    assert continued.r_gas > 0.0
-    assert part["series_resistance"]["r_gas"] == pytest.approx(continued.r_gas)
-    assert part["series_resistance"]["flux_kg_s_m2"] == pytest.approx(
-        continued.flux_kg_s_m2
+    assert part["series_resistance"]["r_gas"] > 0.0
+    assert capacity_kg_hr == pytest.approx(_FE_CONTINUATION_CAPACITY_KG_HR)
+    assert part["native_fe_vapor_capacity_mol_hr"] == pytest.approx(
+        _FE_CONTINUATION_CAPACITY_MOL_HR
     )
-    assert capacity_kg_hr == pytest.approx(
-        continued.flux_kg_s_m2 * area * 3600.0
-    )
-    assert capacity_kg_hr > 0.0
-    assert part["native_fe_vapor_mol"] == pytest.approx(_POOL_MOL)
-    assert residual_mol > 0.0
-    assert melt_kg_hr > 0.0
-    assert melt_kg_hr == pytest.approx(residual_mol * molar)
+    assert part["native_fe_vapor_mol"] == pytest.approx(_FE_CONTINUATION_VAPOR_MOL)
+    assert part["native_fe_tap_mol"] == pytest.approx(_FE_CONTINUATION_TAP_MOL)
+    assert residual_mol == pytest.approx(_FE_CONTINUATION_RESIDUAL_MOL_HR)
+    assert melt_kg_hr == pytest.approx(_FE_CONTINUATION_MELT_KG_HR)
     assert melt_kg_hr < _MELT_RAW_KG_HR
+    assert area == pytest.approx(0.2)
+    assert molar == pytest.approx(0.055845)
 
 
 def test_c2a_staged_in_band_native_fe_is_unchanged(
@@ -330,7 +339,7 @@ def test_c2a_staged_in_band_native_fe_is_unchanged(
     sim.melt.p_total_mbar = _VISCOUS_PA / 100.0
     sim._melt_headspace_composition_mbar = {}
     part = sim._native_fe_partition_diagnostic(_POOL_MOL)
-    ordinary = _independent_native_series(sim, part, extrapolate=False)
+    ordinary = _in_band_native_series(sim, part)
     area = float(sim.melt.melt_surface_area_m2)
     assert part.get("status") is None
     assert part.get("ledger_yields_authorized") is None
@@ -361,7 +370,12 @@ def test_transitional_melt_fe_cap_uses_continuation_residual(
     assert part["status"] == "extrapolated"
     assert part["ledger_yields_authorized"] is True
     residual_mol = float(part["ordinary_melt_fe_residual_capacity_mol_hr"])
-    assert residual_mol > 0.0
+    assert residual_mol == pytest.approx(_FE_CONTINUATION_RESIDUAL_MOL_HR)
+    assert part["native_fe_vapor_capacity_kg_hr"] == pytest.approx(
+        _FE_CONTINUATION_CAPACITY_KG_HR
+    )
+    assert part["native_fe_vapor_mol"] == pytest.approx(_FE_CONTINUATION_VAPOR_MOL)
+    assert part["native_fe_tap_mol"] == pytest.approx(_FE_CONTINUATION_TAP_MOL)
     sim._native_fe_vapor_residual_capacity_mol_this_hr = residual_mol
     stub = IntentResult(
         intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -385,11 +399,14 @@ def test_transitional_melt_fe_cap_uses_continuation_residual(
     flux = sim._calculate_evaporation(equilibrium)
     molar = _fe_molar_mass_kg_mol(sim)
     expected = pool_first_residual_kg_hr(_MELT_RAW_KG_HR, residual_mol, molar)
-    assert expected > 0.0
-    assert flux.species_kg_hr["Fe"] == pytest.approx(expected)
+    assert expected == pytest.approx(_FE_CONTINUATION_MELT_KG_HR)
+    assert flux.species_kg_hr["Fe"] == pytest.approx(_FE_CONTINUATION_MELT_KG_HR)
     allocation = sim._last_evaporation_flux_diagnostic["native_fe_capacity_allocation"]
-    assert allocation["melt_fe_applied_kg_hr"] == pytest.approx(expected)
+    assert allocation["melt_fe_applied_kg_hr"] == pytest.approx(
+        _FE_CONTINUATION_MELT_KG_HR
+    )
     assert allocation["melt_fe_raw_kg_hr"] == pytest.approx(_MELT_RAW_KG_HR)
+    assert molar == pytest.approx(0.055845)
 
 
 def test_invalid_kn_resolves_to_a_typed_zero() -> None:
@@ -445,12 +462,12 @@ def test_c7_transitional_transport_is_a_flagged_continuation(
     assert diagnostic["evaporation_flux_status"] == "extrapolated"
     assert diagnostic["c7_transport_refusal"] == ""
     assert diagnostic["R_gas"] > 0.0
-    flux = float(diagnostic["c7_ca_flux_kg_s_m2"])
-    assert flux > 0.0
-    assert extent == pytest.approx(
-        flux * 0.2 * 3600.0 / (MOLAR_MASS["Ca"] / 1000.0) / 3.0
+    # Frozen continuation at 0.03632 mbar, 1750 C, 0.2 m^2, 1 h, ca_per_extent=3.
+    # Not recomputed from the diagnostic flux.
+    assert float(diagnostic["c7_ca_flux_kg_s_m2"]) == pytest.approx(
+        132.2801891709535
     )
-    assert extent > 0.0
+    assert extent == pytest.approx(792136.4689113438)
 
 
 def test_authorized_extrapolation_without_continuation_refuses() -> None:

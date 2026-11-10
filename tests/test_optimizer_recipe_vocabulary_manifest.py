@@ -28,11 +28,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # from 700 C to the 250 C Na/Mg collector. The generated vocabulary records
     # that one bound change; the conditional subspace dimensions/digests stay
     # unchanged.
-    # b-245: C2A p_total admission low is 0 (physical). Search stays [5, 15].
+    # b-245: C2A p_total admission is finite and >= 0 (high is null). Search
+    # stays [5, 15] on the bounds identity, not as an admission ceiling.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "c3e23cab17d0f64c6999eaa96d94c227e1da08b56d7f25b6165cab8eb4157538"
+        "01df4d1c83820786ce491b0bd759ef3a0ee7a6c10f9995623ff76d3fe596f116"
     )
-    assert digest == "76a6c6f35e0af5d8144fde5e3fdc39885bb536f2559150aaf3fcc45539425c18"
+    assert digest == "355f88914faa1944e8f4b0372a9c0e313ffe976ce8beefdb6e9ba583894025bb"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

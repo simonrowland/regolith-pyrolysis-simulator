@@ -26,7 +26,13 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
-from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    knob_search_high,
+    knob_search_low,
+)
 from simulator.optimize.strategy import bayesian
 from simulator.optimize.strategy.genetic import (
     OPTUNA_NSGA2_REQUIRED_MESSAGE,
@@ -347,10 +353,12 @@ def test_nsga2_ask_returns_schema_valid_unique_deterministic_candidates() -> Non
         assert all(not schema.is_forbidden(path) for path in candidate.patch.values)
         for spec in schema.search_allowlist:
             value = candidate.patch.values[spec.path]
-            if spec.low is not None:
-                assert float(value) >= float(spec.low)
-            if spec.high is not None:
-                assert float(value) <= float(spec.high)
+            low = knob_search_low(spec)
+            high = knob_search_high(spec)
+            if low is not None:
+                assert float(value) >= float(low)
+            if high is not None:
+                assert float(value) <= float(high)
 
 
 def test_nsga2_pressure_conditioning_updates_recorded_trial_params() -> None:

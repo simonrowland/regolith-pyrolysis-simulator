@@ -93,12 +93,25 @@ def test_c7_enabled_run_flags_transitional_transport_and_closes_mass(
     assert report["enabled"] is True
 
     products = report["products"]
-    assert products["Ca_metal"]["kg"] > 0.0
-    assert products["calcium_aluminate_cement_slag"]["kg"] > 0.0
+    # Frozen flagged-continuation products. Green refused this hold, so Ca,
+    # slag, enrichment and removal were 0 / 1.0 / 0. Not derived from the
+    # production series calculator.
+    assert products["Ca_metal"]["kg"] == pytest.approx(3.515575293230434)
+    assert products["calcium_aluminate_cement_slag"]["kg"] == pytest.approx(
+        7.900236827790157
+    )
     ree = products["residual_REE_enriched_terminal_ceramic"]
-    assert ree["REE_enrichment_factor"] > 1.0
+    assert ree["REE_enrichment_factor"] == pytest.approx(1.0099476446169866)
     assert ree["REE_retention_fraction"] == pytest.approx(1.0)
-    assert ree["mass_removal_extent_fraction"] > 0.0
+    assert ree["mass_removal_extent_fraction"] == pytest.approx(
+        0.00984966366326745
+    )
+    assert ree["REE_oxides_wt_pct_before_C7"] == pytest.approx(
+        1.4507533963224937
+    )
+    assert ree["REE_oxides_wt_pct_after_C7"] == pytest.approx(
+        1.465184975535996
+    )
     assert ree["REE_partition_source_ids"] == ["REF-056", "REF-057"]
     assert ree["REE_enrichment_derivation"] == (
         "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
@@ -116,8 +129,10 @@ def test_c7_enabled_run_flags_transitional_transport_and_closes_mass(
     assert diagnostic["regime"] == "transitional"
     assert diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert diagnostic["certified_band_mbar"] == pytest.approx([5.0, 15.0])
-    assert diagnostic["r_transport"] > 0.0
-    assert diagnostic["c7_ca_flux_kg_s_m2"] > 0.0
+    assert diagnostic["r_transport"] == pytest.approx(27152.589213216823)
+    assert diagnostic["c7_ca_flux_kg_s_m2"] == pytest.approx(
+        4.5342561270304325
+    )
     assert diagnostic["c7_overhead_pressure_pa"] == pytest.approx(5.0)
     assert diagnostic["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert diagnostic["c7_al_credit_unused_mol"] > 0.0

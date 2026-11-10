@@ -39,6 +39,7 @@ from simulator.optimize.recipe import (
     c2a_staged_stage_order,
     c5_sampler_context,
     conditional_context_metadata,
+    knob_search_high,
     knob_search_low,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
@@ -1814,8 +1815,9 @@ def _joint_refine_anchor_value(parent: RecipePatch, spec: KnobSpec) -> Any:
         return parent.values[spec.path]
     if spec.kind == "float":
         search_low = knob_search_low(spec)
+        search_high = knob_search_high(spec)
         low = 0.0 if search_low is None else float(search_low)
-        high = low if spec.high is None else float(spec.high)
+        high = low if search_high is None else float(search_high)
         return (low + high) / 2.0 if high > low else low
     if spec.kind == "int":
         search_low = knob_search_low(spec)

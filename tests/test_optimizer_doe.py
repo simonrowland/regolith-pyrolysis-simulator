@@ -34,6 +34,8 @@ from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
     _default_setpoint_value,
+    knob_search_high,
+    knob_search_low,
 )
 from simulator.optimize.study import _study_manifest_payload
 
@@ -258,10 +260,12 @@ def _assert_patch_values_match_specs(schema: RecipeSchema, patches: tuple) -> No
                 assert value in spec.choices
             elif spec.kind == "int":
                 assert isinstance(value, int)
-                assert spec.low <= value <= spec.high
+                # Sampler output stays on the search interval. Admission may
+                # be wider (C2A total pressure is finite and >= 0).
+                assert knob_search_low(spec) <= value <= knob_search_high(spec)
             elif spec.kind == "float":
                 assert isinstance(value, float)
-                assert spec.low <= value <= spec.high
+                assert knob_search_low(spec) <= value <= knob_search_high(spec)
             else:
                 raise AssertionError(f"unsupported knob kind {spec.kind!r}")
 
