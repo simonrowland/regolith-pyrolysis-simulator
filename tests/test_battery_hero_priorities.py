@@ -53,7 +53,7 @@ def _residual(
     return row
 
 
-def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
+def test_cli_filters_hero_envelope_and_scores_flagged_but_excludes_refused_rows(
     tmp_path: Path,
 ) -> None:
     hero_report = {
@@ -285,13 +285,13 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
         (row["rail"], row["species"], row["engine"], row["unit"])
         for row in groups
     ] == [
+        ("vapour", "Fe", "internal-analytical", "dex"),
         (
             "thermochemistry",
             "CaO",
             "internal-analytical",
             "kJ_per_declared_mol_basis (absolute)",
         ),
-        ("vapour", "Fe", "internal-analytical", "dex"),
         ("melt_activity", "FeO", "openimcc", "dex"),
         ("vapour", "SiO", "openimcc", "dex"),
         (
@@ -301,19 +301,20 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
             "dimensionless (ratio)",
         ),
     ]
-    calcium_enthalpy_group, iron, iron_oxide, silica, calcium_ratio_group = groups
+    iron, calcium_enthalpy_group, iron_oxide, silica, calcium_ratio_group = groups
     assert calcium_enthalpy_group["n"] == 1
     assert calcium_enthalpy_group["rms"] == pytest.approx(10.0)
     assert calcium_ratio_group["n"] == 1
     assert calcium_ratio_group["rms"] == pytest.approx(0.5)
-    assert iron["n"] == 2
+    assert iron["n"] == 3
     assert iron["unit"] == "dex"
-    assert iron["rms"] == pytest.approx(math.sqrt(12.5))
-    assert iron["median"] == pytest.approx(3.5)
-    assert iron["bias"] == pytest.approx(3.5)
-    assert iron["flagged_count"] == 1
+    assert iron["rms"] == pytest.approx(math.sqrt((3.0**2 + 4.0**2 + 100.0**2) / 3))
+    assert iron["rms_unflagged_only"] == pytest.approx(math.sqrt(12.5))
+    assert iron["median"] == pytest.approx(4.0)
+    assert iron["bias"] == pytest.approx(107 / 3)
+    assert iron["flagged_n"] == 1
     assert iron["refused_count"] == 1
-    assert iron["worst_observation_ids"] == ["fe-four", "fe-three"]
+    assert iron["worst_observation_ids"] == ["fe-flagged", "fe-four", "fe-three"]
     iron_mol = 2 * 0.055845 / resolve_species_formula(
         "Fe"
     ).molar_mass_kg_per_mol()
@@ -324,7 +325,9 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     assert silica["median"] == pytest.approx(-0.5)
     assert silica["bias"] == pytest.approx(-0.5)
     markdown = out.read_text()
-    assert "| 1 | thermochemistry | CaO | internal-analytical |" in markdown
-    assert "| 2 | vapour | Fe | internal-analytical |" in markdown
+    assert "Flagged n" in markdown
+    assert "RMS (unflagged only)" in markdown
+    assert "| 1 | vapour | Fe | internal-analytical |" in markdown
+    assert "| 2 | thermochemistry | CaO | internal-analytical |" in markdown
     assert "| 3 | melt_activity | FeO | openimcc |" in markdown
     assert "| 4 | vapour | SiO | openimcc |" in markdown
