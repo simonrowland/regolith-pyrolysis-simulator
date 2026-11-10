@@ -373,13 +373,17 @@ def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point,
 
 def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels=()):
     openimcc = pytest.importorskip("openimcc")
-    from simulator.battery.residue import _make_residue_pressure_model
+    from simulator.battery.residue import (
+        _make_residue_pressure_model,
+        _residue_gas_channels_for_engine,
+    )
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     pack = openimcc.load_gas_datapack()
     if inventory is None:
         inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
     channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
     assert not omissions
+    channels = _residue_gas_channels_for_engine("internal-analytical", channels)
     channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,
@@ -387,6 +391,29 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels
         caller="Knudsen regression",
     )
     return inventory, channels, pressure_model
+
+
+def test_non_openimcc_residue_channels_exclude_profile_only_gases() -> None:
+    from simulator.battery.residue import _residue_gas_channels_for_engine
+
+    channels = (
+        ("SiO", ("SiO2", 1.0, 0.0)),
+        ("Si2O2", ("SiO2", 2.0, 0.0)),
+        ("AlSiO", ("Al2O3", 0.5, 1.25)),
+    )
+
+    assert tuple(
+        species
+        for species, _reaction in _residue_gas_channels_for_engine(
+            "internal-analytical", channels
+        )
+    ) == ("SiO",)
+    assert tuple(
+        species
+        for species, _reaction in _residue_gas_channels_for_engine(
+            "openimcc", channels
+        )
+    ) == ("SiO", "Si2O2", "AlSiO")
 
 
 def test_internal_analytical_pressure_callback_covers_real_channels_and_oxygen():

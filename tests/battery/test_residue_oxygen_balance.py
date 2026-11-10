@@ -168,8 +168,13 @@ def _engine_models():
                 openimcc_state.parent_oxide_activities.get(parent, 0.0) or 0.0
             ) <= 0.0:
                 continue
-            match = _catalog_match(catalog_rows, species, parent)
-            assert match is not None, f"runtime catalog has no {species}/{parent} channel"
+            alpha_species = "SiO" if species in {"Si2O2", "AlSiO"} else species
+            alpha_parent = "SiO2" if species in {"Si2O2", "AlSiO"} else parent
+            match = _catalog_match(catalog_rows, alpha_species, alpha_parent)
+            assert match is not None, (
+                f"runtime catalog has no alpha row for {species}/{parent} "
+                f"via {alpha_species}/{alpha_parent}"
+            )
             catalog_name, row = match
             is_active = row.get("flux_dormant") is not True
             alpha_source = _alpha_source_for_catalog_row(catalog_name, row)
