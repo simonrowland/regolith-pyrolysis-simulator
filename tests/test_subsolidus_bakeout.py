@@ -818,6 +818,14 @@ def test_c0_same_step_pipe_cap_numeric_pin():
 
 
 def test_competing_branches_share_one_host_inventory():
+    """Equal driving force splits the host by rate, not by reaction id.
+
+    Each branch's free extent is 0.8 mol and the host has 1 mol. Name
+    order used to accept 0.8 on the alphabetically first id and 0.2 on
+    the other. Equal wants share the host, so each extent is
+    0.8 * 1 / 1.6 = 0.5 mol. Renaming the branches does not move that.
+    Total S2 stays 0.5 mol because both branches have the same gas term.
+    """
     temperature_K = 900.0
     alpha = 0.25
     p_eq = 8.0
@@ -830,31 +838,38 @@ def test_competing_branches_share_one_host_inventory():
         area_m2=1.0,
     )
     area_m2 = 0.4 / per_m2
-    result = _dispatch_bakeout(
-        temperature_C=temperature_K - 273.15,
-        vapour_batch_flux_pressures_Pa={"S2": p_eq},
-        solid_host_area_m2=area_m2,
-        max_throughput_kg_hr=1.0e6,
-        dt_hr=1.0,
-        alpha={"S2": alpha},
-        molar_mass_kg_mol={"S2": _molar("S2")},
-        reactions=[
-            _troilite_reaction(
-                reaction_id="b_branch",
-                host_remaining_mol=1.0,
-                extent_bound_mol_rxn=10.0,
-            ),
-            _troilite_reaction(
-                reaction_id="a_branch",
-                host_remaining_mol=1.0,
-                extent_bound_mol_rxn=10.0,
-            ),
-        ],
-    )
-    accepted = result.diagnostic["accepted_extent_mol_by_reaction"]
-    assert accepted["a_branch"] == pytest.approx(0.8, rel=1e-9)
-    assert accepted["b_branch"] == pytest.approx(0.2, rel=1e-9)
-    assert accepted["a_branch"] + accepted["b_branch"] == pytest.approx(1.0, rel=1e-9)
+    for first, second in (
+        ("b_branch", "a_branch"),
+        ("a_branch", "b_branch"),
+        ("z_branch", "m_branch"),
+    ):
+        result = _dispatch_bakeout(
+            temperature_C=temperature_K - 273.15,
+            vapour_batch_flux_pressures_Pa={"S2": p_eq},
+            solid_host_area_m2=area_m2,
+            max_throughput_kg_hr=1.0e6,
+            dt_hr=1.0,
+            alpha={"S2": alpha},
+            molar_mass_kg_mol={"S2": _molar("S2")},
+            reactions=[
+                _troilite_reaction(
+                    reaction_id=first,
+                    host_remaining_mol=1.0,
+                    extent_bound_mol_rxn=10.0,
+                ),
+                _troilite_reaction(
+                    reaction_id=second,
+                    host_remaining_mol=1.0,
+                    extent_bound_mol_rxn=10.0,
+                ),
+            ],
+        )
+        accepted = result.diagnostic["accepted_extent_mol_by_reaction"]
+        assert accepted[first] == pytest.approx(0.5, rel=1e-9)
+        assert accepted[second] == pytest.approx(0.5, rel=1e-9)
+        assert result.diagnostic["released_mol_by_species"]["S2"] == pytest.approx(
+            0.5, rel=1e-9
+        )
 
 
 def test_shared_host_prefers_higher_equilibrium_driving_force():
